@@ -51,4 +51,12 @@ object ExpandedName {
     val prefix: String = jqname.getPrefix
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
+
+  /** "Implicit class" for converting a String to an ExpandedName */
+  final class ToExpandedName(val s: String) {
+    def ename: ExpandedName = ExpandedName(s)
+  }
+
+  /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an ExpandedName */
+  implicit def toExpandedName(s: String): ToExpandedName = new ToExpandedName(s)
 }

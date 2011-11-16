@@ -58,4 +58,12 @@ object QName {
       case _ => sys.error("Did not expect more than 1 colon in QName '%s'".format(s))
     }
   }
+
+  /** "Implicit class" for converting a String to an UnprefixedName */
+  final class ToUnprefixedName(val s: String) {
+    def qname: QName = UnprefixedName(s)
+  }
+
+  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into an UnprefixedName */
+  implicit def toUnprefixedName(s: String): ToUnprefixedName = new ToUnprefixedName(s)
 }

@@ -116,6 +116,10 @@ trait AsElement extends Node { self =>
   /** Returns the first text child, if any, and None otherwise */
   def firstTextChild: Option[Text] = textChildren.headOption
 
+  /** Finds the parent element, if any, searching in the tree with the given root element */
+  def parentIn(root: AsElement): Option[AsElement] =
+    (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
+
   /** Returns the XML string corresponding to this element */
   override def toString: String = toString(Scope.Empty)
 
