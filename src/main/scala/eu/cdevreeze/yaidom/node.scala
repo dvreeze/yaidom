@@ -11,7 +11,7 @@ import scala.collection.immutable
  * Scala collections.</li>
  * <li>Nodes have no reference to their parent/ancestor nodes. If you want to quickly
  * find the parent element of an element, consider adding some unique "identifier" (meta)attribute for all
- * elements.</li>
+ * elements, as well as a "parent identifier" (meta)attribute.</li>
  * <li>Documents are absent in both APIs, so "owning" documents are not modeled.
  * Comments are absent as well.</li>
  * <li>Nodes have (potentially expensive) overridden equals and hashCode methods.
@@ -34,21 +34,18 @@ import scala.collection.immutable
 trait Node extends Immutable
 
 /**
- * AsElement Node as mixin. An AsElement consists of a QName of the element, the attributes mapping attribute QNames to String values,
+ * Element node. An Element consists of a QName of the element, the attributes mapping attribute QNames to String values,
  * a Scope mapping prefixes to namespace URIs, and an immutable collection of child Nodes. The element QName and attribute
  * QNames must be in scope, according to the passed Scope. The Scope is absolute, typically containing a lot more than
  * the (implicit) Scope.Declarations of this element.
  *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
- *
- * This AsElement trait can be mixed in, e.g. into XLinks. Often class Element, which extends AsElement, is used, however.
  */
-trait AsElement extends Node { self =>
-
-  val qname: QName
-  val attributes: Map[QName, String]
-  val scope: Scope
-  val children: immutable.Seq[Node]
+final case class Element(
+  qname: QName,
+  attributes: Map[QName, String],
+  scope: Scope,
+  children: immutable.Seq[Node]) extends Node { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -58,9 +55,9 @@ trait AsElement extends Node { self =>
   /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespace = None)
 
-  /** The AsElement name as ExpandedName, obtained by resolving the element QName against the Scope */
+  /** The Element name as ExpandedName, obtained by resolving the element QName against the Scope */
   val resolvedName: ExpandedName =
-    scope.resolveQName(qname).getOrElse(sys.error("AsElement name '%s' should resolve to a ExpandedName in scope [%s]".format(qname, scope)))
+    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to a ExpandedName in scope [%s]".format(qname, scope)))
 
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values, obtained by resolving attribute QNames against the attribute scope */
   val resolvedAttributes: Map[ExpandedName, String] = {
@@ -76,23 +73,23 @@ trait AsElement extends Node { self =>
   def attribute(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
 
   /** Returns the child elements */
-  def childElements: immutable.Seq[AsElement] = children collect { case e: AsElement => e }
+  def childElements: immutable.Seq[Element] = children collect { case e: Element => e }
 
   /** Returns the child elements obeying the given predicate */
-  def childElements(p: AsElement => Boolean): immutable.Seq[AsElement] = childElements.filter(p)
+  def childElements(p: Element => Boolean): immutable.Seq[Element] = childElements.filter(p)
 
   /** Returns the child elements with the given expanded name */
-  def childElements(expandedName: ExpandedName): immutable.Seq[AsElement] = childElements(e => e.resolvedName == expandedName)
+  def childElements(expandedName: ExpandedName): immutable.Seq[Element] = childElements(e => e.resolvedName == expandedName)
 
   /** Returns the child elements with the given expanded name, obeying the given predicate */
-  def childElements(expandedName: ExpandedName, p: AsElement => Boolean): immutable.Seq[AsElement] =
+  def childElements(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
     childElements(e => (e.resolvedName == expandedName) && p(e))
 
   /** Returns the descendant elements (not including this element) */
-  def descendants: immutable.Seq[AsElement] = {
+  def descendants: immutable.Seq[Element] = {
     @tailrec
-    def descendants(elems: immutable.IndexedSeq[AsElement], acc: immutable.IndexedSeq[AsElement]): immutable.IndexedSeq[AsElement] = {
-      val childElements: immutable.IndexedSeq[AsElement] = elems.flatMap(_.childElements)
+    def descendants(elems: immutable.IndexedSeq[Element], acc: immutable.IndexedSeq[Element]): immutable.IndexedSeq[Element] = {
+      val childElements: immutable.IndexedSeq[Element] = elems.flatMap(_.childElements)
 
       if (childElements.isEmpty) acc else descendants(childElements, acc ++ childElements)
     }
@@ -101,13 +98,13 @@ trait AsElement extends Node { self =>
   }
 
   /** Returns the descendant elements obeying the given predicate */
-  def descendants(p: AsElement => Boolean): immutable.Seq[AsElement] = descendants.filter(p)
+  def descendants(p: Element => Boolean): immutable.Seq[Element] = descendants.filter(p)
 
   /** Returns the descendant elements with the given expanded name */
-  def descendants(expandedName: ExpandedName): immutable.Seq[AsElement] = descendants(e => e.resolvedName == expandedName)
+  def descendants(expandedName: ExpandedName): immutable.Seq[Element] = descendants(e => e.resolvedName == expandedName)
 
   /** Returns the descendant elements with the given expanded name, obeying the given predicate */
-  def descendants(expandedName: ExpandedName, p: AsElement => Boolean): immutable.Seq[AsElement] =
+  def descendants(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
     descendants(e => (e.resolvedName == expandedName) && p(e))
 
   /** Returns the text children */
@@ -117,7 +114,7 @@ trait AsElement extends Node { self =>
   def firstTextChild: Option[Text] = textChildren.headOption
 
   /** Finds the parent element, if any, searching in the tree with the given root element */
-  def parentIn(root: AsElement): Option[AsElement] =
+  def parentIn(root: Element): Option[Element] =
     (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
 
   /** Returns the XML string corresponding to this element */
@@ -151,9 +148,6 @@ trait AsElement extends Node { self =>
     }
   }
 }
-
-final case class Element(
-  qname: QName, attributes: Map[QName, String], scope: Scope, children: immutable.Seq[Node]) extends AsElement
 
 final case class Text(val text: String) extends Node {
   require(text ne null)
