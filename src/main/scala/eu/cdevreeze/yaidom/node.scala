@@ -115,6 +115,9 @@ final class Element(
   /** Returns the first text child, if any, and None otherwise */
   def firstTextChild: Option[Text] = textChildren.headOption
 
+  /** Returns the first text child's value, if any, and None otherwise */
+  def firstTextValue: Option[String] = textChildren.headOption.map(_.text)
+
   /** Finds the parent element, if any, searching in the tree with the given root element */
   def parentIn(root: Element): Option[Element] =
     (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
@@ -170,9 +173,9 @@ object Element {
 
   def apply(
     qname: QName,
-    attributes: Map[QName, String],
-    scope: Scope,
-    children: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, children)
+    attributes: Map[QName, String] = Map(),
+    scope: Scope = Scope.Empty,
+    children: immutable.Seq[Node] = immutable.Seq()): Element = new Element(qname, attributes, scope, children)
 }
 
 final case class Text(val text: String) extends Node {
