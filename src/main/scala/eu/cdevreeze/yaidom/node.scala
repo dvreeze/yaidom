@@ -1,5 +1,6 @@
 package eu.cdevreeze.yaidom
 
+import java.{ util => jutil }
 import scala.annotation.tailrec
 import scala.collection.immutable
 
@@ -10,12 +11,10 @@ import scala.collection.immutable
  * <li>Nodes in this API are truly immutable and thread-safe, backed by immutable
  * Scala collections.</li>
  * <li>Nodes have no reference to their parent/ancestor nodes. If you want to quickly
- * find the parent element of an element, consider adding some unique "identifier" (meta)attribute for all
- * elements, as well as a "parent identifier" (meta)attribute.</li>
+ * find the parent element of an element, consider adding a "parent-uuid" (meta)attribute for all
+ * elements but the root.</li>
  * <li>Documents are absent in both APIs, so "owning" documents are not modeled.
  * Comments are absent as well.</li>
- * <li>Nodes have (potentially expensive) overridden equals and hashCode methods.
- * Be careful when creating Sets of Nodes!</li>
  * </ul>
  * Unlike Anti-XML:
  * <ul>
@@ -28,10 +27,10 @@ import scala.collection.immutable
  * Moreover, Scopes are first-class citizens as well. By explicitly modeling QNames, ExpandedNames and Scopes,
  * the user of the API is somewhat shielded from some XML quirks.</li>
  * <li>This API is less ambitious. Like said above, XPath support is absent. So is support for "updates" through
- * zippers. It is currently also less mature, and less well tested.</li>
+ * zippers. So is true equality based on the exact tree. It is currently also less mature, and less well tested.</li>
  * </ul>
  */
-trait Node extends Immutable
+sealed trait Node extends Immutable
 
 /**
  * Element node. An Element consists of a QName of the element, the attributes mapping attribute QNames to String values,
@@ -41,16 +40,19 @@ trait Node extends Immutable
  *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
  */
-final case class Element(
-  qname: QName,
-  attributes: Map[QName, String],
-  scope: Scope,
-  children: immutable.Seq[Node]) extends Node { self =>
+final class Element(
+  val qname: QName,
+  val attributes: Map[QName, String],
+  val scope: Scope,
+  val children: immutable.Seq[Node]) extends Node { self =>
 
   require(qname ne null)
   require(attributes ne null)
   require(scope ne null)
   require(children ne null)
+
+  /** Unique identifier of the element */
+  val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespace = None)
@@ -117,11 +119,26 @@ final case class Element(
   def parentIn(root: Element): Option[Element] =
     (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
 
+  /** Creates a copy, but with the children passed as parameter newChildren */
+  def withChildren(newChildren: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, newChildren)
+
+  /** Equality based on the UUID. Fast but depends not only on the tree itself, but also the time of creation */
+  override def equals(other: Any): Boolean = other match {
+    case e: Element => self.uuid == e.uuid
+    case _ => false
+  }
+
+  /** Hash code, consistent with equals */
+  override def hashCode: Int = uuid.hashCode
+
+  /** Returns the XML string corresponding to this element, without the children (but ellipsis instead) */
+  override def toString: String = withChildren(immutable.Seq[Node](Text(" ... "))).toXmlString(Scope.Empty)
+
   /** Returns the XML string corresponding to this element */
-  override def toString: String = toString(Scope.Empty)
+  def toXmlString: String = toXmlString(Scope.Empty)
 
   /** Returns the XML string corresponding to this element, taking the given parent Scope into account */
-  def toString(parentScope: Scope): String = toLines("", parentScope).mkString("%n".format())
+  def toXmlString(parentScope: Scope): String = toLines("", parentScope).mkString("%n".format())
 
   private def toLines(indent: String, parentScope: Scope): List[String] = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
@@ -147,6 +164,15 @@ final case class Element(
       (firstLine :: childElementLines ::: List(lastLine)).map(ln => indent + ln)
     }
   }
+}
+
+object Element {
+
+  def apply(
+    qname: QName,
+    attributes: Map[QName, String],
+    scope: Scope,
+    children: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, children)
 }
 
 final case class Text(val text: String) extends Node {
