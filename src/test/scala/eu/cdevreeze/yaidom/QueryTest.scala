@@ -494,257 +494,171 @@ class QueryTest extends Suite {
     Element(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Text("A First Course in Database Systems"))),
         Element(
           qname = QName("Authors"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Jeffrey"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Ullman"))))),
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Jennifer"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Widom")))))))))
 
   private val book2 =
     Element(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Text("Database Systems: The Complete Book"))),
         Element(
           qname = QName("Authors"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Hector"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Garcia-Molina"))))),
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Jeffrey"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Ullman"))))),
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Jennifer"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Widom"))))))),
         Element(
           qname = QName("Remark"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(Text("Buy this book bundled with \"A First Course\" - a great deal!")))))
 
   private val book3 =
     Element(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Text("Hector and Jeff's Database Hints"))),
         Element(
           qname = QName("Authors"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Jeffrey"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Ullman"))))),
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Hector"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Garcia-Molina"))))))),
         Element(
           qname = QName("Remark"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(Text("An indispensable companion to your textbook")))))
 
   private val book4 =
     Element(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Text("Jennifer's Economical Database Hints"))),
         Element(
           qname = QName("Authors"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(
             Element(
               qname = QName("Author"),
-              attributes = Map(),
-              scope = Scope.Empty,
               children = immutable.IndexedSeq(
                 Element(
                   qname = QName("First_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Jennifer"))),
                 Element(
                   qname = QName("Last_Name"),
-                  attributes = Map(),
-                  scope = Scope.Empty,
                   children = immutable.IndexedSeq(Text("Widom")))))))))
 
   private val magazine1 =
     Element(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(Text("National Geographic")))))
 
   private val magazine2 =
     Element(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(Text("National Geographic")))))
 
   private val magazine3 =
     Element(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(Text("Newsweek")))))
 
   private val magazine4 =
     Element(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         Element(
           qname = QName("Title"),
-          attributes = Map(),
-          scope = Scope.Empty,
           children = immutable.IndexedSeq(Text("Hector and Jeff's Database Hints")))))
 
   private def sampleXml: Element =
     Element(
       qname = QName("Bookstore"),
-      attributes = Map(),
-      scope = Scope.Empty,
       children = immutable.IndexedSeq(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
 }
