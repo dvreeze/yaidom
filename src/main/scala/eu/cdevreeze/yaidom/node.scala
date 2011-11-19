@@ -44,7 +44,7 @@ final class Element(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  val children: immutable.Seq[Node]) extends Node { self =>
+  val children: immutable.IndexedSeq[Node]) extends Node { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -123,7 +123,7 @@ final class Element(
     (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
 
   /** Creates a copy, but with the children passed as parameter newChildren */
-  def withChildren(newChildren: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, newChildren)
+  def withChildren(newChildren: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, newChildren.toIndexedSeq)
 
   /** Equality based on the UUID. Fast but depends not only on the tree itself, but also the time of creation */
   override def equals(other: Any): Boolean = other match {
@@ -175,7 +175,7 @@ object Element {
     qname: QName,
     attributes: Map[QName, String] = Map(),
     scope: Scope = Scope.Empty,
-    children: immutable.Seq[Node] = immutable.Seq()): Element = new Element(qname, attributes, scope, children)
+    children: immutable.Seq[Node] = immutable.Seq()): Element = new Element(qname, attributes, scope, children.toIndexedSeq)
 }
 
 final case class Text(val text: String) extends Node {
