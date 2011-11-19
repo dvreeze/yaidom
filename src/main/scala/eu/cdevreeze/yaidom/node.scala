@@ -39,6 +39,9 @@ sealed trait Node extends Immutable
  * the (implicit) Scope.Declarations of this element.
  *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
+ *
+ * The API is geared towards data-oriented XML that uses namespaces, and that is described in schemas (so that the user of this
+ * API knows the structure of the XML being processed). The methods that return an Option say so in their name.
  */
 final class Element(
   val qname: QName,
@@ -59,20 +62,23 @@ final class Element(
 
   /** The Element name as ExpandedName, obtained by resolving the element QName against the Scope */
   val resolvedName: ExpandedName =
-    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to a ExpandedName in scope [%s]".format(qname, scope)))
+    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an ExpandedName in scope [%s]".format(qname, scope)))
 
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values, obtained by resolving attribute QNames against the attribute scope */
   val resolvedAttributes: Map[ExpandedName, String] = {
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attributeScope.resolveQName(attName).getOrElse(sys.error("Attribute name '%s' should resolve to a ExpandedName in scope [%s]".format(attName, attributeScope)))
+      val expandedName = attributeScope.resolveQName(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an ExpandedName in scope [%s]".format(attName, attributeScope)))
       (expandedName -> attValue)
     }
   }
 
   /** Returns the value of the attribute with the given expanded name, if any, and None otherwise */
-  def attribute(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
+  def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
+
+  /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
+  def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements */
   def childElements: immutable.Seq[Element] = children collect { case e: Element => e }
@@ -86,6 +92,20 @@ final class Element(
   /** Returns the child elements with the given expanded name, obeying the given predicate */
   def childElements(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
     childElements(e => (e.resolvedName == expandedName) && p(e))
+
+  /** Returns the single child element with the given expanded name, if any, and None otherwise */
+  def childElemOption(expandedName: ExpandedName): Option[Element] = {
+    val result = childElements(expandedName)
+    require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
+    result.headOption
+  }
+
+  /** Returns the single child element with the given expanded name, and throws an exception otherwise */
+  def childElem(expandedName: ExpandedName): Element = {
+    val result = childElements(expandedName)
+    require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
+    result.head
+  }
 
   /** Returns the descendant elements (not including this element) */
   def descendants: immutable.Seq[Element] = {
@@ -113,13 +133,19 @@ final class Element(
   def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
 
   /** Returns the first text child, if any, and None otherwise */
-  def firstTextChild: Option[Text] = textChildren.headOption
+  def firstTextChildOption: Option[Text] = textChildren.headOption
 
   /** Returns the first text child's value, if any, and None otherwise */
-  def firstTextValue: Option[String] = textChildren.headOption.map(_.text)
+  def firstTextValueOption: Option[String] = textChildren.headOption.map(_.text)
+
+  /** Returns the first text child, if any, and None otherwise */
+  def firstTextChild: Text = firstTextChildOption.getOrElse(sys.error("Missing text child"))
+
+  /** Returns the first text child's value, if any, and None otherwise */
+  def firstTextValue: String = firstTextValueOption.getOrElse(sys.error("Missing text child"))
 
   /** Finds the parent element, if any, searching in the tree with the given root element */
-  def parentIn(root: Element): Option[Element] =
+  def parentInTreeOption(root: Element): Option[Element] =
     (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
 
   /** Creates a copy, but with the children passed as parameter newChildren */
