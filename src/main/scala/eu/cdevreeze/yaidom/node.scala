@@ -81,28 +81,28 @@ final class Element(
   def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements */
-  def childElements: immutable.Seq[Element] = children collect { case e: Element => e }
+  def childElems: immutable.Seq[Element] = children collect { case e: Element => e }
 
   /** Returns the child elements obeying the given predicate */
-  def childElements(p: Element => Boolean): immutable.Seq[Element] = childElements.filter(p)
+  def childElems(p: Element => Boolean): immutable.Seq[Element] = childElems.filter(p)
 
   /** Returns the child elements with the given expanded name */
-  def childElements(expandedName: ExpandedName): immutable.Seq[Element] = childElements(e => e.resolvedName == expandedName)
+  def childElems(expandedName: ExpandedName): immutable.Seq[Element] = childElems(e => e.resolvedName == expandedName)
 
   /** Returns the child elements with the given expanded name, obeying the given predicate */
-  def childElements(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
-    childElements(e => (e.resolvedName == expandedName) && p(e))
+  def childElems(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
+    childElems(e => (e.resolvedName == expandedName) && p(e))
 
   /** Returns the single child element with the given expanded name, if any, and None otherwise */
   def childElemOption(expandedName: ExpandedName): Option[Element] = {
-    val result = childElements(expandedName)
+    val result = childElems(expandedName)
     require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.headOption
   }
 
   /** Returns the single child element with the given expanded name, and throws an exception otherwise */
   def childElem(expandedName: ExpandedName): Element = {
-    val result = childElements(expandedName)
+    val result = childElems(expandedName)
     require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.head
   }
@@ -111,9 +111,9 @@ final class Element(
   def descendants: immutable.Seq[Element] = {
     @tailrec
     def descendants(elems: immutable.IndexedSeq[Element], acc: immutable.IndexedSeq[Element]): immutable.IndexedSeq[Element] = {
-      val childElements: immutable.IndexedSeq[Element] = elems.flatMap(_.childElements)
+      val childElems: immutable.IndexedSeq[Element] = elems.flatMap(_.childElems)
 
-      if (childElements.isEmpty) acc else descendants(childElements, acc ++ childElements)
+      if (childElems.isEmpty) acc else descendants(childElems, acc ++ childElems)
     }
 
     descendants(immutable.IndexedSeq(self), immutable.IndexedSeq())
@@ -146,7 +146,7 @@ final class Element(
 
   /** Finds the parent element, if any, searching in the tree with the given root element */
   def parentInTreeOption(root: Element): Option[Element] =
-    (root.descendants :+ root).find(e => e.childElements.exists(ch => ch == self))
+    (root.descendants :+ root).find(e => e.childElems.exists(ch => ch == self))
 
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, newChildren.toIndexedSeq)
@@ -177,7 +177,7 @@ final class Element(
     if (self.children.isEmpty) {
       val line = "<%s />".format(List(qname, declarationsString, attrsString).filterNot(_ == "").mkString(" "))
       List(line).map(ln => indent + ln)
-    } else if (this.childElements.isEmpty) {
+    } else if (this.childElems.isEmpty) {
       val line = "<%s>%s</%s>".format(
         List(qname, declarationsString, attrsString).filterNot(_ == "").mkString(" "),
         children.map(_.toString).mkString,
@@ -187,7 +187,7 @@ final class Element(
       val firstLine: String = "<%s>".format(List(qname, declarationsString, attrsString).filterNot(_ == "").mkString(" "))
       val lastLine: String = "</%s>".format(qname)
       // Recursive (not tail-recursive) calls, ignoring non-element children
-      val childElementLines: List[String] = self.childElements.toList.flatMap({ e =>
+      val childElementLines: List[String] = self.childElems.toList.flatMap({ e =>
         e.toLines("  ", self.scope)
       })
       (firstLine :: childElementLines ::: List(lastLine)).map(ln => indent + ln)
