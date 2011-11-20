@@ -214,7 +214,7 @@ final case class Text(text: String) extends Node {
   override def toString: String = text
 }
 
-final case class ProcessingInstruction(target: String, val data: String) extends Node {
+final case class ProcessingInstruction(target: String, data: String) extends Node {
   require(target ne null)
   require(data ne null)
 
