@@ -26,7 +26,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookTitles: immutable.Seq[Element] =
+    val bookTitles: immutable.Seq[Elem] =
       bookstore.childElems("Book".ename) map { e => e.childElem("Title".ename) }
 
     expect(Set(
@@ -44,7 +44,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookOrMagazineTitles: immutable.Seq[Element] =
+    val bookOrMagazineTitles: immutable.Seq[Elem] =
       for {
         bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
       } yield bookOrMagazine.childElem("Title".ename)
@@ -66,7 +66,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val titles: immutable.Seq[Element] =
+    val titles: immutable.Seq[Elem] =
       for (ch <- bookstore.childElems) yield ch.childElem("Title".ename)
 
     expect(Set(
@@ -86,7 +86,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val titles: immutable.Seq[Element] =
+    val titles: immutable.Seq[Elem] =
       for (title <- bookstore.elems("Title".ename)) yield title
 
     expect(Set(
@@ -106,7 +106,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elements: immutable.Seq[Element] = bookstore.elems :+ bookstore
+    val elements: immutable.Seq[Elem] = bookstore.elems :+ bookstore
 
     assert(elements.contains(bookstore), "Expected element 'Bookstore', among others")
     assert(elements.size > 10, "Expected more than 10 elements")
@@ -139,7 +139,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val books: immutable.Seq[Element] =
+    val books: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val price = book.attribute("Price".ename)
@@ -158,7 +158,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val titles: immutable.Seq[Element] =
+    val titles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         if book.attribute("Price".ename).toInt < 90
@@ -178,7 +178,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookTitles: immutable.Seq[Element] =
+    val bookTitles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         if !book.childElems("Remark".ename).isEmpty
@@ -197,7 +197,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookTitles: immutable.Seq[Element] =
+    val bookTitles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         if book.attribute("Price".ename).toInt < 90
@@ -223,7 +223,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookTitles: immutable.Seq[Element] =
+    val bookTitles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         if book.attribute("Price".ename).toInt < 90
@@ -251,7 +251,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookTitles: immutable.Seq[Element] =
+    val bookTitles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val authors = book.childElem("Authors".ename)
@@ -274,7 +274,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val secondAuthors: immutable.Seq[Element] =
+    val secondAuthors: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val authors = book.childElem("Authors".ename)
@@ -283,7 +283,7 @@ class QueryTest extends Suite {
         secondAuthor <- authorColl.drop(1).headOption
       } yield secondAuthor
 
-    val secondAuthorLastNames: immutable.Seq[Element] = secondAuthors.map(e => e.childElem("Last_Name".ename))
+    val secondAuthorLastNames: immutable.Seq[Elem] = secondAuthors.map(e => e.childElem("Last_Name".ename))
     expect(Set(
       "Widom",
       "Ullman",
@@ -298,7 +298,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val titles: immutable.Seq[Element] =
+    val titles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         remark <- book.childElems("Remark".ename)
@@ -316,7 +316,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val magazines: immutable.Seq[Element] =
+    val magazines: immutable.Seq[Elem] =
       for {
         magazine <- bookstore.childElems("Magazine".ename)
         val magazineTitle: String = magazine.childElem("Title".ename).firstTextValue
@@ -339,7 +339,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elems: immutable.Seq[Element] =
+    val elems: immutable.Seq[Elem] =
       for {
         desc <- bookstore.elems
         parent <- desc.parentInTreeOption(bookstore)
@@ -359,7 +359,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val booksAndMagazines: immutable.Seq[Element] =
+    val booksAndMagazines: immutable.Seq[Elem] =
       for {
         bookOrMagazine <- bookstore.childElems(e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName))
         val titleString: String = bookOrMagazine.childElem("Title".ename).firstTextValue
@@ -380,7 +380,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val booksAndMagazines: immutable.Seq[Element] =
+    val booksAndMagazines: immutable.Seq[Elem] =
       for {
         bookOrMagazine <- bookstore.childElems(e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName))
         val titleString: String = bookOrMagazine.childElem("Title".ename).firstTextValue
@@ -411,7 +411,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val books: immutable.Seq[Element] =
+    val books: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val authorNames: Set[String] = (for {
@@ -432,7 +432,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val titles: immutable.Seq[Element] =
+    val titles: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val authorNames: Set[String] = book.elems("Author".ename).map(_.childElem("Last_Name".ename).firstTextValue).toSet
@@ -460,18 +460,18 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val titleAndFirstNames: immutable.Seq[Element] =
+    val titleAndFirstNames: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val title = book.childElem("Title".ename)
         val authorFirstNames: Set[String] = book.elems("Author".ename).map(_.childElem("First_Name".ename).firstTextValue).toSet
         val searchedForFirstNames: Set[String] = authorFirstNames.filter(firstName => title.firstTextValue.indexOf(firstName) >= 0)
         if !searchedForFirstNames.isEmpty
-      } yield Element(
+      } yield Elem(
         qname = "Book".qname,
         children = List(
           title,
-          Element(qname = "First_Name".qname, children = List(Text(searchedForFirstNames.head)))))
+          Elem(qname = "First_Name".qname, children = List(Text(searchedForFirstNames.head)))))
 
     expect(2) {
       titleAndFirstNames.size
@@ -500,7 +500,7 @@ class QueryTest extends Suite {
         val price = book.attribute("Price".ename).toDouble
       } yield price
     val averagePrice =
-      Element(qname = "Average".qname,
+      Elem(qname = "Average".qname,
         children = List(Text((prices.sum.toDouble / prices.size).toString)))
 
     expect(65) {
@@ -532,16 +532,16 @@ class QueryTest extends Suite {
 
     val avg: Double = prices.sum.toDouble / prices.size
 
-    val cheapBooks: immutable.Seq[Element] =
+    val cheapBooks: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         val price = book.attribute("Price".ename).toDouble
         if price < avg
-      } yield Element(
+      } yield Elem(
         qname = "Book".qname,
         children = List(
           book.childElem("Title".ename),
-          Element(
+          Elem(
             qname = "Price".qname,
             children = List(Text(price.toString)))))
 
@@ -571,21 +571,21 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    def cheaper(book1: Element, book2: Element): Boolean = {
+    def cheaper(book1: Elem, book2: Elem): Boolean = {
       val price1 = book1.attribute("Price".ename).toInt
       val price2 = book2.attribute("Price".ename).toInt
       price1 < price2
     }
 
-    val books: immutable.Seq[Element] = {
+    val books: immutable.Seq[Elem] = {
       for {
         book <- bookstore.childElems("Book".ename).sortWith(cheaper _)
         val price = book.attribute("Price".ename).toDouble
-      } yield Element(
+      } yield Elem(
         qname = "Book".qname,
         children = List(
           book.childElem("Title".ename),
-          Element(
+          Elem(
             qname = "Price".qname,
             children = List(Text(price.toString)))))
     }
@@ -648,7 +648,7 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    def bookAuthorLastNames(book: Element): Set[String] = {
+    def bookAuthorLastNames(book: Elem): Set[String] = {
       val authors = book.childElem("Authors".ename)
       (for {
         author <- authors.childElems("Author".ename)
@@ -657,21 +657,21 @@ class QueryTest extends Suite {
       } yield lastNameValue).toSet
     }
 
-    def bookTitle(book: Element): String = book.childElem("Title".ename).firstTextValue
+    def bookTitle(book: Elem): String = book.childElem("Title".ename).firstTextValue
 
-    val pairs: immutable.Seq[Element] =
+    val pairs: immutable.Seq[Elem] =
       for {
         book1 <- bookstore.childElems("Book".ename)
         book2 <- bookstore.childElems("Book".ename)
         if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
         if bookTitle(book1) < bookTitle(book2)
-      } yield Element(
+      } yield Elem(
         qname = "BookPair".qname,
         children = List(
-          Element(
+          Elem(
             qname = "Title1".qname,
             children = List(Text(bookTitle(book1)))),
-          Element(
+          Elem(
             qname = "Title2".qname,
             children = List(Text(bookTitle(book2))))))
 
@@ -721,213 +721,213 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    def books(authorLastName: String): immutable.Seq[Element] =
+    def books(authorLastName: String): immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         author <- book.elems("Author".ename)
         if author.childElem("Last_Name".ename).firstTextValue == authorLastName
-      } yield Element(
+      } yield Elem(
         qname = "Book".qname,
         attributes = book.attributes.filterKeys(a => Set("ISBN".qname, "Price".qname).contains(a)),
         children = book.childElems("Title".ename))
 
-    val authorsWithBooks: immutable.Seq[Element] =
+    val authorsWithBooks: immutable.Seq[Elem] =
       for {
         lastNameValue <- bookstore.elems("Author".ename).map(e => e.childElem("Last_Name".ename).firstTextValue).distinct
       } yield {
-        val author: Element =
+        val author: Elem =
           (for {
             author <- bookstore.elems("Author".ename)
             if author.childElem("Last_Name".ename).firstTextValue == lastNameValue
           } yield author).head
         val firstNameValue: String = author.childElem("First_Name".ename).firstTextValue
 
-        Element(
+        Elem(
           qname = "Author".qname,
           children = List(
-            Element(
+            Elem(
               qname = "First_Name".qname,
               children = List(Text(firstNameValue))),
-            Element(
+            Elem(
               qname = "Last_Name".qname,
               children = List(Text(lastNameValue)))) ++ books(lastNameValue))
       }
 
-    val invertedBookstore: Element = Element(qname = "InvertedBookstore".qname, children = authorsWithBooks)
+    val invertedBookstore: Elem = Elem(qname = "InvertedBookstore".qname, children = authorsWithBooks)
 
     expect(3) {
       invertedBookstore.childElems.size
     }
   }
 
-  private val book1: Element =
-    Element(
+  private val book1: Elem =
+    Elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(
             Text("A First Course in Database Systems"))),
-        Element(
+        Elem(
           qname = QName("Authors"),
           children = List(
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Jeffrey"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Ullman"))))),
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Jennifer"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Widom")))))))))
 
   private val book2 =
-    Element(
+    Elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(
             Text("Database Systems: The Complete Book"))),
-        Element(
+        Elem(
           qname = QName("Authors"),
           children = List(
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Hector"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Garcia-Molina"))))),
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Jeffrey"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Ullman"))))),
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Jennifer"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Widom"))))))),
-        Element(
+        Elem(
           qname = QName("Remark"),
           children = List(Text("Buy this book bundled with \"A First Course\" - a great deal!")))))
 
   private val book3 =
-    Element(
+    Elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(
             Text("Hector and Jeff's Database Hints"))),
-        Element(
+        Elem(
           qname = QName("Authors"),
           children = List(
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Jeffrey"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Ullman"))))),
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Hector"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Garcia-Molina"))))))),
-        Element(
+        Elem(
           qname = QName("Remark"),
           children = List(Text("An indispensable companion to your textbook")))))
 
   private val book4 =
-    Element(
+    Elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(
             Text("Jennifer's Economical Database Hints"))),
-        Element(
+        Elem(
           qname = QName("Authors"),
           children = List(
-            Element(
+            Elem(
               qname = QName("Author"),
               children = List(
-                Element(
+                Elem(
                   qname = QName("First_Name"),
                   children = List(Text("Jennifer"))),
-                Element(
+                Elem(
                   qname = QName("Last_Name"),
                   children = List(Text("Widom")))))))))
 
   private val magazine1 =
-    Element(
+    Elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(Text("National Geographic")))))
 
   private val magazine2 =
-    Element(
+    Elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(Text("National Geographic")))))
 
   private val magazine3 =
-    Element(
+    Elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(Text("Newsweek")))))
 
   private val magazine4 =
-    Element(
+    Elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = List(
-        Element(
+        Elem(
           qname = QName("Title"),
           children = List(Text("Hector and Jeff's Database Hints")))))
 
-  private def sampleXml: Element =
-    Element(
+  private def sampleXml: Elem =
+    Elem(
       qname = QName("Bookstore"),
       children = List(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
