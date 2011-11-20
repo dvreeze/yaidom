@@ -50,7 +50,7 @@ final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  val children: immutable.IndexedSeq[Node]) extends Node { self =>
+  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -63,7 +63,7 @@ final class Elem(
   val attributeScope: Scope = scope.copy(defaultNamespace = None)
 
   /** The Elem name as ExpandedName, obtained by resolving the element QName against the Scope */
-  val resolvedName: ExpandedName =
+  override val resolvedName: ExpandedName =
     scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an ExpandedName in scope [%s]".format(qname, scope)))
 
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values, obtained by resolving attribute QNames against the attribute scope */
@@ -83,53 +83,7 @@ final class Elem(
   def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements */
-  def childElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
-
-  /** Returns the child elements obeying the given predicate */
-  def childElems(p: Elem => Boolean): immutable.Seq[Elem] = childElems.filter(p)
-
-  /** Returns the child elements with the given expanded name */
-  def childElems(expandedName: ExpandedName): immutable.Seq[Elem] = childElems(e => e.resolvedName == expandedName)
-
-  /** Returns the child elements with the given expanded name, obeying the given predicate */
-  def childElems(expandedName: ExpandedName, p: Elem => Boolean): immutable.Seq[Elem] =
-    childElems(e => (e.resolvedName == expandedName) && p(e))
-
-  /** Returns the single child element with the given expanded name, if any, and None otherwise */
-  def childElemOption(expandedName: ExpandedName): Option[Elem] = {
-    val result = childElems(expandedName)
-    require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
-    result.headOption
-  }
-
-  /** Returns the single child element with the given expanded name, and throws an exception otherwise */
-  def childElem(expandedName: ExpandedName): Elem = {
-    val result = childElems(expandedName)
-    require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
-    result.head
-  }
-
-  /** Returns the descendant elements (not including this element) */
-  def elems: immutable.Seq[Elem] = {
-    @tailrec
-    def elems(elms: immutable.IndexedSeq[Elem], acc: immutable.IndexedSeq[Elem]): immutable.IndexedSeq[Elem] = {
-      val childElms: immutable.IndexedSeq[Elem] = elms.flatMap(_.childElems)
-
-      if (childElms.isEmpty) acc else elems(childElms, acc ++ childElms)
-    }
-
-    elems(immutable.IndexedSeq(self), immutable.IndexedSeq())
-  }
-
-  /** Returns the descendant elements obeying the given predicate */
-  def elems(p: Elem => Boolean): immutable.Seq[Elem] = elems.filter(p)
-
-  /** Returns the descendant elements with the given expanded name */
-  def elems(expandedName: ExpandedName): immutable.Seq[Elem] = elems(e => e.resolvedName == expandedName)
-
-  /** Returns the descendant elements with the given expanded name, obeying the given predicate */
-  def elems(expandedName: ExpandedName, p: Elem => Boolean): immutable.Seq[Elem] =
-    elems(e => (e.resolvedName == expandedName) && p(e))
+  override def childElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
 
   /** Returns the text children */
   def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
