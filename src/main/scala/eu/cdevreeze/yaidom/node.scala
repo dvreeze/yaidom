@@ -10,9 +10,8 @@ import scala.collection.immutable
  * <ul>
  * <li>Nodes in this API are truly immutable and thread-safe, backed by immutable
  * Scala collections.</li>
- * <li>Nodes have no reference to their parent/ancestor nodes. If you want to quickly
- * find the parent element of an element, consider adding a "parent-uuid" (meta)attribute for all
- * elements but the root.</li>
+ * <li>Nodes have no reference to their parent/ancestor nodes. These nodes can be re-used in several
+ * XML trees.</li>
  * <li>Documents are absent in both APIs, so "owning" documents are not modeled.
  * Comments are absent as well.</li>
  * </ul>
@@ -30,7 +29,11 @@ import scala.collection.immutable
  * zippers. So is true equality based on the exact tree. It is currently also less mature, and less well tested.</li>
  * </ul>
  */
-sealed trait Node extends Immutable
+sealed trait Node extends Immutable {
+
+  /** The unique ID of the immutable Node (and its subtree). "Updates" result in new UUIDs. */
+  val uuid: jutil.UUID
+}
 
 /**
  * Element node. An Element consists of a QName of the element, the attributes mapping attribute QNames to String values,
@@ -54,8 +57,7 @@ final class Element(
   require(scope ne null)
   require(children ne null)
 
-  /** Unique identifier of the element */
-  val uuid: jutil.UUID = jutil.UUID.randomUUID
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespace = None)
@@ -111,9 +113,9 @@ final class Element(
   def descendants: immutable.Seq[Element] = {
     @tailrec
     def descendants(elems: immutable.IndexedSeq[Element], acc: immutable.IndexedSeq[Element]): immutable.IndexedSeq[Element] = {
-      val childElems: immutable.IndexedSeq[Element] = elems.flatMap(_.childElems)
+      val childElms: immutable.IndexedSeq[Element] = elems.flatMap(_.childElems)
 
-      if (childElems.isEmpty) acc else descendants(childElems, acc ++ childElems)
+      if (childElms.isEmpty) acc else descendants(childElms, acc ++ childElms)
     }
 
     descendants(immutable.IndexedSeq(self), immutable.IndexedSeq())
@@ -204,27 +206,35 @@ object Element {
     children: immutable.Seq[Node] = immutable.Seq()): Element = new Element(qname, attributes, scope, children.toIndexedSeq)
 }
 
-final case class Text(val text: String) extends Node {
+final case class Text(text: String) extends Node {
   require(text ne null)
+
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toString: String = text
 }
 
-final case class ProcessingInstruction(val target: String, val data: String) extends Node {
+final case class ProcessingInstruction(target: String, val data: String) extends Node {
   require(target ne null)
   require(data ne null)
+
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toString: String = """<?%s %s?>""".format(target, data)
 }
 
-final case class CData(val text: String) extends Node {
+final case class CData(text: String) extends Node {
   require(text ne null)
+
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toString: String = """<![CDATA[%s]]>""".format(text)
 }
 
-final case class EntityRef(val entity: String) extends Node {
+final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
+
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toString: String = """&%s;""".format(entity)
 }
