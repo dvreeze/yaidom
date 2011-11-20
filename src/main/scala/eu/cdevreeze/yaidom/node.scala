@@ -100,10 +100,6 @@ final class Elem(
   /** Returns the first text child's value, if any, and None otherwise */
   def firstTextValue: String = firstTextValueOption.getOrElse(sys.error("Missing text child"))
 
-  /** Finds the parent element, if any, searching in the tree with the given root element */
-  def parentInTreeOption(root: Elem): Option[Elem] =
-    (root.elems :+ root).find(e => e.childElems.exists(ch => ch == self))
-
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 

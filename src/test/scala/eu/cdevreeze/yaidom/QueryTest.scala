@@ -342,7 +342,7 @@ class QueryTest extends Suite {
     val elems: immutable.Seq[Elem] =
       for {
         desc <- bookstore.elems
-        parent <- desc.parentInTreeOption(bookstore)
+        parent <- desc.findParentInTree(bookstore)
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
 

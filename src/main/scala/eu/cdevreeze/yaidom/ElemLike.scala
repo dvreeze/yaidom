@@ -3,6 +3,9 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 import scala.annotation.tailrec
 
+/**
+ * Supertrait for Elems, among others.
+ */
 trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Resolved name of the element, as ExpandedName */
@@ -56,4 +59,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the descendant elements with the given expanded name, obeying the given predicate */
   final def elems(expandedName: ExpandedName, p: E => Boolean): immutable.Seq[E] =
     elems(e => (e.resolvedName == expandedName) && p(e))
+
+  /** Finds the parent element, if any, searching in the tree with the given root element. Typically expensive. */
+  final def findParentInTree(root: E): Option[E] =
+    (root.elems :+ root).find(e => e.childElems.exists(ch => ch == self))
 }
