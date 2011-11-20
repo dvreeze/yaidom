@@ -110,26 +110,26 @@ final class Element(
   }
 
   /** Returns the descendant elements (not including this element) */
-  def descendants: immutable.Seq[Element] = {
+  def elems: immutable.Seq[Element] = {
     @tailrec
-    def descendants(elems: immutable.IndexedSeq[Element], acc: immutable.IndexedSeq[Element]): immutable.IndexedSeq[Element] = {
-      val childElms: immutable.IndexedSeq[Element] = elems.flatMap(_.childElems)
+    def elems(elms: immutable.IndexedSeq[Element], acc: immutable.IndexedSeq[Element]): immutable.IndexedSeq[Element] = {
+      val childElms: immutable.IndexedSeq[Element] = elms.flatMap(_.childElems)
 
-      if (childElms.isEmpty) acc else descendants(childElms, acc ++ childElms)
+      if (childElms.isEmpty) acc else elems(childElms, acc ++ childElms)
     }
 
-    descendants(immutable.IndexedSeq(self), immutable.IndexedSeq())
+    elems(immutable.IndexedSeq(self), immutable.IndexedSeq())
   }
 
   /** Returns the descendant elements obeying the given predicate */
-  def descendants(p: Element => Boolean): immutable.Seq[Element] = descendants.filter(p)
+  def elems(p: Element => Boolean): immutable.Seq[Element] = elems.filter(p)
 
   /** Returns the descendant elements with the given expanded name */
-  def descendants(expandedName: ExpandedName): immutable.Seq[Element] = descendants(e => e.resolvedName == expandedName)
+  def elems(expandedName: ExpandedName): immutable.Seq[Element] = elems(e => e.resolvedName == expandedName)
 
   /** Returns the descendant elements with the given expanded name, obeying the given predicate */
-  def descendants(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
-    descendants(e => (e.resolvedName == expandedName) && p(e))
+  def elems(expandedName: ExpandedName, p: Element => Boolean): immutable.Seq[Element] =
+    elems(e => (e.resolvedName == expandedName) && p(e))
 
   /** Returns the text children */
   def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
@@ -148,7 +148,7 @@ final class Element(
 
   /** Finds the parent element, if any, searching in the tree with the given root element */
   def parentInTreeOption(root: Element): Option[Element] =
-    (root.descendants :+ root).find(e => e.childElems.exists(ch => ch == self))
+    (root.elems :+ root).find(e => e.childElems.exists(ch => ch == self))
 
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Element = new Element(qname, attributes, scope, newChildren.toIndexedSeq)
