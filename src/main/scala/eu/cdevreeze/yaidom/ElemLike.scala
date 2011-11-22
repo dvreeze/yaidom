@@ -4,7 +4,7 @@ import scala.collection.immutable
 import scala.annotation.tailrec
 
 /**
- * Supertrait for Elems, among others.
+ * Supertrait for Elems and other element-like objects.
  */
 trait ElemLike[E <: ElemLike[E]] { self: E =>
 

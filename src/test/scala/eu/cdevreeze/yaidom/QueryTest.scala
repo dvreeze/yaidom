@@ -353,6 +353,37 @@ class QueryTest extends Suite {
     }
   }
 
+  @Test def testQueryTreeElementsWithParentNotBookOrBookstore() {
+    // Again XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
+
+    // This time we use TreeElems, and the method parentUuidOption
+
+    val bookstore = sampleXml
+    require(bookstore.qname.localPart == "Bookstore")
+
+    val bookstoreTree = Tree(bookstore)
+
+    // This should always hold for trees
+    expect(bookstore.elems) {
+      bookstoreTree.root.elems.map(e => e.node)
+    }
+
+    val treeElems: immutable.Seq[TreeElem] =
+      for {
+        desc <- bookstoreTree.root.elems
+        val parentUuidOption = desc.parentUuidOption
+        if parentUuidOption.isDefined
+        parent <- bookstoreTree.root.elems(e => e.node.uuid == parentUuidOption.get)
+        if parent.node.qname != "Bookstore".qname && parent.node.qname != "Book".qname
+      } yield desc
+
+    assert(treeElems.size > 10, "Expected more than 10 matching elements")
+    val qnames: Set[QName] = treeElems.map(_.node.qname).toSet
+    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
+      qnames
+    }
+  }
+
   @Test def testQueryBooksOrMagazinesWithNonUniqueTitles() {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
@@ -758,6 +789,34 @@ class QueryTest extends Suite {
     expect(3) {
       invertedBookstore.childElems.size
     }
+  }
+
+  @Test def testQueryBookAndMagazineTitlesRelabeled() {
+    // Taken from the XSLT demo
+    val bookstore = sampleXml
+    require(bookstore.qname.localPart == "Bookstore")
+
+    val bookOrMagazineTitles: immutable.Seq[Elem] =
+      for {
+        bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+      } yield {
+        val titleString = bookOrMagazine.childElem("Title".ename).firstTextValue
+
+        if (bookOrMagazine.resolvedName == "Book".ename) {
+          Elem(
+            qname = "BookTitle".qname,
+            children = List(Text(titleString)))
+        } else {
+          Elem(
+            qname = "MagazineTitle".qname,
+            children = List(Text(titleString)))
+        }
+      }
+
+    expect(Set("BookTitle".ename, "MagazineTitle".ename)) {
+      bookOrMagazineTitles.map(e => e.resolvedName).toSet
+    }
+    assert(bookOrMagazineTitles.count(e => e.firstTextValue == "National Geographic") == 2, "Expected 'National Geographic' twice")
   }
 
   private val book1: Elem =
