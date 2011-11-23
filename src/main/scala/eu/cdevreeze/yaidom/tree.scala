@@ -8,7 +8,9 @@ import scala.collection.immutable
  * Nodes as they occur in a tree of nodes. This augments nodes with a UUID of the parent (if not a root).
  * Whereas Nodes can freely be used (as "leaf trees") in arbitrary trees, TreeNodes are themselves (parts of) such trees.
  *
- * TreeNodes are particularly useful for transformations of XML trees, as an alternative to XSLT.
+ * The parent UUIDs do not in themselves make lookups of parent nodes much faster. For large XML trees, consider
+ * building an index as <code>Map[UUID, TreeNode]</code>. Then parent node lookups (as well as direct node lookups)
+ * can become very fast.
  */
 sealed trait TreeNode extends Immutable {
 

@@ -11,7 +11,7 @@ import QName._
 
 /**
  * Query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat
- * verbosely. More than anything else, it demonstrates the expressive power of Scala's excellent Collections API.
+ * verbosely. More than anything else, it demonstrates some of the expressive power of Scala's excellent Collections API.
  *
  * Acknowledgments: The sample XML and original XPath and XQuery queries are part of the online course
  * "Introduction to Databases", by professor Widom at Stanford University. Many thanks for letting me use
@@ -817,6 +817,87 @@ class QueryTest extends Suite {
       bookOrMagazineTitles.map(e => e.resolvedName).toSet
     }
     assert(bookOrMagazineTitles.count(e => e.firstTextValue == "National Geographic") == 2, "Expected 'National Geographic' twice")
+  }
+
+  @Test def testTransformLeavingOutPrices() {
+    // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
+    // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
+    // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
+
+    // Transforms the XML tree, leaving out book prices
+
+    val bookstore = sampleXml
+    require(bookstore.qname.localPart == "Bookstore")
+
+    def removePrice(book: Elem): Elem = {
+      require(book.resolvedName == "Book".ename)
+      Elem(
+        qname = book.qname,
+        attributes = book.attributes.filterKeys(a => a != "Price".qname),
+        scope = book.scope,
+        children = book.children)
+    }
+
+    def removePricesWithin(e: Elem): Elem = {
+      e.resolvedName match {
+        case ExpandedName(None, "Book") => removePrice(e)
+        case _ => e.withChildren(e.children.map(ch => ch match {
+          case ch: Elem => removePricesWithin(ch)
+          case n => n
+        }))
+      }
+    }
+
+    val bookstoreWithoutPrices: Elem = removePricesWithin(bookstore)
+
+    expect(4) {
+      bookstore.elems("Book".ename).count(e => e.attributeOption("Price".ename).isDefined)
+    }
+    expect(0) {
+      bookstoreWithoutPrices.elems("Book".ename).count(e => e.attributeOption("Price".ename).isDefined)
+    }
+  }
+
+  @Test def testTransformCombiningFirstAndLastName() {
+    // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
+    // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
+    // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
+
+    // Transforms the XML tree, combining first and last names into Name elements
+
+    val bookstore = sampleXml
+    require(bookstore.qname.localPart == "Bookstore")
+
+    def combineName(author: Elem): Elem = {
+      require(author.resolvedName == "Author".ename)
+
+      val firstNameValue: String = author.childElem("First_Name".ename).firstTextValue
+      val lastNameValue: String = author.childElem("Last_Name".ename).firstTextValue
+      val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
+      val name: Elem = Elem(qname = "Name".qname, children = List(Text(nameValue)))
+
+      Elem(
+        qname = author.qname,
+        attributes = author.attributes,
+        scope = author.scope,
+        children = List(name))
+    }
+
+    def combineNamesWithin(e: Elem): Elem = {
+      e.resolvedName match {
+        case ExpandedName(None, "Author") => combineName(e)
+        case _ => e.withChildren(e.children.map(ch => ch match {
+          case ch: Elem => combineNamesWithin(ch)
+          case n => n
+        }))
+      }
+    }
+
+    val bookstoreWithCombinedNames: Elem = combineNamesWithin(bookstore)
+
+    expect(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
+      bookstoreWithCombinedNames.elems("Name".ename).map(_.firstTextValue).toSet
+    }
   }
 
   private val book1: Elem =
