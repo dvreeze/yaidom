@@ -838,17 +838,8 @@ class QueryTest extends Suite {
         children = book.children)
     }
 
-    def removePricesWithin(e: Elem): Elem = {
-      e.resolvedName match {
-        case ExpandedName(None, "Book") => removePrice(e)
-        case _ => e.withChildren(e.children.map(ch => ch match {
-          case ch: Elem => removePricesWithin(ch)
-          case n => n
-        }))
-      }
-    }
-
-    val bookstoreWithoutPrices: Elem = removePricesWithin(bookstore)
+    val bookstoreWithoutPrices: Elem =
+      bookstore copy { case e: Elem if e.resolvedName == "Book".ename => removePrice(e) }
 
     expect(4) {
       bookstore.elems("Book".ename).count(e => e.attributeOption("Price".ename).isDefined)
@@ -883,17 +874,8 @@ class QueryTest extends Suite {
         children = List(name))
     }
 
-    def combineNamesWithin(e: Elem): Elem = {
-      e.resolvedName match {
-        case ExpandedName(None, "Author") => combineName(e)
-        case _ => e.withChildren(e.children.map(ch => ch match {
-          case ch: Elem => combineNamesWithin(ch)
-          case n => n
-        }))
-      }
-    }
-
-    val bookstoreWithCombinedNames: Elem = combineNamesWithin(bookstore)
+    val bookstoreWithCombinedNames: Elem =
+      bookstore copy { case e: Elem if e.resolvedName == "Author".ename => combineName(e) }
 
     expect(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
       bookstoreWithCombinedNames.elems("Name".ename).map(_.firstTextValue).toSet

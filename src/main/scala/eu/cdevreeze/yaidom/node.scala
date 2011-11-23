@@ -103,6 +103,18 @@ final class Elem(
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 
+  /** Copies this Elem, but on encountering a descendant (or self) matching the given partial function, invokes that function instead */
+  def copy(f: PartialFunction[Elem, Elem]): Elem = {
+    // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
+    if (f.isDefinedAt(self)) f(self) else {
+      val newChildren = self.children.map((ch: Node) => ch match {
+        case ch: Elem => ch.copy(f)
+        case n => n
+      })
+      self.withChildren(newChildren)
+    }
+  }
+
   /** Equality based on the UUID. Fast but depends not only on the tree itself, but also the time of creation */
   override def equals(other: Any): Boolean = other match {
     case e: Elem => self.uuid == e.uuid
