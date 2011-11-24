@@ -7,11 +7,14 @@ import XLink._
 
 /** XLink or a part thereof */
 sealed trait XLinkPart extends ElemLike[XLinkPart] with Immutable {
+
   val elem: Elem
 
-  final def resolvedName: ExpandedName = elem.resolvedName
+  require(elem ne null)
 
-  final def childElems: immutable.Seq[XLinkPart] = elem.childElems.map(e => XLinkPart(e))
+  final val resolvedName: ExpandedName = elem.resolvedName
+
+  final val childElems: immutable.Seq[XLinkPart] = elem.childElems.map(e => XLinkPart(e))
 }
 
 /** XLink */
@@ -30,6 +33,7 @@ trait Link extends XLink
 
 final case class SimpleLink(override val elem: Elem) extends Link {
   require(xlinkType == "simple")
+  require(elem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
 
   def href: URI = elem.attributeOption(XLinkHrefExpandedName).map(s => URI.create(s)).getOrElse(sys.error("Missing %s".format(XLinkHrefExpandedName)))
   def roleOption: Option[String] = elem.attributeOption(XLinkRoleExpandedName)
@@ -43,15 +47,17 @@ final case class ExtendedLink(override val elem: Elem) extends Link {
 
   def roleOption: Option[String] = elem.attributeOption(XLinkRoleExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = elem.childElems collect { case e: Elem if mustBeTitle(e) => Title(e) }
-  def locatorXLinks: immutable.Seq[Locator] = elem.childElems collect { case e: Elem if mustBeLocator(e) => Locator(e) }
-  def arcXLinks: immutable.Seq[Arc] = elem.childElems collect { case e: Elem if mustBeArc(e) => Arc(e) }
-  def resourceXLinks: immutable.Seq[Resource] = elem.childElems collect { case e: Elem if mustBeResource(e) => Resource(e) }
+  def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
+  def locatorXLinks: immutable.Seq[Locator] = childElems collect { case xlink: Locator => xlink }
+  def arcXLinks: immutable.Seq[Arc] = childElems collect { case xlink: Arc => xlink }
+  def resourceXLinks: immutable.Seq[Resource] = childElems collect { case xlink: Resource => xlink }
 }
 
 final case class Arc(override val elem: Elem) extends XLink {
   require(xlinkType == "arc")
   require(arcroleOption.isDefined, "Missing %s".format(XLinkArcroleExpandedName))
+  require(elem.attributeOption(XLinkFromExpandedName).isDefined, "Missing %s".format(XLinkFromExpandedName))
+  require(elem.attributeOption(XLinkToExpandedName).isDefined, "Missing %s".format(XLinkToExpandedName))
 
   def from: String = elem.attributeOption(XLinkFromExpandedName).getOrElse(sys.error("Missing %s".format(XLinkFromExpandedName)))
   def to: String = elem.attributeOption(XLinkToExpandedName).getOrElse(sys.error("Missing %s".format(XLinkToExpandedName)))
@@ -62,22 +68,25 @@ final case class Arc(override val elem: Elem) extends XLink {
   def useOption: Option[String] = elem.attributeOption(XLinkUseExpandedName)
   def priorityOption: Option[String] = elem.attributeOption(XLinkPriorityExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = elem.childElems collect { case e: Elem if mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
 }
 
 final case class Locator(override val elem: Elem) extends XLink {
   require(xlinkType == "locator")
+  require(elem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
+  require(elem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
   def href: URI = elem.attributeOption(XLinkHrefExpandedName).map(s => URI.create(s)).getOrElse(sys.error("Missing %s".format(XLinkHrefExpandedName)))
   def label: String = elem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
   def roleOption: Option[String] = elem.attributeOption(XLinkRoleExpandedName)
   def titleOption: Option[String] = elem.attributeOption(XLinkTitleExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = elem.childElems collect { case e: Elem if mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
 }
 
 final case class Resource(override val elem: Elem) extends XLink {
   require(xlinkType == "resource")
+  require(elem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
   def label: String = elem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
   def roleOption: Option[String] = elem.attributeOption(XLinkRoleExpandedName)
@@ -100,16 +109,12 @@ object XLinkPart {
     case e if mustBeXLink(e) => {
       new {
         val elem: Elem = e
-      } with XLink {
-        require(elem ne null)
-      }
+      } with XLink
     }
     case e => {
       new {
         val elem: Elem = e
-      } with XLinkPart {
-        require(elem ne null)
-      }
+      } with XLinkPart
     }
   }
 }
