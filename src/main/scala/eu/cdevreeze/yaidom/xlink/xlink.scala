@@ -104,7 +104,13 @@ object XLinkPart {
         require(elem ne null)
       }
     }
-    case e => sys.error("Not an XLink: %s".format(e.resolvedName))
+    case e => {
+      new {
+        val elem: Elem = e
+      } with XLinkPart {
+        require(elem ne null)
+      }
+    }
   }
 }
 
