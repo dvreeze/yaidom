@@ -5,7 +5,7 @@ import java.net.URI
 import scala.collection.immutable
 import XLink._
 
-/** XLink or a part thereof */
+/** XLink or a part thereof (or even the parent, such as the root element of a linkbase) */
 sealed trait XLinkPart extends ElemLike[XLinkPart] with Immutable {
 
   val elem: Elem
