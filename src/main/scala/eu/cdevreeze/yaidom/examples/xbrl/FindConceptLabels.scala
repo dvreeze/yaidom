@@ -15,7 +15,7 @@ object FindConceptLabels {
   def main(args: Array[String]) {
     require(args.length >= 2, "Usage: FindConceptLabels <language code> <url> ... ")
     val languageCode = args(0)
-    val uris = args.drop(1).map(s => new URI(s)).toList
+    val uris = args.drop(1).flatMap(arg => arg.split(',').map(s => new URI(s))).toList
 
     for (uri <- uris) {
       require(new jio.File(uri).exists, "Taxonomy directory '%s' not found".format(uri.toString))
@@ -127,7 +127,7 @@ object FindConceptLabels {
         val conceptLabel = new ConceptLabel(
           conceptUri = currentUri.resolve(fromLocatorOption.get.href),
           languageOption = toResourceOption.get.wrappedElem.attributeOption(XmlLang),
-          labelText = toResourceOption.get.wrappedElem.firstTextValue)
+          labelText = toResourceOption.get.wrappedElem.firstTextValueOption.getOrElse(""))
         Some(conceptLabel)
       }
     }

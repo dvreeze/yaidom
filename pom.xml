@@ -53,6 +53,15 @@
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
 				<version>2.15.2</version>
+				<configuration>
+					<launchers>
+						<launcher>
+							<!-- Run with mvn scala:run -Dlauncher=findConceptLabels -DaddArgs="<language code>|<url 1>| ... " -->
+							<id>findConceptLabels</id>
+							<mainClass>eu.cdevreeze.yaidom.examples.xbrl.FindConceptLabels</mainClass>
+						</launcher>
+					</launchers>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
