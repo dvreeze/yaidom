@@ -13,15 +13,31 @@ import java.net.URI
 object FindConceptLabels {
 
   def main(args: Array[String]) {
-    require(args.length == 2, "Usage: FindConceptLabels <url> <language code>")
-    val uri = new URI(args(0))
-    val languageCode = args(1)
+    require(args.length >= 2, "Usage: FindConceptLabels <language code> <url> ... ")
+    val languageCode = args(0)
+    val uris = args.drop(1).map(s => new URI(s)).toList
 
-    require(new jio.File(uri).exists, "Taxonomy directory '%s' not found".format(uri.toString))
+    for (uri <- uris) {
+      require(new jio.File(uri).exists, "Taxonomy directory '%s' not found".format(uri.toString))
+    }
     println("Reading taxonomy ...")
 
     val taxonomyProducer = new Taxonomy.FileBasedTaxonomyProducer
-    val taxonomy: Taxonomy = taxonomyProducer(uri)
+    val taxonomy: Taxonomy = taxonomyProducer(uris)
+
+    val substitutionGroups: Set[ExpandedName] = taxonomy.substitutionGroups
+    println("Found substitution groups: %s".format(substitutionGroups.mkString(", ")))
+
+    val substitutionGroupElemDefs: Map[ExpandedName, Elem] = taxonomy.substitutionGroupElemDefinitionsFor(substitutionGroups)
+    val parentSubstitutionGroups: Map[ExpandedName, ExpandedName] =
+      substitutionGroupElemDefs.mapValues(elemDef => taxonomy.substitutionGroupOption(elemDef)).filter(_._2.isDefined).mapValues(_.get)
+    println("Substitution group parents: %s".format(parentSubstitutionGroups.mkString(", ")))
+
+    val substGroupAncestries: immutable.Seq[List[ExpandedName]] = taxonomy.substitutionGroupAncestries
+    println("Substitution group ancestries: %s".format(substGroupAncestries.mkString(", ")))
+    val itemOrTupleSubstGroups: Set[ExpandedName] =
+      substGroupAncestries.filter(ancestry => ancestry.contains(XbrliItem) || ancestry.contains(XbrliTuple)).map(_.head).toSet
+    println("Item or tuple substitution groups: %s".format(itemOrTupleSubstGroups.mkString(", ")))
 
     val labelLinkbases: Map[URI, XLinkPart] =
       taxonomy.linkbases.filter(uriAndLinkbase => isLabelLinkbase(uriAndLinkbase._2))
@@ -49,7 +65,6 @@ object FindConceptLabels {
         if (schemaRootOption.isEmpty) None else {
           elemDefOption.map(elemDef => new ResolvedConceptLabel(
             schemaRoot = schemaRootOption.get,
-            conceptUri = conceptLabel.conceptUri,
             elementDefinition = elemDef,
             languageOption = conceptLabel.languageOption,
             labelText = conceptLabel.labelText))
@@ -57,8 +72,15 @@ object FindConceptLabels {
       })
     println("Found %d resolved concept-labels with language %s".format(resolvedConceptLabels.size, languageCode))
 
+    val itemOrTupleConceptLabels: immutable.Seq[ResolvedConceptLabel] =
+      resolvedConceptLabels.filter(conceptLabel => {
+        val substGroupOption: Option[ExpandedName] = taxonomy.substitutionGroupOption(conceptLabel.elementDefinition)
+        substGroupOption.isDefined && itemOrTupleSubstGroups.contains(substGroupOption.get)
+      })
+    println("Found %d resolved concept-labels for items/tuples with language %s".format(itemOrTupleConceptLabels.size, languageCode))
+
     val props = new jutil.Properties
-    for (conceptLabel <- resolvedConceptLabels) {
+    for (conceptLabel <- itemOrTupleConceptLabels) {
       val tnsOption = conceptLabel.schemaRoot.attributeOption("targetNamespace".ename)
       val localName = conceptLabel.elementDefinition.attribute("name".ename)
       val name: ExpandedName = ExpandedName(tnsOption, localName)
@@ -83,12 +105,9 @@ object FindConceptLabels {
 
   final class ResolvedConceptLabel(
     val schemaRoot: Elem,
-    val conceptUri: URI,
     val elementDefinition: Elem,
     val languageOption: Option[String],
     val labelText: String) extends Immutable {
-
-    require(conceptUri.isAbsolute)
   }
 
   def isLabelLinkbase(xlink: XLinkPart): Boolean = {

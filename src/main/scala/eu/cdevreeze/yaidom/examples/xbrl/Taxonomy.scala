@@ -12,27 +12,12 @@ import ExpandedName._
 import Taxonomy._
 
 /**
- * Poor man's low level representation of an immutable XBRL taxonomy, at the level of XML Elems and XLinks.
+ * Very poor man's, low level, ad-hoc representation of an immutable XBRL taxonomy, at the level of XML Elems and XLinks.
  * Even at this low level of abstraction, interesting queries are possible, merely by using yaidom and Scala's
  * great Collections API.
  *
- * There is a clear distinction between producers of a Taxonomy (from file system, a web site and the like) and
- * consumers of a Taxonomy (such as queries, for example to find concept labels). The assumption is that
- * taxonomies are resolved entirely and stored in memory before use, instead of discovering them while using them.
- *
- * In a REPL session, we can set up a taxonomy (read from file system) for querying like this:
- * <pre>
- * import java.{ util => jutil, io => jio }
- * val taxonomyRootDir = new jio.File("/taxonomy-rootdir")
- * taxonomyRootDir.exists // just checking...
- *
- * import eu.cdevreeze.yaidom._
- * import eu.cdevreeze.yaidom.xlink._
- * import eu.cdevreeze.yaidom.examples.xbrl._
- *
- * val uri = taxonomyRootDir.toURI
- * val taxonomy = (new Taxonomy.FileBasedTaxonomyProducer).apply(uri)
- * </pre>
+ * It is assumed that taxonomies are resolved entirely and stored in memory before use, instead of discovering them
+ * while using them.
  */
 final class Taxonomy(
   val schemas: Map[URI, Elem],
@@ -75,11 +60,65 @@ final class Taxonomy(
       elemDefinitionOption
     }
   }
+
+  def findElementDefinitions(root: Elem): immutable.Seq[Elem] = {
+    root.elems(e => e.resolvedName == XsdElementDefinition)
+  }
+
+  def substitutionGroupOption(elemDef: Elem): Option[ExpandedName] = {
+    require(elemDef.resolvedName == XsdElementDefinition)
+
+    elemDef.attributeOption("substitutionGroup".ename).flatMap(v => {
+      val qname = QName.parse(v)
+      elemDef.scope.resolveQName(qname)
+    })
+  }
+
+  def substitutionGroups: Set[ExpandedName] = {
+    val elemDefs = schemas.values.flatMap(root => findElementDefinitions(root))
+    elemDefs.flatMap(elemDef => substitutionGroupOption(elemDef)).toSet
+  }
+
+  def substitutionGroupElemDefinitionsFor(substitutionGroups: Set[ExpandedName]): Map[ExpandedName, Elem] = {
+    def substitutionGroupElemDefinitionsIn(root: Elem): Map[ExpandedName, Elem] = {
+      val tns = root.attribute("targetNamespace".ename)
+
+      val elemDefs = findElementDefinitions(root)
+      val filteredElemDefs = elemDefs.filter(elemDef => {
+        val nameOption = elemDef.attributeOption("name".ename)
+        val enameOption = nameOption.map(name => ExpandedName(tns, name))
+
+        nameOption.isDefined && enameOption.isDefined && substitutionGroups.contains(enameOption.get)
+      })
+      filteredElemDefs.map(elemDef => (ExpandedName(tns, elemDef.attribute("name".ename)) -> elemDef)).toMap
+    }
+
+    schemas.values.map(root => substitutionGroupElemDefinitionsIn(root)).flatten.toMap
+  }
+
+  def substitutionGroupAncestries: immutable.Seq[List[ExpandedName]] = {
+    val substGroups = substitutionGroups
+
+    val substGroupParents: Map[ExpandedName, ExpandedName] =
+      substitutionGroupElemDefinitionsFor(substGroups).mapValues(elemDef => substitutionGroupOption(elemDef)).filter(_._2.isDefined).mapValues(_.get)
+
+    def ancestries(currentAncestries: immutable.Seq[List[ExpandedName]]): immutable.Seq[List[ExpandedName]] = {
+      // Very inefficient
+      val newAncestries: immutable.Seq[List[ExpandedName]] = currentAncestries.map(ancestry => {
+        if (substGroupParents.contains(ancestry.last))
+          ancestry ::: List(substGroupParents(ancestry.last))
+        else ancestry
+      })
+      if (newAncestries == currentAncestries) currentAncestries else ancestries(newAncestries)
+    }
+
+    ancestries(substGroups.toIndexedSeq[ExpandedName].map(substGroup => List(substGroup)))
+  }
 }
 
 object Taxonomy {
 
-  type Producer = ((URI) => Taxonomy)
+  type Producer = ((List[URI]) => Taxonomy)
 
   val SchemaNamespace = URI.create("http://www.w3.org/2001/XMLSchema")
   val XsdSchema = ExpandedName(SchemaNamespace.toString, "schema")
@@ -87,6 +126,10 @@ object Taxonomy {
 
   val XmlNamespace = URI.create("http://www.w3.org/XML/1998/namespace")
   val XmlLang = ExpandedName(XmlNamespace.toString, "lang")
+
+  val XbrliNamespace = URI.create("http://www.xbrl.org/2003/instance")
+  val XbrliItem = ExpandedName(XbrliNamespace.toString, "item")
+  val XbrliTuple = ExpandedName(XbrliNamespace.toString, "tuple")
 
   val XbrlLinkbaseNamespace = URI.create("http://www.xbrl.org/2003/linkbase")
   val XbrlLinkbase = ExpandedName(XbrlLinkbaseNamespace.toString, "linkbase")
@@ -107,9 +150,13 @@ object Taxonomy {
 
   final class FileBasedTaxonomyProducer extends Producer {
 
-    def apply(uri: URI): Taxonomy = {
+    def apply(uris: List[URI]): Taxonomy = {
       val xmlInputFactory = XMLInputFactory.newFactory
-      val elems = readFiles(new jio.File(uri), xmlInputFactory)
+      val elems: Map[URI, Elem] = {
+        def uriElems(rootUri: URI): Map[URI, Elem] = readFiles(new jio.File(rootUri), xmlInputFactory)
+
+        uris.flatMap(uri => readFiles(new jio.File(uri), xmlInputFactory).toList).toMap
+      }
       Taxonomy(elems)
     }
 
