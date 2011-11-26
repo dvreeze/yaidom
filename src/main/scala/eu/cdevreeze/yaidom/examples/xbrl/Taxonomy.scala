@@ -134,7 +134,6 @@ object Taxonomy {
   val XbrlLinkbaseNamespace = URI.create("http://www.xbrl.org/2003/linkbase")
   val XbrlLinkbase = ExpandedName(XbrlLinkbaseNamespace.toString, "linkbase")
 
-  val XbrlLabelLinkbase = ExpandedName(XbrlLinkbaseNamespace.toString, "linkbase")
   val XbrlLabelLink = ExpandedName(XbrlLinkbaseNamespace.toString, "labelLink")
   val XbrlLabelArc = ExpandedName(XbrlLinkbaseNamespace.toString, "labelArc")
   val XbrlConceptLabelArcRole = "http://www.xbrl.org/2003/arcrole/concept-label"

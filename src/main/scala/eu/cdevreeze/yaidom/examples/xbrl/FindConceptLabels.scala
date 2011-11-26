@@ -39,11 +39,9 @@ object FindConceptLabels {
       substGroupAncestries.filter(ancestry => ancestry.contains(XbrliItem) || ancestry.contains(XbrliTuple)).map(_.head).toSet
     println("Item or tuple substitution groups: %s".format(itemOrTupleSubstGroups.mkString(", ")))
 
-    val labelLinkbases: Map[URI, XLinkPart] =
-      taxonomy.linkbases.filter(uriAndLinkbase => isLabelLinkbase(uriAndLinkbase._2))
-    println("Found %d label linkbases (of %d linkbases)".format(labelLinkbases.size, taxonomy.linkbases.size))
+    println("Found %d linkbases".format(taxonomy.linkbases.size))
 
-    val labelLinks: Map[URI, immutable.Seq[ExtendedLink]] = labelLinkbases.mapValues(linkbase => findLabelLinks(linkbase))
+    val labelLinks: Map[URI, immutable.Seq[ExtendedLink]] = taxonomy.linkbases.mapValues(linkbase => findLabelLinks(linkbase))
     println("Found %d label links".format(labelLinks.values.flatten.size))
 
     val conceptLabels: immutable.Seq[ConceptLabel] =
@@ -108,10 +106,6 @@ object FindConceptLabels {
     val elementDefinition: Elem,
     val languageOption: Option[String],
     val labelText: String) extends Immutable {
-  }
-
-  def isLabelLinkbase(xlink: XLinkPart): Boolean = {
-    xlink.wrappedElem.resolvedName == XbrlLabelLinkbase
   }
 
   def findLabelLinks(root: XLinkPart): immutable.Seq[ExtendedLink] = {
