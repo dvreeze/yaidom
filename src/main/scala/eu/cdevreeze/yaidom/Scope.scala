@@ -13,8 +13,8 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
   require(prefixScope.keySet.forall(pref => (pref ne null) && (pref.length > 0)))
   require(prefixScope.values.forall(ns => (ns ne null) && (ns.length > 0)))
 
-  /** Creates a copy, with the implicit "xml" namespace added */
-  def withXmlNamespace: Scope = copy(prefixScope = prefixScope + ("xml" -> "http://www.w3.org/XML/1998/namespace"))
+  /** The prefix scope, with the implicit "xml" namespace added */
+  def completePrefixScope: Map[String, String] = prefixScope + ("xml" -> "http://www.w3.org/XML/1998/namespace")
 
   /** Creates a Map from prefixes to namespaces URIs, giving the default namespace the empty String as prefix */
   def toMap: Map[String, String] = {
@@ -38,7 +38,7 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
     case unprefixedName: UnprefixedName if defaultNamespace.isEmpty => Some(ExpandedName(unprefixedName.localPart))
     case unprefixedName: UnprefixedName => Some(ExpandedName(defaultNamespace.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
-      withXmlNamespace.prefixScope.get(prefixedName.prefix).map(nsUri => ExpandedName(nsUri, prefixedName.localPart))
+      completePrefixScope.get(prefixedName.prefix).map(nsUri => ExpandedName(nsUri, prefixedName.localPart))
   }
 
   /**

@@ -8,6 +8,7 @@ import scala.collection.immutable
 import resource._
 import xlink._
 import parse._
+import ExpandedName._
 import Taxonomy._
 
 /**
@@ -44,21 +45,60 @@ final class Taxonomy(
 
   require(schemas.size + linkbases.size + otherFiles.size == (schemas.keySet ++ linkbases.keySet ++ otherFiles.keySet).size)
 
-  require(schemas.values.forall(root => root.resolvedName == xsdSchema))
+  require(schemas.values.forall(root => root.resolvedName == XsdSchema))
+
+  def linkbaseElems: Map[URI, Elem] = linkbases.mapValues(xlink => xlink.wrappedElem)
+
+  def findSchemaRoot(url: URI): Option[Elem] = {
+    require(url.isAbsolute)
+
+    val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
+    val fragment = url.getFragment
+
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl)
+    schemaOption
+  }
+
+  def findElementDefinition(url: URI): Option[Elem] = {
+    require(url.isAbsolute)
+
+    val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
+    val fragment = url.getFragment
+
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl)
+
+    if (schemaOption.isEmpty) None else {
+      val elemDefinitionOption: Option[Elem] = schemaOption.get.elems(e => {
+        (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
+      }).headOption
+
+      elemDefinitionOption
+    }
+  }
 }
 
 object Taxonomy {
 
   type Producer = ((URI) => Taxonomy)
 
-  val schemaNamespace = URI.create("http://www.w3.org/2001/XMLSchema")
-  val xsdSchema = ExpandedName(schemaNamespace.toString, "schema")
+  val SchemaNamespace = URI.create("http://www.w3.org/2001/XMLSchema")
+  val XsdSchema = ExpandedName(SchemaNamespace.toString, "schema")
+  val XsdElementDefinition = ExpandedName(SchemaNamespace.toString, "element")
 
-  val xbrlLinkbase = ExpandedName("http://www.xbrl.org/2003/linkbase", "linkbase")
+  val XmlNamespace = URI.create("http://www.w3.org/XML/1998/namespace")
+  val XmlLang = ExpandedName(XmlNamespace.toString, "lang")
+
+  val XbrlLinkbaseNamespace = URI.create("http://www.xbrl.org/2003/linkbase")
+  val XbrlLinkbase = ExpandedName(XbrlLinkbaseNamespace.toString, "linkbase")
+
+  val XbrlLabelLinkbase = ExpandedName(XbrlLinkbaseNamespace.toString, "linkbase")
+  val XbrlLabelLink = ExpandedName(XbrlLinkbaseNamespace.toString, "labelLink")
+  val XbrlLabelArc = ExpandedName(XbrlLinkbaseNamespace.toString, "labelArc")
+  val XbrlConceptLabelArcRole = "http://www.xbrl.org/2003/arcrole/concept-label"
 
   def apply(elems: Map[URI, Elem]): Taxonomy = {
-    val schemas = elems collect { case (uri, elem) if elem.resolvedName == xsdSchema => (uri, elem) }
-    val linkbaseElems: Map[URI, Elem] = elems collect { case (uri, elem) if elem.resolvedName == xbrlLinkbase => (uri, elem) }
+    val schemas = elems collect { case (uri, elem) if elem.resolvedName == XsdSchema => (uri, elem) }
+    val linkbaseElems: Map[URI, Elem] = elems collect { case (uri, elem) if elem.resolvedName == XbrlLinkbase => (uri, elem) }
     val linkbases: Map[URI, XLinkPart] = linkbaseElems mapValues (e => XLinkPart(e))
     val otherElems = (elems -- schemas.keySet) -- linkbases.keySet
 
