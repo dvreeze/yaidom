@@ -151,17 +151,10 @@ object Taxonomy {
 
     def apply(uris: List[URI]): Taxonomy = {
       val elems: Map[URI, Elem] = {
-        // Using uris.par instead a lot of locking would be done, so we do not use parallel collections here
-        uris.flatMap(uri => readFiles(new jio.File(uri)).toList).toMap
+        // I tried to use par collections here, but saw too much locking going on (analyzing with jvisualvm), so chickened out
+        uris.flatMap(uri => readFiles(new jio.File(uri), XMLInputFactory.newInstance).toList).toMap
       }
       Taxonomy(elems)
-    }
-
-    private def readFiles(dir: jio.File): Map[URI, Elem] = {
-      require(dir.isDirectory && dir.exists, "Directory '%s' must be an existing directory".format(dir.getPath))
-
-      val xmlInputFactory = XMLInputFactory.newFactory
-      readFiles(dir, xmlInputFactory)
     }
 
     private def readFiles(dir: jio.File, xmlInputFactory: XMLInputFactory): Map[URI, Elem] = {

@@ -10,8 +10,7 @@ import xlink._
 import ExpandedName._
 import Taxonomy._
 
-import java.net.URI
-
+/** Finds the concept-labels in an XBRL taxonomy */
 object FindConceptLabels {
 
   private val logger: jlogging.Logger = jlogging.Logger.getLogger("eu.cdevreeze.yaidom.examples.xbrl")
