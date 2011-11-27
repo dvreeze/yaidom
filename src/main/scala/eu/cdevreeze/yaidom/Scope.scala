@@ -10,8 +10,11 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
   require(defaultNamespace ne null)
   require(defaultNamespace.forall(ns => (ns ne null) && (ns.length > 0)))
   require(prefixScope ne null)
-  require(prefixScope.keySet.forall(pref => (pref ne null) && (pref.length > 0)))
-  require(prefixScope.values.forall(ns => (ns ne null) && (ns.length > 0)))
+  require(prefixScope.forall(kv => {
+    val pref = kv._1
+    val ns = kv._2
+    (pref ne null) && (pref.length > 0) && (ns ne null) && (ns.length > 0)
+  }))
 
   /** The prefix scope, with the implicit "xml" namespace added */
   def completePrefixScope: Map[String, String] = prefixScope + ("xml" -> "http://www.w3.org/XML/1998/namespace")

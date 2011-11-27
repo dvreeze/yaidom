@@ -59,6 +59,10 @@
 							<!-- Run with mvn scala:run -Dlauncher=findConceptLabels -DaddArgs="<language code>|<url 1>| ... " -->
 							<id>findConceptLabels</id>
 							<mainClass>eu.cdevreeze.yaidom.examples.xbrl.FindConceptLabels</mainClass>
+							<jvmArgs>
+								<!-- Giving 4GB to the heap requires a 64bit environment (hardware, OS, JVM etc.) -->
+								<jvmArg>-Xmx4G</jvmArg>
+							</jvmArgs>
 						</launcher>
 					</launchers>
 				</configuration>
