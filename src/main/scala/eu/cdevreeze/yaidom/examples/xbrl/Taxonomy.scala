@@ -150,13 +150,18 @@ object Taxonomy {
   final class FileBasedTaxonomyProducer extends Producer {
 
     def apply(uris: List[URI]): Taxonomy = {
-      val xmlInputFactory = XMLInputFactory.newFactory
       val elems: Map[URI, Elem] = {
-        def uriElems(rootUri: URI): Map[URI, Elem] = readFiles(new jio.File(rootUri), xmlInputFactory)
-
-        uris.flatMap(uri => readFiles(new jio.File(uri), xmlInputFactory).toList).toMap
+        // Using uris.par instead a lot of locking would be done, so we do not use parallel collections here
+        uris.flatMap(uri => readFiles(new jio.File(uri)).toList).toMap
       }
       Taxonomy(elems)
+    }
+
+    private def readFiles(dir: jio.File): Map[URI, Elem] = {
+      require(dir.isDirectory && dir.exists, "Directory '%s' must be an existing directory".format(dir.getPath))
+
+      val xmlInputFactory = XMLInputFactory.newFactory
+      readFiles(dir, xmlInputFactory)
     }
 
     private def readFiles(dir: jio.File, xmlInputFactory: XMLInputFactory): Map[URI, Elem] = {

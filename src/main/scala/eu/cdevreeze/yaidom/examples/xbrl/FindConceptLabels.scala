@@ -58,13 +58,13 @@ object FindConceptLabels {
       } yield findConceptLabels(uri, link)).flatten.toIndexedSeq
     logger.info("Found %d concept-labels".format(conceptLabels.size))
 
-    val languageCodes: Set[String] = conceptLabels.par.flatMap(conceptLabel => conceptLabel.languageOption).toSet.seq
+    val languageCodes: Set[String] = conceptLabels.flatMap(conceptLabel => conceptLabel.languageOption).toSet
     logger.info("Language codes found in the concept-labels: %s".format(languageCodes.mkString(", ")))
-    val numberOfConceptLabelsWithoutLanguage = conceptLabels.par.count(conceptLabel => conceptLabel.languageOption.isEmpty)
+    val numberOfConceptLabelsWithoutLanguage = conceptLabels.count(conceptLabel => conceptLabel.languageOption.isEmpty)
     logger.info("Number of concept-labels without language: %d".format(numberOfConceptLabelsWithoutLanguage))
 
     val conceptLabelsSearchedFor: immutable.Seq[ConceptLabel] =
-      conceptLabels.par.filter(conceptLabel => conceptLabel.languageOption == Some(languageCode)).seq
+      conceptLabels.filter(conceptLabel => conceptLabel.languageOption == Some(languageCode)).seq
     logger.info("Found %d concept-labels with language %s".format(conceptLabelsSearchedFor.size, languageCode))
 
     val resolvedConceptLabels: immutable.Seq[ResolvedConceptLabel] =
