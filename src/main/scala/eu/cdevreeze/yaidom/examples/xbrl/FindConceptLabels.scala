@@ -64,7 +64,7 @@ object FindConceptLabels {
     logger.info("Number of concept-labels without language: %d".format(numberOfConceptLabelsWithoutLanguage))
 
     val conceptLabelsSearchedFor: immutable.Seq[ConceptLabel] =
-      conceptLabels.filter(conceptLabel => conceptLabel.languageOption == Some(languageCode)).seq
+      conceptLabels.filter(conceptLabel => conceptLabel.languageOption == Some(languageCode))
     logger.info("Found %d concept-labels with language %s".format(conceptLabelsSearchedFor.size, languageCode))
 
     val resolvedConceptLabels: immutable.Seq[ResolvedConceptLabel] =
