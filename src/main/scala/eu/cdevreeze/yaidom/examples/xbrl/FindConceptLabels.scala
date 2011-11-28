@@ -81,6 +81,19 @@ object FindConceptLabels {
       }).seq
     logger.info("Found %d resolved concept-labels with language %s".format(resolvedConceptLabels.size, languageCode))
 
+    val unresolvedConceptLabels: immutable.Seq[ConceptLabel] = {
+      conceptLabelsSearchedFor.par.filter(conceptLabel => {
+        val schemaRootOption: Option[Elem] = taxonomy.findSchemaRoot(conceptLabel.conceptUri)
+        val elemDefOption: Option[Elem] = taxonomy.findElementDefinition(conceptLabel.conceptUri)
+        schemaRootOption.isEmpty || elemDefOption.isEmpty
+      }).seq
+    }
+    logger.info("Found %d unresolved concept-labels with language %s".format(unresolvedConceptLabels.size, languageCode))
+    val schemaAuthoritiesOfUnresolvedConceptLabels: Set[String] =
+      unresolvedConceptLabels.map(conceptLabel => conceptLabel.conceptUri.getAuthority).toSet
+
+    logger.info("Schema authorities of unresolved concept-labels: %s".format(schemaAuthoritiesOfUnresolvedConceptLabels.mkString(", ")))
+
     val itemOrTupleConceptLabels: immutable.Seq[ResolvedConceptLabel] =
       resolvedConceptLabels.par.filter(conceptLabel => {
         val substGroupOption: Option[ExpandedName] = taxonomy.substitutionGroupOption(conceptLabel.elementDefinition)
