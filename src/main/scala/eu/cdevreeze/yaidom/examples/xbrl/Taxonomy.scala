@@ -152,6 +152,7 @@ object Taxonomy {
     def apply(uris: List[URI]): Taxonomy = {
       val elems: Map[URI, Elem] = {
         // I tried to use par collections here, but saw too much locking going on (analyzing with jvisualvm), so chickened out
+        // Thread dumps showed locking inside Elem creation, during UUID creation
         uris.flatMap(uri => readFiles(new jio.File(uri), XMLInputFactory.newInstance).toList).toMap
       }
       Taxonomy(elems)

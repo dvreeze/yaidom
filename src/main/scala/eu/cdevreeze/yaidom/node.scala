@@ -57,6 +57,7 @@ final class Elem(
   require(scope ne null)
   require(children ne null)
 
+  /** The unique UUID of this Elem. Note that UUID creation turns out to suffer from poor concurrency due to locking */
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
