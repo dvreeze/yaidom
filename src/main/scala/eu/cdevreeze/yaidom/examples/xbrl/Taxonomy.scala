@@ -53,11 +53,28 @@ final class Taxonomy(
     val schemaOption: Option[Elem] = schemas.get(schemaUrl)
 
     if (schemaOption.isEmpty) None else {
-      val elemDefinitionOption: Option[Elem] = schemaOption.get.elems(e => {
+      val elemDefinitionOption: Option[Elem] = schemaOption.get.firstElemOption(e => {
         (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
-      }).headOption
+      })
 
       elemDefinitionOption
+    }
+  }
+
+  def findSchemaRootAndElementDefinition(url: URI): Option[(Elem, Elem)] = {
+    require(url.isAbsolute)
+
+    val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
+    val fragment = url.getFragment
+
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl)
+
+    if (schemaOption.isEmpty) None else {
+      val elemDefinitionOption: Option[Elem] = schemaOption.get.firstElemOption(e => {
+        (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
+      })
+
+      elemDefinitionOption.map(elemDef => (schemaOption.get -> elemDef))
     }
   }
 
@@ -150,12 +167,12 @@ object Taxonomy {
   final class FileBasedTaxonomyProducer extends Producer {
 
     def apply(uris: List[URI]): Taxonomy = {
-      val elems: Map[URI, Elem] = {
+      val elms: Map[URI, Elem] = {
         // I tried to use par collections here, but saw too much locking going on (analyzing with jvisualvm), so chickened out
         // Thread dumps showed locking inside Elem creation, during UUID creation
         uris.flatMap(uri => readFiles(new jio.File(uri), XMLInputFactory.newInstance).toList).toMap
       }
-      Taxonomy(elems)
+      Taxonomy(elms)
     }
 
     private def readFiles(dir: jio.File, xmlInputFactory: XMLInputFactory): Map[URI, Elem] = {

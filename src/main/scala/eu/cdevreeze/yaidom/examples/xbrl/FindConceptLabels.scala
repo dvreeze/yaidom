@@ -30,6 +30,7 @@ object FindConceptLabels {
 
     val taxonomyProducer = new Taxonomy.FileBasedTaxonomyProducer
     val taxonomy: Taxonomy = taxonomyProducer(uris)
+    logger.info("Successfully read taxonomy")
 
     val substitutionGroups: Set[ExpandedName] = taxonomy.substitutionGroups
     logger.info("Found substitution groups: %s".format(substitutionGroups.mkString(", ")))
@@ -47,7 +48,8 @@ object FindConceptLabels {
 
     logger.info("Found %d linkbases".format(taxonomy.linkbases.size))
 
-    val labelLinks: Map[URI, immutable.Seq[ExtendedLink]] = taxonomy.linkbases.mapValues(linkbase => findLabelLinks(linkbase))
+    val labelLinks: Map[URI, immutable.Seq[ExtendedLink]] =
+      taxonomy.linkbases.mapValues(linkbase => findLabelLinks(linkbase))
     logger.info("Found %d label links".format(labelLinks.values.flatten.size))
 
     val conceptLabels: immutable.Seq[ConceptLabel] =
@@ -68,8 +70,10 @@ object FindConceptLabels {
 
     val resolvedConceptLabels: immutable.Seq[ResolvedConceptLabel] =
       conceptLabelsSearchedFor.par.flatMap(conceptLabel => {
-        val schemaRootOption: Option[Elem] = taxonomy.findSchemaRoot(conceptLabel.conceptUri)
-        val elemDefOption: Option[Elem] = taxonomy.findElementDefinition(conceptLabel.conceptUri)
+        val rootAndElemDefOption: Option[(Elem, Elem)] =
+          taxonomy.findSchemaRootAndElementDefinition(conceptLabel.conceptUri)
+        val schemaRootOption: Option[Elem] = rootAndElemDefOption.map(_._1)
+        val elemDefOption: Option[Elem] = rootAndElemDefOption.map(_._2)
 
         if (schemaRootOption.isEmpty) None else {
           elemDefOption.map(elemDef => new ResolvedConceptLabel(
@@ -83,8 +87,11 @@ object FindConceptLabels {
 
     val unresolvedConceptLabels: immutable.Seq[ConceptLabel] = {
       conceptLabelsSearchedFor.par.filter(conceptLabel => {
-        val schemaRootOption: Option[Elem] = taxonomy.findSchemaRoot(conceptLabel.conceptUri)
-        val elemDefOption: Option[Elem] = taxonomy.findElementDefinition(conceptLabel.conceptUri)
+        val rootAndElemDefOption: Option[(Elem, Elem)] =
+          taxonomy.findSchemaRootAndElementDefinition(conceptLabel.conceptUri)
+        val schemaRootOption: Option[Elem] = rootAndElemDefOption.map(_._1)
+        val elemDefOption: Option[Elem] = rootAndElemDefOption.map(_._2)
+
         schemaRootOption.isEmpty || elemDefOption.isEmpty
       }).seq
     }
@@ -95,20 +102,20 @@ object FindConceptLabels {
     logger.info("Schema authorities of unresolved concept-labels: %s".format(schemaAuthoritiesOfUnresolvedConceptLabels.mkString(", ")))
 
     val itemOrTupleConceptLabels: immutable.Seq[ResolvedConceptLabel] =
-      resolvedConceptLabels.par.filter(conceptLabel => {
+      resolvedConceptLabels.filter(conceptLabel => {
         val substGroupOption: Option[ExpandedName] = taxonomy.substitutionGroupOption(conceptLabel.elementDefinition)
         substGroupOption.isDefined && itemOrTupleSubstGroups.contains(substGroupOption.get)
-      }).seq
+      })
     logger.info("Found %d resolved concept-labels for items/tuples with language %s".format(itemOrTupleConceptLabels.size, languageCode))
 
     val resultMap: Map[String, String] =
-      (for (conceptLabel <- itemOrTupleConceptLabels.par) yield {
+      (for (conceptLabel <- itemOrTupleConceptLabels) yield {
         val tnsOption = conceptLabel.schemaRoot.attributeOption("targetNamespace".ename)
         val localName = conceptLabel.elementDefinition.attribute("name".ename)
         val name: ExpandedName = ExpandedName(tnsOption, localName)
 
         (name.toString -> conceptLabel.labelText)
-      }).toMap.seq
+      }).toMap
 
     val props = new jutil.Properties
     for ((name, labelText) <- resultMap) props.put(name, labelText)
@@ -134,7 +141,9 @@ object FindConceptLabels {
   }
 
   def findLabelLinks(root: XLinkPart): immutable.Seq[ExtendedLink] = {
-    root.elems.collect({ case link: ExtendedLink if link.resolvedName == XbrlLabelLink => link })
+    root.firstElems(lnk => lnk.isInstanceOf[ExtendedLink] && lnk.resolvedName == XbrlLabelLink).collect({
+      case link: ExtendedLink => link
+    })
   }
 
   def findConceptLabels(currentUri: URI, labelLink: ExtendedLink): immutable.Seq[ConceptLabel] = {
