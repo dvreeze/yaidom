@@ -59,6 +59,9 @@ object FindConceptLabels {
       } yield findConceptLabels(uri, link)).flatten.toIndexedSeq
     logger.info("Found %d concept-labels".format(conceptLabels.size))
 
+    val arcroles: Set[String] = conceptLabels.map(_.arcrole).toSet
+    logger.info("Concept-label arcroles: %s".format(arcroles.mkString(", ")))
+
     val languageCodes: Set[String] = conceptLabels.flatMap(conceptLabel => conceptLabel.languageOption).toSet
     logger.info("Language codes found in the concept-labels: %s".format(languageCodes.mkString(", ")))
     val numberOfConceptLabelsWithoutLanguage = conceptLabels.count(conceptLabel => conceptLabel.languageOption.isEmpty)
@@ -79,6 +82,7 @@ object FindConceptLabels {
           elemDefOption.map(elemDef => new ResolvedConceptLabel(
             schemaRoot = schemaRootOption.get,
             elementDefinition = elemDef,
+            arcrole = conceptLabel.arcrole,
             languageOption = conceptLabel.languageOption,
             labelText = conceptLabel.labelText))
         }
@@ -128,7 +132,10 @@ object FindConceptLabels {
   }
 
   final class ConceptLabel(
-    val conceptUri: URI, val languageOption: Option[String], val labelText: String) extends Immutable {
+    val conceptUri: URI,
+    val languageOption: Option[String],
+    val arcrole: String,
+    val labelText: String) extends Immutable {
 
     require(conceptUri.isAbsolute)
   }
@@ -136,6 +143,7 @@ object FindConceptLabels {
   final class ResolvedConceptLabel(
     val schemaRoot: Elem,
     val elementDefinition: Elem,
+    val arcrole: String,
     val languageOption: Option[String],
     val labelText: String) extends Immutable {
   }
@@ -154,6 +162,7 @@ object FindConceptLabels {
       if (fromLocatorOption.isEmpty || toResourceOption.isEmpty) None else {
         val conceptLabel = new ConceptLabel(
           conceptUri = currentUri.resolve(fromLocatorOption.get.href),
+          arcrole = arc.arcroleOption.get,
           languageOption = toResourceOption.get.wrappedElem.attributeOption(XmlLang),
           labelText = toResourceOption.get.wrappedElem.firstTextValueOption.getOrElse(""))
         Some(conceptLabel)
