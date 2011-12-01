@@ -4,7 +4,7 @@ import scala.collection.immutable
 
 /**
  * DSL to build Elems without having to pass parent Scopes around.
- * Example (without namespaces):
+ * Example:
  * <pre>
  * import NodeBuilder._
  *

@@ -45,8 +45,11 @@ sealed trait Node extends Immutable {
  *
  * The API is geared towards data-oriented XML that uses namespaces, and that is described in schemas (so that the user of this
  * API knows the structure of the XML being processed). The methods that return an Option say so in their name.
+ *
+ * The constructor is private, because it is easy to use incorrectly (w.r.t. passed Scopes). See also the apply factory
+ * method on the companion object.
  */
-final class Elem(
+final class Elem private (
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
@@ -166,7 +169,11 @@ object Elem {
 
   final case class RootAndElem(root: Elem, elem: Elem) extends Immutable
 
-  def apply(
+  /**
+   * The constructor is private to the package, because it is easy to use incorrectly (w.r.t. passed Scopes).
+   * To construct Elems, use an ElemBuilder, via method <code>NodeBuilder.elem</code>.
+   */
+  private[yaidom] def apply(
     qname: QName,
     attributes: Map[QName, String] = Map(),
     scope: Scope = Scope.Empty,
