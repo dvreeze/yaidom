@@ -886,175 +886,202 @@ class QueryTest extends Suite {
     }
   }
 
-  private val book1: Elem =
-    Elem(
+  private val book1: Elem = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
           children = List(
-            Text("A First Course in Database Systems"))),
-        Elem(
+            text("A First Course in Database Systems"))),
+        elem(
           qname = QName("Authors"),
           children = List(
-            Elem(
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Jeffrey"))),
-                Elem(
+                  children = List(text("Jeffrey"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Ullman"))))),
-            Elem(
+                  children = List(text("Ullman"))))),
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Jennifer"))),
-                Elem(
+                  children = List(text("Jennifer"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Widom")))))))))
+                  children = List(text("Widom"))))))))).build()
+  }
 
-  private val book2 =
-    Elem(
+  private val book2 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
           children = List(
-            Text("Database Systems: The Complete Book"))),
-        Elem(
+            text("Database Systems: The Complete Book"))),
+        elem(
           qname = QName("Authors"),
           children = List(
-            Elem(
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Hector"))),
-                Elem(
+                  children = List(text("Hector"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Garcia-Molina"))))),
-            Elem(
+                  children = List(text("Garcia-Molina"))))),
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Jeffrey"))),
-                Elem(
+                  children = List(text("Jeffrey"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Ullman"))))),
-            Elem(
+                  children = List(text("Ullman"))))),
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Jennifer"))),
-                Elem(
+                  children = List(text("Jennifer"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Widom"))))))),
-        Elem(
+                  children = List(text("Widom"))))))),
+        elem(
           qname = QName("Remark"),
-          children = List(Text("Buy this book bundled with \"A First Course\" - a great deal!")))))
+          children = List(text("Buy this book bundled with \"A First Course\" - a great deal!"))))).build()
+  }
 
-  private val book3 =
-    Elem(
+  private val book3 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
           children = List(
-            Text("Hector and Jeff's Database Hints"))),
-        Elem(
+            text("Hector and Jeff's Database Hints"))),
+        elem(
           qname = QName("Authors"),
           children = List(
-            Elem(
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Jeffrey"))),
-                Elem(
+                  children = List(text("Jeffrey"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Ullman"))))),
-            Elem(
+                  children = List(text("Ullman"))))),
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Hector"))),
-                Elem(
+                  children = List(text("Hector"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Garcia-Molina"))))))),
-        Elem(
+                  children = List(text("Garcia-Molina"))))))),
+        elem(
           qname = QName("Remark"),
-          children = List(Text("An indispensable companion to your textbook")))))
+          children = List(text("An indispensable companion to your textbook"))))).build()
+  }
 
-  private val book4 =
-    Elem(
+  private val book4 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
           children = List(
-            Text("Jennifer's Economical Database Hints"))),
-        Elem(
+            text("Jennifer's Economical Database Hints"))),
+        elem(
           qname = QName("Authors"),
           children = List(
-            Elem(
+            elem(
               qname = QName("Author"),
               children = List(
-                Elem(
+                elem(
                   qname = QName("First_Name"),
-                  children = List(Text("Jennifer"))),
-                Elem(
+                  children = List(text("Jennifer"))),
+                elem(
                   qname = QName("Last_Name"),
-                  children = List(Text("Widom")))))))))
+                  children = List(text("Widom"))))))))).build()
+  }
 
-  private val magazine1 =
-    Elem(
+  private val magazine1 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
-          children = List(Text("National Geographic")))))
+          children = List(text("National Geographic"))))).build()
+  }
 
-  private val magazine2 =
-    Elem(
+  private val magazine2 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
-          children = List(Text("National Geographic")))))
+          children = List(text("National Geographic"))))).build()
+  }
 
-  private val magazine3 =
-    Elem(
+  private val magazine3 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
-          children = List(Text("Newsweek")))))
+          children = List(text("Newsweek"))))).build()
+  }
 
-  private val magazine4 =
-    Elem(
+  private val magazine4 = {
+    import NodeBuilder._
+
+    elem(
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = List(
-        Elem(
+        elem(
           qname = QName("Title"),
-          children = List(Text("Hector and Jeff's Database Hints")))))
+          children = List(text("Hector and Jeff's Database Hints"))))).build()
+  }
 
-  private def sampleXml: Elem =
+  private def sampleXml: Elem = {
+    import NodeBuilder._
+
     Elem(
       qname = QName("Bookstore"),
       children = List(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
+  }
 }

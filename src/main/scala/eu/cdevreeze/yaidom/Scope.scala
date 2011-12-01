@@ -5,6 +5,8 @@ package eu.cdevreeze.yaidom
  * namespace.
  *
  * The purpose of a Scope is to resolve QNames as ExpandedNames.
+ * 
+ * TODO Rename to Namespaces???
  */
 final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String, String]) extends Immutable {
   require(defaultNamespace ne null)
