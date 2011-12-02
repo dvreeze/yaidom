@@ -6,7 +6,7 @@ import java.net.URI
 import javax.xml.stream._
 import scala.collection.immutable
 import resource._
-import xlink._
+import xlink.{Elem => _, _}
 import parse._
 import ExpandedName._
 import Taxonomy._
@@ -21,7 +21,7 @@ import Taxonomy._
  */
 final class Taxonomy(
   val schemas: Map[URI, Elem],
-  val linkbases: Map[URI, XLinkPart],
+  val linkbases: Map[URI, xlink.Elem],
   val otherFiles: Map[URI, Elem]) extends Immutable {
 
   require(schemas ne null)
@@ -158,7 +158,7 @@ object Taxonomy {
   def apply(elems: Map[URI, Elem]): Taxonomy = {
     val schemas = elems collect { case (uri, elem) if elem.resolvedName == XsdSchema => (uri, elem) }
     val linkbaseElems: Map[URI, Elem] = elems collect { case (uri, elem) if elem.resolvedName == XbrlLinkbase => (uri, elem) }
-    val linkbases: Map[URI, XLinkPart] = linkbaseElems mapValues (e => XLinkPart(e))
+    val linkbases: Map[URI, xlink.Elem] = linkbaseElems mapValues (e => xlink.Elem(e))
     val otherElems = (elems -- schemas.keySet) -- linkbases.keySet
 
     new Taxonomy(schemas, linkbases, otherElems)

@@ -6,7 +6,7 @@ import jutil.{ logging => jlogging }
 import java.net.URI
 import java.lang.management.ManagementFactory
 import scala.collection.immutable
-import xlink._
+import xlink.{Elem => _, _}
 import ExpandedName._
 import Taxonomy._
 
@@ -148,7 +148,7 @@ object FindConceptLabels {
     val labelText: String) extends Immutable {
   }
 
-  def findLabelLinks(root: XLinkPart): immutable.Seq[ExtendedLink] = {
+  def findLabelLinks(root: xlink.Elem): immutable.Seq[ExtendedLink] = {
     root.firstElems(lnk => lnk.isInstanceOf[ExtendedLink] && lnk.resolvedName == XbrlLabelLink).collect({
       case link: ExtendedLink => link
     })
