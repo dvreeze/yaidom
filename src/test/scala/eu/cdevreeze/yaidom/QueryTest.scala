@@ -147,8 +147,10 @@ class QueryTest extends Suite {
       } yield book
 
     expect(Set(
-      book1, book3, book4)) {
-      books.toSet
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      books.flatMap(book => book.firstElemOption("Title".ename).map(_.firstTextValue)).toSet
     }
   }
 
@@ -328,8 +330,8 @@ class QueryTest extends Suite {
         if !booksWithSameName.isEmpty
       } yield magazine
 
-    expect(Set(magazine4)) {
-      magazines.toSet
+    expect(Set("Hector and Jeff's Database Hints")) {
+      magazines.flatMap(mag => mag.firstElemOption("Title".ename).map(_.firstTextValue)).toSet
     }
   }
 
@@ -400,8 +402,8 @@ class QueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expect(Set(book3, magazine4, magazine1, magazine2)) {
-      booksAndMagazines.toSet
+    expect(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+      booksAndMagazines.flatMap(mag => mag.firstElemOption("Title".ename).map(_.firstTextValue)).toSet
     }
   }
 
@@ -421,8 +423,8 @@ class QueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expect(Set(magazine4)) {
-      booksAndMagazines.toSet
+    expect(Set("Hector and Jeff's Database Hints")) {
+      booksAndMagazines.flatMap(mag => mag.firstElemOption("Title".ename).map(_.firstTextValue)).toSet
     }
   }
 
@@ -452,8 +454,8 @@ class QueryTest extends Suite {
         if authorNames.forall(name => name.indexOf("J") >= 0)
       } yield book
 
-    expect(Set(book1, book4)) {
-      books.toSet
+    expect(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
+      books.flatMap(book => book.firstElemOption("Title".ename).map(_.firstTextValue)).toSet
     }
   }
 
@@ -491,6 +493,8 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     val titleAndFirstNames: immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
@@ -498,11 +502,11 @@ class QueryTest extends Suite {
         val authorFirstNames: Set[String] = book.elems("Author".ename).map(_.childElem("First_Name".ename).firstTextValue).toSet
         val searchedForFirstNames: Set[String] = authorFirstNames.filter(firstName => title.firstTextValue.indexOf(firstName) >= 0)
         if !searchedForFirstNames.isEmpty
-      } yield Elem(
+      } yield elem(
         qname = "Book".qname,
         children = List(
-          title,
-          Elem(qname = "First_Name".qname, children = List(Text(searchedForFirstNames.head)))))
+          fromElem(title)(title.scope),
+          elem(qname = "First_Name".qname, children = List(text(searchedForFirstNames.head))))).build()
 
     expect(2) {
       titleAndFirstNames.size
@@ -525,14 +529,16 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     val prices: immutable.Seq[Double] =
       for {
         book <- bookstore.childElems("Book".ename)
         val price = book.attribute("Price".ename).toDouble
       } yield price
     val averagePrice =
-      Elem(qname = "Average".qname,
-        children = List(Text((prices.sum.toDouble / prices.size).toString)))
+      elem(qname = "Average".qname,
+        children = List(text((prices.sum.toDouble / prices.size).toString))).build()
 
     expect(65) {
       averagePrice.firstTextValue.toDouble.intValue
@@ -555,6 +561,8 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     val prices: immutable.Seq[Double] =
       for {
         book <- bookstore.childElems("Book".ename)
@@ -568,13 +576,13 @@ class QueryTest extends Suite {
         book <- bookstore.childElems("Book".ename)
         val price = book.attribute("Price".ename).toDouble
         if price < avg
-      } yield Elem(
+      } yield elem(
         qname = "Book".qname,
         children = List(
-          book.childElem("Title".ename),
-          Elem(
+          fromElem(book.childElem("Title".ename))(Scope.Empty),
+          elem(
             qname = "Price".qname,
-            children = List(Text(price.toString)))))
+            children = List(text(price.toString))))).build()
 
     expect(2) {
       cheapBooks.size
@@ -602,6 +610,8 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     def cheaper(book1: Elem, book2: Elem): Boolean = {
       val price1 = book1.attribute("Price".ename).toInt
       val price2 = book2.attribute("Price".ename).toInt
@@ -612,13 +622,13 @@ class QueryTest extends Suite {
       for {
         book <- bookstore.childElems("Book".ename).sortWith(cheaper _)
         val price = book.attribute("Price".ename).toDouble
-      } yield Elem(
+      } yield elem(
         qname = "Book".qname,
         children = List(
-          book.childElem("Title".ename),
-          Elem(
+          fromElem(book.childElem("Title".ename))(Scope.Empty),
+          elem(
             qname = "Price".qname,
-            children = List(Text(price.toString)))))
+            children = List(text(price.toString))))).build()
     }
 
     expect(4) {
@@ -679,6 +689,8 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     def bookAuthorLastNames(book: Elem): Set[String] = {
       val authors = book.childElem("Authors".ename)
       (for {
@@ -696,15 +708,15 @@ class QueryTest extends Suite {
         book2 <- bookstore.childElems("Book".ename)
         if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
         if bookTitle(book1) < bookTitle(book2)
-      } yield Elem(
+      } yield elem(
         qname = "BookPair".qname,
         children = List(
-          Elem(
+          elem(
             qname = "Title1".qname,
-            children = List(Text(bookTitle(book1)))),
-          Elem(
+            children = List(text(bookTitle(book1)))),
+          elem(
             qname = "Title2".qname,
-            children = List(Text(bookTitle(book2))))))
+            children = List(text(bookTitle(book2)))))).build()
 
     expect(5) {
       pairs.size
@@ -752,15 +764,17 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     def books(authorLastName: String): immutable.Seq[Elem] =
       for {
         book <- bookstore.childElems("Book".ename)
         author <- book.elems("Author".ename)
         if author.childElem("Last_Name".ename).firstTextValue == authorLastName
-      } yield Elem(
+      } yield elem(
         qname = "Book".qname,
-        attributes = book.attributes.filterKeys(a => Set("ISBN".qname, "Price".qname).contains(a)),
-        children = book.childElems("Title".ename))
+        attributes = book.attributes.filterKeys(a => Set("ISBN".qname, "Price".qname).contains(a))).
+        withChildNodes(book.childElems("Title".ename))(Scope.Empty).build()
 
     val authorsWithBooks: immutable.Seq[Elem] =
       for {
@@ -773,15 +787,18 @@ class QueryTest extends Suite {
           } yield author).head
         val firstNameValue: String = author.childElem("First_Name".ename).firstTextValue
 
-        Elem(
+        val foundBooks = books(lastNameValue)
+        val bookBuilders = foundBooks.map(book => fromElem(book)(book.scope))
+
+        elem(
           qname = "Author".qname,
           children = List(
-            Elem(
+            elem(
               qname = "First_Name".qname,
-              children = List(Text(firstNameValue))),
-            Elem(
+              children = List(text(firstNameValue))),
+            elem(
               qname = "Last_Name".qname,
-              children = List(Text(lastNameValue)))) ++ books(lastNameValue))
+              children = List(text(lastNameValue)))) ++ bookBuilders).build()
       }
 
     val invertedBookstore: Elem = Elem(qname = "InvertedBookstore".qname, children = authorsWithBooks)
@@ -796,6 +813,8 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     val bookOrMagazineTitles: immutable.Seq[Elem] =
       for {
         bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
@@ -803,13 +822,13 @@ class QueryTest extends Suite {
         val titleString = bookOrMagazine.childElem("Title".ename).firstTextValue
 
         if (bookOrMagazine.resolvedName == "Book".ename) {
-          Elem(
+          elem(
             qname = "BookTitle".qname,
-            children = List(Text(titleString)))
+            children = List(text(titleString))).build()
         } else {
-          Elem(
+          elem(
             qname = "MagazineTitle".qname,
-            children = List(Text(titleString)))
+            children = List(text(titleString))).build()
         }
       }
 
@@ -861,19 +880,21 @@ class QueryTest extends Suite {
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
+    import NodeBuilder._
+
     def combineName(author: Elem): Elem = {
       require(author.resolvedName == "Author".ename)
 
       val firstNameValue: String = author.childElem("First_Name".ename).firstTextValue
       val lastNameValue: String = author.childElem("Last_Name".ename).firstTextValue
       val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
-      val name: Elem = Elem(qname = "Name".qname, children = List(Text(nameValue)))
+      val name: ElemBuilder = elem(qname = "Name".qname, children = List(text(nameValue)))
 
-      Elem(
+      elem(
         qname = author.qname,
         attributes = author.attributes,
-        scope = author.scope,
-        children = List(name))
+        namespaces = Scope.Empty.relativize(author.scope),
+        children = List(name)).build()
     }
 
     val bookstoreWithCombinedNames: Elem =
@@ -1079,9 +1100,9 @@ class QueryTest extends Suite {
   private def sampleXml: Elem = {
     import NodeBuilder._
 
-    Elem(
-      qname = QName("Bookstore"),
-      children = List(
-        book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
+    elem(
+      qname = QName("Bookstore")).
+      withChildNodes(List(
+        book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))(Scope.Empty).build()
   }
 }

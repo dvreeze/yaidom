@@ -99,8 +99,6 @@ object Scope {
 
   /**
    * Namespace declarations (and undeclarations), typically at the level of one Element.
-   *
-   * TODO Rename to Namespaces???
    */
   final case class Declarations(declared: Scope, defaultNamespaceUndeclared: Boolean, undeclaredPrefixes: Set[String]) extends Immutable {
     require(declared ne null)

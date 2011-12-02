@@ -17,7 +17,7 @@ import scala.collection.immutable
  *       qname = QName("Title"),
  *       children = List(text("Newsweek"))))).build()
  * </pre>
- * 
+ *
  * TODO Indeed support easier creation of namespace declarations.
  */
 sealed trait NodeBuilder extends Immutable {
@@ -33,7 +33,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
   val namespaces: Scope.Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder {
+  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -50,6 +50,14 @@ final class ElemBuilder(
       attributes,
       newScope,
       children.map(ch => ch.build(newScope)))
+  }
+
+  def withChildNodes(childNodes: immutable.Seq[Node])(scope: Scope): ElemBuilder = {
+    new ElemBuilder(
+      qname = self.qname,
+      attributes = self.attributes,
+      namespaces = self.namespaces,
+      children = childNodes.map(ch => NodeBuilder.fromNode(ch)(scope)).toIndexedSeq)
   }
 }
 
@@ -105,4 +113,27 @@ object NodeBuilder {
   def cdata(textValue: String): CDataBuilder = CDataBuilder(textValue)
 
   def entityRef(entity: String): EntityRefBuilder = EntityRefBuilder(entity)
+
+  /**
+   * Converts a Node to a NodeBuilder, given a Scope.
+   *
+   * The following must always hold: fromNode(node)(scope).build(scope) "is structurally equal to" node
+   */
+  def fromNode(node: Node)(scope: Scope): NodeBuilder = node match {
+    case Text(s) => TextBuilder(s)
+    case ProcessingInstruction(target, data) => ProcessingInstructionBuilder(target, data)
+    case CData(s) => CDataBuilder(s)
+    case EntityRef(entity) => EntityRefBuilder(entity)
+    case e: Elem =>
+      require(scope.resolve(scope.relativize(e.scope)) == e.scope)
+
+      // Recursive call, but not tail-recursive
+      new ElemBuilder(
+        qname = e.qname,
+        attributes = e.attributes,
+        namespaces = scope.relativize(e.scope),
+        children = e.children.map(ch => fromNode(ch)(e.scope)))
+  }
+
+  def fromElem(elem: Elem)(scope: Scope): ElemBuilder = fromNode(elem)(scope).asInstanceOf[ElemBuilder]
 }
