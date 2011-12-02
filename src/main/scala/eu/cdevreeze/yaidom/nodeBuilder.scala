@@ -135,5 +135,5 @@ object NodeBuilder {
         children = e.children.map(ch => fromNode(ch)(e.scope)))
   }
 
-  def fromElem(elem: Elem)(scope: Scope): ElemBuilder = fromNode(elem)(scope).asInstanceOf[ElemBuilder]
+  def fromElem(elm: Elem)(scope: Scope): ElemBuilder = fromNode(elm)(scope).asInstanceOf[ElemBuilder]
 }

@@ -505,7 +505,7 @@ class QueryTest extends Suite {
       } yield elem(
         qname = "Book".qname,
         children = List(
-          fromElem(title)(title.scope),
+          fromElem(title)(Scope.Empty),
           elem(qname = "First_Name".qname, children = List(text(searchedForFirstNames.head))))).build()
 
     expect(2) {
@@ -788,7 +788,7 @@ class QueryTest extends Suite {
         val firstNameValue: String = author.childElem("First_Name".ename).firstTextValue
 
         val foundBooks = books(lastNameValue)
-        val bookBuilders = foundBooks.map(book => fromElem(book)(book.scope))
+        val bookBuilders = foundBooks.map(book => fromElem(book)(Scope.Empty))
 
         elem(
           qname = "Author".qname,
