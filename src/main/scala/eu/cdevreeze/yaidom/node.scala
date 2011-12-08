@@ -44,7 +44,7 @@ import scala.collection.immutable
  * <li>This API is less ambitious. Like said above, XPath support is absent. So is support for "updates" through
  * zippers. So is true equality based on the exact tree. It is currently also less mature, and less well tested.</li>
  * </ul>
- * 
+ *
  * @author Chris de Vreeze
  */
 sealed trait Node extends Immutable {
@@ -136,6 +136,24 @@ final class Elem private (
       })
       self.withChildren(newChildren)
     }
+  }
+
+  /** Computes an index on the UUID. Very inefficient. */
+  def getIndexOnUuid: Map[jutil.UUID, Elem] = {
+    val result = getIndex(e => e.uuid)
+    require(result.values.forall(elms => elms.size == 1))
+    result.mapValues(elms => elms(0))
+  }
+
+  /**
+   * Computes an index to parent elements, on the UUID of the child elements. Very inefficient.
+   * After the index has been built, each element's parent can be obtained very quickly using this index.
+   */
+  def getIndexToParentOnUuid: Map[jutil.UUID, Elem] = {
+    val result = getIndexToParent(e => e.uuid)
+    require(!result.contains(self.uuid))
+    require(result.values.forall(elms => elms.size == 1))
+    result.mapValues(elms => elms(0))
   }
 
   /** Equality based on the UUID. Fast but depends not only on the tree itself, but also the time of creation */

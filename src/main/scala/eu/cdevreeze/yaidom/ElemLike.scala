@@ -21,7 +21,7 @@ import scala.annotation.tailrec
 
 /**
  * Supertrait for Elems and other element-like objects.
- * 
+ *
  * @author Chris de Vreeze
  */
 trait ElemLike[E <: ElemLike[E]] { self: E =>
@@ -138,5 +138,14 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     if (root.childElems.exists(ch => ch == self)) Some(root) else {
       root.firstElemOption(e => e.childElems.exists(ch => ch == self))
     }
+  }
+
+  /** Computes an index on the given function taking an element, for example a function returning a UUID. Very inefficient. */
+  final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = (elems :+ self).groupBy(f)
+
+  /** Computes an index to parent elements, on the given function applied to the child elements. Very inefficient. */
+  final def getIndexToParent[K](f: E => K): Map[K, immutable.Seq[E]] = {
+    val parentChildPairs = (elems :+ self).flatMap(e => e.childElems.map(ch => (e -> ch)))
+    parentChildPairs.groupBy(pair => f(pair._2)).mapValues(pairs => pairs.map(pair => pair._1))
   }
 }

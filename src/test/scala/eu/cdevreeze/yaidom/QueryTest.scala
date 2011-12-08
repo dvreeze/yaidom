@@ -32,7 +32,7 @@ import QName._
  * Acknowledgments: The sample XML and original XPath and XQuery queries are part of the online course
  * "Introduction to Databases", by professor Widom at Stanford University. Many thanks for letting me use
  * this material.
- * 
+ *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
@@ -373,32 +373,26 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTreeElementsWithParentNotBookOrBookstore() {
+  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingIndex() {
     // Again XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
-    // This time we use TreeElems, and the method parentUuidOption
+    // This time we use an index to the parent elements
 
     val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookstoreTree = Tree(bookstore)
+    val indexToParent: Map[jutil.UUID, Elem] = bookstore.getIndexToParentOnUuid
 
-    // This should always hold for trees
-    expect(bookstore.elems) {
-      bookstoreTree.root.elems.map(e => e.node)
-    }
-
-    val treeElems: immutable.Seq[TreeElem] =
+    val elems: immutable.Seq[Elem] =
       for {
-        desc <- bookstoreTree.root.elems
-        val parentUuidOption = desc.parentUuidOption
-        if parentUuidOption.isDefined
-        parent <- bookstoreTree.root.elems(e => e.node.uuid == parentUuidOption.get)
-        if parent.node.qname != "Bookstore".qname && parent.node.qname != "Book".qname
+        desc <- bookstore.elems
+        val parentOption = indexToParent.get(desc.uuid)
+        parent <- parentOption
+        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
 
-    assert(treeElems.size > 10, "Expected more than 10 matching elements")
-    val qnames: Set[QName] = treeElems.map(_.node.qname).toSet
+    assert(elems.size > 10, "Expected more than 10 matching elements")
+    val qnames: Set[QName] = elems.map(_.qname).toSet
     expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
       qnames
     }
