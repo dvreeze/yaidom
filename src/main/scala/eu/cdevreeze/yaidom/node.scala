@@ -168,10 +168,13 @@ final class Elem private (
   /** Returns the XML string corresponding to this element, without the children (but ellipsis instead) */
   override def toString: String = withChildren(immutable.Seq[Node](Text(" ... "))).toXmlString(Scope.Empty)
 
-  /** Returns the XML string corresponding to this element */
+  /** Returns the XML string corresponding to this element. Consider using an XML serializer (such as in JAXP) instead. */
   def toXmlString: String = toXmlString(Scope.Empty)
 
-  /** Returns the XML string corresponding to this element, taking the given parent Scope into account */
+  /**
+   * Returns the XML string corresponding to this element, taking the given parent Scope into account.
+   * Consider using an XML serializer (such as in JAXP) instead.
+   */
   def toXmlString(parentScope: Scope): String = toLines("", parentScope).mkString("%n".format())
 
   private def toLines(indent: String, parentScope: Scope): List[String] = {

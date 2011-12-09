@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom
 
 /**
  * Qualified name. See http://www.w3.org/TR/xml-names11/.
- * Semantically like a QName in anti-xml, and not like a QName in Java.
+ * Semantically like a QName in Anti-XML, and not like a QName in Java.
  *
  * There are 2 types of QNames:
  * <ul>
