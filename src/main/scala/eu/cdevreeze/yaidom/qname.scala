@@ -27,17 +27,20 @@ package eu.cdevreeze.yaidom
  * </ul>
  *
  * QNames are meaningless outside their scope, which resolves the QName as an ExpandedName.
- * 
+ *
  * @author Chris de Vreeze
  */
 sealed trait QName extends Immutable {
 
   def localPart: String
+  def prefixOption: Option[String]
 }
 
 final case class UnprefixedName(override val localPart: String) extends QName {
   require(localPart ne null)
   require(localPart.size > 0)
+
+  override def prefixOption: Option[String] = None
 
   /** The String representation as it appears in XML, that is, the localPart */
   override def toString: String = localPart
@@ -48,6 +51,8 @@ final case class PrefixedName(prefix: String, override val localPart: String) ex
   require(prefix.size > 0)
   require(localPart ne null)
   require(localPart.size > 0)
+
+  override def prefixOption: Option[String] = Some(prefix)
 
   /** The String representation as it appears in XML E.g. <b>xs:schema</b> */
   override def toString: String = "%s:%s".format(prefix, localPart)

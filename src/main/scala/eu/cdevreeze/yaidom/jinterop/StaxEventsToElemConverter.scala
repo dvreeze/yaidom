@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package parse
+package jinterop
 
 import java.{ util => jutil }
 import javax.xml.XMLConstants
@@ -23,28 +23,17 @@ import javax.xml.stream._
 import javax.xml.stream.events._
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
-import ElemReader._
+import StaxEventsToElemConverter._
 
 /**
- * StAX based reader of (top level) Elements.
+ * Converter from immutable.Seq[XMLEvent] to Elem
  *
- * Example usage:
- * <pre>
- * val xmlInputFactory = XMLInputFactory.newFactory
- * val xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
- * val elemReader = new ElemReader(xmlEventReader)
- * val root: Elem = elemReader.readElem()
- * </pre>
- * 
  * @author Chris de Vreeze
  */
-final class ElemReader(val xmlEventReader: XMLEventReader) {
+trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]] {
 
-  def readElem(): Elem = {
-    // Expensive (potentially 2 large collections of XMLEvents are built), but easy to reason about
-
-    val events: immutable.Seq[XMLEvent] =
-      xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]].asScala.toList.dropWhile(ev => !ev.isStartElement)
+  def convertToElem(v: immutable.Seq[XMLEvent]): Elem = {
+    val events: immutable.Seq[XMLEvent] = v.toList.dropWhile(ev => !ev.isStartElement)
 
     val eventsWithDepths: immutable.Seq[EventWithDepth] = {
       var depth = 0
@@ -147,7 +136,7 @@ final class ElemReader(val xmlEventReader: XMLEventReader) {
   // TODO EntityRef, ProcessingInstruction (but those StAX events are only fired if document contains DTD)
 }
 
-object ElemReader {
+object StaxEventsToElemConverter {
 
   private final class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
 

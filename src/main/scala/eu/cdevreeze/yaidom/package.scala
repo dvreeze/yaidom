@@ -36,6 +36,7 @@ package eu.cdevreeze
  * or "precise" appearance.</li>
  * <li>This API should be easy to use for data-oriented XML with a known structure (typically described
  * by an XSD), and known namespaces. It is not geared towards XML that freely mixes text and tags.</li>
+ * <li>This API should have good interop with standard Java XML APIs (JAXP).</li>
  * </ul>
  *
  * Some non-goals or limitations of this API are:
@@ -46,7 +47,6 @@ package eu.cdevreeze
  * support (arguably, it does not need it).</li>
  * <li>This API is not meant to follow the W3C DOM standards. As a consequence, it is also far less complete, and
  * less "correct".</li>
- * <li>Good interop with other XML APIs (such as the JAXP APIs) is not yet a design goal.</li>
  * </ul>
  *
  * Compared to Java's standard DOM API, this API does not follow the DOM specifications (such as DOM level 2 Core),
@@ -75,7 +75,8 @@ package eu.cdevreeze
  * <li>Class Scope</li>
  * <li>Trait ElemLike, containing common functions for "Element-like" classes</li>
  * <li>Trait Node and its subtypes, such as Elem (which extends ElemLike)</li>
- * <li>Trait NodeBuilder and its subtypes, such as ElemBuilder</li>
+ * <li>Trait NodeBuilder and its subtypes, such as ElemBuilder. At the same level are
+ * ConverterToElem and ConverterFromElem</li>
  * </ol>
  * Dependencies are all uni-directional, from top to bottom. All types in this package are (deeply) immutable.
  * That holds even for the NodeBuilder instances.

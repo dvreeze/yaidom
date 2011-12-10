@@ -6,8 +6,8 @@ import java.net.URI
 import javax.xml.stream._
 import scala.collection.immutable
 import resource._
-import xlink.{Elem => _, _}
-import parse._
+import xlink.{ Elem => _, _ }
+import jinterop.StaxConversions._
 import ExpandedName._
 import Taxonomy._
 
@@ -198,8 +198,7 @@ object Taxonomy {
         def createReader(): XMLEventReader = xmlInputFactory.createXMLEventReader(new jio.FileInputStream(file))
 
         managed(createReader()).map({ xmlEventReader =>
-          val elemReader = new ElemReader(xmlEventReader)
-          elemReader.readElem()
+          convertToElem(xmlEventReader.toSeq)
         }).opt.getOrElse(sys.error("Could not parse file '%s' as XML".format(file.getPath)))
       }
       (file.toURI, rootElem)
