@@ -76,7 +76,7 @@ package eu.cdevreeze
  * <li>Trait ElemLike, containing common functions for "Element-like" classes</li>
  * <li>Trait Node and its subtypes, such as Elem (which extends ElemLike)</li>
  * <li>Trait NodeBuilder and its subtypes, such as ElemBuilder. At the same level are
- * ConverterToElem and ConverterFromElem</li>
+ * ConverterToElem and ElemConverter</li>
  * </ol>
  * Dependencies are all uni-directional, from top to bottom. All types in this package are (deeply) immutable.
  * That holds even for the NodeBuilder instances.
