@@ -50,6 +50,8 @@ import scala.collection.JavaConverters._
  *
  * xmlEventWriter.close()
  * </pre>
+ *
+ * @author Chris de Vreeze
  */
 object StaxConversions extends ElemToStaxEventsConverter with StaxEventsToElemConverter {
 
