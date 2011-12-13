@@ -147,9 +147,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Finds the parent element, if any, searching in the tree with the given root element. Typically rather expensive. */
   final def findParentInTree(root: E): Option[E] = {
-    if (root.childElems.exists(ch => ch == self)) Some(root) else {
-      root.firstElemOption(e => e.childElems.exists(ch => ch == self))
-    }
+    root.firstElemOrSelfOption(e => e.childElems.exists(ch => ch == self))
   }
 
   /** Computes an index on the given function taking an element, for example a function returning a UUID. Very inefficient. */
