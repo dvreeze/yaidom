@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom
 
 import scala.collection.immutable
-import scala.annotation.tailrec
 
 /**
  * Supertrait for Elems and other element-like objects.
@@ -86,32 +85,23 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def elemsOrSelf(expandedName: ExpandedName, p: E => Boolean): immutable.Seq[E] =
     elemsOrSelf(e => e.resolvedName == expandedName && p(e))
 
-  /** Returns the descendant elements (not including this element). Very inefficient. Has the same elements as <code>elemsOrSelf.tail</code>. */
+  /** Returns the descendant elements (not including this element). Same as <code>elemsOrSelf.drop(1)</code>. */
   final def elems: immutable.Seq[E] = {
-    // Consider implementing in terms of elemsOrSelf
-    @tailrec
-    def elems(elms: immutable.IndexedSeq[E], acc: immutable.IndexedSeq[E]): immutable.IndexedSeq[E] = {
-      val childElms: immutable.IndexedSeq[E] = elms.flatMap(_.childElems)
-
-      val newAcc = acc ++ childElms
-      if (childElms.isEmpty) newAcc else elems(childElms, newAcc)
-    }
-
-    elems(immutable.IndexedSeq(self), immutable.IndexedSeq())
+    val resultWithSelf = elemsOrSelf
+    require(resultWithSelf.head == self)
+    resultWithSelf.drop(1)
   }
 
   /** Returns the descendant elements obeying the given predicate, that is, elems.filter(p). Not efficient. */
   final def elems(p: E => Boolean): immutable.Seq[E] = {
-    // Consider implementing in terms of elemsOrSelf(p)
-    @tailrec
-    def elems(elms: immutable.IndexedSeq[E], acc: immutable.IndexedSeq[E]): immutable.IndexedSeq[E] = {
-      val childElms: immutable.IndexedSeq[E] = elms.flatMap(_.childElems)
+    val resultWithSelf = elemsOrSelf(p)
 
-      val newAcc = acc ++ childElms.filter(p)
-      if (childElms.isEmpty) newAcc else elems(childElms, newAcc)
+    if (p(self)) {
+      require(resultWithSelf.head == self)
+      resultWithSelf.drop(1)
+    } else {
+      resultWithSelf
     }
-
-    elems(immutable.IndexedSeq(self), immutable.IndexedSeq())
   }
 
   /** Returns the descendant elements with the given expanded name. Not efficient. */
@@ -123,16 +113,14 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def firstElems(p: E => Boolean): immutable.Seq[E] = {
-    @tailrec
-    def firstElems(elms: immutable.IndexedSeq[E], acc: immutable.IndexedSeq[E]): immutable.IndexedSeq[E] = {
-      val childElms: immutable.IndexedSeq[E] = elms.flatMap(_.childElems)
-      val (matchingChildren, nonMatchingChildren) = childElms.partition(e => p(e))
+    val resultWithSelf = firstElemsOrSelfList(p)
 
-      val newAcc = acc ++ matchingChildren
-      if (nonMatchingChildren.isEmpty) newAcc else firstElems(nonMatchingChildren, newAcc)
+    if (p(self)) {
+      require(resultWithSelf.head == self)
+      resultWithSelf.drop(1).toIndexedSeq
+    } else {
+      resultWithSelf.toIndexedSeq
     }
-
-    firstElems(immutable.IndexedSeq(self), immutable.IndexedSeq())
   }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
@@ -147,15 +135,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the first found descendant element obeying the given predicate, if any, wrapped in an Option. */
   final def firstElemOption(p: E => Boolean): Option[E] = {
-    @tailrec
-    def firstElemOption(elms: immutable.IndexedSeq[E]): Option[E] = {
-      val childElms: immutable.IndexedSeq[E] = elms.flatMap(_.childElems)
-      val elmOption: Option[E] = childElms.find(p)
-
-      if (elmOption.isDefined) elmOption else firstElemOption(childElms)
-    }
-
-    firstElemOption(immutable.IndexedSeq(self))
+    self.childElems.view.flatMap(ch => ch.firstElemOrSelfOption(p)).headOption
   }
 
   /** Returns the first found descendant element with the given expanded name, if any, wrapped in an Option */
@@ -173,11 +153,11 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Computes an index on the given function taking an element, for example a function returning a UUID. Very inefficient. */
-  final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = (elems :+ self).groupBy(f)
+  final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = (elemsOrSelf).groupBy(f)
 
   /** Computes an index to parent elements, on the given function applied to the child elements. Very inefficient. */
   final def getIndexToParent[K](f: E => K): Map[K, immutable.Seq[E]] = {
-    val parentChildPairs = (elems :+ self).flatMap(e => e.childElems.map(ch => (e -> ch)))
+    val parentChildPairs = (elemsOrSelf).flatMap(e => e.childElems.map(ch => (e -> ch)))
     parentChildPairs.groupBy(pair => f(pair._2)).mapValues(pairs => pairs.map(pair => pair._1))
   }
 
@@ -201,5 +181,21 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     // Not tail-recursive, but the depth should typically be limited
     val resultWithoutSelf = self.childElems.toList.flatMap(ch => ch.elemsOrSelfList(p))
     if (p(self)) self :: resultWithoutSelf else resultWithoutSelf
+  }
+
+  /**
+   * Returns a List of those of this element and its descendant elements that obey the given predicate,
+   * such that no ancestor obeys the predicate. The result is in the same order as corresponding StAX "start" events.
+   * This method is not efficient.
+   */
+  private final def firstElemsOrSelfList(p: E => Boolean): List[E] = {
+    // Not tail-recursive, but the depth should typically be limited
+    if (p(self)) List(self) else self.childElems.toList.flatMap(ch => ch.firstElemsOrSelfList(p))
+  }
+
+  /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an Option. */
+  private final def firstElemOrSelfOption(p: E => Boolean): Option[E] = {
+    // Not tail-recursive, but the depth should typically be limited
+    if (p(self)) Some(self) else self.childElems.view.flatMap(ch => ch.firstElemOrSelfOption(p)).headOption
   }
 }
