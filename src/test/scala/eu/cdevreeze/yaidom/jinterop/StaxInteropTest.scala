@@ -76,7 +76,6 @@ class StaxInteropTest extends Suite {
     xmlEventWriter.close()
 
     val xmlString = new String(bos.toByteArray, "utf-8")
-    println(xmlString)
 
     // 3. Parse XML string into Elem
 
