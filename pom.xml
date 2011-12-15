@@ -8,7 +8,7 @@
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
 	<artifactId>yaidom</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Yet another immutable XML DOM-like API</name>
