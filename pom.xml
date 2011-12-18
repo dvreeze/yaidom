@@ -12,6 +12,12 @@
 	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
 	<name>Yet another immutable XML DOM-like API</name>
 	<description>Yet another Scala-based immutable XML DOM-like API</description>
 	<url>https://github.com/dvreeze/yaidom</url>
