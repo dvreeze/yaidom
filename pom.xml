@@ -8,7 +8,7 @@
 	</properties>
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
-	<artifactId>yaidom_${scala.version}</artifactId>
+	<artifactId>yaidom_2.9.1</artifactId>
 	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
