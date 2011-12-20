@@ -31,21 +31,21 @@ import scala.collection.immutable
  * <li>descendant elements</li>
  * <li>descendant or self elements</li>
  * <li>first found descendant elements obeying a predicate, meaning that
- * no ancestors obey that predicate</li>
+ * they have no ancestors obeying that predicate</li>
  * </ul>
  * There are also methods for indexing the element tree.
  *
- * These methods each have up to 4 variants (returning collections of elements):
+ * These element finder methods each have up to 4 variants (returning collections of elements):
  * <ol>
- * <li>No argument variant, if applicable</li>
- * <li>Single <code>E => Boolean</code> predicate argument variant</li>
- * <li>Expanded name argument variant</li>
+ * <li>A no argument variant, if applicable</li>
+ * <li>A single <code>E => Boolean</code> predicate argument variant</li>
+ * <li>An expanded name argument variant</li>
  * <li>A 2-argument variant taking both expanded name and predicate (interpreted as AND, not OR)</li>
  * </ol>
  * The latter 2 variants are implemented in terms of the single predicate argument variant.
  * Some methods also have variants that return a single element or an element Option.
  *
- * These methods process and return elements in the following (depth-first) order:
+ * These finder methods process and return elements in the following (depth-first) order:
  * <ol>
  * <li>Parents are processed before their children</li>
  * <li>Children are processed before the next sibling</li>
