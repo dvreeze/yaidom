@@ -16,23 +16,28 @@ import Taxonomy._
  * Even at this low level of abstraction, interesting queries are possible, merely by using yaidom and Scala's
  * great Collections API.
  *
+ * The term taxonomy is used rather loosely. The XBRL spec (http://www.xbrl.org/Specification/XBRL-RECOMMENDATION-2003-12-31+Corrected-Errata-2008-07-02.htm#_3.1)
+ * speaks of a taxonomy as a schema with the linkbases directly referred from that schema. This wikipedia page
+ * (http://en.wikipedia.org/wiki/XBRL) uses a far looser definition of taxonomies. Although the spec should be leading,
+ * we use the looser definition, of a taxonomy as a set of taxonomy schemas and linkbases.
+ *
  * It is assumed that taxonomies are resolved entirely and stored in memory before use, instead of discovering them
  * while using them.
  */
 final class Taxonomy(
-  val schemas: Map[URI, Elem],
+  val schemas: Map[URI, xlink.Elem],
   val linkbases: Map[URI, xlink.Elem],
-  val otherFiles: Map[URI, Elem]) extends Immutable {
+  val otherFiles: Map[URI, xlink.Elem]) extends Immutable {
 
   require(schemas ne null)
   require(linkbases ne null)
   require(otherFiles ne null)
 
-  require(schemas.size + linkbases.size + otherFiles.size == (schemas.keySet ++ linkbases.keySet ++ otherFiles.keySet).size)
+  require(numberOfFiles == (schemas.keySet ++ linkbases.keySet ++ otherFiles.keySet).size)
 
   require(schemas.values.forall(root => root.resolvedName == XsdSchema))
 
-  def linkbaseElems: Map[URI, Elem] = linkbases.mapValues(xlink => xlink.wrappedElem)
+  def numberOfFiles: Int = schemas.size + linkbases.size + otherFiles.size
 
   def findSchemaRoot(url: URI): Option[Elem] = {
     require(url.isAbsolute)
@@ -40,8 +45,8 @@ final class Taxonomy(
     val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
     val fragment = url.getFragment
 
-    val schemaOption: Option[Elem] = schemas.get(schemaUrl)
-    schemaOption
+    val schemaOption: Option[xlink.Elem] = schemas.get(schemaUrl)
+    schemaOption.map(schema => schema.wrappedElem)
   }
 
   def findElementDefinition(url: URI): Option[Elem] = {
@@ -50,7 +55,7 @@ final class Taxonomy(
     val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
     val fragment = url.getFragment
 
-    val schemaOption: Option[Elem] = schemas.get(schemaUrl)
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl).map(_.wrappedElem)
 
     if (schemaOption.isEmpty) None else {
       val elemDefinitionOption: Option[Elem] = schemaOption.get.firstElemOption(e => {
@@ -67,7 +72,7 @@ final class Taxonomy(
     val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
     val fragment = url.getFragment
 
-    val schemaOption: Option[Elem] = schemas.get(schemaUrl)
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl).map(_.wrappedElem)
 
     if (schemaOption.isEmpty) None else {
       val elemDefinitionOption: Option[Elem] = schemaOption.get.firstElemOption(e => {
@@ -92,7 +97,7 @@ final class Taxonomy(
   }
 
   def substitutionGroups: Set[ExpandedName] = {
-    val elemDefs = schemas.values.flatMap(root => findElementDefinitions(root))
+    val elemDefs = schemas.values.flatMap(root => findElementDefinitions(root.wrappedElem))
     elemDefs.flatMap(elemDef => substitutionGroupOption(elemDef)).toSet
   }
 
@@ -110,7 +115,7 @@ final class Taxonomy(
       filteredElemDefs.map(elemDef => (ExpandedName(tns, elemDef.attribute("name".ename)) -> elemDef)).toMap
     }
 
-    schemas.values.map(root => substitutionGroupElemDefinitionsIn(root)).flatten.toMap
+    schemas.values.map(root => substitutionGroupElemDefinitionsIn(root.wrappedElem)).flatten.toMap
   }
 
   def substitutionGroupAncestries: immutable.Seq[List[ExpandedName]] = {
@@ -130,6 +135,12 @@ final class Taxonomy(
     }
 
     ancestries(substGroups.toIndexedSeq[ExpandedName].map(substGroup => List(substGroup)))
+  }
+
+  def isSubTaxonomyOf(other: Taxonomy): Boolean = {
+    schemas.toSet.subsetOf(other.schemas.toSet) &&
+      linkbases.toSet.subsetOf(other.linkbases.toSet) &&
+      otherFiles.toSet.subsetOf(other.otherFiles.toSet)
   }
 }
 
@@ -161,7 +172,7 @@ object Taxonomy {
     val linkbases: Map[URI, xlink.Elem] = linkbaseElems mapValues (e => xlink.Elem(e))
     val otherElems = (elems -- schemas.keySet) -- linkbases.keySet
 
-    new Taxonomy(schemas, linkbases, otherElems)
+    new Taxonomy(schemas.mapValues(e => xlink.Elem(e)), linkbases, otherElems.mapValues(e => xlink.Elem(e)))
   }
 
   final class FileBasedTaxonomyProducer extends Producer {
