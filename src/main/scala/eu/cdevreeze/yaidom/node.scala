@@ -33,7 +33,7 @@ import scala.collection.immutable
  * </ul>
  * Unlike Anti-XML:
  * <ul>
- * <li>This is just a DOM API, around immutable Nodes and immutable Scala Collections of Nodes,
+ * <li>This is just a DOM-like API, around immutable Nodes and immutable Scala Collections of Nodes,
  * without any XPath support. Despite the absence of selectors like those in Anti-XML, this DOM API
  * is still quite expressive, be it with somewhat verbose method names. This API is also simpler
  * in that CanBuildFrom "axioms" are absent, and implicit conversions are absent or at least rare.
