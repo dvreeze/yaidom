@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Bookstore>
+<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
 	<Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
 		<Title>A First Course in Database Systems</Title>
 		<Authors>
@@ -67,4 +67,4 @@
 	<Magazine Month="March" Year="2009">
 		<Title>Hector and Jeff's Database Hints</Title>
 	</Magazine>
-</Bookstore>
+</books:Bookstore>

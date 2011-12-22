@@ -42,8 +42,8 @@ package eu.cdevreeze
  * Some non-goals or limitations of this API are:
  * <ul>
  * <li>This API should not try to solve all problems. Sometimes SAX, StAX or DOM is better.
- * In particular, immutability has some drawbacks too, such as the elements not keeping a reference to the
- * parent element, or the missing convenience of in-place updates. Furthermore, this API is not meant to offer XPath
+ * In particular, immutability (using strict evaluation) has some drawbacks too, such as the elements not keeping a reference
+ * to the parent element, or the missing convenience of in-place updates. Furthermore, this API is not meant to offer XPath
  * support (arguably, it does not need it).</li>
  * <li>This API is not meant to follow the W3C DOM standards. As a consequence, it is also far less complete, and
  * less "correct".</li>
@@ -57,6 +57,11 @@ package eu.cdevreeze
  * Compared to JDOM, which unlike the standard DOM API leverages idiomatic Java, this API in a similar vein attempts
  * to leverage idiomatic Scala. Immutability, Scala collection processing and Options instead of nulls are
  * characteristic of this API. Like is the case for DOM, JDOM has more far more functionality than this API.
+ *
+ * XOM is another idiomatic Java XML API. It focuses on correctness, among other things. To check yaidom for correctness,
+ * it makes sense to compare the yaidom API against XOM. Unlike yaidom Nodes, XOM Nodes are mutable. Like Java's standard
+ * DOM API, XOM is far more complete than yaidom (even sporting XPath support). Also note that yaidom does not support
+ * base URIs.
  *
  * Like Scala's standard XML API, this API is centered around immutable XML trees. Again, this API is far less
  * ambitious. For one, XPath-like syntax is not offered. That has some advantages too, like a much simpler and more

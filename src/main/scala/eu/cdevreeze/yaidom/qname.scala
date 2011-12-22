@@ -39,6 +39,7 @@ sealed trait QName extends Immutable {
 final case class UnprefixedName(override val localPart: String) extends QName {
   require(localPart ne null)
   require(localPart.size > 0)
+  require(localPart.indexOf(":") < 0)
 
   override def prefixOption: Option[String] = None
 

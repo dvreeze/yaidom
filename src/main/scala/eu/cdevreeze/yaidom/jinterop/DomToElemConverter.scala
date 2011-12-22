@@ -31,7 +31,7 @@ import scala.collection.{ immutable, mutable }
 trait DomToElemConverter extends ConverterToElem[Element] {
 
   def convertToElem(v: Element): Elem = {
-    val qname: QName = QName(Option(v.getPrefix), Option(v.getLocalName).getOrElse(v.getTagName))
+    val qname: QName = QName(Option(v.getPrefix), extractLocalName(v))
     val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
 
     val nsMap: Map[String, String] = {
@@ -78,11 +78,12 @@ trait DomToElemConverter extends ConverterToElem[Element] {
   private def convertToCData(v: org.w3c.dom.CDATASection): CData = CData(v.getData)
 
   private def convertAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {
-    (0 until domAttributes.getLength).map(i => {
+    (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
-      val qname: QName = QName(Option(attr.getPrefix), Option(attr.getLocalName).getOrElse(attr.getName))
+      val qname: QName = QName(Option(attr.getPrefix), extractLocalName(attr))
 
-      (qname -> attr.getValue)
+      val isNamespaceDeclaration: Boolean = qname.prefixOption == Some("xmlns") || qname.localPart == "xmlns"
+      if (isNamespaceDeclaration) None else Some(qname -> attr.getValue)
     }).toMap
   }
 
@@ -90,16 +91,40 @@ trait DomToElemConverter extends ConverterToElem[Element] {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
       val prefixOption = Option(attr.getPrefix)
+      val qname: QName = QName(prefixOption, extractLocalName(attr))
 
-      // No default namespace for attributes!
-      if (prefixOption.isEmpty) None else {
-        require(attr.getNamespaceURI ne null)
-        Some(prefixOption.get -> attr.getNamespaceURI)
+      val isNamespaceDeclaration: Boolean = qname.prefixOption == Some("xmlns") || qname.localPart == "xmlns"
+
+      if (isNamespaceDeclaration) None else {
+        // No default namespace for attributes!
+        if (prefixOption.isEmpty) None else {
+          require(attr.getNamespaceURI ne null)
+          Some(prefixOption.get -> attr.getNamespaceURI)
+        }
       }
     }).toMap
   }
 
   private def convertNodeList(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
     (0 until nodeList.getLength).map(i => nodeList.item(i)).toIndexedSeq
+  }
+
+  private def extractLocalName(v: org.w3c.dom.Element): String = {
+    def empty2Null(s: String): String = if (s == "") null else s
+
+    val name: String = Option(empty2Null(v.getLocalName)).getOrElse(v.getTagName)
+    val arr = name.split(':')
+    require(arr.length >= 1 && arr.length <= 2)
+    if (arr.length == 1) arr(0) else arr(1)
+  }
+
+  private def extractLocalName(v: org.w3c.dom.Attr): String = {
+    // Possibly the attribute is a namespace declaration!
+    def empty2Null(s: String): String = if (s == "") null else s
+
+    val name: String = Option(empty2Null(v.getLocalName)).getOrElse(v.getName)
+    val arr = name.split(':')
+    require(arr.length >= 1 && arr.length <= 2)
+    if (arr.length == 1) arr(0) else arr(1)
   }
 }

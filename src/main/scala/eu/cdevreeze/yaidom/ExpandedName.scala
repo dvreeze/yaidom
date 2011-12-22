@@ -24,7 +24,7 @@ import javax.xml.namespace.{ QName => JQName }
  * Semantically like a QName in Java, but not keeping the prefix.
  *
  * To get an ExpandedName from a QName, the latter needs to be resolved against a Scope.
- * 
+ *
  * @author Chris de Vreeze
  */
 final case class ExpandedName(namespaceUri: Option[String], localPart: String) extends Immutable {
