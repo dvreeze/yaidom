@@ -33,14 +33,14 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
 
   def convertElem(elm: Elem): ElementProducer = {
     { (doc: Document) =>
-      val element = convertElem(elm, doc, doc)
+      val element = convertElem(elm, doc, doc, Scope.Empty)
       element
     }
   }
 
-  private def convertNode(node: Node, doc: Document, parent: org.w3c.dom.Node): org.w3c.dom.Node = {
+  private def convertNode(node: Node, doc: Document, parent: org.w3c.dom.Node, parentScope: Scope): org.w3c.dom.Node = {
     node match {
-      case e: Elem => convertElem(e, doc, parent)
+      case e: Elem => convertElem(e, doc, parent, parentScope)
       case t: Text => convertText(t, doc, parent)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc, parent)
       case t: CData => convertCData(t, doc, parent)
@@ -48,11 +48,15 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
     }
   }
 
-  private def convertElem(elm: Elem, doc: Document, parent: org.w3c.dom.Node): Element = {
+  private def convertElem(elm: Elem, doc: Document, parent: org.w3c.dom.Node, parentScope: Scope): Element = {
     // Not tail-recursive, but the recursion depth should be limited
 
-    val element = createElement(elm, doc)
-    val childNodes: immutable.IndexedSeq[org.w3c.dom.Node] = elm.children.map(ch => convertNode(ch, doc, element))
+    val element = createElementWithoutChildren(elm, doc, parentScope)
+    val childNodes: immutable.IndexedSeq[org.w3c.dom.Node] = elm.children.map(ch => {
+      convertNode(ch, doc, element, elm.scope)
+    })
+
+    for (ch <- childNodes) element.appendChild(ch)
 
     parent.appendChild(element)
     element
@@ -88,15 +92,23 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
     domEntityRef
   }
 
-  private def createElement(elm: Elem, doc: Document): Element = {
-    // TODO Take parent element scope into account
-
+  private def createElementWithoutChildren(elm: Elem, doc: Document, parentScope: Scope): Element = {
     val element =
       if (elm.resolvedName.namespaceUri.isEmpty) {
         doc.createElement(elm.qname.localPart)
       } else {
         doc.createElementNS(elm.resolvedName.namespaceUri.get, elm.qname.toString)
       }
+
+    val namespaceDeclarations: Scope.Declarations = parentScope.relativize(elm.scope)
+
+    for ((prefix, ns) <- namespaceDeclarations.declared.toMap) {
+      if (prefix == "") {
+        element.setAttribute("xmlns", ns)
+      } else {
+        element.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:%s".format(prefix), ns)
+      }
+    }
 
     for ((attrQName, attrValue) <- elm.attributes) {
       if (attrQName.prefixOption.isEmpty) {

@@ -61,7 +61,7 @@ class StaxInteropTest extends Suite {
       root.elemsOrSelf(ExpandedName(ns, "Title")).size
     }
     expect(3) {
-      root.elemsOrSelf(e => e.qname.localPart == "Last_Name" && e.firstTextValue == "Ullman").size
+      root.elemsOrSelf(ExpandedName(ns, "Last_Name"), e => e.firstTextValue == "Ullman").size
     }
 
     // 2. Write Elem to an XML string

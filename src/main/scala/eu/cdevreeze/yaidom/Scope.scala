@@ -21,7 +21,7 @@ package eu.cdevreeze.yaidom
  * namespace.
  *
  * The purpose of a Scope is to resolve QNames as ExpandedNames.
- * 
+ *
  * @author Chris de Vreeze
  */
 final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String, String]) extends Immutable {
@@ -110,6 +110,10 @@ object Scope {
 
   /** Parses the given Map into a Scope. The Map must follow the Scope.toMap format. */
   def fromMap(m: Map[String, String]): Scope = {
+    require(m.keySet.forall(pref => pref ne null))
+    require(m.values.forall(ns => ns ne null))
+    require(m.values.forall(ns => ns != ""))
+
     val defaultNamespace: Option[String] = m.get("")
     val prefixScope: Map[String, String] = m - ""
     Scope(defaultNamespace, prefixScope)
@@ -141,6 +145,23 @@ object Scope {
       val undeclaredPrefixesString = undeclaredPrefixes.map(pref => """xmlns:%s=""""".format(pref)).mkString(" ")
 
       List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString).filterNot(_ == "").mkString(" ")
+    }
+  }
+
+  object Declarations {
+
+    def fromMap(m: Map[String, String]): Declarations = {
+      require(m.keySet.forall(pref => pref ne null))
+      require(m.values.forall(ns => ns ne null))
+
+      val scope = Scope.fromMap(m.filter(kv => !kv._2.isEmpty))
+      val defaultNamespaceUndeclared: Boolean = {
+        val defaultNs = m.get("")
+        defaultNs == Some("")
+      }
+      val undeclaredPrefixes = m.filterKeys(pref => pref != "").filter(kv => kv._2 == "").keySet
+
+      Declarations(scope, defaultNamespaceUndeclared, undeclaredPrefixes)
     }
   }
 }

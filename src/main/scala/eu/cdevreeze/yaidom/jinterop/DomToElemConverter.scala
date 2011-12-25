@@ -31,37 +31,28 @@ import scala.collection.{ immutable, mutable }
 trait DomToElemConverter extends ConverterToElem[Element] {
 
   def convertToElem(v: Element): Elem = {
-    val qname: QName = QName(Option(v.getPrefix), extractLocalName(v))
+    convertToElem(Scope.Empty, v)
+  }
+
+  /** Given a parent scope, converts an org.w3c.dom.Element to a yaidom Elem */
+  private def convertToElem(parentScope: Scope, v: Element): Elem = {
+    val qname: QName = toQName(v)
     val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
 
-    val nsMap: Map[String, String] = {
-      val nsOption = Option(v.getNamespaceURI)
-      val prefixOption = Option(v.getPrefix)
-
-      val elementScope: Map[String, String] = {
-        val result: Option[(String, String)] =
-          if (nsOption.isEmpty) None else {
-            if (prefixOption.isEmpty) Some("" -> nsOption.get) else Some(prefixOption.get -> nsOption.get)
-          }
-
-        if (result.isDefined) Map(result.get) else Map()
-      }
-
-      val attributeScope: Map[String, String] = getAttributeScope(v.getAttributes)
-
-      elementScope ++ attributeScope
-    }
+    val namespaceDeclarations: Scope.Declarations = extractNamespaceDeclarations(v.getAttributes)
+    val newScope: Scope = parentScope.resolve(namespaceDeclarations)
 
     Elem(
       qname = qname,
       attributes = attributes,
-      scope = Scope.fromMap(nsMap),
-      children = convertNodeList(v.getChildNodes).flatMap(n => convertToNodeOption(n)))
+      scope = newScope,
+      children = nodeListToIndexedSeq(v.getChildNodes).flatMap(n => convertToNodeOption(newScope, n)))
   }
 
-  private def convertToNodeOption(v: org.w3c.dom.Node): Option[Node] = {
+  /** Given a parent scope, converts an org.w3c.dom.Node to an optional yaidom Node */
+  private def convertToNodeOption(parentScope: Scope, v: org.w3c.dom.Node): Option[Node] = {
     v match {
-      case e: Element => Some(convertToElem(e))
+      case e: Element => Some(convertToElem(parentScope, e))
       case cdata: org.w3c.dom.CDATASection => Some(convertToCData(cdata))
       case t: org.w3c.dom.Text => Some(convertToText(t))
       case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
@@ -70,61 +61,82 @@ trait DomToElemConverter extends ConverterToElem[Element] {
     }
   }
 
+  /** Converts an org.w3c.dom.Text to a yaidom Text */
   private def convertToText(v: org.w3c.dom.Text): Text = Text(v.getData)
 
+  /** Converts an org.w3c.dom.ProcessingInstruction to a yaidom ProcessingInstruction */
   private def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
 
+  /** Converts an org.w3c.dom.CDATASection to a yaidom CData */
   private def convertToCData(v: org.w3c.dom.CDATASection): CData = CData(v.getData)
 
+  /** Converts a NamedNodeMap to a Map[QName, String] */
   private def convertAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
-      val qname: QName = QName(Option(attr.getPrefix), extractLocalName(attr))
 
-      val isNamespaceDeclaration: Boolean = qname.prefixOption == Some("xmlns") || qname.localPart == "xmlns"
-      if (isNamespaceDeclaration) None else Some(qname -> attr.getValue)
-    }).toMap
-  }
-
-  private def getAttributeScope(domAttributes: NamedNodeMap): Map[String, String] = {
-    (0 until domAttributes.getLength).flatMap(i => {
-      val attr = domAttributes.item(i).asInstanceOf[Attr]
-      val prefixOption = Option(attr.getPrefix)
-      val qname: QName = QName(prefixOption, extractLocalName(attr))
-
-      val isNamespaceDeclaration: Boolean = qname.prefixOption == Some("xmlns") || qname.localPart == "xmlns"
-
-      if (isNamespaceDeclaration) None else {
-        // No default namespace for attributes!
-        if (prefixOption.isEmpty) None else {
-          require(attr.getNamespaceURI ne null)
-          Some(prefixOption.get -> attr.getNamespaceURI)
-        }
+      if (isNamespaceDeclaration(attr)) None else {
+        val qname: QName = toQName(attr)
+        Some(qname -> attr.getValue)
       }
     }).toMap
   }
 
-  private def convertNodeList(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
+  /** Converts the namespace declarations in a NamedNodeMap to a Scope.Declarations */
+  private def extractNamespaceDeclarations(domAttributes: NamedNodeMap): Scope.Declarations = {
+    val nsMap =
+      (0 until domAttributes.getLength).flatMap(i => {
+        val attr = domAttributes.item(i).asInstanceOf[Attr]
+
+        if (isNamespaceDeclaration(attr)) {
+          val result = extractNamespaceDeclaration(attr)
+          Some(result).map(pair => (pair._1.getOrElse(""), pair._2))
+        } else None
+      }).toMap
+    Scope.Declarations.fromMap(nsMap)
+  }
+
+  /** Converts a NodeList to an IndexedSeq[org.w3c.dom.Node] */
+  private def nodeListToIndexedSeq(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
     (0 until nodeList.getLength).map(i => nodeList.item(i)).toIndexedSeq
   }
 
-  private def extractLocalName(v: org.w3c.dom.Element): String = {
-    def empty2Null(s: String): String = if (s == "") null else s
-
-    val name: String = Option(empty2Null(v.getLocalName)).getOrElse(v.getTagName)
+  /** Extracts the QName of an org.w3c.dom.Element */
+  private def toQName(v: org.w3c.dom.Element): QName = {
+    val name: String = v.getTagName
     val arr = name.split(':')
     require(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) arr(0) else arr(1)
+    if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
 
-  private def extractLocalName(v: org.w3c.dom.Attr): String = {
-    // Possibly the attribute is a namespace declaration!
-    def empty2Null(s: String): String = if (s == "") null else s
-
-    val name: String = Option(empty2Null(v.getLocalName)).getOrElse(v.getName)
+  /** Extracts the QName of an org.w3c.dom.Attr. If the Attr is a namespace declaration, the prefix or unprefixed name is "xmlns" */
+  private def toQName(v: org.w3c.dom.Attr): QName = {
+    val name: String = v.getName
     val arr = name.split(':')
     require(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) arr(0) else arr(1)
+    if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
+
+  /** Returns true if the org.w3c.dom.Attr is a namespace declaration */
+  private def isNamespaceDeclaration(v: org.w3c.dom.Attr): Boolean = {
+    val name: String = v.getName
+    val arr = name.split(':')
+    require(arr.length >= 1 && arr.length <= 2)
+    val result = arr(0) == "xmlns"
+    result
+  }
+
+  /** Extracts (optional) prefix and namespace. Call only if isNamespaceDeclaration(v). */
+  private def extractNamespaceDeclaration(v: org.w3c.dom.Attr): (Option[String], String) = {
+    val name: String = v.getName
+    val arr = name.split(':')
+    require(arr.length >= 1 && arr.length <= 2)
+    require(arr(0) == "xmlns")
+    val prefixOption: Option[String] = if (arr.length == 1) None else Some(arr(1))
+    val attrValue: String = v.getValue
+    (prefixOption, attrValue)
+  }
+
+  private def empty2Null(s: String): String = if (s == "") null else s
 }
