@@ -41,7 +41,6 @@ class QueryTest extends Suite {
   @Test def testQueryBookTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val bookTitles: immutable.Seq[Elem] =
@@ -59,7 +58,6 @@ class QueryTest extends Suite {
   @Test def testQueryBookOrMagazineTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val bookOrMagazineTitles: immutable.Seq[Elem] =
@@ -81,7 +79,6 @@ class QueryTest extends Suite {
   @Test def testQueryTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val titles: immutable.Seq[Elem] =
@@ -101,7 +98,6 @@ class QueryTest extends Suite {
   @Test def testQueryAllTitles() {
     // XPath: doc("bookstore.xml")//Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val titles: immutable.Seq[Elem] =
@@ -121,7 +117,6 @@ class QueryTest extends Suite {
   @Test def testQueryAllElements() {
     // XPath: doc("bookstore.xml")//*
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val elements: immutable.Seq[Elem] = bookstore.elems :+ bookstore
@@ -136,7 +131,6 @@ class QueryTest extends Suite {
   @Test def testQueryBookIsbns() {
     // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val isbns: immutable.Seq[String] =
@@ -154,7 +148,6 @@ class QueryTest extends Suite {
   @Test def testQueryCheapBooks() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val books: immutable.Seq[Elem] =
@@ -175,7 +168,6 @@ class QueryTest extends Suite {
   @Test def testQueryCheapBookTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val titles: immutable.Seq[Elem] =
@@ -195,7 +187,6 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfBooksWithRemarks() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val bookTitles: immutable.Seq[Elem] =
@@ -214,7 +205,6 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfCheapBooksByUllman() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val bookTitles: immutable.Seq[Elem] =
@@ -240,7 +230,6 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfCheapBooksByJeffreyUllman() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val bookTitles: immutable.Seq[Elem] =
@@ -268,7 +257,6 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfBooksByJeffreyUllmanButNotWidom() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val bookTitles: immutable.Seq[Elem] =
@@ -291,7 +279,6 @@ class QueryTest extends Suite {
   @Test def testQuerySecondAuthors() {
     // XPath: doc("bookstore.xml")//Authors/Author[2]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val secondAuthors: immutable.Seq[Elem] =
@@ -315,7 +302,6 @@ class QueryTest extends Suite {
   @Test def testQueryGreatBooks() {
     // XPath: doc("bookstore.xml")//Book[contains(Remark, "great")]/Title
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val titles: immutable.Seq[Elem] =
@@ -333,7 +319,6 @@ class QueryTest extends Suite {
   @Test def testQueryMagazinesWithSameNameAsBook() {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val magazines: immutable.Seq[Elem] =
@@ -356,7 +341,6 @@ class QueryTest extends Suite {
   @Test def testQueryElementsWithParentNotBookOrBookstore() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val elems: immutable.Seq[Elem] =
@@ -378,7 +362,6 @@ class QueryTest extends Suite {
 
     // This time we use an index to the parent elements
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val indexToParent: Map[jutil.UUID, Elem] = bookstore.getIndexToParentOnUuid
@@ -401,7 +384,6 @@ class QueryTest extends Suite {
   @Test def testQueryBooksOrMagazinesWithNonUniqueTitles() {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val booksAndMagazines: immutable.Seq[Elem] =
@@ -422,7 +404,6 @@ class QueryTest extends Suite {
   @Test def testQueryBooksOrMagazinesWithTitleAsOtherBook() {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val booksAndMagazines: immutable.Seq[Elem] =
@@ -453,7 +434,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val books: immutable.Seq[Elem] =
@@ -474,7 +454,6 @@ class QueryTest extends Suite {
   @Test def testQueryBooksFromUllmanButNotWidom() {
     // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val titles: immutable.Seq[Elem] =
@@ -502,7 +481,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryBooksWithAuthorInTitle() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -538,7 +516,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryAverageBookPrice() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -570,7 +547,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryBooksPricedBelowAverage() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -619,7 +595,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryBooksOrderedByPrice() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -668,7 +643,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryLastNames() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     val lastNameValues: immutable.Seq[String] =
@@ -698,7 +672,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryBookPairsFromSameAuthor() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -735,23 +708,23 @@ class QueryTest extends Suite {
     }
     expect(3) {
       pairs.filter(pair =>
-        pair.childElem("Title1".ename).firstTextValue == bookTitle(book1) ||
-          pair.childElem("Title2".ename).firstTextValue == bookTitle(book1)).size
+        pair.childElem("Title1".ename).firstTextValue == bookTitle(book1.build()) ||
+          pair.childElem("Title2".ename).firstTextValue == bookTitle(book1.build())).size
     }
     expect(3) {
       pairs.filter(pair =>
-        pair.childElem("Title1".ename).firstTextValue == bookTitle(book2) ||
-          pair.childElem("Title2".ename).firstTextValue == bookTitle(book2)).size
+        pair.childElem("Title1".ename).firstTextValue == bookTitle(book2.build()) ||
+          pair.childElem("Title2".ename).firstTextValue == bookTitle(book2.build())).size
     }
     expect(2) {
       pairs.filter(pair =>
-        pair.childElem("Title1".ename).firstTextValue == bookTitle(book3) ||
-          pair.childElem("Title2".ename).firstTextValue == bookTitle(book3)).size
+        pair.childElem("Title1".ename).firstTextValue == bookTitle(book3.build()) ||
+          pair.childElem("Title2".ename).firstTextValue == bookTitle(book3.build())).size
     }
     expect(2) {
       pairs.filter(pair =>
-        pair.childElem("Title1".ename).firstTextValue == bookTitle(book4) ||
-          pair.childElem("Title2".ename).firstTextValue == bookTitle(book4)).size
+        pair.childElem("Title1".ename).firstTextValue == bookTitle(book4.build()) ||
+          pair.childElem("Title2".ename).firstTextValue == bookTitle(book4.build())).size
     }
   }
 
@@ -773,7 +746,6 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryInvertedBookstore() {
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -822,7 +794,6 @@ class QueryTest extends Suite {
 
   @Test def testQueryBookAndMagazineTitlesRelabeled() {
     // Taken from the XSLT demo
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -857,7 +828,6 @@ class QueryTest extends Suite {
 
     // Transforms the XML tree, leaving out book prices
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     def removePrice(book: Elem): Elem = {
@@ -889,7 +859,6 @@ class QueryTest extends Suite {
 
     // Transforms the XML tree, combining first and last names into Name elements
 
-    val bookstore = sampleXml
     require(bookstore.qname.localPart == "Bookstore")
 
     import NodeBuilder._
@@ -919,202 +888,202 @@ class QueryTest extends Suite {
     }
   }
 
-  private val book1: Elem = {
+  private val book1: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      qname = "Book".qname,
+      attributes = Map("ISBN".qname -> "ISBN-0-13-713526-2", "Price".qname -> "85", "Edition".qname -> "3rd"),
       children = List(
         elem(
-          qname = QName("Title"),
+          qname = "Title".qname,
           children = List(
             text("A First Course in Database Systems"))),
         elem(
-          qname = QName("Authors"),
+          qname = "Authors".qname,
           children = List(
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = QName("Last_Name"),
+                  qname = "Last_Name".qname,
                   children = List(text("Ullman"))))),
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = QName("Last_Name"),
-                  children = List(text("Widom"))))))))).build()
+                  qname = "Last_Name".qname,
+                  children = List(text("Widom")))))))))
   }
 
-  private val book2 = {
+  private val book2: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      qname = "Book".qname,
+      attributes = Map("ISBN".qname -> "ISBN-0-13-815504-6", "Price".qname -> "100"),
       children = List(
         elem(
-          qname = QName("Title"),
+          qname = "Title".qname,
           children = List(
             text("Database Systems: The Complete Book"))),
         elem(
-          qname = QName("Authors"),
+          qname = "Authors".qname,
           children = List(
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Hector"))),
                 elem(
-                  qname = QName("Last_Name"),
+                  qname = "Last_Name".qname,
                   children = List(text("Garcia-Molina"))))),
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = QName("Last_Name"),
+                  qname = "Last_Name".qname,
                   children = List(text("Ullman"))))),
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = QName("Last_Name"),
+                  qname = "Last_Name".qname,
                   children = List(text("Widom"))))))),
         elem(
-          qname = QName("Remark"),
-          children = List(text("Buy this book bundled with \"A First Course\" - a great deal!"))))).build()
+          qname = "Remark".qname,
+          children = List(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
   }
 
-  private val book3 = {
+  private val book3: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      qname = "Book".qname,
+      attributes = Map("ISBN".qname -> "ISBN-0-11-222222-3", "Price".qname -> "50"),
       children = List(
         elem(
-          qname = QName("Title"),
+          qname = "Title".qname,
           children = List(
             text("Hector and Jeff's Database Hints"))),
         elem(
-          qname = QName("Authors"),
+          qname = "Authors".qname,
           children = List(
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = QName("Last_Name"),
+                  qname = "Last_Name".qname,
                   children = List(text("Ullman"))))),
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Hector"))),
                 elem(
-                  qname = QName("Last_Name"),
+                  qname = "Last_Name".qname,
                   children = List(text("Garcia-Molina"))))))),
         elem(
-          qname = QName("Remark"),
-          children = List(text("An indispensable companion to your textbook"))))).build()
+          qname = "Remark".qname,
+          children = List(text("An indispensable companion to your textbook")))))
   }
 
-  private val book4 = {
+  private val book4: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      qname = "Book".qname,
+      attributes = Map("ISBN".qname -> "ISBN-9-88-777777-6", "Price".qname -> "25"),
       children = List(
         elem(
-          qname = QName("Title"),
+          qname = "Title".qname,
           children = List(
             text("Jennifer's Economical Database Hints"))),
         elem(
-          qname = QName("Authors"),
+          qname = "Authors".qname,
           children = List(
             elem(
-              qname = QName("Author"),
+              qname = "Author".qname,
               children = List(
                 elem(
-                  qname = QName("First_Name"),
+                  qname = "First_Name".qname,
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = QName("Last_Name"),
-                  children = List(text("Widom"))))))))).build()
+                  qname = "Last_Name".qname,
+                  children = List(text("Widom")))))))))
   }
 
-  private val magazine1 = {
+  private val magazine1: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
+      qname = "Magazine".qname,
+      attributes = Map("Month".qname -> "January", "Year".qname -> "2009"),
       children = List(
         elem(
-          qname = QName("Title"),
-          children = List(text("National Geographic"))))).build()
+          qname = "Title".qname,
+          children = List(text("National Geographic")))))
   }
 
-  private val magazine2 = {
+  private val magazine2: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      qname = "Magazine".qname,
+      attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
       children = List(
         elem(
-          qname = QName("Title"),
-          children = List(text("National Geographic"))))).build()
+          qname = "Title".qname,
+          children = List(text("National Geographic")))))
   }
 
-  private val magazine3 = {
+  private val magazine3: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      qname = "Magazine".qname,
+      attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
       children = List(
         elem(
-          qname = QName("Title"),
-          children = List(text("Newsweek"))))).build()
+          qname = "Title".qname,
+          children = List(text("Newsweek")))))
   }
 
-  private val magazine4 = {
+  private val magazine4: ElemBuilder = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
+      qname = "Magazine".qname,
+      attributes = Map("Month".qname -> "March", "Year".qname -> "2009"),
       children = List(
         elem(
-          qname = QName("Title"),
-          children = List(text("Hector and Jeff's Database Hints"))))).build()
+          qname = "Title".qname,
+          children = List(text("Hector and Jeff's Database Hints")))))
   }
 
-  private def sampleXml: Elem = {
+  private val bookstore: Elem = {
     import NodeBuilder._
 
     elem(
-      qname = QName("Bookstore")).
-      withChildNodes(List(
-        book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))(Scope.Empty).build()
+      qname = "Bookstore".qname,
+      children = List(
+        book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
   }
 }

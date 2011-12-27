@@ -25,17 +25,15 @@ import scala.collection.immutable
  * import NodeBuilder._
  *
  * elem(
- *   qname = QName("Magazine"),
- *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   qname = "Magazine".qname,
+ *   attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
  *   namespaces = Map("dbclass" -> "http://www.db-class.org")),
  *   children = List(
  *     elem(
- *       qname = QName("Title"),
+ *       qname = "Title".qname,
  *       children = List(text("Newsweek"))))).build()
  * </pre>
  *
- * TODO Indeed support easier creation of namespace declarations.
- * 
  * @author Chris de Vreeze
  */
 sealed trait NodeBuilder extends Immutable {

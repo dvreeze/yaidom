@@ -50,8 +50,10 @@ final case class UnprefixedName(override val localPart: String) extends QName {
 final case class PrefixedName(prefix: String, override val localPart: String) extends QName {
   require(prefix ne null)
   require(prefix.size > 0)
+  require(prefix.indexOf(":") < 0)
   require(localPart ne null)
   require(localPart.size > 0)
+  require(localPart.indexOf(":") < 0)
 
   override def prefixOption: Option[String] = Some(prefix)
 
@@ -83,11 +85,11 @@ object QName {
     }
   }
 
-  /** "Implicit class" for converting a String to an UnprefixedName */
-  final class ToUnprefixedName(val s: String) {
-    def qname: QName = UnprefixedName(s)
+  /** "Implicit class" for converting a String to a QName */
+  final class ToParsedQName(val s: String) {
+    def qname: QName = QName.parse(s)
   }
 
-  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into an UnprefixedName */
-  implicit def toUnprefixedName(s: String): ToUnprefixedName = new ToUnprefixedName(s)
+  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into a QName */
+  implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
 }
