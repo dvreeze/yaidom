@@ -161,7 +161,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Computes an index to parent elements, on the given function applied to the child elements */
   final def getIndexToParent[K](f: E => K): Map[K, immutable.Seq[E]] = {
     val parentChildPairs = (elemsOrSelf).flatMap(e => e.childElems.map(ch => (e -> ch)))
-    parentChildPairs.groupBy(pair => f(pair._2)).mapValues(pairs => pairs.map(pair => pair._1))
+    parentChildPairs.groupBy(pair => f(pair._2)).mapValues(pairs => pairs.map(pair => pair._1)).mapValues(_.distinct)
   }
 
   /** Returns a List of this element followed by the descendant elements */
