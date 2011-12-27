@@ -58,10 +58,10 @@ class StaxInteropTest extends Suite {
       root.elemsOrSelf.map(e => e.qname.localPart).toSet
     }
     expect(8) {
-      root.elemsOrSelf(ExpandedName(ns, "Title")).size
+      root.elemsOrSelf(ns.ns.ename("Title")).size
     }
     expect(3) {
-      root.elemsOrSelf(ExpandedName(ns, "Last_Name"), e => e.firstTextValue == "Ullman").size
+      root.elemsOrSelf(ns.ns.ename("Last_Name"), e => e.firstTextValue == "Ullman").size
     }
 
     // 2. Write Elem to an XML string
@@ -95,11 +95,11 @@ class StaxInteropTest extends Suite {
     expect(root.elemsOrSelf.map(e => e.qname.localPart).toSet) {
       root2.elemsOrSelf.map(e => e.qname.localPart).toSet
     }
-    expect(root.elemsOrSelf(ExpandedName(ns, "Title")).size) {
-      root2.elemsOrSelf(ExpandedName(ns, "Title")).size
+    expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
+      root2.elemsOrSelf(ns.ns.ename("Title")).size
     }
-    expect(root.elemsOrSelf(ExpandedName(ns, "Last_Name"), e => e.firstTextValue == "Ullman").size) {
-      root2.elemsOrSelf(ExpandedName(ns, "Last_Name"), e => e.firstTextValue == "Ullman").size
+    expect(root.elemsOrSelf(ns.ns.ename("Last_Name"), e => e.firstTextValue == "Ullman").size) {
+      root2.elemsOrSelf(ns.ns.ename("Last_Name"), e => e.firstTextValue == "Ullman").size
     }
   }
 }

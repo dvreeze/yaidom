@@ -70,11 +70,38 @@ object ExpandedName {
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
 
+  /** Parses a String into an ExpandedName. The String must conform to the <b>toString</b> format of an ExpandedName */
+  def parse(s: String): ExpandedName = s match {
+    case s if s.startsWith("{") =>
+      val idx = s.indexWhere(c => c == '}')
+      require(idx >= 2 && idx < s.length - 1)
+      val ns = s.slice(1, idx)
+      val localPart = s.slice(idx + 1, s.length)
+      ExpandedName(ns, localPart)
+    case _ =>
+      require(s.indexOf("{") < 0)
+      require(s.indexOf("}") < 0)
+      ExpandedName(s)
+  }
+
   /** "Implicit class" for converting a String to an ExpandedName */
-  final class ToExpandedName(val s: String) {
-    def ename: ExpandedName = ExpandedName(s)
+  final class ToParsedExpandedName(val s: String) {
+    def ename: ExpandedName = ExpandedName.parse(s)
   }
 
   /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an ExpandedName */
-  implicit def toExpandedName(s: String): ToExpandedName = new ToExpandedName(s)
+  implicit def toParsedExpandedName(s: String): ToParsedExpandedName = new ToParsedExpandedName(s)
+
+  /** Namespace. It offers a method to create an ExpandedName with that namespace from a given localPart */
+  final class Namespace(val ns: String) {
+    def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
+  }
+
+  /** "Implicit class" for converting a String to a Namespace */
+  final class ToNamespace(val s: String) {
+    def ns: Namespace = new Namespace(s)
+  }
+
+  /** Implicit conversion enriching a String with a <code>ns</code> method that turns the String into a Namespace */
+  implicit def toNamespace(s: String): ToNamespace = new ToNamespace(s)
 }
