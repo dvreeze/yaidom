@@ -91,8 +91,10 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
     }
     val defaultNamespaceUndeclared: Boolean = this.defaultNamespace.isDefined && scope.defaultNamespace.isEmpty
     val undeclaredPrefixes: Set[String] = Scope.this.prefixScope.keySet.diff(scope.prefixScope.keySet)
+    val undeclaredOptionalPrefixes =
+      undeclaredPrefixes.map(pref => Some(pref)) ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
 
-    Scope.Declarations(declared, defaultNamespaceUndeclared, undeclaredPrefixes)
+    Scope.Declarations(declared, undeclaredOptionalPrefixes)
   }
 
   /** Creates a String representation of this Scope, as it is shown in XML */
@@ -122,15 +124,19 @@ object Scope {
   /**
    * Namespace declarations (and undeclarations), typically at the level of one Element.
    */
-  final case class Declarations(declared: Scope, defaultNamespaceUndeclared: Boolean, undeclaredPrefixes: Set[String]) extends Immutable {
+  final case class Declarations(declared: Scope, undeclaredOptionalPrefixes: Set[Option[String]]) extends Immutable {
     require(declared ne null)
-    require(undeclaredPrefixes ne null)
-    require(undeclaredPrefixes.forall(pref => (pref ne null) && (pref.length > 0)))
+    require(undeclaredOptionalPrefixes ne null)
+    require(undeclaredOptionalPrefixes.forall(pref => (pref ne null) && (pref.forall(_.length > 0))))
     require(declared.toMap.keySet.intersect(undeclaredSet).isEmpty)
     require(!defaultNamespaceUndeclared || declared.defaultNamespace.isEmpty)
 
     /** Convenience constructor if there are no undeclarations */
-    def this(declared: Scope) = this(declared, false, Set())
+    def this(declared: Scope) = this(declared, Set())
+
+    def defaultNamespaceUndeclared: Boolean = undeclaredOptionalPrefixes.contains(None)
+
+    def undeclaredPrefixes: Set[String] = undeclaredOptionalPrefixes collect { case Some(pref) => pref }
 
     /** Returns the Set of undeclared prefixes, with an undeclared default namespace represented by the empty String */
     def undeclaredSet: Set[String] = defaultNamespaceUndeclared match {
@@ -160,8 +166,10 @@ object Scope {
         defaultNs == Some("")
       }
       val undeclaredPrefixes = m.filterKeys(pref => pref != "").filter(kv => kv._2 == "").keySet
+      val undeclaredOptionalPrefixes =
+        undeclaredPrefixes.map(pref => Some(pref)) ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
 
-      Declarations(scope, defaultNamespaceUndeclared, undeclaredPrefixes)
+      Declarations(scope, undeclaredOptionalPrefixes)
     }
   }
 }

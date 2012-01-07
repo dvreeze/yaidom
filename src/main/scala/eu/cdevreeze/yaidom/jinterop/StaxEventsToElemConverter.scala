@@ -111,8 +111,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
         prefixScope = namespaces.filterNot(_.isDefaultNamespaceDeclaration).map(ns => (ns.getPrefix -> ns.getNamespaceURI)).toMap)
       new Scope.Declarations(
         declared = declaredScope,
-        defaultNamespaceUndeclared = false,
-        undeclaredPrefixes = Set())
+        undeclaredOptionalPrefixes = Set())
     }
     val currScope = parentScope.resolve(declarations)
 
