@@ -45,7 +45,7 @@ class ElemLikeTest extends Suite {
     val bookstoreChildElms: immutable.Seq[Elem] = bookstore.childElems
     val magazineElms: immutable.Seq[Elem] = bookstore.childElems(e => e.resolvedName == ns.ns.ename("Magazine"))
     val bookElms: immutable.Seq[Elem] = bookstore.childElems(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] = bookstore.childElems(ns.ns.ename("Book"), e => e.attribute("Price".ename).toInt <= 50)
+    val cheapBookElms: immutable.Seq[Elem] = bookstore.childElems(e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50)
 
     expect(8) {
       bookstoreChildElms.size
@@ -96,7 +96,7 @@ class ElemLikeTest extends Suite {
     val elms: immutable.Seq[Elem] = bookstore.elems
     val magazineElms: immutable.Seq[Elem] = bookstore.elems(e => e.resolvedName == ns.ns.ename("Magazine"))
     val bookElms: immutable.Seq[Elem] = bookstore.elems(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] = bookstore.elems(ns.ns.ename("Book"), e => e.attribute("Price".ename).toInt <= 50)
+    val cheapBookElms: immutable.Seq[Elem] = bookstore.elems(e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50)
 
     expect(46) {
       elms.size
@@ -144,7 +144,7 @@ class ElemLikeTest extends Suite {
     val elms: immutable.Seq[Elem] = bookstore.elemsOrSelf
     val magazineElms: immutable.Seq[Elem] = bookstore.elemsOrSelf(e => e.resolvedName == ns.ns.ename("Magazine"))
     val bookElms: immutable.Seq[Elem] = bookstore.elemsOrSelf(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] = bookstore.elemsOrSelf(ns.ns.ename("Book"), e => e.attribute("Price".ename).toInt <= 50)
+    val cheapBookElms: immutable.Seq[Elem] = bookstore.elemsOrSelf(e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50)
 
     expect(47) {
       elms.size
@@ -196,7 +196,7 @@ class ElemLikeTest extends Suite {
     val elms: immutable.Seq[Elem] = bookstore.elems
     val magazineElms: immutable.Seq[Elem] = bookstore.firstElems(e => e.resolvedName == ns.ns.ename("Magazine"))
     val bookElms: immutable.Seq[Elem] = bookstore.firstElems(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] = bookstore.firstElems(ns.ns.ename("Book"), e => e.attribute("Price".ename).toInt <= 50)
+    val cheapBookElms: immutable.Seq[Elem] = bookstore.firstElems(e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50)
 
     expect(46) {
       elms.size
@@ -229,7 +229,7 @@ class ElemLikeTest extends Suite {
       cheapBookElm.firstElemOption(e => e.resolvedName == ns.ns.ename("Remark")).map(_.firstTextValue).getOrElse(sys.error("Missing Remark"))
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm.firstElemOption(ns.ns.ename("Remark"), e => e.childElems.isEmpty).map(_.firstTextValue).getOrElse(sys.error("Missing Remark"))
+      cheapBookElm.firstElemOption(e => e.resolvedName == ns.ns.ename("Remark") && e.childElems.isEmpty).map(_.firstTextValue).getOrElse(sys.error("Missing Remark"))
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
@@ -276,7 +276,7 @@ class ElemLikeTest extends Suite {
       lastNameElms.map(e => e.findParentInTree(bookstore)).flatMap(eOption => eOption.map(_.resolvedName)).toSet
     }
 
-    val cheapBookElms: immutable.Seq[Elem] = bookstore.firstElems(ns.ns.ename("Book"), e => e.attribute("Price".ename).toInt <= 50)
+    val cheapBookElms: immutable.Seq[Elem] = bookstore.firstElems(e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50)
     val cheapBookElm: Elem = cheapBookElms(0)
     val cheapBookAuthorElms: immutable.Seq[Elem] = cheapBookElm.elems(ns.ns.ename("Author"))
 

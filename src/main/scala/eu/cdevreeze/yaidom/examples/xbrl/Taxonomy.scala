@@ -35,7 +35,9 @@ final class Taxonomy(
 
   require(numberOfFiles == (schemas.keySet ++ linkbases.keySet ++ otherFiles.keySet).size)
 
-  require(schemas.values.forall(root => root.resolvedName == XsdSchema))
+  require {
+    schemas.values forall { root => root.resolvedName == XsdSchema }
+  }
 
   def numberOfFiles: Int = schemas.size + linkbases.size + otherFiles.size
 
@@ -46,7 +48,7 @@ final class Taxonomy(
     val fragment = url.getFragment
 
     val schemaOption: Option[xlink.Elem] = schemas.get(schemaUrl)
-    schemaOption.map(schema => schema.wrappedElem)
+    schemaOption map { schema => schema.wrappedElem }
   }
 
   def findElementDefinition(url: URI): Option[Elem] = {
@@ -55,12 +57,12 @@ final class Taxonomy(
     val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
     val fragment = url.getFragment
 
-    val schemaOption: Option[Elem] = schemas.get(schemaUrl).map(_.wrappedElem)
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl) map { _.wrappedElem }
 
     if (schemaOption.isEmpty) None else {
-      val elemDefinitionOption: Option[Elem] = schemaOption.get.firstElemOption(e => {
+      val elemDefinitionOption: Option[Elem] = schemaOption.get firstElemOption { e =>
         (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
-      })
+      }
 
       elemDefinitionOption
     }
@@ -72,33 +74,33 @@ final class Taxonomy(
     val schemaUrl: URI = new URI(url.getScheme, url.getSchemeSpecificPart(), null)
     val fragment = url.getFragment
 
-    val schemaOption: Option[Elem] = schemas.get(schemaUrl).map(_.wrappedElem)
+    val schemaOption: Option[Elem] = schemas.get(schemaUrl) map { _.wrappedElem }
 
     if (schemaOption.isEmpty) None else {
-      val elemDefinitionOption: Option[Elem] = schemaOption.get.firstElemOption(e => {
+      val elemDefinitionOption: Option[Elem] = schemaOption.get firstElemOption { e =>
         (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
-      })
+      }
 
-      elemDefinitionOption.map(elemDef => (schemaOption.get -> elemDef))
+      elemDefinitionOption map { elemDef => (schemaOption.get -> elemDef) }
     }
   }
 
   def findElementDefinitions(root: Elem): immutable.Seq[Elem] = {
-    root.elems(e => e.resolvedName == XsdElementDefinition)
+    root elems { e => e.resolvedName == XsdElementDefinition }
   }
 
   def substitutionGroupOption(elemDef: Elem): Option[ExpandedName] = {
     require(elemDef.resolvedName == XsdElementDefinition)
 
-    elemDef.attributeOption("substitutionGroup".ename).flatMap(v => {
+    elemDef.attributeOption("substitutionGroup".ename) flatMap { v =>
       val qname = QName.parse(v)
       elemDef.scope.resolveQName(qname)
-    })
+    }
   }
 
   def substitutionGroups: Set[ExpandedName] = {
-    val elemDefs = schemas.values.flatMap(root => findElementDefinitions(root.wrappedElem))
-    elemDefs.flatMap(elemDef => substitutionGroupOption(elemDef)).toSet
+    val elemDefs = schemas.values flatMap { root => findElementDefinitions(root.wrappedElem) }
+    elemDefs flatMap { elemDef => substitutionGroupOption(elemDef) } toSet
   }
 
   def substitutionGroupElemDefinitionsFor(substitutionGroups: Set[ExpandedName]): Map[ExpandedName, Elem] = {
@@ -106,35 +108,38 @@ final class Taxonomy(
       val tns = root.attribute("targetNamespace".ename)
 
       val elemDefs = findElementDefinitions(root)
-      val filteredElemDefs = elemDefs.filter(elemDef => {
+      val filteredElemDefs = elemDefs filter { elemDef =>
         val nameOption = elemDef.attributeOption("name".ename)
-        val enameOption = nameOption.map(name => ExpandedName(tns, name))
+        val enameOption = nameOption map { name => ExpandedName(tns, name) }
 
         nameOption.isDefined && enameOption.isDefined && substitutionGroups.contains(enameOption.get)
-      })
-      filteredElemDefs.map(elemDef => (ExpandedName(tns, elemDef.attribute("name".ename)) -> elemDef)).toMap
+      }
+      val result = filteredElemDefs map { elemDef => (ExpandedName(tns, elemDef.attribute("name".ename)) -> elemDef) }
+      result.toMap
     }
 
-    schemas.values.map(root => substitutionGroupElemDefinitionsIn(root.wrappedElem)).flatten.toMap
+    val result = schemas.values map { root => substitutionGroupElemDefinitionsIn(root.wrappedElem) }
+    result.flatten.toMap
   }
 
   def substitutionGroupAncestries: immutable.Seq[List[ExpandedName]] = {
     val substGroups = substitutionGroups
 
     val substGroupParents: Map[ExpandedName, ExpandedName] =
-      substitutionGroupElemDefinitionsFor(substGroups).mapValues(elemDef => substitutionGroupOption(elemDef)).filter(_._2.isDefined).mapValues(_.get)
+      substitutionGroupElemDefinitionsFor(substGroups) mapValues { elemDef => substitutionGroupOption(elemDef) } filter { _._2.isDefined } mapValues { _.get }
 
     def ancestries(currentAncestries: immutable.Seq[List[ExpandedName]]): immutable.Seq[List[ExpandedName]] = {
       // Very inefficient
-      val newAncestries: immutable.Seq[List[ExpandedName]] = currentAncestries.map(ancestry => {
+      val newAncestries: immutable.Seq[List[ExpandedName]] = currentAncestries map { ancestry =>
         if (substGroupParents.contains(ancestry.last))
           ancestry ::: List(substGroupParents(ancestry.last))
         else ancestry
-      })
+      }
       if (newAncestries == currentAncestries) currentAncestries else ancestries(newAncestries)
     }
 
-    ancestries(substGroups.toIndexedSeq[ExpandedName].map(substGroup => List(substGroup)))
+    val currAncestries = substGroups.toIndexedSeq[ExpandedName] map { substGroup => List(substGroup) }
+    ancestries(currAncestries)
   }
 
   def isSubTaxonomyOf(other: Taxonomy): Boolean = {
@@ -169,10 +174,12 @@ object Taxonomy {
   def apply(elems: Map[URI, Elem]): Taxonomy = {
     val schemas = elems collect { case (uri, elem) if elem.resolvedName == XsdSchema => (uri, elem) }
     val linkbaseElems: Map[URI, Elem] = elems collect { case (uri, elem) if elem.resolvedName == XbrlLinkbase => (uri, elem) }
-    val linkbases: Map[URI, xlink.Elem] = linkbaseElems mapValues (e => xlink.Elem(e))
+    val linkbases: Map[URI, xlink.Elem] = linkbaseElems mapValues { e => xlink.Elem(e) }
     val otherElems = (elems -- schemas.keySet) -- linkbases.keySet
 
-    new Taxonomy(schemas.mapValues(e => xlink.Elem(e)), linkbases, otherElems.mapValues(e => xlink.Elem(e)))
+    val taxonomySchemas = schemas mapValues { e => xlink.Elem(e) }
+    val taxonomyOtherElems = otherElems mapValues { e => xlink.Elem(e) }
+    new Taxonomy(taxonomySchemas, linkbases, taxonomyOtherElems)
   }
 
   final class FileBasedTaxonomyProducer extends Producer {
@@ -181,7 +188,8 @@ object Taxonomy {
       val elms: Map[URI, Elem] = {
         // I tried to use par collections here, but saw too much locking going on (analyzing with jvisualvm), so chickened out
         // Thread dumps showed locking inside Elem creation, during UUID creation
-        uris.flatMap(uri => readFiles(new jio.File(uri), XMLInputFactory.newInstance).toList).toMap
+        val result = uris flatMap { uri => readFiles(new jio.File(uri), XMLInputFactory.newInstance).toList }
+        result.toMap
       }
       Taxonomy(elms)
     }
@@ -190,15 +198,18 @@ object Taxonomy {
       require(dir.isDirectory && dir.exists, "Directory '%s' must be an existing directory".format(dir.getPath))
 
       def endsWithOneOf(f: jio.File, nameEndings: List[String]): Boolean =
-        nameEndings.exists(ending => f.getName.endsWith(ending))
+        nameEndings exists { ending => f.getName.endsWith(ending) }
 
       val files: List[jio.File] = dir.listFiles.toList
-      val normalFiles: List[jio.File] = files.filter(_.isFile).filter(f => endsWithOneOf(f, List(".xml", ".xsd", ".xbrl")))
-      val dirs: List[jio.File] = files.filter(_.isDirectory).filter(dir => !endsWithOneOf(dir, List(".svn", ".git")))
+      val normalFiles: List[jio.File] = files filter { _.isFile } filter { f => endsWithOneOf(f, List(".xml", ".xsd", ".xbrl")) }
+      val dirs: List[jio.File] = files filter { _.isDirectory } filter { dir => !endsWithOneOf(dir, List(".svn", ".git")) }
 
       // Recursive calls (not tail-recursive)
-      val readNormalFiles = normalFiles.map(file => readFile(file, xmlInputFactory)).toMap
-      val recursivelyReadFiles = dirs.flatMap(dir => readFiles(dir, xmlInputFactory))
+      val readNormalFiles = {
+        val result = normalFiles map { file => readFile(file, xmlInputFactory) }
+        result.toMap
+      }
+      val recursivelyReadFiles = dirs flatMap { dir => readFiles(dir, xmlInputFactory) }
       readNormalFiles ++ recursivelyReadFiles
     }
 
@@ -208,9 +219,10 @@ object Taxonomy {
       val rootElem: Elem = {
         def createReader(): XMLEventReader = xmlInputFactory.createXMLEventReader(new jio.FileInputStream(file))
 
-        managed(createReader()).map({ xmlEventReader =>
+        val result = managed(createReader()) map { xmlEventReader =>
           convertToElem(xmlEventReader.toSeq)
-        }).opt.getOrElse(sys.error("Could not parse file '%s' as XML".format(file.getPath)))
+        }
+        result.opt.getOrElse(sys.error("Could not parse file '%s' as XML".format(file.getPath)))
       }
       (file.toURI, rootElem)
     }

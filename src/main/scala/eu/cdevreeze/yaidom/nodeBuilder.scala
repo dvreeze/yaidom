@@ -65,7 +65,7 @@ final class ElemBuilder(
       qname,
       attributes,
       newScope,
-      children.map(ch => ch.build(newScope)))
+      children map { ch => ch.build(newScope) })
   }
 
   def withChildNodes(childNodes: immutable.Seq[Node])(scope: Scope): ElemBuilder = {
@@ -73,7 +73,7 @@ final class ElemBuilder(
       qname = self.qname,
       attributes = self.attributes,
       namespaces = self.namespaces,
-      children = childNodes.map(ch => NodeBuilder.fromNode(ch)(scope)).toIndexedSeq)
+      children = childNodes map { ch => NodeBuilder.fromNode(ch)(scope) } toIndexedSeq)
   }
 }
 
@@ -148,7 +148,7 @@ object NodeBuilder {
         qname = e.qname,
         attributes = e.attributes,
         namespaces = scope.relativize(e.scope),
-        children = e.children.map(ch => fromNode(ch)(e.scope)))
+        children = e.children map { ch => fromNode(ch)(e.scope) })
   }
 
   def fromElem(elm: Elem)(scope: Scope): ElemBuilder = fromNode(elm)(scope).asInstanceOf[ElemBuilder]

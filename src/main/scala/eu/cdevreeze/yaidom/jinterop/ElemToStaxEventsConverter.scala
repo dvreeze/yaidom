@@ -56,7 +56,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
     // Not tail-recursive, but the recursion depth should be limited
 
     val startEvent: XMLEvent = createStartElement(elm, xmlEventFactory)
-    val childEvents: immutable.IndexedSeq[XMLEvent] = elm.children.flatMap(ch => convertNode(ch, xmlEventFactory))
+    val childEvents: immutable.IndexedSeq[XMLEvent] = elm.children flatMap { ch => convertNode(ch, xmlEventFactory) }
     val endEvent: XMLEvent = createEndElement(elm, xmlEventFactory)
 
     immutable.IndexedSeq(startEvent) ++ childEvents ++ immutable.IndexedSeq(endEvent)
@@ -95,16 +95,19 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
 
     val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeList.toBuffer.asJava).iterator
 
-    val namespaceList: List[Namespace] = elm.scope.toMap.map(kv => {
-      val prefix = kv._1
-      val nsUri = kv._2
+    val namespaceList: List[Namespace] = {
+      val result = elm.scope.toMap map { kv =>
+        val prefix = kv._1
+        val nsUri = kv._2
 
-      if ((prefix eq null) || (prefix == "")) {
-        (prefix -> xmlEventFactory.createNamespace(nsUri))
-      } else {
-        (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
+        if ((prefix eq null) || (prefix == "")) {
+          (prefix -> xmlEventFactory.createNamespace(nsUri))
+        } else {
+          (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
+        }
       }
-    }).values.toList
+      result.values.toList
+    }
 
     val namespaces: jutil.Iterator[Namespace] = new jutil.ArrayList[Namespace](namespaceList.toBuffer.asJava).iterator
 

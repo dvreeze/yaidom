@@ -33,7 +33,7 @@ import StaxEventsToElemConverter._
 trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]] {
 
   def convertToElem(v: immutable.Seq[XMLEvent]): Elem = {
-    val events: immutable.Seq[XMLEvent] = v.toList.dropWhile(ev => !ev.isStartElement)
+    val events: immutable.Seq[XMLEvent] = v.toList dropWhile { ev => !ev.isStartElement }
 
     val eventsWithDepths: immutable.Seq[EventWithDepth] = {
       var depth = 0
@@ -48,7 +48,9 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
     val result = eventsToElem(eventsWithDepths, Scope.Empty)
 
-    require(result.remainder.forall(ev => !ev.event.isStartElement && !ev.event.isEndElement))
+    require {
+      result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
+    }
     result.elem
   }
 
@@ -102,16 +104,21 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
   private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
     val declarations: Scope.Declarations = {
-      val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList.collect({ case ns: Namespace => ns })
-      require(namespaces.forall(ns => (ns.getNamespaceURI ne null) && (ns.getNamespaceURI != "")))
+      val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
+      require {
+        namespaces forall { ns => (ns.getNamespaceURI ne null) && (ns.getNamespaceURI != "") }
+      }
       // Namespace undeclaration not supported
 
-      val declaredScope: Scope = new Scope(
-        defaultNamespace = namespaces.filter(_.isDefaultNamespaceDeclaration).headOption.map(_.getNamespaceURI),
-        prefixScope = namespaces.filterNot(_.isDefaultNamespaceDeclaration).map(ns => (ns.getPrefix -> ns.getNamespaceURI)).toMap)
-      new Scope.Declarations(
-        declared = declaredScope,
-        undeclaredOptionalPrefixes = Set())
+      val declaredScope: Scope = {
+        val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { _.getNamespaceURI } headOption
+        val prefScope = {
+          val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> ns.getNamespaceURI) }
+          result.toMap
+        }
+        new Scope(defaultNamespace = defaultNs, prefixScope = prefScope)
+      }
+      new Scope.Declarations(declared = declaredScope, undeclaredOptionalPrefixes = Set())
     }
     val currScope = parentScope.resolve(declarations)
 
@@ -119,12 +126,13 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
     val elemPrefix: Option[String] = ExpandedName.prefixFromJavaQName(startElement.getName)
 
     val currAttrs: Map[QName, String] = {
-      val attributes: List[Attribute] = startElement.getAttributes.asScala.toList.collect({ case a: Attribute => a })
-      attributes.map(a => {
+      val attributes: List[Attribute] = startElement.getAttributes.asScala.toList collect { case a: Attribute => a }
+      val result = attributes map { a =>
         val prefix: Option[String] = ExpandedName.prefixFromJavaQName(a.getName)
         val name = ExpandedName.fromJavaQName(a.getName).toQName(prefix)
         (name -> a.getValue)
-      }).toMap
+      }
+      result.toMap
     }
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here

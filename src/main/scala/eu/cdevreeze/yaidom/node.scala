@@ -113,7 +113,7 @@ final class Elem private (
   def firstTextChildOption: Option[Text] = textChildren.headOption
 
   /** Returns the first text child's value, if any, and None otherwise */
-  def firstTextValueOption: Option[String] = textChildren.headOption.map(_.text)
+  def firstTextValueOption: Option[String] = textChildren.headOption map { _.text }
 
   /** Returns the first text child, if any, and None otherwise */
   def firstTextChild: Text = firstTextChildOption.getOrElse(sys.error("Missing text child"))
@@ -130,10 +130,12 @@ final class Elem private (
     val rootAndElem = Elem.RootAndElem(root, self)
 
     if (f.isDefinedAt(rootAndElem)) f(rootAndElem) else {
-      val newChildren = self.children.map((ch: Node) => ch match {
-        case ch: Elem => ch.copy(root, f)
-        case n => n
-      })
+      val newChildren = self.children map { (ch: Node) =>
+        ch match {
+          case ch: Elem => ch.copy(root, f)
+          case n => n
+        }
+      }
       self.withChildren(newChildren)
     }
   }
@@ -141,8 +143,10 @@ final class Elem private (
   /** Computes an index on the UUID. Very inefficient. */
   def getIndexOnUuid: Map[jutil.UUID, Elem] = {
     val result = getIndex(e => e.uuid)
-    require(result.values.forall(elms => elms.size == 1))
-    result.mapValues(elms => elms(0))
+    require {
+      result.values forall { elms => elms.size == 1 }
+    }
+    result mapValues { elms => elms(0) }
   }
 
   /**
@@ -152,8 +156,10 @@ final class Elem private (
   def getIndexToParentOnUuid: Map[jutil.UUID, Elem] = {
     val result = getIndexToParent(e => e.uuid)
     require(!result.contains(self.uuid))
-    require(result.values.forall(elms => elms.size == 1))
-    result.mapValues(elms => elms(0))
+    require {
+      result.values forall { elms => elms.size == 1 }
+    }
+    result mapValues { elms => elms(0) }
   }
 
   /** Equality based on the UUID. Fast but depends not only on the tree itself, but also the time of creation */
@@ -180,25 +186,24 @@ final class Elem private (
   private def toLines(indent: String, parentScope: Scope): List[String] = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
     val declarationsString = declarations.toStringInXml
-    val attrsString = attributes.map(kv => """%s="%s"""".format(kv._1, kv._2)).mkString(" ")
+    val attrsString = attributes map { kv => """%s="%s"""".format(kv._1, kv._2) } mkString (" ")
 
     if (self.children.isEmpty) {
-      val line = "<%s />".format(List(qname, declarationsString, attrsString).filterNot(_ == "").mkString(" "))
+      val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
+      val line = "<%s />".format(start)
       List(line).map(ln => indent + ln)
     } else if (this.childElems.isEmpty) {
-      val line = "<%s>%s</%s>".format(
-        List(qname, declarationsString, attrsString).filterNot(_ == "").mkString(" "),
-        children.map(_.toString).mkString,
-        qname)
+      val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
+      val content = children map { _.toString } mkString
+      val line = "<%s>%s</%s>".format(start, content, qname)
       List(line).map(ln => indent + ln)
     } else {
-      val firstLine: String = "<%s>".format(List(qname, declarationsString, attrsString).filterNot(_ == "").mkString(" "))
+      val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
+      val firstLine: String = "<%s>".format(start)
       val lastLine: String = "</%s>".format(qname)
       // Recursive (not tail-recursive) calls, ignoring non-element children
-      val childElementLines: List[String] = self.childElems.toList.flatMap({ e =>
-        e.toLines("  ", self.scope)
-      })
-      (firstLine :: childElementLines ::: List(lastLine)).map(ln => indent + ln)
+      val childElementLines: List[String] = self.childElems.toList flatMap { e => e.toLines("  ", self.scope) }
+      (firstLine :: childElementLines ::: List(lastLine)) map { ln => indent + ln }
     }
   }
 }

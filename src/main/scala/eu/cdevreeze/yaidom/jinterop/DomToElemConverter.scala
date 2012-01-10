@@ -46,7 +46,7 @@ trait DomToElemConverter extends ConverterToElem[Element] {
       qname = qname,
       attributes = attributes,
       scope = newScope,
-      children = nodeListToIndexedSeq(v.getChildNodes).flatMap(n => convertToNodeOption(newScope, n)))
+      children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(newScope, n) })
   }
 
   /** Given a parent scope, converts an org.w3c.dom.Node to an optional yaidom Node */
@@ -85,21 +85,23 @@ trait DomToElemConverter extends ConverterToElem[Element] {
 
   /** Converts the namespace declarations in a NamedNodeMap to a Scope.Declarations */
   private def extractNamespaceDeclarations(domAttributes: NamedNodeMap): Scope.Declarations = {
-    val nsMap =
-      (0 until domAttributes.getLength).flatMap(i => {
+    val nsMap = {
+      val result = (0 until domAttributes.getLength) flatMap { i =>
         val attr = domAttributes.item(i).asInstanceOf[Attr]
 
         if (isNamespaceDeclaration(attr)) {
           val result = extractNamespaceDeclaration(attr)
-          Some(result).map(pair => (pair._1.getOrElse(""), pair._2))
+          Some(result) map { pair => (pair._1.getOrElse(""), pair._2) }
         } else None
-      }).toMap
+      }
+      result.toMap
+    }
     Scope.Declarations.fromMap(nsMap)
   }
 
   /** Converts a NodeList to an IndexedSeq[org.w3c.dom.Node] */
   private def nodeListToIndexedSeq(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
-    (0 until nodeList.getLength).map(i => nodeList.item(i)).toIndexedSeq
+    (0 until nodeList.getLength) map { i => nodeList.item(i) } toIndexedSeq
   }
 
   /** Extracts the QName of an org.w3c.dom.Element */

@@ -26,13 +26,17 @@ package eu.cdevreeze.yaidom
  */
 final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String, String]) extends Immutable {
   require(defaultNamespace ne null)
-  require(defaultNamespace.forall(ns => (ns ne null) && (ns.length > 0)))
+  require {
+    defaultNamespace forall { ns => (ns ne null) && (ns.length > 0) }
+  }
   require(prefixScope ne null)
-  require(prefixScope.forall(kv => {
-    val pref = kv._1
-    val ns = kv._2
-    (pref ne null) && (pref.length > 0) && (ns ne null) && (ns.length > 0)
-  }))
+  require {
+    prefixScope forall { kv =>
+      val pref = kv._1
+      val ns = kv._2
+      (pref ne null) && (pref.length > 0) && (ns ne null) && (ns.length > 0)
+    }
+  }
 
   /** The prefix scope, with the implicit "xml" namespace added */
   def completePrefixScope: Map[String, String] = prefixScope + ("xml" -> "http://www.w3.org/XML/1998/namespace")
@@ -48,7 +52,9 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
     val thisMap = toMap
     val otherMap = scope.toMap
 
-    thisMap.keySet.subsetOf(otherMap.keySet) && thisMap.keySet.forall(pref => thisMap(pref) == otherMap(pref))
+    thisMap.keySet.subsetOf(otherMap.keySet) && {
+      thisMap.keySet forall { pref => thisMap(pref) == otherMap(pref) }
+    }
   }
 
   /** Returns true if this is a superscope of the given parameter Scope. A Scope is considered superscope of itself. */
@@ -59,7 +65,7 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
     case unprefixedName: UnprefixedName if defaultNamespace.isEmpty => Some(ExpandedName(unprefixedName.localPart))
     case unprefixedName: UnprefixedName => Some(ExpandedName(defaultNamespace.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
-      completePrefixScope.get(prefixedName.prefix).map(nsUri => ExpandedName(nsUri, prefixedName.localPart))
+      completePrefixScope.get(prefixedName.prefix) map { nsUri => ExpandedName(nsUri, prefixedName.localPart) }
   }
 
   /**
@@ -85,14 +91,17 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
         case (Some(ns1), Some(ns2)) if ns1 == ns2 => None
         case (_, _) => scope.defaultNamespace
       }
-      val prefixScope: Map[String, String] = scope.prefixScope.collect { case (pref, nsUri) if (!Scope.this.prefixScope.contains(pref)) || (Scope.this.prefixScope(pref) != scope.prefixScope(pref)) => (pref -> nsUri) }
+      val prefixScope: Map[String, String] = scope.prefixScope collect {
+        case (pref, nsUri) if (!Scope.this.prefixScope.contains(pref)) || (Scope.this.prefixScope(pref) != scope.prefixScope(pref)) => (pref -> nsUri)
+      }
 
       Scope(defaultNs, prefixScope)
     }
     val defaultNamespaceUndeclared: Boolean = this.defaultNamespace.isDefined && scope.defaultNamespace.isEmpty
     val undeclaredPrefixes: Set[String] = Scope.this.prefixScope.keySet.diff(scope.prefixScope.keySet)
-    val undeclaredOptionalPrefixes =
-      undeclaredPrefixes.map(pref => Some(pref)) ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
+    val undeclaredOptionalPrefixes = {
+      undeclaredPrefixes map { pref => Some(pref) }
+    } ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
 
     Scope.Declarations(declared, undeclaredOptionalPrefixes)
   }
@@ -100,8 +109,8 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
   /** Creates a String representation of this Scope, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespace.isEmpty) "" else """xmlns="%s"""".format(defaultNamespace.get)
-    val prefixScopeString = prefixScope.map(kv => """xmlns:%s="%s"""".format(kv._1, kv._2)).mkString(" ")
-    List(defaultNsString, prefixScopeString).filterNot(_ == "").mkString(" ")
+    val prefixScopeString = prefixScope map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }
 
@@ -112,9 +121,15 @@ object Scope {
 
   /** Parses the given Map into a Scope. The Map must follow the Scope.toMap format. */
   def fromMap(m: Map[String, String]): Scope = {
-    require(m.keySet.forall(pref => pref ne null))
-    require(m.values.forall(ns => ns ne null))
-    require(m.values.forall(ns => ns != ""))
+    require {
+      m.keySet forall { pref => pref ne null }
+    }
+    require {
+      m.values forall { ns => ns ne null }
+    }
+    require {
+      m.values forall { ns => ns != "" }
+    }
 
     val defaultNamespace: Option[String] = m.get("")
     val prefixScope: Map[String, String] = m - ""
@@ -127,7 +142,13 @@ object Scope {
   final case class Declarations(declared: Scope, undeclaredOptionalPrefixes: Set[Option[String]]) extends Immutable {
     require(declared ne null)
     require(undeclaredOptionalPrefixes ne null)
-    require(undeclaredOptionalPrefixes.forall(pref => (pref ne null) && (pref.forall(_.length > 0))))
+    require {
+      undeclaredOptionalPrefixes forall { pref =>
+        (pref ne null) && {
+          pref forall { _.length > 0 }
+        }
+      }
+    }
     require(declared.toMap.keySet.intersect(undeclaredSet).isEmpty)
     require(!defaultNamespaceUndeclared || declared.defaultNamespace.isEmpty)
 
@@ -148,26 +169,34 @@ object Scope {
     def toStringInXml: String = {
       val declaredString = declared.toStringInXml
       val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
-      val undeclaredPrefixesString = undeclaredPrefixes.map(pref => """xmlns:%s=""""".format(pref)).mkString(" ")
+      val undeclaredPrefixesString = undeclaredPrefixes map { pref => """xmlns:%s=""""".format(pref) } mkString (" ")
 
-      List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString).filterNot(_ == "").mkString(" ")
+      List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString) filterNot { _ == "" } mkString (" ")
     }
   }
 
   object Declarations {
 
     def fromMap(m: Map[String, String]): Declarations = {
-      require(m.keySet.forall(pref => pref ne null))
-      require(m.values.forall(ns => ns ne null))
+      require {
+        m.keySet forall { pref => pref ne null }
+      }
+      require {
+        m.values forall { ns => ns ne null }
+      }
 
-      val scope = Scope.fromMap(m.filter(kv => !kv._2.isEmpty))
+      val scope = {
+        val scopeMap = m filter { kv => !kv._2.isEmpty }
+        Scope.fromMap(scopeMap)
+      }
       val defaultNamespaceUndeclared: Boolean = {
         val defaultNs = m.get("")
         defaultNs == Some("")
       }
-      val undeclaredPrefixes = m.filterKeys(pref => pref != "").filter(kv => kv._2 == "").keySet
-      val undeclaredOptionalPrefixes =
-        undeclaredPrefixes.map(pref => Some(pref)) ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
+      val undeclaredPrefixes = m filterKeys { pref => pref != "" } filter { kv => kv._2 == "" } keySet
+      val undeclaredOptionalPrefixes = {
+        undeclaredPrefixes map { pref => Some(pref) }
+      } ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
 
       Declarations(scope, undeclaredOptionalPrefixes)
     }

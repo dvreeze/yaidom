@@ -6,7 +6,7 @@ import jutil.{ logging => jlogging }
 import java.net.URI
 import java.lang.management.ManagementFactory
 import scala.collection.immutable
-import xlink.{Elem => _, _}
+import xlink.{ Elem => _, _ }
 import ExpandedName._
 import Taxonomy._
 
@@ -18,7 +18,8 @@ object FindConceptLabels {
   def main(args: Array[String]) {
     require(args.length >= 2, "Usage: FindConceptLabels <language code> <url> ... ")
     val languageCode = args(0)
-    val uris = args.drop(1).flatMap(arg => arg.split(',').map(s => new URI(s))).toList
+    def parseUris(s: String): List[URI] = s.split(',') map { v => new URI(v) } toList
+    val uris = args.drop(1) flatMap { arg => parseUris(arg) } toList
 
     val availableProcessors = ManagementFactory.getOperatingSystemMXBean.getAvailableProcessors
     logger.info("Number of available processors: %d".format(availableProcessors))
@@ -37,89 +38,111 @@ object FindConceptLabels {
 
     val substitutionGroupElemDefs: Map[ExpandedName, Elem] = taxonomy.substitutionGroupElemDefinitionsFor(substitutionGroups)
     val parentSubstitutionGroups: Map[ExpandedName, ExpandedName] =
-      substitutionGroupElemDefs.mapValues(elemDef => taxonomy.substitutionGroupOption(elemDef)).filter(_._2.isDefined).mapValues(_.get)
+      substitutionGroupElemDefs mapValues { elemDef => taxonomy.substitutionGroupOption(elemDef) } filter { _._2.isDefined } mapValues { _.get }
     logger.info("Substitution group parents: %s".format(parentSubstitutionGroups.mkString(", ")))
 
     val substGroupAncestries: immutable.Seq[List[ExpandedName]] = taxonomy.substitutionGroupAncestries
     logger.info("Substitution group ancestries: %s".format(substGroupAncestries.mkString(", ")))
-    val itemOrTupleSubstGroups: Set[ExpandedName] =
-      substGroupAncestries.filter(ancestry => ancestry.contains(XbrliItem) || ancestry.contains(XbrliTuple)).map(_.head).toSet
+    val itemOrTupleSubstGroups: Set[ExpandedName] = {
+      val result = substGroupAncestries filter { ancestry => ancestry.contains(XbrliItem) || ancestry.contains(XbrliTuple) } map { _.head }
+      result.toSet
+    }
     logger.info("Item or tuple substitution groups: %s".format(itemOrTupleSubstGroups.mkString(", ")))
 
     logger.info("Found %d linkbases".format(taxonomy.linkbases.size))
 
     val labelLinks: Map[URI, immutable.Seq[ExtendedLink]] =
-      taxonomy.linkbases.mapValues(linkbase => findLabelLinks(linkbase))
+      taxonomy.linkbases mapValues { linkbase => findLabelLinks(linkbase) }
     logger.info("Found %d label links".format(labelLinks.values.flatten.size))
 
-    val conceptLabels: immutable.Seq[ConceptLabel] =
-      (for {
-        (uri, links) <- labelLinks.par
-        link <- links
-      } yield findConceptLabels(uri, link)).flatten.toIndexedSeq
+    val conceptLabels: immutable.Seq[ConceptLabel] = {
+      val result =
+        for {
+          (uri, links) <- labelLinks.par
+          link <- links
+          conceptLabel <- findConceptLabels(uri, link)
+        } yield conceptLabel
+      result.toIndexedSeq
+    }
     logger.info("Found %d concept-labels".format(conceptLabels.size))
 
-    val arcroles: Set[String] = conceptLabels.map(_.arcrole).toSet
+    val arcroles: Set[String] = {
+      val result = conceptLabels map { _.arcrole }
+      result.toSet
+    }
     logger.info("Concept-label arcroles: %s".format(arcroles.mkString(", ")))
 
-    val languageCodes: Set[String] = conceptLabels.flatMap(conceptLabel => conceptLabel.languageOption).toSet
+    val languageCodes: Set[String] = {
+      val result = conceptLabels flatMap { _.languageOption }
+      result.toSet
+    }
     logger.info("Language codes found in the concept-labels: %s".format(languageCodes.mkString(", ")))
-    val numberOfConceptLabelsWithoutLanguage = conceptLabels.count(conceptLabel => conceptLabel.languageOption.isEmpty)
+    val numberOfConceptLabelsWithoutLanguage = conceptLabels count { _.languageOption.isEmpty }
     logger.info("Number of concept-labels without language: %d".format(numberOfConceptLabelsWithoutLanguage))
 
     val conceptLabelsSearchedFor: immutable.Seq[ConceptLabel] =
-      conceptLabels.filter(conceptLabel => conceptLabel.languageOption == Some(languageCode))
+      conceptLabels filter { conceptLabel => conceptLabel.languageOption == Some(languageCode) }
     logger.info("Found %d concept-labels with language %s".format(conceptLabelsSearchedFor.size, languageCode))
 
-    val resolvedConceptLabels: immutable.Seq[ResolvedConceptLabel] =
-      conceptLabelsSearchedFor.par.flatMap(conceptLabel => {
+    val resolvedConceptLabels: immutable.Seq[ResolvedConceptLabel] = {
+      val result = conceptLabelsSearchedFor.par flatMap { conceptLabel =>
         val rootAndElemDefOption: Option[(Elem, Elem)] =
           taxonomy.findSchemaRootAndElementDefinition(conceptLabel.conceptUri)
-        val schemaRootOption: Option[Elem] = rootAndElemDefOption.map(_._1)
-        val elemDefOption: Option[Elem] = rootAndElemDefOption.map(_._2)
+        val schemaRootOption: Option[Elem] = rootAndElemDefOption map { _._1 }
+        val elemDefOption: Option[Elem] = rootAndElemDefOption map { _._2 }
 
         if (schemaRootOption.isEmpty) None else {
-          elemDefOption.map(elemDef => new ResolvedConceptLabel(
-            schemaRoot = schemaRootOption.get,
-            elementDefinition = elemDef,
-            arcrole = conceptLabel.arcrole,
-            languageOption = conceptLabel.languageOption,
-            labelText = conceptLabel.labelText))
+          elemDefOption map { elemDef =>
+            new ResolvedConceptLabel(
+              schemaRoot = schemaRootOption.get,
+              elementDefinition = elemDef,
+              arcrole = conceptLabel.arcrole,
+              languageOption = conceptLabel.languageOption,
+              labelText = conceptLabel.labelText)
+          }
         }
-      }).seq
+      }
+      result.seq
+    }
     logger.info("Found %d resolved concept-labels with language %s".format(resolvedConceptLabels.size, languageCode))
 
     val unresolvedConceptLabels: immutable.Seq[ConceptLabel] = {
-      conceptLabelsSearchedFor.par.filter(conceptLabel => {
+      val result = conceptLabelsSearchedFor.par filter { conceptLabel =>
         val rootAndElemDefOption: Option[(Elem, Elem)] =
           taxonomy.findSchemaRootAndElementDefinition(conceptLabel.conceptUri)
-        val schemaRootOption: Option[Elem] = rootAndElemDefOption.map(_._1)
-        val elemDefOption: Option[Elem] = rootAndElemDefOption.map(_._2)
+        val schemaRootOption: Option[Elem] = rootAndElemDefOption map { _._1 }
+        val elemDefOption: Option[Elem] = rootAndElemDefOption map { _._2 }
 
         schemaRootOption.isEmpty || elemDefOption.isEmpty
-      }).seq
+      }
+      result.seq
     }
     logger.info("Found %d unresolved concept-labels with language %s".format(unresolvedConceptLabels.size, languageCode))
-    val schemaAuthoritiesOfUnresolvedConceptLabels: Set[String] =
-      unresolvedConceptLabels.map(conceptLabel => conceptLabel.conceptUri.getAuthority).toSet
+    val schemaAuthoritiesOfUnresolvedConceptLabels: Set[String] = {
+      val result = unresolvedConceptLabels map { conceptLabel => conceptLabel.conceptUri.getAuthority }
+      result.toSet
+    }
 
     logger.info("Schema authorities of unresolved concept-labels: %s".format(schemaAuthoritiesOfUnresolvedConceptLabels.mkString(", ")))
 
     val itemOrTupleConceptLabels: immutable.Seq[ResolvedConceptLabel] =
-      resolvedConceptLabels.filter(conceptLabel => {
+      resolvedConceptLabels filter { conceptLabel =>
         val substGroupOption: Option[ExpandedName] = taxonomy.substitutionGroupOption(conceptLabel.elementDefinition)
         substGroupOption.isDefined && itemOrTupleSubstGroups.contains(substGroupOption.get)
-      })
+      }
     logger.info("Found %d resolved concept-labels for items/tuples with language %s".format(itemOrTupleConceptLabels.size, languageCode))
 
-    val resultMap: Map[String, String] =
-      (for (conceptLabel <- itemOrTupleConceptLabels) yield {
-        val tnsOption = conceptLabel.schemaRoot.attributeOption("targetNamespace".ename)
-        val localName = conceptLabel.elementDefinition.attribute("name".ename)
-        val name: ExpandedName = ExpandedName(tnsOption, localName)
+    val resultMap: Map[String, String] = {
+      val result =
+        for (conceptLabel <- itemOrTupleConceptLabels) yield {
+          val tnsOption = conceptLabel.schemaRoot.attributeOption("targetNamespace".ename)
+          val localName = conceptLabel.elementDefinition.attribute("name".ename)
+          val name: ExpandedName = ExpandedName(tnsOption, localName)
 
-        (name.toString -> conceptLabel.labelText)
-      }).toMap
+          (name.toString -> conceptLabel.labelText)
+        }
+      result.toMap
+    }
 
     val props = new jutil.Properties
     for ((name, labelText) <- resultMap) props.put(name, labelText)
@@ -149,15 +172,15 @@ object FindConceptLabels {
   }
 
   def findLabelLinks(root: xlink.Elem): immutable.Seq[ExtendedLink] = {
-    root.firstElems(lnk => lnk.isInstanceOf[ExtendedLink] && lnk.resolvedName == XbrlLabelLink).collect({
+    root.firstElems(lnk => lnk.isInstanceOf[ExtendedLink] && lnk.resolvedName == XbrlLabelLink) collect {
       case link: ExtendedLink => link
-    })
+    }
   }
 
   def findConceptLabels(currentUri: URI, labelLink: ExtendedLink): immutable.Seq[ConceptLabel] = {
     def labelArcToConceptLabelOption(arc: Arc): Option[ConceptLabel] = {
-      val fromLocatorOption: Option[Locator] = labelLink.locatorXLinks.find(loc => loc.label == arc.from)
-      val toResourceOption: Option[Resource] = labelLink.resourceXLinks.find(res => res.label == arc.to)
+      val fromLocatorOption: Option[Locator] = labelLink.locatorXLinks find { loc => loc.label == arc.from }
+      val toResourceOption: Option[Resource] = labelLink.resourceXLinks find { res => res.label == arc.to }
 
       if (fromLocatorOption.isEmpty || toResourceOption.isEmpty) None else {
         val conceptLabel = new ConceptLabel(
@@ -169,7 +192,7 @@ object FindConceptLabels {
       }
     }
 
-    val labelArcs = labelLink.arcXLinks.filter(arc => arc.wrappedElem.resolvedName == XbrlLabelArc)
-    labelArcs.flatMap(labelArc => labelArcToConceptLabelOption(labelArc))
+    val labelArcs = labelLink.arcXLinks filter { arc => arc.wrappedElem.resolvedName == XbrlLabelArc }
+    labelArcs flatMap { labelArc => labelArcToConceptLabelOption(labelArc) }
   }
 }

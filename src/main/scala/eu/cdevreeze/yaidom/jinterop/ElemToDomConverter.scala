@@ -52,9 +52,8 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
     // Not tail-recursive, but the recursion depth should be limited
 
     val element = createElementWithoutChildren(elm, doc, parentScope)
-    val childNodes: immutable.IndexedSeq[org.w3c.dom.Node] = elm.children.map(ch => {
-      convertNode(ch, doc, element, elm.scope)
-    })
+    val childNodes: immutable.IndexedSeq[org.w3c.dom.Node] =
+      elm.children map { ch => convertNode(ch, doc, element, elm.scope) }
 
     for (ch <- childNodes) element.appendChild(ch)
 

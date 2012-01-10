@@ -21,9 +21,9 @@ import java.net.URI
 import scala.collection.immutable
 import XLink._
 
-/** 
+/**
  * Elem at the level of XLink awareness. It is either an XLink or not. It wraps a yaidom Elem.
- * 
+ *
  * @author Chris de Vreeze
  */
 sealed trait Elem extends ElemLike[Elem] with Immutable {
@@ -34,7 +34,7 @@ sealed trait Elem extends ElemLike[Elem] with Immutable {
 
   final val resolvedName: ExpandedName = wrappedElem.resolvedName
 
-  final val childElems: immutable.Seq[Elem] = wrappedElem.childElems.map(e => Elem(e))
+  final val childElems: immutable.Seq[Elem] = wrappedElem.childElems map { e => Elem(e) }
 }
 
 /** XLink */
@@ -43,7 +43,7 @@ trait XLink extends Elem {
 
   def xlinkType: String = wrappedElem.attribute(XLinkTypeExpandedName)
 
-  def xlinkAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes.filterKeys(a => a.namespaceUri == Some(XLinkNamespace.toString))
+  def xlinkAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes filterKeys { a => a.namespaceUri == Some(XLinkNamespace.toString) }
 
   def arcroleOption: Option[String] = wrappedElem.attributeOption(XLinkArcroleExpandedName)
 }
@@ -55,7 +55,7 @@ final case class SimpleLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem) 
   require(xlinkType == "simple")
   require(wrappedElem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
 
-  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName).map(s => URI.create(s)).getOrElse(sys.error("Missing %s".format(XLinkHrefExpandedName)))
+  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
   def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
   def showOption: Option[String] = wrappedElem.attributeOption(XLinkShowExpandedName)
@@ -96,7 +96,7 @@ final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) ext
   require(wrappedElem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
   require(wrappedElem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
-  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName).map(s => URI.create(s)).getOrElse(sys.error("Missing %s".format(XLinkHrefExpandedName)))
+  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
   def label: String = wrappedElem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
   def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)

@@ -29,7 +29,9 @@ import javax.xml.namespace.{ QName => JQName }
  */
 final case class ExpandedName(namespaceUri: Option[String], localPart: String) extends Immutable {
   require(namespaceUri ne null)
-  require(namespaceUri.forall(ns => (ns ne null) && (ns.length > 0)))
+  require {
+    namespaceUri forall { ns => (ns ne null) && (ns.length > 0) }
+  }
   require(localPart ne null)
   require(localPart.length > 0)
 
@@ -73,7 +75,7 @@ object ExpandedName {
   /** Parses a String into an ExpandedName. The String must conform to the <b>toString</b> format of an ExpandedName */
   def parse(s: String): ExpandedName = s match {
     case s if s.startsWith("{") =>
-      val idx = s.indexWhere(c => c == '}')
+      val idx = s indexWhere { c => c == '}' }
       require(idx >= 2 && idx < s.length - 1)
       val ns = s.slice(1, idx)
       val localPart = s.slice(idx + 1, s.length)
