@@ -52,16 +52,16 @@ class StaxInteropTest extends Suite {
     eventReader.close()
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.elems.map(e => e.qname.localPart).toSet
+      root.elems map { e => e.qname.localPart } toSet
     }
     expect(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.elemsOrSelf.map(e => e.qname.localPart).toSet
+      root.elemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(8) {
       root.elemsOrSelf(ns.ns.ename("Title")).size
     }
     expect(3) {
-      root.elemsOrSelf(e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman").size
+      root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 2. Write Elem to an XML string
@@ -90,16 +90,18 @@ class StaxInteropTest extends Suite {
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(root.elems.map(e => e.qname.localPart).toSet) {
-      root2.elems.map(e => e.qname.localPart).toSet
+      root2.elems map { e => e.qname.localPart } toSet
     }
     expect(root.elemsOrSelf.map(e => e.qname.localPart).toSet) {
-      root2.elemsOrSelf.map(e => e.qname.localPart).toSet
+      root2.elemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
       root2.elemsOrSelf(ns.ns.ename("Title")).size
     }
-    expect(root.elemsOrSelf(e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman").size) {
-      root2.elemsOrSelf(e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman").size
+    expect {
+      root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    } {
+      root2 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
   }
 }

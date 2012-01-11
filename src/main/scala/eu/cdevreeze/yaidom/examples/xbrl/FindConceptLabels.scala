@@ -172,7 +172,7 @@ object FindConceptLabels {
   }
 
   def findLabelLinks(root: xlink.Elem): immutable.Seq[ExtendedLink] = {
-    root.firstElems(lnk => lnk.isInstanceOf[ExtendedLink] && lnk.resolvedName == XbrlLabelLink) collect {
+    root firstElems { lnk => lnk.isInstanceOf[ExtendedLink] && lnk.resolvedName == XbrlLabelLink } collect {
       case link: ExtendedLink => link
     }
   }
