@@ -25,6 +25,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import QName._
 import ExpandedName._
 import StaxConversions._
 
@@ -32,7 +33,8 @@ import StaxConversions._
  * StAX interoperability test case.
  *
  * Acknowledgments: The sample XML is part of the online course "Introduction to Databases", by professor Widom at
- * Stanford University. Many thanks for letting me use this material.
+ * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
+ * issues.
  *
  * @author Chris de Vreeze
  */
@@ -42,6 +44,7 @@ class StaxInteropTest extends Suite {
   private val ns = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsYahoo = "http://www.yahoo.com"
+  private val nsFooBar = "urn:foo:bar"
 
   @Test def testParse() {
     // 1. Parse XML file into Elem
@@ -150,6 +153,61 @@ class StaxInteropTest extends Suite {
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
       val result = root2.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+  }
+
+  /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
+  @Test def testParseDefaultNamespaceXml() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    val is = classOf[StaxInteropTest].getResourceAsStream("trivialXml.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
+      val result = root.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set("root".qname, "child".qname)) {
+      val result = root.elemsOrSelf map { e => e.qname }
+      result.toSet
+    }
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
+      val result = root2.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set("root".qname, "child".qname)) {
+      val result = root2.elemsOrSelf map { e => e.qname }
       result.toSet
     }
   }
