@@ -40,6 +40,8 @@ import DomConversions._
 class DomInteropTest extends Suite {
 
   private val ns = "http://bookstore"
+  private val nsGoogle = "http://www.google.com"
+  private val nsYahoo = "http://www.yahoo.com"
 
   @Test def testParse() {
     // 1. Parse XML file into Elem
@@ -90,6 +92,41 @@ class DomInteropTest extends Suite {
       root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
       root2 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    }
+  }
+
+  /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
+  @Test def testParseStrangeXml() {
+    // 1. Parse XML file into Elem
+
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomInteropTest].getResourceAsStream("strangeXml.xml")
+    val doc = db.parse(is)
+
+    val root: Elem = convertToElem(doc.getDocumentElement)
+    is.close()
+
+    expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
+      val result = root.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 2. Convert Elem to a DOM element
+
+    val db2 = dbf.newDocumentBuilder
+    val doc2 = db2.newDocument
+    val element = convertElem(root)(doc2)
+
+    // 3. Convert DOM element into Elem
+
+    val root2: Elem = convertToElem(doc2.getDocumentElement)
+
+    // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
+
+    expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
+      val result = root2.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
     }
   }
 }

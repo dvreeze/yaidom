@@ -40,6 +40,8 @@ import StaxConversions._
 class StaxInteropTest extends Suite {
 
   private val ns = "http://bookstore"
+  private val nsGoogle = "http://www.google.com"
+  private val nsYahoo = "http://www.yahoo.com"
 
   @Test def testParse() {
     // 1. Parse XML file into Elem
@@ -102,6 +104,53 @@ class StaxInteropTest extends Suite {
       root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
       root2 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    }
+  }
+
+  /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
+  @Test def testParseStrangeXml() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    val is = classOf[StaxInteropTest].getResourceAsStream("strangeXml.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
+      val result = root.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
+      val result = root2.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
     }
   }
 }
