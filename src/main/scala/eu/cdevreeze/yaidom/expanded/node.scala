@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom
 package expanded
 
 import scala.collection.immutable
+import eu.cdevreeze.yaidom
 
 /**
  * Representation of Nodes, and Elems in particular, without any prefixes.
@@ -78,4 +79,44 @@ final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
 
   override def toString: String = """&%s;""".format(entity)
+}
+
+object Node {
+
+  def fromNormalNode(n: yaidom.Node): Node = n match {
+    case e: yaidom.Elem => Elem.fromNormalElem(e)
+    case t: yaidom.Text => Text.fromNormalText(t)
+    case pi: yaidom.ProcessingInstruction => ProcessingInstruction.fromNormalProcessingInstruction(pi)
+    case cdata: yaidom.CData => CData.fromNormalCData(cdata)
+    case er: yaidom.EntityRef => EntityRef.fromNormalEntityRef(er)
+  }
+}
+
+object Elem {
+
+  def fromNormalElem(e: yaidom.Elem): Elem = new Elem(
+    resolvedName = e.resolvedName,
+    resolvedAttributes = e.resolvedAttributes,
+    children = e.children map { ch => Node.fromNormalNode(ch) })
+}
+
+object Text {
+
+  def fromNormalText(t: yaidom.Text): Text = Text(t.text)
+}
+
+object ProcessingInstruction {
+
+  def fromNormalProcessingInstruction(pi: yaidom.ProcessingInstruction): ProcessingInstruction =
+    ProcessingInstruction(pi.target, pi.data)
+}
+
+object CData {
+
+  def fromNormalCData(cdata: yaidom.CData): CData = CData(cdata.text)
+}
+
+object EntityRef {
+
+  def fromNormalEntityRef(er: yaidom.EntityRef): EntityRef = EntityRef(er.entity)
 }
