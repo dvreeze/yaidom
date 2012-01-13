@@ -22,10 +22,10 @@ import scala.collection.immutable
  * Supertrait for <code>Elem</code>s and other element-like objects, such as <code>xlink.Elem</code>s.
  * Below, we refer to these element-like objects as elements.
  *
- * The only abstract methods are <code>resolvedName</code> and <code>childElems</code> (without arguments).
- * Based on these methods alone, this trait offers a rich API for querying elements.
+ * The only abstract methods are <code>resolvedName</code>, <code>resolvedAttributes</code> and <code>childElems</code> (without arguments).
+ * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
- * This trait offers public methods to obtain:
+ * This trait offers public element retrieval methods to obtain:
  * <ul>
  * <li>child elements</li>
  * <li>descendant elements</li>
@@ -33,9 +33,9 @@ import scala.collection.immutable
  * <li>first found descendant elements obeying a predicate, meaning that
  * they have no ancestors obeying that predicate</li>
  * </ul>
- * There are also methods for indexing the element tree.
+ * There are also attribute retrieval methods, and methods for indexing the element tree.
  *
- * These element finder methods each have up to 3 variants (returning collections of elements):
+ * These element retrieval methods each have up to 3 variants (returning collections of elements):
  * <ol>
  * <li>A no argument variant, if applicable</li>
  * <li>A single <code>E => Boolean</code> predicate argument variant</li>
@@ -43,7 +43,7 @@ import scala.collection.immutable
  * The latter variant is implemented in terms of the single predicate argument variant.
  * Some methods also have variants that return a single element or an element Option.
  *
- * These finder methods process and return elements in the following (depth-first) order:
+ * These element finder methods process and return elements in the following (depth-first) order:
  * <ol>
  * <li>Parents are processed before their children</li>
  * <li>Children are processed before the next sibling</li>
@@ -63,8 +63,17 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Resolved name of the element, as ExpandedName */
   def resolvedName: ExpandedName
 
+  /** The attributes as a Map from ExpandedNames (instead of QNames) to values */
+  def resolvedAttributes: Map[ExpandedName, String]
+
   /** Returns the child elements, in the correct order */
   def childElems: immutable.Seq[E]
+
+  /** Returns the value of the attribute with the given expanded name, if any, and None otherwise */
+  final def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
+
+  /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
+  final def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements obeying the given predicate */
   final def childElems(p: E => Boolean): immutable.Seq[E] = childElems filter p

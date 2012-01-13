@@ -88,7 +88,7 @@ final class Elem private (
     scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an ExpandedName in scope [%s]".format(qname, scope)))
 
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values, obtained by resolving attribute QNames against the attribute scope */
-  val resolvedAttributes: Map[ExpandedName, String] = {
+  override val resolvedAttributes: Map[ExpandedName, String] = {
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
@@ -96,12 +96,6 @@ final class Elem private (
       (expandedName -> attValue)
     }
   }
-
-  /** Returns the value of the attribute with the given expanded name, if any, and None otherwise */
-  def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
-
-  /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
-  def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements */
   override def childElems: immutable.Seq[Elem] = children collect { case e: Elem => e }

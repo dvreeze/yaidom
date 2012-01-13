@@ -32,20 +32,22 @@ sealed trait Elem extends ElemLike[Elem] with Immutable {
 
   require(wrappedElem ne null)
 
-  final val resolvedName: ExpandedName = wrappedElem.resolvedName
+  final override val resolvedName: ExpandedName = wrappedElem.resolvedName
 
-  final val childElems: immutable.Seq[Elem] = wrappedElem.childElems map { e => Elem(e) }
+  final override val resolvedAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes
+
+  final override val childElems: immutable.Seq[Elem] = wrappedElem.childElems map { e => Elem(e) }
 }
 
 /** XLink */
 trait XLink extends Elem {
-  require(wrappedElem.attributeOption(XLinkTypeExpandedName).isDefined, "Missing %s".format(XLinkTypeExpandedName))
+  require(attributeOption(XLinkTypeExpandedName).isDefined, "Missing %s".format(XLinkTypeExpandedName))
 
-  def xlinkType: String = wrappedElem.attribute(XLinkTypeExpandedName)
+  def xlinkType: String = attribute(XLinkTypeExpandedName)
 
-  def xlinkAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes filterKeys { a => a.namespaceUri == Some(XLinkNamespace.toString) }
+  def xlinkAttributes: Map[ExpandedName, String] = resolvedAttributes filterKeys { a => a.namespaceUri == Some(XLinkNamespace.toString) }
 
-  def arcroleOption: Option[String] = wrappedElem.attributeOption(XLinkArcroleExpandedName)
+  def arcroleOption: Option[String] = attributeOption(XLinkArcroleExpandedName)
 }
 
 /** Simple or extended link */
@@ -53,19 +55,19 @@ trait Link extends XLink
 
 final case class SimpleLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends Link {
   require(xlinkType == "simple")
-  require(wrappedElem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
+  require(attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
 
-  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
-  def showOption: Option[String] = wrappedElem.attributeOption(XLinkShowExpandedName)
-  def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateExpandedName)
+  def href: URI = attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
+  def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
+  def titleOption: Option[String] = attributeOption(XLinkTitleExpandedName)
+  def showOption: Option[String] = attributeOption(XLinkShowExpandedName)
+  def actuateOption: Option[String] = attributeOption(XLinkActuateExpandedName)
 }
 
 final case class ExtendedLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends Link {
   require(xlinkType == "extended")
 
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
+  def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
 
   def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
   def locatorXLinks: immutable.Seq[Locator] = childElems collect { case xlink: Locator => xlink }
@@ -76,41 +78,41 @@ final case class ExtendedLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem
 final case class Arc(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
   require(xlinkType == "arc")
   require(arcroleOption.isDefined, "Missing %s".format(XLinkArcroleExpandedName))
-  require(wrappedElem.attributeOption(XLinkFromExpandedName).isDefined, "Missing %s".format(XLinkFromExpandedName))
-  require(wrappedElem.attributeOption(XLinkToExpandedName).isDefined, "Missing %s".format(XLinkToExpandedName))
+  require(attributeOption(XLinkFromExpandedName).isDefined, "Missing %s".format(XLinkFromExpandedName))
+  require(attributeOption(XLinkToExpandedName).isDefined, "Missing %s".format(XLinkToExpandedName))
 
-  def from: String = wrappedElem.attributeOption(XLinkFromExpandedName).getOrElse(sys.error("Missing %s".format(XLinkFromExpandedName)))
-  def to: String = wrappedElem.attributeOption(XLinkToExpandedName).getOrElse(sys.error("Missing %s".format(XLinkToExpandedName)))
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
-  def showOption: Option[String] = wrappedElem.attributeOption(XLinkShowExpandedName)
-  def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateExpandedName)
-  def orderOption: Option[String] = wrappedElem.attributeOption(XLinkOrderExpandedName)
-  def useOption: Option[String] = wrappedElem.attributeOption(XLinkUseExpandedName)
-  def priorityOption: Option[String] = wrappedElem.attributeOption(XLinkPriorityExpandedName)
+  def from: String = attributeOption(XLinkFromExpandedName).getOrElse(sys.error("Missing %s".format(XLinkFromExpandedName)))
+  def to: String = attributeOption(XLinkToExpandedName).getOrElse(sys.error("Missing %s".format(XLinkToExpandedName)))
+  def titleOption: Option[String] = attributeOption(XLinkTitleExpandedName)
+  def showOption: Option[String] = attributeOption(XLinkShowExpandedName)
+  def actuateOption: Option[String] = attributeOption(XLinkActuateExpandedName)
+  def orderOption: Option[String] = attributeOption(XLinkOrderExpandedName)
+  def useOption: Option[String] = attributeOption(XLinkUseExpandedName)
+  def priorityOption: Option[String] = attributeOption(XLinkPriorityExpandedName)
 
   def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
 }
 
 final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
   require(xlinkType == "locator")
-  require(wrappedElem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
-  require(wrappedElem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
+  require(attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
+  require(attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
-  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
-  def label: String = wrappedElem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
+  def href: URI = attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
+  def label: String = attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
+  def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
+  def titleOption: Option[String] = attributeOption(XLinkTitleExpandedName)
 
   def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
 }
 
 final case class Resource(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
   require(xlinkType == "resource")
-  require(wrappedElem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
+  require(attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
-  def label: String = wrappedElem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
+  def label: String = attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
+  def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
+  def titleOption: Option[String] = attributeOption(XLinkTitleExpandedName)
 }
 
 final case class Title(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {

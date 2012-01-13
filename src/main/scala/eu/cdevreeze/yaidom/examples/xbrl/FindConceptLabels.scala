@@ -186,7 +186,7 @@ object FindConceptLabels {
         val conceptLabel = new ConceptLabel(
           conceptUri = currentUri.resolve(fromLocatorOption.get.href),
           arcrole = arc.arcroleOption.get,
-          languageOption = toResourceOption.get.wrappedElem.attributeOption(XmlLang),
+          languageOption = toResourceOption.get.attributeOption(XmlLang),
           labelText = toResourceOption.get.wrappedElem.firstTextValueOption.getOrElse(""))
         Some(conceptLabel)
       }
