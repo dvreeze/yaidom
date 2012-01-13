@@ -31,11 +31,11 @@ import scala.collection.{ immutable, mutable }
 trait DomToElemConverter extends ConverterToElem[Element] {
 
   def convertToElem(v: Element): Elem = {
-    convertToElem(Scope.Empty, v)
+    convertToElem(v, Scope.Empty)
   }
 
   /** Given a parent scope, converts an org.w3c.dom.Element to a yaidom Elem */
-  private def convertToElem(parentScope: Scope, v: Element): Elem = {
+  private def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
     val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
 
@@ -46,13 +46,13 @@ trait DomToElemConverter extends ConverterToElem[Element] {
       qname = qname,
       attributes = attributes,
       scope = newScope,
-      children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(newScope, n) })
+      children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) })
   }
 
   /** Given a parent scope, converts an org.w3c.dom.Node to an optional yaidom Node */
-  private def convertToNodeOption(parentScope: Scope, v: org.w3c.dom.Node): Option[Node] = {
+  private def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {
-      case e: Element => Some(convertToElem(parentScope, e))
+      case e: Element => Some(convertToElem(e, parentScope))
       case cdata: org.w3c.dom.CDATASection => Some(convertToCData(cdata))
       case t: org.w3c.dom.Text => Some(convertToText(t))
       case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
