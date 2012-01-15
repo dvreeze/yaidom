@@ -449,13 +449,13 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * for $b in doc("bookstore.xml")/Bookstore/Book
    * where every $fn in $b/Authors/Author/First_Name satisfies contains($fn, "J")
    * return $b
    * </pre>
    * or XPath:
-   * <pre>
+   * }}}
    * doc("bookstore.xml")//Book[count(Authors/Author[contains(First_Name, "J"]) = count(Authors/Author/First_Name)]
    * </pre>
    */
@@ -503,14 +503,14 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * for $b in doc("bookstore.xml")/Bookstore/Book
    * where some $fm in $b/Authors/Author/First_Name satisfies contains($b/Title, $fn)
    * return &lt;Book&gt;
    *          { $b/Title }
    *          { for $fm in $b/Authors/Author/First_Name where contains($b/Title, $fn) return $fn }
    *        &lt;/Book&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryBooksWithAuthorInTitle() {
     require(bookstore.qname.localPart == "Bookstore")
@@ -544,12 +544,12 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * &lt;Average&gt;
    * { let $plist := doc("bookstore.xml")/Bookstore/Book/@Price
    *   return avg($plist) }
    * &lt;/Average&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryAverageBookPrice() {
     require(bookstore.qname.localPart == "Bookstore")
@@ -572,7 +572,7 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * let $a := avg(doc("bookstore.xml")/Bookstore/Book/@Price)
    * for $b in doc("bookstore.xml")/Bookstore/Book
    * where $b/@Price < $a
@@ -580,7 +580,7 @@ class QueryTest extends Suite {
    *          { $b/Title }
    *          &lt;Price&gt; { $b/data(@Price) } &lt;/Price&gt;
    *        &lt;/Book&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryBooksPricedBelowAverage() {
     require(bookstore.qname.localPart == "Bookstore")
@@ -621,14 +621,14 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * for $b in doc("bookstore.xml")/Bookstore/Book
    * order by $b/@Price
    * return &lt;Book&gt;
    *          { $b/Title }
    *          &lt;Price&gt; { $b/data(@Price) } &lt;/Price&gt;
    *        &lt;/Book&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryBooksOrderedByPrice() {
     require(bookstore.qname.localPart == "Bookstore")
@@ -671,12 +671,12 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * for $n in distinct-values(doc("bookstore.xml")//Last_Name)
    * return &lt;Last_Name&gt;
    *          { $n }
    *        &lt;/Last_Name&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryLastNames() {
     require(bookstore.qname.localPart == "Bookstore")
@@ -696,7 +696,7 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * for $b1 in doc("bookstore.xml")/Bookstore/Book
    * for $b2 in doc("bookstore.xml")/Bookstore/Book
    * where $b1/Authors/Author/Last_Name = $b2/Authors/Author/Last_Name
@@ -705,7 +705,7 @@ class QueryTest extends Suite {
    *          &lt;Title1&gt;{ data($b1/Title) }&lt;/Title1&gt;
    *          &lt;Title2&gt;{ data($b2/Title) }&lt;/Title2&gt;
    *        &lt;/BookPair&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryBookPairsFromSameAuthor() {
     require(bookstore.qname.localPart == "Bookstore")
@@ -767,7 +767,7 @@ class QueryTest extends Suite {
 
   /**
    * The equivalent of XQuery:
-   * <pre>
+   * {{{
    * &lt;InvertedBookstore&gt;
    * {
    *   for $ln in distinct-values(doc("bookstore.xml")//Author/Last_Name)
@@ -780,7 +780,7 @@ class QueryTest extends Suite {
    *           return &lt;Book&gt; { $b/@ISBN } { $b/@Price } { $b/Title } &lt;/Book&gt; }
    *       &lt;/Author&gt; }
    * &lt;/InvertedBookstore&gt;
-   * </pre>
+   * }}}
    */
   @Test def testQueryInvertedBookstore() {
     require(bookstore.qname.localPart == "Bookstore")

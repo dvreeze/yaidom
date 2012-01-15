@@ -27,7 +27,7 @@ import scala.collection.JavaConverters._
  * Conversions between Elems of this API and StAX events.
  *
  * Example usage for parsing an XML file into an Elem using StAX:
- * <pre>
+ * {{{
  * import StaxConversions._
  *
  * val xmlInputFactory = XMLInputFactory.newFactory
@@ -35,10 +35,10 @@ import scala.collection.JavaConverters._
  * val root: Elem = convertToElem(xmlEventReader.toSeq)
  *
  * xmlEventReader.close()
- * </pre>
+ * }}}
  *
  * A somewhat involved example for writing an Elem to an XML file using StAX:
- * <pre>
+ * {{{
  * import StaxConversions._
  *
  * val xmlEventFactory = XMLEventFactory.newFactory
@@ -49,7 +49,7 @@ import scala.collection.JavaConverters._
  * events.foreach(ev => xmlEventWriter.add(ev))
  *
  * xmlEventWriter.close()
- * </pre>
+ * }}}
  *
  * @author Chris de Vreeze
  */

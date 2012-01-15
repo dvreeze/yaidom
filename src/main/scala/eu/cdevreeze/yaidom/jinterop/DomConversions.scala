@@ -21,17 +21,17 @@ package jinterop
  * Conversions between Elems of this API and DOM Elements.
  *
  * Example usage for parsing an XML file into an Elem using DOM:
- * <pre>
+ * {{{
  * import DomConversions._
  *
  * val dbf = DocumentBuilderFactory.newInstance
  * val db = dbf.newDocumentBuilder
  * val doc = db.parse(inputFile)
  * val root: Elem = convertToElem(doc.getDocumentElement)
- * </pre>
+ * }}}
  *
  * A somewhat involved example for writing an Elem to an XML file using DOM:
- * <pre>
+ * {{{
  * import DomConversions._
  *
  * val dbf = DocumentBuilderFactory.newInstance
@@ -46,7 +46,7 @@ package jinterop
  * tr.transform(source, result)
  *
  * outputStream.close()
- * </pre>
+ * }}}
  *
  * @author Chris de Vreeze
  */

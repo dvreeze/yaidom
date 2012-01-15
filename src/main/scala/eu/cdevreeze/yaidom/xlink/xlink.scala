@@ -22,7 +22,7 @@ import scala.collection.immutable
 import XLink._
 
 /**
- * Elem at the level of XLink awareness. It is either an XLink or not. It wraps a yaidom Elem.
+ * Elem at the level of XLink awareness. It is either an XLink or not. It wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
  *
  * @author Chris de Vreeze
  */

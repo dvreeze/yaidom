@@ -22,26 +22,27 @@ package eu.cdevreeze
  * Scala Collections of nodes. Below, when mentioning DOM trees, the DOM-like trees of this
  * API are meant, not W3C DOM trees, unless mentioned otherwise.
  *
- * Some design goals of this API are:
+ * By design, some characteristics of this API are:
  * <ul>
- * <li>The DOM trees of this API should be <em>immutable</em> and <em>thread-safe</em>.
+ * <li>The DOM trees of this API are <em>immutable</em> and <em>thread-safe</em>.
  * This facilitates safe multi-threaded processing of these trees.</li>
- * <li>This API should leverage the highly <em>expressive</em> <em>Scala Collections API</em>.
- * Querying DOM trees should be easy to achieve using Scala <code>for</code> comprehensions,
+ * <li>This API leverages the highly <em>expressive</em> <em>Scala Collections API</em>.
+ * Querying DOM trees is easy to achieve using Scala <code>for</code> comprehensions,
  * using immutable Scala collections. It should even be attractive to use this API instead of
- * XPath, XSLT and/or XQuery, at the cost of slightly more verbosity.</li>
- * <li>This API should explicitly model <em>qualified names</em>, <em>expanded names</em> and namespace scopes.
+ * XPath, XSLT and/or XQuery, at the cost of slightly more verbosity and loss of typing information.</li>
+ * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts, this API
  * can hide several XML complexities behind their implementations. It does give this API a somewhat "strict"
  * or "precise" appearance.</li>
- * <li>This API should be easy to use for data-oriented XML with a known structure (typically described
+ * <li>This API aims at being easy to use for data-oriented XML with a known structure (typically described
  * by an XSD), and known namespaces. It is not geared towards XML that freely mixes text and tags.</li>
- * <li>This API should have good interop with standard Java XML APIs (JAXP).</li>
+ * <li>This API has good interop with standard Java XML APIs (JAXP).</li>
  * </ul>
  *
  * Some non-goals or limitations of this API are:
  * <ul>
- * <li>This API should not try to solve all problems. Sometimes SAX, StAX or DOM is better.
+ * <li>This API does not have a low memory footprint.</li>
+ * <li>This API does not try to solve all problems. Sometimes SAX, StAX or DOM is better.
  * In particular, immutability (using strict evaluation) has some drawbacks too, such as the elements not keeping a reference
  * to the parent element, or the missing convenience of in-place updates. Furthermore, this API is not meant to offer XPath
  * support (arguably, it does not need it).</li>
@@ -75,16 +76,16 @@ package eu.cdevreeze
  *
  * The dependencies in this package are as follows, from bottom to top:
  * <ol>
- * <li>Trait QName and its subtypes</li>
- * <li>Class ExpandedName</li>
- * <li>Class Scope</li>
- * <li>Trait ElemLike, containing common functions for "Element-like" classes</li>
- * <li>Trait Node and its subtypes, such as Elem (which extends ElemLike)</li>
- * <li>Trait NodeBuilder and its subtypes, such as ElemBuilder. At the same level are
- * ConverterToElem and ElemConverter</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.QName]] and its subtypes</li>
+ * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
+ * <li>Class [[eu.cdevreeze.yaidom.Scope]]</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]], containing common functions for "Element-like" classes</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]] (which extends [[eu.cdevreeze.yaidom.ElemLike]])</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
+ * [[eu.cdevreeze.yaidom.ConverterToElem]] and [[eu.cdevreeze.yaidom.ElemConverter]]</li>
  * </ol>
  * Dependencies are all uni-directional, from top to bottom. All types in this package are (deeply) immutable.
- * That holds even for the NodeBuilder instances.
+ * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
  * @author Chris de Vreeze
  */

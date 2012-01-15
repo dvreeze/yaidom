@@ -21,7 +21,7 @@ import scala.collection.immutable
 /**
  * DSL to build Elems without having to pass parent Scopes around.
  * Example:
- * <pre>
+ * {{{
  * import NodeBuilder._
  *
  * elem(
@@ -32,7 +32,7 @@ import scala.collection.immutable
  *     elem(
  *       qname = "Title".qname,
  *       children = List(text("Newsweek"))))).build()
- * </pre>
+ * }}}
  *
  * In https://github.com/djspiewak/anti-xml/issues/78, Daniel Spiewak explains an impedance mismatch between
  * XML's scoping rules (which are top-down, from root to leaves) and Anti-XML's functional trees (which are built bottom-up,

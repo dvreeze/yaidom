@@ -22,11 +22,11 @@ package eu.cdevreeze.yaidom
  *
  * There are 2 types of QNames:
  * <ul>
- * <li>UnprefixedNames, which only contain a local part</li>
- * <li>PrefixedNames, which combine a non-empty prefix with a local part</li>
+ * <li>[[eu.cdevreeze.yaidom.UnprefixedName]], which only contains a local part</li>
+ * <li>[[eu.cdevreeze.yaidom.PrefixedName]], which combines a non-empty prefix with a local part</li>
  * </ul>
  *
- * QNames are meaningless outside their scope, which resolves the QName as an ExpandedName.
+ * QNames are meaningless outside their scope, which resolves the QName as an [[eu.cdevreeze.yaidom.ExpandedName]].
  *
  * @author Chris de Vreeze
  */

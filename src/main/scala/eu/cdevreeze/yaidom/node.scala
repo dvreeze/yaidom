@@ -34,9 +34,9 @@ import scala.collection.immutable
  * Unlike Anti-XML:
  * <ul>
  * <li>This is just a DOM-like API, around immutable Nodes and immutable Scala Collections of Nodes,
- * without any XPath support. Despite the absence of selectors like those in Anti-XML, this DOM API
+ * without any XPath support. Despite the absence of selectors like those in Anti-XML, this DOM-like API
  * is still quite expressive, be it with somewhat verbose method names. This API is also simpler
- * in that CanBuildFrom "axioms" are absent, and implicit conversions are absent or at least rare.
+ * in that CanBuildFrom "axioms" are absent, and implicit conversions are rare and rather "explicit" and therefore safe.
  * It is more verbose in that many ("DOM-like") convenience methods are offered.</li>
  * <li>This API distinguishes between QNames and ExpandedNames, making both first-class citizens in the API.
  * Moreover, Scopes are first-class citizens as well. By explicitly modeling QNames, ExpandedNames and Scopes,

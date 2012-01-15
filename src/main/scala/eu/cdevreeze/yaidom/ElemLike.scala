@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * Supertrait for <code>Elem</code>s and other element-like objects, such as <code>xlink.Elem</code>s.
+ * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.xlink.Elem]].
  * Below, we refer to these element-like objects as elements.
  *
  * The only abstract methods are <code>resolvedName</code>, <code>resolvedAttributes</code> and <code>childElems</code> (without arguments).
