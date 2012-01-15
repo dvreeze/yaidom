@@ -119,14 +119,14 @@ final class Elem private (
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 
   /** Copies this Elem, but on encountering a descendant (or self) matching the given partial function, invokes that function instead */
-  def copy(root: Elem, f: PartialFunction[Elem.RootAndElem, Elem]): Elem = {
+  def copyAndTransform(root: Elem, f: PartialFunction[Elem.RootAndElem, Elem]): Elem = {
     // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
     val rootAndElem = Elem.RootAndElem(root, self)
 
     if (f.isDefinedAt(rootAndElem)) f(rootAndElem) else {
       val newChildren = self.children map { (ch: Node) =>
         ch match {
-          case ch: Elem => ch.copy(root, f)
+          case ch: Elem => ch.copyAndTransform(root, f)
           case n => n
         }
       }

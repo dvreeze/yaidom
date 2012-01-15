@@ -883,7 +883,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore.copy(
+      bookstore.copyAndTransform(
         bookstore,
         { case Elem.RootAndElem(root, elem) if elem.resolvedName == "Book".ename => removePrice(elem) })
 
@@ -922,7 +922,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore.copy(
+      bookstore.copyAndTransform(
         bookstore,
         { case Elem.RootAndElem(root, elem) if elem.resolvedName == "Author".ename => combineName(elem) })
 
