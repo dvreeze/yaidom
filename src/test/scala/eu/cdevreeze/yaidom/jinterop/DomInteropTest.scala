@@ -96,6 +96,25 @@ class DomInteropTest extends Suite {
     } {
       root2 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(root.elems.map(e => e.qname.localPart).toSet) {
+      root3.elems map { e => e.qname.localPart } toSet
+    }
+    expect(root.elemsOrSelf.map(e => e.qname.localPart).toSet) {
+      root3.elemsOrSelf map { e => e.qname.localPart } toSet
+    }
+    expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
+      root3.elemsOrSelf(ns.ns.ename("Title")).size
+    }
+    expect {
+      root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    } {
+      root3 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    }
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
@@ -129,6 +148,15 @@ class DomInteropTest extends Suite {
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
       val result = root2.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
+      val result = root3.elemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
   }
@@ -172,6 +200,19 @@ class DomInteropTest extends Suite {
     }
     expect(Set("root".qname, "child".qname)) {
       val result = root2.elemsOrSelf map { e => e.qname }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
+      val result = root3.elemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set("root".qname, "child".qname)) {
+      val result = root3.elemsOrSelf map { e => e.qname }
       result.toSet
     }
   }

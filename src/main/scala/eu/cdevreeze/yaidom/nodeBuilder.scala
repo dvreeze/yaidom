@@ -27,12 +27,24 @@ import scala.collection.immutable
  * elem(
  *   qname = "Magazine".qname,
  *   attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
- *   namespaces = Map("dbclass" -> "http://www.db-class.org")),
+ *   namespaces = Scope.Declarations.fromMap(Map("dbclass" -> "http://www.db-class.org"))),
  *   children = List(
  *     elem(
  *       qname = "Title".qname,
  *       children = List(text("Newsweek"))))).build()
  * </pre>
+ *
+ * In https://github.com/djspiewak/anti-xml/issues/78, Daniel Spiewak explains an impedance mismatch between
+ * XML's scoping rules (which are top-down, from root to leaves) and Anti-XML's functional trees (which are built bottom-up,
+ * from leaves to root). One way to decrease this impedance mismatch is to distinguish between Nodes and the NodeBuilders
+ * below (compare with String versus StringBuilder). Both NodeBuilders and Nodes are functional trees, but only NodeBuilders
+ * are easy to construct in a bottom-up manner. On the other hand, NodeBuilders are not XML representations (scoping info
+ * may be missing), whereas Nodes are XML representations (scoping info is present in each Elem). That's ok, especially if
+ * Nodes are constructed from NodeBuilders. Put differently, a fundamental difference between traits ElemBuilder and Elem is
+ * that ElemBuilder uses Scope.Declarations (easy to use during bottom-up construction), whereas Elem uses Scope (for
+ * correctness of the XML representation w.r.t. scoping). The fundamental contradiction that Daniel Spiewak mentions does
+ * not apply if we distinguish NodeBuilders from Nodes, viz. only NodeBuilders can have unbound prefixes but only Nodes have
+ * (resolved) scopes.
  *
  * @author Chris de Vreeze
  */
@@ -40,7 +52,7 @@ sealed trait NodeBuilder extends Immutable {
 
   type NodeType <: Node
 
-  def build(scope: Scope): NodeType
+  def build(parentScope: Scope): NodeType
 
   final def build(): NodeType = build(Scope.Empty)
 }
@@ -58,8 +70,8 @@ final class ElemBuilder(
 
   type NodeType = Elem
 
-  def build(scope: Scope): Elem = {
-    val newScope = scope.resolve(namespaces)
+  def build(parentScope: Scope): Elem = {
+    val newScope = parentScope.resolve(namespaces)
 
     Elem(
       qname,
@@ -68,12 +80,12 @@ final class ElemBuilder(
       children map { ch => ch.build(newScope) })
   }
 
-  def withChildNodes(childNodes: immutable.Seq[Node])(scope: Scope): ElemBuilder = {
+  def withChildNodes(childNodes: immutable.Seq[Node])(parentScope: Scope): ElemBuilder = {
     new ElemBuilder(
       qname = self.qname,
       attributes = self.attributes,
       namespaces = self.namespaces,
-      children = childNodes map { ch => NodeBuilder.fromNode(ch)(scope) } toIndexedSeq)
+      children = childNodes map { ch => NodeBuilder.fromNode(ch)(parentScope) } toIndexedSeq)
   }
 }
 
@@ -82,7 +94,7 @@ final case class TextBuilder(text: String) extends NodeBuilder {
 
   type NodeType = Text
 
-  def build(scope: Scope): Text = Text(text)
+  def build(parentScope: Scope): Text = Text(text)
 }
 
 final case class ProcessingInstructionBuilder(target: String, data: String) extends NodeBuilder {
@@ -91,7 +103,7 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
 
   type NodeType = ProcessingInstruction
 
-  def build(scope: Scope): ProcessingInstruction = ProcessingInstruction(target, data)
+  def build(parentScope: Scope): ProcessingInstruction = ProcessingInstruction(target, data)
 }
 
 final case class CDataBuilder(text: String) extends NodeBuilder {
@@ -99,7 +111,7 @@ final case class CDataBuilder(text: String) extends NodeBuilder {
 
   type NodeType = CData
 
-  def build(scope: Scope): CData = CData(text)
+  def build(parentScope: Scope): CData = CData(text)
 }
 
 final case class EntityRefBuilder(entity: String) extends NodeBuilder {
@@ -107,7 +119,7 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
 
   type NodeType = EntityRef
 
-  def build(scope: Scope): EntityRef = EntityRef(entity)
+  def build(parentScope: Scope): EntityRef = EntityRef(entity)
 }
 
 object NodeBuilder {
@@ -131,25 +143,25 @@ object NodeBuilder {
   def entityRef(entity: String): EntityRefBuilder = EntityRefBuilder(entity)
 
   /**
-   * Converts a Node to a NodeBuilder, given a Scope.
+   * Converts a Node to a NodeBuilder, given a parent scope.
    *
-   * The following must always hold: fromNode(node)(scope).build(scope) "is structurally equal to" node
+   * The following must always hold: fromNode(node)(parentScope).build(parentScope) "is structurally equal to" node
    */
-  def fromNode(node: Node)(scope: Scope): NodeBuilder = node match {
+  def fromNode(node: Node)(parentScope: Scope): NodeBuilder = node match {
     case Text(s) => TextBuilder(s)
     case ProcessingInstruction(target, data) => ProcessingInstructionBuilder(target, data)
     case CData(s) => CDataBuilder(s)
     case EntityRef(entity) => EntityRefBuilder(entity)
     case e: Elem =>
-      require(scope.resolve(scope.relativize(e.scope)) == e.scope)
+      require(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 
       // Recursive call, but not tail-recursive
       new ElemBuilder(
         qname = e.qname,
         attributes = e.attributes,
-        namespaces = scope.relativize(e.scope),
+        namespaces = parentScope.relativize(e.scope),
         children = e.children map { ch => fromNode(ch)(e.scope) })
   }
 
-  def fromElem(elm: Elem)(scope: Scope): ElemBuilder = fromNode(elm)(scope).asInstanceOf[ElemBuilder]
+  def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = fromNode(elm)(parentScope).asInstanceOf[ElemBuilder]
 }
