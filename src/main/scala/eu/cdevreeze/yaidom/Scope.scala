@@ -200,5 +200,13 @@ object Scope {
 
       Declarations(scope, undeclaredOptionalPrefixes)
     }
+
+    /** "Implicit class" for converting a Map[String, String] to a Scope.Declarations */
+    final class ToNamespaces(val m: Map[String, String]) {
+      def namespaces: Declarations = Declarations.fromMap(m)
+    }
+
+    /** Implicit conversion enriching a Map[String, String] with a <code>namespaces</code> method that turns the Map into a Scope.Declarations */
+    implicit def toNamespaces(m: Map[String, String]): ToNamespaces = new ToNamespaces(m)
   }
 }

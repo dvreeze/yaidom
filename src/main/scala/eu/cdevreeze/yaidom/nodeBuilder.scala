@@ -22,12 +22,13 @@ import scala.collection.immutable
  * DSL to build Elems without having to pass parent Scopes around.
  * Example:
  * {{{
+ * import Scope.Declarations._
  * import NodeBuilder._
  *
  * elem(
  *   qname = "Magazine".qname,
  *   attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
- *   namespaces = Scope.Declarations.fromMap(Map("dbclass" -> "http://www.db-class.org"))),
+ *   namespaces = Map("dbclass" -> "http://www.db-class.org").namespaces,
  *   children = List(
  *     elem(
  *       qname = "Title".qname,

@@ -24,6 +24,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import ExpandedName._
 import QName._
+import Scope.Declarations._
 
 /**
  * ElemLike test case.
@@ -538,7 +539,7 @@ class ElemLikeTest extends Suite {
     val result: Elem =
       elem(
         qname = "books:Bookstore".qname,
-        namespaces = Scope.Declarations.fromMap(Map("" -> ns, "books" -> ns)),
+        namespaces = Map("" -> ns, "books" -> ns).namespaces,
         children = List(
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
 
