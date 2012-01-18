@@ -5,7 +5,6 @@ import java.{ util => jutil, io => jio }
 import java.net.URI
 import javax.xml.stream._
 import scala.collection.immutable
-import resource._
 import xlink.{ Elem => _, _ }
 import jinterop.StaxConversions._
 import ExpandedName._
@@ -217,12 +216,16 @@ object Taxonomy {
       require(file.isFile && file.exists, "File '%s' must be an existing file".format(file.getPath))
 
       val rootElem: Elem = {
-        def createReader(): XMLEventReader = xmlInputFactory.createXMLEventReader(new jio.FileInputStream(file))
-
-        val result = managed(createReader()) map { xmlEventReader =>
-          convertToElem(xmlEventReader.toSeq)
+        var reader: XMLEventReader = null
+        try {
+          reader = xmlInputFactory.createXMLEventReader(new jio.FileInputStream(file))
+          val elm = convertToElem(reader.toSeq)
+          elm
+        } catch {
+          case e: Exception => sys.error("Could not parse file '%s' as XML".format(file.getPath))
+        } finally {
+          reader.close()
         }
-        result.opt.getOrElse(sys.error("Could not parse file '%s' as XML".format(file.getPath)))
       }
       (file.toURI, rootElem)
     }
