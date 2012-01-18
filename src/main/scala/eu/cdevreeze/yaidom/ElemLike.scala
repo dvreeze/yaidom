@@ -66,8 +66,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values */
   def resolvedAttributes: Map[ExpandedName, String]
 
-  /** Returns the child elements, in the correct order */
-  def childElems: immutable.Seq[E]
+  /** Returns all child elements, in the correct order */
+  def allChildElems: immutable.Seq[E]
 
   /** Returns the value of the attribute with the given expanded name, if any, and None otherwise */
   final def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
@@ -76,10 +76,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements obeying the given predicate */
-  final def childElems(p: E => Boolean): immutable.Seq[E] = childElems filter p
+  final def childElemsWhere(p: E => Boolean): immutable.Seq[E] = allChildElems filter p
 
   /** Returns the child elements with the given expanded name */
-  final def childElems(expandedName: ExpandedName): immutable.Seq[E] = childElems { e => e.resolvedName == expandedName }
+  final def childElems(expandedName: ExpandedName): immutable.Seq[E] = childElemsWhere { e => e.resolvedName == expandedName }
 
   /** Returns the single child element with the given expanded name, if any, and None otherwise */
   final def childElemOption(expandedName: ExpandedName): Option[E] = {
@@ -95,72 +95,72 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     result.head
   }
 
-  /** Returns this element followed by the descendant elements */
-  final def elemsOrSelf: immutable.Seq[E] = elemsOrSelfList.toIndexedSeq
+  /** Returns this element followed by all descendant elements */
+  final def allElemsOrSelf: immutable.Seq[E] = allElemsOrSelfList.toIndexedSeq
 
   /**
    * Returns those elements among this element and its descendant elements that obey the given predicate.
-   * That is, the result is equivalent to <code>elemsOrSelf filter p</code>.
+   * That is, the result is equivalent to <code>allElemsOrSelf filter p</code>.
    */
-  final def elemsOrSelf(p: E => Boolean): immutable.Seq[E] = elemsOrSelfList(p).toIndexedSeq
+  final def elemsOrSelfWhere(p: E => Boolean): immutable.Seq[E] = elemsOrSelfListWhere(p).toIndexedSeq
 
   /** Returns those of this element and its descendant elements that have the given expanded name */
-  final def elemsOrSelf(expandedName: ExpandedName): immutable.Seq[E] = elemsOrSelf { e => e.resolvedName == expandedName }
+  final def elemsOrSelf(expandedName: ExpandedName): immutable.Seq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
 
-  /** Returns the descendant elements (not including this element). Same as <code>elemsOrSelf.drop(1)</code> */
-  final def elems: immutable.Seq[E] = childElems flatMap { ch => ch.elemsOrSelf }
+  /** Returns all descendant elements (not including this element). Same as <code>allElemsOrSelf.drop(1)</code> */
+  final def allElems: immutable.Seq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
 
-  /** Returns the descendant elements obeying the given predicate, that is, elems filter p */
-  final def elems(p: E => Boolean): immutable.Seq[E] = childElems flatMap { ch => ch elemsOrSelf p }
+  /** Returns the descendant elements obeying the given predicate, that is, allElems filter p */
+  final def elemsWhere(p: E => Boolean): immutable.Seq[E] = allChildElems flatMap { ch => ch elemsOrSelfWhere p }
 
   /** Returns the descendant elements with the given expanded name */
-  final def elems(expandedName: ExpandedName): immutable.Seq[E] = elems { e => e.resolvedName == expandedName }
+  final def elems(expandedName: ExpandedName): immutable.Seq[E] = elemsWhere { e => e.resolvedName == expandedName }
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def firstElems(p: E => Boolean): immutable.Seq[E] =
-    childElems flatMap { ch => ch firstElemsOrSelfList p toIndexedSeq }
+  final def firstElemsWhere(p: E => Boolean): immutable.Seq[E] =
+    allChildElems flatMap { ch => ch firstElemsOrSelfListWhere p toIndexedSeq }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def firstElems(expandedName: ExpandedName): immutable.Seq[E] = firstElems { e => e.resolvedName == expandedName }
+  final def firstElems(expandedName: ExpandedName): immutable.Seq[E] = firstElemsWhere { e => e.resolvedName == expandedName }
 
   /** Returns the first found descendant element obeying the given predicate, if any, wrapped in an Option */
-  final def firstElemOption(p: E => Boolean): Option[E] = {
-    self.childElems.view flatMap { ch => ch firstElemOrSelfOption p } headOption
+  final def firstElemOptionWhere(p: E => Boolean): Option[E] = {
+    self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
   }
 
   /** Returns the first found descendant element with the given expanded name, if any, wrapped in an Option */
-  final def firstElemOption(expandedName: ExpandedName): Option[E] = firstElemOption { e => e.resolvedName == expandedName }
+  final def firstElemOption(expandedName: ExpandedName): Option[E] = firstElemOptionWhere { e => e.resolvedName == expandedName }
 
   /** Finds the parent element, if any, searching in the tree with the given root element. Typically rather expensive. */
   final def findParentInTree(root: E): Option[E] = {
-    root firstElemOrSelfOption { e => e.childElems exists { ch => ch == self } }
+    root firstElemOrSelfOptionWhere { e => e.allChildElems exists { ch => ch == self } }
   }
 
   /** Computes an index on the given function taking an element, for example a function returning a UUID */
-  final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = elemsOrSelf groupBy f
+  final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = allElemsOrSelf groupBy f
 
   /** Computes an index to parent elements, on the given function applied to the child elements */
   final def getIndexToParent[K](f: E => K): Map[K, immutable.Seq[E]] = {
-    val parentChildPairs = elemsOrSelf flatMap { e => e.childElems map { ch => (e -> ch) } }
+    val parentChildPairs = allElemsOrSelf flatMap { e => e.allChildElems map { ch => (e -> ch) } }
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
   }
 
-  /** Returns a List of this element followed by the descendant elements */
-  private final def elemsOrSelfList: List[E] = {
+  /** Returns a List of this element followed by all descendant elements */
+  private final def allElemsOrSelfList: List[E] = {
     // Not tail-recursive, but the depth should typically be limited
     self :: {
-      self.childElems.toList flatMap { ch => ch.elemsOrSelfList }
+      self.allChildElems.toList flatMap { ch => ch.allElemsOrSelfList }
     }
   }
 
   /**
    * Returns a List of those of this element and its descendant elements that obey the given predicate.
-   * That is, the result is equivalent to <code>elemsOrSelfList filter p</code>.
+   * That is, the result is equivalent to <code>allElemsOrSelfList filter p</code>.
    */
-  private final def elemsOrSelfList(p: E => Boolean): List[E] = {
+  private final def elemsOrSelfListWhere(p: E => Boolean): List[E] = {
     // Not tail-recursive, but the depth should typically be limited
     val includesSelf = p(self)
-    val resultWithoutSelf = self.childElems.toList flatMap { ch => ch elemsOrSelfList p }
+    val resultWithoutSelf = self.allChildElems.toList flatMap { ch => ch elemsOrSelfListWhere p }
     if (includesSelf) self :: resultWithoutSelf else resultWithoutSelf
   }
 
@@ -168,14 +168,14 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns a List of those of this element and its descendant elements that obey the given predicate,
    * such that no ancestor obeys the predicate.
    */
-  private final def firstElemsOrSelfList(p: E => Boolean): List[E] = {
+  private final def firstElemsOrSelfListWhere(p: E => Boolean): List[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    if (p(self)) List(self) else self.childElems.toList flatMap { ch => ch firstElemsOrSelfList p }
+    if (p(self)) List(self) else self.allChildElems.toList flatMap { ch => ch firstElemsOrSelfListWhere p }
   }
 
   /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an Option */
-  private final def firstElemOrSelfOption(p: E => Boolean): Option[E] = {
+  private final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    if (p(self)) Some(self) else self.childElems.view flatMap { ch => ch firstElemOrSelfOption p } headOption
+    if (p(self)) Some(self) else self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
   }
 }

@@ -38,7 +38,7 @@ final class Elem(
   require(resolvedAttributes ne null)
   require(children ne null)
 
-  override def childElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
+  override def allChildElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
 
   /** Returns the text children */
   def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }

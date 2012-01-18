@@ -60,7 +60,7 @@ final class Taxonomy(
     val schemaOption: Option[Elem] = schemas.get(schemaUrl) map { _.wrappedElem }
 
     if (schemaOption.isEmpty) None else {
-      val elemDefinitionOption: Option[Elem] = schemaOption.get firstElemOption { e =>
+      val elemDefinitionOption: Option[Elem] = schemaOption.get firstElemOptionWhere { e =>
         (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
       }
 
@@ -77,7 +77,7 @@ final class Taxonomy(
     val schemaOption: Option[Elem] = schemas.get(schemaUrl) map { _.wrappedElem }
 
     if (schemaOption.isEmpty) None else {
-      val elemDefinitionOption: Option[Elem] = schemaOption.get firstElemOption { e =>
+      val elemDefinitionOption: Option[Elem] = schemaOption.get firstElemOptionWhere { e =>
         (e.resolvedName == XsdElementDefinition) && (e.attributeOption("id".ename) == Some(fragment))
       }
 
@@ -86,7 +86,7 @@ final class Taxonomy(
   }
 
   def findElementDefinitions(root: Elem): immutable.Seq[Elem] = {
-    root elems { e => e.resolvedName == XsdElementDefinition }
+    root elemsWhere { e => e.resolvedName == XsdElementDefinition }
   }
 
   def substitutionGroupOption(elemDef: Elem): Option[ExpandedName] = {

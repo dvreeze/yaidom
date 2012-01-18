@@ -58,16 +58,16 @@ class DomInteropTest extends Suite {
     is.close()
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.elems map { e => e.qname.localPart } toSet
+      root.allElems map { e => e.qname.localPart } toSet
     }
     expect(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.elemsOrSelf map { e => e.qname.localPart } toSet
+      root.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(8) {
       root.elemsOrSelf(ns.ns.ename("Title")).size
     }
     expect(3) {
-      root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 2. Convert Elem to a DOM element
@@ -82,38 +82,38 @@ class DomInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expect(root.elems.map(e => e.qname.localPart).toSet) {
-      root2.elems map { e => e.qname.localPart } toSet
+    expect(root.allElems map { e => e.qname.localPart } toSet) {
+      root2.allElems map { e => e.qname.localPart } toSet
     }
-    expect(root.elemsOrSelf.map(e => e.qname.localPart).toSet) {
-      root2.elemsOrSelf map { e => e.qname.localPart } toSet
+    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
+      root2.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
       root2.elemsOrSelf(ns.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
-      root2 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root2 elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 5. Convert to NodeBuilder and back, and check again
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(root.elems.map(e => e.qname.localPart).toSet) {
-      root3.elems map { e => e.qname.localPart } toSet
+    expect(root.allElems map { e => e.qname.localPart } toSet) {
+      root3.allElems map { e => e.qname.localPart } toSet
     }
-    expect(root.elemsOrSelf.map(e => e.qname.localPart).toSet) {
-      root3.elemsOrSelf map { e => e.qname.localPart } toSet
+    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
+      root3.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
       root3.elemsOrSelf(ns.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
-      root3 elemsOrSelf { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root3 elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
   }
 
@@ -130,7 +130,7 @@ class DomInteropTest extends Suite {
     is.close()
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
-      val result = root.elemsOrSelf map { e => e.resolvedName }
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
@@ -147,7 +147,7 @@ class DomInteropTest extends Suite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
-      val result = root2.elemsOrSelf map { e => e.resolvedName }
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
@@ -156,7 +156,7 @@ class DomInteropTest extends Suite {
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
-      val result = root3.elemsOrSelf map { e => e.resolvedName }
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
   }
@@ -174,11 +174,11 @@ class DomInteropTest extends Suite {
     is.close()
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
-      val result = root.elemsOrSelf map { e => e.resolvedName }
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
     expect(Set("root".qname, "child".qname)) {
-      val result = root.elemsOrSelf map { e => e.qname }
+      val result = root.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
 
@@ -195,11 +195,11 @@ class DomInteropTest extends Suite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
-      val result = root2.elemsOrSelf map { e => e.resolvedName }
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
     expect(Set("root".qname, "child".qname)) {
-      val result = root2.elemsOrSelf map { e => e.qname }
+      val result = root2.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
 
@@ -208,11 +208,11 @@ class DomInteropTest extends Suite {
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
-      val result = root3.elemsOrSelf map { e => e.resolvedName }
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
     expect(Set("root".qname, "child".qname)) {
-      val result = root3.elemsOrSelf map { e => e.qname }
+      val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
   }

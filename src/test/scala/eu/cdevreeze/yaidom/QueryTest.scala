@@ -62,7 +62,7 @@ class QueryTest extends Suite {
 
     val bookOrMagazineTitles: immutable.Seq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
       } yield bookOrMagazine.childElem("Title".ename)
 
     expect(Set(
@@ -82,7 +82,7 @@ class QueryTest extends Suite {
     require(bookstore.qname.localPart == "Bookstore")
 
     val titles: immutable.Seq[Elem] =
-      for (ch <- bookstore.childElems) yield ch.childElem("Title".ename)
+      for (ch <- bookstore.allChildElems) yield ch.childElem("Title".ename)
 
     expect(Set(
       "A First Course in Database Systems",
@@ -119,14 +119,14 @@ class QueryTest extends Suite {
 
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elements: immutable.Seq[Elem] = bookstore.elems :+ bookstore
+    val elements: immutable.Seq[Elem] = bookstore.allElems :+ bookstore
 
     assert(elements.contains(bookstore), "Expected element 'Bookstore', among others")
     assert(elements.size > 10, "Expected more than 10 elements")
 
     val childrenAlsoIncluded =
       elements forall { e =>
-        e.childElems forall { ch => elements.contains(ch) }
+        e.allChildElems forall { ch => elements.contains(ch) }
       }
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
   }
@@ -356,7 +356,7 @@ class QueryTest extends Suite {
 
     val elms: immutable.Seq[Elem] =
       for {
-        desc <- bookstore.elems
+        desc <- bookstore.allElems
         parent <- desc.findParentInTree(bookstore)
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
@@ -382,7 +382,7 @@ class QueryTest extends Suite {
 
     val elms: immutable.Seq[Elem] =
       for {
-        desc <- bookstore.elems
+        desc <- bookstore.allElems
         val parentOption = indexToParent.get(desc.uuid)
         parent <- parentOption
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
@@ -405,10 +405,10 @@ class QueryTest extends Suite {
 
     val booksAndMagazines: immutable.Seq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
         val titleString: String = bookOrMagazine.childElem("Title".ename).firstTextValue
         val otherBooksAndMagazines = {
-          val result = bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+          val result = bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
           result.toSet -- Set(bookOrMagazine)
         }
         val titles = otherBooksAndMagazines map { e => e.childElem("Title".ename) }
@@ -431,7 +431,7 @@ class QueryTest extends Suite {
 
     val booksAndMagazines: immutable.Seq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
         val titleString: String = bookOrMagazine.childElem("Title".ename).firstTextValue
         val otherBooks = bookstore.childElems("Book".ename).toSet -- Set(bookOrMagazine)
         val titles = otherBooks map { e => e.childElem("Title".ename) }
@@ -830,7 +830,7 @@ class QueryTest extends Suite {
     val invertedBookstore: Elem = Elem(qname = "InvertedBookstore".qname, children = authorsWithBooks)
 
     expect(3) {
-      invertedBookstore.childElems.size
+      invertedBookstore.allChildElems.size
     }
   }
 
@@ -842,7 +842,7 @@ class QueryTest extends Suite {
 
     val bookOrMagazineTitles: immutable.Seq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
       } yield {
         val titleString = bookOrMagazine.childElem("Title".ename).firstTextValue
 

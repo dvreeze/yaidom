@@ -36,7 +36,7 @@ sealed trait Elem extends ElemLike[Elem] with Immutable {
 
   final override val resolvedAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes
 
-  final override val childElems: immutable.Seq[Elem] = wrappedElem.childElems map { e => Elem(e) }
+  final override val allChildElems: immutable.Seq[Elem] = wrappedElem.allChildElems map { e => Elem(e) }
 }
 
 /** XLink */
@@ -69,10 +69,10 @@ final case class ExtendedLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem
 
   def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
-  def locatorXLinks: immutable.Seq[Locator] = childElems collect { case xlink: Locator => xlink }
-  def arcXLinks: immutable.Seq[Arc] = childElems collect { case xlink: Arc => xlink }
-  def resourceXLinks: immutable.Seq[Resource] = childElems collect { case xlink: Resource => xlink }
+  def titleXLinks: immutable.Seq[Title] = allChildElems collect { case xlink: Title => xlink }
+  def locatorXLinks: immutable.Seq[Locator] = allChildElems collect { case xlink: Locator => xlink }
+  def arcXLinks: immutable.Seq[Arc] = allChildElems collect { case xlink: Arc => xlink }
+  def resourceXLinks: immutable.Seq[Resource] = allChildElems collect { case xlink: Resource => xlink }
 }
 
 final case class Arc(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
@@ -90,7 +90,7 @@ final case class Arc(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends
   def useOption: Option[String] = attributeOption(XLinkUseExpandedName)
   def priorityOption: Option[String] = attributeOption(XLinkPriorityExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
+  def titleXLinks: immutable.Seq[Title] = allChildElems collect { case xlink: Title => xlink }
 }
 
 final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
@@ -103,7 +103,7 @@ final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) ext
   def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
   def titleOption: Option[String] = attributeOption(XLinkTitleExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = childElems collect { case xlink: Title => xlink }
+  def titleXLinks: immutable.Seq[Title] = allChildElems collect { case xlink: Title => xlink }
 }
 
 final case class Resource(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {

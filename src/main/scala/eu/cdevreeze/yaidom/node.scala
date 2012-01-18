@@ -97,8 +97,8 @@ final class Elem private (
     }
   }
 
-  /** Returns the child elements */
-  override def childElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
+  /** Returns all child elements */
+  override def allChildElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
 
   /** Returns the text children */
   def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
@@ -186,7 +186,7 @@ final class Elem private (
       val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
       val line = "<%s />".format(start)
       List(line).map(ln => indent + ln)
-    } else if (this.childElems.isEmpty) {
+    } else if (this.allChildElems.isEmpty) {
       val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
       val content = children map { _.toString } mkString
       val line = "<%s>%s</%s>".format(start, content, qname)
@@ -196,7 +196,7 @@ final class Elem private (
       val firstLine: String = "<%s>".format(start)
       val lastLine: String = "</%s>".format(qname)
       // Recursive (not tail-recursive) calls, ignoring non-element children
-      val childElementLines: List[String] = self.childElems.toList flatMap { e => e.toLines("  ", self.scope) }
+      val childElementLines: List[String] = self.allChildElems.toList flatMap { e => e.toLines("  ", self.scope) }
       (firstLine :: childElementLines ::: List(lastLine)) map { ln => indent + ln }
     }
   }
