@@ -41,10 +41,11 @@ import DomConversions._
 @RunWith(classOf[JUnitRunner])
 class DomInteropTest extends Suite {
 
-  private val ns = "http://bookstore"
+  private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsYahoo = "http://www.yahoo.com"
   private val nsFooBar = "urn:foo:bar"
+  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
   @Test def testParse() {
     // 1. Parse XML file into Elem
@@ -64,10 +65,10 @@ class DomInteropTest extends Suite {
       root.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(8) {
-      root.elemsOrSelf(ns.ns.ename("Title")).size
+      root.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect(3) {
-      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 2. Convert Elem to a DOM element
@@ -88,13 +89,13 @@ class DomInteropTest extends Suite {
     expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
       root2.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
-    expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
-      root2.elemsOrSelf(ns.ns.ename("Title")).size
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root2.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
-      root2 elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 5. Convert to NodeBuilder and back, and check again
@@ -107,13 +108,13 @@ class DomInteropTest extends Suite {
     expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
       root3.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
-    expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
-      root3.elemsOrSelf(ns.ns.ename("Title")).size
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
-      root3 elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
   }
 
@@ -215,5 +216,96 @@ class DomInteropTest extends Suite {
       val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
+  }
+
+  @Test def testParseSchemaXsd() {
+    // 1. Parse XML file into Elem
+
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
+    val doc = db.parse(is)
+
+    val root: Elem = convertToElem(doc.getDocumentElement)
+    is.close()
+
+    val ns = nsXmlSchema.ns
+
+    val xsElmENames: Set[ExpandedName] =
+      Set(ns.ename("schema"), ns.ename("annotation"), ns.ename("documentation"),
+        ns.ename("import"), ns.ename("complexType"), ns.ename("complexContent"),
+        ns.ename("extension"), ns.ename("sequence"), ns.ename("element"),
+        ns.ename("attribute"), ns.ename("choice"), ns.ename("group"),
+        ns.ename("simpleType"), ns.ename("restriction"), ns.ename("enumeration"),
+        ns.ename("list"), ns.ename("union"), ns.ename("key"),
+        ns.ename("selector"), ns.ename("field"), ns.ename("attributeGroup"),
+        ns.ename("anyAttribute"), ns.ename("whiteSpace"), ns.ename("fractionDigits"),
+        ns.ename("pattern"), ns.ename("any"), ns.ename("appinfo"),
+        ns.ename("minLength"), ns.ename("maxInclusive"), ns.ename("minInclusive"),
+        ns.ename("notation"))
+
+    expect(xsElmENames) {
+      val result = root elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set(0, 1)) {
+      val result = root elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      result.toSet
+    }
+
+    def checkForChoiceDocumentation(rootElm: Elem): Unit = {
+      val forChoiceDefOption: Option[Elem] =
+        rootElm childElemsWhere { e => e.resolvedName == ns.ename("simpleType") && e.attribute("name".ename) == "formChoice" } headOption
+
+      expect(true) {
+        forChoiceDefOption.isDefined
+      }
+
+      val forChoiceDefDocumentation: String =
+        forChoiceDefOption.get.elems(ns.ename("documentation")) flatMap { e => e.firstTextValue } mkString
+
+      expect("A utility type, not for public use") {
+        forChoiceDefDocumentation.trim
+      }
+    }
+    checkForChoiceDocumentation(root)
+
+    // 2. Convert Elem to a DOM element
+
+    val db2 = dbf.newDocumentBuilder
+    val doc2 = db2.newDocument
+    val element = convertElem(root)(doc2)
+
+    // 3. Convert DOM element into Elem
+
+    val root2: Elem = convertToElem(doc2.getDocumentElement)
+
+    // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
+
+    expect(xsElmENames) {
+      val result = root2 elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set(0, 1)) {
+      val result = root2 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      result.toSet
+    }
+
+    checkForChoiceDocumentation(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(xsElmENames) {
+      val result = root3 elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set(0, 1)) {
+      val result = root3 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      result.toSet
+    }
+
+    checkForChoiceDocumentation(root3)
   }
 }
