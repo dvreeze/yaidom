@@ -70,7 +70,7 @@ final class Elem private (
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] { self =>
+  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasText[Text] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -101,19 +101,7 @@ final class Elem private (
   override def allChildElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
 
   /** Returns the text children */
-  def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
-
-  /** Returns the first text child, if any, and None otherwise */
-  def firstTextChildOption: Option[Text] = textChildren.headOption
-
-  /** Returns the first text child's value, if any, and None otherwise */
-  def firstTextValueOption: Option[String] = textChildren.headOption map { _.text }
-
-  /** Returns the first text child, if any, and None otherwise */
-  def firstTextChild: Text = firstTextChildOption.getOrElse(sys.error("Missing text child"))
-
-  /** Returns the first text child's value, if any, and None otherwise */
-  def firstTextValue: String = firstTextValueOption.getOrElse(sys.error("Missing text child"))
+  override def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
 
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
@@ -242,6 +230,16 @@ final case class CData(text: String) extends Node {
   override def toString: String = """<![CDATA[%s]]>""".format(text)
 }
 
+/**
+ * An entity reference. Example:
+ * {{{
+ * &amp;
+ * }}}
+ * We obtain this entity reference as follows:
+ * {{{
+ * EntityRef("amp")
+ * }}}
+ */
 final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
 

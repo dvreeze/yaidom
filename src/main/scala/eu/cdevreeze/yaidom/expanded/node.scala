@@ -32,7 +32,7 @@ sealed trait Node extends Immutable
 final class Elem(
   override val resolvedName: ExpandedName,
   override val resolvedAttributes: Map[ExpandedName, String],
-  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] {
+  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasText[Text] {
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -40,20 +40,7 @@ final class Elem(
 
   override def allChildElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
 
-  /** Returns the text children */
-  def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
-
-  /** Returns the first text child, if any, and None otherwise */
-  def firstTextChildOption: Option[Text] = textChildren.headOption
-
-  /** Returns the first text child's value, if any, and None otherwise */
-  def firstTextValueOption: Option[String] = textChildren.headOption map { _.text }
-
-  /** Returns the first text child, if any, and None otherwise */
-  def firstTextChild: Text = firstTextChildOption.getOrElse(sys.error("Missing text child"))
-
-  /** Returns the first text child's value, if any, and None otherwise */
-  def firstTextValue: String = firstTextValueOption.getOrElse(sys.error("Missing text child"))
+  override def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
 }
 
 final case class Text(text: String) extends Node {
