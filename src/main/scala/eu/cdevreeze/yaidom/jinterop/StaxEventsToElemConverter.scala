@@ -20,7 +20,7 @@ package jinterop
 import java.{ util => jutil }
 import javax.xml.XMLConstants
 import javax.xml.stream._
-import javax.xml.stream.events._
+import javax.xml.stream.events.{ ProcessingInstruction => _, _ }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 import StaxEventsToElemConverter._
@@ -88,10 +88,25 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
+        case ev if ev.event.isEntityReference => {
+          val erEv = ev.event.asInstanceOf[EntityReference]
+          val ch = eventToEntityRef(erEv)
+          children += ch
+          remainingEvents = remainingEvents.drop(1)
+        }
+        case ev if ev.event.isProcessingInstruction => {
+          val piEv = ev.event.asInstanceOf[javax.xml.stream.events.ProcessingInstruction]
+          val ch = eventToProcessingInstruction(piEv)
+          children += ch
+          remainingEvents = remainingEvents.drop(1)
+        }
         case _ => remainingEvents = remainingEvents.drop(1)
       }
     }
     require(startsWithMatchingEndElement(remainingEvents))
+    val endElementEv = remainingEvents.head.event.asEndElement
+    require(endElementEv.getName == eventsWithDepths.head.event.asStartElement.getName)
+
     remainingEvents = remainingEvents.drop(1)
 
     val elemWithChildren: Elem = elem.withChildren(children.toIndexedSeq)
@@ -102,23 +117,39 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
   private def eventToCData(event: Characters): CData = CData(event.getData)
 
+  private def eventToEntityRef(event: EntityReference): EntityRef = EntityRef(event.getName)
+
+  private def eventToProcessingInstruction(event: javax.xml.stream.events.ProcessingInstruction): ProcessingInstruction =
+    ProcessingInstruction(event.getTarget, event.getData)
+
   private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
     val declarations: Scope.Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
-      require {
-        namespaces forall { ns => (ns.getNamespaceURI ne null) && (ns.getNamespaceURI != "") }
-      }
-      // Namespace undeclaration not supported
+      // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
 
       val declaredScope: Scope = {
-        val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { _.getNamespaceURI } headOption
+        val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ != "" } headOption
         val prefScope = {
-          val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> ns.getNamespaceURI) }
+          val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 != "" }
           result.toMap
         }
         new Scope(defaultNamespace = defaultNs, prefixScope = prefScope)
       }
-      new Scope.Declarations(declared = declaredScope, undeclaredOptionalPrefixes = Set())
+      val undeclaredOptionalPrefixes: Set[Option[String]] = {
+        val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ == "" } headOption
+        val defaultNsUndeclared = defaultNs.isDefined
+
+        val undeclaredPrefixOptions: Set[Option[String]] = {
+          val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 == "" } map { kv => Some(kv._1) }
+          result.toSet
+        }
+
+        if (defaultNsUndeclared)
+          Set(None) ++ undeclaredPrefixOptions
+        else
+          undeclaredPrefixOptions
+      }
+      new Scope.Declarations(declared = declaredScope, undeclaredOptionalPrefixes = undeclaredOptionalPrefixes)
     }
     val currScope = parentScope.resolve(declarations)
 
@@ -139,8 +170,6 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
     Elem(elemExpandedName.toQName(elemPrefix), currAttrs, currScope, Nil.toIndexedSeq)
   }
-
-  // TODO EntityRef, ProcessingInstruction (but those StAX events are only fired if document contains DTD)
 }
 
 object StaxEventsToElemConverter {

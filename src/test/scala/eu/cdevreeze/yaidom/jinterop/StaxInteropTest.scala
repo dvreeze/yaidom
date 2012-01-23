@@ -41,10 +41,11 @@ import StaxConversions._
 @RunWith(classOf[JUnitRunner])
 class StaxInteropTest extends Suite {
 
-  private val ns = "http://bookstore"
+  private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsYahoo = "http://www.yahoo.com"
   private val nsFooBar = "urn:foo:bar"
+  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
   @Test def testParse() {
     // 1. Parse XML file into Elem
@@ -63,10 +64,10 @@ class StaxInteropTest extends Suite {
       root.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
     expect(8) {
-      root.elemsOrSelf(ns.ns.ename("Title")).size
+      root.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect(3) {
-      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 2. Write Elem to an XML string
@@ -100,13 +101,13 @@ class StaxInteropTest extends Suite {
     expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
       root2.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
-    expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
-      root2.elemsOrSelf(ns.ns.ename("Title")).size
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root2.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
-      root2 elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
 
     // 5. Convert to NodeBuilder and back, and check again
@@ -119,13 +120,13 @@ class StaxInteropTest extends Suite {
     expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
       root3.allElemsOrSelf map { e => e.qname.localPart } toSet
     }
-    expect(root.elemsOrSelf(ns.ns.ename("Title")).size) {
-      root3.elemsOrSelf(ns.ns.ename("Title")).size
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
-      root3 elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
   }
 
@@ -249,6 +250,334 @@ class StaxInteropTest extends Suite {
     }
     expect(Set("root".qname, "child".qname)) {
       val result = root3.allElemsOrSelf map { e => e.qname }
+      result.toSet
+    }
+  }
+
+  @Test def testParseSchemaXsd() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val is = classOf[StaxInteropTest].getResourceAsStream("XMLSchema.xsd")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    val ns = nsXmlSchema.ns
+
+    val xsElmENames: Set[ExpandedName] =
+      Set(ns.ename("schema"), ns.ename("annotation"), ns.ename("documentation"),
+        ns.ename("import"), ns.ename("complexType"), ns.ename("complexContent"),
+        ns.ename("extension"), ns.ename("sequence"), ns.ename("element"),
+        ns.ename("attribute"), ns.ename("choice"), ns.ename("group"),
+        ns.ename("simpleType"), ns.ename("restriction"), ns.ename("enumeration"),
+        ns.ename("list"), ns.ename("union"), ns.ename("key"),
+        ns.ename("selector"), ns.ename("field"), ns.ename("attributeGroup"),
+        ns.ename("anyAttribute"), ns.ename("whiteSpace"), ns.ename("fractionDigits"),
+        ns.ename("pattern"), ns.ename("any"), ns.ename("appinfo"),
+        ns.ename("minLength"), ns.ename("maxInclusive"), ns.ename("minInclusive"),
+        ns.ename("notation"))
+
+    expect(xsElmENames) {
+      val result = root elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+    // Remember, coalescing is set to true!
+    expect(Set(0, 1)) {
+      val result = root elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      result.toSet
+    }
+
+    def checkForChoiceDocumentation(rootElm: Elem): Unit = {
+      val forChoiceDefOption: Option[Elem] =
+        rootElm childElemsWhere { e => e.resolvedName == ns.ename("simpleType") && e.attribute("name".ename) == "formChoice" } headOption
+
+      expect(true) {
+        forChoiceDefOption.isDefined
+      }
+
+      val forChoiceDefDocumentation: String =
+        forChoiceDefOption.get.elems(ns.ename("documentation")) flatMap { e => e.firstTextValue } mkString
+
+      expect("A utility type, not for public use") {
+        forChoiceDefDocumentation.trim
+      }
+    }
+    checkForChoiceDocumentation(root)
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(xsElmENames) {
+      val result = root2 elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set(0, 1)) {
+      val result = root2 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      result.toSet
+    }
+
+    checkForChoiceDocumentation(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(xsElmENames) {
+      val result = root3 elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set(0, 1)) {
+      val result = root3 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      result.toSet
+    }
+
+    checkForChoiceDocumentation(root3)
+  }
+
+  @Test def testParseXmlWithExpandedEntityRef() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildText(rootElm: Elem): Unit = {
+      val childOption = rootElm.firstElemOption(ns.ename("child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      // Remember, coalescing is set to true!
+      expect(1) {
+        childOption.get.textChildren.size
+      }
+      val text = "This text contains an entity reference, viz. hi"
+      expect(text) {
+        childOption.get.firstTextValue.trim.take(text.length)
+      }
+    }
+
+    checkChildText(root)
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root3)
+  }
+
+  @Test def testParseXmlWithNonExpandedEntityRef() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, java.lang.Boolean.FALSE)
+    val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildTextAndEntityRef(rootElm: Elem): Unit = {
+      val childOption = rootElm.firstElemOption(ns.ename("child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      expect(2) {
+        val result = childOption.get.textChildren filter { t => t.text.trim != "" }
+        result.size
+      }
+      expect(1) {
+        val result = childOption.get.children collect { case er: EntityRef => er }
+        result.size
+      }
+      expect(EntityRef("hello")) {
+        val entityRefs = childOption.get.children collect { case er: EntityRef => er }
+        val entityRef: EntityRef = entityRefs.head
+        entityRef
+      }
+      expect("This text contains an entity reference, viz.") {
+        childOption.get.firstTextValue.trim
+      }
+    }
+
+    checkChildTextAndEntityRef(root)
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    // The entity references are lost in the following conversion!
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+    
+    // No check on entity references, because they were lost in the conversion back to StAX events
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+  }
+
+  @Test def testParseXmlWithNamespaceUndeclarations() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
   }

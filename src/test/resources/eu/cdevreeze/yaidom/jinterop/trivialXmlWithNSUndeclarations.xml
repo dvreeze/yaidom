@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns="urn:foo:bar">
+	<a>
+		<b xmlns="">
+			<c>
+				<d xmlns="urn:foo:bar">text</d>
+			</c>
+		</b>
+	</a>
+</root>

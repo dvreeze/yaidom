@@ -35,29 +35,30 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
   def convertElem(elm: Elem): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
-      val nonDocEvents = convertElem(elm, xmlEventFactory)
+      val nonDocEvents = convertElem(elm, xmlEventFactory, Scope.Empty)
       val endDocument = xmlEventFactory.createEndDocument
 
       immutable.IndexedSeq(startDocument) ++ nonDocEvents ++ immutable.Seq(endDocument)
     }
   }
 
-  private def convertNode(node: Node, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+  private def convertNode(node: Node, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     node match {
-      case e: Elem => convertElem(e, xmlEventFactory)
+      case e: Elem => convertElem(e, xmlEventFactory, parentScope)
       case t: Text => convertText(t, xmlEventFactory)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, xmlEventFactory)
       case t: CData => convertCData(t, xmlEventFactory)
-      case er: EntityRef => immutable.IndexedSeq[XMLEvent]() // TODO Implement
+      // Difficult to convert yaidom EntityRef to StAX EntityReference, because of missing declaration
+      case er: EntityRef => immutable.IndexedSeq[XMLEvent]()
     }
   }
 
-  private def convertElem(elm: Elem, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+  private def convertElem(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     // Not tail-recursive, but the recursion depth should be limited
 
-    val startEvent: XMLEvent = createStartElement(elm, xmlEventFactory)
-    val childEvents: immutable.IndexedSeq[XMLEvent] = elm.children flatMap { ch => convertNode(ch, xmlEventFactory) }
-    val endEvent: XMLEvent = createEndElement(elm, xmlEventFactory)
+    val startEvent: XMLEvent = createStartElement(elm, xmlEventFactory, parentScope)
+    val childEvents: immutable.IndexedSeq[XMLEvent] = elm.children flatMap { ch => convertNode(ch, xmlEventFactory, elm.scope) }
+    val endEvent: XMLEvent = createEndElement(elm, xmlEventFactory, parentScope)
 
     immutable.IndexedSeq(startEvent) ++ childEvents ++ immutable.IndexedSeq(endEvent)
   }
@@ -79,8 +80,9 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
     immutable.IndexedSeq(event)
   }
 
-  private def createStartElement(elm: Elem, xmlEventFactory: XMLEventFactory): StartElement = {
-    // TODO Take parent element scope into account
+  private def createStartElement(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): StartElement = {
+    val namespaceDeclarations: Scope.Declarations = parentScope.relativize(elm.scope)
+
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
     val attributeList: List[Attribute] = elm.attributes.map(kv => {
@@ -96,7 +98,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
     val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeList.toBuffer.asJava).iterator
 
     val namespaceList: List[Namespace] = {
-      val result = elm.scope.toMap map { kv =>
+      val result = namespaceDeclarations.toMap map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
 
@@ -114,12 +116,29 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
     xmlEventFactory.createStartElement(javaQName, attributes, namespaces)
   }
 
-  private def createEndElement(elm: Elem, xmlEventFactory: XMLEventFactory): EndElement = {
-    // TODO Take parent element scope into account
+  private def createEndElement(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): EndElement = {
+    val namespaceDeclarations: Scope.Declarations = parentScope.relativize(elm.scope)
+
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
-    // TODO Namespaces that have gone out of scope are now ignored!
-    xmlEventFactory.createEndElement(javaQName, null)
+    val namespaceOutOfScopeList: List[Namespace] = {
+      val result = namespaceDeclarations.toMap map { kv =>
+        val prefix = kv._1
+        val nsUri = kv._2
+
+        if ((prefix eq null) || (prefix == "")) {
+          (prefix -> xmlEventFactory.createNamespace(nsUri))
+        } else {
+          (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
+        }
+      }
+      result.values.toList
+    }
+
+    val namespacesOutOfScope: jutil.Iterator[Namespace] =
+      new jutil.ArrayList[Namespace](namespaceOutOfScopeList.toBuffer.asJava).iterator
+
+    xmlEventFactory.createEndElement(javaQName, namespacesOutOfScope)
   }
 }
 

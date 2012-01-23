@@ -233,11 +233,11 @@ final case class CData(text: String) extends Node {
 /**
  * An entity reference. Example:
  * {{{
- * &amp;
+ * &hello;
  * }}}
  * We obtain this entity reference as follows:
  * {{{
- * EntityRef("amp")
+ * EntityRef("hello")
  * }}}
  */
 final case class EntityRef(entity: String) extends Node {

@@ -101,7 +101,7 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
 
     val namespaceDeclarations: Scope.Declarations = parentScope.relativize(elm.scope)
 
-    for ((prefix, ns) <- namespaceDeclarations.declared.toMap) {
+    for ((prefix, ns) <- namespaceDeclarations.toMap) {
       if (prefix == "") {
         element.setAttribute("xmlns", ns)
       } else {

@@ -165,6 +165,16 @@ object Scope {
       case true => undeclaredPrefixes + ""
     }
 
+    /** Creates a Map from prefixes to (possibly "undeclared") namespaces URIs, giving the default namespace the empty String as prefix */
+    def toMap: Map[String, String] = {
+      val undeclaredMap: Map[String, String] = {
+        val result = undeclaredOptionalPrefixes map { prefixOption => if (prefixOption.isEmpty) ("" -> "") else (prefixOption.get -> "") }
+        result.toMap
+      }
+      val declaredMap: Map[String, String] = declared.toMap
+      undeclaredMap ++ declaredMap
+    }
+
     /** Creates a String representation of this Scope.Declarations, as it is shown in an XML element */
     def toStringInXml: String = {
       val declaredString = declared.toStringInXml

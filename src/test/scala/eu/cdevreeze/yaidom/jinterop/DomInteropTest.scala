@@ -308,4 +308,188 @@ class DomInteropTest extends Suite {
 
     checkForChoiceDocumentation(root3)
   }
+
+  @Test def testParseXmlWithExpandedEntityRef() {
+    // 1. Parse XML file into Elem
+
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+    val doc = db.parse(is)
+
+    val root: Elem = convertToElem(doc.getDocumentElement)
+    is.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildText(rootElm: Elem): Unit = {
+      val childOption = rootElm.firstElemOption(ns.ename("child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      expect(1) {
+        childOption.get.textChildren.size
+      }
+      val text = "This text contains an entity reference, viz. hi"
+      expect(text) {
+        childOption.get.firstTextValue.trim.take(text.length)
+      }
+    }
+
+    checkChildText(root)
+
+    // 2. Convert Elem to a DOM element
+
+    val db2 = dbf.newDocumentBuilder
+    val doc2 = db2.newDocument
+    val element = convertElem(root)(doc2)
+
+    // 3. Convert DOM element into Elem
+
+    val root2: Elem = convertToElem(doc2.getDocumentElement)
+
+    // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root3)
+  }
+
+  @Test def testParseXmlWithNonExpandedEntityRef() {
+    // 1. Parse XML file into Elem
+
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setExpandEntityReferences(false)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+    val doc = db.parse(is)
+
+    val root: Elem = convertToElem(doc.getDocumentElement)
+    is.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildTextAndEntityRef(rootElm: Elem): Unit = {
+      val childOption = rootElm.firstElemOption(ns.ename("child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      expect(2) {
+        childOption.get.textChildren.size
+      }
+      expect(1) {
+        val result = childOption.get.children collect { case er: EntityRef => er }
+        result.size
+      }
+      expect(EntityRef("hello")) {
+        val entityRefs = childOption.get.children collect { case er: EntityRef => er }
+        val entityRef: EntityRef = entityRefs.head
+        entityRef
+      }
+      expect("This text contains an entity reference, viz.") {
+        childOption.get.firstTextValue.trim
+      }
+    }
+
+    checkChildTextAndEntityRef(root)
+
+    // 2. Convert Elem to a DOM element
+
+    val db2 = dbf.newDocumentBuilder
+    val doc2 = db2.newDocument
+    val element = convertElem(root)(doc2)
+
+    // 3. Convert DOM element into Elem
+
+    val root2: Elem = convertToElem(doc2.getDocumentElement)
+
+    // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildTextAndEntityRef(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildTextAndEntityRef(root3)
+  }
+
+  @Test def testParseXmlWithNamespaceUndeclarations() {
+    // 1. Parse XML file into Elem
+
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
+    val doc = db.parse(is)
+
+    val root: Elem = convertToElem(doc.getDocumentElement)
+    is.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 2. Convert Elem to a DOM element
+
+    val db2 = dbf.newDocumentBuilder
+    val doc2 = db2.newDocument
+    val element = convertElem(root)(doc2)
+
+    // 3. Convert DOM element into Elem
+
+    val root2: Elem = convertToElem(doc2.getDocumentElement)
+
+    // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+  }
 }

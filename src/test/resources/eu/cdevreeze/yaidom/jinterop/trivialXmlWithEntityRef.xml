@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE root [
+  <!ENTITY hello "hi">
+  <!ELEMENT root (child)>
+  <!ELEMENT child (#PCDATA)>
+  <!ATTLIST root xmlns CDATA #REQUIRED>
+]>
 <root xmlns="urn:foo:bar">
-	<child>This text contains an entity reference, viz. &amp;</child>
+	<child>This text contains an entity reference, viz. &hello;.
+	The entity is defined in the included DTD.
+	</child>
 </root>
