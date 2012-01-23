@@ -68,6 +68,12 @@ final case class EntityRef(entity: String) extends Node {
   override def toString: String = """&%s;""".format(entity)
 }
 
+final case class Comment(text: String) extends Node {
+  require(text ne null)
+
+  override def toString: String = """<!-- %s -->""".format(text)
+}
+
 object Node {
 
   def fromNormalNode(n: yaidom.Node): Node = n match {
@@ -76,6 +82,7 @@ object Node {
     case pi: yaidom.ProcessingInstruction => ProcessingInstruction.fromNormalProcessingInstruction(pi)
     case cdata: yaidom.CData => CData.fromNormalCData(cdata)
     case er: yaidom.EntityRef => EntityRef.fromNormalEntityRef(er)
+    case c: yaidom.Comment => Comment.fromNormalComment(c)
   }
 }
 
@@ -106,4 +113,9 @@ object CData {
 object EntityRef {
 
   def fromNormalEntityRef(er: yaidom.EntityRef): EntityRef = EntityRef(er.entity)
+}
+
+object Comment {
+
+  def fromNormalComment(c: yaidom.Comment): Comment = Comment(c.text)
 }

@@ -20,7 +20,7 @@ package jinterop
 import java.{ util => jutil }
 import javax.xml.XMLConstants
 import javax.xml.stream._
-import javax.xml.stream.events.{ ProcessingInstruction => _, _ }
+import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 import StaxEventsToElemConverter._
@@ -100,6 +100,12 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
+        case ev if ev.event.isInstanceOf[javax.xml.stream.events.Comment] => {
+          val comEv = ev.event.asInstanceOf[javax.xml.stream.events.Comment]
+          val ch = eventToComment(comEv)
+          children += ch
+          remainingEvents = remainingEvents.drop(1)
+        }
         case _ => remainingEvents = remainingEvents.drop(1)
       }
     }
@@ -121,6 +127,8 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
   private def eventToProcessingInstruction(event: javax.xml.stream.events.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(event.getTarget, event.getData)
+
+  private def eventToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
 
   private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
     val declarations: Scope.Declarations = {

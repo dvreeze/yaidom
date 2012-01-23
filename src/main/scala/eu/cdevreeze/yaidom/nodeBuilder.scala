@@ -123,6 +123,14 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
   def build(parentScope: Scope): EntityRef = EntityRef(entity)
 }
 
+final case class CommentBuilder(text: String) extends NodeBuilder {
+  require(text ne null)
+
+  type NodeType = Comment
+
+  def build(parentScope: Scope): Comment = Comment(text)
+}
+
 object NodeBuilder {
 
   def elem(
@@ -143,6 +151,8 @@ object NodeBuilder {
 
   def entityRef(entity: String): EntityRefBuilder = EntityRefBuilder(entity)
 
+  def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
+
   /**
    * Converts a Node to a NodeBuilder, given a parent scope.
    *
@@ -153,6 +163,7 @@ object NodeBuilder {
     case ProcessingInstruction(target, data) => ProcessingInstructionBuilder(target, data)
     case CData(s) => CDataBuilder(s)
     case EntityRef(entity) => EntityRefBuilder(entity)
+    case Comment(s) => CommentBuilder(s)
     case e: Elem =>
       require(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 

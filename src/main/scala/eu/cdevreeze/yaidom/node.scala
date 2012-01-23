@@ -28,8 +28,7 @@ import scala.collection.immutable
  * Scala collections.</li>
  * <li>Nodes have no reference to their parent/ancestor nodes. These nodes can be re-used in several
  * XML trees.</li>
- * <li>Documents are absent in both APIs, so "owning" documents are not modeled.
- * Comments are absent as well.</li>
+ * <li>Documents are absent in both APIs, so "owning" documents are not modeled.</li>
  * </ul>
  * Unlike Anti-XML:
  * <ul>
@@ -246,4 +245,12 @@ final case class EntityRef(entity: String) extends Node {
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toString: String = """&%s;""".format(entity)
+}
+
+final case class Comment(text: String) extends Node {
+  require(text ne null)
+
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
+
+  override def toString: String = """<!-- %s -->""".format(text)
 }

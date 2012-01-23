@@ -182,6 +182,10 @@ class DomInteropTest extends Suite {
       val result = root.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
+    expect("Trivial XML") {
+      val result = root.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      result.mkString
+    }
 
     // 2. Convert Elem to a DOM element
 
@@ -203,6 +207,10 @@ class DomInteropTest extends Suite {
       val result = root2.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
+    expect("Trivial XML") {
+      val result = root2.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      result.mkString
+    }
 
     // 5. Convert to NodeBuilder and back, and check again
 
@@ -215,6 +223,10 @@ class DomInteropTest extends Suite {
     expect(Set("root".qname, "child".qname)) {
       val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
+    }
+    expect("Trivial XML") {
+      val result = root3.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      result.mkString
     }
   }
 

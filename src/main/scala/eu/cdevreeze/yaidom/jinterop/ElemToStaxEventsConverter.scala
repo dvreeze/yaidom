@@ -20,7 +20,7 @@ package jinterop
 import java.{ util => jutil }
 import javax.xml.XMLConstants
 import javax.xml.stream._
-import javax.xml.stream.events.{ ProcessingInstruction => _, _ }
+import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 import ElemToStaxEventsConverter._
@@ -50,6 +50,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
       case t: CData => convertCData(t, xmlEventFactory)
       // Difficult to convert yaidom EntityRef to StAX EntityReference, because of missing declaration
       case er: EntityRef => immutable.IndexedSeq[XMLEvent]()
+      case c: Comment => convertComment(c, xmlEventFactory)
     }
   }
 
@@ -77,6 +78,11 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
 
   private def convertCData(cdata: CData, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
     val event = xmlEventFactory.createCData(cdata.text)
+    immutable.IndexedSeq(event)
+  }
+
+  private def convertComment(comment: Comment, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+    val event = xmlEventFactory.createComment(comment.text)
     immutable.IndexedSeq(event)
   }
 

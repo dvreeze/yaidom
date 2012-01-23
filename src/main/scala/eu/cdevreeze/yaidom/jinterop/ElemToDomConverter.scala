@@ -45,6 +45,7 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc, parent)
       case t: CData => convertCData(t, doc, parent)
       case er: EntityRef => convertEntityRef(er, doc, parent)
+      case c: Comment => convertComment(c, doc, parent)
     }
   }
 
@@ -89,6 +90,13 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] {
 
     parent.appendChild(domEntityRef)
     domEntityRef
+  }
+
+  private def convertComment(comment: Comment, doc: Document, parent: org.w3c.dom.Node): org.w3c.dom.Comment = {
+    val domComment = doc.createComment(comment.text)
+
+    parent.appendChild(domComment)
+    domComment
   }
 
   private def createElementWithoutChildren(elm: Elem, doc: Document, parentScope: Scope): Element = {

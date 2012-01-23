@@ -57,6 +57,7 @@ trait DomToElemConverter extends ConverterToElem[Element] {
       case t: org.w3c.dom.Text => Some(convertToText(t))
       case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
       case er: org.w3c.dom.EntityReference => Some(convertToEntityRef(er))
+      case c: org.w3c.dom.Comment => Some(convertToComment(c))
       case _ => None
     }
   }
@@ -73,6 +74,9 @@ trait DomToElemConverter extends ConverterToElem[Element] {
 
   /** Converts an org.w3c.dom.EntityReference to a yaidom EntityRef */
   private def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)
+
+  /** Converts an org.w3c.dom.Comment to a yaidom Comment */
+  private def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
   /** Converts a NamedNodeMap to a Map[QName, String] */
   private def convertAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {

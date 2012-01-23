@@ -52,7 +52,7 @@ package eu.cdevreeze
  *
  * Compared to Java's standard DOM API, this API does not follow the DOM specifications (such as DOM level 2 Core),
  * so it contains far less functionality. For example, attribute types are absent, normalized text can not be obtained,
- * comments and documents are not modeled, parent elements can not be obtained, etc. On the other hand, this API is
+ * documents are not modeled, parent elements can not be obtained, etc. On the other hand, this API is
  * far more modern, and safe to use in a multi-threaded environment.
  *
  * Compared to JDOM, which unlike the standard DOM API leverages idiomatic Java, this API in a similar vein attempts
@@ -79,7 +79,7 @@ package eu.cdevreeze
  * <li>Trait [[eu.cdevreeze.yaidom.QName]] and its subtypes</li>
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Class [[eu.cdevreeze.yaidom.Scope]]</li>
- * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]], containing common functions for "Element-like" classes</li>
+ * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.HasText]], containing common functions for "Element-like" classes</li>
  * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]] (which extends [[eu.cdevreeze.yaidom.ElemLike]])</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
  * [[eu.cdevreeze.yaidom.ConverterToElem]] and [[eu.cdevreeze.yaidom.ElemConverter]]</li>
