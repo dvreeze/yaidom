@@ -194,7 +194,8 @@ class StaxInteropTest extends Suite {
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXml.xml")
     var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
+    val document: Document = convertToDocument(eventReader.toSeq)
+    val root: Elem = document.documentElement
     eventReader.close()
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
@@ -204,6 +205,10 @@ class StaxInteropTest extends Suite {
     expect(Set("root".qname, "child".qname)) {
       val result = root.allElemsOrSelf map { e => e.qname }
       result.toSet
+    }
+    expect("This is trivial XML") {
+      val result = document.comments map { com => com.text.trim }
+      result.mkString
     }
     expect("Trivial XML") {
       val result = root.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
@@ -215,7 +220,7 @@ class StaxInteropTest extends Suite {
     val bos = new jio.ByteArrayOutputStream
 
     val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
+    val events = convertDocument(document)(xmlEventFactory)
 
     val xmlOutputFactory = XMLOutputFactory.newFactory
     val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
@@ -230,7 +235,8 @@ class StaxInteropTest extends Suite {
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
     eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
+    val document2: Document = convertToDocument(eventReader.toSeq)
+    val root2: Elem = document2.documentElement
     eventReader.close()
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
@@ -243,6 +249,10 @@ class StaxInteropTest extends Suite {
       val result = root2.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
+    expect("This is trivial XML") {
+      val result = document2.comments map { com => com.text.trim }
+      result.mkString
+    }
     expect("Trivial XML") {
       val result = root2.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
@@ -250,7 +260,8 @@ class StaxInteropTest extends Suite {
 
     // 5. Convert to NodeBuilder and back, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val document3: Document = NodeBuilder.fromDocument(document2)(Scope.Empty).build()
+    val root3: Elem = document3.documentElement
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
       val result = root3.allElemsOrSelf map { e => e.resolvedName }
@@ -259,6 +270,10 @@ class StaxInteropTest extends Suite {
     expect(Set("root".qname, "child".qname)) {
       val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
+    }
+    expect("This is trivial XML") {
+      val result = document3.comments map { com => com.text.trim }
+      result.mkString
     }
     expect("Trivial XML") {
       val result = root3.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
@@ -274,7 +289,8 @@ class StaxInteropTest extends Suite {
     val is = classOf[StaxInteropTest].getResourceAsStream("XMLSchema.xsd")
     var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
+    val document: Document = convertToDocument(eventReader.toSeq)
+    val root: Elem = document.documentElement
     eventReader.close()
 
     val ns = nsXmlSchema.ns
@@ -523,7 +539,7 @@ class StaxInteropTest extends Suite {
       val result = root2.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    
+
     // No check on entity references, because they were lost in the conversion back to StAX events
 
     // 5. Convert to NodeBuilder and back, and check again

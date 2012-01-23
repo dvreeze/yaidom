@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * DSL to build Elems without having to pass parent Scopes around.
+ * DSL to build Elems (or Documents) without having to pass parent Scopes around.
  * Example:
  * {{{
  * import Scope.Declarations._
@@ -58,11 +58,40 @@ sealed trait NodeBuilder extends Immutable {
   final def build(): NodeType = build(Scope.Empty)
 }
 
+trait ParentNodeBuilder extends NodeBuilder {
+
+  def children: immutable.IndexedSeq[NodeBuilder]
+}
+
+final class DocumentBuilder(
+  val documentElement: ElemBuilder,
+  val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
+  val comments: immutable.IndexedSeq[CommentBuilder]) extends ParentNodeBuilder { self =>
+
+  require(documentElement ne null)
+  require(processingInstructions ne null)
+  require(comments ne null)
+
+  type NodeType = Document
+
+  override def children: immutable.IndexedSeq[NodeBuilder] =
+    processingInstructions ++ comments ++ immutable.IndexedSeq[NodeBuilder](documentElement)
+
+  def build(parentScope: Scope): Document = {
+    require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
+
+    Document(
+      documentElement.build(parentScope),
+      processingInstructions map { pi => pi.build(parentScope) },
+      comments map { c => c.build(parentScope) })
+  }
+}
+
 final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
   val namespaces: Scope.Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder { self =>
+  override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -133,6 +162,14 @@ final case class CommentBuilder(text: String) extends NodeBuilder {
 
 object NodeBuilder {
 
+  def document(
+    documentElement: ElemBuilder,
+    processingInstructions: immutable.Seq[ProcessingInstructionBuilder],
+    comments: immutable.Seq[CommentBuilder]): DocumentBuilder = {
+
+    new DocumentBuilder(documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
+  }
+
   def elem(
     qname: QName,
     attributes: Map[QName, String] = Map(),
@@ -164,6 +201,14 @@ object NodeBuilder {
     case CData(s) => CDataBuilder(s)
     case EntityRef(entity) => EntityRefBuilder(entity)
     case Comment(s) => CommentBuilder(s)
+    case d: Document =>
+      require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
+
+      // Recursive calls, but not tail-recursive
+      new DocumentBuilder(
+        documentElement = fromNode(d.documentElement)(parentScope).asInstanceOf[ElemBuilder],
+        processingInstructions = d.processingInstructions collect { case pi: ProcessingInstruction => fromNode(pi)(parentScope).asInstanceOf[ProcessingInstructionBuilder] },
+        comments = d.comments collect { case c => fromNode(c)(parentScope).asInstanceOf[CommentBuilder] })
     case e: Elem =>
       require(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 
@@ -174,6 +219,8 @@ object NodeBuilder {
         namespaces = parentScope.relativize(e.scope),
         children = e.children map { ch => fromNode(ch)(e.scope) })
   }
+
+  def fromDocument(doc: Document)(parentScope: Scope): DocumentBuilder = fromNode(doc)(parentScope).asInstanceOf[DocumentBuilder]
 
   def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = fromNode(elm)(parentScope).asInstanceOf[ElemBuilder]
 }

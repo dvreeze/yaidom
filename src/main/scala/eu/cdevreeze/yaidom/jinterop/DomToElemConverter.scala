@@ -19,16 +19,25 @@ package jinterop
 
 import java.{ util => jutil }
 import javax.xml.XMLConstants
-import org.w3c.dom.{ Document, Element, Attr, NamedNodeMap, NodeList }
+import org.w3c.dom.{ Element, Attr, NamedNodeMap, NodeList }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 
 /**
- * Converter from DOM Element to Elem
+ * Converter from DOM Element to Elem, and from DOM Document to (yaidom) Document.
  *
  * @author Chris de Vreeze
  */
-trait DomToElemConverter extends ConverterToElem[Element] {
+trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocument[org.w3c.dom.Document] {
+
+  def convertToDocument(v: org.w3c.dom.Document): Document = {
+    Document(
+      documentElement = convertToElem(v.getDocumentElement, Scope.Empty),
+      processingInstructions =
+        nodeListToIndexedSeq(v.getChildNodes) collect { case pi: org.w3c.dom.ProcessingInstruction => convertToProcessingInstruction(pi) },
+      comments =
+        nodeListToIndexedSeq(v.getChildNodes) collect { case c: org.w3c.dom.Comment => convertToComment(c) })
+  }
 
   def convertToElem(v: Element): Elem = {
     convertToElem(v, Scope.Empty)

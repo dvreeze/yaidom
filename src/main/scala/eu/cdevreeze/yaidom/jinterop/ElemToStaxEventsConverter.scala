@@ -30,7 +30,21 @@ import ElemToStaxEventsConverter._
  *
  * @author Chris de Vreeze
  */
-trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
+trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with DocumentConverter[XmlEventsProducer] {
+
+  def convertDocument(doc: Document): XmlEventsProducer = {
+    { (xmlEventFactory: XMLEventFactory) =>
+      val startDocument = xmlEventFactory.createStartDocument
+      val piEvents: immutable.IndexedSeq[XMLEvent] =
+        doc.processingInstructions flatMap { pi => convertProcessingInstruction(pi, xmlEventFactory) }
+      val commentEvents: immutable.IndexedSeq[XMLEvent] =
+        doc.comments flatMap { com => convertComment(com, xmlEventFactory) }
+      val docElmEvents = convertElem(doc.documentElement, xmlEventFactory, Scope.Empty)
+      val endDocument = xmlEventFactory.createEndDocument
+
+      immutable.IndexedSeq(startDocument) ++ piEvents ++ commentEvents ++ docElmEvents ++ immutable.IndexedSeq(endDocument)
+    }
+  }
 
   def convertElem(elm: Elem): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
@@ -38,7 +52,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] {
       val nonDocEvents = convertElem(elm, xmlEventFactory, Scope.Empty)
       val endDocument = xmlEventFactory.createEndDocument
 
-      immutable.IndexedSeq(startDocument) ++ nonDocEvents ++ immutable.Seq(endDocument)
+      immutable.IndexedSeq(startDocument) ++ nonDocEvents ++ immutable.IndexedSeq(endDocument)
     }
   }
 

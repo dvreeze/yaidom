@@ -171,7 +171,8 @@ class DomInteropTest extends Suite {
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXml.xml")
     val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
+    val document: eu.cdevreeze.yaidom.Document = convertToDocument(doc)
+    val root: Elem = document.documentElement
     is.close()
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
@@ -182,6 +183,10 @@ class DomInteropTest extends Suite {
       val result = root.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
+    expect("This is trivial XML") {
+      val result = document.comments map { com => com.text.trim }
+      result.mkString
+    }
     expect("Trivial XML") {
       val result = root.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
@@ -190,12 +195,12 @@ class DomInteropTest extends Suite {
     // 2. Convert Elem to a DOM element
 
     val db2 = dbf.newDocumentBuilder
-    val doc2 = db2.newDocument
-    val element = convertElem(root)(doc2)
+    val doc2 = convertDocument(document)(db2.newDocument)
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val document2: eu.cdevreeze.yaidom.Document = convertToDocument(doc2)
+    val root2: Elem = document2.documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -207,6 +212,10 @@ class DomInteropTest extends Suite {
       val result = root2.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
+    expect("This is trivial XML") {
+      val result = document2.comments map { com => com.text.trim }
+      result.mkString
+    }
     expect("Trivial XML") {
       val result = root2.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
@@ -214,7 +223,8 @@ class DomInteropTest extends Suite {
 
     // 5. Convert to NodeBuilder and back, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val document3: eu.cdevreeze.yaidom.Document = NodeBuilder.fromDocument(document2)(Scope.Empty).build()
+    val root3: Elem = document3.documentElement
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
       val result = root3.allElemsOrSelf map { e => e.resolvedName }
@@ -223,6 +233,10 @@ class DomInteropTest extends Suite {
     expect(Set("root".qname, "child".qname)) {
       val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
+    }
+    expect("This is trivial XML") {
+      val result = document3.comments map { com => com.text.trim }
+      result.mkString
     }
     expect("Trivial XML") {
       val result = root3.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
@@ -238,7 +252,8 @@ class DomInteropTest extends Suite {
     val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
     val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
+    val document: eu.cdevreeze.yaidom.Document = convertToDocument(doc)
+    val root: Elem = document.documentElement
     is.close()
 
     val ns = nsXmlSchema.ns

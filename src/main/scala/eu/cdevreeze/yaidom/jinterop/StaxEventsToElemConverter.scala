@@ -26,11 +26,33 @@ import scala.collection.{ immutable, mutable }
 import StaxEventsToElemConverter._
 
 /**
- * Converter from immutable.Seq[XMLEvent] to Elem
+ * Converter from immutable.Seq[XMLEvent] to Elem, or to Document.
  *
  * @author Chris de Vreeze
  */
-trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]] {
+trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]] with ConverterToDocument[immutable.Seq[XMLEvent]] {
+
+  def convertToDocument(v: immutable.Seq[XMLEvent]): Document = {
+    val events: immutable.Seq[XMLEvent] = v.toList dropWhile { ev => !ev.isStartDocument }
+
+    val eventsWithDepths: immutable.Seq[EventWithDepth] = {
+      var depth = 0
+      events.map(ev => ev match {
+        case start: StartElement => depth += 1; new EventWithDepth(start, depth)
+        case end: EndElement => val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
+        case _ => new EventWithDepth(ev, depth)
+      })
+    }
+
+    require(!eventsWithDepths.drop(3).isEmpty) // Cheaper than calling size for Lists
+
+    val result = eventsToDocument(eventsWithDepths)
+
+    require {
+      result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement && !ev.event.isStartDocument && !ev.event.isEndDocument }
+    }
+    result.doc
+  }
 
   def convertToElem(v: immutable.Seq[XMLEvent]): Elem = {
     val events: immutable.Seq[XMLEvent] = v.toList dropWhile { ev => !ev.isStartElement }
@@ -52,6 +74,60 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
       result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
     }
     result.elem
+  }
+
+  private def eventsToDocument(eventsWithDepths: immutable.Seq[EventWithDepth]): DocumentResult = {
+    require(!eventsWithDepths.drop(3).isEmpty) // Cheaper than calling size for Lists
+    require(eventsWithDepths.head.event.isStartDocument)
+
+    val startDocument: StartDocument = eventsWithDepths.head.event.asInstanceOf[StartDocument]
+
+    def startsWithEndDocument(events: immutable.Seq[EventWithDepth]): Boolean = {
+      if (events.isEmpty) false else {
+        val head: EventWithDepth = events.head
+        head.event.isInstanceOf[EndDocument]
+      }
+    }
+
+    var remainingEvents = eventsWithDepths.drop(1)
+    val pis = mutable.Buffer[ProcessingInstruction]()
+    val comments = mutable.Buffer[Comment]()
+    var docElement: Elem = null
+
+    // Imperative code
+    while (!remainingEvents.isEmpty && !startsWithEndDocument(remainingEvents)) {
+      remainingEvents.head match {
+        case ev if ev.event.isStartElement => {
+          require(docElement eq null, "Only 1 document element allowed and required")
+          val result = eventsToElem(remainingEvents, Scope.Empty)
+          docElement = result.elem
+          remainingEvents = result.remainder
+        }
+        case ev if ev.event.isProcessingInstruction => {
+          val piEv = ev.event.asInstanceOf[javax.xml.stream.events.ProcessingInstruction]
+          val pi = eventToProcessingInstruction(piEv)
+          pis += pi
+          remainingEvents = remainingEvents.drop(1)
+        }
+        case ev if ev.event.isInstanceOf[javax.xml.stream.events.Comment] => {
+          val comEv = ev.event.asInstanceOf[javax.xml.stream.events.Comment]
+          val com = eventToComment(comEv)
+          comments += com
+          remainingEvents = remainingEvents.drop(1)
+        }
+        case _ => remainingEvents = remainingEvents.drop(1)
+      }
+    }
+    require(docElement ne null, "There must be 1 document element")
+    require(startsWithEndDocument(remainingEvents))
+
+    remainingEvents = remainingEvents.drop(1)
+
+    val doc: Document = new Document(
+      documentElement = docElement,
+      processingInstructions = pis.toIndexedSeq,
+      comments = comments.toIndexedSeq)
+    new DocumentResult(doc, remainingEvents)
   }
 
   private def eventsToElem(eventsWithDepths: immutable.Seq[EventWithDepth], parentScope: Scope): ElemResult = {
@@ -185,4 +261,6 @@ object StaxEventsToElemConverter {
   private final class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
 
   private final class ElemResult(val elem: Elem, val remainder: immutable.Seq[EventWithDepth]) extends Immutable
+
+  private final class DocumentResult(val doc: Document, val remainder: immutable.Seq[EventWithDepth]) extends Immutable
 }

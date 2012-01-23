@@ -26,9 +26,8 @@ import scala.collection.immutable
  * <ul>
  * <li>Nodes in this API are truly immutable and thread-safe, backed by immutable
  * Scala collections.</li>
- * <li>Nodes have no reference to their parent/ancestor nodes. These nodes can be re-used in several
- * XML trees.</li>
- * <li>Documents are absent in both APIs, so "owning" documents are not modeled.</li>
+ * <li>Nodes have no reference to their parent/ancestor nodes. Hence, for example, you cannot
+ * ask a Node for its "owning" document. Yet these nodes can be re-used in several XML trees.</li>
  * </ul>
  * Unlike Anti-XML:
  * <ul>
@@ -52,6 +51,48 @@ sealed trait Node extends Immutable {
   val uuid: jutil.UUID
 }
 
+/** Document or Elem node */
+trait ParentNode extends Node {
+
+  def children: immutable.Seq[Node]
+}
+
+/**
+ * Document node. Although the document element seems to be the root node, this is not entirely true.
+ * For example, there may be comments at top level, outside the document root.
+ */
+final class Document(
+  val documentElement: Elem,
+  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
+  val comments: immutable.IndexedSeq[Comment]) extends ParentNode {
+
+  require(documentElement ne null)
+  require(processingInstructions ne null)
+  require(comments ne null)
+
+  /** The unique UUID of this Document. Note that UUID creation turns out to suffer from poor concurrency due to locking */
+  override val uuid: jutil.UUID = jutil.UUID.randomUUID
+
+  override def children: immutable.Seq[Node] =
+    processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
+
+  /** Expensive method to obtain all processing instructions */
+  def allProcessingInstructions: immutable.Seq[ProcessingInstruction] = {
+    val result: immutable.Seq[immutable.Seq[ProcessingInstruction]] =
+      documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case pi: ProcessingInstruction => pi } }
+    val elemPIs = result.flatten
+    processingInstructions ++ elemPIs
+  }
+
+  /** Expensive method to obtain all comments */
+  def allComments: immutable.Seq[Comment] = {
+    val result: immutable.Seq[immutable.Seq[Comment]] =
+      documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
+    val elemComments = result.flatten
+    comments ++ elemComments
+  }
+}
+
 /**
  * Element node. An Elem consists of a QName of the element, the attributes mapping attribute QNames to String values,
  * a Scope mapping prefixes to namespace URIs, and an immutable collection of child Nodes. The element QName and attribute
@@ -69,7 +110,7 @@ final class Elem private (
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasText[Text] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText[Text] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -155,11 +196,11 @@ final class Elem private (
   /** Returns the XML string corresponding to this element, without the children (but ellipsis instead) */
   override def toString: String = withChildren(immutable.Seq[Node](Text(" ... "))).toXmlString(Scope.Empty)
 
-  /** Returns the XML string corresponding to this element. Consider using an XML serializer (such as in JAXP) instead. */
+  /** Returns (a naive approximation of) the XML string corresponding to this element. Consider using an XML serializer (such as in JAXP) instead. */
   def toXmlString: String = toXmlString(Scope.Empty)
 
   /**
-   * Returns the XML string corresponding to this element, taking the given parent Scope into account.
+   * Returns (a naive approximation of) the XML string corresponding to this element, taking the given parent Scope into account.
    * Consider using an XML serializer (such as in JAXP) instead.
    */
   def toXmlString(parentScope: Scope): String = toLines("", parentScope).mkString("%n".format())
@@ -182,26 +223,11 @@ final class Elem private (
       val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
       val firstLine: String = "<%s>".format(start)
       val lastLine: String = "</%s>".format(qname)
-      // Recursive (not tail-recursive) calls, ignoring non-element children
+      // Recursive (not tail-recursive) calls, ignoring non-element children, such as text, comments etc.
       val childElementLines: List[String] = self.allChildElems.toList flatMap { e => e.toLines("  ", self.scope) }
       (firstLine :: childElementLines ::: List(lastLine)) map { ln => indent + ln }
     }
   }
-}
-
-object Elem {
-
-  final case class RootAndElem(root: Elem, elem: Elem) extends Immutable
-
-  /**
-   * Use this constructor with care, because it is easy to use incorrectly (w.r.t. passed Scopes).
-   * To construct Elems, prefer using an ElemBuilder, via method <code>NodeBuilder.elem</code>.
-   */
-  def apply(
-    qname: QName,
-    attributes: Map[QName, String] = Map(),
-    scope: Scope = Scope.Empty,
-    children: immutable.Seq[Node] = immutable.Seq()): Elem = new Elem(qname, attributes, scope, children.toIndexedSeq)
 }
 
 final case class Text(text: String) extends Node {
@@ -253,4 +279,30 @@ final case class Comment(text: String) extends Node {
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toString: String = """<!-- %s -->""".format(text)
+}
+
+object Document {
+
+  def apply(
+    documentElement: Elem,
+    processingInstructions: immutable.Seq[ProcessingInstruction] = Nil,
+    comments: immutable.Seq[Comment] = Nil): Document = {
+
+    new Document(documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
+  }
+}
+
+object Elem {
+
+  final case class RootAndElem(root: Elem, elem: Elem) extends Immutable
+
+  /**
+   * Use this constructor with care, because it is easy to use incorrectly (w.r.t. passed Scopes).
+   * To construct Elems, prefer using an ElemBuilder, via method <code>NodeBuilder.elem</code>.
+   */
+  def apply(
+    qname: QName,
+    attributes: Map[QName, String] = Map(),
+    scope: Scope = Scope.Empty,
+    children: immutable.Seq[Node] = immutable.Seq()): Elem = new Elem(qname, attributes, scope, children.toIndexedSeq)
 }

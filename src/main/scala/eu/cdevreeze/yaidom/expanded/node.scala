@@ -29,10 +29,28 @@ import eu.cdevreeze.yaidom
  */
 sealed trait Node extends Immutable
 
+trait ParentNode extends Node {
+
+  def children: immutable.IndexedSeq[Node]
+}
+
+final class Document(
+  val documentElement: Elem,
+  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
+  val comments: immutable.IndexedSeq[Comment]) extends ParentNode {
+
+  require(documentElement ne null)
+  require(processingInstructions ne null)
+  require(comments ne null)
+
+  override def children: immutable.IndexedSeq[Node] =
+    processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
+}
+
 final class Elem(
   override val resolvedName: ExpandedName,
   override val resolvedAttributes: Map[ExpandedName, String],
-  val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasText[Text] {
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText[Text] {
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -77,6 +95,7 @@ final case class Comment(text: String) extends Node {
 object Node {
 
   def fromNormalNode(n: yaidom.Node): Node = n match {
+    case d: yaidom.Document => Document.fromNormalDocument(d)
     case e: yaidom.Elem => Elem.fromNormalElem(e)
     case t: yaidom.Text => Text.fromNormalText(t)
     case pi: yaidom.ProcessingInstruction => ProcessingInstruction.fromNormalProcessingInstruction(pi)
@@ -84,6 +103,14 @@ object Node {
     case er: yaidom.EntityRef => EntityRef.fromNormalEntityRef(er)
     case c: yaidom.Comment => Comment.fromNormalComment(c)
   }
+}
+
+object Document {
+
+  def fromNormalDocument(d: yaidom.Document): Document = new Document(
+    documentElement = Elem.fromNormalElem(d.documentElement),
+    processingInstructions = d.processingInstructions map { pi => ProcessingInstruction.fromNormalProcessingInstruction(pi) },
+    comments = d.comments map { c => Comment.fromNormalComment(c) })
 }
 
 object Elem {
