@@ -78,6 +78,7 @@ package eu.cdevreeze
  *
  * The dependencies in this package are as follows, from bottom to top:
  * <ol>
+ * <li>Singleton object [[eu.cdevreeze.yaidom.XmlStringUtils]]</li>
  * <li>Trait [[eu.cdevreeze.yaidom.QName]] and its subtypes</li>
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]</li>

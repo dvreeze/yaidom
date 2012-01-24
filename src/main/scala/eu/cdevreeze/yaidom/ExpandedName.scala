@@ -34,7 +34,7 @@ final case class ExpandedName(namespaceUri: Option[String], localPart: String) e
     namespaceUri forall { ns => (ns ne null) && (ns.length > 0) }
   }
   require(localPart ne null)
-  require(localPart.length > 0)
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   /** Given an optional prefix, creates a QName from this ExpandedName */
   def toQName(prefix: Option[String]): QName = {

@@ -38,8 +38,7 @@ sealed trait QName extends Immutable {
 
 final case class UnprefixedName(override val localPart: String) extends QName {
   require(localPart ne null)
-  require(localPart.size > 0)
-  require(localPart.indexOf(":") < 0)
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   override def prefixOption: Option[String] = None
 
@@ -49,11 +48,9 @@ final case class UnprefixedName(override val localPart: String) extends QName {
 
 final case class PrefixedName(prefix: String, override val localPart: String) extends QName {
   require(prefix ne null)
-  require(prefix.size > 0)
-  require(prefix.indexOf(":") < 0)
+  require(XmlStringUtils.isAllowedPrefix(prefix), "'%s' is not an allowed prefix name".format(prefix))
   require(localPart ne null)
-  require(localPart.size > 0)
-  require(localPart.indexOf(":") < 0)
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   override def prefixOption: Option[String] = Some(prefix)
 

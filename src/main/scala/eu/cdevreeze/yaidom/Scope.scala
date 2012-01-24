@@ -34,7 +34,7 @@ final case class Scope(defaultNamespace: Option[String], prefixScope: Map[String
     prefixScope forall { kv =>
       val pref = kv._1
       val ns = kv._2
-      (pref ne null) && (pref.length > 0) && (ns ne null) && (ns.length > 0)
+      (pref ne null) && XmlStringUtils.isAllowedPrefix(pref) && (ns ne null) && (ns.length > 0)
     }
   }
 
@@ -145,7 +145,7 @@ object Scope {
     require {
       undeclaredOptionalPrefixes forall { pref =>
         (pref ne null) && {
-          pref forall { _.length > 0 }
+          pref forall { s => XmlStringUtils.isAllowedPrefix(s) }
         }
       }
     }
