@@ -235,7 +235,7 @@ final case class Text(text: String) extends Node {
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
-  override def toString: String = text
+  override def toString: String = XmlStringUtils.escapeText(text)
 }
 
 final case class ProcessingInstruction(target: String, data: String) extends Node {
@@ -249,6 +249,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 
 final case class CData(text: String) extends Node {
   require(text ne null)
+  require(!text.containsSlice("]]>"))
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 

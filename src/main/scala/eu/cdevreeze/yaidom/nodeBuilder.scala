@@ -138,6 +138,7 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
 
 final case class CDataBuilder(text: String) extends NodeBuilder {
   require(text ne null)
+  require(!text.containsSlice("]]>"))
 
   type NodeType = CData
 

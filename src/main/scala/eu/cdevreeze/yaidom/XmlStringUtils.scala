@@ -29,6 +29,23 @@ object XmlStringUtils {
     (s.length > 0) && !containsColon(s) && isProbableXmlName(s)
   }
 
+  def isAllowedOnlyInCData(c: Char): Boolean = (c == '<') || (c == '&')
+
+  /** Escapes XML text, in particular ampersands, less-than and greater-than symbols */
+  def escapeText(s: String): String = {
+    require(s ne null)
+
+    // Taken from Anti-XML, and enhanced (there are 5 predefined entities)
+    s flatMap {
+      case '&' => "&amp;"
+      case '<' => "&lt;"
+      case '>' => "&gt;"
+      case '\'' => "&apos;"
+      case '"' => "&quot;"
+      case c => List(c)
+    }
+  }
+
   private def isProbableXmlNameStart(c: Char): Boolean = c match {
     case '-' => false
     case '.' => false

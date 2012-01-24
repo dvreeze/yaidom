@@ -83,5 +83,11 @@ class XmlStringUtilsTest extends Suite {
     expect(false) {
       isProbableXmlName("")
     }
+    expect(false) {
+      isProbableXmlName("<")
+    }
+    expect(false) {
+      isProbableXmlName("&")
+    }
   }
 }
