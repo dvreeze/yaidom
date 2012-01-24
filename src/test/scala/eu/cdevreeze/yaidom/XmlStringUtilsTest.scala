@@ -67,27 +67,27 @@ class XmlStringUtilsTest extends Suite {
     }
 
     expect(true) {
-      isProbableXmlName("xmlns")
+      isProbablyValidXmlName("xmlns")
     }
     expect(false) {
       isAllowedElementLocalName("xmlns")
     }
 
     expect(true) {
-      isProbableXmlName("cars:tire")
+      isProbablyValidXmlName("cars:tire")
     }
     expect(false) {
       isAllowedElementLocalName("cars:tire")
     }
 
     expect(false) {
-      isProbableXmlName("")
+      isProbablyValidXmlName("")
     }
     expect(false) {
-      isProbableXmlName("<")
+      isProbablyValidXmlName("<")
     }
     expect(false) {
-      isProbableXmlName("&")
+      isProbablyValidXmlName("&")
     }
   }
 }

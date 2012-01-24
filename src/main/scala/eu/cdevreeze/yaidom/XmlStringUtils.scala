@@ -5,7 +5,7 @@ import java.{ lang => jlang }
 object XmlStringUtils {
 
   /** Returns true if the name is probably a valid XML name (even if reserved or containing a colon) */
-  def isProbableXmlName(s: String): Boolean = {
+  def isProbablyValidXmlName(s: String): Boolean = {
     require(s ne null)
     (s.length > 0) && isProbableXmlNameStart(s(0)) && {
       s.drop(1) forall { c => isProbableXmlNameChar(c) }
@@ -20,13 +20,13 @@ object XmlStringUtils {
   /** Returns true if the name is probably a valid XML name which is not reserved and contains no colon. */
   def isAllowedElementLocalName(s: String): Boolean = {
     require(s ne null)
-    (s.length > 0) && !isReserved(s) && !containsColon(s) && isProbableXmlName(s)
+    (s.length > 0) && !isReserved(s) && !containsColon(s) && isProbablyValidXmlName(s)
   }
 
   /** Returns true if the name is probably a valid XML name which contains no colon. */
   def isAllowedPrefix(s: String): Boolean = {
     require(s ne null)
-    (s.length > 0) && !containsColon(s) && isProbableXmlName(s)
+    (s.length > 0) && !containsColon(s) && isProbablyValidXmlName(s)
   }
 
   def isAllowedOnlyInCData(c: Char): Boolean = (c == '<') || (c == '&')
