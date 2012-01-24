@@ -297,7 +297,7 @@ object Elem {
   final case class RootAndElem(root: Elem, elem: Elem) extends Immutable
 
   /**
-   * Use this constructor with care, because it is easy to use incorrectly (w.r.t. passed Scopes).
+   * Use this constructor with care, because it is easy to use incorrectly (regarding passed Scopes).
    * To construct Elems, prefer using an ElemBuilder, via method <code>NodeBuilder.elem</code>.
    */
   def apply(

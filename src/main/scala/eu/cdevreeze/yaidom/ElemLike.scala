@@ -40,6 +40,7 @@ import scala.collection.immutable
  * <li>A no argument variant, if applicable</li>
  * <li>A single <code>E => Boolean</code> predicate argument variant</li>
  * <li>An expanded name argument variant</li>
+ * </ol>
  * The latter variant is implemented in terms of the single predicate argument variant.
  * Some methods also have variants that return a single element or an element Option.
  *
@@ -49,7 +50,7 @@ import scala.collection.immutable
  * <li>Children are processed before the next sibling</li>
  * <li>The first child element is processed before the next child element, and so on</li>
  * </ol>
- * assuming that the no-arg <code>childElems</code> methods returns the child elements in the correct order.
+ * assuming that the no-arg <code>allChildElems</code> method returns the child elements in the correct order.
  * Hence, the methods taking a predicate invoke that predicate on the elements in a predictable order.
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.

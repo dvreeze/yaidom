@@ -29,7 +29,7 @@ package eu.cdevreeze
  * <li>This API leverages the highly <em>expressive</em> <em>Scala Collections API</em>.
  * Querying DOM trees is easy to achieve using Scala <code>for</code> comprehensions,
  * using immutable Scala collections. It should even be attractive to use this API instead of
- * XPath, XSLT and/or XQuery, at the cost of slightly more verbosity and loss of typing information.</li>
+ * XPath, XSLT and/or XQuery, at the cost of slightly more verbosity and loss of (schema) typing information.</li>
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts, this API
  * can hide several XML complexities behind their implementations. It does give this API a somewhat "strict"
@@ -39,7 +39,7 @@ package eu.cdevreeze
  * <li>This API has good interop with standard Java XML APIs (JAXP).</li>
  * </ul>
  *
- * Some non-goals or limitations of this API are:
+ * Some limitations of this API are:
  * <ul>
  * <li>This API does not have a low memory footprint.</li>
  * <li>This API does not try to solve all problems. Sometimes SAX, StAX or DOM is better.
@@ -48,6 +48,8 @@ package eu.cdevreeze
  * support (arguably, it does not need it).</li>
  * <li>This API is not meant to follow the W3C DOM standards. As a consequence, it is also far less complete, and
  * less "correct".</li>
+ * <li>DTDs are not first-class citizens in this API. DTDs are awkward anyway for describing XML that uses namespaces
+ * (see for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm).</li>
  * </ul>
  *
  * Compared to Java's standard DOM API, this API does not follow the DOM specifications (such as DOM level 2 Core),
@@ -78,11 +80,11 @@ package eu.cdevreeze
  * <ol>
  * <li>Trait [[eu.cdevreeze.yaidom.QName]] and its subtypes</li>
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
- * <li>Class [[eu.cdevreeze.yaidom.Scope]]</li>
+ * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]</li>
  * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.HasText]], containing common functions for "Element-like" classes</li>
  * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]] (which extends [[eu.cdevreeze.yaidom.ElemLike]])</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
- * [[eu.cdevreeze.yaidom.ConverterToElem]] and [[eu.cdevreeze.yaidom.ElemConverter]]</li>
+ * [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
  * </ol>
  * Dependencies are all uni-directional, from top to bottom. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
