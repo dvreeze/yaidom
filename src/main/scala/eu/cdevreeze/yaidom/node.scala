@@ -58,15 +58,19 @@ sealed trait Node extends Immutable {
    * <li>The AST is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
    * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
    * <li>Relatively low runtime costs</li>
-   * <li>The output of method toAstString is Scala code (for instance useful REPL or unit tests)</li>
+   * <li>The output of method toAstString is itself Scala ("NodeBuilder") DSL code (for instance useful REPL or unit tests)</li>
    * </ul>
    */
   final def toAstString(parentScope: Scope): String = toShiftedAstString(parentScope, 0)
 
+  /** Same as toAstString(Scope.Empty) */
+  final def toAstString: String = toAstString(Scope.Empty)
+
+  /** Same as toAstString(parentScope), but shifted numberOrSpaces to the right. Used for implementing toAstString(parentScope). */
   def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String
 
   /** Returns the AST string corresponding to this element. Possibly expensive! */
-  final override def toString: String = toAstString(Scope.Empty)
+  final override def toString: String = toAstString
 }
 
 /** Document or Elem node */
@@ -284,14 +288,14 @@ final class Elem private (
       result.mkString("%n".format())
     }
 
-    val qnameString = "\"%s\".qname".format(self.qname.toString)
+    val qnameString = "\"\"\"%s\"\"\".qname".format(self.qname.toString)
 
     val attributesString = {
       val result = self.attributes map { kv =>
         val qn: QName = kv._1
         val value: String = kv._2
-        val qnameString = "\"%s\".qname".format(qn.toString)
-        val valueString = "\"%s\"".format(value)
+        val qnameString = "\"\"\"%s\"\"\".qname".format(qn.toString)
+        val valueString = "\"\"\"%s\"\"\"".format(value)
         (qnameString -> valueString)
       }
       result.toString
@@ -304,8 +308,8 @@ final class Elem private (
         val result = declarations.toMap map { kv =>
           val prefix: String = kv._1
           val nsUri: String = kv._2
-          val prefixString = "\"%s\"".format(prefix)
-          val nsUriString = "\"%s\"".format(nsUri)
+          val prefixString = "\"\"\"%s\"\"\"".format(prefix)
+          val nsUriString = "\"\"\"%s\"\"\"".format(nsUri)
           (prefixString -> nsUriString)
         }
         "%s.namespaces".format(result.toString)

@@ -20,11 +20,14 @@ package jinterop
 import java.{ util => jutil, io => jio }
 import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory }
 import javax.xml.stream.events.XMLEvent
+import javax.xml.transform.stream.StreamSource
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import parse.DocumentStaxParser
+import print.DocumentPrinterUsingStax
 import QName._
 import ExpandedName._
 import StaxConversions._
@@ -127,6 +130,37 @@ class StaxInteropTest extends Suite {
       root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
       root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    }
+
+    // 6. Print to XML and parse back, and check again
+
+    val doc = new Document(
+      documentElement = root3,
+      processingInstructions = Nil.toIndexedSeq,
+      comments = Nil.toIndexedSeq)
+
+    val printer = DocumentPrinterUsingStax.newInstance
+    val xmlString2 = printer.printXml(doc)
+
+    val parser = DocumentStaxParser.newInstance
+    val source = new StreamSource(new jio.StringReader(xmlString2))
+    val doc2 = parser.parse(source)
+
+    val root4 = doc2.documentElement
+
+    expect(root.allElems map { e => e.qname.localPart } toSet) {
+      root4.allElems map { e => e.qname.localPart } toSet
+    }
+    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
+      root4.allElemsOrSelf map { e => e.qname.localPart } toSet
+    }
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
+    }
+    expect {
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    } {
+      root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
   }
 
