@@ -143,6 +143,9 @@ final class Elem private (
   /** Returns the text children */
   override def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
 
+  /** Returns the comment children */
+  def commentChildren: immutable.Seq[Comment] = children collect { case c: Comment => c }
+
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 

@@ -539,20 +539,32 @@ class DomInteropTest extends Suite {
       result.toSet
     }
 
-    def checkChildText(rootElm: Elem): Unit = {
+    def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.firstElems(ns.ename("child"))
       expect(2) {
         childElms.size
       }
+
       val text = "Jansen & co"
+
       // Remember: we set the parser to coalescing!
       expect(Set(text)) {
         val result = childElms map { e => e.firstTrimmedTextValueOption.getOrElse("Missing text") }
         result.toSet
       }
+
+      expect(Set(text)) {
+        val result = childElms map { e => e.attributeOption("about".ename).getOrElse("Missing text") }
+        result.toSet
+      }
+
+      expect(Set(text)) {
+        val result = rootElm.commentChildren map { c => c.text.trim }
+        result.toSet
+      }
     }
 
-    checkChildText(root)
+    doChecks(root)
 
     // 2. Convert Elem to a DOM element
 
@@ -571,7 +583,7 @@ class DomInteropTest extends Suite {
       result.toSet
     }
 
-    checkChildText(root2)
+    doChecks(root2)
 
     // 5. Convert to NodeBuilder and back, and check again
 
@@ -582,6 +594,6 @@ class DomInteropTest extends Suite {
       result.toSet
     }
 
-    checkChildText(root3)
+    doChecks(root3)
   }
 }
