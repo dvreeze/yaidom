@@ -609,4 +609,81 @@ class StaxInteropTest extends Suite {
       result.toSet
     }
   }
+
+  @Test def testParseXmlWithEscapedChars() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildText(rootElm: Elem): Unit = {
+      val childElms = rootElm.firstElems(ns.ename("child"))
+      expect(2) {
+        childElms.size
+      }
+      val text = "Jansen & co"
+      // Remember: we set the parser to coalescing!
+      expect(Set(text)) {
+        val result = childElms map { e => e.firstTrimmedTextValueOption.getOrElse("Missing text") }
+        result.toSet
+      }
+    }
+
+    checkChildText(root)
+
+    // 2. Write Elem to an XML string
+
+    val bos = new jio.ByteArrayOutputStream
+
+    val xmlEventFactory = XMLEventFactory.newFactory
+    val events = convertElem(root)(xmlEventFactory)
+
+    val xmlOutputFactory = XMLOutputFactory.newFactory
+    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
+    events.foreach(ev => xmlEventWriter.add(ev))
+
+    xmlEventWriter.close()
+
+    val xmlString = new String(bos.toByteArray, "utf-8")
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    eventReader = xmlInputFactory.createXMLEventReader(bis)
+
+    val root2: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root3)
+  }
 }

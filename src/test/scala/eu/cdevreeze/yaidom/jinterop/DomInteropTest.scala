@@ -519,4 +519,69 @@ class DomInteropTest extends Suite {
       result.toSet
     }
   }
+
+  @Test def testParseXmlWithEscapedChars() {
+    // 1. Parse XML file into Elem
+
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setCoalescing(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
+    val doc = db.parse(is)
+
+    val root: Elem = convertToElem(doc.getDocumentElement)
+    is.close()
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildText(rootElm: Elem): Unit = {
+      val childElms = rootElm.firstElems(ns.ename("child"))
+      expect(2) {
+        childElms.size
+      }
+      val text = "Jansen & co"
+      // Remember: we set the parser to coalescing!
+      expect(Set(text)) {
+        val result = childElms map { e => e.firstTrimmedTextValueOption.getOrElse("Missing text") }
+        result.toSet
+      }
+    }
+
+    checkChildText(root)
+
+    // 2. Convert Elem to a DOM element
+
+    val db2 = dbf.newDocumentBuilder
+    val doc2 = db2.newDocument
+    val element = convertElem(root)(doc2)
+
+    // 3. Convert DOM element into Elem
+
+    val root2: Elem = convertToElem(doc2.getDocumentElement)
+
+    // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root3)
+  }
 }

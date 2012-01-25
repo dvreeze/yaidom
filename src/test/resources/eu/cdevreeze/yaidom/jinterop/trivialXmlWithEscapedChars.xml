@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns="urn:foo:bar">
+	<child>
+	Jansen &amp; co
+	</child>
+	<child>
+	<![CDATA[Jansen & co]]>
+	</child>
+</root>
