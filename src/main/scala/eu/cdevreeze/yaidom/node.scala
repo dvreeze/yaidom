@@ -49,6 +49,24 @@ sealed trait Node extends Immutable {
 
   /** The unique ID of the immutable Node (and its subtree). "Updates" result in new UUIDs. */
   val uuid: jutil.UUID
+
+  /**
+   * Returns the AST (abstract syntax tree) as String, conforming to the DSL for NodeBuilders.
+   *
+   * There are a couple of advantages of this method compared to a "toXmlString" method which returns the XML string:
+   * <ul>
+   * <li>The AST is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
+   * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
+   * <li>Relatively low runtime costs</li>
+   * <li>The output of method toAstString is Scala code (for instance useful REPL or unit tests)</li>
+   * </ul>
+   */
+  final def toAstString(parentScope: Scope): String = toShiftedAstString(parentScope, 0)
+
+  def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String
+
+  /** Returns the AST string corresponding to this element. Possibly expensive! */
+  final override def toString: String = toAstString(Scope.Empty)
 }
 
 /** Document or Elem node */
@@ -90,6 +108,55 @@ final class Document(
       documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
     val elemComments = result.flatten
     comments ++ elemComments
+  }
+
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+    require(parentScope == Scope.Empty, "A document has no parent scope")
+
+    val unshiftedFormatString =
+      """|document(
+         |  documentElement =
+         |%s,
+         |  processingInstructions = List(
+         |%s
+         |  ),
+         |  comments = List(
+         |%s
+         |  )
+         |)""".stripMargin
+
+    val formatString = {
+      val result = unshiftedFormatString.lines.toList collect {
+        case ln if ln.trim == "%s" => ln // "%s" not indented here!
+        case ln => (" " * numberOfSpaces) + ln
+      }
+      result.mkString("%n".format())
+    }
+
+    val documentElementString: String = documentElement.toShiftedAstString(parentScope, numberOfSpaces + 4)
+
+    val pisString = {
+      val indent = numberOfSpaces + 4
+      val pisStringList: List[String] =
+        processingInstructions.toList map { ch => ch.toShiftedAstString(parentScope, indent) }
+
+      val separator = ",%n".format()
+      val resultString: String = pisStringList.mkString(separator)
+      resultString
+    }
+
+    val commentsString = {
+      val indent = numberOfSpaces + 4
+      val commentsStringList: List[String] =
+        comments.toList map { ch => ch.toShiftedAstString(parentScope, indent) }
+
+      val separator = ",%n".format()
+      val resultString: String = commentsStringList.mkString(separator)
+      resultString
+    }
+
+    val result: String = formatString.format(documentElementString, pisString, commentsString)
+    result
   }
 }
 
@@ -196,40 +263,67 @@ final class Elem private (
   /** Hash code, consistent with equals */
   override def hashCode: Int = uuid.hashCode
 
-  /** Returns the XML string corresponding to this element, without the children (but ellipsis instead) */
-  override def toString: String = withChildren(immutable.Seq[Node](Text(" ... "))).toXmlString(Scope.Empty)
-
-  /** Returns (a naive approximation of) the XML string corresponding to this element. Consider using an XML serializer (such as in JAXP) instead. */
-  def toXmlString: String = toXmlString(Scope.Empty)
-
-  /**
-   * Returns (a naive approximation of) the XML string corresponding to this element, taking the given parent Scope into account.
-   * Consider using an XML serializer (such as in JAXP) instead.
-   */
-  def toXmlString(parentScope: Scope): String = toLines("", parentScope).mkString("%n".format())
-
-  private def toLines(indent: String, parentScope: Scope): List[String] = {
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
-    val declarationsString = declarations.toStringInXml
-    val attrsString = attributes map { kv => """%s="%s"""".format(kv._1, kv._2) } mkString (" ")
 
-    if (self.children.isEmpty) {
-      val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
-      val line = "<%s />".format(start)
-      List(line).map(ln => indent + ln)
-    } else if (this.allChildElems.isEmpty) {
-      val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
-      val content = children map { _.toString } mkString
-      val line = "<%s>%s</%s>".format(start, content, qname)
-      List(line).map(ln => indent + ln)
-    } else {
-      val start = List(qname, declarationsString, attrsString) filterNot { _ == "" } mkString (" ")
-      val firstLine: String = "<%s>".format(start)
-      val lastLine: String = "</%s>".format(qname)
-      // Recursive (not tail-recursive) calls, ignoring non-element children, such as text, comments etc.
-      val childElementLines: List[String] = self.allChildElems.toList flatMap { e => e.toLines("  ", self.scope) }
-      (firstLine :: childElementLines ::: List(lastLine)) map { ln => indent + ln }
+    val unshiftedFormatString =
+      """|elem(
+         |  qname = %s,
+         |  attributes = %s,
+         |  namespaces = %s,
+         |  children = List(
+         |%s
+         |  )
+         |)""".stripMargin
+
+    val formatString = {
+      val result = unshiftedFormatString.lines.toList collect {
+        case ln if ln.trim == "%s" => ln // "%s" not indented here!
+        case ln => (" " * numberOfSpaces) + ln
+      }
+      result.mkString("%n".format())
     }
+
+    val qnameString = "\"%s\".qname".format(self.qname.toString)
+
+    val attributesString = {
+      val result = self.attributes map { kv =>
+        val qn: QName = kv._1
+        val value: String = kv._2
+        val qnameString = "\"%s\".qname".format(qn.toString)
+        val valueString = "\"%s\"".format(value)
+        (qnameString -> valueString)
+      }
+      result.toString
+    }
+
+    val namespacesString = {
+      if (declarations.toMap.isEmpty) {
+        "Scope.Declarations.Empty"
+      } else {
+        val result = declarations.toMap map { kv =>
+          val prefix: String = kv._1
+          val nsUri: String = kv._2
+          val prefixString = "\"%s\"".format(prefix)
+          val nsUriString = "\"%s\"".format(nsUri)
+          (prefixString -> nsUriString)
+        }
+        "%s.namespaces".format(result.toString)
+      }
+    }
+
+    val childrenString = {
+      val indent = numberOfSpaces + 4
+      val childrenStringList: List[String] =
+        self.children.toList map { ch => ch.toShiftedAstString(self.scope, indent) }
+
+      val separator = ",%n".format()
+      val resultString: String = childrenStringList.mkString(separator)
+      resultString
+    }
+
+    val resultString = formatString.format(qnameString, attributesString, namespacesString, childrenString)
+    resultString
   }
 }
 
@@ -238,7 +332,10 @@ final case class Text(text: String) extends Node {
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
-  override def toString: String = XmlStringUtils.escapeText(text)
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+    val result = "text(\"\"\"%s\"\"\")".format(text)
+    (" " * numberOfSpaces) + result
+  }
 }
 
 final case class ProcessingInstruction(target: String, data: String) extends Node {
@@ -247,7 +344,10 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
-  override def toString: String = """<?%s %s?>""".format(target, data)
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+    val result = "processingInstruction(\"\"\"%s\"\"\", \"\"\"%s\"\"\")".format(target, data)
+    (" " * numberOfSpaces) + result
+  }
 }
 
 final case class CData(text: String) extends Node {
@@ -256,7 +356,10 @@ final case class CData(text: String) extends Node {
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
-  override def toString: String = """<![CDATA[%s]]>""".format(text)
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+    val result = "cdata(\"\"\"%s\"\"\")".format(text)
+    (" " * numberOfSpaces) + result
+  }
 }
 
 /**
@@ -274,7 +377,10 @@ final case class EntityRef(entity: String) extends Node {
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
-  override def toString: String = """&%s;""".format(entity)
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+    val result = "entityRef(\"\"\"%s\"\"\")".format(entity)
+    (" " * numberOfSpaces) + result
+  }
 }
 
 final case class Comment(text: String) extends Node {
@@ -282,7 +388,10 @@ final case class Comment(text: String) extends Node {
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
-  override def toString: String = """<!-- %s -->""".format(text)
+  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+    val result = "comment(\"\"\"%s\"\"\")".format(text)
+    (" " * numberOfSpaces) + result
+  }
 }
 
 object Document {

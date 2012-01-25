@@ -56,6 +56,12 @@ sealed trait NodeBuilder extends Immutable {
   def build(parentScope: Scope): NodeType
 
   final def build(): NodeType = build(Scope.Empty)
+
+  /** Returns the AST as String. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
+  final def toAstString(parentScope: Scope): String = build(parentScope).toAstString(parentScope)
+
+  /** Returns toAstString */
+  final override def toString: String = toAstString(Scope.Empty)
 }
 
 trait ParentNodeBuilder extends NodeBuilder {

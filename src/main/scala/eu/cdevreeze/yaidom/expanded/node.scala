@@ -64,7 +64,7 @@ final class Elem(
 final case class Text(text: String) extends Node {
   require(text ne null)
 
-  override def toString: String = XmlStringUtils.escapeText(text)
+  override def toString: String = text
 }
 
 final case class ProcessingInstruction(target: String, data: String) extends Node {

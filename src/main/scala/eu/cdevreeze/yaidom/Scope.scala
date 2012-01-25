@@ -187,6 +187,9 @@ object Scope {
 
   object Declarations {
 
+    /** The "empty" Declarations */
+    val Empty = Declarations(declared = Scope.Empty, undeclaredOptionalPrefixes = Set())
+
     def fromMap(m: Map[String, String]): Declarations = {
       require {
         m.keySet forall { pref => pref ne null }
