@@ -295,7 +295,118 @@ class DomInteropTest extends Suite {
         forChoiceDefDocumentation.trim
       }
     }
+
     checkForChoiceDocumentation(root)
+
+    def checkCommentWithEscapedChar(rootElm: Elem): Unit = {
+      val documentationElms =
+        for {
+          annotationElm <- rootElm.childElems(ns.ename("annotation"))
+          documentationElm <- annotationElm.childElems(ns.ename("documentation"))
+        } yield documentationElm
+
+      val documentationText = documentationElms.drop(1).headOption flatMap { e => e.firstTrimmedTextValueOption } getOrElse ""
+
+      // The XML string contains "&lt;", but the parsed text should contain an unescaped "<" instead
+      expect(true) {
+        documentationText.containsSlice("""XML Schema language.  The documentation (within <documentation> elements)""")
+      }
+    }
+
+    checkCommentWithEscapedChar(root)
+
+    def checkIdentityConstraintElm(rootElm: Elem): Unit = {
+      val identityConstraintElms =
+        for {
+          schemaElm <- rootElm elemsWhere { e =>
+            e.resolvedName == ns.ename("element") &&
+              e.attributeOption("name".ename) == Some("schema") &&
+              e.attributeOption("id".ename) == Some("schema")
+          }
+          idConstraintElm <- schemaElm childElemsWhere { e =>
+            e.resolvedName == ns.ename("key") &&
+              e.attributeOption("name".ename) == Some("identityConstraint")
+          }
+        } yield idConstraintElm
+
+      expect(1) {
+        identityConstraintElms.size
+      }
+
+      val selectorElms = identityConstraintElms.head.childElems(ns.ename("selector"))
+
+      expect(1) {
+        selectorElms.size
+      }
+
+      expect(""".//xs:key|.//xs:unique|.//xs:keyref""") {
+        selectorElms.head.attributeOption("xpath".ename).getOrElse("")
+      }
+    }
+
+    checkIdentityConstraintElm(root)
+
+    def checkComplexTypeElm(rootElm: Elem): Unit = {
+      val complexTypeElms =
+        rootElm elemsWhere { e =>
+          e.resolvedName == ns.ename("complexType") &&
+            e.attributeOption("name".ename) == Some("element") &&
+            e.attributeOption("abstract".ename) == Some("true")
+        }
+
+      expect(1) {
+        complexTypeElms.size
+      }
+
+      val extensionElms = complexTypeElms.head.elems(ns.ename("extension"))
+      val sequenceElms = complexTypeElms.head.elems(ns.ename("sequence"))
+      val choiceElms = complexTypeElms.head.elems(ns.ename("choice"))
+      val elementElms = complexTypeElms.head.elems(ns.ename("element"))
+      val groupElms = complexTypeElms.head.elems(ns.ename("group"))
+      val attributeElms = complexTypeElms.head.elems(ns.ename("attribute"))
+      val attributeGroupElms = complexTypeElms.head.elems(ns.ename("attributeGroup"))
+
+      expect(Set("base".ename)) {
+        val result = extensionElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+      expect(Set("xs:annotated")) {
+        val result = extensionElms flatMap { e => e.resolvedAttributes.values }
+        result.toSet
+      }
+
+      expect(Set()) {
+        val result = sequenceElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+
+      expect(Set("minOccurs".ename)) {
+        val result = choiceElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+
+      expect(Set("name".ename, "type".ename)) {
+        val result = elementElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+
+      expect(Set("ref".ename, "minOccurs".ename, "maxOccurs".ename)) {
+        val result = groupElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+
+      expect(Set("name".ename, "type".ename, "use".ename, "default".ename)) {
+        val result = attributeElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+
+      expect(Set("ref".ename)) {
+        val result = attributeGroupElms flatMap { e => e.resolvedAttributes.keySet }
+        result.toSet
+      }
+    }
+
+    checkComplexTypeElm(root)
 
     // 2. Convert Elem to a DOM element
 
@@ -319,6 +430,9 @@ class DomInteropTest extends Suite {
     }
 
     checkForChoiceDocumentation(root2)
+    checkCommentWithEscapedChar(root2)
+    checkIdentityConstraintElm(root2)
+    checkComplexTypeElm(root2)
 
     // 5. Convert to NodeBuilder and back, and check again
 
@@ -334,6 +448,9 @@ class DomInteropTest extends Suite {
     }
 
     checkForChoiceDocumentation(root3)
+    checkCommentWithEscapedChar(root3)
+    checkIdentityConstraintElm(root3)
+    checkComplexTypeElm(root3)
   }
 
   @Test def testParseXmlWithExpandedEntityRef() {
