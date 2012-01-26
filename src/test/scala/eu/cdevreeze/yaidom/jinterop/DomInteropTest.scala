@@ -408,6 +408,26 @@ class DomInteropTest extends Suite {
 
     checkComplexTypeElm(root)
 
+    def checkFieldPattern(rootElm: Elem): Unit = {
+      val fieldElms = rootElm elemsWhere { e =>
+        e.resolvedName == ns.ename("element") &&
+          e.attributeOption("name".ename) == Some("field") &&
+          e.attributeOption("id".ename) == Some("field")
+      }
+
+      val patternElms = fieldElms flatMap { e => e.elems(ns.ename("pattern")) }
+
+      expect(1) {
+        patternElms.size
+      }
+
+      expect("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
+        patternElms.head.attributeOption("value".ename).getOrElse("")
+      }
+    }
+
+    checkFieldPattern(root)
+
     // 2. Convert Elem to a DOM element
 
     val db2 = dbf.newDocumentBuilder
@@ -433,6 +453,7 @@ class DomInteropTest extends Suite {
     checkCommentWithEscapedChar(root2)
     checkIdentityConstraintElm(root2)
     checkComplexTypeElm(root2)
+    checkFieldPattern(root2)
 
     // 5. Convert to NodeBuilder and back, and check again
 
@@ -451,6 +472,7 @@ class DomInteropTest extends Suite {
     checkCommentWithEscapedChar(root3)
     checkIdentityConstraintElm(root3)
     checkComplexTypeElm(root3)
+    checkFieldPattern(root3)
   }
 
   @Test def testParseXmlWithExpandedEntityRef() {
