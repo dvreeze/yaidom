@@ -58,7 +58,7 @@ sealed trait Node extends Immutable {
    * <li>The AST is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
    * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
    * <li>Relatively low runtime costs</li>
-   * <li>The output of method toAstString is itself Scala ("NodeBuilder") DSL code (for instance useful REPL or unit tests)</li>
+   * <li>The output of method toAstString is itself Scala ("NodeBuilder") DSL code (for instance useful in REPL or unit tests)</li>
    * </ul>
    */
   final def toAstString(parentScope: Scope): String = toShiftedAstString(parentScope, 0)
