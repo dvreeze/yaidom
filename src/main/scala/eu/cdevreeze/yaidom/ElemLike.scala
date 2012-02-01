@@ -22,7 +22,7 @@ import scala.collection.immutable
  * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.xlink.Elem]].
  * Below, we refer to these element-like objects as elements.
  *
- * The only abstract methods are <code>resolvedName</code>, <code>resolvedAttributes</code> and <code>childElems</code> (without arguments).
+ * The only abstract methods are <code>resolvedName</code>, <code>resolvedAttributes</code> and <code>allChildElems</code>.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
  * This trait offers public element retrieval methods to obtain:
