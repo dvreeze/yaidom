@@ -19,12 +19,15 @@ package jinterop
 
 import java.{ util => jutil, io => jio }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import org.w3c.dom.{ Element, Document }
+import org.w3c.dom.{ Element }
+import javax.xml.transform.stream.StreamSource
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import parse.DocumentParserUsingStax
+import print.DocumentPrinterUsingDom
 import QName._
 import ExpandedName._
 import DomConversions._
@@ -53,9 +56,9 @@ class DomInteropTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomInteropTest].getResourceAsStream("books.xml")
-    val doc = db.parse(is)
+    val domDoc: org.w3c.dom.Document = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
+    val root: Elem = convertToElem(domDoc.getDocumentElement)
     is.close()
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
@@ -74,12 +77,12 @@ class DomInteropTest extends Suite {
     // 2. Convert Elem to a DOM element
 
     val db2 = dbf.newDocumentBuilder
-    val doc2 = db2.newDocument
-    val element = convertElem(root)(doc2)
+    val domDoc2: org.w3c.dom.Document = db2.newDocument
+    val element = convertElem(root)(domDoc2)
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToElem(domDoc2.getDocumentElement)
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -115,6 +118,37 @@ class DomInteropTest extends Suite {
       root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     } {
       root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    }
+
+    // 6. Print to XML and parse back, and check again
+
+    val doc = new Document(
+      documentElement = root3,
+      processingInstructions = Nil.toIndexedSeq,
+      comments = Nil.toIndexedSeq)
+
+    val printer = DocumentPrinterUsingDom.newInstance
+    val xmlString2 = printer.printXml(doc)
+
+    val parser = DocumentParserUsingStax.newInstance
+    val source = new StreamSource(new jio.StringReader(xmlString2))
+    val doc2 = parser.parse(source)
+
+    val root4 = doc2.documentElement
+
+    expect(root.allElems map { e => e.qname.localPart } toSet) {
+      root4.allElems map { e => e.qname.localPart } toSet
+    }
+    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
+      root4.allElemsOrSelf map { e => e.qname.localPart } toSet
+    }
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
+    }
+    expect {
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+    } {
+      root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
     }
   }
 

@@ -24,7 +24,7 @@ import javax.xml.transform.Source
 import jinterop.StaxConversions._
 
 /** StAX-based Document parser */
-final class DocumentStaxParser(val xmlInputFactory: XMLInputFactory) {
+final class DocumentParserUsingStax(val xmlInputFactory: XMLInputFactory) extends DocumentParser {
 
   def parse(source: Source): Document = {
     var xmlEventReader: XMLEventReader = null
@@ -37,12 +37,12 @@ final class DocumentStaxParser(val xmlInputFactory: XMLInputFactory) {
   }
 }
 
-object DocumentStaxParser {
+object DocumentParserUsingStax {
 
   /** Returns a new instance, configured to coalesce whitespace */
-  def newInstance(): DocumentStaxParser = {
+  def newInstance(): DocumentParserUsingStax = {
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    new DocumentStaxParser(xmlInputFactory)
+    new DocumentParserUsingStax(xmlInputFactory)
   }
 }

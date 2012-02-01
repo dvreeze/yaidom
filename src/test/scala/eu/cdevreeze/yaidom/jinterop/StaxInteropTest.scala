@@ -26,7 +26,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentStaxParser
+import parse.DocumentParserUsingStax
 import print.DocumentPrinterUsingStax
 import QName._
 import ExpandedName._
@@ -142,7 +142,7 @@ class StaxInteropTest extends Suite {
     val printer = DocumentPrinterUsingStax.newInstance
     val xmlString2 = printer.printXml(doc)
 
-    val parser = DocumentStaxParser.newInstance
+    val parser = DocumentParserUsingStax.newInstance
     val source = new StreamSource(new jio.StringReader(xmlString2))
     val doc2 = parser.parse(source)
 
