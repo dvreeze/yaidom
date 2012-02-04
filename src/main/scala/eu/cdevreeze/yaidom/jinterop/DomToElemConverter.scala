@@ -72,14 +72,14 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
   }
 
   /** Converts an org.w3c.dom.Text to a yaidom Text */
-  private def convertToText(v: org.w3c.dom.Text): Text = Text(v.getData)
+  private def convertToText(v: org.w3c.dom.Text): Text = Text(text = v.getData, isCData = false)
 
   /** Converts an org.w3c.dom.ProcessingInstruction to a yaidom ProcessingInstruction */
   private def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
 
   /** Converts an org.w3c.dom.CDATASection to a yaidom CData */
-  private def convertToCData(v: org.w3c.dom.CDATASection): CData = CData(v.getData)
+  private def convertToCData(v: org.w3c.dom.CDATASection): Text = Text(text = v.getData, isCData = true)
 
   /** Converts an org.w3c.dom.EntityReference to a yaidom EntityRef */
   private def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)

@@ -46,6 +46,20 @@ object XmlStringUtils {
     }
   }
 
+  /**
+   * Normalizes the string, removing surrounding whitespace and normalizing internal whitespace to a single space.
+   * Whitespace includes #x20 (space), #x9 (tab), #xD (carriage return), #xA (line feed). If there is only whitespace,
+   * the empty string is returned. Inspired by the JDOM library.
+   */
+  def normalizeString(s: String): String = {
+    require(s ne null)
+
+    val separators = Array(' ', '\t', '\r', '\n')
+    val words: Seq[String] = s.split(separators).toSeq filterNot { s => s.isEmpty }
+
+    words.mkString(" ") // Returns empty string if words.isEmpty
+  }
+
   private def isProbableXmlNameStart(c: Char): Boolean = c match {
     case '-' => false
     case '.' => false

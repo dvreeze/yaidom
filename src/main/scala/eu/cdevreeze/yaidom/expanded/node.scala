@@ -61,10 +61,11 @@ final class Elem(
   override def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
 }
 
-final case class Text(text: String) extends Node {
+final case class Text(text: String, isCData: Boolean) extends Node with TextLike {
   require(text ne null)
+  if (isCData) require(!text.containsSlice("]]>"))
 
-  override def toString: String = text
+  override def toString: String = if (isCData) """<![CDATA[%s]]>""".format(text) else text
 }
 
 final case class ProcessingInstruction(target: String, data: String) extends Node {
@@ -72,13 +73,6 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
   require(data ne null)
 
   override def toString: String = """<?%s %s?>""".format(target, data)
-}
-
-final case class CData(text: String) extends Node {
-  require(text ne null)
-  require(!text.containsSlice("]]>"))
-
-  override def toString: String = """<![CDATA[%s]]>""".format(text)
 }
 
 final case class EntityRef(entity: String) extends Node {
@@ -100,7 +94,6 @@ object Node {
     case e: yaidom.Elem => Elem.fromNormalElem(e)
     case t: yaidom.Text => Text.fromNormalText(t)
     case pi: yaidom.ProcessingInstruction => ProcessingInstruction.fromNormalProcessingInstruction(pi)
-    case cdata: yaidom.CData => CData.fromNormalCData(cdata)
     case er: yaidom.EntityRef => EntityRef.fromNormalEntityRef(er)
     case c: yaidom.Comment => Comment.fromNormalComment(c)
   }
@@ -124,18 +117,13 @@ object Elem {
 
 object Text {
 
-  def fromNormalText(t: yaidom.Text): Text = Text(t.text)
+  def fromNormalText(t: yaidom.Text): Text = Text(t.text, t.isCData)
 }
 
 object ProcessingInstruction {
 
   def fromNormalProcessingInstruction(pi: yaidom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(pi.target, pi.data)
-}
-
-object CData {
-
-  def fromNormalCData(cdata: yaidom.CData): CData = CData(cdata.text)
 }
 
 object EntityRef {

@@ -125,12 +125,13 @@ final class ElemBuilder(
   }
 }
 
-final case class TextBuilder(text: String) extends NodeBuilder {
+final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder with TextLike {
   require(text ne null)
+  if (isCData) require(!text.containsSlice("]]>"))
 
   type NodeType = Text
 
-  def build(parentScope: Scope): Text = Text(text)
+  def build(parentScope: Scope): Text = Text(text, isCData)
 }
 
 final case class ProcessingInstructionBuilder(target: String, data: String) extends NodeBuilder {
@@ -140,15 +141,6 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
   type NodeType = ProcessingInstruction
 
   def build(parentScope: Scope): ProcessingInstruction = ProcessingInstruction(target, data)
-}
-
-final case class CDataBuilder(text: String) extends NodeBuilder {
-  require(text ne null)
-  require(!text.containsSlice("]]>"))
-
-  type NodeType = CData
-
-  def build(parentScope: Scope): CData = CData(text)
 }
 
 final case class EntityRefBuilder(entity: String) extends NodeBuilder {
@@ -186,12 +178,12 @@ object NodeBuilder {
     new ElemBuilder(qname, attributes, namespaces, children.toIndexedSeq)
   }
 
-  def text(textValue: String): TextBuilder = TextBuilder(textValue)
+  def text(textValue: String): TextBuilder = TextBuilder(text = textValue, isCData = false)
+
+  def cdata(textValue: String): TextBuilder = TextBuilder(text = textValue, isCData = true)
 
   def processingInstruction(target: String, data: String): ProcessingInstructionBuilder =
     ProcessingInstructionBuilder(target, data)
-
-  def cdata(textValue: String): CDataBuilder = CDataBuilder(textValue)
 
   def entityRef(entity: String): EntityRefBuilder = EntityRefBuilder(entity)
 
@@ -203,9 +195,9 @@ object NodeBuilder {
    * The following must always hold: fromNode(node)(parentScope).build(parentScope) "is structurally equal to" node
    */
   def fromNode(node: Node)(parentScope: Scope): NodeBuilder = node match {
-    case Text(s) => TextBuilder(s)
+    case Text(s, false) => TextBuilder(s, false)
+    case Text(s, true) => TextBuilder(s, true)
     case ProcessingInstruction(target, data) => ProcessingInstructionBuilder(target, data)
-    case CData(s) => CDataBuilder(s)
     case EntityRef(entity) => EntityRefBuilder(entity)
     case Comment(s) => CommentBuilder(s)
     case d: Document =>

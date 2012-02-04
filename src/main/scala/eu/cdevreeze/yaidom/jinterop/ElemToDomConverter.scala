@@ -57,9 +57,9 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
   private def convertNode(node: Node, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): org.w3c.dom.Node = {
     node match {
       case e: Elem => convertElem(e, doc, parent, parentScope)
-      case t: Text => convertText(t, doc, parent)
+      case t: Text if t.isCData => convertCData(t, doc, parent)
+      case t: Text => require(!t.isCData); convertText(t, doc, parent)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc, parent)
-      case t: CData => convertCData(t, doc, parent)
       case er: EntityRef => convertEntityRef(er, doc, parent)
       case c: Comment => convertComment(c, doc, parent)
     }
@@ -78,6 +78,13 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     element
   }
 
+  private def convertCData(cdata: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.CDATASection = {
+    val domCData = doc.createCDATASection(cdata.text)
+
+    parent.appendChild(domCData)
+    domCData
+  }
+
   private def convertText(text: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Text = {
     val domText = doc.createTextNode(text.text)
 
@@ -92,13 +99,6 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
 
     parent.appendChild(domPi)
     domPi
-  }
-
-  private def convertCData(cdata: CData, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.CDATASection = {
-    val domCData = doc.createCDATASection(cdata.text)
-
-    parent.appendChild(domCData)
-    domCData
   }
 
   private def convertEntityRef(entityRef: EntityRef, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.EntityReference = {

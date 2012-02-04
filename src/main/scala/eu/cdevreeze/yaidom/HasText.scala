@@ -29,23 +29,38 @@ import scala.collection.immutable
  * about "ignorable whitespace" (or "element content whitespace"). After all, typical XML input is nicely formatted w.r.t. indenting,
  * but those indents are often not really considered a part of the "data" represented by that XML input, especially if the
  * XML is validated by the parser against a schema. Consider also the possible presence of CDATA sections and entity references,
- * and XML parser configuration options to influence whitespace handling.
+ * and XML parser configuration options to influence whitespace handling. To make matters even worse, see for example
+ * http://www.xmlplease.com/normalized about normalized strings etc.
  *
  * All in all, whitespace handling in XML is pretty complex. This API does not try to make that any easier. It is geared
- * towards "data"-oriented XML rather than free format XML (mixing text with elements). To get the most out of this API,
- * configure the XML parser to combine adjacent text, and if applicable ask for the trimmed text. If adjacent text is indeed
- * combined by the parser, the first text child of an element is likely to be the only text child. If the XML is described by
- * a schema, consider having the parser validate the XML against the schema, so further XML parser configuration would then
- * not be needed for "ignoring whitespace" (at the runtime cost of validation).
- *
- * Considering these complexities, no effort was done (in yaidom) to offer a method to obtain the node "value".
+ * towards "data"-oriented XML rather than free format XML (mixing text with elements). To obtain text, you can always configure the XML
+ * parser to combine adjacent text, and treat CData as normal text, or to validate the XML so the parser knows which whitespace
+ * is "ignorable". Yet when using methods <code>trimmedText</code> or <code>normalizedText</code>, many of these complexities are
+ * somewhat hidden.
  *
  * Typical element-like classes mix in this trait as well as [[eu.cdevreeze.yaidom.ElemLike]].
+ *
+ * Part of this API was inspired by the JDOM library.
  */
-trait HasText[T <: { def text: String }] {
+trait HasText[T <: TextLike] {
 
-  /** Returns the text children */
+  /** Returns the text children (including CData), in the correct order */
   def textChildren: immutable.Seq[T]
+
+  /**
+   * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
+   * If there are no text children, the empty string is returned.
+   */
+  final def text: String = {
+    val textStrings = textChildren map { t => t.text }
+    textStrings.mkString
+  }
+
+  /** Returns <code>text.trim</code>. */
+  final def trimmedText: String = text.trim
+
+  /** Returns <code>XmlStringUtils.normalizeString(text)</code>. */
+  final def normalizedText: String = XmlStringUtils.normalizeString(text)
 
   /** Returns the first text child, if any, and None otherwise */
   final def firstTextChildOption: Option[T] = textChildren.headOption

@@ -331,14 +331,20 @@ final class Elem private (
   }
 }
 
-final case class Text(text: String) extends Node {
+final case class Text(text: String, isCData: Boolean) extends Node with TextLike {
   require(text ne null)
+  if (isCData) require(!text.containsSlice("]]>"))
 
   override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
-    val result = "text(\"\"\"%s\"\"\")".format(text)
-    (" " * numberOfSpaces) + result
+    if (isCData) {
+      val result = "cdata(\"\"\"%s\"\"\")".format(text)
+      (" " * numberOfSpaces) + result
+    } else {
+      val result = "text(\"\"\"%s\"\"\")".format(text)
+      (" " * numberOfSpaces) + result
+    }
   }
 }
 
@@ -350,18 +356,6 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "processingInstruction(\"\"\"%s\"\"\", \"\"\"%s\"\"\")".format(target, data)
-    (" " * numberOfSpaces) + result
-  }
-}
-
-final case class CData(text: String) extends Node {
-  require(text ne null)
-  require(!text.containsSlice("]]>"))
-
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
-
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
-    val result = "cdata(\"\"\"%s\"\"\")".format(text)
     (" " * numberOfSpaces) + result
   }
 }

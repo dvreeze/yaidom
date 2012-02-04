@@ -195,9 +195,9 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
     new ElemResult(elemWithChildren, remainingEvents)
   }
 
-  private def eventToText(event: Characters): Text = Text(event.getData)
+  private def eventToText(event: Characters): Text = Text(text = event.getData, isCData = false)
 
-  private def eventToCData(event: Characters): CData = CData(event.getData)
+  private def eventToCData(event: Characters): Text = Text(text = event.getData, isCData = true)
 
   private def eventToEntityRef(event: EntityReference): EntityRef = EntityRef(event.getName)
 

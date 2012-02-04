@@ -59,9 +59,9 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   private def convertNode(node: Node, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     node match {
       case e: Elem => convertElem(e, xmlEventFactory, parentScope)
-      case t: Text => convertText(t, xmlEventFactory)
+      case t: Text if t.isCData => convertCData(t, xmlEventFactory)
+      case t: Text => require(!t.isCData); convertText(t, xmlEventFactory)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, xmlEventFactory)
-      case t: CData => convertCData(t, xmlEventFactory)
       // Difficult to convert yaidom EntityRef to StAX EntityReference, because of missing declaration
       case er: EntityRef => immutable.IndexedSeq[XMLEvent]()
       case c: Comment => convertComment(c, xmlEventFactory)
@@ -78,6 +78,11 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     immutable.IndexedSeq(startEvent) ++ childEvents ++ immutable.IndexedSeq(endEvent)
   }
 
+  private def convertCData(cdata: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+    val event = xmlEventFactory.createCData(cdata.text)
+    immutable.IndexedSeq(event)
+  }
+
   private def convertText(text: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
     val event = xmlEventFactory.createCharacters(text.text)
     immutable.IndexedSeq(event)
@@ -87,11 +92,6 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     processingInstruction: ProcessingInstruction, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
 
     val event = xmlEventFactory.createProcessingInstruction(processingInstruction.target, processingInstruction.data)
-    immutable.IndexedSeq(event)
-  }
-
-  private def convertCData(cdata: CData, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
-    val event = xmlEventFactory.createCData(cdata.text)
     immutable.IndexedSeq(event)
   }
 
