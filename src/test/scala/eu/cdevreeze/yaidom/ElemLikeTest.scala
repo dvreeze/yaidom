@@ -75,21 +75,21 @@ class ElemLikeTest extends Suite {
       cheapBookElm.attribute("ISBN".ename)
     }
     expect("Hector and Jeff's Database Hints") {
-      cheapBookElm.childElem(ns.ns.ename("Title")).firstTextValue
+      cheapBookElm.childElem(ns.ns.ename("Title")).trimmedText
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm.childElem(ns.ns.ename("Remark")).firstTextValue
+      cheapBookElm.childElem(ns.ns.ename("Remark")).trimmedText
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms map { e => e.childElem(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.firstTextValue } toSet
+      authorLastNameElms map { e => e.trimmedText } toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.childElemOption(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.firstTextValue } toSet
+      authorLastNameElms map { e => e.trimmedText } toSet
     }
   }
 
@@ -129,18 +129,18 @@ class ElemLikeTest extends Suite {
       cheapBookElm.attribute("ISBN".ename)
     }
     expect("Hector and Jeff's Database Hints") {
-      val result = cheapBookElm.elems(ns.ns.ename("Title")) map { _.firstTextValue }
+      val result = cheapBookElm.elems(ns.ns.ename("Title")) map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Title"))
     }
     expect("An indispensable companion to your textbook") {
-      val result = cheapBookElm.elems(ns.ns.ename("Remark")) map { _.firstTextValue }
+      val result = cheapBookElm.elems(ns.ns.ename("Remark")) map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Remark"))
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.elems(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.firstTextValue } toSet
+      authorLastNameElms map { e => e.trimmedText } toSet
     }
   }
 
@@ -184,18 +184,18 @@ class ElemLikeTest extends Suite {
       cheapBookElm.attribute("ISBN".ename)
     }
     expect("Hector and Jeff's Database Hints") {
-      val result = cheapBookElm.elemsOrSelf(ns.ns.ename("Title")) map { _.firstTextValue }
+      val result = cheapBookElm.elemsOrSelf(ns.ns.ename("Title")) map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Title"))
     }
     expect("An indispensable companion to your textbook") {
-      val result = cheapBookElm.elemsOrSelf(ns.ns.ename("Remark")) map { _.firstTextValue }
+      val result = cheapBookElm.elemsOrSelf(ns.ns.ename("Remark")) map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Remark"))
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.elemsOrSelf(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.firstTextValue } toSet
+      authorLastNameElms map { e => e.trimmedText } toSet
     }
   }
 
@@ -230,33 +230,33 @@ class ElemLikeTest extends Suite {
       cheapBookElm.attribute("ISBN".ename)
     }
     expect("Hector and Jeff's Database Hints") {
-      cheapBookElm.firstElemOption(ns.ns.ename("Title")) map { _.firstTextValue } getOrElse (sys.error("Missing Title"))
+      cheapBookElm.firstElemOption(ns.ns.ename("Title")) map { _.trimmedText } getOrElse (sys.error("Missing Title"))
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm.firstElemOption(ns.ns.ename("Remark")) map { _.firstTextValue } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm.firstElemOption(ns.ns.ename("Remark")) map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm firstElemOptionWhere { e => e.resolvedName == ns.ns.ename("Remark") } map { _.firstTextValue } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm firstElemOptionWhere { e => e.resolvedName == ns.ns.ename("Remark") } map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm firstElemOptionWhere { e => e.resolvedName == ns.ns.ename("Remark") && e.allChildElems.isEmpty } map { _.firstTextValue } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm firstElemOptionWhere { e => e.resolvedName == ns.ns.ename("Remark") && e.allChildElems.isEmpty } map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).firstElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.firstElemOption(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.firstTextValue } toSet
+      authorLastNameElms map { e => e.trimmedText } toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).firstElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.firstElems(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.firstTextValue } toSet
+      authorLastNameElms map { e => e.trimmedText } toSet
     }
 
     val ullmanAncestors: immutable.Seq[Elem] =
-      cheapBookElm elemsWhere { e => e.allElemsOrSelf exists { e2 => e2.firstTextValueOption == Some("Ullman") } }
+      cheapBookElm elemsWhere { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
     val firstUllmanAncestors: immutable.Seq[Elem] =
-      cheapBookElm firstElemsWhere { e => e.allElemsOrSelf exists { e2 => e2.firstTextValueOption == Some("Ullman") } }
+      cheapBookElm firstElemsWhere { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
 
     expect(3) {
       ullmanAncestors.size

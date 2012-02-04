@@ -71,7 +71,7 @@ class DomInteropTest extends Suite {
       root.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect(3) {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     }
 
     // 2. Convert Elem to a DOM element
@@ -96,9 +96,9 @@ class DomInteropTest extends Suite {
       root2.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     } {
-      root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     }
 
     // 5. Convert to NodeBuilder and back, and check again
@@ -115,9 +115,9 @@ class DomInteropTest extends Suite {
       root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     } {
-      root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     }
 
     // 6. Print to XML and parse back, and check again
@@ -146,9 +146,9 @@ class DomInteropTest extends Suite {
       root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     } {
-      root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.firstTextValue == "Ullman" } size
+      root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     }
   }
 
@@ -323,7 +323,7 @@ class DomInteropTest extends Suite {
       }
 
       val forChoiceDefDocumentation: String =
-        forChoiceDefOption.get.elems(ns.ename("documentation")) flatMap { e => e.firstTextValue } mkString
+        forChoiceDefOption.get.elems(ns.ename("documentation")) flatMap { e => e.trimmedText } mkString
 
       expect("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
@@ -339,7 +339,7 @@ class DomInteropTest extends Suite {
           documentationElm <- annotationElm.childElems(ns.ename("documentation"))
         } yield documentationElm
 
-      val documentationText = documentationElms.drop(1).headOption flatMap { e => e.firstTrimmedTextValueOption } getOrElse ""
+      val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
 
       // The XML string contains "&lt;", but the parsed text should contain an unescaped "<" instead
       expect(true) {
@@ -537,7 +537,7 @@ class DomInteropTest extends Suite {
       }
       val text = "This text contains an entity reference, viz. hi"
       expect(text) {
-        childOption.get.firstTextValue.trim.take(text.length)
+        childOption.get.trimmedText.take(text.length)
       }
     }
 
@@ -610,8 +610,9 @@ class DomInteropTest extends Suite {
         val entityRef: EntityRef = entityRefs.head
         entityRef
       }
-      expect("This text contains an entity reference, viz.") {
-        childOption.get.firstTextValue.trim
+      val s = "This text contains an entity reference, viz."
+      expect(s) {
+        childOption.get.trimmedText.take(s.length)
       }
     }
 
@@ -722,7 +723,7 @@ class DomInteropTest extends Suite {
 
       // Remember: we set the parser to coalescing!
       expect(Set(text)) {
-        val result = childElms map { e => e.firstTrimmedTextValueOption.getOrElse("Missing text") }
+        val result = childElms map { e => e.trimmedText }
         result.toSet
       }
 
