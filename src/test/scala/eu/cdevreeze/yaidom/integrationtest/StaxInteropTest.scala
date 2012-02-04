@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package integrationtest
 
 import java.{ util => jutil, io => jio }
 import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory }
@@ -30,7 +30,7 @@ import parse.DocumentParserUsingStax
 import print.DocumentPrinterUsingStax
 import QName._
 import ExpandedName._
-import StaxConversions._
+import jinterop.StaxConversions._
 
 /**
  * StAX interoperability test case.

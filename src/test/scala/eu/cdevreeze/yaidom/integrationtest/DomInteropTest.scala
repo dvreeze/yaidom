@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package integrationtest
 
 import java.{ util => jutil, io => jio }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
@@ -30,7 +30,7 @@ import parse.DocumentParserUsingStax
 import print.DocumentPrinterUsingDom
 import QName._
 import ExpandedName._
-import DomConversions._
+import jinterop.DomConversions._
 
 /**
  * DOM interoperability test case.
