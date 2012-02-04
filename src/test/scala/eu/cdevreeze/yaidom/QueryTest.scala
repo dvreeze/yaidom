@@ -352,39 +352,14 @@ class QueryTest extends Suite {
   @Test def testQueryElementsWithParentNotBookOrBookstore() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
+    // TODO What we need is some index to parent nodes, e.g. from "path expressions" to parent nodes...
+
     require(bookstore.qname.localPart == "Bookstore")
 
     val elms: immutable.Seq[Elem] =
       for {
         desc <- bookstore.allElems
-        parent <- desc.findParentInTree(bookstore)
-        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
-      } yield desc
-
-    assert(elms.size > 10, "Expected more than 10 matching elements")
-    val qnames: Set[QName] = {
-      val result = elms map { _.qname }
-      result.toSet
-    }
-    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
-      qnames
-    }
-  }
-
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingIndex() {
-    // Again XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
-
-    // This time we use an index to the parent elements
-
-    require(bookstore.qname.localPart == "Bookstore")
-
-    val indexToParent: Map[jutil.UUID, Elem] = bookstore.getIndexToParentOnUuid
-
-    val elms: immutable.Seq[Elem] =
-      for {
-        desc <- bookstore.allElems
-        val parentOption = indexToParent.get(desc.uuid)
-        parent <- parentOption
+        parent <- desc.findParentInTree(bookstore) // Inefficient
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
 

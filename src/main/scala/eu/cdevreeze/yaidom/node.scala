@@ -47,9 +47,6 @@ import scala.collection.immutable
  */
 sealed trait Node extends Immutable {
 
-  /** The unique ID of the immutable Node (and its subtree). "Updates" result in new UUIDs. */
-  val uuid: jutil.UUID
-
   /**
    * Returns the AST (abstract syntax tree) as String, conforming to the DSL for NodeBuilders.
    *
@@ -91,9 +88,6 @@ final class Document(
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
-
-  /** The unique UUID of this Document. Note that UUID creation turns out to suffer from poor concurrency due to locking */
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def children: immutable.Seq[Node] =
     processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
@@ -175,6 +169,9 @@ final class Document(
  * The API is geared towards data-oriented XML that uses namespaces, and that is described in schemas (so that the user of this
  * API knows the structure of the XML being processed). The methods that return an Option say so in their name.
  *
+ * No notion of (value) equality has been defined. When thinking about it, it is very hard to come up with any useful
+ * notion of equality for Elems.
+ *
  * The constructor is private. See the apply factory method on the companion object, and its documentation.
  */
 final class Elem private (
@@ -187,9 +184,6 @@ final class Elem private (
   require(attributes ne null)
   require(scope ne null)
   require(children ne null)
-
-  /** The unique UUID of this Elem. Note that UUID creation turns out to suffer from poor concurrency due to locking */
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespace = None)
@@ -235,37 +229,6 @@ final class Elem private (
       self.withChildren(newChildren)
     }
   }
-
-  /** Computes an index on the UUID. Very inefficient. */
-  def getIndexOnUuid: Map[jutil.UUID, Elem] = {
-    val result = getIndex(e => e.uuid)
-    require {
-      result.values forall { elms => elms.size == 1 }
-    }
-    result mapValues { elms => elms(0) }
-  }
-
-  /**
-   * Computes an index to parent elements, on the UUID of the child elements. Very inefficient.
-   * After the index has been built, each element's parent can be obtained very quickly using this index.
-   */
-  def getIndexToParentOnUuid: Map[jutil.UUID, Elem] = {
-    val result = getIndexToParent(e => e.uuid)
-    require(!result.contains(self.uuid))
-    require {
-      result.values forall { elms => elms.size == 1 }
-    }
-    result mapValues { elms => elms(0) }
-  }
-
-  /** Equality based on the UUID. Fast but depends not only on the tree itself, but also the time of creation */
-  override def equals(other: Any): Boolean = other match {
-    case e: Elem => self.uuid == e.uuid
-    case _ => false
-  }
-
-  /** Hash code, consistent with equals */
-  override def hashCode: Int = uuid.hashCode
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
@@ -335,8 +298,6 @@ final case class Text(text: String, isCData: Boolean) extends Node with TextLike
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
 
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
-
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     if (isCData) {
       val result = "cdata(\"\"\"%s\"\"\")".format(text)
@@ -351,8 +312,6 @@ final case class Text(text: String, isCData: Boolean) extends Node with TextLike
 final case class ProcessingInstruction(target: String, data: String) extends Node {
   require(target ne null)
   require(data ne null)
-
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "processingInstruction(\"\"\"%s\"\"\", \"\"\"%s\"\"\")".format(target, data)
@@ -373,8 +332,6 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
 
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
-
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "entityRef(\"\"\"%s\"\"\")".format(entity)
     (" " * numberOfSpaces) + result
@@ -383,8 +340,6 @@ final case class EntityRef(entity: String) extends Node {
 
 final case class Comment(text: String) extends Node {
   require(text ne null)
-
-  override val uuid: jutil.UUID = jutil.UUID.randomUUID
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "comment(\"\"\"%s\"\"\")".format(text)

@@ -137,7 +137,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     root firstElemOrSelfOptionWhere { e => e.allChildElems exists { ch => ch == self } }
   }
 
-  /** Computes an index on the given function taking an element, for example a function returning a UUID */
+  /** Computes an index on the given function taking an element, for example a function returning some unique Elem "identifier" */
   final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = allElemsOrSelf groupBy f
 
   /** Computes an index to parent elements, on the given function applied to the child elements */

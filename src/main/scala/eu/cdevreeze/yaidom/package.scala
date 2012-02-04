@@ -53,9 +53,9 @@ package eu.cdevreeze
  * </ul>
  *
  * Compared to Java's standard DOM API, this API does not follow the DOM specifications (such as DOM level 2 Core),
- * so it contains far less functionality. For example, attribute types are absent, normalized text can not be obtained,
- * documents are poorly modeled, parent elements can not be obtained, etc. On the other hand, this API is
- * far more modern, and safe to use in a multi-threaded environment.
+ * so it contains far less functionality. For example, attribute types are absent, documents are poorly modeled,
+ * parent elements can not be obtained, etc. On the other hand, this API is far more modern, and safe to use
+ * in a multi-threaded environment.
  *
  * Compared to JDOM, which unlike the standard DOM API leverages idiomatic Java, this API in a similar vein attempts
  * to leverage idiomatic Scala. Immutability, Scala collection processing and Options instead of nulls are
