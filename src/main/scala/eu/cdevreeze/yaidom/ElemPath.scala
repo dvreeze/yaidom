@@ -16,7 +16,11 @@
 
 package eu.cdevreeze.yaidom
 
-/** Unique identification of a descendant ElemLike given a root ElemLike. */
+/**
+ * Unique identification of a descendant (or self) ElemLike given a root ElemLike.
+ * The ElemPath contains a List of path entries for a child element, grandchild element etc.,
+ * but the (root) element itself is referred to by an empty list of path entries.
+ */
 final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { self =>
 
   require(entries ne null)
@@ -25,7 +29,7 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
   def ::(idx: Int): ElemPath = ElemPath(ElemPath.Entry(idx) :: self.entries)
 
   /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
-  def tail: ElemPath = ElemPath(entries.tail)
+  def skipEntry: ElemPath = ElemPath(entries.tail)
 
   /**
    * Returns the corresponding XPath.

@@ -165,7 +165,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
         val newRoot = childElms(hd.index)
 
         // Recursive call. Not tail-recursive, but recursion depth should be limited.
-        newRoot.findWithElemPath(path.tail)
+        newRoot.findWithElemPath(path.skipEntry)
       }
   }
 
