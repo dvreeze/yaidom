@@ -33,12 +33,15 @@ import scala.collection.immutable
  * <li>first found descendant elements obeying a predicate, meaning that
  * they have no ancestors obeying that predicate</li>
  * </ul>
- * There are also attribute retrieval methods, and methods for indexing the element tree.
+ * In the method names, "elems" stands for descendant elements, and "first elems" stands for first found descendant
+ * elements as explained above.
+ *
+ * There are also attribute retrieval methods, and methods for indexing the element tree and finding subtrees.
  *
  * These element retrieval methods each have up to 3 variants (returning collections of elements):
  * <ol>
- * <li>A no argument variant, if applicable</li>
- * <li>A single <code>E => Boolean</code> predicate argument variant</li>
+ * <li>A no argument variant, if applicable (typically with prefix "all" in the method name)</li>
+ * <li>A single <code>E => Boolean</code> predicate argument variant (with suffix "where" in the method name)</li>
  * <li>An expanded name argument variant</li>
  * </ol>
  * The latter variant is implemented in terms of the single predicate argument variant.
@@ -132,7 +135,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the first found descendant element with the given expanded name, if any, wrapped in an Option */
   final def firstElemOption(expandedName: ExpandedName): Option[E] = firstElemOptionWhere { e => e.resolvedName == expandedName }
 
-  /** Finds the parent element, if any, searching in the tree with the given root element. Typically rather expensive. */
+  /**
+   * Finds the parent element, if any, searching in the tree with the given root element.
+   * The implementation uses the equals method on the self type, and uses no index. Typically rather expensive.
+   */
   final def findParentInTree(root: E): Option[E] = {
     root firstElemOrSelfOptionWhere { e => e.allChildElems exists { ch => ch == self } }
   }
@@ -144,6 +150,41 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def getIndexToParent[K](f: E => K): Map[K, immutable.Seq[E]] = {
     val parentChildPairs = allElemsOrSelf flatMap { e => e.allChildElems map { ch => (e -> ch) } }
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
+  }
+
+  /** Finds the element with the given ElemPath, if any, wrapped in an Option. */
+  final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
+    case Nil => Some(self)
+    case _ =>
+      val childElms = self.allChildElems
+
+      val hd = path.entries.head
+      val tl = path.entries.tail
+
+      if (hd.index >= childElms.size) None else {
+        val newRoot = childElms(hd.index)
+
+        // Recursive call. Not tail-recursive, but recursion depth should be limited.
+        newRoot.findWithElemPath(path.tail)
+      }
+  }
+
+  /** Computes the index on the ElemPath. Expensive operation. */
+  final def getIndexOnElemPath: Map[ElemPath, E] = {
+    Map(ElemPath.Root -> self) ++ {
+      // Recursive calls, but not tail-recursive. Recursion depth is typically limited, so that's ok.
+      val childIndexes: immutable.Seq[(ElemPath, E)] = self.allChildElems.zipWithIndex flatMap { pair =>
+        val e = pair._1
+        val idx = pair._2
+        val indexesOfChild: Map[ElemPath, E] = e.getIndexOnElemPath map { kv =>
+          val elmPath = kv._1
+          val elm = kv._2
+          ((idx :: elmPath) -> elm)
+        }
+        indexesOfChild
+      }
+      childIndexes.toMap
+    }
   }
 
   /** Returns a List of this element followed by all descendant elements */
