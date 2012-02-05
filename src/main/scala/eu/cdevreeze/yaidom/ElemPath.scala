@@ -32,7 +32,7 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
    */
   def toXPath: String = {
     val entryXPaths = entries map { entry => entry.toXPath }
-    "/" + entryXPaths.mkString("/")
+    "/" + "*" + entryXPaths.mkString
   }
 
   override def toString: String = toXPath
@@ -56,7 +56,7 @@ object ElemPath {
      * Returns the corresponding XPath. Example: <code>*[3]</code>.
      */
     def toXPath: String = {
-      "*[%d]".format(position)
+      "%s*[%d]".format("/", position)
     }
 
     override def toString: String = toXPath
