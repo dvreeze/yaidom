@@ -32,6 +32,21 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
   def skipEntry: ElemPath = ElemPath(entries.tail)
 
   /**
+   * Gets the parent path (if any, because the root path has no parent) wrapped in an Option.
+   *
+   * This method shows much of the reason why class ElemPath exists. If a tree of elements has been indexed on
+   * the ElemPaths, then given an element we know its ElemPath, and therefore its parent ElemPath (using this method),
+   * from which we can obtain the parent element by following the parent path from the root of the tree.
+   */
+  def parentPathOption: Option[ElemPath] = entries match {
+    case Nil => None
+    case _ => Some(ElemPath(entries.dropRight(1)))
+  }
+
+  /** Like parentPathOption, but unwrapping the result (or throwing an exception otherwise) */
+  def parentPath: ElemPath = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
+
+  /**
    * Returns the corresponding XPath.
    */
   def toXPath: String = {
