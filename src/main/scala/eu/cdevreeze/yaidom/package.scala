@@ -83,7 +83,7 @@ package eu.cdevreeze
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]. At the same level
  * is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.HasText]], containing common functions for "Element-like" classes.
+ * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]], containing common functions for "Element-like" classes.
  * Trait [[eu.cdevreeze.yaidom.TextLike]] is also at this level.</li>
  * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]] (which extends [[eu.cdevreeze.yaidom.ElemLike]])</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are

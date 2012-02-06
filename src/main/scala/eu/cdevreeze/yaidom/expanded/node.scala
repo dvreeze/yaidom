@@ -53,7 +53,7 @@ final class Document(
 final class Elem(
   override val resolvedName: ExpandedName,
   override val resolvedAttributes: Map[ExpandedName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText[Text] {
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with TextParentLike[Text] {
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)

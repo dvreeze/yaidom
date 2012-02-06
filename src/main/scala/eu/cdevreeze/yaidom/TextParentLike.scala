@@ -33,7 +33,7 @@ import scala.collection.immutable
  *
  * Typical element-like classes mix in this trait as well as [[eu.cdevreeze.yaidom.ElemLike]].
  */
-trait HasText[T <: TextLike] {
+trait TextParentLike[T <: TextLike] {
 
   /** Returns the text children (including CData), in the correct order */
   def textChildren: immutable.Seq[T]
