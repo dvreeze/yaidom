@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom
 package jinterop
 
 import java.{ util => jutil }
+import java.net.URI
 import javax.xml.XMLConstants
 import javax.xml.stream._
 import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
@@ -123,7 +124,13 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
     remainingEvents = remainingEvents.drop(1)
 
+    val baseUriOption: Option[URI] =
+      if ((startDocument.getSystemId eq null) || (startDocument.getSystemId == "")) None else {
+        Some(new URI(startDocument.getSystemId))
+      }
+
     val doc: Document = new Document(
+      baseUriOption = baseUriOption,
       documentElement = docElement,
       processingInstructions = pis.toIndexedSeq,
       comments = comments.toIndexedSeq)

@@ -152,7 +152,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
   }
 
-  /** Finds the element with the given ElemPath, if any, wrapped in an Option. */
+  /** Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option. */
   final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
     case Nil => Some(self)
     case _ =>
@@ -169,6 +169,9 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
       }
   }
 
+  // TODO Remove. This index gives us little. Consider (at Document level, so outside trait ElemLike)
+  // adding a "meta"-attribute to all Elems containing the ElemPath (compared to the root). We need Elem
+  // method addElemPaths for this purpose.
   /** Computes the index on the ElemPath. Expensive operation. */
   final def getIndexOnElemPath: Map[ElemPath, E] = {
     Map(ElemPath.Root -> self) ++ {

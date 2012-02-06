@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom
 package jinterop
 
 import java.{ util => jutil }
+import java.net.URI
 import javax.xml.XMLConstants
 import org.w3c.dom.{ Element, Attr, NamedNodeMap, NodeList }
 import scala.collection.JavaConverters._
@@ -31,7 +32,10 @@ import scala.collection.{ immutable, mutable }
 trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocument[org.w3c.dom.Document] {
 
   def convertToDocument(v: org.w3c.dom.Document): Document = {
+    val baseUriOption: Option[URI] = Option(v.getDocumentURI) map { uriString => new URI(uriString) }
+
     Document(
+      baseUriOption = baseUriOption,
       documentElement = convertToElem(v.getDocumentElement, Scope.Empty),
       processingInstructions =
         nodeListToIndexedSeq(v.getChildNodes) collect { case pi: org.w3c.dom.ProcessingInstruction => convertToProcessingInstruction(pi) },

@@ -43,6 +43,8 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
       val comments: immutable.Seq[org.w3c.dom.Comment] =
         document.comments map { com => convertComment(com, doc, doc) }
 
+      if (document.baseUriOption.isDefined) doc.setDocumentURI(document.baseUriOption.get.toString)
+
       doc
     }
   }

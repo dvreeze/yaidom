@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom
 package expanded
 
+import java.net.URI
 import scala.collection.immutable
 import eu.cdevreeze.yaidom
 
@@ -35,10 +36,12 @@ trait ParentNode extends Node {
 }
 
 final class Document(
+  val baseUriOption: Option[URI],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends ParentNode {
 
+  require(baseUriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -102,6 +105,7 @@ object Node {
 object Document {
 
   def fromNormalDocument(d: yaidom.Document): Document = new Document(
+    baseUriOption = d.baseUriOption,
     documentElement = Elem.fromNormalElem(d.documentElement),
     processingInstructions = d.processingInstructions map { pi => ProcessingInstruction.fromNormalProcessingInstruction(pi) },
     comments = d.comments map { c => Comment.fromNormalComment(c) })

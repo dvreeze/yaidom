@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.yaidom
 
+import java.net.URI
 import scala.collection.immutable
 
 /**
@@ -70,10 +71,12 @@ trait ParentNodeBuilder extends NodeBuilder {
 }
 
 final class DocumentBuilder(
+  val baseUriOption: Option[URI],
   val documentElement: ElemBuilder,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
   val comments: immutable.IndexedSeq[CommentBuilder]) extends ParentNodeBuilder { self =>
 
+  require(baseUriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -87,6 +90,7 @@ final class DocumentBuilder(
     require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
 
     Document(
+      baseUriOption = self.baseUriOption,
       documentElement.build(parentScope),
       processingInstructions map { pi => pi.build(parentScope) },
       comments map { c => c.build(parentScope) })
@@ -162,11 +166,16 @@ final case class CommentBuilder(text: String) extends NodeBuilder {
 object NodeBuilder {
 
   def document(
+    baseUriOption: Option[String],
     documentElement: ElemBuilder,
     processingInstructions: immutable.Seq[ProcessingInstructionBuilder],
     comments: immutable.Seq[CommentBuilder]): DocumentBuilder = {
 
-    new DocumentBuilder(documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
+    new DocumentBuilder(
+      baseUriOption map { uriString => new URI(uriString) },
+      documentElement,
+      processingInstructions.toIndexedSeq,
+      comments.toIndexedSeq)
   }
 
   def elem(
@@ -205,6 +214,7 @@ object NodeBuilder {
 
       // Recursive calls, but not tail-recursive
       new DocumentBuilder(
+        baseUriOption = d.baseUriOption,
         documentElement = fromNode(d.documentElement)(parentScope).asInstanceOf[ElemBuilder],
         processingInstructions = d.processingInstructions collect { case pi: ProcessingInstruction => fromNode(pi)(parentScope).asInstanceOf[ProcessingInstructionBuilder] },
         comments = d.comments collect { case c => fromNode(c)(parentScope).asInstanceOf[CommentBuilder] })

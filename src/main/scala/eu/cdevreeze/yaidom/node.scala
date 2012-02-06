@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom
 
 import java.{ util => jutil }
+import java.net.URI
 import scala.annotation.tailrec
 import scala.collection.immutable
 
@@ -81,10 +82,12 @@ trait ParentNode extends Node {
  * For example, there may be comments at top level, outside the document root.
  */
 final class Document(
+  val baseUriOption: Option[URI],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends ParentNode {
 
+  require(baseUriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -113,6 +116,7 @@ final class Document(
 
     val unshiftedFormatString =
       """|document(
+         |  baseUriOption = %s,
          |  documentElement =
          |%s,
          |  processingInstructions = List(
@@ -130,6 +134,9 @@ final class Document(
       }
       result.mkString("%n".format())
     }
+
+    val baseUriOptionString: String =
+      if (baseUriOption.isEmpty) "None" else """Some(%s%s%s)""".format("\"\"\"", baseUriOption.get.toString, "\"\"\"")
 
     val documentElementString: String = documentElement.toShiftedAstString(parentScope, numberOfSpaces + 4)
 
@@ -153,7 +160,8 @@ final class Document(
       resultString
     }
 
-    val result: String = formatString.format(documentElementString, pisString, commentsString)
+    val result: String = formatString.format(
+      baseUriOptionString, documentElementString, pisString, commentsString)
     result
   }
 }
@@ -350,11 +358,12 @@ final case class Comment(text: String) extends Node {
 object Document {
 
   def apply(
+    baseUriOption: Option[URI],
     documentElement: Elem,
     processingInstructions: immutable.Seq[ProcessingInstruction] = Nil,
     comments: immutable.Seq[Comment] = Nil): Document = {
 
-    new Document(documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
+    new Document(baseUriOption, documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
   }
 }
 

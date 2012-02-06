@@ -123,6 +123,7 @@ class DomInteropTest extends Suite {
     // 6. Print to XML and parse back, and check again
 
     val doc = new Document(
+      baseUriOption = None,
       documentElement = root3,
       processingInstructions = Nil.toIndexedSeq,
       comments = Nil.toIndexedSeq)

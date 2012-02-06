@@ -39,6 +39,15 @@ sealed trait Elem extends ElemLike[Elem] with Immutable {
   final override val allChildElems: immutable.Seq[Elem] = wrappedElem.allChildElems map { e => Elem(e) }
 }
 
+/** Document at the level of XLink awareness. */
+final class Document(
+  val baseUriOption: Option[URI],
+  val documentElement: Elem) extends Immutable {
+
+  require(baseUriOption ne null)
+  require(documentElement ne null)
+}
+
 /** XLink */
 trait XLink extends Elem {
   require(attributeOption(XLinkTypeExpandedName).isDefined, "Missing %s".format(XLinkTypeExpandedName))
@@ -117,6 +126,15 @@ final case class Resource(override val wrappedElem: eu.cdevreeze.yaidom.Elem) ex
 
 final case class Title(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
   require(xlinkType == "title")
+}
+
+object Document {
+
+  def apply(d: eu.cdevreeze.yaidom.Document): Document = {
+    val docElem = Elem(d.documentElement)
+
+    new Document(d.baseUriOption, docElem)
+  }
 }
 
 object Elem {
