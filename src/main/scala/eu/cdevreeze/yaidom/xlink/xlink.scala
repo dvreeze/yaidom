@@ -25,8 +25,8 @@ import XLink._
  * Elem at the level of XLink awareness. It is either an XLink or not. It wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
  *
  * When using the Elem and Document classes in this package, prefix them with the last part of the package name. So,
- * write <code>xlink.Elem/code> and <code>xlink.Document</code> instead of globally importing classes/traits in the
- * <code>xlink</code> package. This is analogous to the good practice of writing <code>immutable.Seq[T]</code> and
+ * write <code>xlink.Elem</code> and <code>xlink.Document</code> instead of globally importing classes/traits in the
+ * <code>xlink</code> package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
  * <code>mutable.Seq[T]</code> for Scala Collections.
  *
  * @author Chris de Vreeze

@@ -28,9 +28,9 @@ import eu.cdevreeze.yaidom
  * This prefix-less representation does have some shortcomings, though. For example,
  * QNames in text nodes cannot be resolved by scoping information in the element tree itself, etc.
  *
- * When using the Elem and Document classes in this package, prefix them with the last part of the package name. So,
- * write <code>expanded.Elem/code>, <code>expanded.Document</code> etc. instead of globally importing classes/traits in the
- * <code>expanded</code> package. This is analogous to the good practice of writing <code>immutable.Seq[T]</code> and
+ * When using the Node (sub)classes in this package, prefix them with the last part of the package name. So,
+ * write <code>expanded.Elem</code>, <code>expanded.Document</code> etc. instead of globally importing classes/traits in the
+ * <code>expanded</code> package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
  * <code>mutable.Seq[T]</code> for Scala Collections.
  */
 sealed trait Node extends Immutable
