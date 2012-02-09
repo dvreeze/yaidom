@@ -114,18 +114,28 @@ final class Document(
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
-    val unshiftedFormatString =
+    val newline = "%n".format()
+
+    val startFormatString =
       """|document(
          |  baseUriOption = %s,
          |  documentElement =
          |%s,
-         |  processingInstructions = List(
+         |""".stripMargin
+
+    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = List(%s),""" + newline else
+      """|  processingInstructions = List(
          |%s
          |  ),
-         |  comments = List(
+         |""".stripMargin
+
+    val commentsFormatString = if (comments.isEmpty) """  comments = List(%s)""" + newline else
+      """|  comments = List(
          |%s
          |  )
-         |)""".stripMargin
+         |""".stripMargin
+
+    val unshiftedFormatString = startFormatString + pisFormatString + commentsFormatString + ")"
 
     val formatString = {
       val result = unshiftedFormatString.lines.toList collect {
@@ -241,15 +251,22 @@ final class Elem private (
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
 
-    val unshiftedFormatString =
+    val newline = "%n".format()
+
+    val startFormatString =
       """|elem(
          |  qname = %s,
          |  attributes = %s,
          |  namespaces = %s,
-         |  children = List(
+         |""".stripMargin
+
+    val childrenFormatString = if (self.children.isEmpty) """  children = List(%s)""" + newline else
+      """|  children = List(
          |%s
          |  )
-         |)""".stripMargin
+         |""".stripMargin
+
+    val unshiftedFormatString = startFormatString + childrenFormatString + ")"
 
     val formatString = {
       val result = unshiftedFormatString.lines.toList collect {
