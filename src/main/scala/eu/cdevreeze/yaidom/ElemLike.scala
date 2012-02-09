@@ -169,27 +169,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
       }
   }
 
-  // TODO Remove. This index gives us little. Consider (at Document level, so outside trait ElemLike)
-  // adding a "meta"-attribute to all Elems containing the ElemPath (compared to the root). We need Elem
-  // method addElemPaths for this purpose.
-  /** Computes the index on the ElemPath. Expensive operation. */
-  final def getIndexOnElemPath: Map[ElemPath, E] = {
-    Map(ElemPath.Root -> self) ++ {
-      // Recursive calls, but not tail-recursive. Recursion depth is typically limited, so that's ok.
-      val childIndexes: immutable.Seq[(ElemPath, E)] = self.allChildElems.zipWithIndex flatMap { pair =>
-        val e = pair._1
-        val idx = pair._2
-        val indexesOfChild: Map[ElemPath, E] = e.getIndexOnElemPath map { kv =>
-          val elmPath = kv._1
-          val elm = kv._2
-          ((idx :: elmPath) -> elm)
-        }
-        indexesOfChild
-      }
-      childIndexes.toMap
-    }
-  }
-
   /** Returns a List of this element followed by all descendant elements */
   private final def allElemsOrSelfList: List[E] = {
     // Not tail-recursive, but the depth should typically be limited

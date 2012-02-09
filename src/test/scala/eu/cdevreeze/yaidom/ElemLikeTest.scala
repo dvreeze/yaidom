@@ -340,10 +340,8 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testGetIndexOnElemPath() {
+  @Test def testFindByElemPath() {
     require(bookstore.qname.localPart == "Bookstore")
-
-    val index: Map[ElemPath, Elem] = bookstore.getIndexOnElemPath
 
     expect(Some(bookstore)) {
       bookstore.findWithElemPath(ElemPath.Root)
@@ -354,14 +352,6 @@ class ElemLikeTest extends Suite {
     }
     expect(Some("Ullman")) {
       bookstore.findWithElemPath(ElemPath.fromIndexes(List(0, 1, 0, 1))) map { _.trimmedText }
-    }
-
-    assert {
-      index forall { kv =>
-        val path: ElemPath = kv._1
-        val elm: Elem = kv._2
-        bookstore.findWithElemPath(path) == Some(elm)
-      }
     }
   }
 
