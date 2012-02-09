@@ -22,8 +22,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import ExpandedName._
-import QName._
 
 /**
  * Test case for [[eu.cdevreeze.yaidom.XmlStringUtils]].

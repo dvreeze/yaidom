@@ -22,7 +22,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import QName._
 
 /**
  * QName test case.
@@ -86,8 +85,6 @@ class QNameTest extends Suite {
     expect(qname.hashCode) {
       qname4.hashCode
     }
-
-    import QName._
 
     val qname5 = "Bookstore".qname
 
@@ -187,8 +184,6 @@ class QNameTest extends Suite {
     expect(qname.hashCode) {
       qname4.hashCode
     }
-
-    import QName._
 
     val qname5 = "books:Bookstore".qname.asInstanceOf[PrefixedName]
 

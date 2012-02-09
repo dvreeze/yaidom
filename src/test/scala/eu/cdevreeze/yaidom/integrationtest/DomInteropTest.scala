@@ -28,8 +28,6 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingStax
 import print.DocumentPrinterUsingDom
-import QName._
-import ExpandedName._
 import jinterop.DomConversions._
 
 /**

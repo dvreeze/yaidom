@@ -94,4 +94,42 @@ package eu.cdevreeze
  *
  * @author Chris de Vreeze
  */
-package object yaidom
+package object yaidom {
+
+  /** "Implicit class" for converting a String to a QName */
+  final class ToParsedQName(val s: String) {
+    def qname: QName = QName.parse(s)
+  }
+
+  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into a QName */
+  implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
+
+  /** "Implicit class" for converting a String to an ExpandedName */
+  final class ToParsedExpandedName(val s: String) {
+    def ename: ExpandedName = ExpandedName.parse(s)
+  }
+
+  /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an ExpandedName */
+  implicit def toParsedExpandedName(s: String): ToParsedExpandedName = new ToParsedExpandedName(s)
+
+  /** Namespace. It offers a method to create an ExpandedName with that namespace from a given localPart */
+  final class Namespace(val ns: String) {
+    def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
+  }
+
+  /** "Implicit class" for converting a String to a Namespace */
+  final class ToNamespace(val s: String) {
+    def ns: Namespace = new Namespace(s)
+  }
+
+  /** Implicit conversion enriching a String with a <code>ns</code> method that turns the String into a Namespace */
+  implicit def toNamespace(s: String): ToNamespace = new ToNamespace(s)
+
+  /** "Implicit class" for converting a Map[String, String] to a Scope.Declarations */
+  final class ToNamespaces(val m: Map[String, String]) {
+    def namespaces: Scope.Declarations = Scope.Declarations.fromMap(m)
+  }
+
+  /** Implicit conversion enriching a Map[String, String] with a <code>namespaces</code> method that turns the Map into a Scope.Declarations */
+  implicit def toNamespaces(m: Map[String, String]): ToNamespaces = new ToNamespaces(m)
+}

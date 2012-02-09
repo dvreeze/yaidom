@@ -81,12 +81,4 @@ object QName {
       case _ => sys.error("Did not expect more than 1 colon in QName '%s'".format(s))
     }
   }
-
-  /** "Implicit class" for converting a String to a QName */
-  final class ToParsedQName(val s: String) {
-    def qname: QName = QName.parse(s)
-  }
-
-  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into a QName */
-  implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
 }

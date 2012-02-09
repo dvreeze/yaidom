@@ -86,25 +86,4 @@ object ExpandedName {
       require(s.indexOf("}") < 0)
       ExpandedName(s)
   }
-
-  /** "Implicit class" for converting a String to an ExpandedName */
-  final class ToParsedExpandedName(val s: String) {
-    def ename: ExpandedName = ExpandedName.parse(s)
-  }
-
-  /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an ExpandedName */
-  implicit def toParsedExpandedName(s: String): ToParsedExpandedName = new ToParsedExpandedName(s)
-
-  /** Namespace. It offers a method to create an ExpandedName with that namespace from a given localPart */
-  final class Namespace(val ns: String) {
-    def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
-  }
-
-  /** "Implicit class" for converting a String to a Namespace */
-  final class ToNamespace(val s: String) {
-    def ns: Namespace = new Namespace(s)
-  }
-
-  /** Implicit conversion enriching a String with a <code>ns</code> method that turns the String into a Namespace */
-  implicit def toNamespace(s: String): ToNamespace = new ToNamespace(s)
 }
