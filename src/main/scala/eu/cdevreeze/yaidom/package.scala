@@ -17,64 +17,77 @@
 package eu.cdevreeze
 
 /**
- * Yet another immutable DOM-like API. This is not W3C DOM, not even close. Instead, this is
- * a DOM-like API optimized for Scala. Foremost, that means that this API is centered around
- * Scala Collections of nodes. Below, when mentioning DOM trees, the DOM-like trees of this
- * API are meant, not W3C DOM trees, unless mentioned otherwise.
+ * Yet another immutable DOM-like API. Hence the name <em>yaidom</em>. This is not an implementation of W3C DOM.
+ * Instead, this is a Scala-ish DOM-like API. Foremost, that means that this API is centered around
+ * Scala Collections of immutable nodes.
  *
  * By design, some characteristics of this API are:
  * <ul>
- * <li>The DOM trees of this API are <em>immutable</em> and <em>thread-safe</em>.
- * This facilitates safe multi-threaded processing of these trees.</li>
+ * <li>The DOM-like trees of this API are (deeply) <em>immutable</em> and therefore <em>thread-safe</em>.
+ * This facilitates safe multi-threaded querying of these trees.</li>
  * <li>This API leverages the highly <em>expressive</em> <em>Scala Collections API</em>.
- * Querying DOM trees is easy to achieve using Scala <code>for</code> comprehensions,
- * using immutable Scala collections. It should even be attractive to use this API instead of
- * XPath, XSLT and/or XQuery, at the cost of slightly more verbosity and loss of (schema) typing information.</li>
+ * Querying yaidom trees is easy to achieve using Scala <code>for</code> comprehensions,
+ * manipulating immutable Scala collections. It should often even be attractive to use this API instead of
+ * XPath, XSLT and/or XQuery, at the cost of somewhat more verbosity and loss of (schema) typing information.</li>
+ * <li>Yaidom supports <em>multiple implementations</em> of nodes. In this package, the default implementation of nodes
+ * (and elements, documents, texts etc.) are offered. Yet in the <code>xlink</code> sub-package nodes with XLink-awareness are
+ * offered. In the <code>expanded</code> sub-package prefixes are removed. To support these and other node implementations,
+ * this package offers some traits that provide partial implementations. Typical "element node" implementations mix in
+ * traits <code>ElemLike</code> and <code>TextParentLike</code>, and typical "text node" implementations mix in trait
+ * <code>TextLike</code>.</li>
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
- * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts, this API
- * can hide several XML complexities behind their implementations. It does give this API a somewhat "strict"
- * or "precise" appearance.</li>
- * <li>This API aims at being easy to use for data-oriented XML with a known structure (typically described
- * by an XSD), and known namespaces. It is not geared towards XML that freely mixes text and tags.</li>
- * <li>This API has good interop with standard Java XML APIs (JAXP).</li>
+ * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts as classes, this API
+ * can hide some XML complexities (like predefined namespaces) behind the implementations of these classes. These concepts
+ * are even so prominent in yaidom that yaidom may feel a bit "static" and "sober".</li>
+ * <li>This API is easier to use for data-oriented XML with a known structure (defined in an XSD) than for free format XML.
+ * Namespaces are first-class citizens in yaidom. DTDs are not (but DTDs do not understand namespaces anyway).</li>
+ * <li>This API has good interop with standard Java XML APIs (JAXP). Printing and parsing XML are delegated to JAXP.</li>
  * </ul>
  *
  * Some limitations of this API are:
  * <ul>
  * <li>This API does not have a low memory footprint.</li>
- * <li>This API does not try to solve all problems. Sometimes SAX, StAX or DOM is better.
- * In particular, immutability (using strict evaluation) has some drawbacks too, such as the elements not keeping a reference
- * to the parent element, or the missing convenience of in-place updates. Furthermore, this API is not meant to offer XPath
- * support (arguably, it does not need it).</li>
- * <li>This API is not meant to follow the W3C DOM standards. As a consequence, it is also far less complete, and
- * less "correct".</li>
- * <li>DTDs are not first-class citizens in this API. DTDs are awkward anyway for describing XML that uses namespaces
- * (see for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm).</li>
+ * <li>Yaidom has no XPath(-like) support. The API does not unify nodes with (singleton) collections of nodes.
+ * That makes code using yaidom more verbose than XPath(-like) code found in APIs like Scala's XML library or
+ * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
+ * <li>Besides not offering any XPath(-like) support, yaidom is not very ambitious in other ways as well. For example,
+ * yaidom offers no XML literals (but does offer a more verbose DSL for building XML). As another example, yaidom
+ * does not simplify printing/parsing of XML.</li>
+ * <li>Yaidom deals only with XML, not with HTML.</li>
+ * <li>Immutability (using strict evaluation) has some drawbacks too, such as the elements not keeping a reference
+ * to the parent element, or the missing convenience of in-place updates.</li>
+ * <li>This API is not meant to follow the W3C DOM standards. Instead, it is about leveraging Scala to query and transform
+ * immutable XML trees.</li>
+ * <li>DTDs are not explicitly supported in this API. DTDs are awkward anyway for describing XML that uses namespaces
+ * (see for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm). Related to not supporting DTDs is the
+ * absence of attribute types in yaidom (only the attribute value can be obtained).</li>
+ * <li>Compared to commonly used DOM APIs, such as Java's standard DOM API, JDOM and XOM, besides the limitations
+ * mentioned above, other features are missing as well, such as rich support for base URIs.</li>
  * </ul>
  *
- * Compared to Java's standard DOM API, this API does not follow the DOM specifications (such as DOM level 2 Core),
- * so it contains far less functionality. For example, attribute types are absent, documents are poorly modeled,
- * parent elements can not be obtained, etc. On the other hand, this API is far more modern, and safe to use
- * in a multi-threaded environment.
+ * To some extent, yaidom is a Scala-ish DOM-like API much like JDOM is a Java-ish DOM API. Yaidom is Scala-ish in the
+ * pervasive use of immutable Scala collections, and the use of Options over nulls.
  *
- * Compared to JDOM, which unlike the standard DOM API leverages idiomatic Java, this API in a similar vein attempts
- * to leverage idiomatic Scala. Immutability, Scala collection processing and Options instead of nulls are
- * characteristic of this API. Like is the case for DOM, JDOM has more far more functionality than this API.
+ * Yaidom has been inspired by Anti-XML. The Anti-XML library tackles some weaknesses of Scala's standard XML API, w.r.t.
+ * robustness, ease of use and performance. Yaidom tries to achieve the same, except that it is less ambitious, foremost
+ * in not offering any XPath(-like) support. Robustness comes from Scala's Collections API. Ease of use in yaidom's case
+ * means more verbosity than Anti-XML, but it also means code that is trivial to understand and reason about.
+ * Performance comes from Scala's Collections API.
  *
- * XOM is another idiomatic Java XML API. It focuses on correctness, among other things. To check yaidom for correctness,
- * it makes sense to compare the yaidom API against XOM. Unlike yaidom Nodes, XOM Nodes are mutable. Like Java's standard
- * DOM API, XOM is far more complete than yaidom (even sporting XPath support). Also note that yaidom does not support
- * base URIs.
- *
- * Like Scala's standard XML API, this API is centered around immutable XML trees. Again, this API is far less
- * ambitious. For one, XPath-like syntax is not offered. That has some advantages too, like a much simpler and more
- * straightforward implementation. This API does not need Scala XML's NodeSeq (where Node is NodeSeq, which is Seq[Node]).
- * Moreover, whereas Scala's XML API dates from before Scala 2.8, this API leverages Scala's 2.8+ Collections API.
- *
- * The Anti-XML library tackles some weaknesses of Scala's standard XML API, w.r.t. robustness, ease of use and performance.
- * It is mostly the Anti-XML API that inspired this API. Unlike Anti-XML this API does not offer XPath-like syntax, which
- * made this API very simple to implement (and understand), at the cost of moderate verbosity. Again, this API is less
- * ambitious.
+ * This package contains the following parts:
+ * <ol>
+ * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.ExpandedName]] and
+ * [[eu.cdevreeze.yaidom.Scope]].</li>
+ * <li>Traits for partial implementations of DOM-like trees, such as [[eu.cdevreeze.yaidom.ElemLike]] and
+ * [[eu.cdevreeze.yaidom.TextParentLike]] (for "element nodes"), and [[eu.cdevreeze.yaidom.TextLike]] (for "text nodes").</li>
+ * <li>The default "node implementation", as trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
+ * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned traits for "element nodes").</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
+ * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of Scopes,
+ * whereas the Nodes that they create all must have a fixed Scope, so node builders are indeed intended to be handy for creation
+ * of node trees.</li>
+ * <li>Contracts (as traits) for conversions from and to Documents or Elems</li>
+ * </ol>
  *
  * The dependencies in this package are as follows, from bottom to top:
  * <ol>
@@ -83,14 +96,23 @@ package eu.cdevreeze
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]. At the same level
  * is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]], containing common functions for "Element-like" classes.
+ * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]].
  * Trait [[eu.cdevreeze.yaidom.TextLike]] is also at this level.</li>
- * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]] (which extends [[eu.cdevreeze.yaidom.ElemLike]])</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
  * [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
  * </ol>
  * Dependencies are all uni-directional, from top to bottom. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
+ *
+ * In this package are some ("explicit" and therefore safe) implicit conversions, for treating strings as QNames,
+ * ExpandedNames, namespaces etc.
+ *
+ * Parsing and printing of XML is not handled in this package. Even the <code>toString</code> methods for nodes
+ * use the NodeBuilder DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
+ * "ignorable whitespace" etc. are not handled in this package. Parsing and printing of XML are offered by the
+ * <code>parse</code> and <code>print</code> subpackages, which depend on the <code>jinterop</code> subpackage.
+ * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
  *
  * @author Chris de Vreeze
  */
