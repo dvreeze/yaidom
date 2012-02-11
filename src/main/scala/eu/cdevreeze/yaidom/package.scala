@@ -38,7 +38,7 @@ package eu.cdevreeze
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts as classes, this API
  * can hide some XML complexities (like predefined namespaces) behind the implementations of these classes. These concepts
- * are even so prominent in yaidom that yaidom may feel a bit "static" and "sober".</li>
+ * are even so prominent in yaidom that yaidom may feel a bit "static" and somewhat verbose.</li>
  * <li>This API is easier to use for data-oriented XML with a known structure (defined in an XSD) than for free format XML.
  * Namespaces are first-class citizens in yaidom. DTDs are not (but DTDs do not understand namespaces anyway).</li>
  * <li>This API has good interop with standard Java XML APIs (JAXP). Printing and parsing XML are delegated to JAXP.</li>
@@ -52,7 +52,7 @@ package eu.cdevreeze
  * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
  * <li>Besides not offering any XPath(-like) support, yaidom is not very ambitious in other ways as well. For example,
  * yaidom offers no XML literals (but does offer a more verbose DSL for building XML). As another example, yaidom
- * does not simplify printing/parsing of XML.</li>
+ * does not simplify printing/parsing of XML. The upside is that yaidom has a very good power-to-weight ratio.</li>
  * <li>Yaidom deals only with XML, not with HTML.</li>
  * <li>Immutability (using strict evaluation) has some drawbacks too, such as the elements not keeping a reference
  * to the parent element, or the missing convenience of in-place updates.</li>
