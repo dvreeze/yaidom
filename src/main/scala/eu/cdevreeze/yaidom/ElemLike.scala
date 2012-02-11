@@ -156,13 +156,13 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
     case Nil => Some(self)
     case _ =>
-      val childElms = self.allChildElems
-
       val hd = path.entries.head
       val tl = path.entries.tail
 
-      if (hd.index >= childElms.size) None else {
-        val newRoot = childElms(hd.index)
+      val relevantChildElms = self.childElems(hd.elementName)
+
+      if (hd.index >= relevantChildElms.size) None else {
+        val newRoot = relevantChildElms(hd.index)
 
         // Recursive call. Not tail-recursive, but recursion depth should be limited.
         newRoot.findWithElemPath(path.skipEntry)

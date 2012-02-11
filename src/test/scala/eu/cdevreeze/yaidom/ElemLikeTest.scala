@@ -348,10 +348,20 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Some("Last_Name".qname)) {
-      bookstore.findWithElemPath(ElemPath.fromIndexes(List(0, 1, 0, 1))) map { _.qname }
+      val path = ElemPath(List(
+        ElemPath.Entry(ns.ns.ename("Book"), 0),
+        ElemPath.Entry(ns.ns.ename("Authors"), 0),
+        ElemPath.Entry(ns.ns.ename("Author"), 0),
+        ElemPath.Entry(ns.ns.ename("Last_Name"), 0)))
+      bookstore.findWithElemPath(path) map { _.qname }
     }
     expect(Some("Ullman")) {
-      bookstore.findWithElemPath(ElemPath.fromIndexes(List(0, 1, 0, 1))) map { _.trimmedText }
+      val path = ElemPath(List(
+        ElemPath.Entry(ns.ns.ename("Book"), 0),
+        ElemPath.Entry(ns.ns.ename("Authors"), 0),
+        ElemPath.Entry(ns.ns.ename("Author"), 0),
+        ElemPath.Entry(ns.ns.ename("Last_Name"), 0)))
+      bookstore.findWithElemPath(path) map { _.trimmedText }
     }
   }
 

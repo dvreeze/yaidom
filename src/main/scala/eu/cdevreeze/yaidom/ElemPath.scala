@@ -17,16 +17,22 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Unique identification of a descendant (or self) ElemLike given a root ElemLike.
- * The ElemPath contains a List of path entries for a child element, grandchild element etc.,
+ * Unique identification of a descendant (or self) ElemLike given a root ElemLike. It is used for transformations
+ * from one node tree to another collection of nodes.
+ *
+ * The ElemPath contains a List of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
+ *
+ * Strictly speaking, each element in a tree would be uniquely identified by path entries that only contained
+ * a child index instead of an element name plus child index (of children with the given name). Yet that would
+ * be far less easy to use. Hence ElemPath.Entry instances each contain an element name plus index.
  */
 final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { self =>
 
   require(entries ne null)
 
-  /** Prepends an Entry with the given index to this ElemPath */
-  def ::(idx: Int): ElemPath = ElemPath(ElemPath.Entry(idx) :: self.entries)
+  /** Prepends a given Entry to this ElemPath */
+  def ::(entry: ElemPath.Entry): ElemPath = ElemPath(entry :: self.entries)
 
   /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
   def skipEntry: ElemPath = ElemPath(entries.tail)
@@ -47,37 +53,36 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
   def parentPath: ElemPath = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
 
   /**
-   * Returns the corresponding XPath.
+   * Returns the corresponding pseudo-XPath.
    */
-  def toXPath: String = {
-    val entryXPaths = entries map { entry => entry.toXPath }
-    "/" + "*" + entryXPaths.mkString
+  def toPseudoXPath: String = {
+    val entryPseudoXPaths = entries map { entry => entry.toPseudoXPath }
+    "/" + "*" + entryPseudoXPaths.mkString
   }
 
-  override def toString: String = toXPath
+  override def toString: String = toPseudoXPath
 }
 
 object ElemPath {
 
   val Root: ElemPath = ElemPath(Nil)
 
-  def fromIndexes(indexes: List[Int]): ElemPath = ElemPath(indexes map { idx => ElemPath.Entry(idx) })
+  /** An entry in an ElemPath, as an expanded element name plus zero-based index of the elem as child (with that name) of the parent. */
+  final case class Entry(elementName: ExpandedName, index: Int) extends Immutable {
 
-  /** An entry in an ElemPath, as a zero-based index of the elem as child of the parent. */
-  final case class Entry(index: Int) extends Immutable {
-
+    require(elementName ne null)
     require(index >= 0)
 
     /** Position (1-based) of the elem as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
     /**
-     * Returns the corresponding XPath. Example: <code>*[3]</code>.
+     * Returns the corresponding pseudo-XPath. Example: <code>*[3]</code>.
      */
-    def toXPath: String = {
-      "%s*[%d]".format("/", position)
+    def toPseudoXPath: String = {
+      "%s%s[%d]".format("/", elementName.toString, position)
     }
 
-    override def toString: String = toXPath
+    override def toString: String = toPseudoXPath
   }
 }
