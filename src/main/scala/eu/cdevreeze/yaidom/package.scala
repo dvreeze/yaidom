@@ -29,12 +29,12 @@ package eu.cdevreeze
  * Querying yaidom trees is easy to achieve using Scala <code>for</code> comprehensions,
  * manipulating immutable Scala collections. It should often even be attractive to use this API instead of
  * XPath, XSLT and/or XQuery, at the cost of somewhat more verbosity and loss of (schema) typing information.</li>
- * <li>Yaidom supports <em>multiple implementations</em> of nodes. In this package, the default implementation of nodes
- * (and elements, documents, texts etc.) are offered. Yet in the <code>xlink</code> sub-package nodes with XLink-awareness are
- * offered. In the <code>expanded</code> sub-package prefixes are removed. To support these and other node implementations,
+ * <li>Yaidom supports <em>multiple implementations</em> of nodes. In this package, the default implementations of nodes
+ * (and elements, documents, texts etc.) are offered. Yet in the [[eu.cdevreeze.yaidom.xlink]] sub-package nodes with XLink-awareness are
+ * offered. In the [[eu.cdevreeze.yaidom.expanded]] sub-package elements contain no prefixes. To support these and other node implementations,
  * this package offers some traits that provide partial implementations. Typical "element node" implementations mix in
- * traits <code>ElemLike</code> and <code>TextParentLike</code>, and typical "text node" implementations mix in trait
- * <code>TextLike</code>.</li>
+ * traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]], and typical "text node" implementations mix in trait
+ * [[eu.cdevreeze.yaidom.TextLike]].</li>
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts as classes, this API
  * can hide some XML complexities (like predefined namespaces) behind the implementations of these classes. These concepts
@@ -47,7 +47,7 @@ package eu.cdevreeze
  * Some limitations of this API are:
  * <ul>
  * <li>This API does not have a low memory footprint.</li>
- * <li>Yaidom has no XPath(-like) support. The API does not unify nodes with (singleton) collections of nodes.
+ * <li>Yaidom has no XPath(-like) support. The API does not unify nodes with sequences of nodes.
  * That makes code using yaidom more verbose than XPath(-like) code found in APIs like Scala's XML library or
  * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
  * <li>Besides not offering any XPath(-like) support, yaidom is not very ambitious in other ways as well. For example,
@@ -59,7 +59,7 @@ package eu.cdevreeze
  * <li>This API is not meant to follow the W3C DOM standards. Instead, it is about leveraging Scala to query and transform
  * immutable XML trees.</li>
  * <li>DTDs are not explicitly supported in this API. DTDs are awkward anyway for describing XML that uses namespaces
- * (see for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm). Related to not supporting DTDs is the
+ * (see for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm). Related to this is the
  * absence of attribute types in yaidom (only the attribute value can be obtained).</li>
  * <li>Compared to commonly used DOM APIs, such as Java's standard DOM API, JDOM and XOM, besides the limitations
  * mentioned above, other features are missing as well, such as rich support for base URIs.</li>
@@ -102,7 +102,7 @@ package eu.cdevreeze
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
  * [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
  * </ol>
- * Dependencies are all uni-directional, from top to bottom. All types in this package are (deeply) immutable.
+ * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
  * In this package are some ("explicit" and therefore safe) implicit conversions, for treating strings as QNames,
@@ -111,30 +111,30 @@ package eu.cdevreeze
  * Parsing and printing of XML is not handled in this package. Even the <code>toString</code> methods for nodes
  * use the NodeBuilder DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
  * "ignorable whitespace" etc. are not handled in this package. Parsing and printing of XML are offered by the
- * <code>parse</code> and <code>print</code> subpackages, which depend on the <code>jinterop</code> subpackage.
+ * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.jinterop]] subpackage.
  * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
  *
  * @author Chris de Vreeze
  */
 package object yaidom {
 
-  /** "Implicit class" for converting a String to a QName */
+  /** "Implicit class" for converting a String to a [[eu.cdevreeze.yaidom.QName]] */
   final class ToParsedQName(val s: String) {
     def qname: QName = QName.parse(s)
   }
 
-  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into a QName */
+  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into a [[eu.cdevreeze.yaidom.QName]] */
   implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
 
-  /** "Implicit class" for converting a String to an ExpandedName */
+  /** "Implicit class" for converting a String to an [[eu.cdevreeze.yaidom.ExpandedName]] */
   final class ToParsedExpandedName(val s: String) {
     def ename: ExpandedName = ExpandedName.parse(s)
   }
 
-  /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an ExpandedName */
+  /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an [[eu.cdevreeze.yaidom.ExpandedName]] */
   implicit def toParsedExpandedName(s: String): ToParsedExpandedName = new ToParsedExpandedName(s)
 
-  /** Namespace. It offers a method to create an ExpandedName with that namespace from a given localPart */
+  /** Namespace. It offers a method to create an [[eu.cdevreeze.yaidom.ExpandedName]] with that namespace from a given localPart */
   final class Namespace(val ns: String) {
     def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
   }
@@ -147,11 +147,11 @@ package object yaidom {
   /** Implicit conversion enriching a String with a <code>ns</code> method that turns the String into a Namespace */
   implicit def toNamespace(s: String): ToNamespace = new ToNamespace(s)
 
-  /** "Implicit class" for converting a Map[String, String] to a Scope.Declarations */
+  /** "Implicit class" for converting a Map[String, String] to a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
   final class ToNamespaces(val m: Map[String, String]) {
     def namespaces: Scope.Declarations = Scope.Declarations.fromMap(m)
   }
 
-  /** Implicit conversion enriching a Map[String, String] with a <code>namespaces</code> method that turns the Map into a Scope.Declarations */
+  /** Implicit conversion enriching a Map[String, String] with a <code>namespaces</code> method that turns the Map into a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
   implicit def toNamespaces(m: Map[String, String]): ToNamespaces = new ToNamespaces(m)
 }

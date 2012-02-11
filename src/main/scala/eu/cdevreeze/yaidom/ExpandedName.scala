@@ -73,7 +73,7 @@ object ExpandedName {
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
 
-  /** Parses a String into an ExpandedName. The String must conform to the <b>toString</b> format of an ExpandedName */
+  /** Parses a String into an ExpandedName. The String must conform to the <code>toString</code> format of an ExpandedName */
   def parse(s: String): ExpandedName = s match {
     case s if s.startsWith("{") =>
       val idx = s indexWhere { c => c == '}' }

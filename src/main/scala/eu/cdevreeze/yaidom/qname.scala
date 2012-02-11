@@ -54,7 +54,7 @@ final case class PrefixedName(prefix: String, override val localPart: String) ex
 
   override def prefixOption: Option[String] = Some(prefix)
 
-  /** The String representation as it appears in XML E.g. <b>xs:schema</b> */
+  /** The String representation as it appears in XML. For example, <code>xs:schema</code> */
   override def toString: String = "%s:%s".format(prefix, localPart)
 }
 
@@ -70,7 +70,7 @@ object QName {
   /** Creates an UnprefixedName from a localPart */
   def apply(localPart: String): QName = UnprefixedName(localPart)
 
-  /** Parses a String into a QName. The String must conform to the <b>toString</b> format of a PrefixedName or UnprefixedName */
+  /** Parses a String into a QName. The String must conform to the <code>toString</code> format of a PrefixedName or UnprefixedName */
   def parse(s: String): QName = {
     val arr = s.split(':')
     require(arr.size <= 2, "Expected at most 1 colon in QName '%s'".format(s))

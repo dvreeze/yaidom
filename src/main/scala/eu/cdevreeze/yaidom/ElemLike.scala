@@ -73,7 +73,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns all child elements, in the correct order */
   def allChildElems: immutable.Seq[E]
 
-  /** Returns the value of the attribute with the given expanded name, if any, and None otherwise */
+  /** Returns the value of the attribute with the given expanded name, if any, wrapped in an Option */
   final def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
 
   /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
@@ -85,7 +85,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the child elements with the given expanded name */
   final def childElems(expandedName: ExpandedName): immutable.Seq[E] = childElemsWhere { e => e.resolvedName == expandedName }
 
-  /** Returns the single child element with the given expanded name, if any, and None otherwise */
+  /** Returns the single child element with the given expanded name, if any, wrapped in an Option */
   final def childElemOption(expandedName: ExpandedName): Option[E] = {
     val result = childElems(expandedName)
     require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
@@ -108,7 +108,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    */
   final def elemsOrSelfWhere(p: E => Boolean): immutable.Seq[E] = elemsOrSelfListWhere(p).toIndexedSeq
 
-  /** Returns those of this element and its descendant elements that have the given expanded name */
+  /** Returns those elements among this element and its descendant elements that have the given expanded name */
   final def elemsOrSelf(expandedName: ExpandedName): immutable.Seq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
 
   /** Returns all descendant elements (not including this element). Same as <code>allElemsOrSelf.drop(1)</code> */

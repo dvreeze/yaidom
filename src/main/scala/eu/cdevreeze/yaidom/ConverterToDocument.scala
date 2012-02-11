@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Converter from T (which can be anything) to Document.
+ * Converter from T (which can be anything) to [[eu.cdevreeze.yaidom.Document]].
  *
  * @author Chris de Vreeze
  */

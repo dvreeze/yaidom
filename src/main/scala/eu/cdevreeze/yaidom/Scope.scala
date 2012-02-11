@@ -20,7 +20,7 @@ package eu.cdevreeze.yaidom
  * Scope mapping prefixes to namespace URIs, as well as holding an optional default
  * namespace.
  *
- * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve a [[eu.cdevreeze.yaidom.QName]] as [[eu.cdevreeze.yaidom.ExpandedName]].
+ * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.ExpandedName]]s.
  *
  * @author Chris de Vreeze
  */

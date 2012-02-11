@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Converter from Elem to T (which can be anything, such as a DOM Element).
+ * Converter from [[eu.cdevreeze.yaidom.Elem]] to T (which can be anything, such as a DOM Element).
  *
  * @author Chris de Vreeze
  */

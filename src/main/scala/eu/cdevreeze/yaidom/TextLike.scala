@@ -28,7 +28,9 @@ trait TextLike {
 
   def text: String
 
+  /** Returns <code>text.trim</code>. */
   final def trimmedText: String = text.trim
 
+  /** Returns <code>XmlStringUtils.normalizeString(text)</code>. */
   final def normalizedText: String = XmlStringUtils.normalizeString(text)
 }

@@ -33,15 +33,13 @@ import scala.collection.immutable
  * Unlike Anti-XML:
  * <ul>
  * <li>This is just a DOM-like API, around immutable Nodes and immutable Scala Collections of Nodes,
- * without any XPath support. Despite the absence of selectors like those in Anti-XML, this DOM-like API
- * is still quite expressive, be it with somewhat verbose method names. This API is also simpler
- * in that CanBuildFrom "axioms" are absent, and implicit conversions are rare and rather "explicit" and therefore safe.
- * It is more verbose in that many ("DOM-like") convenience methods are offered.</li>
- * <li>This API distinguishes between QNames and ExpandedNames, making both first-class citizens in the API.
- * Moreover, Scopes are first-class citizens as well. By explicitly modeling QNames, ExpandedNames and Scopes,
- * the user of the API is somewhat shielded from some XML quirks.</li>
- * <li>This API is less ambitious. Like said above, XPath support is absent. So is support for "updates" through
- * zippers. So is true equality based on the exact tree. It is currently also less mature, and less well tested.</li>
+ * without any XPath(-like) support. Despite the absence of selectors like those in Anti-XML, this DOM-like API
+ * is still quite expressive, be it somewhat more verbose.</li>
+ * <li>This API distinguishes between [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.ExpandedName]], making both
+ * first-class citizens in the API. Moreover, the concept of a [[eu.cdevreeze.yaidom.Scope]] is a first-class citizen as well.
+ * By explicitly modeling QNames, ExpandedNames and Scopes, the user of the API is somewhat shielded from some XML quirks.</li>
+ * <li>This API is less ambitious. Like said above, XPath(-like) support is absent. So is support for "updates" through
+ * zippers. So is "true" equality based on the exact tree.</li>
  * </ul>
  *
  * @author Chris de Vreeze
@@ -55,13 +53,13 @@ sealed trait Node extends Immutable {
    * <ul>
    * <li>The AST is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
    * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
-   * <li>Relatively low runtime costs</li>
+   * <li>Lower runtime costs</li>
    * <li>The output of method toAstString is itself Scala ("NodeBuilder") DSL code (for instance useful in REPL or unit tests)</li>
    * </ul>
    */
   final def toAstString(parentScope: Scope): String = toShiftedAstString(parentScope, 0)
 
-  /** Same as toAstString(Scope.Empty) */
+  /** Same as toAstString(emptyScope) */
   final def toAstString: String = toAstString(Scope.Empty)
 
   /** Same as toAstString(parentScope), but shifted numberOrSpaces to the right. Used for implementing toAstString(parentScope). */
@@ -78,8 +76,8 @@ trait ParentNode extends Node {
 }
 
 /**
- * Document node. Although the document element seems to be the root node, this is not entirely true.
- * For example, there may be comments at top level, outside the document root.
+ * Document node. Although at first sight the document root element seems to be the root node, this is not entirely true.
+ * For example, there may be comments at top level, outside the document root element.
  */
 final class Document(
   val baseUriOption: Option[URI],
@@ -177,18 +175,24 @@ final class Document(
 }
 
 /**
- * Element node. An Elem consists of a QName of the element, the attributes mapping attribute QNames to String values,
- * a Scope mapping prefixes to namespace URIs, and an immutable collection of child Nodes. The element QName and attribute
- * QNames must be in scope, according to the passed Scope. The Scope is absolute, typically containing a lot more than
- * the (implicit) Scope.Declarations of this element.
+ * Element node. An [[eu.cdevreeze.yaidom.Elem]] contains:
+ * <ol>
+ * <li>the [[eu.cdevreeze.yaidom.QName]] of the element</li>
+ * <li>the attributes of the element, mapping attribute [[eu.cdevreeze.yaidom.QName]]s to String values</li>
+ * <li>a [[eu.cdevreeze.yaidom.Scope]] mapping prefixes to namespace URIs</li>
+ * <li>an immutable collection of child nodes</li>
+ * </ol>
+ *
+ * The [[eu.cdevreeze.yaidom.Scope]] is absolute, typically containing a lot more than
+ * the (implicit) [[eu.cdevreeze.yaidom.Scope.Declarations]] of this element.
  *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
  *
- * The API is geared towards data-oriented XML that uses namespaces, and that is described in schemas (so that the user of this
- * API knows the structure of the XML being processed). The methods that return an Option say so in their name.
+ * The API is geared towards data-oriented XML that uses namespaces, and that typically is described in schemas (so that the
+ * user of this API knows the structure of the XML being processed). The methods that return an Option say so in their name.
  *
  * No notion of (value) equality has been defined. When thinking about it, it is very hard to come up with any useful
- * notion of equality for Elems.
+ * notion of equality for class [[eu.cdevreeze.yaidom.Elem]].
  *
  * The constructor is private. See the apply factory method on the companion object, and its documentation.
  */

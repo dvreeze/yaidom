@@ -35,17 +35,13 @@ import scala.collection.immutable
  *       children = List(text("Newsweek"))))).build()
  * }}}
  *
- * In https://github.com/djspiewak/anti-xml/issues/78, Daniel Spiewak explains an impedance mismatch between
- * XML's scoping rules (which are top-down, from root to leaves) and Anti-XML's functional trees (which are built bottom-up,
- * from leaves to root). One way to decrease this impedance mismatch is to distinguish between Nodes and the NodeBuilders
- * below (compare with String versus StringBuilder). Both NodeBuilders and Nodes are functional trees, but only NodeBuilders
- * are easy to construct in a bottom-up manner. On the other hand, NodeBuilders are not XML representations (scoping info
- * may be missing), whereas Nodes are XML representations (scoping info is present in each Elem). That's ok, especially if
- * Nodes are constructed from NodeBuilders. Put differently, a fundamental difference between traits ElemBuilder and Elem is
- * that ElemBuilder uses Scope.Declarations (easy to use during bottom-up construction), whereas Elem uses Scope (for
- * correctness of the XML representation w.r.t. scoping). The fundamental contradiction that Daniel Spiewak mentions does
- * not apply if we distinguish NodeBuilders from Nodes, viz. only NodeBuilders can have unbound prefixes but only Nodes have
- * (resolved) scopes.
+ * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
+ * (which are built bottom-up, from leaves to root). In the context of the Anti-XML library, Daniel Spiewak explained this
+ * impedance mismatch in https://github.com/djspiewak/anti-xml/issues/78. In yaidom, however, this impedance mismatch
+ * is far less severe. Yaidom distinguishes between [[eu.cdevreeze.yaidom.Node]] and [[eu.cdevreeze.yaidom.NodeBuilder]].
+ * Nodes have (fixed, resolved) Scopes, but NodeBuilders do not. Using NodeBuilders, Scope determination is postponed. Only NodeBuilders
+ * can have unbound prefixes, but only nodes have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], a NodeBuilder
+ * has a [[eu.cdevreeze.yaidom.Scope.Declarations]].
  *
  * @author Chris de Vreeze
  */

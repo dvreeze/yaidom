@@ -20,7 +20,7 @@ import scala.collection.immutable
 
 /**
  * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.expanded.Elem]],
- * offering methods to obtain text children.
+ * offering methods to obtain text from text children.
  *
  * The only abstract method is <code>textChildren</code>.
  * Based on this method alone, this trait offers a richer API for querying text.
