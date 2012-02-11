@@ -26,7 +26,7 @@ import scala.collection.{ immutable, mutable }
 import ElemToStaxEventsConverter._
 
 /**
- * Converter from Elem to immutable.Seq[XMLEvent]
+ * Converter from [[eu.cdevreeze.yaidom.Elem]] to immutable.Seq[XMLEvent]
  *
  * @author Chris de Vreeze
  */

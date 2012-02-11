@@ -24,9 +24,9 @@ import scala.collection.immutable
 import scala.collection.JavaConverters._
 
 /**
- * Conversions between Elems of this API and StAX events.
+ * Conversions between [[eu.cdevreeze.yaidom.Elem]]s and StAX events.
  *
- * Example usage for parsing an XML file into an Elem using StAX:
+ * Example usage for parsing an XML file into an [[eu.cdevreeze.yaidom.Elem]] using StAX:
  * {{{
  * import StaxConversions._
  *
@@ -37,7 +37,7 @@ import scala.collection.JavaConverters._
  * xmlEventReader.close()
  * }}}
  *
- * A somewhat involved example for writing an Elem to an XML file using StAX:
+ * A somewhat involved example for writing an [[eu.cdevreeze.yaidom.Elem]] to an XML file using StAX:
  * {{{
  * import StaxConversions._
  *

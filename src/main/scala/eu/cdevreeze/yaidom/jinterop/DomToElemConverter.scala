@@ -25,7 +25,7 @@ import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 
 /**
- * Converter from DOM Element to Elem, and from DOM Document to (yaidom) Document.
+ * Converter from DOM Element to [[eu.cdevreeze.yaidom.Elem]], and from DOM Document to [[eu.cdevreeze.yaidom.Document]].
  *
  * @author Chris de Vreeze
  */
@@ -47,7 +47,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     convertToElem(v, Scope.Empty)
   }
 
-  /** Given a parent scope, converts an org.w3c.dom.Element to a yaidom Elem */
+  /** Given a parent scope, converts an org.w3c.dom.Element to a [[eu.cdevreeze.yaidom.Elem]] */
   private def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
     val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
@@ -62,7 +62,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
       children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) })
   }
 
-  /** Given a parent scope, converts an org.w3c.dom.Node to an optional yaidom Node */
+  /** Given a parent scope, converts an org.w3c.dom.Node to an optional [[eu.cdevreeze.yaidom.Node]] */
   private def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {
       case e: Element => Some(convertToElem(e, parentScope))
@@ -75,20 +75,20 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     }
   }
 
-  /** Converts an org.w3c.dom.Text to a yaidom Text */
+  /** Converts an org.w3c.dom.Text to a [[eu.cdevreeze.yaidom.Text]] */
   private def convertToText(v: org.w3c.dom.Text): Text = Text(text = v.getData, isCData = false)
 
-  /** Converts an org.w3c.dom.ProcessingInstruction to a yaidom ProcessingInstruction */
+  /** Converts an org.w3c.dom.ProcessingInstruction to a [[eu.cdevreeze.yaidom.ProcessingInstruction]] */
   private def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
 
-  /** Converts an org.w3c.dom.CDATASection to a yaidom CData */
+  /** Converts an org.w3c.dom.CDATASection to a [[eu.cdevreeze.yaidom.Text]] */
   private def convertToCData(v: org.w3c.dom.CDATASection): Text = Text(text = v.getData, isCData = true)
 
-  /** Converts an org.w3c.dom.EntityReference to a yaidom EntityRef */
+  /** Converts an org.w3c.dom.EntityReference to a [[eu.cdevreeze.yaidom.EntityRef]] */
   private def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)
 
-  /** Converts an org.w3c.dom.Comment to a yaidom Comment */
+  /** Converts an org.w3c.dom.Comment to a [[eu.cdevreeze.yaidom.Comment]] */
   private def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
   /** Converts a NamedNodeMap to a Map[QName, String] */

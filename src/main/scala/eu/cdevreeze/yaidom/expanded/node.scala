@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom
  *
  * When using the Node (sub)classes in this package, prefix them with the last part of the package name. So,
  * write <code>expanded.Elem</code>, <code>expanded.Document</code> etc. instead of globally importing classes/traits in the
- * <code>expanded</code> package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
+ * [[eu.cdevreeze.yaidom.expanded]] package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
  * <code>mutable.Seq[T]</code> for Scala Collections.
  */
 sealed trait Node extends Immutable

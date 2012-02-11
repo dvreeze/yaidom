@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom
 import ElemToDomConverter._
 
 /**
- * Converter from Elem to a DOM element, and from (yaidom) Document to a DOM Document.
+ * Converter from [[eu.cdevreeze.yaidom.Elem]] to a DOM element, and from [[eu.cdevreeze.yaidom.Document]] to a DOM Document.
  *
  * @author Chris de Vreeze
  */

@@ -23,7 +23,7 @@ import javax.xml.stream.events.XMLEvent
 import scala.collection.immutable
 import jinterop.StaxConversions._
 
-/** StAX-based Document printer. Note: this XML printer does not pretty-print! */
+/** StAX-based [[eu.cdevreeze.yaidom.Document]] printer. Note: this XML printer does not pretty-print! */
 final class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,
   val outputFactory: XMLOutputFactory) extends DocumentPrinter {

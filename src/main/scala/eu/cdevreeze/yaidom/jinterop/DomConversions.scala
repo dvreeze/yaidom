@@ -18,9 +18,9 @@ package eu.cdevreeze.yaidom
 package jinterop
 
 /**
- * Conversions between Elems of this API and DOM Elements.
+ * Conversions between [[eu.cdevreeze.yaidom.Elem]]s of this API and DOM Elements.
  *
- * Example usage for parsing an XML file into an Elem using DOM:
+ * Example usage for parsing an XML file into an [[eu.cdevreeze.yaidom.Elem]] using DOM:
  * {{{
  * import DomConversions._
  *
@@ -30,7 +30,7 @@ package jinterop
  * val root: Elem = convertToElem(doc.getDocumentElement)
  * }}}
  *
- * A somewhat involved example for writing an Elem to an XML file using DOM:
+ * A somewhat involved example for writing an [[eu.cdevreeze.yaidom.Elem]] to an XML file using DOM:
  * {{{
  * import DomConversions._
  *

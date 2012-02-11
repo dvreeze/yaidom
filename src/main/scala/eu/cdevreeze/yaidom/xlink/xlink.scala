@@ -26,7 +26,7 @@ import XLink._
  *
  * When using the Elem and Document classes in this package, prefix them with the last part of the package name. So,
  * write <code>xlink.Elem</code> and <code>xlink.Document</code> instead of globally importing classes/traits in the
- * <code>xlink</code> package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
+ * [[eu.cdevreeze.yaidom.xlink]] package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
  * <code>mutable.Seq[T]</code> for Scala Collections.
  *
  * @author Chris de Vreeze

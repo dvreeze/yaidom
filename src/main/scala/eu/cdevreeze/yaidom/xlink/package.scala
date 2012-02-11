@@ -17,17 +17,17 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLink-aware DOM layer on top of the normal yaidom DOM layer.
+ * XLink-aware DOM-like layer on top of the normal yaidom DOM-like layer.
  *
  * The Elems in this layer wrap the yaidom Elems (other nodes are not wrapped, but that is ok, since the wrapped
  * elems are always accessible). Like the wrapped Elems, they are immutable. Each Elem in this layer that is an XLink
- * is indeed of type XLink (typically of a subtype).
+ * is indeed of type [[eu.cdevreeze.yaidom.xlink.XLink]] (typically of a subtype).
  *
  * The Elem companion object in this package has a factory method to quickly transform a yaidom Elem into an
  * XLink-aware Elem, which typically contains XLink instances.
  *
- * In Java speak, this package depends on the eu.cdevreeze.yaidom package, and not the other way around.
- * In Scala speak, this package is in the eu.cdevreeze.yaidom namespace.
+ * In Java speak, this package depends on the [[eu.cdevreeze.yaidom]] package, and not the other way around.
+ * In Scala speak, this package is in the [[eu.cdevreeze.yaidom]] namespace.
  *
  * @author Chris de Vreeze
  */

@@ -19,7 +19,7 @@ package parse
 
 import javax.xml.transform.Source
 
-/** Document parser */
+/** [[eu.cdevreeze.yaidom.Document]] parser */
 trait DocumentParser {
 
   def parse(source: Source): Document

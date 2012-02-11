@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 package print
 
-/** Document printer (to the XML as a String). */
+/** [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a String). */
 trait DocumentPrinter {
 
   /** Converts the Document to a String. May use a lot of memory for large XML documents. */
