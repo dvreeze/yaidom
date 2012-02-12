@@ -154,7 +154,7 @@ class ElemLikeTest extends Suite {
       elms.size
     }
     expect(47) {
-      val elms = bookstore elemsOrSelfWhere { e => e.resolvedName.namespaceUri == Some(ns) }
+      val elms = bookstore elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(ns) }
       elms.size
     }
     expect(4) {
@@ -566,7 +566,7 @@ class ElemLikeTest extends Suite {
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
 
     require {
-      result.allElemsOrSelf forall { e => e.resolvedName.namespaceUri == Option(ns) }
+      result.allElemsOrSelf forall { e => e.resolvedName.namespaceUriOption == Option(ns) }
     }
     require(result.qname.prefixOption == Some("books"))
     require {

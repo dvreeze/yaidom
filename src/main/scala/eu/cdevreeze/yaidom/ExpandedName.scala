@@ -28,24 +28,24 @@ import javax.xml.namespace.{ QName => JQName }
  *
  * @author Chris de Vreeze
  */
-final case class ExpandedName(namespaceUri: Option[String], localPart: String) extends Immutable {
-  require(namespaceUri ne null)
+final case class ExpandedName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
+  require(namespaceUriOption ne null)
   require {
-    namespaceUri forall { ns => (ns ne null) && (ns.length > 0) }
+    namespaceUriOption forall { ns => (ns ne null) && (ns.length > 0) }
   }
   require(localPart ne null)
   require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   /** Given an optional prefix, creates a QName from this ExpandedName */
   def toQName(prefix: Option[String]): QName = {
-    require(namespaceUri.isDefined || prefix.isEmpty)
+    require(namespaceUriOption.isDefined || prefix.isEmpty)
     QName(prefix, localPart)
   }
 
   /** Given an optional prefix, creates a [[javax.xml.namespace.QName]] from this ExpandedName */
   def toJavaQName(prefix: Option[String]): JQName = {
-    require(namespaceUri.isDefined || prefix.isEmpty)
-    new JQName(namespaceUri.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefix.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
+    require(namespaceUriOption.isDefined || prefix.isEmpty)
+    new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefix.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
   }
 
   /** The String representation, in the format of the javax.xml.namespace.QName.toString method */

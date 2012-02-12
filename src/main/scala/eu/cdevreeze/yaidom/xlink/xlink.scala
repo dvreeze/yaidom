@@ -59,7 +59,7 @@ trait XLink extends Elem {
 
   def xlinkType: String = attribute(XLinkTypeExpandedName)
 
-  def xlinkAttributes: Map[ExpandedName, String] = resolvedAttributes filterKeys { a => a.namespaceUri == Some(XLinkNamespace.toString) }
+  def xlinkAttributes: Map[ExpandedName, String] = resolvedAttributes filterKeys { a => a.namespaceUriOption == Some(XLinkNamespace.toString) }
 
   def arcroleOption: Option[String] = attributeOption(XLinkArcroleExpandedName)
 }
