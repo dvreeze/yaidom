@@ -856,7 +856,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore copyAndTransformTree {
+      bookstore updated {
         case path if path.endsWithName("Book".ename) =>
           val elem = bookstore.findWithElemPath(path).get
           removePrice(elem)
@@ -897,7 +897,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore copyAndTransformTree {
+      bookstore updated {
         case path if path.endsWithName("Author".ename) =>
           val elem = bookstore.findWithElemPath(path).get
           combineName(elem)

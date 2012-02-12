@@ -237,39 +237,43 @@ final class Elem private (
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 
   /**
-   * Copies this Elem recursively, but on encountering a descendant (or self) matching the given partial function,
-   * invokes that function instead. The match must be on the ElemPath of the copied/transformed element, starting with this element as root.
+   * Returns a copy of the tree with this element as root element, except that the result tree is updated according to
+   * the passed partial function mapping [[eu.cdevreeze.yaidom.ElemPath]]s to [[eu.cdevreeze.yaidom.Elem]]s.
+   * That is, wherever (in top-down tree traversal) an element is found that has an ElemPath (w.r.t. this element as root)
+   * for which the partial function is defined, that partial function is invoked instead for that element, returning
+   * an "updated element".
    */
-  def copyAndTransformTree(f: PartialFunction[ElemPath, Elem]): Elem = {
-    def copyAndTransform(currentPath: ElemPath): Elem = currentPath match {
-      case p if f.isDefinedAt(p) =>
-        val elm = self.findWithElemPath(p).getOrElse(sys.error("Undefined path %s for root element %s".format(p, self)))
-        f(p)
-      case p =>
-        val elm = self.findWithElemPath(p).getOrElse(sys.error("Undefined path %s for root element %s".format(p, self)))
-        val childElmEntries = elm.allChildElemPathEntries
-        val childElmPaths = childElmEntries map { entry => currentPath.append(entry) }
+  def updated(f: PartialFunction[ElemPath, Elem]): Elem = {
+    def updated(currentPath: ElemPath): Elem = {
+      val elm = self.findWithElemPath(currentPath).getOrElse(sys.error("Undefined path %s for root element %s".format(currentPath, self)))
 
-        // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
-        val childElmResults = childElmPaths map { path => copyAndTransform(path) }
+      currentPath match {
+        case p if f.isDefinedAt(p) => f(p)
+        case p =>
+          val childElmEntries = elm.allChildElemPathEntries
+          val childElmPaths = childElmEntries map { entry => currentPath.append(entry) }
 
-        var remainingChildElmResults = childElmResults
+          // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
+          val childElmResults = childElmPaths map { path => updated(path) }
 
-        val childResults: immutable.Seq[Node] = elm.children map {
-          case e: Elem =>
-            require(!remainingChildElmResults.isEmpty)
-            val currResult = remainingChildElmResults.head
-            remainingChildElmResults = remainingChildElmResults.tail
-            currResult
-          case n => n
-        }
+          var remainingChildElmResults = childElmResults
 
-        require(remainingChildElmResults.isEmpty)
+          val childResults: immutable.Seq[Node] = elm.children map {
+            case e: Elem =>
+              require(!remainingChildElmResults.isEmpty)
+              val currResult = remainingChildElmResults.head
+              remainingChildElmResults = remainingChildElmResults.tail
+              currResult
+            case n => n
+          }
 
-        elm.withChildren(childResults)
+          require(remainingChildElmResults.isEmpty)
+
+          elm.withChildren(childResults)
+      }
     }
 
-    copyAndTransform(ElemPath.Root)
+    updated(ElemPath.Root)
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
