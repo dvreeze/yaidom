@@ -37,15 +37,15 @@ final case class ExpandedName(namespaceUriOption: Option[String], localPart: Str
   require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   /** Given an optional prefix, creates a QName from this ExpandedName */
-  def toQName(prefix: Option[String]): QName = {
-    require(namespaceUriOption.isDefined || prefix.isEmpty)
-    QName(prefix, localPart)
+  def toQName(prefixOption: Option[String]): QName = {
+    require(namespaceUriOption.isDefined || prefixOption.isEmpty)
+    QName(prefixOption, localPart)
   }
 
   /** Given an optional prefix, creates a [[javax.xml.namespace.QName]] from this ExpandedName */
-  def toJavaQName(prefix: Option[String]): JQName = {
-    require(namespaceUriOption.isDefined || prefix.isEmpty)
-    new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefix.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
+  def toJavaQName(prefixOption: Option[String]): JQName = {
+    require(namespaceUriOption.isDefined || prefixOption.isEmpty)
+    new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
   }
 
   /** The String representation, in the format of the javax.xml.namespace.QName.toString method */
