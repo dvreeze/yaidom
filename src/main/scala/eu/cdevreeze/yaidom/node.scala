@@ -208,7 +208,7 @@ final class Elem private (
   require(children ne null)
 
   /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
-  val attributeScope: Scope = scope.copy(defaultNamespace = None)
+  val attributeScope: Scope = scope.copy(defaultNamespaceOption = None)
 
   /** The Elem name as ExpandedName, obtained by resolving the element QName against the Scope */
   override val resolvedName: ExpandedName =

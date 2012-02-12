@@ -224,7 +224,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
           val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 != "" }
           result.toMap
         }
-        new Scope(defaultNamespace = defaultNs, prefixScope = prefScope)
+        new Scope(defaultNamespaceOption = defaultNs, prefixScope = prefScope)
       }
       val undeclaredOptionalPrefixes: Set[Option[String]] = {
         val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ == "" } headOption

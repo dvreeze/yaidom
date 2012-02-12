@@ -66,7 +66,8 @@ package eu.cdevreeze
  * </ul>
  *
  * To some extent, yaidom is a Scala-ish DOM-like API much like JDOM is a Java-ish DOM API. Yaidom is Scala-ish in the
- * pervasive use of immutable Scala collections, and the use of Options over nulls.
+ * pervasive use of immutable Scala collections, and the use of Options over nulls. It is clear from method and variable
+ * names where Options are used. Also, methods whose names start with "find" tend to return Options.
  *
  * Yaidom has been inspired by Anti-XML. The Anti-XML library tackles some weaknesses of Scala's standard XML API, w.r.t.
  * robustness, ease of use and performance. Yaidom tries to achieve the same, except that it is less ambitious, foremost
