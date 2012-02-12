@@ -37,6 +37,9 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
   /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
   def skipEntry: ElemPath = ElemPath(entries.tail)
 
+  /** Appends a given Entry to this ElemPath */
+  def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries ::: List(entry))
+
   /**
    * Gets the parent path (if any, because the root path has no parent) wrapped in an Option.
    *
@@ -51,6 +54,27 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
 
   /** Like parentPathOption, but unwrapping the result (or throwing an exception otherwise) */
   def parentPath: ElemPath = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
+
+  /** Returns the first entry, if any, wrapped in an Option */
+  def firstEntryOption: Option[ElemPath.Entry] = entries.headOption
+
+  /** Returns the first entry, if any, and throws an exception otherwise */
+  def firstEntry: ElemPath.Entry = firstEntryOption.getOrElse(sys.error("There are no entries"))
+
+  /** Returns the last entry, if any, wrapped in an Option */
+  def lastEntryOption: Option[ElemPath.Entry] = entries.takeRight(1).headOption
+
+  /** Returns the last entry, if any, and throws an exception otherwise */
+  def lastEntry: ElemPath.Entry = lastEntryOption.getOrElse(sys.error("There are no entries"))
+
+  /** Convenience method returning true if the first entry (if any) has the given element name */
+  def startsWithName(ename: ExpandedName): Boolean = firstEntryOption exists { entry => entry.elementName == ename }
+
+  /** Convenience method returning true if the last entry (if any) has the given element name */
+  def endsWithName(ename: ExpandedName): Boolean = lastEntryOption exists { entry => entry.elementName == ename }
+
+  /** Convenience method returning true if at least one entry has the given element name */
+  def containsName(ename: ExpandedName): Boolean = entries exists { entry => entry.elementName == ename }
 
   /**
    * Returns the corresponding pseudo-XPath.

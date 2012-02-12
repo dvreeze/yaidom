@@ -856,9 +856,11 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore.copyAndTransform(
-        bookstore,
-        { case Elem.RootAndElem(root, elem) if elem.resolvedName == "Book".ename => removePrice(elem) })
+      bookstore copyAndTransformTree {
+        case path if path.endsWithName("Book".ename) =>
+          val elem = bookstore.findWithElemPath(path).get
+          removePrice(elem)
+      }
 
     expect(4) {
       bookstore.elems("Book".ename) count { e => e.attributeOption("Price".ename).isDefined }
@@ -895,9 +897,11 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore.copyAndTransform(
-        bookstore,
-        { case Elem.RootAndElem(root, elem) if elem.resolvedName == "Author".ename => combineName(elem) })
+      bookstore copyAndTransformTree {
+        case path if path.endsWithName("Author".ename) =>
+          val elem = bookstore.findWithElemPath(path).get
+          combineName(elem)
+      }
 
     expect(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
       bookstoreWithCombinedNames.elems("Name".ename) map { _.trimmedText } toSet

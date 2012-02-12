@@ -169,6 +169,17 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
       }
   }
 
+  /** Returns the ElemPath entries of all child elements, in the correct order */
+  final def allChildElemPathEntries: immutable.Seq[ElemPath.Entry] = {
+    val startAcc = immutable.IndexedSeq[ElemPath.Entry]()
+
+    allChildElems.foldLeft(startAcc) { (acc, elm) =>
+      val countForName = acc count { entry => entry.elementName == elm.resolvedName }
+      val entry = ElemPath.Entry(elm.resolvedName, countForName)
+      acc :+ entry
+    }
+  }
+
   /** Returns a List of this element followed by all descendant elements */
   private final def allElemsOrSelfList: List[E] = {
     // Not tail-recursive, but the depth should typically be limited

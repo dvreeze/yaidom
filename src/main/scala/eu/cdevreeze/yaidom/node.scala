@@ -236,20 +236,40 @@ final class Elem private (
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 
-  /** Copies this Elem, but on encountering a descendant (or self) matching the given partial function, invokes that function instead */
-  def copyAndTransform(root: Elem, f: PartialFunction[Elem.RootAndElem, Elem]): Elem = {
-    // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
-    val rootAndElem = Elem.RootAndElem(root, self)
+  /**
+   * Copies this Elem recursively, but on encountering a descendant (or self) matching the given partial function,
+   * invokes that function instead. The match must be on the ElemPath of the copied/transformed element, starting with this element as root.
+   */
+  def copyAndTransformTree(f: PartialFunction[ElemPath, Elem]): Elem = {
+    def copyAndTransform(currentPath: ElemPath): Elem = currentPath match {
+      case p if f.isDefinedAt(p) =>
+        val elm = self.findWithElemPath(p).getOrElse(sys.error("Undefined path %s for root element %s".format(p, self)))
+        f(p)
+      case p =>
+        val elm = self.findWithElemPath(p).getOrElse(sys.error("Undefined path %s for root element %s".format(p, self)))
+        val childElmEntries = elm.allChildElemPathEntries
+        val childElmPaths = childElmEntries map { entry => currentPath.append(entry) }
 
-    if (f.isDefinedAt(rootAndElem)) f(rootAndElem) else {
-      val newChildren = self.children map { (ch: Node) =>
-        ch match {
-          case ch: Elem => ch.copyAndTransform(root, f)
+        // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
+        val childElmResults = childElmPaths map { path => copyAndTransform(path) }
+
+        var remainingChildElmResults = childElmResults
+
+        val childResults: immutable.Seq[Node] = elm.children map {
+          case e: Elem =>
+            require(!remainingChildElmResults.isEmpty)
+            val currResult = remainingChildElmResults.head
+            remainingChildElmResults = remainingChildElmResults.tail
+            currResult
           case n => n
         }
-      }
-      self.withChildren(newChildren)
+
+        require(remainingChildElmResults.isEmpty)
+
+        elm.withChildren(childResults)
     }
+
+    copyAndTransform(ElemPath.Root)
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
@@ -389,8 +409,6 @@ object Document {
 }
 
 object Elem {
-
-  final case class RootAndElem(root: Elem, elem: Elem) extends Immutable
 
   /**
    * Use this constructor with care, because it is easy to use incorrectly (regarding passed Scopes).
