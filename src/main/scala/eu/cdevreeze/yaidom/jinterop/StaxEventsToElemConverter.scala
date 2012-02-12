@@ -245,13 +245,13 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
     val currScope = parentScope.resolve(declarations)
 
     val elemExpandedName = ExpandedName.fromJavaQName(startElement.getName)
-    val elemPrefix: Option[String] = ExpandedName.prefixFromJavaQName(startElement.getName)
+    val elemPrefixOption: Option[String] = ExpandedName.prefixOptionFromJavaQName(startElement.getName)
 
     val currAttrs: Map[QName, String] = {
       val attributes: List[Attribute] = startElement.getAttributes.asScala.toList collect { case a: Attribute => a }
       val result = attributes map { a =>
-        val prefix: Option[String] = ExpandedName.prefixFromJavaQName(a.getName)
-        val name = ExpandedName.fromJavaQName(a.getName).toQName(prefix)
+        val prefixOption: Option[String] = ExpandedName.prefixOptionFromJavaQName(a.getName)
+        val name = ExpandedName.fromJavaQName(a.getName).toQName(prefixOption)
         (name -> a.getValue)
       }
       result.toMap
@@ -259,7 +259,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here
 
-    Elem(elemExpandedName.toQName(elemPrefix), currAttrs, currScope, Nil.toIndexedSeq)
+    Elem(elemExpandedName.toQName(elemPrefixOption), currAttrs, currScope, Nil.toIndexedSeq)
   }
 }
 

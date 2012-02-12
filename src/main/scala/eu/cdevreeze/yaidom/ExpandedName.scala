@@ -68,7 +68,7 @@ object ExpandedName {
   }
 
   /** Gets an optional prefix from a [[javax.xml.namespace.QName]] */
-  def prefixFromJavaQName(jqname: JQName): Option[String] = {
+  def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
     val prefix: String = jqname.getPrefix
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
