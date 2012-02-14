@@ -871,4 +871,99 @@ class StaxInteropTest extends Suite {
 
     doChecks(root3)
   }
+
+  @Test def testParseGeneratedHtml() {
+    // 1. Parse XML file into Elem
+
+    val xmlInputFactory = XMLInputFactory.newFactory
+    val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
+    var eventReader = xmlInputFactory.createXMLEventReader(is)
+
+    val root: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    require(root.qname.localPart == "Bookstore")
+
+    // 2. Create HTML string
+
+    val htmlFormatString =
+      """|<html>
+         |  <body>
+         |    <h1>Bookstore</h1>
+         |    <table>
+         |      <tr>
+         |        <th>Title</th>
+         |        <th>ISBN</th>
+         |        <th>Edition</th>
+         |        <th>Authors</th>
+         |        <th>Price</th>
+         |      </tr>
+         |%s
+         |    </table>
+         |  </body>
+         |</html>""".stripMargin
+
+    val bookFormatString =
+      """|      <tr>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |      </tr>""".stripMargin
+
+    def bookHtmlString(bookElm: Elem): String = {
+      val authorNames: immutable.Seq[String] =
+        bookElm.elems("{http://bookstore}Author".ename) map { e =>
+          "%s %s".format(e.childElem("{http://bookstore}First_Name".ename).trimmedText, e.childElem("{http://bookstore}Last_Name".ename).trimmedText)
+        }
+
+      val authors = authorNames.mkString(", ")
+
+      val result = bookFormatString.format(
+        bookElm.childElem("{http://bookstore}Title".ename).trimmedText,
+        bookElm.attributeOption("ISBN".ename).getOrElse(""),
+        bookElm.attributeOption("Edition".ename).getOrElse(""),
+        authors,
+        bookElm.attributeOption("Price".ename).getOrElse(""))
+      result
+    }
+
+    val booksHtmlString = root.elems("{http://bookstore}Book".ename) map { e => bookHtmlString(e) } mkString ("%n".format())
+    val htmlString = htmlFormatString.format(booksHtmlString)
+
+    // 3. Parse HTML string (which is also valid XML in this case) into Document
+
+    val reader = new jio.StringReader(htmlString)
+    eventReader = xmlInputFactory.createXMLEventReader(reader)
+
+    val htmlRoot: Elem = convertToElem(eventReader.toSeq)
+    eventReader.close()
+
+    // 4. Check the parsed HTML
+
+    val tableRowElms = htmlRoot.elems("tr".ename).drop(1)
+
+    expect(4) {
+      tableRowElms.size
+    }
+
+    val isbnElms = tableRowElms flatMap { rowElm => rowElm.childElems("td".ename).drop(1).headOption }
+    val isbns = isbnElms map { e => e.trimmedText }
+
+    expect(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
+      isbns.toSet
+    }
+
+    val authorsElms = tableRowElms flatMap { rowElm => rowElm.childElems("td".ename).drop(3).headOption }
+    val authors = authorsElms map { e => e.trimmedText }
+
+    expect(Set(
+      "Jeffrey Ullman, Jennifer Widom",
+      "Hector Garcia-Molina, Jeffrey Ullman, Jennifer Widom",
+      "Jeffrey Ullman, Hector Garcia-Molina",
+      "Jennifer Widom")) {
+      authors.toSet
+    }
+  }
 }
