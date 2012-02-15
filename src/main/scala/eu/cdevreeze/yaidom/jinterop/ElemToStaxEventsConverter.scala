@@ -35,6 +35,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   def convertDocument(doc: Document): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
+      val newline = xmlEventFactory.createCharacters("\n") // Correct on Windows as well?
       val piEvents: immutable.IndexedSeq[XMLEvent] =
         doc.processingInstructions flatMap { pi => convertProcessingInstruction(pi, xmlEventFactory) }
       val commentEvents: immutable.IndexedSeq[XMLEvent] =
@@ -42,17 +43,18 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
       val docElmEvents = convertElem(doc.documentElement, xmlEventFactory, Scope.Empty)
       val endDocument = xmlEventFactory.createEndDocument
 
-      immutable.IndexedSeq(startDocument) ++ piEvents ++ commentEvents ++ docElmEvents ++ immutable.IndexedSeq(endDocument)
+      immutable.IndexedSeq(startDocument, newline) ++ piEvents ++ commentEvents ++ docElmEvents ++ immutable.IndexedSeq(endDocument)
     }
   }
 
   def convertElem(elm: Elem): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
+      val newline = xmlEventFactory.createCharacters("\n") // Correct on Windows as well?
       val nonDocEvents = convertElem(elm, xmlEventFactory, Scope.Empty)
       val endDocument = xmlEventFactory.createEndDocument
 
-      immutable.IndexedSeq(startDocument) ++ nonDocEvents ++ immutable.IndexedSeq(endDocument)
+      immutable.IndexedSeq(startDocument, newline) ++ nonDocEvents ++ immutable.IndexedSeq(endDocument)
     }
   }
 
