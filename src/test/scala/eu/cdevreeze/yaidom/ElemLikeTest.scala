@@ -90,6 +90,50 @@ class ElemLikeTest extends Suite {
     }
   }
 
+  @Test def testCollectFromChildElems() {
+    require(bookstore.qname.localPart == "Bookstore")
+
+    val bookstoreChildElms: immutable.Seq[Elem] = bookstore.allChildElems
+    val magazineElms: immutable.Seq[Elem] = bookstore collectFromChildElems {
+      case e if e.resolvedName == ns.ns.ename("Magazine") => e
+    }
+    val bookElms: immutable.Seq[Elem] = bookstore collectFromChildElems {
+      case e if e.resolvedName == ns.ns.ename("Book") => e
+    }
+    val cheapBookElms: immutable.Seq[Elem] =
+      bookstore collectFromChildElems {
+        case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 => e
+      }
+    val cheapBookPrices: immutable.Seq[Int] =
+      bookstore collectFromChildElems {
+        case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 =>
+          e.attribute("Price".ename).toInt
+      }
+
+    expect(8) {
+      bookstoreChildElms.size
+    }
+    expect(4) {
+      magazineElms.size
+    }
+    expect(4) {
+      bookElms.size
+    }
+    expect(2) {
+      cheapBookElms.size
+    }
+    expect(Set(25, 50)) {
+      cheapBookPrices.toSet
+    }
+    expect(Set(ns.ns.ename("Book"), ns.ns.ename("Magazine"))) {
+      val result = bookstoreChildElms map { e => e.resolvedName }
+      result.toSet
+    }
+    assert(magazineElms.toSet.subsetOf(bookstoreChildElms.toSet))
+    assert(bookElms.toSet.subsetOf(bookstoreChildElms.toSet))
+    assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
+  }
+
   @Test def testElems() {
     require(bookstore.qname.localPart == "Bookstore")
 
@@ -139,6 +183,43 @@ class ElemLikeTest extends Suite {
       val authorLastNameElms = authorElms flatMap { e => e.elems(ns.ns.ename("Last_Name")) }
       authorLastNameElms map { e => e.trimmedText } toSet
     }
+  }
+
+  @Test def testCollectFromElems() {
+    require(bookstore.qname.localPart == "Bookstore")
+
+    val elms: immutable.Seq[Elem] = bookstore.allElems
+    val magazineElms: immutable.Seq[Elem] = bookstore collectFromElems {
+      case e if e.resolvedName == ns.ns.ename("Magazine") => e
+    }
+    val bookElms: immutable.Seq[Elem] = bookstore collectFromElems {
+      case e if e.resolvedName == ns.ns.ename("Book") => e
+    }
+    val cheapBookElms: immutable.Seq[Elem] =
+      bookstore collectFromElems {
+        case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 => e
+      }
+
+    expect(46) {
+      elms.size
+    }
+    expect(4) {
+      magazineElms.size
+    }
+    expect(4) {
+      bookElms.size
+    }
+    expect(2) {
+      cheapBookElms.size
+    }
+    expect(Set(ns.ns.ename("Book"), ns.ns.ename("Magazine"), ns.ns.ename("Title"),
+      ns.ns.ename("Authors"), ns.ns.ename("Author"), ns.ns.ename("First_Name"), ns.ns.ename("Last_Name"),
+      ns.ns.ename("Remark"))) {
+      elms map { e => e.resolvedName } toSet
+    }
+    assert(magazineElms.toSet.subsetOf(elms.toSet))
+    assert(bookElms.toSet.subsetOf(elms.toSet))
+    assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
   @Test def testElemsOrSelf() {
@@ -194,6 +275,47 @@ class ElemLikeTest extends Suite {
       val authorLastNameElms = authorElms flatMap { e => e.elemsOrSelf(ns.ns.ename("Last_Name")) }
       authorLastNameElms map { e => e.trimmedText } toSet
     }
+  }
+
+  @Test def testCollectFromElemsOrSelf() {
+    require(bookstore.qname.localPart == "Bookstore")
+
+    val elms: immutable.Seq[Elem] = bookstore.allElemsOrSelf
+    val magazineElms: immutable.Seq[Elem] = bookstore collectFromElemsOrSelf {
+      case e if e.resolvedName == ns.ns.ename("Magazine") => e
+    }
+    val bookElms: immutable.Seq[Elem] = bookstore collectFromElemsOrSelf {
+      case e if e.resolvedName == ns.ns.ename("Book") => e
+    }
+    val cheapBookElms: immutable.Seq[Elem] =
+      bookstore collectFromElemsOrSelf {
+        case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 => e
+      }
+
+    expect(47) {
+      elms.size
+    }
+    expect(47) {
+      val elms = bookstore elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(ns) }
+      elms.size
+    }
+    expect(4) {
+      magazineElms.size
+    }
+    expect(4) {
+      bookElms.size
+    }
+    expect(2) {
+      cheapBookElms.size
+    }
+    expect(Set(ns.ns.ename("Bookstore"), ns.ns.ename("Book"), ns.ns.ename("Magazine"), ns.ns.ename("Title"),
+      ns.ns.ename("Authors"), ns.ns.ename("Author"), ns.ns.ename("First_Name"), ns.ns.ename("Last_Name"),
+      ns.ns.ename("Remark"))) {
+      elms map { e => e.resolvedName } toSet
+    }
+    assert(magazineElms.toSet.subsetOf(elms.toSet))
+    assert(bookElms.toSet.subsetOf(elms.toSet))
+    assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
   @Test def testFirstElems() {
