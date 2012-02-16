@@ -25,6 +25,10 @@ import scala.collection.immutable
  * The only abstract methods are <code>resolvedName</code>, <code>resolvedAttributes</code> and <code>allChildElems</code>.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
+ * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
+ * general, and therefore contains no implementations of methods such as <code>Elem.updated</code>. "Fixing" that would have
+ * significantly impacted the power-to-weight ratio of this API.
+ *
  * This trait offers public element retrieval methods to obtain:
  * <ul>
  * <li>child elements</li>
@@ -85,6 +89,9 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the child elements with the given expanded name */
   final def childElems(expandedName: ExpandedName): immutable.Seq[E] = childElemsWhere { e => e.resolvedName == expandedName }
 
+  /** Returns <code>allChildElems collect pf</code> */
+  final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.Seq[B] = allChildElems collect pf
+
   /** Returns the single child element with the given expanded name, if any, wrapped in an Option */
   final def childElemOption(expandedName: ExpandedName): Option[E] = {
     val result = childElems(expandedName)
@@ -111,6 +118,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns those elements among this element and its descendant elements that have the given expanded name */
   final def elemsOrSelf(expandedName: ExpandedName): immutable.Seq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
 
+  /** Returns (the equivalent of) <code>allElemsOrSelf collect pf</code> */
+  final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.Seq[B] =
+    elemsOrSelfWhere { e => pf.isDefinedAt(e) } collect pf
+
   /** Returns all descendant elements (not including this element). Same as <code>allElemsOrSelf.drop(1)</code> */
   final def allElems: immutable.Seq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
 
@@ -119,6 +130,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the descendant elements with the given expanded name */
   final def elems(expandedName: ExpandedName): immutable.Seq[E] = elemsWhere { e => e.resolvedName == expandedName }
+
+  /** Returns (the equivalent of) <code>allElems collect pf</code> */
+  final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.Seq[B] =
+    elemsWhere { e => pf.isDefinedAt(e) } collect pf
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def firstElemsWhere(p: E => Boolean): immutable.Seq[E] =
@@ -143,7 +158,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     root firstElemOrSelfOptionWhere { e => e.allChildElems exists { ch => ch == self } }
   }
 
-  /** Computes an index on the given function taking an element, for example a function returning some unique Elem "identifier" */
+  /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
   final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = allElemsOrSelf groupBy f
 
   /** Computes an index to parent elements, on the given function applied to the child elements */
