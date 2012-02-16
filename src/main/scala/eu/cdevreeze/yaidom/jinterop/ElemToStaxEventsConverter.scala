@@ -35,7 +35,8 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   def convertDocument(doc: Document): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
-      val newline = xmlEventFactory.createCharacters("\n") // Correct on Windows as well?
+      // For the line separator, see for example http://xerces.apache.org/xerces-j/apiDocs/org/apache/xml/serialize/OutputFormat.html#setLineSeparator(java.lang.String).
+      val newline = xmlEventFactory.createCharacters("\n")
       val piEvents: immutable.IndexedSeq[XMLEvent] =
         doc.processingInstructions flatMap { pi => convertProcessingInstruction(pi, xmlEventFactory) }
       val commentEvents: immutable.IndexedSeq[XMLEvent] =
@@ -50,7 +51,8 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   def convertElem(elm: Elem): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
-      val newline = xmlEventFactory.createCharacters("\n") // Correct on Windows as well?
+      // For the line separator, see for example http://xerces.apache.org/xerces-j/apiDocs/org/apache/xml/serialize/OutputFormat.html#setLineSeparator(java.lang.String).
+      val newline = xmlEventFactory.createCharacters("\n")
       val nonDocEvents = convertElem(elm, xmlEventFactory, Scope.Empty)
       val endDocument = xmlEventFactory.createEndDocument
 

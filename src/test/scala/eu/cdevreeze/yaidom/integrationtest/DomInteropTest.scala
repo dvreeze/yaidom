@@ -828,7 +828,7 @@ class DomInteropTest extends Suite {
       result
     }
 
-    val booksHtmlString = root.elems("{http://bookstore}Book".ename) map { e => bookHtmlString(e) } mkString ("%n".format())
+    val booksHtmlString = root.elems("{http://bookstore}Book".ename) map { e => bookHtmlString(e) } mkString ("\n")
     val htmlString = htmlFormatString.format(booksHtmlString)
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
