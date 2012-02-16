@@ -243,12 +243,12 @@ final class Elem private (
    * for which the partial function is defined, that partial function is invoked instead for that element, returning
    * an "updated element".
    */
-  def updated(f: PartialFunction[ElemPath, Elem]): Elem = {
+  def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
     def updated(currentPath: ElemPath): Elem = {
       val elm = self.findWithElemPath(currentPath).getOrElse(sys.error("Undefined path %s for root element %s".format(currentPath, self)))
 
       currentPath match {
-        case p if f.isDefinedAt(p) => f(p)
+        case p if pf.isDefinedAt(p) => pf(p)
         case p =>
           val childElmEntries = elm.allChildElemPathEntries
           val childElmPaths = childElmEntries map { entry => currentPath.append(entry) }
