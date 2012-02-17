@@ -197,7 +197,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns the ElemPath.Entry of this element with respect to the given parent,
+   * Returns the ElemPath Entry of this element with respect to the given parent,
    * throwing an exception if this element is not a child of that parent.
    *
    * The implementation uses the equals method on the self type.
