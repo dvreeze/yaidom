@@ -25,7 +25,7 @@ import org.scalatest.junit.JUnitRunner
 
 /**
  * Test case for [[eu.cdevreeze.yaidom.XmlStringUtils]].
- * 
+ *
  * The example test strings have been taken from http://docstore.mik.ua/orelly/xml/xmlnut/ch02_04.htm.
  *
  * @author Chris de Vreeze
@@ -86,6 +86,45 @@ class XmlStringUtilsTest extends Suite {
     }
     expect(false) {
       isProbablyValidXmlName("&")
+    }
+  }
+
+  @Test def testXPathNotValidName() {
+    import XmlStringUtils._
+
+    // To parse simple XPath expressions, we want to establish that "/", "*", "[" and "]" are never themselves
+    // part of qualified names.
+
+    expect(true) {
+      isProbablyValidXmlName("tire")
+    }
+    expect(false) {
+      isProbablyValidXmlName("/tire")
+    }
+
+    expect(true) {
+      isProbablyValidXmlName("cars:tire")
+    }
+    expect(false) {
+      isProbablyValidXmlName("/cars:tire")
+    }
+
+    expect(true) {
+      isProbablyValidXmlName("tire")
+    }
+    expect(false) {
+      isProbablyValidXmlName("tire[1]")
+    }
+
+    expect(true) {
+      isProbablyValidXmlName("cars:tire")
+    }
+    expect(false) {
+      isProbablyValidXmlName("cars:tire[1]")
+    }
+
+    expect(false) {
+      isProbablyValidXmlName("*")
     }
   }
 }

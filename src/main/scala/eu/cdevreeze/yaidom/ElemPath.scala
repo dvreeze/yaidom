@@ -89,6 +89,8 @@ object ElemPath {
 
   /** Parses a String, which must be in the toXPath format, into an ElemPath */
   def fromXPath(s: String)(scope: Scope): ElemPath = {
+    // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
+
     require(s.startsWith("/"))
     require(s.drop(1).startsWith("*"))
     val remainder = s.drop(2)
@@ -100,6 +102,7 @@ object ElemPath {
         require(idx > 0)
         val curr = str.take(idx + 1)
         val rest = str.drop(idx + 1)
+        require(rest.size == 0 || rest.startsWith("/"))
         curr :: getEntryStrings(rest)
     }
 
@@ -143,6 +146,8 @@ object ElemPath {
 
     /** Parses a String, which must be in the toXPath format, into an ElemPath.Entry, given a Scope */
     def fromXPath(s: String)(scope: Scope): Entry = {
+      // We use the fact that "/", "[" and "]" are never part of qualified names!
+
       require(s.startsWith("/"))
       val remainder = s.drop(1)
       require(remainder.size > 3)
