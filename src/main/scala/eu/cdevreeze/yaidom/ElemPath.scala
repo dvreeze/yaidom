@@ -76,20 +76,37 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
   /** Convenience method returning true if at least one entry has the given element name */
   def containsName(ename: ExpandedName): Boolean = entries exists { entry => entry.elementName == ename }
 
-  /**
-   * Returns the corresponding pseudo-XPath.
-   */
-  def toPseudoXPath: String = {
-    val entryPseudoXPaths = entries map { entry => entry.toPseudoXPath }
-    "/" + "*" + entryPseudoXPaths.mkString
+  /** Given a Scope, returns the corresponding XPath */
+  def toXPath(scope: Scope): String = {
+    val entryXPaths = entries map { entry => entry.toXPath(scope) }
+    "/" + "*" + entryXPaths.mkString
   }
-
-  override def toString: String = toPseudoXPath
 }
 
 object ElemPath {
 
   val Root: ElemPath = ElemPath(Nil)
+
+  /** Parses a String, which must be in the toXPath format, into an ElemPath */
+  def fromXPath(s: String)(scope: Scope): ElemPath = {
+    require(s.startsWith("/"))
+    require(s.drop(1).startsWith("*"))
+    val remainder = s.drop(2)
+
+    def getEntryStrings(str: String): List[String] = str match {
+      case "" => Nil
+      case _ =>
+        val idx = str indexWhere { c => c == ']' }
+        require(idx > 0)
+        val curr = str.take(idx + 1)
+        val rest = str.drop(idx + 1)
+        curr :: getEntryStrings(rest)
+    }
+
+    val entryStrings = getEntryStrings(remainder)
+    val entries = entryStrings map { entryString => ElemPath.Entry.fromXPath(entryString)(scope) }
+    ElemPath(entries)
+  }
 
   /** An entry in an ElemPath, as an expanded element name plus zero-based index of the elem as child (with that name) of the parent. */
   final case class Entry(elementName: ExpandedName, index: Int) extends Immutable {
@@ -100,13 +117,45 @@ object ElemPath {
     /** Position (1-based) of the elem as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
-    /**
-     * Returns the corresponding pseudo-XPath. Example: <code>*[3]</code>.
-     */
-    def toPseudoXPath: String = {
-      "%s%s[%d]".format("/", elementName.toString, position)
-    }
+    /** Given a Scope, returns the corresponding XPath */
+    def toXPath(scope: Scope): String = {
+      val prefixOption: Option[String] = {
+        if (elementName.namespaceUriOption.isEmpty) None else {
+          val nsUri: String = elementName.namespaceUriOption.get
+          require(scope.prefixScope.values.toSet.contains(nsUri), "Expected at least one prefix for namespace URI '%s'".format(nsUri))
 
-    override def toString: String = toPseudoXPath
+          val result = scope.prefixScope.toList collectFirst {
+            case pair if pair._2 == nsUri =>
+              val prefix: String = pair._1
+              val ns: String = pair._2
+              prefix
+          }
+          require(result.isDefined)
+          result
+        }
+      }
+
+      "%s%s[%d]".format("/", elementName.toQName(prefixOption).toString, position)
+    }
+  }
+
+  object Entry {
+
+    /** Parses a String, which must be in the toXPath format, into an ElemPath.Entry, given a Scope */
+    def fromXPath(s: String)(scope: Scope): Entry = {
+      require(s.startsWith("/"))
+      val remainder = s.drop(1)
+      require(remainder.size > 3)
+      val (qnameString, positionString) = remainder span { c => c != '[' }
+      require(positionString.size >= 3)
+      require(positionString.startsWith("["))
+      require(positionString.endsWith("]"))
+
+      val qname = QName.parse(qnameString)
+      val elementName = scope.resolveQName(qname).getOrElse(sys.error("Could not resolve QName '%s'".format(qname)))
+      val position = positionString.drop(1).dropRight(1).toInt
+
+      Entry(elementName, position - 1)
+    }
   }
 }

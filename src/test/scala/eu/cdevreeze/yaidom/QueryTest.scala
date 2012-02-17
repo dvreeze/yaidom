@@ -350,7 +350,7 @@ class QueryTest extends Suite {
   @Test def testQueryElementsWithParentNotBookOrBookstore() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
-    // TODO What we need is some index to parent nodes, e.g. from "path expressions" to parent nodes...
+    // Inefficient implementation, with expensive method calls to retrieve parent nodes.
 
     require(bookstore.qname.localPart == "Bookstore")
 
@@ -358,6 +358,50 @@ class QueryTest extends Suite {
       for {
         desc <- bookstore.allElems
         parent <- desc.findParentInTree(bookstore) // Inefficient
+        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
+      } yield desc
+
+    assert(elms.size > 10, "Expected more than 10 matching elements")
+    val qnames: Set[QName] = {
+      val result = elms map { _.qname }
+      result.toSet
+    }
+    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
+      qnames
+    }
+  }
+
+  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingElemPaths() {
+    // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
+
+    // This implementation should be more efficient than the preceding one, in particular in much larger XML trees.
+
+    require(bookstore.qname.localPart == "Bookstore")
+
+    def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
+      Elem(
+        qname = e.qname,
+        attributes = e.attributes + ("elemPath".qname -> path.toXPath(scope)),
+        scope = e.scope,
+        children = e.children map { ch =>
+          ch match {
+            case che: Elem =>
+              val childPath = path.append(che.ownElemPathEntry(e))
+              // Recursive call
+              addElemPaths(che, childPath, scope)
+            case _ => ch
+          }
+        })
+    }
+
+    // Not using method Elem.updated here
+    val bookStoreWithPaths = addElemPaths(bookstore, ElemPath.Root, Scope.Empty)
+
+    val elms: immutable.Seq[Elem] =
+      for {
+        desc <- bookStoreWithPaths.allElems
+        val path = ElemPath.fromXPath(desc.attribute("elemPath".ename))(Scope.Empty)
+        parent <- bookstore.findWithElemPath(path.parentPath)
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
 

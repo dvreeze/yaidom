@@ -40,7 +40,8 @@ import scala.collection.immutable
  * In the method names, "elems" stands for descendant elements, and "first elems" stands for first found descendant
  * elements as explained above.
  *
- * There are also attribute retrieval methods, and methods for indexing the element tree and finding subtrees.
+ * There are also attribute retrieval methods, methods for indexing the element tree and finding subtrees,
+ * and methods dealing with ElemPaths.
  *
  * These element retrieval methods each have up to 3 variants (returning collections of elements):
  * <ol>
@@ -49,7 +50,8 @@ import scala.collection.immutable
  * <li>An expanded name argument variant</li>
  * </ol>
  * The latter variant is implemented in terms of the single predicate argument variant.
- * Some methods also have variants that return a single element or an element Option.
+ * Some methods also have variants that return a single element or an element Option, or that "collect" data by applying
+ * a partial function.
  *
  * These element finder methods process and return elements in the following (depth-first) order:
  * <ol>
@@ -167,21 +169,20 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
   }
 
+  /** Returns the equivalent of <code>findWithElemPath(ElemPath(List(entry)))</code> */
+  final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
+    val relevantChildElms = self.childElems(entry.elementName)
+
+    if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
+  }
+
   /** Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option. */
   final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
     case Nil => Some(self)
     case _ =>
-      val hd = path.entries.head
-      val tl = path.entries.tail
-
-      val relevantChildElms = self.childElems(hd.elementName)
-
-      if (hd.index >= relevantChildElms.size) None else {
-        val newRoot = relevantChildElms(hd.index)
-
-        // Recursive call. Not tail-recursive, but recursion depth should be limited.
-        newRoot.findWithElemPath(path.skipEntry)
-      }
+      val newRootOption: Option[E] = findWithElemPathEntry(path.entries.head)
+      // Recursive call. Not tail-recursive, but recursion depth should be limited.
+      newRootOption flatMap { newRoot => newRoot.findWithElemPath(path.skipEntry) }
   }
 
   /** Returns the ElemPath entries of all child elements, in the correct order */
@@ -193,6 +194,18 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
       val entry = ElemPath.Entry(elm.resolvedName, countForName)
       acc :+ entry
     }
+  }
+
+  /**
+   * Returns the ElemPath.Entry of this element with respect to the given parent,
+   * throwing an exception if this element is not a child of that parent.
+   *
+   * The implementation uses the equals method on the self type.
+   */
+  final def ownElemPathEntry(parent: E): ElemPath.Entry = {
+    val idx = parent.childElems(self.resolvedName) indexWhere { e => e == self }
+    require(idx >= 0, "Expected %s to have parent %s".format(self.toString, parent.toString))
+    ElemPath.Entry(self.resolvedName, idx)
   }
 
   /** Returns a List of this element followed by all descendant elements */
