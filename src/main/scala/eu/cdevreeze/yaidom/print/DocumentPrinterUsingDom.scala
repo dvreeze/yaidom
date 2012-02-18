@@ -58,7 +58,7 @@ object DocumentPrinterUsingDom {
     new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
   }
 
-  /** Creates an instance with library-dependent (partial) path for bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446 */
+  /** Creates an instance with library-dependent (partial) patch for bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446 */
   def newInstanceWithIndentPatch(): DocumentPrinterUsingDom = {
     val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
 
