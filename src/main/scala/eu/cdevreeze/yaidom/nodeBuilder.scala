@@ -44,6 +44,11 @@ import scala.collection.immutable
  * can have unbound prefixes, but only Elems have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], an ElemBuilder
  * has a [[eu.cdevreeze.yaidom.Scope.Declarations]].
  *
+ * Another reason that the above-mentioned impedance mismatch is less of a problem in practice is that typically the XML
+ * trees (as NodeBuilders or directly as Nodes) are built in a top-down manner. The [[eu.cdevreeze.yaidom.ConverterToDocument]]s
+ * in package [[eu.cdevreeze.yaidom.jinterop]] recursively build Elems in a top-down manner, possibly creating an Elem
+ * instance (for each element) twice (first without children, and finally as a copy with children added).
+ *
  * When using NodeBuilders to create a Document, this Document typically contains no "ignorable whitespace". This may cause
  * the Document not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the Document
  * to an XML string. See also the classes in package [[eu.cdevreeze.yaidom.print]].
