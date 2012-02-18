@@ -71,13 +71,15 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
   }
 
   /**
-   * Resolves the given declarations against this Scope, returning an updated Scope.
+   * Resolves the given declarations against this Scope, returning an "updated" Scope.
    *
    * Inspired by java.net.URI, which has a similar method for URIs.
    */
   def resolve(declarations: Scope.Declarations): Scope = {
-    val m = (toMap ++ declarations.declared.toMap) -- declarations.undeclaredSet
-    Scope.fromMap(m)
+    if (declarations == Scope.Declarations.Empty) this else {
+      val m = (toMap ++ declarations.declared.toMap) -- declarations.undeclaredSet
+      Scope.fromMap(m)
+    }
   }
 
   /**
