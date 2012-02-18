@@ -38,9 +38,10 @@ import scala.collection.immutable
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
  * (which are built bottom-up, from leaves to root). In the context of the Anti-XML library, Daniel Spiewak explained this
  * impedance mismatch in https://github.com/djspiewak/anti-xml/issues/78. In yaidom, however, this impedance mismatch
- * is far less severe. Yaidom distinguishes between [[eu.cdevreeze.yaidom.Node]] and [[eu.cdevreeze.yaidom.NodeBuilder]].
- * Nodes have (fixed, resolved) Scopes, but NodeBuilders do not. Using NodeBuilders, Scope determination is postponed. Only NodeBuilders
- * can have unbound prefixes, but only nodes have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], a NodeBuilder
+ * is far less severe. Yaidom distinguishes between [[eu.cdevreeze.yaidom.Node]] and [[eu.cdevreeze.yaidom.NodeBuilder]],
+ * and [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.ElemBuilder]] in particular. Elems have (fixed, resolved) Scopes,
+ * but ElemBuilders do not. Using NodeBuilders, Scope determination is postponed. Only ElemBuilders
+ * can have unbound prefixes, but only Elems have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], an ElemBuilder
  * has a [[eu.cdevreeze.yaidom.Scope.Declarations]].
  *
  * @author Chris de Vreeze
