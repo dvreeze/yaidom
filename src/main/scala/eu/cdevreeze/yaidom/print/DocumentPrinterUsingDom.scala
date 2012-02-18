@@ -39,6 +39,7 @@ final class DocumentPrinterUsingDom(
 
     val domSource = new DOMSource(domDocument)
 
+    // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
     val sw = new jio.StringWriter
     val streamResult = new StreamResult(sw)
 
@@ -54,6 +55,17 @@ object DocumentPrinterUsingDom {
   def newInstance(): DocumentPrinterUsingDom = {
     val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
     val transformerFactory: TransformerFactory = TransformerFactory.newInstance
+    new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
+  }
+
+  /** Creates an instance with library-dependent (partial) path for bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446 */
+  def newInstanceWithIndentPatch(): DocumentPrinterUsingDom = {
+    val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
+
+    val transformerFactory: TransformerFactory = TransformerFactory.newInstance
+    // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
+    transformerFactory.setAttribute("indent-number", java.lang.Integer.valueOf(2))
+
     new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
   }
 }

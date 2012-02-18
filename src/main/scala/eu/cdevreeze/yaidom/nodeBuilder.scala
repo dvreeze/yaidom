@@ -44,6 +44,10 @@ import scala.collection.immutable
  * can have unbound prefixes, but only Elems have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], an ElemBuilder
  * has a [[eu.cdevreeze.yaidom.Scope.Declarations]].
  *
+ * When using NodeBuilders to create a Document, this Document typically contains no "ignorable whitespace". This may cause
+ * the Document not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the Document
+ * to an XML string. See also the classes in package [[eu.cdevreeze.yaidom.print]].
+ *
  * @author Chris de Vreeze
  */
 sealed trait NodeBuilder extends Immutable {
