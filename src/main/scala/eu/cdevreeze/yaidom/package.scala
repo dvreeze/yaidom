@@ -50,7 +50,7 @@ package eu.cdevreeze
  * <li>Yaidom has no XPath(-like) support. The API does not unify nodes with sequences of nodes.
  * That makes code using yaidom more verbose than XPath(-like) code found in APIs like Scala's XML library or
  * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
- * <li>Besides not offering any XPath(-like) support, yaidom is not very ambitious in other ways as well. For example,
+ * <li>Besides not offering any XPath(-like) support, yaidom is not very ambitious in other ways either. For example,
  * yaidom offers no XML literals (but does offer a more verbose DSL for building XML). As another example, yaidom
  * does not simplify printing/parsing of XML. The upside is that yaidom has a very good power-to-weight ratio.</li>
  * <li>Yaidom deals only with XML, not with HTML.</li>
