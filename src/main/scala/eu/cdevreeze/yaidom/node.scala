@@ -192,7 +192,7 @@ final class Document(
  * user of this API knows the structure of the XML being processed). The methods that return an Option say so in their name.
  *
  * No notion of (value) equality has been defined. When thinking about it, it is very hard to come up with any useful
- * notion of equality for class [[eu.cdevreeze.yaidom.Elem]].
+ * notion of equality for representations of XML elements. Think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
  *
  * The constructor is private. See the apply factory method on the companion object, and its documentation.
  */
