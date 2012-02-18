@@ -240,8 +240,8 @@ final class Elem private (
    * Returns a copy of the tree with this element as root element, except that the result tree is updated according to
    * the passed partial function mapping [[eu.cdevreeze.yaidom.ElemPath]]s to [[eu.cdevreeze.yaidom.Elem]]s.
    * That is, wherever (in top-down tree traversal) an element is found that has an ElemPath (w.r.t. this element as root)
-   * for which the partial function is defined, that partial function is invoked instead for that element, returning
-   * an "updated element".
+   * for which the partial function is defined, that partial function is invoked instead for that element, "replacing"
+   * that element, thus resulting in an "updated" tree.
    */
   def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
     def updated(currentPath: ElemPath): Elem = {
