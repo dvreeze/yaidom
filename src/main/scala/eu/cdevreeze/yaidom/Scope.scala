@@ -17,24 +17,26 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Scope mapping prefixes to namespace URIs, as well as holding an optional default
- * namespace.
+ * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace.
  *
  * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.ExpandedName]]s.
+ *
+ * A Scope must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
  *
  * @author Chris de Vreeze
  */
 final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[String, String]) extends Immutable {
   require(defaultNamespaceOption ne null)
   require {
-    defaultNamespaceOption forall { ns => (ns ne null) && (ns.length > 0) }
+    defaultNamespaceOption forall { ns => (ns ne null) && (ns.length > 0) && (ns != "http://www.w3.org/2000/xmlns/") }
   }
   require(prefixScope ne null)
   require {
     prefixScope forall { kv =>
       val pref = kv._1
       val ns = kv._2
-      (pref ne null) && XmlStringUtils.isAllowedPrefix(pref) && (ns ne null) && (ns.length > 0)
+      (pref ne null) && XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") &&
+        (ns ne null) && (ns.length > 0) && (ns != "http://www.w3.org/2000/xmlns/")
     }
   }
 
@@ -143,9 +145,9 @@ object Scope {
     require(declared ne null)
     require(undeclaredOptionalPrefixes ne null)
     require {
-      undeclaredOptionalPrefixes forall { pref =>
-        (pref ne null) && {
-          pref forall { s => XmlStringUtils.isAllowedPrefix(s) }
+      undeclaredOptionalPrefixes forall { prefOption =>
+        (prefOption ne null) && {
+          prefOption forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
         }
       }
     }
