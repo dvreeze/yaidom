@@ -106,8 +106,8 @@ package eu.cdevreeze
  * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
- * In this package are some ("explicit" and therefore safe) implicit conversions, for treating strings as QNames,
- * ExpandedNames, namespaces etc.
+ * In this package are some ("explicit" and therefore safe) implicit conversions, for treating a String as QName,
+ * ExpandedName, Scope.Declarations, Scope, etc.
  *
  * Parsing and printing of XML is not handled in this package. Even the <code>toString</code> methods for nodes
  * use the NodeBuilder DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
@@ -155,4 +155,12 @@ package object yaidom {
 
   /** Implicit conversion enriching a Map[String, String] with a <code>namespaces</code> method that turns the Map into a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
   implicit def toNamespaces(m: Map[String, String]): ToNamespaces = new ToNamespaces(m)
+
+  /** "Implicit class" for converting a Map[String, String] to a [[eu.cdevreeze.yaidom.Scope]] */
+  final class ToScope(val m: Map[String, String]) {
+    def scope: Scope = Scope.fromMap(m)
+  }
+
+  /** Implicit conversion enriching a Map[String, String] with a <code>scope</code> method that turns the Map into a [[eu.cdevreeze.yaidom.Scope]] */
+  implicit def toScope(m: Map[String, String]): ToScope = new ToScope(m)
 }
