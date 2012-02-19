@@ -25,7 +25,21 @@ import javax.xml.parsers.DocumentBuilderFactory
 import scala.collection.immutable
 import jinterop.DomConversions._
 
-/** DOM-based Document printer. */
+/**
+ * DOM-based Document printer.
+ *
+ * It may be the case that the DocumentPrinter does not indent. See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446.
+ * This problem appears especially when creating a Document from scratch, using NodeBuilders.
+ * A possible (implementation-specific) workaround is to create the DocumentPrinter as follows:
+ * {{{
+ * val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
+ *
+ * val transformerFactory: TransformerFactory = TransformerFactory.newInstance
+ * transformerFactory.setAttribute("indent-number", java.lang.Integer.valueOf(2))
+ *
+ * val documentPrinter = new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
+ * }}}
+ */
 final class DocumentPrinterUsingDom(
   val documentBuilderFactory: DocumentBuilderFactory,
   val transformerFactory: TransformerFactory) extends DocumentPrinter {
@@ -55,17 +69,6 @@ object DocumentPrinterUsingDom {
   def newInstance(): DocumentPrinterUsingDom = {
     val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
     val transformerFactory: TransformerFactory = TransformerFactory.newInstance
-    new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
-  }
-
-  /** Creates an instance with library-dependent (partial) patch for bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446 */
-  def newInstanceWithIndentPatch(): DocumentPrinterUsingDom = {
-    val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
-
-    val transformerFactory: TransformerFactory = TransformerFactory.newInstance
-    // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
-    transformerFactory.setAttribute("indent-number", java.lang.Integer.valueOf(2))
-
     new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
   }
 }
