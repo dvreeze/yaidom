@@ -3,7 +3,7 @@ Yet Another Immutable DOM
 =========================
 
 Yaidom (yet another immutable DOM) is a Scala-ish DOM-like API. Yaidom is DOM-like in that it represents
-XML as in-memory trees of elements and other nodes. Intentionally, yaidom does not implement W3C DOM.
+XML as in-memory trees of elements, text nodes, and other nodes. Intentionally, yaidom does not implement W3C DOM.
 Yaidom is Scala-ish in that it leverages immutability and the Scala Collections API.
 
 Why do we need yet another Scala DOM-like API? The standard Scala XML library has issues w.r.t. usability
@@ -32,9 +32,9 @@ Some characteristics of yaidom are:
   *  The node trees are immutable and therefore thread-safe
   *  Yaidom leverages the Scala Collections API
   *  Option types are used instead of null
-  *  Yaidom trees can be queried using the Scala Collections API as "query language"
+  *  Yaidom trees can be queried easily using Scala For Comprehensions
 
-* **Strict w.r.t. names and namespaces**
+* **Strict when it comes to names and namespaces**
 
   *  Qualified names, expanded names, namespace scopes and declarations are explicitly modeled
   *  Namespaces are first-class citizens in the API
@@ -47,3 +47,12 @@ Some characteristics of yaidom are:
   *  Less ambitious than Scala's XML library and Anti-XML (no XPath-like support, no value equality)
   *  Leaves many hard parts to Java's JAXP, such as parsing and printing
   *  Good interop with Java
+
+As said above, yaidom has no XPath-like support, and it does not try to unify nodes with collections of nodes.
+Yet yaidom trees can be queried quite well using Scala For Comprehensions. This is more verbose than XPath-like
+syntax (as in Scala's XML library, and in Anti-XML), but more straightforward to understand, use, and implement.
+
+Yaidom quite intentionally leaves the hard parts of parsing and printing to Java's JAXP. Think for example about
+"ignorable whitespace", or the many ways to configure a parser. Yaidom merely represents the parsed XML as immutable
+Scala-ish node trees.
+
