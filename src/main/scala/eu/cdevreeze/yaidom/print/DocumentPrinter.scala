@@ -17,7 +17,16 @@
 package eu.cdevreeze.yaidom
 package print
 
-/** [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a String). */
+/**
+ * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a String).
+ *
+ * Implementing classes deal with the details of printing yaidom documents as XML strings.
+ * The [[eu.cdevreeze.yaidom]] package itself is agnostic of those details.
+ *
+ * Typical implementations use DOM, StAX or SAX, but make them easier to use in the tradition of the "template" classes
+ * of the Spring framework. That is, resource management is done as much as possible by the DocumentPrinter,
+ * typical usage is easy, and complex scenarios are still possible.
+ */
 trait DocumentPrinter {
 
   /** Converts the Document to a String. May use a lot of memory for large XML documents. */

@@ -18,10 +18,10 @@ package eu.cdevreeze.yaidom
 package print
 
 import java.{ util => jutil, io => jio }
-import javax.xml.transform.{ TransformerFactory, OutputKeys }
+import javax.xml.transform.{ TransformerFactory, Transformer, OutputKeys }
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
-import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
 import jinterop.DomConversions._
 
@@ -42,14 +42,25 @@ import jinterop.DomConversions._
  */
 final class DocumentPrinterUsingDom(
   val documentBuilderFactory: DocumentBuilderFactory,
-  val transformerFactory: TransformerFactory) extends DocumentPrinter {
+  val documentBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
+  val transformerFactory: TransformerFactory,
+  val transformerCreator: TransformerFactory => Transformer) extends DocumentPrinter {
+
+  def this(dbf: DocumentBuilderFactory, tf: TransformerFactory) = this(
+    documentBuilderFactory = dbf,
+    documentBuilderCreator = { docBuilderFactory => docBuilderFactory.newDocumentBuilder() },
+    transformerFactory = tf,
+    transformerCreator = { transFactory =>
+      val t = transFactory.newTransformer()
+      t.setOutputProperty(OutputKeys.INDENT, "yes")
+      t
+    })
 
   def print(doc: Document): String = {
-    val docBuilder = documentBuilderFactory.newDocumentBuilder
+    val docBuilder = documentBuilderCreator(documentBuilderFactory)
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
 
-    val transformer = transformerFactory.newTransformer
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+    val transformer = transformerCreator(transformerFactory)
 
     val domSource = new DOMSource(domDocument)
 

@@ -71,18 +71,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
@@ -134,7 +125,6 @@ class StaxInteropTest extends Suite {
       processingInstructions = Nil.toIndexedSeq,
       comments = Nil.toIndexedSeq)
 
-    val printer = DocumentPrinterUsingStax.newInstance
     val xmlString2 = printer.print(doc)
 
     val doc2 = staxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
@@ -173,18 +163,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
@@ -238,18 +219,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertDocument(document)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(document)
 
     // 3. Parse XML string into Elem
 
@@ -486,18 +458,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
@@ -578,18 +541,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
@@ -663,19 +617,10 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    // The entity references are lost in the conversion within the print method!
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    // The entity references are lost in the following conversion!
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
@@ -721,18 +666,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
@@ -803,18 +739,9 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val bos = new jio.ByteArrayOutputStream
+    val printer = DocumentPrinterUsingStax.newInstance
 
-    val xmlEventFactory = XMLEventFactory.newFactory
-    val events = convertElem(root)(xmlEventFactory)
-
-    val xmlOutputFactory = XMLOutputFactory.newFactory
-    val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(bos)
-    events.foreach(ev => xmlEventWriter.add(ev))
-
-    xmlEventWriter.close()
-
-    val xmlString = new String(bos.toByteArray, "utf-8")
+    val xmlString = printer.print(Document(None, root))
 
     // 3. Parse XML string into Elem
 
