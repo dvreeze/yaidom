@@ -42,16 +42,16 @@ final class ElemProducingSaxContentHandler extends DefaultHandler {
       val newState = new State(Some(Document(None, elm)), ElemPath.Root)
       currentState = newState
     } else {
-      val newParent = currentState.documentElement.findWithElemPath(currentState.elemPath).get
-
       val updatedRoot = currentState.documentElement updated {
-        case p if p == currentState.elemPath => newParent.plusChild(elm)
+        case p if p == currentState.elemPath =>
+          val newParent = currentState.documentElement.findWithElemPath(currentState.elemPath).get
+          newParent.plusChild(elm)
       }
 
-      val updatedNewParent = updatedRoot.findWithElemPath(currentState.elemPath).get
+      val newParent = updatedRoot.findWithElemPath(currentState.elemPath).get
 
       val newDoc = currentState.documentOption.get.withDocumentElement(updatedRoot)
-      val pathEntry = elm.ownElemPathEntry(updatedNewParent)
+      val pathEntry = elm.ownElemPathEntry(newParent)
       val newState = new State(Some(newDoc), currentState.elemPath.append(pathEntry))
       currentState = newState
     }
