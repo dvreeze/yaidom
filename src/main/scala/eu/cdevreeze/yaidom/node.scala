@@ -109,6 +109,13 @@ final class Document(
     comments ++ elemComments
   }
 
+  /** Creates a copy, but with the new documentElement passed as parameter newRoot */
+  def withDocumentElement(newRoot: Elem): Document = new Document(
+    baseUriOption = this.baseUriOption,
+    documentElement = newRoot,
+    processingInstructions = this.processingInstructions,
+    comments = this.comments)
+
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
@@ -235,6 +242,9 @@ final class Elem private (
 
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
+
+  /** Returns <code>withChildren(self.children ++ List(newChild))</code>. */
+  def plusChild(newChild: Node): Elem = withChildren(self.children ++ List(newChild))
 
   /**
    * Returns a copy of the tree with this element as root element, except that the result tree is updated according to

@@ -20,7 +20,8 @@ object XmlStringUtils {
   /** Returns true if the name is probably a valid XML name which is not reserved and contains no colon. */
   def isAllowedElementLocalName(s: String): Boolean = {
     require(s ne null)
-    (s.length > 0) && !isReserved(s) && !containsColon(s) && isProbablyValidXmlName(s)
+    // Name "xmlns" allowed for default namespace declarations.
+    (s.length > 0) && (!isReserved(s) || (s == "xmlns")) && !containsColon(s) && isProbablyValidXmlName(s)
   }
 
   /** Returns true if the name is probably a valid XML name which contains no colon. */
