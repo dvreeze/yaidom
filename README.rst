@@ -22,25 +22,26 @@ Yaidom in a nutshell
 
 Some characteristics of yaidom are:
 
-* ** DOM-like **
+* **DOM-like**
 
   *  Like DOM, Yaidom represents XML as trees of nodes, stored entirely in memory
   *  Only XML is modeled, not HTML
 
-* ** Scala-ish  **
+* **Scala-ish**
 
   *  The node trees are immutable and therefore thread-safe
   *  Yaidom leverages the Scala Collections API
   *  Option types are used instead of null
   *  Yaidom trees can be queried using the Scala Collections API as "query language"
 
-* ** Strict w.r.t. names and namespaces **
+* **Strict w.r.t. names and namespaces**
 
   *  Qualified names, expanded names, namespace scopes and declarations are explicitly modeled
   *  Namespaces are first-class citizens in the API
   *  DTDs are not first-class citizens
 
-* ** Conceptually simple **
+* **Conceptually simple**
+
   *  Few concepts to learn and understand
   *  Also easy to implement
   *  Less ambitious than Scala's XML library and Anti-XML (no XPath-like support, no value equality)
