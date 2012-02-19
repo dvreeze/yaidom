@@ -68,6 +68,9 @@ class XmlStringUtilsTest extends Suite {
       isProbablyValidXmlName("xmlns")
     }
     expect(false) {
+      isAllowedElementLocalName("xml")
+    }
+    expect(true) {
       isAllowedElementLocalName("xmlns")
     }
 
