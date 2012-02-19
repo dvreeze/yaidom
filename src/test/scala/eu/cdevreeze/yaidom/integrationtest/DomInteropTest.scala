@@ -20,6 +20,7 @@ package integrationtest
 import java.{ util => jutil, io => jio }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import org.w3c.dom.{ Element }
+import org.xml.sax.{ EntityResolver, InputSource }
 import javax.xml.transform.stream.StreamSource
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
@@ -282,6 +283,18 @@ class DomInteropTest extends Suite {
 
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
+    db.setEntityResolver(new EntityResolver {
+      def resolveEntity(publicId: String, systemId: String): InputSource = {
+        if (systemId.endsWith("/XMLSchema.dtd")) {
+          new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
+        } else if (systemId.endsWith("datatypes.dtd")) {
+          new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
+        } else {
+          // Default behaviour
+          null
+        }
+      }
+    })
     val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
     val doc = db.parse(is)
 
