@@ -28,7 +28,7 @@ final class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,
   val outputFactory: XMLOutputFactory) extends DocumentPrinter {
 
-  def printXml(doc: Document): String = {
+  def print(doc: Document): String = {
     val events: immutable.Seq[XMLEvent] = convertDocument(doc)(eventFactory)
 
     val sw = new jio.StringWriter

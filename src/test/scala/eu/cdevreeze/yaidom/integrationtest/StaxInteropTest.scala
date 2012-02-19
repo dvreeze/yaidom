@@ -135,7 +135,7 @@ class StaxInteropTest extends Suite {
       comments = Nil.toIndexedSeq)
 
     val printer = DocumentPrinterUsingStax.newInstance
-    val xmlString2 = printer.printXml(doc)
+    val xmlString2 = printer.print(doc)
 
     val doc2 = staxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
 

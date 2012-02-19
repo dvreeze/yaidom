@@ -21,5 +21,5 @@ package print
 trait DocumentPrinter {
 
   /** Converts the Document to a String. May use a lot of memory for large XML documents. */
-  def printXml(doc: Document): String
+  def print(doc: Document): String
 }

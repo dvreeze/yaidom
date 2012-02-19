@@ -44,7 +44,7 @@ final class DocumentPrinterUsingDom(
   val documentBuilderFactory: DocumentBuilderFactory,
   val transformerFactory: TransformerFactory) extends DocumentPrinter {
 
-  def printXml(doc: Document): String = {
+  def print(doc: Document): String = {
     val docBuilder = documentBuilderFactory.newDocumentBuilder
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
 

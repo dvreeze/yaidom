@@ -125,7 +125,7 @@ class DomInteropTest extends Suite {
       comments = Nil.toIndexedSeq)
 
     val printer = DocumentPrinterUsingDom.newInstance
-    val xmlString2 = printer.printXml(doc)
+    val xmlString2 = printer.print(doc)
 
     val bis = new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8"))
     val doc2 = domParser.parse(bis)
