@@ -287,7 +287,7 @@ class DomInteropTest extends Suite {
       def resolveEntity(publicId: String, systemId: String): InputSource = {
         if (systemId.endsWith("/XMLSchema.dtd")) {
           new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
-        } else if (systemId.endsWith("datatypes.dtd")) {
+        } else if (systemId.endsWith("/datatypes.dtd")) {
           new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
         } else {
           // Default behaviour
