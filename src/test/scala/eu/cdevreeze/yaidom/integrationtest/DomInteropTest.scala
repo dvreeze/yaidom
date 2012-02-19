@@ -285,9 +285,9 @@ class DomInteropTest extends Suite {
     val db = dbf.newDocumentBuilder
     db.setEntityResolver(new EntityResolver {
       def resolveEntity(publicId: String, systemId: String): InputSource = {
-        if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd")) {
+        if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
           new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
-        } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd")) {
+        } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
           new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
         } else {
           // Default behaviour
