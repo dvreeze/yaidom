@@ -20,19 +20,25 @@ package parse
 import java.{ io => jio }
 import javax.xml.stream.{ XMLInputFactory, XMLEventReader }
 import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.Source
+import scala.util.control.Exception._
 import jinterop.StaxConversions._
 
 /** StAX-based Document parser */
 final class DocumentParserUsingStax(val xmlInputFactory: XMLInputFactory) extends DocumentParser {
 
-  def parse(source: Source): Document = {
+  /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
+  def parse(inputStream: jio.InputStream): Document = {
     var xmlEventReader: XMLEventReader = null
     try {
-      xmlEventReader = xmlInputFactory.createXMLEventReader(source)
+      xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
       convertToDocument(xmlEventReader.toSeq)
     } finally {
-      if (xmlEventReader ne null) xmlEventReader.close()
+      ignoring(classOf[Exception]) {
+        if (xmlEventReader ne null) xmlEventReader.close()
+      }
+      ignoring(classOf[Exception]) {
+        if (inputStream ne null) inputStream.close()
+      }
     }
   }
 }

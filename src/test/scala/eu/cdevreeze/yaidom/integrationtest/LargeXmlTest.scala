@@ -63,7 +63,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val xmlString = stringWriter.toString
 
     val parser = DocumentParserUsingStax.newInstance
-    doc = parser.parse(new StreamSource(new jio.StringReader(xmlString)))
+    doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
   }
 
   @Test def testProcessLargeXml() {

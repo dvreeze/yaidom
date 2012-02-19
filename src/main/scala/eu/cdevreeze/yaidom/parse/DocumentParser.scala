@@ -17,10 +17,11 @@
 package eu.cdevreeze.yaidom
 package parse
 
-import javax.xml.transform.Source
+import java.io.InputStream
 
 /** [[eu.cdevreeze.yaidom.Document]] parser */
 trait DocumentParser {
 
-  def parse(source: Source): Document
+  /** Parses the input stream into a [[eu.cdevreeze.yaidom.Document]]. This method should close the input stream afterwards. */
+  def parse(inputStream: InputStream): Document
 }

@@ -29,6 +29,7 @@ package jinterop
  * val doc = db.parse(inputFile)
  * val root: Elem = convertToElem(doc.getDocumentElement)
  * }}}
+ * Class [[eu.cdevreeze.yaidom.parse.DocumentParserUsingDom]] makes this a lot easier, though.
  *
  * A somewhat involved example for writing an [[eu.cdevreeze.yaidom.Elem]] to an XML file using DOM:
  * {{{
@@ -47,6 +48,7 @@ package jinterop
  *
  * outputStream.close()
  * }}}
+ * Class [[eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom]] makes this a lot easier, though.
  *
  * @author Chris de Vreeze
  */

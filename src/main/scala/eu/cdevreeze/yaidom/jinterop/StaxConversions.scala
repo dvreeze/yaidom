@@ -36,6 +36,7 @@ import scala.collection.JavaConverters._
  *
  * xmlEventReader.close()
  * }}}
+ * Class [[eu.cdevreeze.yaidom.parse.DocumentParserUsingStax]] makes this a lot easier, though.
  *
  * A somewhat involved example for writing an [[eu.cdevreeze.yaidom.Elem]] to an XML file using StAX:
  * {{{
@@ -50,6 +51,7 @@ import scala.collection.JavaConverters._
  *
  * xmlEventWriter.close()
  * }}}
+ * Class [[eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax]] makes this a lot easier, though.
  *
  * @author Chris de Vreeze
  */

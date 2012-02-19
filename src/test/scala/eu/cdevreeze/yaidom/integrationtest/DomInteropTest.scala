@@ -18,16 +18,16 @@ package eu.cdevreeze.yaidom
 package integrationtest
 
 import java.{ util => jutil, io => jio }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import org.w3c.dom.{ Element }
 import org.xml.sax.{ EntityResolver, InputSource }
 import javax.xml.transform.stream.StreamSource
+import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingStax
+import parse.DocumentParserUsingDom
 import print.DocumentPrinterUsingDom
 import jinterop.DomConversions._
 
@@ -52,13 +52,10 @@ class DomInteropTest extends Suite {
   @Test def testParse() {
     // 1. Parse XML file into Elem
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
+    val domParser = DocumentParserUsingDom.newInstance
     val is = classOf[DomInteropTest].getResourceAsStream("books.xml")
-    val domDoc: org.w3c.dom.Document = db.parse(is)
 
-    val root: Elem = convertToElem(domDoc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       root.allElems map { e => e.qname.localPart } toSet
@@ -75,7 +72,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = dbf.newDocumentBuilder
+    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
     val domDoc2: org.w3c.dom.Document = db2.newDocument
     val element = convertElem(root)(domDoc2)
 
@@ -130,9 +127,8 @@ class DomInteropTest extends Suite {
     val printer = DocumentPrinterUsingDom.newInstance
     val xmlString2 = printer.printXml(doc)
 
-    val parser = DocumentParserUsingStax.newInstance
-    val source = new StreamSource(new jio.StringReader(xmlString2))
-    val doc2 = parser.parse(source)
+    val bis = new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8"))
+    val doc2 = domParser.parse(bis)
 
     val root4 = doc2.documentElement
 
@@ -156,13 +152,10 @@ class DomInteropTest extends Suite {
   @Test def testParseStrangeXml() {
     // 1. Parse XML file into Elem
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
+    val domParser = DocumentParserUsingDom.newInstance
     val is = classOf[DomInteropTest].getResourceAsStream("strangeXml.xml")
-    val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
       val result = root.allElemsOrSelf map { e => e.resolvedName }
@@ -171,7 +164,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = dbf.newDocumentBuilder
+    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
 
@@ -200,14 +193,11 @@ class DomInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml() {
     // 1. Parse XML file into Elem
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
+    val domParser = DocumentParserUsingDom.newInstance
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXml.xml")
-    val doc = db.parse(is)
 
-    val document: eu.cdevreeze.yaidom.Document = convertToDocument(doc)
+    val document: Document = domParser.parse(is)
     val root: Elem = document.documentElement
-    is.close()
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
       val result = root.allElemsOrSelf map { e => e.resolvedName }
@@ -228,7 +218,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = dbf.newDocumentBuilder
+    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
     val doc2 = convertDocument(document)(db2.newDocument)
 
     // 3. Convert DOM element into Elem
@@ -282,25 +272,28 @@ class DomInteropTest extends Suite {
     // 1. Parse XML file into Elem
 
     val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    db.setEntityResolver(new EntityResolver {
-      def resolveEntity(publicId: String, systemId: String): InputSource = {
-        if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
-          new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
-        } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
-          new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
-        } else {
-          // Default behaviour
-          null
-        }
-      }
-    })
-    val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
-    val doc = db.parse(is)
 
-    val document: eu.cdevreeze.yaidom.Document = convertToDocument(doc)
-    val root: Elem = document.documentElement
-    is.close()
+    def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
+      val db = documentBuilderFactory.newDocumentBuilder()
+      db.setEntityResolver(new EntityResolver {
+        def resolveEntity(publicId: String, systemId: String): InputSource = {
+          if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
+            new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
+          } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
+            new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
+          } else {
+            // Default behaviour
+            null
+          }
+        }
+      })
+      db
+    }
+
+    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+    val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
+
+    val root: Elem = domParser.parse(is).documentElement
 
     val ns = nsXmlSchema.ns
 
@@ -524,13 +517,10 @@ class DomInteropTest extends Suite {
   @Test def testParseXmlWithExpandedEntityRef() {
     // 1. Parse XML file into Elem
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
+    val domParser = DocumentParserUsingDom.newInstance
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -557,7 +547,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = dbf.newDocumentBuilder
+    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
 
@@ -591,12 +581,10 @@ class DomInteropTest extends Suite {
 
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setExpandEntityReferences(false)
-    val db = dbf.newDocumentBuilder
+    val domParser = new DocumentParserUsingDom(dbf)
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -664,13 +652,10 @@ class DomInteropTest extends Suite {
   @Test def testParseXmlWithNamespaceUndeclarations() {
     // 1. Parse XML file into Elem
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
+    val domParser = DocumentParserUsingDom.newInstance
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
-    val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -681,7 +666,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = dbf.newDocumentBuilder
+    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
 
@@ -711,12 +696,10 @@ class DomInteropTest extends Suite {
 
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setCoalescing(true)
-    val db = dbf.newDocumentBuilder
+    val domParser = new DocumentParserUsingDom(dbf)
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
-    val doc = db.parse(is)
 
-    val root: Elem = convertToElem(doc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -786,13 +769,10 @@ class DomInteropTest extends Suite {
   @Test def testParseGeneratedHtml() {
     // 1. Parse XML file into Elem
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
+    val domParser = DocumentParserUsingDom.newInstance
     val is = classOf[DomInteropTest].getResourceAsStream("books.xml")
-    val domDoc: org.w3c.dom.Document = db.parse(is)
 
-    val root: Elem = convertToElem(domDoc.getDocumentElement)
-    is.close()
+    val root: Elem = domParser.parse(is).documentElement
 
     require(root.qname.localPart == "Bookstore")
 
@@ -846,12 +826,7 @@ class DomInteropTest extends Suite {
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
 
-    val reader = new jio.StringReader(htmlString)
-    val inputSource = new org.xml.sax.InputSource(reader)
-    val htmlDomDoc: org.w3c.dom.Document = db.parse(inputSource)
-
-    val htmlRoot: Elem = convertToElem(htmlDomDoc.getDocumentElement)
-    reader.close()
+    val htmlRoot: Elem = domParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
 
     // 4. Check the parsed HTML
 

@@ -51,12 +51,10 @@ class StaxInteropTest extends Suite {
   @Test def testParse() {
     // 1. Parse XML file into Elem
 
-    val xmlInputFactory = XMLInputFactory.newFactory
+    val staxParser = DocumentParserUsingStax.newInstance
     val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       root.allElems map { e => e.qname.localPart } toSet
@@ -89,10 +87,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -141,9 +137,7 @@ class StaxInteropTest extends Suite {
     val printer = DocumentPrinterUsingStax.newInstance
     val xmlString2 = printer.printXml(doc)
 
-    val parser = DocumentParserUsingStax.newInstance
-    val source = new StreamSource(new jio.StringReader(xmlString2))
-    val doc2 = parser.parse(source)
+    val doc2 = staxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
 
     val root4 = doc2.documentElement
 
@@ -167,12 +161,10 @@ class StaxInteropTest extends Suite {
   @Test def testParseStrangeXml() {
     // 1. Parse XML file into Elem
 
-    val xmlInputFactory = XMLInputFactory.newFactory
+    val staxParser = DocumentParserUsingStax.newInstance
     val is = classOf[StaxInteropTest].getResourceAsStream("strangeXml.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
       val result = root.allElemsOrSelf map { e => e.resolvedName }
@@ -197,10 +189,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -223,13 +213,11 @@ class StaxInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml() {
     // 1. Parse XML file into Elem
 
-    val xmlInputFactory = XMLInputFactory.newFactory
+    val staxParser = DocumentParserUsingStax.newInstance
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXml.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val document: Document = convertToDocument(eventReader.toSeq)
+    val document: Document = staxParser.parse(is)
     val root: Elem = document.documentElement
-    eventReader.close()
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
       val result = root.allElemsOrSelf map { e => e.resolvedName }
@@ -266,11 +254,9 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val document2: Document = convertToDocument(eventReader.toSeq)
+    val document2: Document = staxParser.parse(bis)
     val root2: Elem = document2.documentElement
-    eventReader.close()
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -319,12 +305,11 @@ class StaxInteropTest extends Suite {
 
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
     val is = classOf[StaxInteropTest].getResourceAsStream("XMLSchema.xsd")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val document: Document = convertToDocument(eventReader.toSeq)
+    val document: Document = staxParser.parse(is)
     val root: Elem = document.documentElement
-    eventReader.close()
 
     val ns = nsXmlSchema.ns
 
@@ -517,10 +502,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -564,11 +547,10 @@ class StaxInteropTest extends Suite {
 
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -612,10 +594,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -643,11 +623,10 @@ class StaxInteropTest extends Suite {
 
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, java.lang.Boolean.FALSE)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -701,10 +680,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -730,11 +707,10 @@ class StaxInteropTest extends Suite {
 
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -761,10 +737,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -788,11 +762,10 @@ class StaxInteropTest extends Suite {
 
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     val ns = "urn:foo:bar".ns
 
@@ -846,10 +819,8 @@ class StaxInteropTest extends Suite {
     // 3. Parse XML string into Elem
 
     val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
-    eventReader = xmlInputFactory.createXMLEventReader(bis)
 
-    val root2: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root2: Elem = staxParser.parse(bis).documentElement
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
@@ -875,12 +846,10 @@ class StaxInteropTest extends Suite {
   @Test def testParseGeneratedHtml() {
     // 1. Parse XML file into Elem
 
-    val xmlInputFactory = XMLInputFactory.newFactory
+    val staxParser = DocumentParserUsingStax.newInstance
     val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
-    var eventReader = xmlInputFactory.createXMLEventReader(is)
 
-    val root: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val root: Elem = staxParser.parse(is).documentElement
 
     require(root.qname.localPart == "Bookstore")
 
@@ -934,11 +903,7 @@ class StaxInteropTest extends Suite {
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
 
-    val reader = new jio.StringReader(htmlString)
-    eventReader = xmlInputFactory.createXMLEventReader(reader)
-
-    val htmlRoot: Elem = convertToElem(eventReader.toSeq)
-    eventReader.close()
+    val htmlRoot: Elem = staxParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
 
     // 4. Check the parsed HTML
 
