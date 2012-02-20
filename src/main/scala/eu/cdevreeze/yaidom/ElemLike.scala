@@ -69,6 +69,8 @@ import scala.collection.immutable
  * @author Chris de Vreeze
  */
 trait ElemLike[E <: ElemLike[E]] { self: E =>
+  
+  // TODO Use immutable.IndexedSeq, in the API and inside implementations. That should also help getting better performance.
 
   /** Resolved name of the element, as ExpandedName */
   def resolvedName: ExpandedName
@@ -169,14 +171,26 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
   }
 
-  /** Returns the equivalent of <code>findWithElemPath(ElemPath(List(entry)))</code> */
+  /**
+   * Returns the equivalent of <code>findWithElemPath(ElemPath(List(entry)))</code>, but it should be more efficient.
+   *
+   * It is important that this method has a fast implementation.
+   * 
+   * TODO Make faster
+   */
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
     val relevantChildElms = self.childElems(entry.elementName)
 
     if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
   }
 
-  /** Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option. */
+  /**
+   * Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option.
+   *
+   * It is important that this method has a fast implementation.
+   * 
+   * TODO Make faster
+   */
   final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
     case Nil => Some(self)
     case _ =>

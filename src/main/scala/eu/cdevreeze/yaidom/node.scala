@@ -116,6 +116,9 @@ final class Document(
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
+  /** Returns <code>withDocumentElement(this.documentElement updated pf)</code> */
+  def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
+
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 

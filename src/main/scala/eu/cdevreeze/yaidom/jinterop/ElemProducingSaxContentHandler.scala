@@ -19,6 +19,7 @@ package jinterop
 
 import org.xml.sax.{ ContentHandler, Attributes, Locator }
 import org.xml.sax.helpers.DefaultHandler
+import scala.collection.immutable
 import eu.cdevreeze.yaidom._
 import ElemProducingSaxContentHandler._
 
@@ -26,78 +27,83 @@ import ElemProducingSaxContentHandler._
  * SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.Elem]] using
  * method <code>resultingElem</code>, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
  * <code>resultingDocument</code>.
+ *
+ * Can be used as mixin, mixing in some EntityResolver as well, for example.
  */
-final class ElemProducingSaxContentHandler extends DefaultHandler {
+trait ElemProducingSaxContentHandler extends DefaultHandler {
 
-  // Robust "functional" but inefficient implementation, but, who knows, maybe it is fast enough...
+  // Rather "functional" but currently extremely inefficient implementation.
+  // Still, I am not ready yet to use mutable node trees here. First I want much faster tree transformations
+  // while still using the immutable node trees.
 
   @volatile var currentState: State = State.Empty
 
-  override def startDocument() = ()
+  final override def startDocument() = ()
 
-  override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
+  final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
     val elm = startElementToElem(uri, localName, qName, atts)
 
     if (currentState.documentOption.isEmpty) {
-      val newState = new State(Some(Document(None, elm)), ElemPath.Root)
+      val doc = Document(None, elm, currentState.topLevelProcessingInstructions, immutable.IndexedSeq())
+      val newState = new State(Some(doc), ElemPath.Root)
       currentState = newState
     } else {
-      val updatedRoot = currentState.documentElement updated {
-        case p if p == currentState.elemPath =>
-          val newParent = currentState.documentElement.findWithElemPath(currentState.elemPath).get
-          newParent.plusChild(elm)
+      val updatedDoc = currentState.documentOption.get updated {
+        case p if p == currentState.elemPath => currentState.elem.plusChild(elm)
       }
 
-      val newParent = updatedRoot.findWithElemPath(currentState.elemPath).get
-
-      val newDoc = currentState.documentOption.get.withDocumentElement(updatedRoot)
+      val newParent = updatedDoc.documentElement.findWithElemPath(currentState.elemPath).get
       val pathEntry = elm.ownElemPathEntry(newParent)
-      val newState = new State(Some(newDoc), currentState.elemPath.append(pathEntry))
+
+      val newState = new State(Some(updatedDoc), currentState.elemPath.append(pathEntry))
       currentState = newState
     }
   }
 
-  override def endElement(uri: String, localName: String, qName: String) {
+  final override def endElement(uri: String, localName: String, qName: String) {
     require(currentState.documentOption.isDefined)
     val newState = new State(currentState.documentOption, currentState.elemPath.parentPathOption.getOrElse(ElemPath.Root))
     currentState = newState
   }
 
-  override def characters(ch: Array[Char], start: Int, length: Int) {
+  final override def characters(ch: Array[Char], start: Int, length: Int) {
     val text = Text(new String(ch, start, length), false)
 
     if (currentState.documentOption.isEmpty) {
-      // Currently ignored
+      // Ignore
+      require(currentState.elemPath == ElemPath.Root)
     } else {
-      val updatedRoot = currentState.documentElement updated {
+      val updatedDoc = currentState.documentOption.get updated {
         case p if p == currentState.elemPath => currentState.elem.plusChild(text)
       }
 
-      val newDoc = currentState.documentOption.get.withDocumentElement(updatedRoot)
-      val newState = new State(Some(newDoc), currentState.elemPath)
+      val newState = new State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
   }
 
-  override def processingInstruction(target: String, data: String) {
+  final override def processingInstruction(target: String, data: String) {
     val pi = ProcessingInstruction(target, data)
 
     if (currentState.documentOption.isEmpty) {
-      // Currently ignored
+      require(currentState.elemPath == ElemPath.Root)
+      currentState = new State(
+        None,
+        ElemPath.Root,
+        currentState.topLevelProcessingInstructions :+ pi)
     } else {
-      val updatedRoot = currentState.documentElement updated {
+      val updatedDoc = currentState.documentOption.get updated {
         case p if p == currentState.elemPath => currentState.elem.plusChild(pi)
       }
 
-      val newDoc = currentState.documentOption.get.withDocumentElement(updatedRoot)
-      val newState = new State(Some(newDoc), currentState.elemPath)
+      val newState = new State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
   }
 
-  override def endDocument() = ()
+  final override def endDocument() = ()
 
-  override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int) {
+  final override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int) {
     // Self call. If ignorable whitespace makes it until here, we store it in the result tree.
     characters(ch, start, length)
   }
@@ -105,13 +111,13 @@ final class ElemProducingSaxContentHandler extends DefaultHandler {
   // ContentHandler methods startPrefixMapping, endPrefixMapping, skippedEntity and setDocumentLocator not overridden
 
   /** Returns the resulting Elem. Do not call before SAX parsing is ready. */
-  def resultingElem: Elem = {
+  final def resultingElem: Elem = {
     val root = currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?")).documentElement
     root.findWithElemPath(currentState.elemPath).getOrElse(sys.error("Wrong ElemPath '%s'".format(currentState.elemPath)))
   }
 
   /** Returns the resulting Document. Do not call before SAX parsing is ready. */
-  def resultingDocument: Document = currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?"))
+  final def resultingDocument: Document = currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?"))
 
   private def startElementToElem(uri: String, localName: String, qName: String, atts: Attributes): Elem = {
     require(uri ne null)
@@ -123,20 +129,11 @@ final class ElemProducingSaxContentHandler extends DefaultHandler {
     val newScope = currentState.scope.resolve(extractDeclarations(atts))
     val attrMap = extractAttributeMap(atts)
 
-    Elem(
-      qname = elmQName,
-      attributes = attrMap,
-      scope = newScope,
-      children = Nil)
+    Elem(qname = elmQName, attributes = attrMap, scope = newScope, children = Nil)
   }
 
   private def extractDeclarations(atts: Attributes): Scope.Declarations = {
-    val attMap: Map[String, String] = {
-      val result = (0 until atts.getLength).toIndexedSeq map { (idx: Int) => (atts.getQName(idx) -> atts.getValue(idx)) }
-      result.toMap
-    }
-
-    val result = attMap filterKeys { qname => isNamespaceDeclaration(qname) } map { kv =>
+    val result = attributeOrDeclarationMap(atts) filterKeys { qname => isNamespaceDeclaration(qname) } map { kv =>
       val key = kv._1.qname
       val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
       val nsUri = kv._2
@@ -146,17 +143,17 @@ final class ElemProducingSaxContentHandler extends DefaultHandler {
   }
 
   private def extractAttributeMap(atts: Attributes): Map[QName, String] = {
-    val attMap: Map[String, String] = {
-      val result = (0 until atts.getLength).toIndexedSeq map { (idx: Int) => (atts.getQName(idx) -> atts.getValue(idx)) }
-      result.toMap
-    }
-
-    val result = attMap filterKeys { qname => !isNamespaceDeclaration(qname) } map { kv =>
+    val result = attributeOrDeclarationMap(atts) filterKeys { qname => !isNamespaceDeclaration(qname) } map { kv =>
       val qname = kv._1.qname
       val attValue = kv._2
       (qname -> attValue)
     }
     result
+  }
+
+  private def attributeOrDeclarationMap(atts: Attributes): Map[String, String] = {
+    val result = (0 until atts.getLength).toIndexedSeq map { (idx: Int) => (atts.getQName(idx) -> atts.getValue(idx)) }
+    result.toMap
   }
 
   /** Returns true if the attribute qualified (prefixed) name is a namespace declaration */
@@ -172,10 +169,14 @@ object ElemProducingSaxContentHandler {
 
   final class State(
     val documentOption: Option[Document],
-    val elemPath: ElemPath) extends Immutable {
+    val elemPath: ElemPath,
+    val topLevelProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq()) extends Immutable {
 
     require(documentOption ne null)
     require(elemPath ne null)
+    require(topLevelProcessingInstructions ne null)
+
+    require(topLevelProcessingInstructions.isEmpty || documentOption.isEmpty)
 
     def elemOption: Option[Elem] = {
       documentOption map { doc => doc.documentElement } flatMap { root => root.findWithElemPath(elemPath) }

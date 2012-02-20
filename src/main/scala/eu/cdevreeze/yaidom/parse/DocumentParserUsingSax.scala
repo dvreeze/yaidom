@@ -19,26 +19,27 @@ package parse
 
 import java.{ io => jio }
 import javax.xml.parsers.{ SAXParserFactory, SAXParser }
-import org.w3c.dom.Element
+import org.xml.sax.helpers.DefaultHandler
 import jinterop.ElemProducingSaxContentHandler
 
 /** SAX-based Document parser */
 final class DocumentParserUsingSax(
   val saxParserFactory: SAXParserFactory,
-  val saxParserCreator: SAXParserFactory => SAXParser) extends DocumentParser {
+  val saxParserCreator: SAXParserFactory => SAXParser,
+  val defaultHandler: ElemProducingSaxContentHandler) extends DocumentParser {
 
   def this(spf: SAXParserFactory) = this(
     saxParserFactory = spf,
     saxParserCreator = { spf =>
       val parser = spf.newSAXParser()
       parser
-    })
+    },
+    defaultHandler = new DefaultHandler with ElemProducingSaxContentHandler)
 
   /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     try {
       val sp: SAXParser = saxParserCreator(saxParserFactory)
-      val defaultHandler = new ElemProducingSaxContentHandler
       sp.parse(inputStream, defaultHandler)
 
       val doc: Document = defaultHandler.resultingDocument
