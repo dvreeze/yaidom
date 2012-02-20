@@ -23,7 +23,7 @@ package print
  * Implementing classes deal with the details of printing yaidom documents as XML strings.
  * The [[eu.cdevreeze.yaidom]] package itself is agnostic of those details.
  *
- * Typical implementations use DOM, StAX or SAX, but make them easier to use in the tradition of the "template" classes
+ * Typical implementations use DOM or StAX, but make them easier to use in the tradition of the "template" classes
  * of the Spring framework. That is, resource management is done as much as possible by the DocumentPrinter,
  * typical usage is easy, and complex scenarios are still possible.
  */
