@@ -40,7 +40,7 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
   def prepend(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
 
   /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
-  def skipEntry: ElemPath = ElemPath(entries.tail)
+  def withoutFirstEntry: ElemPath = ElemPath(entries.tail)
 
   /** Appends a given Entry to this ElemPath */
   def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries :+ entry)

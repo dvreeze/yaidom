@@ -301,7 +301,7 @@ final class Elem private (
       require(idx >= 0)
       val childElm = children(idx).asInstanceOf[Elem]
       // Recursive, but not tail-recursive
-      val updatedChildren = children.updated(idx, childElm.updated(path.skipEntry, f))
+      val updatedChildren = children.updated(idx, childElm.updated(path.withoutFirstEntry, f))
       self.withChildren(updatedChildren)
     }
   }
