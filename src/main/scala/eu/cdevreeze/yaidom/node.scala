@@ -260,6 +260,8 @@ final class Elem private (
    * That is, wherever (in top-down tree traversal) an element is found that has an ElemPath (w.r.t. this element as root)
    * for which the partial function is defined, that partial function is invoked instead for that element, "replacing"
    * that element, thus resulting in an "updated" tree.
+   *
+   * This is typically an expensive method.
    */
   def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
     def updated(currentPath: ElemPath): Elem = {
@@ -268,24 +270,16 @@ final class Elem private (
       currentPath match {
         case p if pf.isDefinedAt(p) => pf(p)
         case p =>
-          val childElmEntries = elm.allChildElemPathEntries
-          val childElmPaths = childElmEntries map { entry => currentPath.append(entry) }
-
-          // Recursive, but not tail-recursive. In practice, this should be no problem due to limited recursion depths.
-          val childElmResults = childElmPaths map { path => updated(path) }
-
-          var remainingChildElmResults = childElmResults
-
           val childResults: immutable.IndexedSeq[Node] = elm.children map {
             case e: Elem =>
-              require(!remainingChildElmResults.isEmpty)
-              val currResult = remainingChildElmResults.head
-              remainingChildElmResults = remainingChildElmResults.tail
-              currResult
+              val ownPathEntry = e.ownElemPathEntry(elm)
+              val ownPath = currentPath.append(ownPathEntry)
+
+              // Recursive call, but not tail-recursive
+              val updatedElm = updated(ownPath)
+              updatedElm
             case n => n
           }
-
-          require(remainingChildElmResults.isEmpty)
 
           elm.withChildren(childResults)
       }
@@ -298,7 +292,7 @@ final class Elem private (
    * Returns a copy of the tree with this element as root element, except that the result tree is updated by replacing the
    * element at the given ElemPath (against this element as root) by applying the given function to that element.
    *
-   * This method should be far more efficient than the counterpart taking a partial function.
+   * This method should be far more efficient than the counterpart taking a partial function, be it less powerful.
    */
   def updated(path: ElemPath, f: Elem => Elem): Elem = {
     if (path.entries.isEmpty) f(self) else {
