@@ -234,11 +234,11 @@ final class Elem private (
     }
   }
 
-  /** Returns all child elements */
-  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
+  /** Returns all child elements. Being a val instead of def tremendously helps performance. */
+  override val allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
-  /** Returns the text children */
-  override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
+  /** Returns the text children. Being a val instead of def helps performance. */
+  override val textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
   /** Returns the comment children */
   def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }

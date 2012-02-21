@@ -70,8 +70,6 @@ import scala.collection.immutable
  */
 trait ElemLike[E <: ElemLike[E]] { self: E =>
 
-  // TODO Use immutable.IndexedSeq, in the API and inside implementations. That should also help getting better performance.
-
   /** Resolved name of the element, as ExpandedName */
   def resolvedName: ExpandedName
 
