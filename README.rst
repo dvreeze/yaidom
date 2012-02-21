@@ -32,7 +32,7 @@ Some characteristics of yaidom are:
   *  The node trees are immutable and therefore thread-safe
   *  Yaidom leverages the Scala Collections API
   *  Option types are used instead of null
-  *  Yaidom trees can be queried easily using Scala For Comprehensions
+  *  Yaidom trees can be queried easily using Scala *for comprehensions*
 
 * **Strict when it comes to names and namespaces**
 
@@ -45,11 +45,11 @@ Some characteristics of yaidom are:
   *  Few concepts to learn and understand
   *  Also easy to implement
   *  Less ambitious than Scala's XML library and Anti-XML (no XPath-like support, no value equality)
-  *  Leaves many hard parts to Java's JAXP, such as parsing and printing
+  *  Leaves many hard parts to Java's JAXP, such as parsing and printing, but via easy to use wrappers
   *  Good interop with Java
 
 As said above, yaidom has no XPath-like support, and it does not try to unify nodes with collections of nodes.
-Yet yaidom trees can be queried quite well using Scala For Comprehensions. This is more verbose than XPath-like
+Yet yaidom trees can be queried quite well using Scala *for comprehensions*. This is more verbose than XPath-like
 syntax (as in Scala's XML library, and in Anti-XML), but more straightforward to understand, use, and implement.
 
 Yaidom quite intentionally leaves the hard parts of parsing and printing to Java's JAXP. Think for example about
