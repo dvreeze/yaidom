@@ -244,7 +244,10 @@ final class Elem private (
   def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
 
   /** Creates a copy, but with the children passed as parameter newChildren */
-  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
+  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+    // Only creates a new Elem if needed, at the cost of an equality test
+    if (newChildren == self.children) self else new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
+  }
 
   /** Returns <code>withChildren(self.children :+ newChild)</code>. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
