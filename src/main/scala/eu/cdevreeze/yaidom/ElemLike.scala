@@ -76,7 +76,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values */
   def resolvedAttributes: Map[ExpandedName, String]
 
-  /** Returns all child elements, in the correct order */
+  /** Returns all child elements, in the correct order. The faster this method is, the faster ElemLike's methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an Option */
