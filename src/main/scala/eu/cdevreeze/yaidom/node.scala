@@ -312,11 +312,22 @@ final class Elem private (
     }
   }
 
+  /**
+   * Returns the index of the child with the given ElemPath Entry (taking this element as parent), or -1 if not found.
+   * Must be fast.
+   */
   def childIndexOf(pathEntry: ElemPath.Entry): Int = {
-    val childElmOption = self.findWithElemPathEntry(pathEntry)
-    require(childElmOption.isDefined)
-    val childElm = childElmOption.get
-    children indexWhere { ch => ch == childElm }
+    var cnt = 0
+    var idx = -1
+    while (cnt <= pathEntry.index) {
+      val newIdx = children indexWhere ({
+        case e: Elem if e.resolvedName == pathEntry.elementName => true
+        case _ => false
+      }, idx + 1)
+      idx = newIdx
+      cnt += 1
+    }
+    idx
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
