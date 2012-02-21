@@ -29,10 +29,10 @@ import scala.collection.immutable
  *   qname = "Magazine".qname,
  *   attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
  *   namespaces = Map("dbclass" -> "http://www.db-class.org").namespaces,
- *   children = List(
+ *   children = immutable.IndexedSeq(
  *     elem(
  *       qname = "Title".qname,
- *       children = List(text("Newsweek"))))).build()
+ *       children = immutable.IndexedSeq(text("Newsweek"))))).build()
  * }}}
  *
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
@@ -125,12 +125,12 @@ final class ElemBuilder(
       children map { ch => ch.build(newScope) })
   }
 
-  def withChildNodes(childNodes: immutable.Seq[Node])(parentScope: Scope): ElemBuilder = {
+  def withChildNodes(childNodes: immutable.IndexedSeq[Node])(parentScope: Scope): ElemBuilder = {
     new ElemBuilder(
       qname = self.qname,
       attributes = self.attributes,
       namespaces = self.namespaces,
-      children = childNodes map { ch => NodeBuilder.fromNode(ch)(parentScope) } toIndexedSeq)
+      children = childNodes map { ch => NodeBuilder.fromNode(ch)(parentScope) })
   }
 }
 
@@ -173,8 +173,8 @@ object NodeBuilder {
   def document(
     baseUriOption: Option[String],
     documentElement: ElemBuilder,
-    processingInstructions: immutable.Seq[ProcessingInstructionBuilder],
-    comments: immutable.Seq[CommentBuilder]): DocumentBuilder = {
+    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
+    comments: immutable.IndexedSeq[CommentBuilder]): DocumentBuilder = {
 
     new DocumentBuilder(
       baseUriOption map { uriString => new URI(uriString) },
@@ -187,7 +187,7 @@ object NodeBuilder {
     qname: QName,
     attributes: Map[QName, String] = Map(),
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
-    children: immutable.Seq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
+    children: immutable.IndexedSeq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, children.toIndexedSeq)
   }

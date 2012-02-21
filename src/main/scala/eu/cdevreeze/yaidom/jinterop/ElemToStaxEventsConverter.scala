@@ -26,7 +26,7 @@ import scala.collection.{ immutable, mutable }
 import ElemToStaxEventsConverter._
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.Elem]] to immutable.Seq[XMLEvent]
+ * Converter from [[eu.cdevreeze.yaidom.Elem]] to immutable.IndexedSeq[XMLEvent]
  *
  * @author Chris de Vreeze
  */
@@ -168,5 +168,5 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
 
 object ElemToStaxEventsConverter {
 
-  type XmlEventsProducer = (XMLEventFactory => immutable.Seq[XMLEvent])
+  type XmlEventsProducer = (XMLEventFactory => immutable.IndexedSeq[XMLEvent])
 }

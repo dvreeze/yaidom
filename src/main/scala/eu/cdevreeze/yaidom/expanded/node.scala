@@ -30,8 +30,8 @@ import eu.cdevreeze.yaidom
  *
  * When using the Node (sub)classes in this package, prefix them with the last part of the package name. So,
  * write <code>expanded.Elem</code>, <code>expanded.Document</code> etc. instead of globally importing classes/traits in the
- * [[eu.cdevreeze.yaidom.expanded]] package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
- * <code>mutable.Seq[T]</code> for Scala Collections.
+ * [[eu.cdevreeze.yaidom.expanded]] package. This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
+ * <code>mutable.IndexedSeq[T]</code> for Scala Collections.
  */
 sealed trait Node extends Immutable
 
@@ -64,9 +64,9 @@ final class Elem(
   require(resolvedAttributes ne null)
   require(children ne null)
 
-  override def allChildElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
+  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
-  override def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
+  override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 }
 
 final case class Text(text: String, isCData: Boolean) extends Node with TextLike {

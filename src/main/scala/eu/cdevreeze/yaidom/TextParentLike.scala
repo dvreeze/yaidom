@@ -36,7 +36,7 @@ import scala.collection.immutable
 trait TextParentLike[T <: TextLike] {
 
   /** Returns the text children (including CData), in the correct order */
-  def textChildren: immutable.Seq[T]
+  def textChildren: immutable.IndexedSeq[T]
 
   /**
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.

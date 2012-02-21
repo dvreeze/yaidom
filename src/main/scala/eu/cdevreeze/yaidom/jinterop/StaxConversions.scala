@@ -59,13 +59,13 @@ object StaxConversions extends ElemToStaxEventsConverter with StaxEventsToElemCo
 
   /** "Implicit" class containing the toSeq method for XMLEventReaders. */
   final class ToXmlEventSeq(xmlEventReader: XMLEventReader) {
-    def toSeq: immutable.Seq[XMLEvent] = {
+    def toSeq: immutable.IndexedSeq[XMLEvent] = {
       xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]].asScala.toIndexedSeq
     }
   }
 
   /**
-   * Adds a toSeq method that implicitly converts an <code>XMLEventReader</code> to a <code>immutable.Seq[XMLEvent]</code>.
+   * Adds a toSeq method that implicitly converts an <code>XMLEventReader</code> to a <code>immutable.IndexedSeq[XMLEvent]</code>.
    */
   implicit def toXmlEventSeq(xmlEventReader: XMLEventReader): ToXmlEventSeq = new ToXmlEventSeq(xmlEventReader)
 }

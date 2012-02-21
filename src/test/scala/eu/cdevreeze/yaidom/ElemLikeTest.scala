@@ -40,10 +40,10 @@ class ElemLikeTest extends Suite {
   @Test def testChildElems() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookstoreChildElms: immutable.Seq[Elem] = bookstore.allChildElems
-    val magazineElms: immutable.Seq[Elem] = bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
-    val bookElms: immutable.Seq[Elem] = bookstore.childElems(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] =
+    val bookstoreChildElms: immutable.IndexedSeq[Elem] = bookstore.allChildElems
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore.childElems(ns.ns.ename("Book"))
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(8) {
@@ -93,18 +93,18 @@ class ElemLikeTest extends Suite {
   @Test def testCollectFromChildElems() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val bookstoreChildElms: immutable.Seq[Elem] = bookstore.allChildElems
-    val magazineElms: immutable.Seq[Elem] = bookstore collectFromChildElems {
+    val bookstoreChildElms: immutable.IndexedSeq[Elem] = bookstore.allChildElems
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore collectFromChildElems {
       case e if e.resolvedName == ns.ns.ename("Magazine") => e
     }
-    val bookElms: immutable.Seq[Elem] = bookstore collectFromChildElems {
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore collectFromChildElems {
       case e if e.resolvedName == ns.ns.ename("Book") => e
     }
-    val cheapBookElms: immutable.Seq[Elem] =
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore collectFromChildElems {
         case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 => e
       }
-    val cheapBookPrices: immutable.Seq[Int] =
+    val cheapBookPrices: immutable.IndexedSeq[Int] =
       bookstore collectFromChildElems {
         case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 =>
           e.attribute("Price".ename).toInt
@@ -137,10 +137,10 @@ class ElemLikeTest extends Suite {
   @Test def testElems() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elms: immutable.Seq[Elem] = bookstore.allElems
-    val magazineElms: immutable.Seq[Elem] = bookstore elemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
-    val bookElms: immutable.Seq[Elem] = bookstore.elems(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] =
+    val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore elemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore.elems(ns.ns.ename("Book"))
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore elemsWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(46) {
@@ -188,14 +188,14 @@ class ElemLikeTest extends Suite {
   @Test def testCollectFromElems() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elms: immutable.Seq[Elem] = bookstore.allElems
-    val magazineElms: immutable.Seq[Elem] = bookstore collectFromElems {
+    val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore collectFromElems {
       case e if e.resolvedName == ns.ns.ename("Magazine") => e
     }
-    val bookElms: immutable.Seq[Elem] = bookstore collectFromElems {
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore collectFromElems {
       case e if e.resolvedName == ns.ns.ename("Book") => e
     }
-    val cheapBookElms: immutable.Seq[Elem] =
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore collectFromElems {
         case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 => e
       }
@@ -225,10 +225,10 @@ class ElemLikeTest extends Suite {
   @Test def testElemsOrSelf() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elms: immutable.Seq[Elem] = bookstore.allElemsOrSelf
-    val magazineElms: immutable.Seq[Elem] = bookstore elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
-    val bookElms: immutable.Seq[Elem] = bookstore.elemsOrSelf(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] =
+    val elms: immutable.IndexedSeq[Elem] = bookstore.allElemsOrSelf
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore.elemsOrSelf(ns.ns.ename("Book"))
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(47) {
@@ -280,14 +280,14 @@ class ElemLikeTest extends Suite {
   @Test def testCollectFromElemsOrSelf() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elms: immutable.Seq[Elem] = bookstore.allElemsOrSelf
-    val magazineElms: immutable.Seq[Elem] = bookstore collectFromElemsOrSelf {
+    val elms: immutable.IndexedSeq[Elem] = bookstore.allElemsOrSelf
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore collectFromElemsOrSelf {
       case e if e.resolvedName == ns.ns.ename("Magazine") => e
     }
-    val bookElms: immutable.Seq[Elem] = bookstore collectFromElemsOrSelf {
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore collectFromElemsOrSelf {
       case e if e.resolvedName == ns.ns.ename("Book") => e
     }
-    val cheapBookElms: immutable.Seq[Elem] =
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore collectFromElemsOrSelf {
         case e if e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 => e
       }
@@ -321,10 +321,10 @@ class ElemLikeTest extends Suite {
   @Test def testFirstElems() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val elms: immutable.Seq[Elem] = bookstore.allElems
-    val magazineElms: immutable.Seq[Elem] = bookstore firstElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
-    val bookElms: immutable.Seq[Elem] = bookstore.firstElems(ns.ns.ename("Book"))
-    val cheapBookElms: immutable.Seq[Elem] =
+    val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore firstElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val bookElms: immutable.IndexedSeq[Elem] = bookstore.firstElems(ns.ns.ename("Book"))
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore firstElemsWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(46) {
@@ -372,9 +372,9 @@ class ElemLikeTest extends Suite {
       authorLastNameElms map { e => e.trimmedText } toSet
     }
 
-    val ullmanAncestors: immutable.Seq[Elem] =
+    val ullmanAncestors: immutable.IndexedSeq[Elem] =
       cheapBookElm elemsWhere { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
-    val firstUllmanAncestors: immutable.Seq[Elem] =
+    val firstUllmanAncestors: immutable.IndexedSeq[Elem] =
       cheapBookElm firstElemsWhere { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
 
     expect(3) {
@@ -408,10 +408,10 @@ class ElemLikeTest extends Suite {
       lastNameElms map { e => e.findParentInTree(bookstore) } flatMap { eOption => eOption map { _.resolvedName } } toSet
     }
 
-    val cheapBookElms: immutable.Seq[Elem] =
+    val cheapBookElms: immutable.IndexedSeq[Elem] =
       bookstore firstElemsWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
     val cheapBookElm: Elem = cheapBookElms(0)
-    val cheapBookAuthorElms: immutable.Seq[Elem] = cheapBookElm.elems(ns.ns.ename("Author"))
+    val cheapBookAuthorElms: immutable.IndexedSeq[Elem] = cheapBookElm.elems(ns.ns.ename("Author"))
 
     expect(cheapBookAuthorElms.toSet) {
       lastNameElms flatMap { e => e.findParentInTree(cheapBookElm) } toSet
@@ -421,7 +421,7 @@ class ElemLikeTest extends Suite {
   @Test def testGetIndex() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val index: Map[ExpandedName, immutable.Seq[Elem]] = bookstore getIndex { e => e.resolvedName }
+    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndex { e => e.resolvedName }
 
     expect {
       val result = bookstore.allElemsOrSelf map { _.resolvedName }
@@ -433,7 +433,7 @@ class ElemLikeTest extends Suite {
     assert {
       index forall { kv =>
         val ename: ExpandedName = kv._1
-        val elms: immutable.Seq[Elem] = kv._2
+        val elms: immutable.IndexedSeq[Elem] = kv._2
         elms forall { e => e.resolvedName == ename }
       }
     }
@@ -442,7 +442,7 @@ class ElemLikeTest extends Suite {
   @Test def testGetIndexToParent() {
     require(bookstore.qname.localPart == "Bookstore")
 
-    val index: Map[ExpandedName, immutable.Seq[Elem]] = bookstore getIndexToParent { e => e.resolvedName }
+    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndexToParent { e => e.resolvedName }
 
     expect {
       val result = bookstore.allElems map { _.resolvedName }
@@ -454,8 +454,8 @@ class ElemLikeTest extends Suite {
     expect(true) {
       index forall { kv =>
         val ename: ExpandedName = kv._1
-        val elms: immutable.Seq[Elem] = kv._2
-        val childElms: immutable.Seq[Elem] = elms flatMap { e => e.allChildElems }
+        val elms: immutable.IndexedSeq[Elem] = kv._2
+        val childElms: immutable.IndexedSeq[Elem] = elms flatMap { e => e.allChildElems }
         val result = childElms exists { e => e.resolvedName == ename }
         result
       }
@@ -470,7 +470,7 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Some("Last_Name".qname)) {
-      val path = ElemPath(List(
+      val path = ElemPath(immutable.IndexedSeq(
         ElemPath.Entry(ns.ns.ename("Book"), 0),
         ElemPath.Entry(ns.ns.ename("Authors"), 0),
         ElemPath.Entry(ns.ns.ename("Author"), 0),
@@ -478,7 +478,7 @@ class ElemLikeTest extends Suite {
       bookstore.findWithElemPath(path) map { _.qname }
     }
     expect(Some("Ullman")) {
-      val path = ElemPath(List(
+      val path = ElemPath(immutable.IndexedSeq(
         ElemPath.Entry(ns.ns.ename("Book"), 0),
         ElemPath.Entry(ns.ns.ename("Authors"), 0),
         ElemPath.Entry(ns.ns.ename("Author"), 0),
@@ -493,32 +493,32 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-13-713526-2", "Price".qname -> "85", "Edition".qname -> "3rd"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             text("A First Course in Database Systems"))),
         elem(
           qname = "Authors".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Jeffrey"))),
+                  children = immutable.IndexedSeq(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Ullman"))))),
+                  children = immutable.IndexedSeq(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Jennifer"))),
+                  children = immutable.IndexedSeq(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Widom")))))))))
+                  children = immutable.IndexedSeq(text("Widom")))))))))
   }
 
   private val book2: ElemBuilder = {
@@ -527,44 +527,44 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-13-815504-6", "Price".qname -> "100"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             text("Database Systems: The Complete Book"))),
         elem(
           qname = "Authors".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Hector"))),
+                  children = immutable.IndexedSeq(text("Hector"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Garcia-Molina"))))),
+                  children = immutable.IndexedSeq(text("Garcia-Molina"))))),
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Jeffrey"))),
+                  children = immutable.IndexedSeq(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Ullman"))))),
+                  children = immutable.IndexedSeq(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Jennifer"))),
+                  children = immutable.IndexedSeq(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Widom"))))))),
+                  children = immutable.IndexedSeq(text("Widom"))))))),
         elem(
           qname = "Remark".qname,
-          children = List(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
+          children = immutable.IndexedSeq(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
   }
 
   private val book3: ElemBuilder = {
@@ -573,35 +573,35 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-11-222222-3", "Price".qname -> "50"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             text("Hector and Jeff's Database Hints"))),
         elem(
           qname = "Authors".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Jeffrey"))),
+                  children = immutable.IndexedSeq(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Ullman"))))),
+                  children = immutable.IndexedSeq(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Hector"))),
+                  children = immutable.IndexedSeq(text("Hector"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Garcia-Molina"))))))),
+                  children = immutable.IndexedSeq(text("Garcia-Molina"))))))),
         elem(
           qname = "Remark".qname,
-          children = List(text("An indispensable companion to your textbook")))))
+          children = immutable.IndexedSeq(text("An indispensable companion to your textbook")))))
   }
 
   private val book4: ElemBuilder = {
@@ -610,23 +610,23 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-9-88-777777-6", "Price".qname -> "25"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             text("Jennifer's Economical Database Hints"))),
         elem(
           qname = "Authors".qname,
-          children = List(
+          children = immutable.IndexedSeq(
             elem(
               qname = "Author".qname,
-              children = List(
+              children = immutable.IndexedSeq(
                 elem(
                   qname = "First_Name".qname,
-                  children = List(text("Jennifer"))),
+                  children = immutable.IndexedSeq(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = List(text("Widom")))))))))
+                  children = immutable.IndexedSeq(text("Widom")))))))))
   }
 
   private val magazine1: ElemBuilder = {
@@ -635,10 +635,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "January", "Year".qname -> "2009"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(text("National Geographic")))))
+          children = immutable.IndexedSeq(text("National Geographic")))))
   }
 
   private val magazine2: ElemBuilder = {
@@ -647,10 +647,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(text("National Geographic")))))
+          children = immutable.IndexedSeq(text("National Geographic")))))
   }
 
   private val magazine3: ElemBuilder = {
@@ -659,10 +659,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(text("Newsweek")))))
+          children = immutable.IndexedSeq(text("Newsweek")))))
   }
 
   private val magazine4: ElemBuilder = {
@@ -671,10 +671,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "March", "Year".qname -> "2009"),
-      children = List(
+      children = immutable.IndexedSeq(
         elem(
           qname = "Title".qname,
-          children = List(text("Hector and Jeff's Database Hints")))))
+          children = immutable.IndexedSeq(text("Hector and Jeff's Database Hints")))))
   }
 
   private val bookstore: Elem = {
@@ -684,7 +684,7 @@ class ElemLikeTest extends Suite {
       elem(
         qname = "books:Bookstore".qname,
         namespaces = Map("" -> ns, "books" -> ns).namespaces,
-        children = List(
+        children = immutable.IndexedSeq(
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
 
     require {

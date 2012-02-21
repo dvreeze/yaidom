@@ -805,7 +805,7 @@ class DomInteropTest extends Suite {
          |      </tr>""".stripMargin
 
     def bookHtmlString(bookElm: Elem): String = {
-      val authorNames: immutable.Seq[String] =
+      val authorNames: immutable.IndexedSeq[String] =
         bookElm.elems("{http://bookstore}Author".ename) map { e =>
           "%s %s".format(e.childElem("{http://bookstore}First_Name".ename).trimmedText, e.childElem("{http://bookstore}Last_Name".ename).trimmedText)
         }

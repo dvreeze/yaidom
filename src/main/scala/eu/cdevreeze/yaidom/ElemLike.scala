@@ -69,7 +69,7 @@ import scala.collection.immutable
  * @author Chris de Vreeze
  */
 trait ElemLike[E <: ElemLike[E]] { self: E =>
-  
+
   // TODO Use immutable.IndexedSeq, in the API and inside implementations. That should also help getting better performance.
 
   /** Resolved name of the element, as ExpandedName */
@@ -79,7 +79,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   def resolvedAttributes: Map[ExpandedName, String]
 
   /** Returns all child elements, in the correct order */
-  def allChildElems: immutable.Seq[E]
+  def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an Option */
   final def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
@@ -88,13 +88,13 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements obeying the given predicate */
-  final def childElemsWhere(p: E => Boolean): immutable.Seq[E] = allChildElems filter p
+  final def childElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
 
   /** Returns the child elements with the given expanded name */
-  final def childElems(expandedName: ExpandedName): immutable.Seq[E] = childElemsWhere { e => e.resolvedName == expandedName }
+  final def childElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = childElemsWhere { e => e.resolvedName == expandedName }
 
   /** Returns <code>allChildElems collect pf</code> */
-  final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.Seq[B] = allChildElems collect pf
+  final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
   /** Returns the single child element with the given expanded name, if any, wrapped in an Option */
   final def childElemOption(expandedName: ExpandedName): Option[E] = {
@@ -111,40 +111,40 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns this element followed by all descendant elements */
-  final def allElemsOrSelf: immutable.Seq[E] = allElemsOrSelfList.toIndexedSeq
+  final def allElemsOrSelf: immutable.IndexedSeq[E] = allElemsOrSelfList.toIndexedSeq
 
   /**
    * Returns those elements among this element and its descendant elements that obey the given predicate.
    * That is, the result is equivalent to <code>allElemsOrSelf filter p</code>.
    */
-  final def elemsOrSelfWhere(p: E => Boolean): immutable.Seq[E] = elemsOrSelfListWhere(p).toIndexedSeq
+  final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = elemsOrSelfListWhere(p).toIndexedSeq
 
   /** Returns those elements among this element and its descendant elements that have the given expanded name */
-  final def elemsOrSelf(expandedName: ExpandedName): immutable.Seq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
+  final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
 
   /** Returns (the equivalent of) <code>allElemsOrSelf collect pf</code> */
-  final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.Seq[B] =
+  final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     elemsOrSelfWhere { e => pf.isDefinedAt(e) } collect pf
 
   /** Returns all descendant elements (not including this element). Same as <code>allElemsOrSelf.drop(1)</code> */
-  final def allElems: immutable.Seq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
+  final def allElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
 
   /** Returns the descendant elements obeying the given predicate, that is, allElems filter p */
-  final def elemsWhere(p: E => Boolean): immutable.Seq[E] = allChildElems flatMap { ch => ch elemsOrSelfWhere p }
+  final def elemsWhere(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch elemsOrSelfWhere p }
 
   /** Returns the descendant elements with the given expanded name */
-  final def elems(expandedName: ExpandedName): immutable.Seq[E] = elemsWhere { e => e.resolvedName == expandedName }
+  final def elems(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsWhere { e => e.resolvedName == expandedName }
 
   /** Returns (the equivalent of) <code>allElems collect pf</code> */
-  final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.Seq[B] =
+  final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     elemsWhere { e => pf.isDefinedAt(e) } collect pf
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def firstElemsWhere(p: E => Boolean): immutable.Seq[E] =
+  final def firstElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
     allChildElems flatMap { ch => ch firstElemsOrSelfListWhere p toIndexedSeq }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def firstElems(expandedName: ExpandedName): immutable.Seq[E] = firstElemsWhere { e => e.resolvedName == expandedName }
+  final def firstElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = firstElemsWhere { e => e.resolvedName == expandedName }
 
   /** Returns the first found descendant element obeying the given predicate, if any, wrapped in an Option */
   final def firstElemOptionWhere(p: E => Boolean): Option[E] = {
@@ -163,10 +163,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
-  final def getIndex[K](f: E => K): Map[K, immutable.Seq[E]] = allElemsOrSelf groupBy f
+  final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = allElemsOrSelf groupBy f
 
   /** Computes an index to parent elements, on the given function applied to the child elements */
-  final def getIndexToParent[K](f: E => K): Map[K, immutable.Seq[E]] = {
+  final def getIndexToParent[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = {
     val parentChildPairs = allElemsOrSelf flatMap { e => e.allChildElems map { ch => (e -> ch) } }
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
   }
@@ -175,7 +175,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns the equivalent of <code>findWithElemPath(ElemPath(List(entry)))</code>, but it should be more efficient.
    *
    * It is important that this method has a fast implementation.
-   * 
+   *
    * TODO Make faster
    */
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
@@ -188,11 +188,11 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option.
    *
    * It is important that this method has a fast implementation.
-   * 
+   *
    * TODO Make faster
    */
   final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
-    case Nil => Some(self)
+    case xs if xs.isEmpty => Some(self)
     case _ =>
       val newRootOption: Option[E] = findWithElemPathEntry(path.entries.head)
       // Recursive call. Not tail-recursive, but recursion depth should be limited.
@@ -200,7 +200,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the ElemPath entries of all child elements, in the correct order */
-  final def allChildElemPathEntries: immutable.Seq[ElemPath.Entry] = {
+  final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
     val startAcc = immutable.IndexedSeq[ElemPath.Entry]()
 
     allChildElems.foldLeft(startAcc) { (acc, elm) =>

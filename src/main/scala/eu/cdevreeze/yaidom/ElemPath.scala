@@ -16,29 +16,31 @@
 
 package eu.cdevreeze.yaidom
 
+import scala.collection.immutable
+
 /**
  * Unique identification of a descendant (or self) ElemLike given a root ElemLike. It is used for transformations
  * from one node tree to another collection of nodes.
  *
- * The ElemPath contains a List of path entries for a specific child element, grandchild element etc.,
+ * The ElemPath contains an IndexedSeq of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
  *
  * Strictly speaking, each element in a tree would be uniquely identified by path entries that only contained
  * a child index instead of an element name plus child index (of children with the given name). Yet that would
  * be far less easy to use. Hence ElemPath.Entry instances each contain an element name plus index.
  */
-final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { self =>
+final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
 
   require(entries ne null)
 
   /** Prepends a given Entry to this ElemPath */
-  def ::(entry: ElemPath.Entry): ElemPath = ElemPath(entry :: self.entries)
+  def ::(entry: ElemPath.Entry): ElemPath = ElemPath(immutable.IndexedSeq(entry) ++ self.entries)
 
   /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
   def skipEntry: ElemPath = ElemPath(entries.tail)
 
   /** Appends a given Entry to this ElemPath */
-  def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries ::: List(entry))
+  def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries :+ entry)
 
   /**
    * Gets the parent path (if any, because the root path has no parent) wrapped in an Option.
@@ -48,7 +50,7 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
    * root of the tree.
    */
   def parentPathOption: Option[ElemPath] = entries match {
-    case Nil => None
+    case xs if xs.isEmpty => None
     case _ => Some(ElemPath(entries.dropRight(1)))
   }
 
@@ -85,7 +87,7 @@ final case class ElemPath(entries: List[ElemPath.Entry]) extends Immutable { sel
 
 object ElemPath {
 
-  val Root: ElemPath = ElemPath(Nil)
+  val Root: ElemPath = ElemPath(immutable.IndexedSeq())
 
   /** Parses a String, which must be in the toXPath format, into an ElemPath */
   def fromXPath(s: String)(scope: Scope): ElemPath = {
@@ -106,7 +108,7 @@ object ElemPath {
         curr :: getEntryStrings(rest)
     }
 
-    val entryStrings = getEntryStrings(remainder)
+    val entryStrings = getEntryStrings(remainder).toIndexedSeq
     val entries = entryStrings map { entryString => ElemPath.Entry.fromXPath(entryString)(scope) }
     ElemPath(entries)
   }

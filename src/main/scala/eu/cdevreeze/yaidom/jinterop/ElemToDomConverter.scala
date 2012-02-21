@@ -37,10 +37,10 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
       // This also sets the document element on the document
       val docRoot: Element = convertElem(document.documentElement, doc, doc, Scope.Empty)
       // This also sets the PIs on the document
-      val pis: immutable.Seq[org.w3c.dom.ProcessingInstruction] =
+      val pis: immutable.IndexedSeq[org.w3c.dom.ProcessingInstruction] =
         document.processingInstructions map { pi => convertProcessingInstruction(pi, doc, doc) }
       // This also sets the comments on the document
-      val comments: immutable.Seq[org.w3c.dom.Comment] =
+      val comments: immutable.IndexedSeq[org.w3c.dom.Comment] =
         document.comments map { com => convertComment(com, doc, doc) }
 
       if (document.baseUriOption.isDefined) doc.setDocumentURI(document.baseUriOption.get.toString)

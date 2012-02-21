@@ -72,7 +72,7 @@ sealed trait Node extends Immutable {
 /** Document or Elem node */
 trait ParentNode extends Node {
 
-  def children: immutable.Seq[Node]
+  def children: immutable.IndexedSeq[Node]
 }
 
 /**
@@ -90,20 +90,20 @@ final class Document(
   require(processingInstructions ne null)
   require(comments ne null)
 
-  override def children: immutable.Seq[Node] =
+  override def children: immutable.IndexedSeq[Node] =
     processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
 
   /** Expensive method to obtain all processing instructions */
-  def allProcessingInstructions: immutable.Seq[ProcessingInstruction] = {
-    val result: immutable.Seq[immutable.Seq[ProcessingInstruction]] =
+  def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
+    val result: immutable.IndexedSeq[immutable.IndexedSeq[ProcessingInstruction]] =
       documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case pi: ProcessingInstruction => pi } }
     val elemPIs = result.flatten
     processingInstructions ++ elemPIs
   }
 
   /** Expensive method to obtain all comments */
-  def allComments: immutable.Seq[Comment] = {
-    val result: immutable.Seq[immutable.Seq[Comment]] =
+  def allComments: immutable.IndexedSeq[Comment] = {
+    val result: immutable.IndexedSeq[immutable.IndexedSeq[Comment]] =
       documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
     val elemComments = result.flatten
     comments ++ elemComments
@@ -131,14 +131,14 @@ final class Document(
          |%s,
          |""".stripMargin
 
-    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = List(%s),""" + newline else
-      """|  processingInstructions = List(
+    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = immutable.IndexedSeq(%s),""" + newline else
+      """|  processingInstructions = immutable.IndexedSeq(
          |%s
          |  ),
          |""".stripMargin
 
-    val commentsFormatString = if (comments.isEmpty) """  comments = List(%s)""" + newline else
-      """|  comments = List(
+    val commentsFormatString = if (comments.isEmpty) """  comments = immutable.IndexedSeq(%s)""" + newline else
+      """|  comments = immutable.IndexedSeq(
          |%s
          |  )
          |""".stripMargin
@@ -235,19 +235,19 @@ final class Elem private (
   }
 
   /** Returns all child elements */
-  override def allChildElems: immutable.Seq[Elem] = children collect { case e: Elem => e }
+  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   /** Returns the text children */
-  override def textChildren: immutable.Seq[Text] = children collect { case t: Text => t }
+  override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
   /** Returns the comment children */
-  def commentChildren: immutable.Seq[Comment] = children collect { case c: Comment => c }
+  def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
 
   /** Creates a copy, but with the children passed as parameter newChildren */
-  def withChildren(newChildren: immutable.Seq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
+  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
 
-  /** Returns <code>withChildren(self.children ++ List(newChild))</code>. */
-  def plusChild(newChild: Node): Elem = withChildren(self.children ++ List(newChild))
+  /** Returns <code>withChildren(self.children :+ newChild)</code>. */
+  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
   /**
    * Returns a copy of the tree with this element as root element, except that the result tree is updated according to
@@ -271,7 +271,7 @@ final class Elem private (
 
           var remainingChildElmResults = childElmResults
 
-          val childResults: immutable.Seq[Node] = elm.children map {
+          val childResults: immutable.IndexedSeq[Node] = elm.children map {
             case e: Elem =>
               require(!remainingChildElmResults.isEmpty)
               val currResult = remainingChildElmResults.head
@@ -301,8 +301,8 @@ final class Elem private (
          |  namespaces = %s,
          |""".stripMargin
 
-    val childrenFormatString = if (self.children.isEmpty) """  children = List(%s)""" + newline else
-      """|  children = List(
+    val childrenFormatString = if (self.children.isEmpty) """  children = immutable.IndexedSeq(%s)""" + newline else
+      """|  children = immutable.IndexedSeq(
          |%s
          |  )
          |""".stripMargin
@@ -418,8 +418,8 @@ object Document {
   def apply(
     baseUriOption: Option[URI],
     documentElement: Elem,
-    processingInstructions: immutable.Seq[ProcessingInstruction] = Nil,
-    comments: immutable.Seq[Comment] = Nil): Document = {
+    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
+    comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
     new Document(baseUriOption, documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
   }
@@ -435,5 +435,5 @@ object Elem {
     qname: QName,
     attributes: Map[QName, String] = Map(),
     scope: Scope = Scope.Empty,
-    children: immutable.Seq[Node] = immutable.Seq()): Elem = new Elem(qname, attributes, scope, children.toIndexedSeq)
+    children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children.toIndexedSeq)
 }

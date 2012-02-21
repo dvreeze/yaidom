@@ -27,16 +27,16 @@ import scala.collection.{ immutable, mutable }
 import StaxEventsToElemConverter._
 
 /**
- * Converter from immutable.Seq[XMLEvent] to [[eu.cdevreeze.yaidom.Elem]], or to [[eu.cdevreeze.yaidom.Document]].
+ * Converter from immutable.IndexedSeq[XMLEvent] to [[eu.cdevreeze.yaidom.Elem]], or to [[eu.cdevreeze.yaidom.Document]].
  *
  * @author Chris de Vreeze
  */
-trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]] with ConverterToDocument[immutable.Seq[XMLEvent]] {
+trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XMLEvent]] with ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
 
-  def convertToDocument(v: immutable.Seq[XMLEvent]): Document = {
-    val events: immutable.Seq[XMLEvent] = v.toList dropWhile { ev => !ev.isStartDocument }
+  def convertToDocument(v: immutable.IndexedSeq[XMLEvent]): Document = {
+    val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartDocument }
 
-    val eventsWithDepths: immutable.Seq[EventWithDepth] = {
+    val eventsWithDepths: immutable.IndexedSeq[EventWithDepth] = {
       var depth = 0
       events.map(ev => ev match {
         case start: StartElement => depth += 1; new EventWithDepth(start, depth)
@@ -45,7 +45,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
       })
     }
 
-    require(!eventsWithDepths.drop(3).isEmpty) // Cheaper than calling size for Lists
+    require(eventsWithDepths.size > 3)
 
     val result = eventsToDocument(eventsWithDepths)
 
@@ -55,10 +55,10 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
     result.doc
   }
 
-  def convertToElem(v: immutable.Seq[XMLEvent]): Elem = {
-    val events: immutable.Seq[XMLEvent] = v.toList dropWhile { ev => !ev.isStartElement }
+  def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
+    val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
 
-    val eventsWithDepths: immutable.Seq[EventWithDepth] = {
+    val eventsWithDepths: immutable.IndexedSeq[EventWithDepth] = {
       var depth = 0
       events.map(ev => ev match {
         case start: StartElement => depth += 1; new EventWithDepth(start, depth)
@@ -67,7 +67,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
       })
     }
 
-    require(!eventsWithDepths.drop(1).isEmpty) // Cheaper than calling size for Lists
+    require(eventsWithDepths.size > 1)
 
     val result = eventsToElem(eventsWithDepths, Scope.Empty)
 
@@ -77,13 +77,13 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
     result.elem
   }
 
-  private def eventsToDocument(eventsWithDepths: immutable.Seq[EventWithDepth]): DocumentResult = {
-    require(!eventsWithDepths.drop(3).isEmpty) // Cheaper than calling size for Lists
+  private def eventsToDocument(eventsWithDepths: immutable.IndexedSeq[EventWithDepth]): DocumentResult = {
+    require(eventsWithDepths.size > 3)
     require(eventsWithDepths.head.event.isStartDocument)
 
     val startDocument: StartDocument = eventsWithDepths.head.event.asInstanceOf[StartDocument]
 
-    def startsWithEndDocument(events: immutable.Seq[EventWithDepth]): Boolean = {
+    def startsWithEndDocument(events: immutable.IndexedSeq[EventWithDepth]): Boolean = {
       if (events.isEmpty) false else {
         val head: EventWithDepth = events.head
         head.event.isInstanceOf[EndDocument]
@@ -137,15 +137,15 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.Seq[XMLEvent]]
     new DocumentResult(doc, remainingEvents)
   }
 
-  private def eventsToElem(eventsWithDepths: immutable.Seq[EventWithDepth], parentScope: Scope): ElemResult = {
-    require(!eventsWithDepths.drop(1).isEmpty) // Cheaper than calling size for Lists
+  private def eventsToElem(eventsWithDepths: immutable.IndexedSeq[EventWithDepth], parentScope: Scope): ElemResult = {
+    require(eventsWithDepths.size > 1)
     require(eventsWithDepths.head.event.isStartElement)
 
     val startElement: StartElement = eventsWithDepths.head.event.asStartElement
 
     val elem: Elem = eventToElem(startElement, parentScope)
 
-    def startsWithMatchingEndElement(events: immutable.Seq[EventWithDepth]): Boolean = {
+    def startsWithMatchingEndElement(events: immutable.IndexedSeq[EventWithDepth]): Boolean = {
       if (events.isEmpty) false else {
         val head: EventWithDepth = events.head
         (head.depth == eventsWithDepths.head.depth) && (head.event.isEndElement)
@@ -267,7 +267,7 @@ object StaxEventsToElemConverter {
 
   private final class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
 
-  private final class ElemResult(val elem: Elem, val remainder: immutable.Seq[EventWithDepth]) extends Immutable
+  private final class ElemResult(val elem: Elem, val remainder: immutable.IndexedSeq[EventWithDepth]) extends Immutable
 
-  private final class DocumentResult(val doc: Document, val remainder: immutable.Seq[EventWithDepth]) extends Immutable
+  private final class DocumentResult(val doc: Document, val remainder: immutable.IndexedSeq[EventWithDepth]) extends Immutable
 }

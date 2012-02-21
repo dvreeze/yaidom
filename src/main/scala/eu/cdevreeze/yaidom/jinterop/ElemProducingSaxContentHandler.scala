@@ -129,7 +129,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
     val newScope = currentState.scope.resolve(extractDeclarations(atts))
     val attrMap = extractAttributeMap(atts)
 
-    Elem(qname = elmQName, attributes = attrMap, scope = newScope, children = Nil)
+    Elem(qname = elmQName, attributes = attrMap, scope = newScope, children = immutable.IndexedSeq())
   }
 
   private def extractDeclarations(atts: Attributes): Scope.Declarations = {

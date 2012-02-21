@@ -26,8 +26,8 @@ import XLink._
  *
  * When using the Elem and Document classes in this package, prefix them with the last part of the package name. So,
  * write <code>xlink.Elem</code> and <code>xlink.Document</code> instead of globally importing classes/traits in the
- * [[eu.cdevreeze.yaidom.xlink]] package. This is analogous to the good practice of writing for example <code>immutable.Seq[T]</code> and
- * <code>mutable.Seq[T]</code> for Scala Collections.
+ * [[eu.cdevreeze.yaidom.xlink]] package. This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
+ * <code>mutable.IndexedSeq[T]</code> for Scala Collections.
  *
  * @author Chris de Vreeze
  */
@@ -41,7 +41,7 @@ sealed trait Elem extends ElemLike[Elem] with Immutable {
 
   final override val resolvedAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes
 
-  final override val allChildElems: immutable.Seq[Elem] = wrappedElem.allChildElems map { e => Elem(e) }
+  final override val allChildElems: immutable.IndexedSeq[Elem] = wrappedElem.allChildElems map { e => Elem(e) }
 }
 
 /** Document at the level of XLink awareness. */
@@ -83,10 +83,10 @@ final case class ExtendedLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem
 
   def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = allChildElems collect { case xlink: Title => xlink }
-  def locatorXLinks: immutable.Seq[Locator] = allChildElems collect { case xlink: Locator => xlink }
-  def arcXLinks: immutable.Seq[Arc] = allChildElems collect { case xlink: Arc => xlink }
-  def resourceXLinks: immutable.Seq[Resource] = allChildElems collect { case xlink: Resource => xlink }
+  def titleXLinks: immutable.IndexedSeq[Title] = allChildElems collect { case xlink: Title => xlink }
+  def locatorXLinks: immutable.IndexedSeq[Locator] = allChildElems collect { case xlink: Locator => xlink }
+  def arcXLinks: immutable.IndexedSeq[Arc] = allChildElems collect { case xlink: Arc => xlink }
+  def resourceXLinks: immutable.IndexedSeq[Resource] = allChildElems collect { case xlink: Resource => xlink }
 }
 
 final case class Arc(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
@@ -104,7 +104,7 @@ final case class Arc(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends
   def useOption: Option[String] = attributeOption(XLinkUseExpandedName)
   def priorityOption: Option[String] = attributeOption(XLinkPriorityExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = allChildElems collect { case xlink: Title => xlink }
+  def titleXLinks: immutable.IndexedSeq[Title] = allChildElems collect { case xlink: Title => xlink }
 }
 
 final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
@@ -117,7 +117,7 @@ final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) ext
   def roleOption: Option[String] = attributeOption(XLinkRoleExpandedName)
   def titleOption: Option[String] = attributeOption(XLinkTitleExpandedName)
 
-  def titleXLinks: immutable.Seq[Title] = allChildElems collect { case xlink: Title => xlink }
+  def titleXLinks: immutable.IndexedSeq[Title] = allChildElems collect { case xlink: Title => xlink }
 }
 
 final case class Resource(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
