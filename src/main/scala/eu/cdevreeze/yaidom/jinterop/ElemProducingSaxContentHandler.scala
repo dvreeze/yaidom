@@ -46,7 +46,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
       val newState = new State(Some(doc), ElemPath.Root)
       currentState = newState
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(elm))
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, { e => currentState.elem.plusChild(elm) })
 
       val newParent = updatedDoc.documentElement.findWithElemPath(currentState.elemPath).get
       val pathEntry = elm.ownElemPathEntry(newParent)
@@ -69,7 +69,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
       // Ignore
       require(currentState.elemPath == ElemPath.Root)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(text))
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, { e => currentState.elem.plusChild(text) })
       val newState = new State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
@@ -85,7 +85,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
         ElemPath.Root,
         currentState.topLevelProcessingInstructions :+ pi)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(pi))
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, { e => currentState.elem.plusChild(pi) })
       val newState = new State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }

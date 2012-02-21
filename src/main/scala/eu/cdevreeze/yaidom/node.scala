@@ -119,8 +119,8 @@ final class Document(
   /** Returns <code>withDocumentElement(this.documentElement updated pf)</code> */
   def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
 
-  /** Returns <code>withDocumentElement(this.documentElement.updated(path, elm))</code>. */
-  def updated(path: ElemPath, elm: Elem): Document = withDocumentElement(this.documentElement.updated(path, elm))
+  /** Returns <code>withDocumentElement(this.documentElement.updated(path, f))</code>. */
+  def updated(path: ElemPath, f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path, f))
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
@@ -296,18 +296,18 @@ final class Elem private (
 
   /**
    * Returns a copy of the tree with this element as root element, except that the result tree is updated by replacing the
-   * element at the given ElemPath (against this element as root) by the given element.
+   * element at the given ElemPath (against this element as root) by applying the given function to that element.
    *
    * This method should be far more efficient than the counterpart taking a partial function.
    */
-  def updated(path: ElemPath, elm: Elem): Elem = {
-    if (path.entries.isEmpty) elm else {
+  def updated(path: ElemPath, f: Elem => Elem): Elem = {
+    if (path.entries.isEmpty) f(self) else {
       val firstEntry = path.firstEntry
       val idx = childIndexOf(firstEntry)
       require(idx >= 0)
       val childElm = children(idx).asInstanceOf[Elem]
       // Recursive, but not tail-recursive
-      val updatedChildren = children.updated(idx, childElm.updated(path.skipEntry, elm))
+      val updatedChildren = children.updated(idx, childElm.updated(path.skipEntry, f))
       self.withChildren(updatedChildren)
     }
   }
