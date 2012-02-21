@@ -172,9 +172,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /**
    * Returns the equivalent of <code>findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))</code>, but it should be more efficient.
    *
-   * It is important that this method has a fast implementation.
-   *
-   * TODO Make faster
+   * It is important that this method has a relatively fast implementation.
    */
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
     val relevantChildElms = self.childElems(entry.elementName)
@@ -189,12 +187,12 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    *
    * TODO Make faster
    */
-  final def findWithElemPath(path: ElemPath): Option[E] = path.entries match {
-    case xs if xs.isEmpty => Some(self)
-    case _ =>
+  final def findWithElemPath(path: ElemPath): Option[E] = {
+    if (path.entries.isEmpty) Some(self) else {
       val newRootOption: Option[E] = findWithElemPathEntry(path.entries.head)
       // Recursive call. Not tail-recursive, but recursion depth should be limited.
       newRootOption flatMap { newRoot => newRoot.findWithElemPath(path.skipEntry) }
+    }
   }
 
   /** Returns the ElemPath entries of all child elements, in the correct order */

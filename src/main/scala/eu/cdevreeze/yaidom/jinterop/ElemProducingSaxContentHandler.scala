@@ -32,9 +32,7 @@ import ElemProducingSaxContentHandler._
  */
 trait ElemProducingSaxContentHandler extends DefaultHandler {
 
-  // Rather "functional" but currently extremely inefficient implementation.
-  // Still, I am not ready yet to use mutable node trees here. First I want much faster tree transformations
-  // while still using the immutable node trees.
+  // Rather "functional" but inefficient implementation.
 
   @volatile var currentState: State = State.Empty
 
@@ -48,9 +46,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
       val newState = new State(Some(doc), ElemPath.Root)
       currentState = newState
     } else {
-      val updatedDoc = currentState.documentOption.get updated {
-        case p if p == currentState.elemPath => currentState.elem.plusChild(elm)
-      }
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(elm))
 
       val newParent = updatedDoc.documentElement.findWithElemPath(currentState.elemPath).get
       val pathEntry = elm.ownElemPathEntry(newParent)
@@ -73,10 +69,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
       // Ignore
       require(currentState.elemPath == ElemPath.Root)
     } else {
-      val updatedDoc = currentState.documentOption.get updated {
-        case p if p == currentState.elemPath => currentState.elem.plusChild(text)
-      }
-
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(text))
       val newState = new State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
@@ -92,10 +85,7 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
         ElemPath.Root,
         currentState.topLevelProcessingInstructions :+ pi)
     } else {
-      val updatedDoc = currentState.documentOption.get updated {
-        case p if p == currentState.elemPath => currentState.elem.plusChild(pi)
-      }
-
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(pi))
       val newState = new State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
@@ -117,7 +107,8 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
   }
 
   /** Returns the resulting Document. Do not call before SAX parsing is ready. */
-  final def resultingDocument: Document = currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?"))
+  final def resultingDocument: Document =
+    currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?"))
 
   private def startElementToElem(uri: String, localName: String, qName: String, atts: Attributes): Elem = {
     require(uri ne null)
@@ -175,7 +166,6 @@ object ElemProducingSaxContentHandler {
     require(documentOption ne null)
     require(elemPath ne null)
     require(topLevelProcessingInstructions ne null)
-
     require(topLevelProcessingInstructions.isEmpty || documentOption.isEmpty)
 
     def elemOption: Option[Elem] = {

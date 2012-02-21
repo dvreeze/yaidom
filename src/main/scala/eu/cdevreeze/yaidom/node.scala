@@ -119,6 +119,9 @@ final class Document(
   /** Returns <code>withDocumentElement(this.documentElement updated pf)</code> */
   def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
 
+  /** Returns <code>withDocumentElement(this.documentElement.updated(path, elm))</code>. */
+  def updated(path: ElemPath, elm: Elem): Document = withDocumentElement(this.documentElement.updated(path, elm))
+
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
@@ -245,8 +248,7 @@ final class Elem private (
 
   /** Creates a copy, but with the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
-    // Only creates a new Elem if needed, at the cost of an equality test
-    if (newChildren == self.children) self else new Elem(qname, attributes, scope, newChildren.toIndexedSeq)
+    new Elem(qname, attributes, scope, newChildren)
   }
 
   /** Returns <code>withChildren(self.children :+ newChild)</code>. */
@@ -290,6 +292,31 @@ final class Elem private (
     }
 
     updated(ElemPath.Root)
+  }
+
+  /**
+   * Returns a copy of the tree with this element as root element, except that the result tree is updated by replacing the
+   * element at the given ElemPath (against this element as root) by the given element.
+   *
+   * This method should be far more efficient than the counterpart taking a partial function.
+   */
+  def updated(path: ElemPath, elm: Elem): Elem = {
+    if (path.entries.isEmpty) elm else {
+      val firstEntry = path.firstEntry
+      val idx = childIndexOf(firstEntry)
+      require(idx >= 0)
+      val childElm = children(idx).asInstanceOf[Elem]
+      // Recursive, but not tail-recursive
+      val updatedChildren = children.updated(idx, childElm.updated(path.skipEntry, elm))
+      self.withChildren(updatedChildren)
+    }
+  }
+
+  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
+    val childElmOption = self.findWithElemPathEntry(pathEntry)
+    require(childElmOption.isDefined)
+    val childElm = childElmOption.get
+    children indexWhere { ch => ch == childElm }
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
