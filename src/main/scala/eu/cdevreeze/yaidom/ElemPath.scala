@@ -33,8 +33,11 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
 
   require(entries ne null)
 
+  /** Returns true if this is the root ElemPath, so if it has no entries */
+  def isRoot: Boolean = entries.isEmpty
+
   /** Prepends a given Entry to this ElemPath */
-  def ::(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
+  def prepend(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
 
   /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
   def skipEntry: ElemPath = ElemPath(entries.tail)
