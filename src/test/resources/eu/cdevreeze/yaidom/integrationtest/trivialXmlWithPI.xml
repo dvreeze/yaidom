@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- See http://en.wikipedia.org/wiki/Simple_API_for_XML -->
+<RootElement param="value">
+	<FirstElement>
+		Some Text
+	</FirstElement>
+    <?some_pi some_attr="some_value"?>
+	<SecondElement param2="something">
+		Pre-Text <Inline>Inlined text</Inline> Post-text.
+	</SecondElement>
+</RootElement>
