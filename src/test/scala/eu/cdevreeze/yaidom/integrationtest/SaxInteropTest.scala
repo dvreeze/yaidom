@@ -94,7 +94,7 @@ class SaxInteropTest extends Suite {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance
-    val is = classOf[DomInteropTest].getResourceAsStream("strangeXml.xml")
+    val is = classOf[SaxInteropTest].getResourceAsStream("strangeXml.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
 
@@ -118,7 +118,7 @@ class SaxInteropTest extends Suite {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance
-    val is = classOf[DomInteropTest].getResourceAsStream("trivialXml.xml")
+    val is = classOf[SaxInteropTest].getResourceAsStream("trivialXml.xml")
 
     val document: Document = saxParser.parse(is)
     val root: Elem = document.documentElement
@@ -131,7 +131,7 @@ class SaxInteropTest extends Suite {
       val result = root.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    // Comments are not empty
+    // Comments are not passed by the parser, so are empty
 
     // 2. Convert to NodeBuilder and back, and check again
 
@@ -146,7 +146,7 @@ class SaxInteropTest extends Suite {
       val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    // Comments are not empty
+    // Comments are not passed by the parser, so are empty
   }
 
   @Test def testParseSchemaXsd() {
@@ -162,9 +162,9 @@ class SaxInteropTest extends Suite {
     class MyEntityResolver extends DefaultHandler {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
         if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
-          new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
+          new InputSource(classOf[SaxInteropTest].getResourceAsStream("XMLSchema.dtd"))
         } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
-          new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
+          new InputSource(classOf[SaxInteropTest].getResourceAsStream("datatypes.dtd"))
         } else {
           // Default behaviour
           null
@@ -173,7 +173,7 @@ class SaxInteropTest extends Suite {
     }
 
     val saxParser = new DocumentParserUsingSax(spf, createSaxParser _, new MyEntityResolver with ElemProducingSaxContentHandler)
-    val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
+    val is = classOf[SaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
     val root: Elem = saxParser.parse(is).documentElement
 
@@ -196,12 +196,6 @@ class SaxInteropTest extends Suite {
       val result = root elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    /*
-    expect(Set(0, 1)) {
-      val result = root elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
-      result.toSet
-    }
-    */
 
     def checkForChoiceDocumentation(rootElm: Elem): Unit = {
       val forChoiceDefOption: Option[Elem] =
@@ -359,17 +353,167 @@ class SaxInteropTest extends Suite {
       val result = root2 elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    /*
-    expect(Set(0, 1)) {
-      val result = root2 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
-      result.toSet
-    }
-    */
 
     checkForChoiceDocumentation(root2)
     checkCommentWithEscapedChar(root2)
     checkIdentityConstraintElm(root2)
     checkComplexTypeElm(root2)
     checkFieldPattern(root2)
+  }
+
+  @Test def testParseXmlWithExpandedEntityRef() {
+    // 1. Parse XML file into Elem
+
+    val saxParser = DocumentParserUsingSax.newInstance
+    val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+
+    val root: Elem = saxParser.parse(is).documentElement
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildText(rootElm: Elem): Unit = {
+      val childOption = rootElm.firstElemOption(ns.ename("child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      val text = "This text contains an entity reference, viz. hi"
+      expect(text) {
+        childOption.get.trimmedText.take(text.length)
+      }
+    }
+
+    checkChildText(root)
+
+    // 2. Convert to NodeBuilder and back, and check again
+
+    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root2)
+  }
+
+  @Test def testParseXmlWithNamespaceUndeclarations() {
+    // 1. Parse XML file into Elem
+
+    val saxParser = DocumentParserUsingSax.newInstance
+    val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
+
+    val root: Elem = saxParser.parse(is).documentElement
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+  }
+
+  @Test def testParseGeneratedHtml() {
+    // 1. Parse XML file into Elem
+
+    val saxParser = DocumentParserUsingSax.newInstance
+    val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
+
+    val root: Elem = saxParser.parse(is).documentElement
+
+    require(root.qname.localPart == "Bookstore")
+
+    // 2. Create HTML string
+
+    val htmlFormatString =
+      """|<html>
+         |  <body>
+         |    <h1>Bookstore</h1>
+         |    <table>
+         |      <tr>
+         |        <th>Title</th>
+         |        <th>ISBN</th>
+         |        <th>Edition</th>
+         |        <th>Authors</th>
+         |        <th>Price</th>
+         |      </tr>
+         |%s
+         |    </table>
+         |  </body>
+         |</html>""".stripMargin
+
+    val bookFormatString =
+      """|      <tr>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |      </tr>""".stripMargin
+
+    def bookHtmlString(bookElm: Elem): String = {
+      val authorNames: immutable.IndexedSeq[String] =
+        bookElm.elems("{http://bookstore}Author".ename) map { e =>
+          "%s %s".format(e.childElem("{http://bookstore}First_Name".ename).trimmedText, e.childElem("{http://bookstore}Last_Name".ename).trimmedText)
+        }
+
+      val authors = authorNames.mkString(", ")
+
+      val result = bookFormatString.format(
+        bookElm.childElem("{http://bookstore}Title".ename).trimmedText,
+        bookElm.attributeOption("ISBN".ename).getOrElse(""),
+        bookElm.attributeOption("Edition".ename).getOrElse(""),
+        authors,
+        bookElm.attributeOption("Price".ename).getOrElse(""))
+      result
+    }
+
+    val booksHtmlString = root.elems("{http://bookstore}Book".ename) map { e => bookHtmlString(e) } mkString ("\n")
+    val htmlString = htmlFormatString.format(booksHtmlString)
+
+    // 3. Parse HTML string (which is also valid XML in this case) into Document
+
+    // New SAX parser!!
+    val saxParser2 = DocumentParserUsingSax.newInstance
+    val htmlRoot: Elem = saxParser2.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
+
+    // 4. Check the parsed HTML
+
+    val tableRowElms = htmlRoot.elems("tr".ename).drop(1)
+
+    expect(4) {
+      tableRowElms.size
+    }
+
+    val isbnElms = tableRowElms flatMap { rowElm => rowElm.childElems("td".ename).drop(1).headOption }
+    val isbns = isbnElms map { e => e.trimmedText }
+
+    expect(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
+      isbns.toSet
+    }
+
+    val authorsElms = tableRowElms flatMap { rowElm => rowElm.childElems("td".ename).drop(3).headOption }
+    val authors = authorsElms map { e => e.trimmedText }
+
+    expect(Set(
+      "Jeffrey Ullman, Jennifer Widom",
+      "Hector Garcia-Molina, Jeffrey Ullman, Jennifer Widom",
+      "Jeffrey Ullman, Hector Garcia-Molina",
+      "Jennifer Widom")) {
+      authors.toSet
+    }
   }
 }
