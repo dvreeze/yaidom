@@ -111,13 +111,13 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns this element followed by all descendant elements */
-  final def allElemsOrSelf: immutable.IndexedSeq[E] = allElemsOrSelfList.toIndexedSeq
+  final def allElemsOrSelf: immutable.IndexedSeq[E] = allElemsOrSelfSeq
 
   /**
    * Returns those elements among this element and its descendant elements that obey the given predicate.
    * That is, the result is equivalent to <code>allElemsOrSelf filter p</code>.
    */
-  final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = elemsOrSelfListWhere(p).toIndexedSeq
+  final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = elemsOrSelfSeqWhere(p)
 
   /** Returns those elements among this element and its descendant elements that have the given expanded name */
   final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
@@ -141,7 +141,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def firstElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch firstElemsOrSelfListWhere p toIndexedSeq }
+    allChildElems flatMap { ch => ch firstElemsOrSelfSeqWhere p }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def firstElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = firstElemsWhere { e => e.resolvedName == expandedName }
@@ -172,7 +172,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns the equivalent of <code>findWithElemPath(ElemPath(List(entry)))</code>, but it should be more efficient.
+   * Returns the equivalent of <code>findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))</code>, but it should be more efficient.
    *
    * It is important that this method has a fast implementation.
    *
@@ -222,32 +222,32 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     ElemPath.Entry(self.resolvedName, idx)
   }
 
-  /** Returns a List of this element followed by all descendant elements */
-  private final def allElemsOrSelfList: List[E] = {
+  /** Returns an IndexedSeq of this element followed by all descendant elements */
+  private final def allElemsOrSelfSeq: immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    self :: {
-      self.allChildElems.toList flatMap { ch => ch.allElemsOrSelfList }
+    self +: {
+      self.allChildElems flatMap { ch => ch.allElemsOrSelfSeq }
     }
   }
 
   /**
-   * Returns a List of those of this element and its descendant elements that obey the given predicate.
-   * That is, the result is equivalent to <code>allElemsOrSelfList filter p</code>.
+   * Returns an IndexedSeq of those of this element and its descendant elements that obey the given predicate.
+   * That is, the result is equivalent to <code>allElemsOrSelfSeq filter p</code>.
    */
-  private final def elemsOrSelfListWhere(p: E => Boolean): List[E] = {
+  private final def elemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
     val includesSelf = p(self)
-    val resultWithoutSelf = self.allChildElems.toList flatMap { ch => ch elemsOrSelfListWhere p }
-    if (includesSelf) self :: resultWithoutSelf else resultWithoutSelf
+    val resultWithoutSelf = self.allChildElems flatMap { ch => ch elemsOrSelfSeqWhere p }
+    if (includesSelf) self +: resultWithoutSelf else resultWithoutSelf
   }
 
   /**
-   * Returns a List of those of this element and its descendant elements that obey the given predicate,
+   * Returns an IndexedSeq of those of this element and its descendant elements that obey the given predicate,
    * such that no ancestor obeys the predicate.
    */
-  private final def firstElemsOrSelfListWhere(p: E => Boolean): List[E] = {
+  private final def firstElemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    if (p(self)) List(self) else self.allChildElems.toList flatMap { ch => ch firstElemsOrSelfListWhere p }
+    if (p(self)) immutable.IndexedSeq(self) else self.allChildElems flatMap { ch => ch firstElemsOrSelfSeqWhere p }
   }
 
   /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an Option */
