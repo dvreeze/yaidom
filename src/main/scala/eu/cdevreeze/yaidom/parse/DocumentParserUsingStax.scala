@@ -31,7 +31,7 @@ final class DocumentParserUsingStax(val xmlInputFactory: XMLInputFactory) extend
     var xmlEventReader: XMLEventReader = null
     try {
       xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
-      convertToDocument(xmlEventReader.toSeq)
+      convertToDocument(xmlEventReader.toIndexedSeq)
     } finally {
       ignoring(classOf[Exception]) {
         if (xmlEventReader ne null) xmlEventReader.close()

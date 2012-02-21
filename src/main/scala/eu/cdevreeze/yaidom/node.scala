@@ -149,7 +149,7 @@ final class Document(
     val unshiftedFormatString = startFormatString + pisFormatString + commentsFormatString + ")"
 
     val formatString = {
-      val result = unshiftedFormatString.lines.toList collect {
+      val result = unshiftedFormatString.lines.toIndexedSeq[String] collect {
         case ln if ln.trim == "%s" => ln // "%s" not indented here!
         case ln => (" " * numberOfSpaces) + ln
       }
@@ -163,8 +163,8 @@ final class Document(
 
     val pisString = {
       val indent = numberOfSpaces + 4
-      val pisStringList: List[String] =
-        processingInstructions.toList map { ch => ch.toShiftedAstString(parentScope, indent) }
+      val pisStringList: Seq[String] =
+        processingInstructions map { ch => ch.toShiftedAstString(parentScope, indent) }
 
       val separator = ",%n".format()
       val resultString: String = pisStringList.mkString(separator)
@@ -173,8 +173,8 @@ final class Document(
 
     val commentsString = {
       val indent = numberOfSpaces + 4
-      val commentsStringList: List[String] =
-        comments.toList map { ch => ch.toShiftedAstString(parentScope, indent) }
+      val commentsStringList: Seq[String] =
+        comments map { ch => ch.toShiftedAstString(parentScope, indent) }
 
       val separator = ",%n".format()
       val resultString: String = commentsStringList.mkString(separator)
@@ -345,7 +345,7 @@ final class Elem private (
     val unshiftedFormatString = startFormatString + childrenFormatString + ")"
 
     val formatString = {
-      val result = unshiftedFormatString.lines.toList collect {
+      val result = unshiftedFormatString.lines.toIndexedSeq[String] collect {
         case ln if ln.trim == "%s" => ln // "%s" not indented here!
         case ln => (" " * numberOfSpaces) + ln
       }
@@ -382,8 +382,8 @@ final class Elem private (
 
     val childrenString = {
       val indent = numberOfSpaces + 4
-      val childrenStringList: List[String] =
-        self.children.toList map { ch => ch.toShiftedAstString(self.scope, indent) }
+      val childrenStringList: Seq[String] =
+        self.children map { ch => ch.toShiftedAstString(self.scope, indent) }
 
       val separator = ",%n".format()
       val resultString: String = childrenStringList.mkString(separator)
@@ -456,7 +456,7 @@ object Document {
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(baseUriOption, documentElement, processingInstructions.toIndexedSeq, comments.toIndexedSeq)
+    new Document(baseUriOption, documentElement, processingInstructions, comments)
   }
 }
 
@@ -470,5 +470,5 @@ object Elem {
     qname: QName,
     attributes: Map[QName, String] = Map(),
     scope: Scope = Scope.Empty,
-    children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children.toIndexedSeq)
+    children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 }

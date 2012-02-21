@@ -109,19 +109,22 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
 
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
-    val attributeList: List[Attribute] = elm.attributes.map(kv => {
-      val attrQName = kv._1
-      val value = kv._2
-      val attrExpandedName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
-        "Attribute name '%s' should resolve to an ExpandedName in scope [%s]".format(attrQName, elm.attributeScope)))
-      val attrJavaQName = attrExpandedName.toJavaQName(attrQName.prefixOption)
+    val attributeIterable: Iterable[Attribute] = {
+      val result = elm.attributes map { kv =>
+        val attrQName = kv._1
+        val value = kv._2
+        val attrExpandedName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
+          "Attribute name '%s' should resolve to an ExpandedName in scope [%s]".format(attrQName, elm.attributeScope)))
+        val attrJavaQName = attrExpandedName.toJavaQName(attrQName.prefixOption)
 
-      (attrQName -> xmlEventFactory.createAttribute(attrJavaQName, value))
-    }).values.toList
+        (attrQName -> xmlEventFactory.createAttribute(attrJavaQName, value))
+      }
+      result.values
+    }
 
-    val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeList.toBuffer.asJava).iterator
+    val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeIterable.toBuffer.asJava).iterator
 
-    val namespaceList: List[Namespace] = {
+    val namespaceIterable: Iterable[Namespace] = {
       val result = namespaceDeclarations.toMap map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
@@ -132,10 +135,10 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
           (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
         }
       }
-      result.values.toList
+      result.values
     }
 
-    val namespaces: jutil.Iterator[Namespace] = new jutil.ArrayList[Namespace](namespaceList.toBuffer.asJava).iterator
+    val namespaces: jutil.Iterator[Namespace] = new jutil.ArrayList[Namespace](namespaceIterable.toBuffer.asJava).iterator
 
     xmlEventFactory.createStartElement(javaQName, attributes, namespaces)
   }
@@ -145,7 +148,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
 
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
-    val namespaceOutOfScopeList: List[Namespace] = {
+    val namespaceOutOfScopeIterable: Iterable[Namespace] = {
       val result = namespaceDeclarations.toMap map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
@@ -156,11 +159,11 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
           (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
         }
       }
-      result.values.toList
+      result.values
     }
 
     val namespacesOutOfScope: jutil.Iterator[Namespace] =
-      new jutil.ArrayList[Namespace](namespaceOutOfScopeList.toBuffer.asJava).iterator
+      new jutil.ArrayList[Namespace](namespaceOutOfScopeIterable.toBuffer.asJava).iterator
 
     xmlEventFactory.createEndElement(javaQName, namespacesOutOfScope)
   }

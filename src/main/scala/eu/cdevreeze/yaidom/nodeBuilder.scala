@@ -179,8 +179,8 @@ object NodeBuilder {
     new DocumentBuilder(
       baseUriOption map { uriString => new URI(uriString) },
       documentElement,
-      processingInstructions.toIndexedSeq,
-      comments.toIndexedSeq)
+      processingInstructions,
+      comments)
   }
 
   def elem(
@@ -189,7 +189,7 @@ object NodeBuilder {
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
     children: immutable.IndexedSeq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, children.toIndexedSeq)
+    new ElemBuilder(qname, attributes, namespaces, children)
   }
 
   def text(textValue: String): TextBuilder = TextBuilder(text = textValue, isCData = false)

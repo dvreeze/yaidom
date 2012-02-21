@@ -32,7 +32,7 @@ import scala.collection.JavaConverters._
  *
  * val xmlInputFactory = XMLInputFactory.newFactory
  * val xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
- * val root: Elem = convertToElem(xmlEventReader.toSeq)
+ * val root: Elem = convertToElem(xmlEventReader.toIndexedSeq)
  *
  * xmlEventReader.close()
  * }}}
@@ -57,15 +57,15 @@ import scala.collection.JavaConverters._
  */
 object StaxConversions extends ElemToStaxEventsConverter with StaxEventsToElemConverter {
 
-  /** "Implicit" class containing the toSeq method for XMLEventReaders. */
+  /** "Implicit" class containing the toIndexedSeq method for XMLEventReaders. */
   final class ToXmlEventSeq(xmlEventReader: XMLEventReader) {
-    def toSeq: immutable.IndexedSeq[XMLEvent] = {
+    def toIndexedSeq: immutable.IndexedSeq[XMLEvent] = {
       xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]].asScala.toIndexedSeq
     }
   }
 
   /**
-   * Adds a toSeq method that implicitly converts an <code>XMLEventReader</code> to a <code>immutable.IndexedSeq[XMLEvent]</code>.
+   * Adds a toIndexedSeq method that implicitly converts an <code>XMLEventReader</code> to an <code>immutable.IndexedSeq[XMLEvent]</code>.
    */
   implicit def toXmlEventSeq(xmlEventReader: XMLEventReader): ToXmlEventSeq = new ToXmlEventSeq(xmlEventReader)
 }

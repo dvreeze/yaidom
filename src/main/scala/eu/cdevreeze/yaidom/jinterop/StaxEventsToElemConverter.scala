@@ -259,7 +259,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here
 
-    Elem(elemExpandedName.toQName(elemPrefixOption), currAttrs, currScope, Nil.toIndexedSeq)
+    Elem(elemExpandedName.toQName(elemPrefixOption), currAttrs, currScope, immutable.IndexedSeq())
   }
 }
 

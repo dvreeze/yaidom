@@ -121,7 +121,8 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
 
   /** Converts a NodeList to an IndexedSeq[org.w3c.dom.Node] */
   private def nodeListToIndexedSeq(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
-    (0 until nodeList.getLength) map { i => nodeList.item(i) } toIndexedSeq
+    val result = (0 until nodeList.getLength) map { i => nodeList.item(i) }
+    result.toIndexedSeq
   }
 
   /** Extracts the QName of an org.w3c.dom.Element */

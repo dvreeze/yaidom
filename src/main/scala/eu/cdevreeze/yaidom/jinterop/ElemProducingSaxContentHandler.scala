@@ -32,7 +32,9 @@ import ElemProducingSaxContentHandler._
  */
 trait ElemProducingSaxContentHandler extends DefaultHandler {
 
-  // Rather "functional" but inefficient implementation.
+  // This content handler has a very simple state space, so is easy to reason about.
+  // It may not be the fastest implementation, but it returns a thread-safe immutable reusable yaidom Document,
+  // so in a bigger picture it is fast enough.
 
   @volatile var currentState: State = State.Empty
 

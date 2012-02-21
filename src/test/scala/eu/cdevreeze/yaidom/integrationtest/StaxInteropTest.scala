@@ -122,8 +122,8 @@ class StaxInteropTest extends Suite {
     val doc = new Document(
       baseUriOption = None,
       documentElement = root3,
-      processingInstructions = Nil.toIndexedSeq,
-      comments = Nil.toIndexedSeq)
+      processingInstructions = immutable.IndexedSeq(),
+      comments = immutable.IndexedSeq())
 
     val xmlString2 = printer.print(doc)
 
