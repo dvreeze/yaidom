@@ -104,8 +104,8 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
 
   /** Returns the resulting Elem. Do not call before SAX parsing is ready. */
   final def resultingElem: Elem = {
-    val root = currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?")).documentElement
-    root.findWithElemPath(currentState.elemPath).getOrElse(sys.error("Wrong ElemPath '%s'".format(currentState.elemPath)))
+    require(currentState.elemPath.isRoot, "When parsing is ready, the current path must be at the root")
+    currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?")).documentElement
   }
 
   /** Returns the resulting Document. Do not call before SAX parsing is ready. */
