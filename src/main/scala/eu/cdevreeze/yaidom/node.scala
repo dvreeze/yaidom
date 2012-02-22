@@ -255,13 +255,13 @@ final class Elem private (
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
   /**
-   * Returns a copy of the tree with this element as root element, except that the result tree is updated according to
-   * the passed partial function mapping [[eu.cdevreeze.yaidom.ElemPath]]s to [[eu.cdevreeze.yaidom.Elem]]s.
-   * That is, wherever (in top-down tree traversal) an element is found that has an ElemPath (w.r.t. this element as root)
-   * for which the partial function is defined, that partial function is invoked instead for that element, "replacing"
-   * that element, thus resulting in an "updated" tree.
+   * "Functionally updates" the tree with this element as root element, by applying the passed partial function to the elements
+   * for which the partial function is defined. The partial function is defined for an element if that element has an [[eu.cdevreeze.yaidom.ElemPath]]
+   * (w.r.t. this element as root) for which it is defined. Tree traversal is top-down.
    *
-   * This is typically an expensive method.
+   * This is an expensive method, partly because it typically creates many objects, and partly because it may invoke the
+   * partial function many times (depending on the partial function, of course). The larger the set of [[eu.cdevreeze.yaidom.ElemPath]]s
+   * for which the partial function is defined, the less efficient this method becomes.
    */
   def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
     def updated(currentPath: ElemPath): Elem = {
@@ -289,10 +289,13 @@ final class Elem private (
   }
 
   /**
-   * Returns a copy of the tree with this element as root element, except that the result tree is updated by replacing the
-   * element at the given ElemPath (against this element as root) by applying the given function to that element.
+   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
+   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). The method throws an exception
+   * if no element is found with the given path.
    *
-   * This method should be far more efficient than the counterpart taking a partial function, be it less powerful.
+   * This method is far more efficient than the counterpart taking a partial function, partly because it invokes the function only once,
+   * and partly because it creates no more objects than needed. In that regard, it has been inspired by Scala's immutable Vector,
+   * which offers efficient "functional updates" (among other efficient operations).
    */
   def updated(path: ElemPath, f: Elem => Elem): Elem = {
     if (path.entries.isEmpty) f(self) else {
