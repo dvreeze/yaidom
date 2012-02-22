@@ -29,8 +29,8 @@ import XLink._
  * This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
  * <code>mutable.IndexedSeq[T]</code> for Scala Collections.
  *
- * It is advisable not to use these xlink.Elems "globally" at a large scale, because that may cause a lot of wrapping of yaidom
- * Elems as xlink.Elems. Rather use xlink.XLinks "locally" as short-lived objects where they are useful.
+ * It is advisable not to use these <code>xlink.Elem</code>s "globally" at a large scale, because that may cause a lot of wrapping of yaidom
+ * Elems as <code>xlink.Elem</code>s. Rather use <code>xlink.XLink</code>s "locally" as short-lived objects where they are useful.
  *
  * @author Chris de Vreeze
  */
