@@ -26,6 +26,9 @@ package eu.cdevreeze.yaidom
  * The Elem companion object in this package has a factory method to quickly transform a yaidom Elem into an
  * XLink-aware Elem, which typically contains XLink instances.
  *
+ * Do not use xlink.Elems "globally" at a large scale, but rather use xlink.XLinks "locally" where they make sense.
+ * See [[eu.cdevreeze.yaidom.xlink.Elem]].
+ *
  * In Java speak, this package depends on the [[eu.cdevreeze.yaidom]] package, and not the other way around.
  * In Scala speak, this package is in the [[eu.cdevreeze.yaidom]] namespace.
  *

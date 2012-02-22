@@ -24,10 +24,13 @@ import XLink._
 /**
  * Elem at the level of XLink awareness. It is either an XLink or not. It wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
  *
- * When using the Elem and Document classes in this package, prefix them with the last part of the package name. So,
- * write <code>xlink.Elem</code> and <code>xlink.Document</code> instead of globally importing classes/traits in the
- * [[eu.cdevreeze.yaidom.xlink]] package. This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
+ * When using the traits and classes in this package, prefix them with the last part of the package name. So,
+ * write <code>xlink.Elem</code> instead of globally importing classes/traits in the [[eu.cdevreeze.yaidom.xlink]] package.
+ * This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
  * <code>mutable.IndexedSeq[T]</code> for Scala Collections.
+ *
+ * It is advisable not to use these xlink.Elems "globally" at a large scale, because that may cause a lot of wrapping of yaidom
+ * Elems as xlink.Elems. Rather use xlink.XLinks "locally" as short-lived objects where they are useful.
  *
  * @author Chris de Vreeze
  */
@@ -40,15 +43,6 @@ sealed trait Elem extends Immutable {
   final def resolvedName: ExpandedName = wrappedElem.resolvedName
 
   final def resolvedAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes
-}
-
-/** Document at the level of XLink awareness. */
-final class Document(
-  val baseUriOption: Option[URI],
-  val documentElement: Elem) extends Immutable {
-
-  require(baseUriOption ne null)
-  require(documentElement ne null)
 }
 
 /** XLink */
@@ -129,15 +123,6 @@ final case class Resource(override val wrappedElem: eu.cdevreeze.yaidom.Elem) ex
 
 final case class Title(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
   require(xlinkType == "title")
-}
-
-object Document {
-
-  def apply(d: eu.cdevreeze.yaidom.Document): Document = {
-    val docElem = Elem(d.documentElement)
-
-    new Document(d.baseUriOption, docElem)
-  }
 }
 
 object Elem {
