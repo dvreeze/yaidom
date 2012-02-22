@@ -30,11 +30,10 @@ package eu.cdevreeze
  * manipulating immutable Scala collections. It should often even be attractive to use this API instead of
  * XPath, XSLT and/or XQuery, at the cost of somewhat more verbosity and loss of (schema) typing information.</li>
  * <li>Yaidom supports <em>multiple implementations</em> of nodes. In this package, the default implementations of nodes
- * (and elements, documents, texts etc.) are offered. Yet in the [[eu.cdevreeze.yaidom.xlink]] sub-package nodes with XLink-awareness are
- * offered. In the [[eu.cdevreeze.yaidom.expanded]] sub-package elements contain no prefixes. To support these and other node implementations,
- * this package offers some traits that provide partial implementations. Typical "element node" implementations mix in
- * traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]], and typical "text node" implementations mix in trait
- * [[eu.cdevreeze.yaidom.TextLike]].</li>
+ * (and elements, documents, texts etc.) are offered. Yet in the [[eu.cdevreeze.yaidom.expanded]] sub-package elements contain no prefixes.
+ * To support these and other node implementations, this package offers some traits that provide partial implementations.
+ * Typical "element node" implementations mix in traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]],
+ * and typical "text node" implementations mix in trait [[eu.cdevreeze.yaidom.TextLike]].</li>
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts as classes, this API
  * can hide some XML complexities (like predefined namespaces) behind the implementations of these classes. These concepts

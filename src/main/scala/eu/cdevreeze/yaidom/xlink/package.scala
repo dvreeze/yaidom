@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLink-aware DOM-like layer on top of the normal yaidom DOM-like layer.
+ * XLink-aware wrappers around [[eu.cdevreeze.yaidom.Elem]].
  *
  * The Elems in this layer wrap the yaidom Elems (other nodes are not wrapped, but that is ok, since the wrapped
  * elems are always accessible). Like the wrapped Elems, they are immutable. Each Elem in this layer that is an XLink
