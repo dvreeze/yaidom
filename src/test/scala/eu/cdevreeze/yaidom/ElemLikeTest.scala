@@ -485,6 +485,32 @@ class ElemLikeTest extends Suite {
         ElemPath.Entry(ns.ns.ename("Last_Name"), 0)))
       bookstore.findWithElemPath(path) map { _.trimmedText }
     }
+
+    val bookstoreChildIndexes = bookstore.allChildElemPathEntries
+
+    expect(8) {
+      bookstoreChildIndexes.size
+    }
+    expect(Set(ns.ns.ename("Book"), ns.ns.ename("Magazine"))) {
+      val result = bookstoreChildIndexes map { idx => idx.elementName }
+      result.toSet
+    }
+    expect((0 to 3).toSet) {
+      val result = bookstoreChildIndexes map { idx => idx.index }
+      result.toSet
+    }
+
+    for (idx <- bookstoreChildIndexes) {
+      expect(true) {
+        bookstore.findWithElemPath(ElemPath(immutable.IndexedSeq(idx))).isDefined
+      }
+    }
+    expect(None) {
+      val p = ElemPath(immutable.IndexedSeq(
+        ElemPath.Entry(ns.ns.ename("Book"), 2),
+        ElemPath.Entry(ns.ns.ename("Title"), 2)))
+      bookstore.findWithElemPath(p)
+    }
   }
 
   private val book1: ElemBuilder = {

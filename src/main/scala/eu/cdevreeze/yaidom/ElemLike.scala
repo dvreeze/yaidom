@@ -202,13 +202,13 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
     val elementNameCounts = mutable.Map[ExpandedName, Int]()
-    val acc = mutable.IndexedSeq[ElemPath.Entry]()
+    val acc = mutable.ArrayBuffer[ElemPath.Entry]()
 
-    for (elm <- allChildElems) {
+    for (elm <- self.allChildElems) {
       val countForName = elementNameCounts.getOrElse(elm.resolvedName, 0)
       val entry = ElemPath.Entry(elm.resolvedName, countForName)
       elementNameCounts.update(elm.resolvedName, countForName + 1)
-      acc :+ entry
+      acc += entry
     }
 
     acc.toIndexedSeq
