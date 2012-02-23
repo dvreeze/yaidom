@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.yaidom
 
-import scala.collection.immutable
+import scala.collection.{ immutable, mutable }
 
 /**
  * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.xlink.Elem]].
@@ -182,22 +182,36 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option.
    */
   final def findWithElemPath(path: ElemPath): Option[E] = {
-    if (path.isRoot) Some(self) else {
-      val newRootOption: Option[E] = findWithElemPathEntry(path.entries.head)
-      // Recursive call. Not tail-recursive, but recursion depth should be limited.
-      newRootOption flatMap { newRoot => newRoot.findWithElemPath(path.withoutFirstEntry) }
+    // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
+
+    def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {
+      require(entryIndex >= 0 && entryIndex <= path.entries.size)
+
+      if (entryIndex == path.entries.size) Some(currentRoot) else {
+        val newRootOption: Option[E] = currentRoot.findWithElemPathEntry(path.entries(entryIndex))
+        // Recursive call. Not tail-recursive, but recursion depth should be limited.
+        newRootOption flatMap { newRoot => findWithElemPath(newRoot, entryIndex + 1) }
+      }
     }
+
+    findWithElemPath(self, 0)
   }
 
   /** Returns the ElemPath entries of all child elements, in the correct order */
   final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
-    val startAcc = immutable.IndexedSeq[ElemPath.Entry]()
+    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
-    allChildElems.foldLeft(startAcc) { (acc, elm) =>
-      val countForName = acc count { entry => entry.elementName == elm.resolvedName }
+    val elementNameCounts = mutable.Map[ExpandedName, Int]()
+    val acc = mutable.IndexedSeq[ElemPath.Entry]()
+
+    for (elm <- allChildElems) {
+      val countForName = elementNameCounts.getOrElse(elm.resolvedName, 0)
       val entry = ElemPath.Entry(elm.resolvedName, countForName)
+      elementNameCounts.update(elm.resolvedName, countForName + 1)
       acc :+ entry
     }
+
+    acc.toIndexedSeq
   }
 
   /**
@@ -215,7 +229,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns an IndexedSeq of this element followed by all descendant elements */
   private final def allElemsOrSelfSeq: immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    self +: {
+    immutable.IndexedSeq(self) ++ {
       self.allChildElems flatMap { ch => ch.allElemsOrSelfSeq }
     }
   }

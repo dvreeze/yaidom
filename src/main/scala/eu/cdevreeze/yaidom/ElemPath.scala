@@ -31,6 +31,8 @@ import scala.collection.immutable
  */
 final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
 
+  // TODO ElemPath is a case class, but contains an IndexedSeq. Is that correct?
+
   require(entries ne null)
 
   /** Returns true if this is the root ElemPath, so if it has no entries */

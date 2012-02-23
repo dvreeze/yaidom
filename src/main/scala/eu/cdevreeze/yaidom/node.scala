@@ -119,8 +119,8 @@ final class Document(
   /** Returns <code>withDocumentElement(this.documentElement updated pf)</code> */
   def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
 
-  /** Returns <code>withDocumentElement(this.documentElement.updated(path, f))</code>. */
-  def updated(path: ElemPath, f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path, f))
+  /** Returns <code>withDocumentElement(this.documentElement.updated(path)(f))</code>. */
+  def updated(path: ElemPath, f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
@@ -259,9 +259,7 @@ final class Elem private (
    * for which the partial function is defined. The partial function is defined for an element if that element has an [[eu.cdevreeze.yaidom.ElemPath]]
    * (w.r.t. this element as root) for which it is defined. Tree traversal is top-down.
    *
-   * This is an expensive method, partly because it typically creates many objects, and partly because it may invoke the
-   * partial function many times (depending on the partial function, of course). The larger the set of [[eu.cdevreeze.yaidom.ElemPath]]s
-   * for which the partial function is defined, the less efficient this method becomes.
+   * This is an expensive method.
    */
   def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
     def updated(currentPath: ElemPath): Elem = {
@@ -292,19 +290,19 @@ final class Elem private (
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
    * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). The method throws an exception
    * if no element is found with the given path.
-   *
-   * This method is far more efficient than the counterpart taking a partial function, partly because it invokes the function only once,
-   * and partly because it creates no more objects than needed. In that regard, it has been inspired by Scala's immutable Vector,
-   * which offers efficient "functional updates" (among other efficient operations).
    */
-  def updated(path: ElemPath, f: Elem => Elem): Elem = {
+  def updated(path: ElemPath)(f: Elem => Elem): Elem = {
+    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
+    // "functional updates" (among other efficient operations).
+
     if (path.entries.isEmpty) f(self) else {
       val firstEntry = path.firstEntry
       val idx = childIndexOf(firstEntry)
-      require(idx >= 0)
+      require(idx >= 0, "The path %s does not exist".format(path))
       val childElm = children(idx).asInstanceOf[Elem]
+
       // Recursive, but not tail-recursive
-      val updatedChildren = children.updated(idx, childElm.updated(path.withoutFirstEntry, f))
+      val updatedChildren = children.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
       self.withChildren(updatedChildren)
     }
   }
