@@ -20,6 +20,7 @@ package parse
 import java.{ io => jio }
 import javax.xml.parsers.{ SAXParserFactory, SAXParser }
 import org.xml.sax.helpers.DefaultHandler
+import org.xml.sax.ext.LexicalHandler
 import jinterop.ElemProducingSaxContentHandler
 
 /** SAX-based Document parser */
@@ -50,16 +51,21 @@ object DocumentParserUsingSax {
     DocumentParserUsingSax.newInstance(spf)
   }
 
-  def newInstance(spf: SAXParserFactory): DocumentParserUsingSax = {
-    val handler = new DefaultHandler with ElemProducingSaxContentHandler
+  def newInstance(spf: SAXParserFactory): DocumentParserUsingSax = newInstance(
+    spf, new DefaultHandler with ElemProducingSaxContentHandler)
 
+  def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxContentHandler): DocumentParserUsingSax = {
     new DocumentParserUsingSax(
       saxParserFactory = spf,
       saxParserCreator = { spf =>
         val parser = spf.newSAXParser()
-        // Property "http://xml.org/sax/properties/lexical-handler" registers a LexicalHandler. See the corresponding API documentation.
-        // It is assumed here that in practice all SAX parsers support LexicalHandlers.
-        parser.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
+
+        if (handler.isInstanceOf[LexicalHandler]) {
+          // Property "http://xml.org/sax/properties/lexical-handler" registers a LexicalHandler. See the corresponding API documentation.
+          // It is assumed here that in practice all SAX parsers support LexicalHandlers.
+          parser.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
+        }
+
         parser
       },
       defaultHandler = handler)

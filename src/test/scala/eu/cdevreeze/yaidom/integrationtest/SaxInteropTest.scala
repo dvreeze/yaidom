@@ -131,7 +131,14 @@ class SaxInteropTest extends Suite {
       val result = root.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    // Comments are not passed by the parser, so are empty
+    expect("This is trivial XML") {
+      val result = document.comments map { com => com.text.trim }
+      result.mkString
+    }
+    expect("Trivial XML") {
+      val result = root.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      result.mkString
+    }
 
     // 2. Convert to NodeBuilder and back, and check again
 
@@ -146,18 +153,20 @@ class SaxInteropTest extends Suite {
       val result = root3.allElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    // Comments are not passed by the parser, so are empty
+    expect("This is trivial XML") {
+      val result = document2.comments map { com => com.text.trim }
+      result.mkString
+    }
+    expect("Trivial XML") {
+      val result = root3.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      result.mkString
+    }
   }
 
   @Test def testParseSchemaXsd() {
     // 1. Parse XML file into Elem
 
     val spf = SAXParserFactory.newInstance
-
-    def createSaxParser(saxParserFactory: SAXParserFactory): SAXParser = {
-      val sp = saxParserFactory.newSAXParser()
-      sp
-    }
 
     class MyEntityResolver extends DefaultHandler {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
@@ -172,7 +181,7 @@ class SaxInteropTest extends Suite {
       }
     }
 
-    val saxParser = new DocumentParserUsingSax(spf, createSaxParser _, new MyEntityResolver with ElemProducingSaxContentHandler)
+    val saxParser = DocumentParserUsingSax.newInstance(spf, new MyEntityResolver with ElemProducingSaxContentHandler)
     val is = classOf[SaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -416,7 +425,7 @@ class SaxInteropTest extends Suite {
       result.toSet
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 2. Convert to NodeBuilder and back, and check again
 
     val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
@@ -424,6 +433,62 @@ class SaxInteropTest extends Suite {
       val result = root2.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
+  }
+
+  @Test def testParseXmlWithEscapedChars() {
+    // 1. Parse XML file into Elem
+
+    val spf = SAXParserFactory.newInstance
+    // I want to set the parser to coalescing somehow, but do not know how (especially in a standard way)
+    val saxParser = DocumentParserUsingSax.newInstance(spf)
+    val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
+
+    val root: Elem = saxParser.parse(is).documentElement
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def doChecks(rootElm: Elem): Unit = {
+      val childElms = rootElm.firstElems(ns.ename("child"))
+      expect(2) {
+        childElms.size
+      }
+
+      val text = "Jansen & co"
+
+      // Seems to work (using Xerces?) without setting some "coalescing" feature
+      expect(Set(text)) {
+        val result = childElms map { e => e.trimmedText }
+        result.toSet
+      }
+
+      expect(Set(text)) {
+        val result = childElms map { e => e.attributeOption("about".ename).getOrElse("Missing text") }
+        result.toSet
+      }
+
+      expect(Set(text)) {
+        val result = rootElm.commentChildren map { c => c.text.trim }
+        result.toSet
+      }
+    }
+
+    doChecks(root)
+
+    // 2. Convert to NodeBuilder and back, and check again
+
+    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    doChecks(root2)
   }
 
   @Test def testParseGeneratedHtml() {
