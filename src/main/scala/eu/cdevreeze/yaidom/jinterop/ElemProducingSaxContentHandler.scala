@@ -19,6 +19,7 @@ package jinterop
 
 import org.xml.sax.{ ContentHandler, Attributes, Locator }
 import org.xml.sax.helpers.DefaultHandler
+import org.xml.sax.ext.LexicalHandler
 import scala.collection.immutable
 import eu.cdevreeze.yaidom._
 import ElemProducingSaxContentHandler._
@@ -28,9 +29,9 @@ import ElemProducingSaxContentHandler._
  * method <code>resultingElem</code>, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
  * <code>resultingDocument</code>.
  *
- * Can be used as mixin, mixing in some EntityResolver as well, for example.
+ * This is a trait instead of a class, so it is easy to mix in EntityResolvers, ErrorHandlers, etc.
  */
-trait ElemProducingSaxContentHandler extends DefaultHandler {
+trait ElemProducingSaxContentHandler extends DefaultHandler with LexicalHandler {
 
   // This content handler has a very simple state space, so is easy to reason about.
   // It may not be the fastest implementation, but it returns a thread-safe immutable reusable yaidom Document,
@@ -38,41 +39,44 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
 
   @volatile var currentState: State = State.Empty
 
+  @volatile var currentlyInCData: Boolean = false
+
   final override def startDocument() = ()
 
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
     val elm = startElementToElem(uri, localName, qName, atts)
 
     if (currentState.documentOption.isEmpty) {
-      val doc = Document(None, elm, currentState.topLevelProcessingInstructions, immutable.IndexedSeq())
-      val newState = new State(Some(doc), ElemPath.Root)
+      val doc = Document(None, elm, currentState.topLevelProcessingInstructions, currentState.topLevelComments)
+      val newState = State(Some(doc), ElemPath.Root)
       currentState = newState
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, { e => currentState.elem.plusChild(elm) })
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(elm))
 
-      val newParent = updatedDoc.documentElement.findWithElemPath(currentState.elemPath).get
-      val pathEntry = elm.ownElemPathEntry(newParent)
+      val updatedParent = updatedDoc.documentElement.findWithElemPath(currentState.elemPath).get
+      val pathEntry = elm.ownElemPathEntry(updatedParent)
 
-      val newState = new State(Some(updatedDoc), currentState.elemPath.append(pathEntry))
+      val newState = State(Some(updatedDoc), currentState.elemPath.append(pathEntry))
       currentState = newState
     }
   }
 
   final override def endElement(uri: String, localName: String, qName: String) {
     require(currentState.documentOption.isDefined)
-    val newState = new State(currentState.documentOption, currentState.elemPath.parentPathOption.getOrElse(ElemPath.Root))
+    val newState = State(currentState.documentOption, currentState.elemPath.parentPathOption.getOrElse(ElemPath.Root))
     currentState = newState
   }
 
   final override def characters(ch: Array[Char], start: Int, length: Int) {
-    val text = Text(new String(ch, start, length), false)
+    val isCData = this.currentlyInCData
+    val text = Text(new String(ch, start, length), isCData)
 
     if (currentState.documentOption.isEmpty) {
       // Ignore
       require(currentState.elemPath == ElemPath.Root)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, { e => currentState.elem.plusChild(text) })
-      val newState = new State(Some(updatedDoc), currentState.elemPath)
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(text))
+      val newState = State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
   }
@@ -85,10 +89,11 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
       currentState = new State(
         None,
         ElemPath.Root,
-        currentState.topLevelProcessingInstructions :+ pi)
+        currentState.topLevelProcessingInstructions :+ pi,
+        currentState.topLevelComments)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, { e => currentState.elem.plusChild(pi) })
-      val newState = new State(Some(updatedDoc), currentState.elemPath)
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(pi))
+      val newState = State(Some(updatedDoc), currentState.elemPath)
       currentState = newState
     }
   }
@@ -101,6 +106,39 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
   }
 
   // ContentHandler methods startPrefixMapping, endPrefixMapping, skippedEntity and setDocumentLocator not overridden
+
+  final override def startCDATA() {
+    this.currentlyInCData = true
+  }
+
+  final override def endCDATA() {
+    this.currentlyInCData = false
+  }
+
+  final override def comment(ch: Array[Char], start: Int, length: Int) {
+    val comment = Comment(new String(ch, start, length))
+
+    if (currentState.documentOption.isEmpty) {
+      require(currentState.elemPath == ElemPath.Root)
+      currentState = new State(
+        None,
+        ElemPath.Root,
+        currentState.topLevelProcessingInstructions,
+        currentState.topLevelComments :+ comment)
+    } else {
+      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(comment))
+      val newState = State(Some(updatedDoc), currentState.elemPath)
+      currentState = newState
+    }
+  }
+
+  final override def startEntity(name: String) = ()
+
+  final override def endEntity(name: String) = ()
+
+  final override def startDTD(name: String, publicId: String, systemId: String) = ()
+
+  final override def endDTD() = ()
 
   /** Returns the resulting Elem. Do not call before SAX parsing is ready. */
   final def resultingElem: Elem = {
@@ -160,14 +198,25 @@ trait ElemProducingSaxContentHandler extends DefaultHandler {
 
 object ElemProducingSaxContentHandler {
 
+  /**
+   * The state kept while building the Document. Roughly it contains the Document built so far,
+   * and the current ElemPath.
+   *
+   * There are 2 phases: before parsing the document element, and after parsing it.
+   * Before parsing the document element, top level processing instructions and comments can be set.
+   * After parsing the document element, the document is kept (in property documentOption), and
+   * those top level processing instructions and comments, if any, are only kept in the document.
+   */
   final class State(
     val documentOption: Option[Document],
     val elemPath: ElemPath,
-    val topLevelProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq()) extends Immutable {
+    val topLevelProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction],
+    val topLevelComments: immutable.IndexedSeq[Comment]) extends Immutable {
 
     require(documentOption ne null)
     require(elemPath ne null)
     require(topLevelProcessingInstructions ne null)
+    require(topLevelComments ne null)
     require(topLevelProcessingInstructions.isEmpty || documentOption.isEmpty)
 
     def elemOption: Option[Elem] = {
@@ -183,6 +232,9 @@ object ElemProducingSaxContentHandler {
 
   object State {
 
-    val Empty = new State(None, ElemPath.Root)
+    val Empty = new State(None, ElemPath.Root, immutable.IndexedSeq(), immutable.IndexedSeq())
+
+    def apply(docOption: Option[Document], path: ElemPath) = new State(
+      docOption, path, immutable.IndexedSeq(), immutable.IndexedSeq())
   }
 }

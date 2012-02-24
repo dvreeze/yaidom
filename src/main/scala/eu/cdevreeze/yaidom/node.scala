@@ -120,7 +120,10 @@ final class Document(
   def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
 
   /** Returns <code>withDocumentElement(this.documentElement.updated(path)(f))</code>. */
-  def updated(path: ElemPath, f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
+  def updated(path: ElemPath)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
+
+  /** Returns <code>updated(path) { e => docElm }</code> */
+  def updated(path: ElemPath, docElm: Elem): Document = updated(path) { e => docElm }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
@@ -306,6 +309,9 @@ final class Elem private (
       self.withChildren(updatedChildren)
     }
   }
+
+  /** Returns <code>updated(path) { e => elm }</code> */
+  def updated(path: ElemPath, elm: Elem): Elem = updated(path) { e => elm }
 
   /**
    * Returns the index of the child with the given ElemPath Entry (taking this element as parent), or -1 if not found.

@@ -28,14 +28,6 @@ final class DocumentParserUsingSax(
   val saxParserCreator: SAXParserFactory => SAXParser,
   val defaultHandler: ElemProducingSaxContentHandler) extends DocumentParser {
 
-  def this(spf: SAXParserFactory) = this(
-    saxParserFactory = spf,
-    saxParserCreator = { spf =>
-      val parser = spf.newSAXParser()
-      parser
-    },
-    defaultHandler = new DefaultHandler with ElemProducingSaxContentHandler)
-
   /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     try {
@@ -55,6 +47,21 @@ object DocumentParserUsingSax {
   /** Returns a new instance */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
-    new DocumentParserUsingSax(spf)
+    DocumentParserUsingSax.newInstance(spf)
+  }
+
+  def newInstance(spf: SAXParserFactory): DocumentParserUsingSax = {
+    val handler = new DefaultHandler with ElemProducingSaxContentHandler
+
+    new DocumentParserUsingSax(
+      saxParserFactory = spf,
+      saxParserCreator = { spf =>
+        val parser = spf.newSAXParser()
+        // Property "http://xml.org/sax/properties/lexical-handler" registers a LexicalHandler. See the corresponding API documentation.
+        // It is assumed here that in practice all SAX parsers support LexicalHandlers.
+        parser.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
+        parser
+      },
+      defaultHandler = handler)
   }
 }

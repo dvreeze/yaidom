@@ -36,7 +36,7 @@ Some characteristics of yaidom are:
 
 * **Strict when it comes to names and namespaces**
 
-  *  Qualified names, expanded names, namespace scopes and declarations are explicitly modeled
+  *  Qualified names, expanded names, namespace scopes and namespace declarations are explicitly modeled
   *  Namespaces are first-class citizens in the API
   *  DTDs are not first-class citizens
 
