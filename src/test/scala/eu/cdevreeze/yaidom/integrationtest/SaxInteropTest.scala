@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingSax
-import jinterop.ElemProducingSaxContentHandler
+import jinterop.DefaultElemProducingSaxContentHandler
 
 /**
  * SAX interoperability test case.
@@ -168,7 +168,7 @@ class SaxInteropTest extends Suite {
 
     val spf = SAXParserFactory.newInstance
 
-    class MyEntityResolver extends DefaultHandler {
+    trait MyEntityResolver extends EntityResolver {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
         if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
           new InputSource(classOf[SaxInteropTest].getResourceAsStream("XMLSchema.dtd"))
@@ -181,7 +181,7 @@ class SaxInteropTest extends Suite {
       }
     }
 
-    val saxParser = DocumentParserUsingSax.newInstance(spf, new MyEntityResolver with ElemProducingSaxContentHandler)
+    val saxParser = DocumentParserUsingSax.newInstance(spf, new DefaultElemProducingSaxContentHandler with MyEntityResolver)
     val is = classOf[SaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
     val root: Elem = saxParser.parse(is).documentElement

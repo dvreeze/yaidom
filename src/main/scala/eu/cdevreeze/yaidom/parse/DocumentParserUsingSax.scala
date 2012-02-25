@@ -21,7 +21,7 @@ import java.{ io => jio }
 import javax.xml.parsers.{ SAXParserFactory, SAXParser }
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
-import jinterop.ElemProducingSaxContentHandler
+import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContentHandler }
 
 /** SAX-based Document parser */
 final class DocumentParserUsingSax(
@@ -52,7 +52,7 @@ object DocumentParserUsingSax {
   }
 
   def newInstance(spf: SAXParserFactory): DocumentParserUsingSax = newInstance(
-    spf, new DefaultHandler with ElemProducingSaxContentHandler)
+    spf, new DefaultHandler with DefaultElemProducingSaxContentHandler)
 
   def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxContentHandler): DocumentParserUsingSax = {
     new DocumentParserUsingSax(
