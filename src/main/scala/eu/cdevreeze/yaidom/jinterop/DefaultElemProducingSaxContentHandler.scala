@@ -35,7 +35,7 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
   // It may not be the fastest implementation, but it returns a thread-safe immutable reusable yaidom Document,
   // so in a bigger picture it is fast enough.
 
-  @volatile var currentState: State = State.Empty
+  @volatile var documentState: DocumentState = DocumentState.Empty
 
   @volatile var currentlyInCData: Boolean = false
 
@@ -44,55 +44,50 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
     val elm = startElementToElem(uri, localName, qName, atts)
 
-    if (currentState.documentOption.isEmpty) {
-      val doc = Document(None, elm, currentState.topLevelProcessingInstructions, currentState.topLevelComments)
-      val newState = State(Some(doc), ElemPath.Root)
-      currentState = newState
+    if (documentState.documentOption.isEmpty) {
+      val newState = documentState.withDocumentElement(elm)
+      documentState = newState
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(elm))
+      val updatedDoc = documentState.documentOption.get.updated(documentState.elemPath, documentState.elem.plusChild(elm))
 
-      val updatedParent = updatedDoc.documentElement.findWithElemPath(currentState.elemPath).get
+      val updatedParent = updatedDoc.documentElement.findWithElemPath(documentState.elemPath).get
       val pathEntry = elm.ownElemPathEntry(updatedParent)
 
-      val newState = State(Some(updatedDoc), currentState.elemPath.append(pathEntry))
-      currentState = newState
+      val newState = documentState.withDocumentAndPath(updatedDoc, documentState.elemPath.append(pathEntry))
+      documentState = newState
     }
   }
 
   final override def endElement(uri: String, localName: String, qName: String) {
-    require(currentState.documentOption.isDefined)
-    val newState = State(currentState.documentOption, currentState.elemPath.parentPathOption.getOrElse(ElemPath.Root))
-    currentState = newState
+    require(documentState.documentOption.isDefined)
+    val newState = documentState.withDocumentAndPath(documentState.documentOption.get, documentState.elemPath.parentPathOption.getOrElse(ElemPath.Root))
+    documentState = newState
   }
 
   final override def characters(ch: Array[Char], start: Int, length: Int) {
     val isCData = this.currentlyInCData
     val text = Text(new String(ch, start, length), isCData)
 
-    if (currentState.documentOption.isEmpty) {
+    if (documentState.documentOption.isEmpty) {
       // Ignore
-      require(currentState.elemPath == ElemPath.Root)
+      require(documentState.elemPath == ElemPath.Root)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(text))
-      val newState = State(Some(updatedDoc), currentState.elemPath)
-      currentState = newState
+      val updatedDoc = documentState.documentOption.get.updated(documentState.elemPath, documentState.elem.plusChild(text))
+      val newState = documentState.withDocumentAndPath(updatedDoc, documentState.elemPath)
+      documentState = newState
     }
   }
 
   final override def processingInstruction(target: String, data: String) {
     val pi = ProcessingInstruction(target, data)
 
-    if (currentState.documentOption.isEmpty) {
-      require(currentState.elemPath == ElemPath.Root)
-      currentState = new State(
-        None,
-        ElemPath.Root,
-        currentState.topLevelProcessingInstructions :+ pi,
-        currentState.topLevelComments)
+    if (documentState.documentOption.isEmpty) {
+      require(documentState.elemPath == ElemPath.Root)
+      documentState = documentState.withTopLevelProcessingInstruction(pi)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(pi))
-      val newState = State(Some(updatedDoc), currentState.elemPath)
-      currentState = newState
+      val updatedDoc = documentState.documentOption.get.updated(documentState.elemPath, documentState.elem.plusChild(pi))
+      val newState = documentState.withDocumentAndPath(updatedDoc, documentState.elemPath)
+      documentState = newState
     }
   }
 
@@ -116,17 +111,13 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
   final override def comment(ch: Array[Char], start: Int, length: Int) {
     val comment = Comment(new String(ch, start, length))
 
-    if (currentState.documentOption.isEmpty) {
-      require(currentState.elemPath == ElemPath.Root)
-      currentState = new State(
-        None,
-        ElemPath.Root,
-        currentState.topLevelProcessingInstructions,
-        currentState.topLevelComments :+ comment)
+    if (documentState.documentOption.isEmpty) {
+      require(documentState.elemPath == ElemPath.Root)
+      documentState = documentState.withTopLevelComment(comment)
     } else {
-      val updatedDoc = currentState.documentOption.get.updated(currentState.elemPath, currentState.elem.plusChild(comment))
-      val newState = State(Some(updatedDoc), currentState.elemPath)
-      currentState = newState
+      val updatedDoc = documentState.documentOption.get.updated(documentState.elemPath, documentState.elem.plusChild(comment))
+      val newState = documentState.withDocumentAndPath(updatedDoc, documentState.elemPath)
+      documentState = newState
     }
   }
 
@@ -139,12 +130,12 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
   final override def endDTD() = ()
 
   final def resultingElem: Elem = {
-    require(currentState.elemPath.isRoot, "When parsing is ready, the current path must be at the root")
-    currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?")).documentElement
+    require(documentState.elemPath.isRoot, "When parsing is ready, the current path must be at the root")
+    documentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?")).documentElement
   }
 
   final def resultingDocument: Document =
-    currentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?"))
+    documentState.documentOption.getOrElse(sys.error("No Document found. Was parsing ready?"))
 
   private def startElementToElem(uri: String, localName: String, qName: String, atts: Attributes): Elem = {
     require(uri ne null)
@@ -153,7 +144,7 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
 
     val elmQName: QName = if (qName != "") qName.qname else localName.qname
 
-    val newScope = currentState.scope.resolve(extractDeclarations(atts))
+    val newScope = documentState.scope.resolve(extractDeclarations(atts))
     val attrMap = extractAttributeMap(atts)
 
     Elem(qname = elmQName, attributes = attrMap, scope = newScope, children = immutable.IndexedSeq())
@@ -195,7 +186,7 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
 object DefaultElemProducingSaxContentHandler {
 
   /**
-   * The state kept while building the Document. Roughly it contains the Document built so far,
+   * The Document state kept while building the Document. Roughly it contains the Document built so far,
    * and the current ElemPath.
    *
    * There are 2 phases: before parsing the document element, and after parsing it.
@@ -203,7 +194,7 @@ object DefaultElemProducingSaxContentHandler {
    * After parsing the document element, the document is kept (in property documentOption), and
    * those top level processing instructions and comments, if any, are only kept in the document.
    */
-  final class State(
+  final class DocumentState private (
     val documentOption: Option[Document],
     val elemPath: ElemPath,
     val topLevelProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction],
@@ -214,6 +205,7 @@ object DefaultElemProducingSaxContentHandler {
     require(topLevelProcessingInstructions ne null)
     require(topLevelComments ne null)
     require(topLevelProcessingInstructions.isEmpty || documentOption.isEmpty)
+    require(topLevelComments.isEmpty || documentOption.isEmpty)
 
     def elemOption: Option[Elem] = {
       documentOption map { doc => doc.documentElement } flatMap { root => root.findWithElemPath(elemPath) }
@@ -224,13 +216,35 @@ object DefaultElemProducingSaxContentHandler {
     def documentElement: Elem = documentOption.getOrElse(sys.error("Expected Document to exist")).documentElement
 
     def scope: Scope = elemOption map { e => e.scope } getOrElse (Scope.Empty)
+
+    /** Creates a new "before-document-root" state with added top level processing instruction */
+    def withTopLevelProcessingInstruction(processingInstruction: ProcessingInstruction): DocumentState = {
+      require(this.documentOption.isEmpty)
+      new DocumentState(None, ElemPath.Root, this.topLevelProcessingInstructions :+ processingInstruction, this.topLevelComments)
+    }
+
+    /** Creates a new "before-document-root" state with added top level comment */
+    def withTopLevelComment(comment: Comment): DocumentState = {
+      require(this.documentOption.isEmpty)
+      new DocumentState(None, ElemPath.Root, this.topLevelProcessingInstructions, this.topLevelComments :+ comment)
+    }
+
+    /** Creates an "after-document-root" state from a "before-document-root" state */
+    def withDocumentElement(docElm: Elem): DocumentState = {
+      require(this.documentOption.isEmpty)
+      val doc = Document(None, docElm, this.topLevelProcessingInstructions, this.topLevelComments)
+      new DocumentState(Some(doc), ElemPath.Root, immutable.IndexedSeq(), immutable.IndexedSeq())
+    }
+
+    /** Creates a new "after-document-root" state with an updated Document and ElemPath */
+    def withDocumentAndPath(updatedDoc: Document, newPath: ElemPath): DocumentState = {
+      require(this.documentOption.isDefined)
+      new DocumentState(Some(updatedDoc), newPath, immutable.IndexedSeq(), immutable.IndexedSeq())
+    }
   }
 
-  object State {
+  object DocumentState {
 
-    val Empty = State(None, ElemPath.Root)
-
-    def apply(docOption: Option[Document], path: ElemPath) = new State(
-      docOption, path, immutable.IndexedSeq(), immutable.IndexedSeq())
+    val Empty = new DocumentState(None, ElemPath.Root, immutable.IndexedSeq(), immutable.IndexedSeq())
   }
 }
