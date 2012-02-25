@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom
 package integrationtest
 
 import java.{ util => jutil, io => jio }
-import org.xml.sax.{ EntityResolver, InputSource }
+import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
 import javax.xml.transform.stream.StreamSource
 import javax.xml.parsers.{ SAXParserFactory, SAXParser }
 import org.xml.sax.helpers.DefaultHandler
@@ -37,10 +37,14 @@ import jinterop.DefaultElemProducingSaxContentHandler
  * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
  * issues.
  *
+ * To debug the SAX parsers, use JVM option -Djaxp.debug=1.
+ *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class SaxInteropTest extends Suite {
+
+  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -51,7 +55,10 @@ class SaxInteropTest extends Suite {
   @Test def testParse() {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -93,7 +100,10 @@ class SaxInteropTest extends Suite {
   @Test def testParseStrangeXml() {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("strangeXml.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -117,7 +127,10 @@ class SaxInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml() {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXml.xml")
 
     val document: Document = saxParser.parse(is)
@@ -168,8 +181,11 @@ class SaxInteropTest extends Suite {
 
     val spf = SAXParserFactory.newInstance
 
-    trait MyEntityResolver extends EntityResolver {
+    // One possible EntityResolver, namely one that tries to find the needed DTDs locally
+    trait EntityResolverUsingLocalDtds extends EntityResolver {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
+        logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+
         if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
           new InputSource(classOf[SaxInteropTest].getResourceAsStream("XMLSchema.dtd"))
         } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
@@ -181,7 +197,19 @@ class SaxInteropTest extends Suite {
       }
     }
 
-    val saxParser = DocumentParserUsingSax.newInstance(spf, new DefaultElemProducingSaxContentHandler with MyEntityResolver)
+    // Another possible EntityResolver, namely one that suppresses DTD resolution
+    trait SuppressingEntityResolver extends EntityResolver {
+      override def resolveEntity(publicId: String, systemId: String): InputSource = {
+        logger.info("Trying to resolve entity (but suppressing it). Public ID: %s. System ID: %s".format(publicId, systemId))
+
+        // See http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds
+        new InputSource(new jio.StringReader(""))
+      }
+    }
+
+    // We use the SuppressingEntityResolver
+    val saxParser = DocumentParserUsingSax.newInstance(spf, new DefaultElemProducingSaxContentHandler with SuppressingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -373,7 +401,10 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithExpandedEntityRef() {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -413,7 +444,10 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithNamespaceUndeclarations() {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -438,9 +472,10 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithEscapedChars() {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    // I want to set the parser to coalescing somehow, but do not know how (especially in a standard way)
-    val saxParser = DocumentParserUsingSax.newInstance(spf)
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -460,7 +495,6 @@ class SaxInteropTest extends Suite {
 
       val text = "Jansen & co"
 
-      // Seems to work (using Xerces?) without setting some "coalescing" feature
       expect(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
@@ -494,7 +528,10 @@ class SaxInteropTest extends Suite {
   @Test def testParseGeneratedHtml() {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver)
+
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = saxParser.parse(is).documentElement
@@ -579,6 +616,50 @@ class SaxInteropTest extends Suite {
       "Jeffrey Ullman, Hector Garcia-Molina",
       "Jennifer Widom")) {
       authors.toSet
+    }
+  }
+
+  @Test def testParseBrokenXml() {
+    var errorCount = 0
+    var fatalErrorCount = 0
+    var warningCount = 0
+
+    trait MyErrorHandler extends ErrorHandler {
+
+      override def error(exc: SAXParseException) { errorCount += 1 }
+
+      override def fatalError(exc: SAXParseException) { fatalErrorCount += 1 }
+
+      override def warning(exc: SAXParseException) { warningCount += 1 }
+    }
+
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver with MyErrorHandler)
+
+    val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
+
+    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+
+    intercept[SAXParseException] {
+      saxParser.parse(is).documentElement
+    }
+    expect(1) {
+      fatalErrorCount
+    }
+    expect(0) {
+      errorCount
+    }
+    expect(0) {
+      warningCount
+    }
+  }
+
+  trait LoggingEntityResolver extends EntityResolver {
+    override def resolveEntity(publicId: String, systemId: String): InputSource = {
+      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      // Default behaviour
+      null
     }
   }
 }

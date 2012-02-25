@@ -18,9 +18,10 @@ package eu.cdevreeze.yaidom
 package integrationtest
 
 import java.{ util => jutil, io => jio }
-import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory }
+import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory, XMLResolver, XMLStreamException }
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
+import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
@@ -37,10 +38,14 @@ import jinterop.StaxConversions._
  * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
  * issues.
  *
+ * To debug the StAX parsers, use JVM option -Djaxp.debug=1.
+ *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class StaxInteropTest extends Suite {
+
+  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -277,7 +282,10 @@ class StaxInteropTest extends Suite {
 
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+    xmlInputFactory.setXMLResolver(new LoggingResolver)
+
     val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+
     val is = classOf[StaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
     val document: Document = staxParser.parse(is)
@@ -856,6 +864,29 @@ class StaxInteropTest extends Suite {
       "Jeffrey Ullman, Hector Garcia-Molina",
       "Jennifer Widom")) {
       authors.toSet
+    }
+  }
+
+  @Test def testParseBrokenXml() {
+    val xmlInputFactory = XMLInputFactory.newFactory
+    xmlInputFactory.setXMLResolver(new LoggingResolver)
+
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+
+    val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
+
+    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+
+    intercept[Exception] {
+      staxParser.parse(is).documentElement
+    }
+  }
+
+  class LoggingResolver extends XMLResolver {
+    override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): InputSource = {
+      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      // Default behaviour
+      null
     }
   }
 }

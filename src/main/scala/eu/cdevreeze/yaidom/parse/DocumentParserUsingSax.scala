@@ -23,7 +23,28 @@ import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
 import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContentHandler }
 
-/** SAX-based Document parser */
+/**
+ * SAX-based Document parser.
+ *
+ * Typical non-trivial creation is as follows, assuming a trait <code>MyEntityHandler</code>, which extends <code>EntityHandler</code>,
+ * and a trait <code>MyErrorHandler</code>, which extends <code>ErrorHandler</code>:
+ * {{{
+ * val parser = DocumentParserUsingSax.newInstance(
+ *   SAXParserFactory.newInstance,
+ *   new DefaultElemProducingSaxContentHandler with MyEntityResolver with MyErrorHandler
+ * )
+ * }}}
+ *
+ * A custom <code>EntityHandler</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
+ * {{{
+ * trait MyEntityHandler extends EntityHandler {
+ *   override def resolveEntity(publicId: String, systemId: String): InputSource = {
+ *     new InputSource(new java.io.StringReader(""))
+ *   }
+ * }
+ * }}}
+ */
 final class DocumentParserUsingSax(
   val saxParserFactory: SAXParserFactory,
   val saxParserCreator: SAXParserFactory => SAXParser,
@@ -45,15 +66,22 @@ final class DocumentParserUsingSax(
 
 object DocumentParserUsingSax {
 
-  /** Returns a new instance */
+  /** Returns a new instance. Same as <code>newInstance(SAXParserFactory.newInstance)</code>. */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
     DocumentParserUsingSax.newInstance(spf)
   }
 
-  def newInstance(spf: SAXParserFactory): DocumentParserUsingSax = newInstance(
-    spf, new DefaultHandler with DefaultElemProducingSaxContentHandler)
+  /** Returns <code>newInstance(spf, new DefaultElemProducingSaxContentHandler {}))</code>. */
+  def newInstance(spf: SAXParserFactory): DocumentParserUsingSax =
+    newInstance(spf, new DefaultElemProducingSaxContentHandler {})
 
+  /**
+   * Invokes the constructur on <code>spf</code>, a <code>SAXParserFactory => SAXParser</code> "SAX parser creator", and
+   * <code>handler</code>. The "SAX parser creator" invokes <code>spf.newSAXParser()</code>, but it also recognizes if the handler is a
+   * <code>LexicalHandler</code>, and, if so, registers that handler as <code>LexicalHandler</code>. The underlying assumption
+   * is that in practice all SAX parsers support LexicalHandlers.
+   */
   def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxContentHandler): DocumentParserUsingSax = {
     new DocumentParserUsingSax(
       saxParserFactory = spf,

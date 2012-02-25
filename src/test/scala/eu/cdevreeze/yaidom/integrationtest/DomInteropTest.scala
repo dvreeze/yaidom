@@ -19,7 +19,7 @@ package integrationtest
 
 import java.{ util => jutil, io => jio }
 import org.w3c.dom.{ Element }
-import org.xml.sax.{ EntityResolver, InputSource }
+import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
 import javax.xml.transform.stream.StreamSource
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
@@ -38,10 +38,14 @@ import jinterop.DomConversions._
  * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
  * issues.
  *
+ * To debug the DOM parsers, use JVM option -Djaxp.debug=1.
+ *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class DomInteropTest extends Suite {
+
+  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -277,6 +281,8 @@ class DomInteropTest extends Suite {
       val db = documentBuilderFactory.newDocumentBuilder()
       db.setEntityResolver(new EntityResolver {
         def resolveEntity(publicId: String, systemId: String): InputSource = {
+          logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
             new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
           } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
@@ -291,6 +297,7 @@ class DomInteropTest extends Suite {
     }
 
     val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+
     val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -852,6 +859,57 @@ class DomInteropTest extends Suite {
       "Jeffrey Ullman, Hector Garcia-Molina",
       "Jennifer Widom")) {
       authors.toSet
+    }
+  }
+
+  @Test def testParseBrokenXml() {
+    var errorCount = 0
+    var fatalErrorCount = 0
+    var warningCount = 0
+
+    class MyErrorHandler extends ErrorHandler {
+
+      override def error(exc: SAXParseException) { errorCount += 1 }
+
+      override def fatalError(exc: SAXParseException) { fatalErrorCount += 1 }
+
+      override def warning(exc: SAXParseException) { warningCount += 1 }
+    }
+
+    val dbf = DocumentBuilderFactory.newInstance
+
+    def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
+      val db = documentBuilderFactory.newDocumentBuilder()
+      db.setEntityResolver(new LoggingEntityResolver)
+      db.setErrorHandler(new MyErrorHandler)
+      db
+    }
+
+    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+
+    val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
+
+    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+
+    intercept[SAXParseException] {
+      domParser.parse(is).documentElement
+    }
+    expect(1) {
+      fatalErrorCount
+    }
+    expect(0) {
+      errorCount
+    }
+    expect(0) {
+      warningCount
+    }
+  }
+
+  class LoggingEntityResolver extends EntityResolver {
+    override def resolveEntity(publicId: String, systemId: String): InputSource = {
+      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      // Default behaviour
+      null
     }
   }
 }

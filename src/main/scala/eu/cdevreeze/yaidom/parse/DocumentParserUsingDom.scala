@@ -22,7 +22,34 @@ import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import org.w3c.dom.Element
 import jinterop.DomConversions._
 
-/** DOM-based Document parser */
+/**
+ * DOM-based Document parser
+ *
+ * Typical non-trivial creation is as follows, assuming class <code>MyEntityHandler</code>, which extends <code>EntityHandler</code>,
+ * and class <code>MyErrorHandler</code>, which extends <code>ErrorHandler</code>:
+ * {{{
+ * val dbf = DocumentBuilderFactory.newInstance
+ *
+ * def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
+ *   val db = documentBuilderFactory.newDocumentBuilder()
+ *   db.setEntityResolver(new MyEntityResolver)
+ *   db.setErrorHandler(new MyErrorHandler)
+ *   db
+ * }
+ *
+ * val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+ * }}}
+ *
+ * A custom <code>EntityHandler</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
+ * {{{
+ * class MyEntityHandler extends EntityHandler {
+ *   override def resolveEntity(publicId: String, systemId: String): InputSource = {
+ *     new InputSource(new java.io.StringReader(""))
+ *   }
+ * }
+ * }}}
+ */
 final class DocumentParserUsingDom(
   val documentBuilderFactory: DocumentBuilderFactory,
   val documentBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends DocumentParser {
@@ -46,9 +73,14 @@ final class DocumentParserUsingDom(
 
 object DocumentParserUsingDom {
 
-  /** Returns a new instance */
+  /** Returns <code>newInstance(DocumentBuilderFactory.newInstance)</code> */
   def newInstance(): DocumentParserUsingDom = {
     val dbf = DocumentBuilderFactory.newInstance
+    newInstance(dbf)
+  }
+
+  /** Returns a new instance, using the given <code>DocumentBuilderFactory</code>, without any further configuration */
+  def newInstance(dbf: DocumentBuilderFactory): DocumentParserUsingDom = {
     new DocumentParserUsingDom(dbf)
   }
 }
