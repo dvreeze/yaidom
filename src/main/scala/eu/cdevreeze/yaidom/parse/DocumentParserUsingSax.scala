@@ -26,7 +26,7 @@ import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContent
 /**
  * SAX-based Document parser.
  *
- * Typical non-trivial creation is as follows, assuming a trait <code>MyEntityHandler</code>, which extends <code>EntityHandler</code>,
+ * Typical non-trivial creation is as follows, assuming a trait <code>MyEntityResolver</code>, which extends <code>EntityResolver</code>,
  * and a trait <code>MyErrorHandler</code>, which extends <code>ErrorHandler</code>:
  * {{{
  * val parser = DocumentParserUsingSax.newInstance(
@@ -35,10 +35,10 @@ import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContent
  * )
  * }}}
  *
- * A custom <code>EntityHandler</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * A custom <code>EntityResolver</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
  * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
  * {{{
- * trait MyEntityHandler extends EntityHandler {
+ * trait MyEntityResolver extends EntityResolver {
  *   override def resolveEntity(publicId: String, systemId: String): InputSource = {
  *     new InputSource(new java.io.StringReader(""))
  *   }
@@ -72,7 +72,7 @@ object DocumentParserUsingSax {
     DocumentParserUsingSax.newInstance(spf)
   }
 
-  /** Returns <code>newInstance(spf, new DefaultElemProducingSaxContentHandler {}))</code>. */
+  /** Returns <code>newInstance(spf, new DefaultElemProducingSaxContentHandler {})</code>. */
   def newInstance(spf: SAXParserFactory): DocumentParserUsingSax =
     newInstance(spf, new DefaultElemProducingSaxContentHandler {})
 

@@ -25,7 +25,7 @@ import jinterop.DomConversions._
 /**
  * DOM-based Document parser
  *
- * Typical non-trivial creation is as follows, assuming class <code>MyEntityHandler</code>, which extends <code>EntityHandler</code>,
+ * Typical non-trivial creation is as follows, assuming class <code>MyEntityResolver</code>, which extends <code>EntityResolver</code>,
  * and class <code>MyErrorHandler</code>, which extends <code>ErrorHandler</code>:
  * {{{
  * val dbf = DocumentBuilderFactory.newInstance
@@ -40,10 +40,10 @@ import jinterop.DomConversions._
  * val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
  * }}}
  *
- * A custom <code>EntityHandler</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * A custom <code>EntityResolver</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
  * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
  * {{{
- * class MyEntityHandler extends EntityHandler {
+ * class MyEntityResolver extends EntityResolver {
  *   override def resolveEntity(publicId: String, systemId: String): InputSource = {
  *     new InputSource(new java.io.StringReader(""))
  *   }
