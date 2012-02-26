@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingSax
-import jinterop.DefaultElemProducingSaxContentHandler
+import jinterop.{ DefaultElemProducingSaxContentHandler, HasLocator }
 
 /**
  * SAX interoperability test case.
@@ -623,19 +623,35 @@ class SaxInteropTest extends Suite {
     var errorCount = 0
     var fatalErrorCount = 0
     var warningCount = 0
+    var lineNumber = 0
+    var columnNumber = 0
 
-    trait MyErrorHandler extends ErrorHandler {
+    trait MyErrorHandler extends ErrorHandler { self: HasLocator =>
 
-      override def error(exc: SAXParseException) { errorCount += 1 }
+      override def error(exc: SAXParseException) {
+        errorCount += 1
+        lineNumber = locator.getLineNumber
+        columnNumber = locator.getColumnNumber
+      }
 
-      override def fatalError(exc: SAXParseException) { fatalErrorCount += 1 }
+      override def fatalError(exc: SAXParseException) {
+        fatalErrorCount += 1
+        lineNumber = locator.getLineNumber
+        columnNumber = locator.getColumnNumber
+      }
 
-      override def warning(exc: SAXParseException) { warningCount += 1 }
+      override def warning(exc: SAXParseException) {
+        warningCount += 1
+        lineNumber = locator.getLineNumber
+        columnNumber = locator.getColumnNumber
+      }
     }
+
+    val handler = new DefaultElemProducingSaxContentHandler with LoggingEntityResolver with MyErrorHandler
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxContentHandler with LoggingEntityResolver with MyErrorHandler)
+      handler)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 
@@ -653,6 +669,10 @@ class SaxInteropTest extends Suite {
     expect(0) {
       warningCount
     }
+    expect(2) {
+      handler.locator.getLineNumber
+    }
+    assert(handler.locator.getColumnNumber >= 18, "Expected the column number to be 18 or larger")
   }
 
   trait LoggingEntityResolver extends EntityResolver {
