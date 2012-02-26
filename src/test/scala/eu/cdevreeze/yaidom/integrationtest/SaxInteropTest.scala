@@ -647,7 +647,7 @@ class SaxInteropTest extends Suite {
       }
     }
 
-    val handler = new DefaultElemProducingSaxContentHandler with LoggingEntityResolver with MyErrorHandler
+    val handler = new DefaultElemProducingSaxContentHandler with LoggingEntityResolver with HasLocator with MyErrorHandler
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
@@ -672,7 +672,7 @@ class SaxInteropTest extends Suite {
     expect(2) {
       handler.locator.getLineNumber
     }
-    assert(handler.locator.getColumnNumber >= 18, "Expected the column number to be 18 or larger")
+    assert(handler.locator.getColumnNumber >= 16, "Expected the column number to be 16 or larger")
   }
 
   trait LoggingEntityResolver extends EntityResolver {

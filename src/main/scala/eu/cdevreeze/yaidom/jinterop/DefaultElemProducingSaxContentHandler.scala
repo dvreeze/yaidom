@@ -28,11 +28,8 @@ import DefaultElemProducingSaxContentHandler._
  * Default [[eu.cdevreeze.yaidom.jinterop.ElemProducingSaxContentHandler]] implementation.
  *
  * This is a trait instead of a class, so it is easy to mix in EntityResolvers, ErrorHandlers, etc.
- *
- * This trait also contains a Locator (via trait HasLocator), which can be used by traits (ErrorHandlers for example) mixed in
- * after this trait.
  */
-trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandler with LexicalHandler with HasLocator {
+trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandler with LexicalHandler {
 
   // This content handler has a very simple state space, so is easy to reason about.
   // It may not be the fastest implementation, but it returns a thread-safe immutable reusable yaidom Document,
@@ -101,8 +98,7 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
     characters(ch, start, length)
   }
 
-  // ContentHandler methods startPrefixMapping, endPrefixMapping, skippedEntity not overridden
-  // Method setDocumentLocator is overridden by trait HasLocator
+  // ContentHandler methods startPrefixMapping, endPrefixMapping, skippedEntity, setDocumentLocator not overridden
 
   final override def startCDATA() {
     this.currentlyInCData = true
