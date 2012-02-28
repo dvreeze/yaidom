@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package parse
 
 import org.xml.sax.{ ContentHandler, Attributes, Locator }
 import org.xml.sax.helpers.DefaultHandler
@@ -23,16 +23,14 @@ import org.xml.sax.ext.LexicalHandler
 import scala.collection.{ immutable, mutable }
 import eu.cdevreeze.yaidom._
 import NodeBuilder._
-import DefaultElemProducingSaxContentHandler._
+import DefaultElemProducingSaxHandler._
 
 /**
- * Default [[eu.cdevreeze.yaidom.jinterop.ElemProducingSaxContentHandler]] implementation.
+ * Default [[eu.cdevreeze.yaidom.jinterop.ElemProducingSaxHandler]] implementation.
  *
  * This is a trait instead of a class, so it is easy to mix in EntityResolvers, ErrorHandlers, etc.
- *
- * TODO Move to parse package
  */
-trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandler with LexicalHandler {
+trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {
 
   // This content handler has a relatively simple state space, so is rather easy to reason about.
 
@@ -216,7 +214,7 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
   }
 }
 
-object DefaultElemProducingSaxContentHandler {
+object DefaultElemProducingSaxHandler {
 
   trait MutableNode {
     def toNode: Node

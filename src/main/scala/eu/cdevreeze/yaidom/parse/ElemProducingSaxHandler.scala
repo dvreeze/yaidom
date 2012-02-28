@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package parse
 
 import org.xml.sax.helpers.DefaultHandler
 import scala.collection.immutable
@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom._
  * method <code>resultingElem</code>, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
  * <code>resultingDocument</code>.
  */
-trait ElemProducingSaxContentHandler extends DefaultHandler {
+trait ElemProducingSaxHandler extends DefaultHandler {
 
   /** Returns the resulting Elem. Do not call before SAX parsing is ready. */
   def resultingElem: Elem

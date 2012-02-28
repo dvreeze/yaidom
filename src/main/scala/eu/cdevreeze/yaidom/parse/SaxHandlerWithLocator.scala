@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package parse
 
 import org.xml.sax.{ ContentHandler, Locator }
 import org.xml.sax.helpers.DefaultHandler
@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom._
 /**
  * Mixin extending DefaultHandler that contains a Locator. Typically this Locator is used by an ErrorHandler mixed in after this trait.
  */
-trait HasLocator extends DefaultHandler {
+trait SaxHandlerWithLocator extends DefaultHandler {
 
   @volatile var locator: Locator = _
 

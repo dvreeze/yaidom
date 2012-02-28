@@ -21,7 +21,6 @@ import java.{ io => jio }
 import javax.xml.parsers.{ SAXParserFactory, SAXParser }
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
-import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContentHandler }
 
 /**
  * SAX-based Document parser.
@@ -31,7 +30,7 @@ import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContent
  * {{{
  * val parser = DocumentParserUsingSax.newInstance(
  *   SAXParserFactory.newInstance,
- *   new DefaultElemProducingSaxContentHandler with MyEntityResolver with MyErrorHandler
+ *   new DefaultElemProducingSaxHandler with MyEntityResolver with MyErrorHandler
  * )
  * }}}
  *
@@ -48,7 +47,7 @@ import jinterop.{ ElemProducingSaxContentHandler, DefaultElemProducingSaxContent
 final class DocumentParserUsingSax(
   val saxParserFactory: SAXParserFactory,
   val saxParserCreator: SAXParserFactory => SAXParser,
-  val defaultHandler: ElemProducingSaxContentHandler) extends DocumentParser {
+  val defaultHandler: ElemProducingSaxHandler) extends DocumentParser {
 
   /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
@@ -72,9 +71,9 @@ object DocumentParserUsingSax {
     DocumentParserUsingSax.newInstance(spf)
   }
 
-  /** Returns <code>newInstance(spf, new DefaultElemProducingSaxContentHandler {})</code>. */
+  /** Returns <code>newInstance(spf, new DefaultElemProducingSaxHandler {})</code>. */
   def newInstance(spf: SAXParserFactory): DocumentParserUsingSax =
-    newInstance(spf, new DefaultElemProducingSaxContentHandler {})
+    newInstance(spf, new DefaultElemProducingSaxHandler {})
 
   /**
    * Invokes the constructur on <code>spf</code>, a <code>SAXParserFactory => SAXParser</code> "SAX parser creator", and
@@ -82,7 +81,7 @@ object DocumentParserUsingSax {
    * <code>LexicalHandler</code>, and, if so, registers that handler as <code>LexicalHandler</code>. The underlying assumption
    * is that in practice all SAX parsers support LexicalHandlers.
    */
-  def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxContentHandler): DocumentParserUsingSax = {
+  def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxHandler): DocumentParserUsingSax = {
     new DocumentParserUsingSax(
       saxParserFactory = spf,
       saxParserCreator = { spf =>
