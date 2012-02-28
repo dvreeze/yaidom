@@ -27,8 +27,8 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingStax
-import print.DocumentPrinterUsingStax
+import parse._
+import print._
 
 /**
  * Large XML test case.
@@ -40,7 +40,7 @@ import print.DocumentPrinterUsingStax
 @RunWith(classOf[JUnitRunner])
 class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
-  @volatile private var doc: Document = _
+  @volatile private var xmlString: String = _
 
   override def beforeAll(configMap: Map[String, Any]) {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
@@ -60,13 +60,31 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
     reader.close()
 
-    val xmlString = stringWriter.toString
-
-    val parser = DocumentParserUsingStax.newInstance
-    doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    this.xmlString = stringWriter.toString
   }
 
-  @Test def testProcessLargeXml() {
+  @Test def testProcessLargeXmlUsingSax() {
+    val parser = DocumentParserUsingSax.newInstance
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    doTest(doc)
+  }
+
+  @Test def testProcessLargeXmlUsingStax() {
+    val parser = DocumentParserUsingStax.newInstance
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    doTest(doc)
+  }
+
+  @Test def testProcessLargeXmlUsingDom() {
+    val parser = DocumentParserUsingDom.newInstance
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    doTest(doc)
+  }
+
+  private def doTest(doc: Document) {
     assert(doc.documentElement.allElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
     expect(Set("contacts".ename, "contact".ename, "firstName".ename, "lastName".ename, "email".ename, "phone".ename)) {
