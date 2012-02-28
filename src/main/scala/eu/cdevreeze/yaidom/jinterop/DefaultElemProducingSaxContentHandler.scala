@@ -36,6 +36,12 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
 
   // This content handler has a relatively simple state space, so is rather easy to reason about.
 
+  // I very much like immutability, but sometimes mutable is better, like in this case.
+  // All my attempts to implement this handler using immutable objects resulted in poor performance.
+  // Mutability inside the SAX handler implementation fits the role of the class (namely to build an immutable Document).
+  // It is also a good fit for the implementation of "parsing state", because we need stable object identities,
+  // but rapidly changing state of those objects. Hence old-fashioned mutable objects.
+
   @volatile private var topLevelProcessingInstructions: immutable.IndexedSeq[MutableProcessingInstruction] = immutable.IndexedSeq()
 
   @volatile private var topLevelComments: immutable.IndexedSeq[MutableComment] = immutable.IndexedSeq()
@@ -53,9 +59,13 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
     val elm: MutableElem = startElementToMutableElem(uri, localName, qName, atts, parentScope)
 
     if (currentRoot eq null) {
+      require(currentElem eq null)
+
       currentRoot = elm
       currentElem = currentRoot
     } else {
+      require(currentElem ne null)
+
       currentElem.children :+= elm
       elm.parentOption = Some(currentElem)
       currentElem = elm
@@ -64,8 +74,9 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
 
   final override def endElement(uri: String, localName: String, qName: String) {
     require(currentRoot ne null)
+    require(currentElem ne null)
 
-    currentElem = currentElem.parentOption map { ch => ch.asInstanceOf[MutableElem] } getOrElse null
+    currentElem = currentElem.parentOption collect { case e: MutableElem => e } getOrElse null
   }
 
   final override def characters(ch: Array[Char], start: Int, length: Int) {
@@ -76,6 +87,8 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
       // Ignore
       require(currentElem eq null)
     } else {
+      require(currentElem ne null)
+
       currentElem.children :+= txt
     }
   }
@@ -84,11 +97,13 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
     val pi = MutableProcessingInstruction(target, data)
 
     if (currentRoot eq null) {
-      // Ignore
       require(currentElem eq null)
+
       val newPis = topLevelProcessingInstructions :+ pi
       topLevelProcessingInstructions = newPis
     } else {
+      require(currentElem ne null)
+
       currentElem.children :+= pi
     }
   }
@@ -114,11 +129,13 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
     val comment = MutableComment(new String(ch, start, length))
 
     if (currentRoot eq null) {
-      // Ignore
       require(currentElem eq null)
+
       val newComments = topLevelComments :+ comment
       topLevelComments = newComments
     } else {
+      require(currentElem ne null)
+
       currentElem.children :+= comment
     }
   }
@@ -132,6 +149,7 @@ trait DefaultElemProducingSaxContentHandler extends ElemProducingSaxContentHandl
   final override def endDTD() = ()
 
   final def resultingElem: Elem = {
+    require(currentRoot ne null, "When parsing is ready, the current root must not be null")
     require(currentElem eq null, "When parsing is ready, the current path must be at the root")
 
     val root = currentRoot.toNode.asInstanceOf[Elem]
