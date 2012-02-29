@@ -40,6 +40,8 @@ import print._
 @RunWith(classOf[JUnitRunner])
 class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
+  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
+
   @volatile private var xmlString: String = _
 
   override def beforeAll(configMap: Map[String, Any]) {
@@ -65,26 +67,40 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   @Test def testProcessLargeXmlUsingSax() {
     val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc)
   }
 
   @Test def testProcessLargeXmlUsingStax() {
     val parser = DocumentParserUsingStax.newInstance
+
+    val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc)
   }
 
   @Test def testProcessLargeXmlUsingDom() {
     val parser = DocumentParserUsingDom.newInstance
+
+    val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc)
   }
 
   private def doTest(doc: Document) {
+    val startMs = System.currentTimeMillis()
+
     assert(doc.documentElement.allElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
     expect(Set("contacts".ename, "contact".ename, "firstName".ename, "lastName".ename, "email".ename, "phone".ename)) {
@@ -94,5 +110,8 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val s = "b" * (2000 + 46)
     val elms1 = doc.documentElement elemsOrSelfWhere { e => e.resolvedName == "phone".ename && e.trimmedText == s }
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
+
+    val endMs = System.currentTimeMillis()
+    logger.info("The test (invoking allElemsOrSelf twice, and elemsOrSelfWhere once) took %d ms".format(endMs - startMs))
   }
 }
