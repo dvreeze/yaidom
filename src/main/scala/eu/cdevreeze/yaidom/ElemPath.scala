@@ -24,6 +24,8 @@ import scala.collection.immutable
  *
  * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),
  * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
+ * There is one catch, though. The ElemPath does not know the root element name, so that is not a part of the corresponding
+ * canonical XPath expression. See the documentation of method toCanonicalXPath.
  *
  * The ElemPath contains an IndexedSeq of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
