@@ -22,6 +22,9 @@ import scala.collection.immutable
  * Unique identification of a descendant (or self) ElemLike given a root ElemLike. It is used for transformations
  * from one node tree to another collection of nodes.
  *
+ * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),
+ * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
+ *
  * The ElemPath contains an IndexedSeq of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
  *
@@ -83,9 +86,14 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
   /** Convenience method returning true if at least one entry has the given element name */
   def containsName(ename: ExpandedName): Boolean = entries exists { entry => entry.elementName == ename }
 
-  /** Given a Scope, returns the corresponding XPath */
-  def toXPath(scope: Scope): String = {
-    val entryXPaths = entries map { entry => entry.toXPath(scope) }
+  /**
+   * Given a Scope, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the ElemPath).
+   * The modification is that the root element is written as a slash followed by an asterisk.
+   *
+   * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
+   */
+  def toCanonicalXPath(scope: Scope): String = {
+    val entryXPaths = entries map { entry => entry.toCanonicalXPath(scope) }
     "/" + "*" + entryXPaths.mkString
   }
 }
@@ -94,8 +102,8 @@ object ElemPath {
 
   val Root: ElemPath = ElemPath(immutable.IndexedSeq())
 
-  /** Parses a String, which must be in the toXPath format, into an ElemPath */
-  def fromXPath(s: String)(scope: Scope): ElemPath = {
+  /** Parses a String, which must be in the toCanonicalXPath format, into an ElemPath */
+  def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
 
     require(s.startsWith("/"))
@@ -114,7 +122,7 @@ object ElemPath {
     }
 
     val entryStrings = getEntryStrings(remainder).toIndexedSeq
-    val entries = entryStrings map { entryString => ElemPath.Entry.fromXPath(entryString)(scope) }
+    val entries = entryStrings map { entryString => ElemPath.Entry.fromCanonicalXPath(entryString)(scope) }
     ElemPath(entries)
   }
 
@@ -127,8 +135,8 @@ object ElemPath {
     /** Position (1-based) of the elem as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
-    /** Given a Scope, returns the corresponding XPath */
-    def toXPath(scope: Scope): String = {
+    /** Given a Scope, returns the corresponding canonical XPath */
+    def toCanonicalXPath(scope: Scope): String = {
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
           val nsUri: String = elementName.namespaceUriOption.get
@@ -151,8 +159,8 @@ object ElemPath {
 
   object Entry {
 
-    /** Parses a String, which must be in the toXPath format, into an ElemPath.Entry, given a Scope */
-    def fromXPath(s: String)(scope: Scope): Entry = {
+    /** Parses a String, which must be in the toCanonicalXPath format, into an ElemPath.Entry, given a Scope */
+    def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
       // We use the fact that "/", "[" and "]" are never part of qualified names!
 
       require(s.startsWith("/"))

@@ -381,7 +381,7 @@ class QueryTest extends Suite {
     def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
       Elem(
         qname = e.qname,
-        attributes = e.attributes + ("elemPath".qname -> path.toXPath(scope)),
+        attributes = e.attributes + ("elemPath".qname -> path.toCanonicalXPath(scope)),
         scope = e.scope,
         children = e.children map { ch =>
           ch match {
@@ -400,7 +400,7 @@ class QueryTest extends Suite {
     val elms: immutable.IndexedSeq[Elem] =
       for {
         desc <- bookStoreWithPaths.allElems
-        val path = ElemPath.fromXPath(desc.attribute("elemPath".ename))(Scope.Empty)
+        val path = ElemPath.fromCanonicalXPath(desc.attribute("elemPath".ename))(Scope.Empty)
         parent <- bookstore.findWithElemPath(path.parentPath)
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
