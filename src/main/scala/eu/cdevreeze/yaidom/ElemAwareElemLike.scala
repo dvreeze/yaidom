@@ -26,8 +26,7 @@ import scala.collection.{ immutable, mutable }
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
- * general, and therefore contains no implementations of methods such as <code>Elem.updated</code>. "Fixing" that would have
- * significantly impacted the power-to-weight ratio of this API.
+ * general. Hence the name [[eu.cdevreeze.yaidom.ElemAwareElemLike]].
  *
  * This trait offers public element retrieval methods to obtain:
  * <ul>
@@ -64,11 +63,11 @@ import scala.collection.{ immutable, mutable }
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.
  *
- * The type parameter is the type of the element, which is itself an ElemLike.
+ * The type parameter is the type of the element, which is itself an ElemAwareElemLike.
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] { self: E =>
+trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
 
   /** Resolved name of the element, as ExpandedName */
   def resolvedName: ExpandedName
@@ -76,7 +75,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** The attributes as a Map from ExpandedNames (instead of QNames) to values */
   def resolvedAttributes: Map[ExpandedName, String]
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster ElemLike's methods will be. */
+  /** Returns all child elements, in the correct order. The faster this method is, the faster ElemAwareElemLike's methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an Option */

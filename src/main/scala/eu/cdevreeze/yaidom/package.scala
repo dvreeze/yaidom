@@ -32,7 +32,7 @@ package eu.cdevreeze
  * <li>Yaidom supports <em>multiple implementations</em> of nodes. In this package, the default implementations of nodes
  * (and elements, documents, texts etc.) are offered. Yet in the [[eu.cdevreeze.yaidom.expanded]] sub-package elements contain no prefixes.
  * To support these and other node implementations, this package offers some traits that provide partial implementations.
- * Typical "element node" implementations mix in traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]],
+ * Typical "element node" implementations mix in traits [[eu.cdevreeze.yaidom.NodeAwareElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]],
  * and typical "text node" implementations mix in trait [[eu.cdevreeze.yaidom.TextLike]].</li>
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts as classes, this API
@@ -78,7 +78,7 @@ package eu.cdevreeze
  * <ol>
  * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.ExpandedName]] and
  * [[eu.cdevreeze.yaidom.Scope]].</li>
- * <li>Traits for partial implementations of DOM-like trees, such as [[eu.cdevreeze.yaidom.ElemLike]] and
+ * <li>Traits for partial implementations of DOM-like trees, such as [[eu.cdevreeze.yaidom.ElemAwareElemLike]], [[eu.cdevreeze.yaidom.NodeAwareElemLike]] and
  * [[eu.cdevreeze.yaidom.TextParentLike]] (for "element nodes"), and [[eu.cdevreeze.yaidom.TextLike]] (for "text nodes").</li>
  * <li>The default "node implementation", as trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
  * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned traits for "element nodes").</li>
@@ -96,7 +96,7 @@ package eu.cdevreeze
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]. At the same level
  * is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]].
+ * <li>Traits [[eu.cdevreeze.yaidom.ElemAwareElemLike]], [[eu.cdevreeze.yaidom.NodeAwareElemLike]] and [[eu.cdevreeze.yaidom.TextParentLike]].
  * Trait [[eu.cdevreeze.yaidom.TextLike]] is also at this level.</li>
  * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are

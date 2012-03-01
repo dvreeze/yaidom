@@ -31,7 +31,7 @@ import scala.collection.immutable
  * whitespace" (with and without schema validation), CData sections, entity references, and the corresponding XML parser configurations
  * all contribute to the complexity of whitespace handling in XML. Again, this trait tries to hide some of those complexities.
  *
- * Typical element-like classes mix in this trait as well as [[eu.cdevreeze.yaidom.ElemLike]].
+ * Typical element-like classes mix in this trait as well as [[eu.cdevreeze.yaidom.NodeAwareElemLike]].
  */
 trait TextParentLike[T <: TextLike] {
 
