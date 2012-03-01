@@ -216,7 +216,7 @@ final class Elem private (
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemAwareElemLike[Elem] with TextParentLike[Text] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextParentLike[Text] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -256,80 +256,6 @@ final class Elem private (
 
   /** Returns <code>withChildren(self.children :+ newChild)</code>. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
-
-  /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed partial function to the elements
-   * for which the partial function is defined. The partial function is defined for an element if that element has an [[eu.cdevreeze.yaidom.ElemPath]]
-   * (w.r.t. this element as root) for which it is defined. Tree traversal is top-down.
-   *
-   * This is an expensive method.
-   */
-  def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
-    def updated(currentPath: ElemPath): Elem = {
-      val elm = self.findWithElemPath(currentPath).getOrElse(sys.error("Undefined path %s for root element %s".format(currentPath, self)))
-
-      currentPath match {
-        case p if pf.isDefinedAt(p) => pf(p)
-        case p =>
-          val childResults: immutable.IndexedSeq[Node] = elm.children map {
-            case e: Elem =>
-              val ownPathEntry = e.ownElemPathEntry(elm)
-              val ownPath = currentPath.append(ownPathEntry)
-
-              // Recursive call, but not tail-recursive
-              val updatedElm = updated(ownPath)
-              updatedElm
-            case n => n
-          }
-
-          elm.withChildren(childResults)
-      }
-    }
-
-    updated(ElemPath.Root)
-  }
-
-  /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). The method throws an exception
-   * if no element is found with the given path.
-   */
-  def updated(path: ElemPath)(f: Elem => Elem): Elem = {
-    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
-    // "functional updates" (among other efficient operations).
-
-    if (path.entries.isEmpty) f(self) else {
-      val firstEntry = path.firstEntry
-      val idx = childIndexOf(firstEntry)
-      require(idx >= 0, "The path %s does not exist".format(path))
-      val childElm = children(idx).asInstanceOf[Elem]
-
-      // Recursive, but not tail-recursive
-      val updatedChildren = children.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
-      self.withChildren(updatedChildren)
-    }
-  }
-
-  /** Returns <code>updated(path) { e => elm }</code> */
-  def updated(path: ElemPath, elm: Elem): Elem = updated(path) { e => elm }
-
-  /**
-   * Returns the index of the child with the given ElemPath Entry (taking this element as parent), or -1 if not found.
-   * Must be fast.
-   */
-  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
-    var cnt = 0
-    var idx = -1
-    while (cnt <= pathEntry.index) {
-      val newIdx = children indexWhere ({
-        case e: Elem if e.resolvedName == pathEntry.elementName => true
-        case _ => false
-      }, idx + 1)
-      idx = newIdx
-      cnt += 1
-    }
-    idx
-  }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)

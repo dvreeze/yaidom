@@ -58,7 +58,7 @@ final class Document(
 final class Elem(
   override val resolvedName: ExpandedName,
   override val resolvedAttributes: Map[ExpandedName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemAwareElemLike[Elem] with TextParentLike[Text] {
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextParentLike[Text] {
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -67,6 +67,11 @@ final class Elem(
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
+
+  /** Creates a copy, but with the children passed as parameter newChildren */
+  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+    new Elem(resolvedName, resolvedAttributes, newChildren)
+  }
 }
 
 final case class Text(text: String, isCData: Boolean) extends Node with TextLike {
