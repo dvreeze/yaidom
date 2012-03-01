@@ -19,14 +19,14 @@ package eu.cdevreeze.yaidom
 /**
  * XLink-aware wrappers around [[eu.cdevreeze.yaidom.Elem]].
  *
- * The Elems in this layer wrap the yaidom Elems (other nodes are not wrapped, but that is ok, since the wrapped
- * elems are always accessible). Like the wrapped Elems, they are immutable. Each Elem in this layer that is an XLink
+ * The `Elem`s in this layer wrap the yaidom `Elem`s (other nodes are not wrapped, but that is ok, since the wrapped
+ * elems are always accessible). Like the wrapped `Elem`s, they are immutable. Each `Elem` in this layer that is an XLink
  * is indeed of type [[eu.cdevreeze.yaidom.xlink.XLink]] (typically of a subtype).
  *
- * The Elem companion object in this package has a factory method to quickly transform a yaidom Elem into an
- * XLink-aware Elem, which typically contains XLink instances.
+ * The `Elem` companion object in this package has a factory method to quickly transform a yaidom `Elem` into an
+ * XLink-aware `Elem`, which typically contains `XLink` instances.
  *
- * Do not use <code>xlink.Elem</code>s "globally" at a large scale, but rather use <code>xlink.XLink</code>s "locally" where they make sense.
+ * Do not use `xlink.Elem`s "globally" at a large scale, but rather use `xlink.XLink`s "locally" where they make sense.
  * See [[eu.cdevreeze.yaidom.xlink.Elem]].
  *
  * In Java speak, this package depends on the [[eu.cdevreeze.yaidom]] package, and not the other way around.

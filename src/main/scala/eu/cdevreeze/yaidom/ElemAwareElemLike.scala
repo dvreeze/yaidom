@@ -22,11 +22,11 @@ import scala.collection.{ immutable, mutable }
  * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.xlink.Elem]].
  * Below, we refer to these element-like objects as elements.
  *
- * The only abstract methods are <code>resolvedName</code>, <code>resolvedAttributes</code> and <code>allChildElems</code>.
+ * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
- * general. Hence the name [[eu.cdevreeze.yaidom.ElemAwareElemLike]].
+ * general. Hence the name `ElemAwareElemLike`.
  *
  * This trait offers public element retrieval methods to obtain:
  * <ul>
@@ -45,11 +45,11 @@ import scala.collection.{ immutable, mutable }
  * These element retrieval methods each have up to 3 variants (returning collections of elements):
  * <ol>
  * <li>A no argument variant, if applicable (typically with prefix "all" in the method name)</li>
- * <li>A single <code>E => Boolean</code> predicate argument variant (with suffix "where" in the method name)</li>
- * <li>An expanded name argument variant</li>
+ * <li>A variant taking a single `E => Boolean` predicate argument (with suffix "where" in the method name)</li>
+ * <li>An variant taking an expanded name argument</li>
  * </ol>
- * The latter variant is implemented in terms of the single predicate argument variant.
- * Some methods also have variants that return a single element or an element Option, or that "collect" data by applying
+ * The latter variant is implemented in terms of the variant that takes a single predicate argument.
+ * Some methods also have variants that return a single element or an element `Option`, or that "collect" data by applying
  * a partial function.
  *
  * These element finder methods process and return elements in the following (depth-first) order:
@@ -58,27 +58,27 @@ import scala.collection.{ immutable, mutable }
  * <li>Children are processed before the next sibling</li>
  * <li>The first child element is processed before the next child element, and so on</li>
  * </ol>
- * assuming that the no-arg <code>allChildElems</code> method returns the child elements in the correct order.
+ * assuming that the no-arg `allChildElems` method returns the child elements in the correct order.
  * Hence, the methods taking a predicate invoke that predicate on the elements in a predictable order.
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.
  *
- * The type parameter is the type of the element, which is itself an ElemAwareElemLike.
+ * @tparam E the (self) type of the element, so the type of the `ElemAwareElemLike[E]` itself
  *
  * @author Chris de Vreeze
  */
 trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
 
-  /** Resolved name of the element, as ExpandedName */
+  /** Resolved name of the element, as `ExpandedName` */
   def resolvedName: ExpandedName
 
-  /** The attributes as a Map from ExpandedNames (instead of QNames) to values */
+  /** The attributes as a `Map` from `ExpandedName`s (instead of `QName`s) to values */
   def resolvedAttributes: Map[ExpandedName, String]
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster ElemAwareElemLike's methods will be. */
+  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemAwareElemLike` methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
-  /** Returns the value of the attribute with the given expanded name, if any, wrapped in an Option */
+  /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */
   final def attributeOption(expandedName: ExpandedName): Option[String] = resolvedAttributes.get(expandedName)
 
   /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
@@ -90,10 +90,10 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   /** Returns the child elements with the given expanded name */
   final def childElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = childElemsWhere { e => e.resolvedName == expandedName }
 
-  /** Returns <code>allChildElems collect pf</code> */
+  /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
-  /** Returns the single child element with the given expanded name, if any, wrapped in an Option */
+  /** Returns the single child element with the given expanded name, if any, wrapped in an `Option` */
   final def childElemOption(expandedName: ExpandedName): Option[E] = {
     val result = childElems(expandedName)
     require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
@@ -112,27 +112,27 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
 
   /**
    * Returns those elements among this element and its descendant elements that obey the given predicate.
-   * That is, the result is equivalent to <code>allElemsOrSelf filter p</code>.
+   * That is, the result is equivalent to `allElemsOrSelf filter p`.
    */
   final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = elemsOrSelfSeqWhere(p)
 
   /** Returns those elements among this element and its descendant elements that have the given expanded name */
   final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
 
-  /** Returns (the equivalent of) <code>allElemsOrSelf collect pf</code> */
+  /** Returns (the equivalent of) `allElemsOrSelf collect pf` */
   final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     elemsOrSelfWhere { e => pf.isDefinedAt(e) } collect pf
 
-  /** Returns all descendant elements (not including this element). Same as <code>allElemsOrSelf.drop(1)</code> */
+  /** Returns all descendant elements (not including this element). Same as `allElemsOrSelf.drop(1)` */
   final def allElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
 
-  /** Returns the descendant elements obeying the given predicate, that is, allElems filter p */
+  /** Returns the descendant elements obeying the given predicate, that is, `allElems filter p` */
   final def elemsWhere(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch elemsOrSelfWhere p }
 
   /** Returns the descendant elements with the given expanded name */
   final def elems(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsWhere { e => e.resolvedName == expandedName }
 
-  /** Returns (the equivalent of) <code>allElems collect pf</code> */
+  /** Returns (the equivalent of) `allElems collect pf` */
   final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     elemsWhere { e => pf.isDefinedAt(e) } collect pf
 
@@ -143,17 +143,17 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def firstElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = firstElemsWhere { e => e.resolvedName == expandedName }
 
-  /** Returns the first found descendant element obeying the given predicate, if any, wrapped in an Option */
+  /** Returns the first found descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def firstElemOptionWhere(p: E => Boolean): Option[E] = {
     self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
   }
 
-  /** Returns the first found descendant element with the given expanded name, if any, wrapped in an Option */
+  /** Returns the first found descendant element with the given expanded name, if any, wrapped in an `Option` */
   final def firstElemOption(expandedName: ExpandedName): Option[E] = firstElemOptionWhere { e => e.resolvedName == expandedName }
 
   /**
    * Finds the parent element, if any, searching in the tree with the given root element.
-   * The implementation uses the equals method on the self type, and uses no index. Typically rather expensive.
+   * The implementation uses the `equals` method on the self type, and uses no index. Typically rather expensive.
    */
   final def findParentInTree(root: E): Option[E] = {
     root firstElemOrSelfOptionWhere { e => e.allChildElems exists { ch => ch == self } }
@@ -169,7 +169,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns the equivalent of <code>findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))</code>, but it should be more efficient.
+   * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.
    */
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
     val relevantChildElms = self.childElems(entry.elementName)
@@ -178,7 +178,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   }
 
   /**
-   * Finds the element with the given ElemPath (where this element is the root), if any, wrapped in an Option.
+   * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
    */
   final def findWithElemPath(path: ElemPath): Option[E] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
@@ -196,7 +196,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
     findWithElemPath(self, 0)
   }
 
-  /** Returns the ElemPath entries of all child elements, in the correct order */
+  /** Returns the `ElemPath` entries of all child elements, in the correct order */
   final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
@@ -214,7 +214,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns the ElemPath Entry of this element with respect to the given parent,
+   * Returns the `ElemPath` `Entry` of this element with respect to the given parent,
    * throwing an exception if this element is not a child of that parent.
    *
    * The implementation uses the equals method on the self type.
@@ -225,7 +225,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
     ElemPath.Entry(self.resolvedName, idx)
   }
 
-  /** Returns an IndexedSeq of this element followed by all descendant elements */
+  /** Returns an `IndexedSeq` of this element followed by all descendant elements */
   private final def allElemsOrSelfSeq: immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
     immutable.IndexedSeq(self) ++ {
@@ -234,8 +234,8 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns an IndexedSeq of those of this element and its descendant elements that obey the given predicate.
-   * That is, the result is equivalent to <code>allElemsOrSelfSeq filter p</code>.
+   * Returns an `IndexedSeq` of those of this element and its descendant elements that obey the given predicate.
+   * That is, the result is equivalent to `allElemsOrSelfSeq filter p`.
    */
   private final def elemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
@@ -245,7 +245,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns an IndexedSeq of those of this element and its descendant elements that obey the given predicate,
+   * Returns an `IndexedSeq` of those of this element and its descendant elements that obey the given predicate,
    * such that no ancestor obeys the predicate.
    */
   private final def firstElemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
@@ -253,7 +253,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
     if (p(self)) immutable.IndexedSeq(self) else self.allChildElems flatMap { ch => ch firstElemsOrSelfSeqWhere p }
   }
 
-  /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an Option */
+  /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
   private final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
     if (p(self)) Some(self) else self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption

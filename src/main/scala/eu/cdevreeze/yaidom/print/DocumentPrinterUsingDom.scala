@@ -26,11 +26,11 @@ import scala.collection.immutable
 import jinterop.DomConversions._
 
 /**
- * DOM-based Document printer.
+ * DOM-based `Document` printer.
  *
- * It may be the case that the DocumentPrinter does not indent. See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446.
- * This problem appears especially when creating a Document from scratch, using NodeBuilders.
- * A possible (implementation-specific) workaround is to create the DocumentPrinter as follows:
+ * It may be the case that the `DocumentPrinter` does not indent. See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446.
+ * This problem appears especially when creating a `Document` from scratch, using `NodeBuilder`s.
+ * A possible (implementation-specific) workaround is to create the `DocumentPrinter` as follows:
  * {{{
  * val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
  *

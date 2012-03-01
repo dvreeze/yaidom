@@ -17,11 +17,13 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.Elem]] to T (which can be anything, such as a DOM Element).
+ * Converter from [[eu.cdevreeze.yaidom.Elem]] to `A` (which can be anything, such as a DOM `Element`).
+ *
+ * @tparam A the result type of the conversion
  *
  * @author Chris de Vreeze
  */
-trait ElemConverter[T] {
+trait ElemConverter[A] {
 
-  def convertElem(elm: Elem): T
+  def convertElem(elm: Elem): A
 }

@@ -28,16 +28,16 @@ import scala.collection.immutable
  * <li>Nodes in this API are truly immutable and thread-safe, backed by immutable
  * Scala collections.</li>
  * <li>Nodes have no reference to their parent/ancestor nodes. Hence, for example, you cannot
- * ask a Node for its "owning" document. Yet these nodes can be re-used in several XML trees.</li>
+ * ask a `Node` for its "owning" document. Yet these nodes can be re-used in several XML trees.</li>
  * </ul>
  * Unlike Anti-XML:
  * <ul>
- * <li>This is just a DOM-like API, around immutable Nodes and immutable Scala Collections of Nodes,
+ * <li>This is just a DOM-like API, around immutable nodes and immutable Scala Collections of nodes,
  * without any XPath(-like) support. Despite the absence of selectors like those in Anti-XML, this DOM-like API
  * is still quite expressive, be it somewhat more verbose.</li>
  * <li>This API distinguishes between [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.ExpandedName]], making both
  * first-class citizens in the API. Moreover, the concept of a [[eu.cdevreeze.yaidom.Scope]] is a first-class citizen as well.
- * By explicitly modeling QNames, ExpandedNames and Scopes, the user of the API is somewhat shielded from some XML quirks.</li>
+ * By explicitly modeling `QName`s, `ExpandedName`s and `Scope`s, the user of the API is somewhat shielded from some XML quirks.</li>
  * <li>This API is less ambitious. Like said above, XPath(-like) support is absent. So is support for "updates" through
  * zippers. So is "true" equality based on the exact tree.</li>
  * </ul>
@@ -47,36 +47,36 @@ import scala.collection.immutable
 sealed trait Node extends Immutable {
 
   /**
-   * Returns the AST (abstract syntax tree) as String, conforming to the DSL for NodeBuilders.
+   * Returns the AST (abstract syntax tree) as `String`, conforming to the DSL for `NodeBuilder`s.
    *
    * There are a couple of advantages of this method compared to a "toXmlString" method which returns the XML string:
    * <ul>
    * <li>The AST is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
    * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
    * <li>Lower runtime costs</li>
-   * <li>The output of method toAstString is itself Scala ("NodeBuilder") DSL code (for instance useful in REPL or unit tests)</li>
+   * <li>The output of method `toAstString` is itself Scala ("NodeBuilder") DSL code (for instance useful in REPL or unit tests)</li>
    * </ul>
    */
   final def toAstString(parentScope: Scope): String = toShiftedAstString(parentScope, 0)
 
-  /** Same as toAstString(emptyScope) */
+  /** Same as `toAstString(emptyScope)` */
   final def toAstString: String = toAstString(Scope.Empty)
 
-  /** Same as toAstString(parentScope), but shifted numberOrSpaces to the right. Used for implementing toAstString(parentScope). */
+  /** Same as `toAstString(parentScope)`, but shifted numberOrSpaces to the right. Used for implementing `toAstString(parentScope)`. */
   def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String
 
   /** Returns the AST string corresponding to this element. Possibly expensive! */
   final override def toString: String = toAstString
 }
 
-/** Document or Elem node */
+/** `Document` or `Elem` node */
 trait ParentNode extends Node {
 
   def children: immutable.IndexedSeq[Node]
 }
 
 /**
- * Document node. Although at first sight the document root element seems to be the root node, this is not entirely true.
+ * `Document` node. Although at first sight the document root element seems to be the root node, this is not entirely true.
  * For example, there may be comments at top level, outside the document root element.
  */
 final class Document(
@@ -116,13 +116,13 @@ final class Document(
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
-  /** Returns <code>withDocumentElement(this.documentElement updated pf)</code> */
+  /** Returns `withDocumentElement(this.documentElement updated pf)` */
   def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
 
-  /** Returns <code>withDocumentElement(this.documentElement.updated(path)(f))</code>. */
+  /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
   def updated(path: ElemPath)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
 
-  /** Returns <code>updated(path) { e => docElm }</code> */
+  /** Returns `updated(path) { e => docElm }` */
   def updated(path: ElemPath, docElm: Elem): Document = updated(path) { e => docElm }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
@@ -223,14 +223,14 @@ final class Elem private (
   require(scope ne null)
   require(children ne null)
 
-  /** The attribute Scope, which is the same Scope but without the default namespace (which is not used for attributes) */
+  /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespaceOption = None)
 
-  /** The Elem name as ExpandedName, obtained by resolving the element QName against the Scope */
+  /** The `Elem` name as `ExpandedName`, obtained by resolving the element `QName` against the `Scope` */
   override val resolvedName: ExpandedName =
     scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an ExpandedName in scope [%s]".format(qname, scope)))
 
-  /** The attributes as a Map from ExpandedNames (instead of QNames) to values, obtained by resolving attribute QNames against the attribute scope */
+  /** The attributes as a `Map` from `ExpandedName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
   override val resolvedAttributes: Map[ExpandedName, String] = {
     attributes map { kv =>
       val attName = kv._1
@@ -254,7 +254,7 @@ final class Elem private (
     new Elem(qname, attributes, scope, newChildren)
   }
 
-  /** Returns <code>withChildren(self.children :+ newChild)</code>. */
+  /** Returns `withChildren(self.children :+ newChild)`. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
@@ -397,7 +397,7 @@ object Elem {
 
   /**
    * Use this constructor with care, because it is easy to use incorrectly (regarding passed Scopes).
-   * To construct Elems, prefer using an ElemBuilder, via method <code>NodeBuilder.elem</code>.
+   * To construct `Elem`s, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
    */
   def apply(
     qname: QName,

@@ -25,8 +25,8 @@ import jinterop.DomConversions._
 /**
  * DOM-based Document parser
  *
- * Typical non-trivial creation is as follows, assuming class <code>MyEntityResolver</code>, which extends <code>EntityResolver</code>,
- * and class <code>MyErrorHandler</code>, which extends <code>ErrorHandler</code>:
+ * Typical non-trivial creation is as follows, assuming class `MyEntityResolver`, which extends `EntityResolver`,
+ * and class `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
  * val dbf = DocumentBuilderFactory.newInstance
  *
@@ -40,7 +40,7 @@ import jinterop.DomConversions._
  * val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
  * }}}
  *
- * A custom <code>EntityResolver</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
  * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
  * {{{
  * class MyEntityResolver extends EntityResolver {
@@ -58,7 +58,7 @@ final class DocumentParserUsingDom(
     documentBuilderFactory = dbf,
     documentBuilderCreator = { dbf => dbf.newDocumentBuilder() })
 
-  /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
+  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     try {
       val db: DocumentBuilder = documentBuilderCreator(documentBuilderFactory)
@@ -73,13 +73,13 @@ final class DocumentParserUsingDom(
 
 object DocumentParserUsingDom {
 
-  /** Returns <code>newInstance(DocumentBuilderFactory.newInstance)</code> */
+  /** Returns `newInstance(DocumentBuilderFactory.newInstance)` */
   def newInstance(): DocumentParserUsingDom = {
     val dbf = DocumentBuilderFactory.newInstance
     newInstance(dbf)
   }
 
-  /** Returns a new instance, using the given <code>DocumentBuilderFactory</code>, without any further configuration */
+  /** Returns a new instance, using the given `DocumentBuilderFactory`, without any further configuration */
   def newInstance(dbf: DocumentBuilderFactory): DocumentParserUsingDom = {
     new DocumentParserUsingDom(dbf)
   }

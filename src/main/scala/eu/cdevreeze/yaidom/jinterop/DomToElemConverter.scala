@@ -47,7 +47,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     convertToElem(v, Scope.Empty)
   }
 
-  /** Given a parent scope, converts an org.w3c.dom.Element to a [[eu.cdevreeze.yaidom.Elem]] */
+  /** Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.Elem]] */
   private def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
     val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
@@ -62,7 +62,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
       children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) })
   }
 
-  /** Given a parent scope, converts an org.w3c.dom.Node to an optional [[eu.cdevreeze.yaidom.Node]] */
+  /** Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.Node]] */
   private def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {
       case e: Element => Some(convertToElem(e, parentScope))
@@ -75,23 +75,23 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     }
   }
 
-  /** Converts an org.w3c.dom.Text to a [[eu.cdevreeze.yaidom.Text]] */
+  /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.Text]] */
   private def convertToText(v: org.w3c.dom.Text): Text = Text(text = v.getData, isCData = false)
 
-  /** Converts an org.w3c.dom.ProcessingInstruction to a [[eu.cdevreeze.yaidom.ProcessingInstruction]] */
+  /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.ProcessingInstruction]] */
   private def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
 
-  /** Converts an org.w3c.dom.CDATASection to a [[eu.cdevreeze.yaidom.Text]] */
+  /** Converts an `org.w3c.dom.CDATASection` to a [[eu.cdevreeze.yaidom.Text]] */
   private def convertToCData(v: org.w3c.dom.CDATASection): Text = Text(text = v.getData, isCData = true)
 
-  /** Converts an org.w3c.dom.EntityReference to a [[eu.cdevreeze.yaidom.EntityRef]] */
+  /** Converts an `org.w3c.dom.EntityReference` to a [[eu.cdevreeze.yaidom.EntityRef]] */
   private def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)
 
-  /** Converts an org.w3c.dom.Comment to a [[eu.cdevreeze.yaidom.Comment]] */
+  /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.Comment]] */
   private def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
-  /** Converts a NamedNodeMap to a Map[QName, String] */
+  /** Converts a `NamedNodeMap` to a `Map[QName, String]` */
   private def convertAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
@@ -103,7 +103,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     }).toMap
   }
 
-  /** Converts the namespace declarations in a NamedNodeMap to a Scope.Declarations */
+  /** Converts the namespace declarations in a `NamedNodeMap` to a `Scope.Declarations` */
   private def extractNamespaceDeclarations(domAttributes: NamedNodeMap): Scope.Declarations = {
     val nsMap = {
       val result = (0 until domAttributes.getLength) flatMap { i =>
@@ -119,13 +119,13 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     Scope.Declarations.fromMap(nsMap)
   }
 
-  /** Converts a NodeList to an IndexedSeq[org.w3c.dom.Node] */
+  /** Converts a `NodeList` to an `IndexedSeq[org.w3c.dom.Node]` */
   private def nodeListToIndexedSeq(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
     val result = (0 until nodeList.getLength) map { i => nodeList.item(i) }
     result.toIndexedSeq
   }
 
-  /** Extracts the QName of an org.w3c.dom.Element */
+  /** Extracts the `QName` of an `org.w3c.dom.Element` */
   private def toQName(v: org.w3c.dom.Element): QName = {
     val name: String = v.getTagName
     val arr = name.split(':')
@@ -133,7 +133,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
 
-  /** Extracts the QName of an org.w3c.dom.Attr. If the Attr is a namespace declaration, the prefix or unprefixed name is "xmlns" */
+  /** Extracts the `QName` of an `org.w3c.dom.Attr`. If the `Attr` is a namespace declaration, the prefix or unprefixed name is "xmlns" */
   private def toQName(v: org.w3c.dom.Attr): QName = {
     val name: String = v.getName
     val arr = name.split(':')
@@ -141,7 +141,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
 
-  /** Returns true if the org.w3c.dom.Attr is a namespace declaration */
+  /** Returns true if the `org.w3c.dom.Attr` is a namespace declaration */
   private def isNamespaceDeclaration(v: org.w3c.dom.Attr): Boolean = {
     val name: String = v.getName
     val arr = name.split(':')
@@ -150,7 +150,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     result
   }
 
-  /** Extracts (optional) prefix and namespace. Call only if isNamespaceDeclaration(v). */
+  /** Extracts (optional) prefix and namespace. Call only if `isNamespaceDeclaration(v)`. */
   private def extractNamespaceDeclaration(v: org.w3c.dom.Attr): (Option[String], String) = {
     val name: String = v.getName
     val arr = name.split(':')

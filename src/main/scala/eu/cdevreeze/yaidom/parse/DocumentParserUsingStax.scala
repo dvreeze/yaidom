@@ -23,10 +23,10 @@ import javax.xml.stream.events.XMLEvent
 import scala.util.control.Exception._
 import jinterop.StaxConversions._
 
-/** StAX-based Document parser */
+/** StAX-based `Document` parser */
 final class DocumentParserUsingStax(val xmlInputFactory: XMLInputFactory) extends DocumentParser {
 
-  /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
+  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     var xmlEventReader: XMLEventReader = null
     try {

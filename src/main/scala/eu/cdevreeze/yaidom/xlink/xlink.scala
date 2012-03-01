@@ -22,15 +22,15 @@ import scala.collection.immutable
 import XLink._
 
 /**
- * Elem at the level of XLink awareness. It is either an XLink or not. It wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
+ * `Elem` at the level of XLink awareness. It is either an `XLink` or not. It wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
  *
  * When using the traits and classes in this package, prefix them with the last part of the package name. So,
- * write <code>xlink.Elem</code> instead of globally importing classes/traits in the [[eu.cdevreeze.yaidom.xlink]] package.
- * This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
- * <code>mutable.IndexedSeq[T]</code> for Scala Collections.
+ * write `xlink.Elem` instead of globally importing classes/traits in the [[eu.cdevreeze.yaidom.xlink]] package.
+ * This is analogous to the good practice of writing for example `immutable.IndexedSeq[T]` and
+ * `mutable.IndexedSeq[T]` for Scala Collections.
  *
- * It is advisable not to use these <code>xlink.Elem</code>s "globally" at a large scale, because that may cause a lot of wrapping of yaidom
- * Elems as <code>xlink.Elem</code>s. Rather use <code>xlink.XLink</code>s "locally" as short-lived objects where they are useful.
+ * It is advisable not to use these `xlink.Elem`s "globally" at a large scale, because that may cause a lot of wrapping of yaidom
+ * `Elem`s as `xlink.Elem`s. Rather use `xlink.XLink`s "locally" as short-lived objects where they are useful.
  *
  * @author Chris de Vreeze
  */

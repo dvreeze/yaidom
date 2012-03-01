@@ -28,7 +28,7 @@ import DefaultElemProducingSaxHandler._
 /**
  * Default [[eu.cdevreeze.yaidom.jinterop.ElemProducingSaxHandler]] implementation.
  *
- * This is a trait instead of a class, so it is easy to mix in EntityResolvers, ErrorHandlers, etc.
+ * This is a trait instead of a class, so it is easy to mix in `EntityResolver`s, `ErrorHandler`s, etc.
  */
 trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {
 

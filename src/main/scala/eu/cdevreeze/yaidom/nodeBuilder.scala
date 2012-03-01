@@ -20,7 +20,7 @@ import java.net.URI
 import scala.collection.immutable
 
 /**
- * DSL to build Elems (or Documents) without having to pass parent Scopes around.
+ * DSL to build `Elem`s (or `Document`s) without having to pass parent `Scope`s around.
  * Example:
  * {{{
  * import NodeBuilder._
@@ -39,18 +39,18 @@ import scala.collection.immutable
  * (which are built bottom-up, from leaves to root). In the context of the Anti-XML library, Daniel Spiewak explained this
  * impedance mismatch in https://github.com/djspiewak/anti-xml/issues/78. In yaidom, however, this impedance mismatch
  * is far less severe. Yaidom distinguishes between [[eu.cdevreeze.yaidom.Node]] and [[eu.cdevreeze.yaidom.NodeBuilder]],
- * and [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.ElemBuilder]] in particular. Elems have (fixed, resolved) Scopes,
- * but ElemBuilders do not. Using NodeBuilders, Scope determination is postponed. Only ElemBuilders
- * can have unbound prefixes, but only Elems have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], an ElemBuilder
+ * and [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.ElemBuilder]] in particular. `Elem`s have (fixed, resolved) `Scope`s,
+ * but `ElemBuilder`s do not. Using `NodeBuilder`s, `Scope` determination is postponed. Only `ElemBuilder`s
+ * can have unbound prefixes, but only `Elem`s have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], an `ElemBuilder`
  * has a [[eu.cdevreeze.yaidom.Scope.Declarations]].
  *
  * Another reason that the above-mentioned impedance mismatch is less of a problem in practice is that typically the XML
- * trees (as NodeBuilders or directly as Nodes) are built in a top-down manner. The [[eu.cdevreeze.yaidom.ConverterToDocument]]s
- * in package [[eu.cdevreeze.yaidom.jinterop]] recursively build Elems in a top-down manner, possibly creating an Elem
+ * trees (as `NodeBuilder`s or directly as `Node`s) are built in a top-down manner. The [[eu.cdevreeze.yaidom.ConverterToDocument]]s
+ * in package [[eu.cdevreeze.yaidom.jinterop]] recursively build `Elem`s in a top-down manner, possibly creating an `Elem`
  * instance (for each element) twice (first without children, and finally as a copy with children added).
  *
- * When using NodeBuilders to create a Document, this Document typically contains no "ignorable whitespace". This may cause
- * the Document not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the Document
+ * When using `NodeBuilder`s to create a `Document`, this `Document` typically contains no "ignorable whitespace". This may cause
+ * the `Document` not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the `Document`
  * to an XML string. See also the classes in package [[eu.cdevreeze.yaidom.print]].
  *
  * @author Chris de Vreeze
@@ -63,10 +63,10 @@ sealed trait NodeBuilder extends Immutable {
 
   final def build(): NodeType = build(Scope.Empty)
 
-  /** Returns the AST as String. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
+  /** Returns the AST as `String`. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
   final def toAstString(parentScope: Scope): String = build(parentScope).toAstString(parentScope)
 
-  /** Returns toAstString */
+  /** Returns `toAstString` */
   final override def toString: String = toAstString(Scope.Empty)
 }
 
@@ -204,9 +204,9 @@ object NodeBuilder {
   def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
 
   /**
-   * Converts a Node to a NodeBuilder, given a parent scope.
+   * Converts a `Node` to a `NodeBuilder`, given a parent scope.
    *
-   * The following must always hold: fromNode(node)(parentScope).build(parentScope) "is structurally equal to" node
+   * The following must always hold: `fromNode(node)(parentScope).build(parentScope)` "is structurally equal to" `node`
    */
   def fromNode(node: Node)(parentScope: Scope): NodeBuilder = node match {
     case Text(s, false) => TextBuilder(s, false)

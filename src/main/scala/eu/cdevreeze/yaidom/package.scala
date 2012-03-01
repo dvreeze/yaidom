@@ -65,8 +65,8 @@ package eu.cdevreeze
  * </ul>
  *
  * To some extent, yaidom is a Scala-ish DOM-like API much like JDOM is a Java-ish DOM API. Yaidom is Scala-ish in the
- * pervasive use of immutable Scala collections, and the use of Options over nulls. It is clear from method and variable
- * names where Options are used. Also, methods whose names start with "find" tend to return Options.
+ * pervasive use of immutable Scala collections, and the use of `Option`s over nulls. It is clear from method and variable
+ * names where `Option`s are used. Also, methods whose names start with "find" tend to return `Option`s.
  *
  * Yaidom has been inspired by Anti-XML. The Anti-XML library tackles some weaknesses of Scala's standard XML API, w.r.t.
  * robustness, ease of use and performance. Yaidom tries to achieve the same, except that it is less ambitious, foremost
@@ -83,10 +83,10 @@ package eu.cdevreeze
  * <li>The default "node implementation", as trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
  * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned traits for "element nodes").</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
- * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of Scopes,
- * whereas the Nodes that they create all must have a fixed Scope, so node builders are indeed intended to be handy for creation
+ * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s,
+ * whereas the `Node`s that they create all must have a fixed `Scope`, so node builders are indeed intended to be handy for creation
  * of node trees.</li>
- * <li>Contracts (as traits) for conversions from and to Documents or Elems</li>
+ * <li>Contracts (as traits) for conversions from and to `Document`s or `Elem`s</li>
  * </ol>
  *
  * The dependencies in this package are as follows, from bottom to top:
@@ -105,11 +105,11 @@ package eu.cdevreeze
  * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
- * In this package are some ("explicit" and therefore safe) implicit conversions, for treating a String as QName,
- * ExpandedName, Scope.Declarations, Scope, etc.
+ * In this package are some ("explicit" and therefore safe) implicit conversions, for treating a `String` as `QName`,
+ * `ExpandedName`, `Scope.Declarations`, `Scope`, etc.
  *
- * Parsing and printing of XML is not handled in this package. Even the <code>toString</code> methods for nodes
- * use the NodeBuilder DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
+ * Parsing and printing of XML is not handled in this package. Even the `toString` methods for nodes
+ * use the `NodeBuilder` DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
  * "ignorable whitespace" etc. are not handled in this package. Parsing and printing of XML are offered by the
  * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.jinterop]] subpackage.
  * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
@@ -118,20 +118,20 @@ package eu.cdevreeze
  */
 package object yaidom {
 
-  /** "Implicit class" for converting a String to a [[eu.cdevreeze.yaidom.QName]] */
+  /** "Implicit class" for converting a `String` to a [[eu.cdevreeze.yaidom.QName]] */
   final class ToParsedQName(val s: String) {
     def qname: QName = QName.parse(s)
   }
 
-  /** Implicit conversion enriching a String with a <code>qname</code> method that turns the String into a [[eu.cdevreeze.yaidom.QName]] */
+  /** Implicit conversion enriching a `String` with a `qname` method that turns the `String` into a [[eu.cdevreeze.yaidom.QName]] */
   implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
 
-  /** "Implicit class" for converting a String to an [[eu.cdevreeze.yaidom.ExpandedName]] */
+  /** "Implicit class" for converting a `String` to an [[eu.cdevreeze.yaidom.ExpandedName]] */
   final class ToParsedExpandedName(val s: String) {
     def ename: ExpandedName = ExpandedName.parse(s)
   }
 
-  /** Implicit conversion enriching a String with a <code>ename</code> method that turns the String into an [[eu.cdevreeze.yaidom.ExpandedName]] */
+  /** Implicit conversion enriching a `String` with a `ename` method that turns the `String` into an [[eu.cdevreeze.yaidom.ExpandedName]] */
   implicit def toParsedExpandedName(s: String): ToParsedExpandedName = new ToParsedExpandedName(s)
 
   /** Namespace. It offers a method to create an [[eu.cdevreeze.yaidom.ExpandedName]] with that namespace from a given localPart */
@@ -139,27 +139,27 @@ package object yaidom {
     def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
   }
 
-  /** "Implicit class" for converting a String to a Namespace */
+  /** "Implicit class" for converting a `String` to a `Namespace` */
   final class ToNamespace(val s: String) {
     def ns: Namespace = new Namespace(s)
   }
 
-  /** Implicit conversion enriching a String with a <code>ns</code> method that turns the String into a Namespace */
+  /** Implicit conversion enriching a `String` with a `ns` method that turns the `String` into a `Namespace` */
   implicit def toNamespace(s: String): ToNamespace = new ToNamespace(s)
 
-  /** "Implicit class" for converting a Map[String, String] to a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
+  /** "Implicit class" for converting a `Map[String, String]` to a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
   final class ToNamespaces(val m: Map[String, String]) {
     def namespaces: Scope.Declarations = Scope.Declarations.fromMap(m)
   }
 
-  /** Implicit conversion enriching a Map[String, String] with a <code>namespaces</code> method that turns the Map into a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
+  /** Implicit conversion enriching a `Map[String, String]` with a `namespaces` method that turns the `Map` into a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
   implicit def toNamespaces(m: Map[String, String]): ToNamespaces = new ToNamespaces(m)
 
-  /** "Implicit class" for converting a Map[String, String] to a [[eu.cdevreeze.yaidom.Scope]] */
+  /** "Implicit class" for converting a `Map[String, String]` to a [[eu.cdevreeze.yaidom.Scope]] */
   final class ToScope(val m: Map[String, String]) {
     def scope: Scope = Scope.fromMap(m)
   }
 
-  /** Implicit conversion enriching a Map[String, String] with a <code>scope</code> method that turns the Map into a [[eu.cdevreeze.yaidom.Scope]] */
+  /** Implicit conversion enriching a `Map[String, String]` with a `scope` method that turns the `Map` into a [[eu.cdevreeze.yaidom.Scope]] */
   implicit def toScope(m: Map[String, String]): ToScope = new ToScope(m)
 }

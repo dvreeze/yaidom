@@ -22,16 +22,16 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom
 
 /**
- * Representation of Nodes, and Elems in particular, without any prefixes.
+ * Representation of `Node`s, and `Elem`s in particular, without any prefixes.
  * After all, the prefixes have no semantical meaning in XML trees.
  *
  * This prefix-less representation does have some shortcomings, though. For example,
  * QNames in text nodes cannot be resolved by scoping information in the element tree itself, etc.
  *
- * When using the Node (sub)classes in this package, prefix them with the last part of the package name. So,
- * write <code>expanded.Elem</code>, <code>expanded.Document</code> etc. instead of globally importing classes/traits in the
- * [[eu.cdevreeze.yaidom.expanded]] package. This is analogous to the good practice of writing for example <code>immutable.IndexedSeq[T]</code> and
- * <code>mutable.IndexedSeq[T]</code> for Scala Collections.
+ * When using the `Node` (sub)classes in this package, prefix them with the last part of the package name. So,
+ * write `expanded.Elem`, `expanded.Document` etc. instead of globally importing classes/traits in the
+ * [[eu.cdevreeze.yaidom.expanded]] package. This is analogous to the good practice of writing for example `immutable.IndexedSeq[T]` and
+ * `mutable.IndexedSeq[T]` for Scala Collections.
  */
 sealed trait Node extends Immutable
 

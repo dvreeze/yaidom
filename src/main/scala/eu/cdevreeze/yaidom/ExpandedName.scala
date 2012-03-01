@@ -21,7 +21,7 @@ import javax.xml.namespace.{ QName => JQName }
 
 /**
  * Expanded name. See http://www.w3.org/TR/xml-names11/. It has a localPart and an optional namespace URI.
- * Semantically like a QName in Java, but not keeping the prefix.
+ * Semantically like a `QName` in Java, but not keeping the prefix.
  *
  * To get an [[eu.cdevreeze.yaidom.ExpandedName]] from a [[eu.cdevreeze.yaidom.QName]],
  * the latter needs to be resolved against a [[eu.cdevreeze.yaidom.Scope]].
@@ -36,7 +36,7 @@ final case class ExpandedName(namespaceUriOption: Option[String], localPart: Str
   require(localPart ne null)
   require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
-  /** Given an optional prefix, creates a QName from this ExpandedName */
+  /** Given an optional prefix, creates a `QName` from this `ExpandedName` */
   def toQName(prefixOption: Option[String]): QName = {
     require(namespaceUriOption.isDefined || prefixOption.isEmpty)
     QName(prefixOption, localPart)
@@ -48,19 +48,19 @@ final case class ExpandedName(namespaceUriOption: Option[String], localPart: Str
     new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
   }
 
-  /** The String representation, in the format of the javax.xml.namespace.QName.toString method */
+  /** The `String` representation, in the format of the `javax.xml.namespace.QName.toString` method */
   override def toString: String = toJavaQName(None).toString
 }
 
 object ExpandedName {
 
-  /** Creates an ExpandedName from a namespaceUri and a localPart */
+  /** Creates an `ExpandedName` from a namespaceUri and a localPart */
   def apply(namespaceUri: String, localPart: String): ExpandedName = ExpandedName(Some(namespaceUri), localPart)
 
-  /** Creates an ExpandedName from a localPart only */
+  /** Creates an `ExpandedName` from a localPart only */
   def apply(localPart: String): ExpandedName = ExpandedName(None, localPart)
 
-  /** Creates an ExpandedName from a [[javax.xml.namespace.QName]] */
+  /** Creates an `ExpandedName` from a [[javax.xml.namespace.QName]] */
   def fromJavaQName(jqname: JQName): ExpandedName = jqname match {
     case jqname: JQName if (jqname.getNamespaceURI eq null) || (jqname.getNamespaceURI == XMLConstants.NULL_NS_URI) =>
       ExpandedName(jqname.getLocalPart)
@@ -73,7 +73,7 @@ object ExpandedName {
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
 
-  /** Parses a String into an ExpandedName. The String must conform to the <code>toString</code> format of an ExpandedName */
+  /** Parses a `String` into an `ExpandedName`. The `String` must conform to the `toString` format of an `ExpandedName` */
   def parse(s: String): ExpandedName = s match {
     case s if s.startsWith("{") =>
       val idx = s indexWhere { c => c == '}' }

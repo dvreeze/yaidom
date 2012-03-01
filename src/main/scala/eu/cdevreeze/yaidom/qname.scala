@@ -18,15 +18,15 @@ package eu.cdevreeze.yaidom
 
 /**
  * Qualified name. See http://www.w3.org/TR/xml-names11/.
- * Semantically like a QName in Anti-XML, and not like a QName in Java.
+ * Semantically like a `QName` in Anti-XML, and not like a `QName` in Java.
  *
- * There are 2 types of QNames:
+ * There are 2 types of `QName`s:
  * <ul>
  * <li>[[eu.cdevreeze.yaidom.UnprefixedName]], which only contains a local part</li>
  * <li>[[eu.cdevreeze.yaidom.PrefixedName]], which combines a non-empty prefix with a local part</li>
  * </ul>
  *
- * QNames are meaningless outside their scope, which resolves the QName as an [[eu.cdevreeze.yaidom.ExpandedName]].
+ * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.ExpandedName]].
  *
  * @author Chris de Vreeze
  */
@@ -42,7 +42,7 @@ final case class UnprefixedName(override val localPart: String) extends QName {
 
   override def prefixOption: Option[String] = None
 
-  /** The String representation as it appears in XML, that is, the localPart */
+  /** The `String` representation as it appears in XML, that is, the localPart */
   override def toString: String = localPart
 }
 
@@ -54,23 +54,23 @@ final case class PrefixedName(prefix: String, override val localPart: String) ex
 
   override def prefixOption: Option[String] = Some(prefix)
 
-  /** The String representation as it appears in XML. For example, <code>xs:schema</code> */
+  /** The `String` representation as it appears in XML. For example, <code>xs:schema</code> */
   override def toString: String = "%s:%s".format(prefix, localPart)
 }
 
 object QName {
 
-  /** Creates a QName from an optional prefix and a localPart */
+  /** Creates a `QName` from an optional prefix and a localPart */
   def apply(prefix: Option[String], localPart: String): QName =
     prefix map { pref => PrefixedName(pref, localPart) } getOrElse (UnprefixedName(localPart))
 
-  /** Creates a PrefixedName from a prefix and a localPart */
+  /** Creates a `PrefixedName` from a prefix and a localPart */
   def apply(prefix: String, localPart: String): QName = PrefixedName(prefix, localPart)
 
-  /** Creates an UnprefixedName from a localPart */
+  /** Creates an `UnprefixedName` from a localPart */
   def apply(localPart: String): QName = UnprefixedName(localPart)
 
-  /** Parses a String into a QName. The String must conform to the <code>toString</code> format of a PrefixedName or UnprefixedName */
+  /** Parses a `String` into a `QName`. The `String` must conform to the `toString` format of a `PrefixedName` or `UnprefixedName` */
   def parse(s: String): QName = {
     val arr = s.split(':')
     require(arr.size <= 2, "Expected at most 1 colon in QName '%s'".format(s))

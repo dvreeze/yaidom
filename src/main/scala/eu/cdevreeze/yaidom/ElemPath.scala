@@ -19,20 +19,20 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * Unique identification of a descendant (or self) ElemAwareElemLike given a root ElemAwareElemLike. It is used for transformations
+ * Unique identification of a descendant (or self) `ElemAwareElemLike` given a root `ElemAwareElemLike`. It is used for transformations
  * from one node tree to another collection of nodes.
  *
  * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),
  * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
- * There is one catch, though. The ElemPath does not know the root element name, so that is not a part of the corresponding
- * canonical XPath expression. See the documentation of method toCanonicalXPath.
+ * There is one catch, though. The `ElemPath` does not know the root element name, so that is not a part of the corresponding
+ * canonical XPath expression. See the documentation of method `toCanonicalXPath`.
  *
- * The ElemPath contains an IndexedSeq of path entries for a specific child element, grandchild element etc.,
+ * The `ElemPath` contains an `IndexedSeq` of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
  *
  * Strictly speaking, each element in a tree would be uniquely identified by path entries that only contained
  * a child index instead of an element name plus child index (of children with the given name). Yet that would
- * be far less easy to use. Hence ElemPath.Entry instances each contain an element name plus index.
+ * be far less easy to use. Hence `ElemPath.Entry` instances each contain an element name plus index.
  */
 final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
 
@@ -40,23 +40,23 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
 
   require(entries ne null)
 
-  /** Returns true if this is the root ElemPath, so if it has no entries */
+  /** Returns true if this is the root `ElemPath`, so if it has no entries */
   def isRoot: Boolean = entries.isEmpty
 
-  /** Prepends a given Entry to this ElemPath */
+  /** Prepends a given `Entry` to this `ElemPath` */
   def prepend(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
 
-  /** Returns the ElemPath with the first path entry removed (if any, otherwise throwing an exception). */
+  /** Returns the `ElemPath` with the first path entry removed (if any, otherwise throwing an exception). */
   def withoutFirstEntry: ElemPath = ElemPath(entries.tail)
 
-  /** Appends a given Entry to this ElemPath */
+  /** Appends a given `Entry` to this `ElemPath` */
   def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries :+ entry)
 
   /**
-   * Gets the parent path (if any, because the root path has no parent) wrapped in an Option.
+   * Gets the parent path (if any, because the root path has no parent) wrapped in an `Option`.
    *
-   * This method shows much of the reason why class ElemPath exists. If we know an element's ElemPath, and therefore its
-   * parent ElemPath (using this method), then we can obtain the parent element by following the parent path from the
+   * This method shows much of the reason why class `ElemPath` exists. If we know an element's `ElemPath`, and therefore its
+   * parent `ElemPath` (using this method), then we can obtain the parent element by following the parent path from the
    * root of the tree.
    */
   def parentPathOption: Option[ElemPath] = entries match {
@@ -64,16 +64,16 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
     case _ => Some(ElemPath(entries.dropRight(1)))
   }
 
-  /** Like parentPathOption, but unwrapping the result (or throwing an exception otherwise) */
+  /** Like `parentPathOption`, but unwrapping the result (or throwing an exception otherwise) */
   def parentPath: ElemPath = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
 
-  /** Returns the first entry, if any, wrapped in an Option */
+  /** Returns the first entry, if any, wrapped in an `Option` */
   def firstEntryOption: Option[ElemPath.Entry] = entries.headOption
 
   /** Returns the first entry, if any, and throws an exception otherwise */
   def firstEntry: ElemPath.Entry = firstEntryOption.getOrElse(sys.error("There are no entries"))
 
-  /** Returns the last entry, if any, wrapped in an Option */
+  /** Returns the last entry, if any, wrapped in an `Option` */
   def lastEntryOption: Option[ElemPath.Entry] = entries.takeRight(1).headOption
 
   /** Returns the last entry, if any, and throws an exception otherwise */
@@ -89,7 +89,7 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
   def containsName(ename: ExpandedName): Boolean = entries exists { entry => entry.elementName == ename }
 
   /**
-   * Given a Scope, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the ElemPath).
+   * Given a `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).
    * The modification is that the root element is written as a slash followed by an asterisk.
    *
    * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
@@ -104,7 +104,7 @@ object ElemPath {
 
   val Root: ElemPath = ElemPath(immutable.IndexedSeq())
 
-  /** Parses a String, which must be in the toCanonicalXPath format, into an ElemPath */
+  /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath` */
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
 
@@ -128,16 +128,16 @@ object ElemPath {
     ElemPath(entries)
   }
 
-  /** An entry in an ElemPath, as an expanded element name plus zero-based index of the elem as child (with that name) of the parent. */
+  /** An entry in an `ElemPath`, as an expanded element name plus zero-based index of the elem as child (with that name) of the parent. */
   final case class Entry(elementName: ExpandedName, index: Int) extends Immutable {
 
     require(elementName ne null)
     require(index >= 0)
 
-    /** Position (1-based) of the elem as child of the parent. Is 1 + index. */
+    /** Position (1-based) of the element as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
-    /** Given a Scope, returns the corresponding canonical XPath */
+    /** Given a `Scope`, returns the corresponding canonical XPath */
     def toCanonicalXPath(scope: Scope): String = {
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
@@ -161,7 +161,7 @@ object ElemPath {
 
   object Entry {
 
-    /** Parses a String, which must be in the toCanonicalXPath format, into an ElemPath.Entry, given a Scope */
+    /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `ElemPath.Entry`, given a `Scope` */
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
       // We use the fact that "/", "[" and "]" are never part of qualified names!
 

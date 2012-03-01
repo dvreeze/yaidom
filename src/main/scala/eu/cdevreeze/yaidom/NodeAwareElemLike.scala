@@ -21,8 +21,11 @@ import scala.collection.immutable
 /**
  * An [[eu.cdevreeze.yaidom.ElemAwareElemLike]] that is aware of its child nodes (which need not be elements).
  *
- * The type parameters are the type of the (child) nodes, namely <code>N</code>, and the type of the element itself, namely
- * <code>E</code>, which is itself a NodeAwareElemLike.
+ * The only abstract methods (added to those in `ElemAwareElemLike`) are `children` and `withChildren`.
+ * Based on these methods alone, this trait offers a rich API for "functional updates" (transformations) of elements.
+ *
+ * @tparam N the node type of the children of this element
+ * @tparam E the (self) type of the element, so the type of the `NodeAwareElemLike[E]` itself
  *
  * @author Chris de Vreeze
  */
@@ -30,7 +33,7 @@ trait NodeAwareElemLike[N, E <: N with NodeAwareElemLike[N, E]] extends ElemAwar
 
   /**
    * Returns all child nodes, in the correct order.
-   * If a child is an element, it must be of type <code>E</code>.
+   * If a child is an element, it must be of type `E`.
    */
   def children: immutable.IndexedSeq[N]
 
@@ -90,11 +93,11 @@ trait NodeAwareElemLike[N, E <: N with NodeAwareElemLike[N, E]] extends ElemAwar
     }
   }
 
-  /** Returns <code>updated(path) { e => elm }</code> */
+  /** Returns `updated(path) { e => elm }` */
   final def updated(path: ElemPath, elm: E): E = updated(path) { e => elm }
 
   /**
-   * Returns the index of the child with the given ElemPath Entry (taking this element as parent), or -1 if not found.
+   * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
    * Must be fast.
    */
   final def childIndexOf(pathEntry: ElemPath.Entry): Int = {

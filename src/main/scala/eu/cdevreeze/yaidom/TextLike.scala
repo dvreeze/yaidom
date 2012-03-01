@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 /**
  * Supertrait of [[eu.cdevreeze.yaidom.Text]] and other text-like classes (including CData).
  *
- * The only abstract method is <code>text</code>.
+ * The only abstract method is `text`.
  * Based on this method alone, this trait offers a somewhat richer API for obtaining trimmed and normalized text.
  *
  * This API was inspired by the JDOM library.
@@ -28,9 +28,9 @@ trait TextLike {
 
   def text: String
 
-  /** Returns <code>text.trim</code>. */
+  /** Returns `text.trim`. */
   final def trimmedText: String = text.trim
 
-  /** Returns <code>XmlStringUtils.normalizeString(text)</code>. */
+  /** Returns `XmlStringUtils.normalizeString(text)` .*/
   final def normalizedText: String = XmlStringUtils.normalizeString(text)
 }

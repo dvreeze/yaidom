@@ -23,14 +23,14 @@ import eu.cdevreeze.yaidom._
 
 /**
  * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.Elem]] using
- * method <code>resultingElem</code>, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
- * <code>resultingDocument</code>.
+ * method `resultingElem`, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
+ * `resultingDocument`.
  */
 trait ElemProducingSaxHandler extends DefaultHandler {
 
-  /** Returns the resulting Elem. Do not call before SAX parsing is ready. */
+  /** Returns the resulting `Elem`. Do not call before SAX parsing is ready. */
   def resultingElem: Elem
 
-  /** Returns the resulting Document. Do not call before SAX parsing is ready. */
+  /** Returns the resulting `Document`. Do not call before SAX parsing is ready. */
   def resultingDocument: Document
 }

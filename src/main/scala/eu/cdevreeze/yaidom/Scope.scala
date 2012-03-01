@@ -21,7 +21,7 @@ package eu.cdevreeze.yaidom
  *
  * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.ExpandedName]]s.
  *
- * A Scope must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
+ * A `Scope` must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
  *
  * @author Chris de Vreeze
  */
@@ -43,13 +43,13 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
   /** The prefix scope, with the implicit "xml" namespace added */
   def completePrefixScope: Map[String, String] = prefixScope + ("xml" -> "http://www.w3.org/XML/1998/namespace")
 
-  /** Creates a Map from prefixes to namespaces URIs, giving the default namespace the empty String as prefix */
+  /** Creates a `Map` from prefixes to namespaces URIs, giving the default namespace the empty `String` as prefix */
   def toMap: Map[String, String] = {
     val defaultNsMap: Map[String, String] = if (defaultNamespaceOption.isEmpty) Map() else Map("" -> defaultNamespaceOption.get)
     defaultNsMap ++ prefixScope
   }
 
-  /** Returns true if this is a subscope of the given parameter Scope. A Scope is considered subscope of itself. */
+  /** Returns true if this is a subscope of the given parameter `Scope`. A `Scope` is considered subscope of itself. */
   def subScopeOf(scope: Scope): Boolean = {
     val thisMap = toMap
     val otherMap = scope.toMap
@@ -59,10 +59,10 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
     }
   }
 
-  /** Returns true if this is a superscope of the given parameter Scope. A Scope is considered superscope of itself. */
+  /** Returns true if this is a superscope of the given parameter `Scope`. A `Scope` is considered superscope of itself. */
   def superScopeOf(scope: Scope): Boolean = scope.subScopeOf(this)
 
-  /** Tries to resolve the given QName against this Scope, returning None otherwise */
+  /** Tries to resolve the given `QName` against this `Scope`, returning `None` otherwise */
   def resolveQName(qname: QName): Option[ExpandedName] = qname match {
     case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(ExpandedName(unprefixedName.localPart))
     case unprefixedName: UnprefixedName => Some(ExpandedName(defaultNamespaceOption.get, unprefixedName.localPart))
@@ -71,9 +71,9 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
   }
 
   /**
-   * Resolves the given declarations against this Scope, returning an "updated" Scope.
+   * Resolves the given declarations against this `Scope`, returning an "updated" `Scope`.
    *
-   * Inspired by java.net.URI, which has a similar method for URIs.
+   * Inspired by `java.net.URI`, which has a similar method for URIs.
    */
   def resolve(declarations: Scope.Declarations): Scope = {
     if (declarations == Scope.Declarations.Empty) this else {
@@ -83,9 +83,9 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
   }
 
   /**
-   * Relativizes the given Scope against this Scope, returning a Declarations object.
+   * Relativizes the given `Scope` against this `Scope`, returning a `Declarations` object.
    *
-   * Inspired by java.net.URI, which has a similar method for URIs.
+   * Inspired by `java.net.URI`, which has a similar method for URIs.
    */
   def relativize(scope: Scope): Scope.Declarations = {
     val declared: Scope = {
@@ -110,7 +110,7 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
     Scope.Declarations(declared, undeclaredOptionalPrefixes)
   }
 
-  /** Creates a String representation of this Scope, as it is shown in XML */
+  /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
     val prefixScopeString = prefixScope map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
@@ -120,10 +120,10 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
 
 object Scope {
 
-  /** The "empty" Scope */
+  /** The "empty" `Scope` */
   val Empty = Scope(defaultNamespaceOption = None, prefixScope = Map())
 
-  /** Parses the given Map into a Scope. The Map must follow the Scope.toMap format. */
+  /** Parses the given `Map` into a `Scope`. The `Map` must follow the `Scope.toMap` format. */
   def fromMap(m: Map[String, String]): Scope = {
     require {
       m.keySet forall { pref => pref ne null }
@@ -141,7 +141,7 @@ object Scope {
   }
 
   /**
-   * Namespace declarations (and undeclarations), typically at the level of one Element.
+   * Namespace declarations (and undeclarations), typically at the level of one element.
    */
   final case class Declarations(declared: Scope, undeclaredOptionalPrefixes: Set[Option[String]]) extends Immutable {
     require(declared ne null)
@@ -163,13 +163,13 @@ object Scope {
 
     def undeclaredPrefixes: Set[String] = undeclaredOptionalPrefixes collect { case Some(pref) => pref }
 
-    /** Returns the Set of undeclared prefixes, with an undeclared default namespace represented by the empty String */
+    /** Returns the `Set` of undeclared prefixes, with an undeclared default namespace represented by the empty `String` */
     def undeclaredSet: Set[String] = defaultNamespaceUndeclared match {
       case false => undeclaredPrefixes
       case true => undeclaredPrefixes + ""
     }
 
-    /** Creates a Map from prefixes to (possibly "undeclared") namespaces URIs, giving the default namespace the empty String as prefix */
+    /** Creates a `Map` from prefixes to (possibly "undeclared") namespaces URIs, giving the default namespace the empty `String` as prefix */
     def toMap: Map[String, String] = {
       val undeclaredMap: Map[String, String] = {
         val result = undeclaredOptionalPrefixes map { prefixOption => if (prefixOption.isEmpty) ("" -> "") else (prefixOption.get -> "") }
@@ -179,7 +179,7 @@ object Scope {
       undeclaredMap ++ declaredMap
     }
 
-    /** Creates a String representation of this Scope.Declarations, as it is shown in an XML element */
+    /** Creates a `String` representation of this `Scope.Declarations`, as it is shown in an XML element */
     def toStringInXml: String = {
       val declaredString = declared.toStringInXml
       val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
@@ -191,7 +191,7 @@ object Scope {
 
   object Declarations {
 
-    /** The "empty" Declarations */
+    /** The "empty" `Declarations` */
     val Empty = Declarations(declared = Scope.Empty, undeclaredOptionalPrefixes = Set())
 
     def fromMap(m: Map[String, String]): Declarations = {

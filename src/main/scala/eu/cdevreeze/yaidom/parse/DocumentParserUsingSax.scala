@@ -23,10 +23,10 @@ import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
 
 /**
- * SAX-based Document parser.
+ * SAX-based `Document` parser.
  *
- * Typical non-trivial creation is as follows, assuming a trait <code>MyEntityResolver</code>, which extends <code>EntityResolver</code>,
- * and a trait <code>MyErrorHandler</code>, which extends <code>ErrorHandler</code>:
+ * Typical non-trivial creation is as follows, assuming a trait `MyEntityResolver`, which extends `EntityResolver`,
+ * and a trait `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
  * val parser = DocumentParserUsingSax.newInstance(
  *   SAXParserFactory.newInstance,
@@ -34,7 +34,7 @@ import org.xml.sax.ext.LexicalHandler
  * )
  * }}}
  *
- * A custom <code>EntityResolver</code> could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
  * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
  * {{{
  * trait MyEntityResolver extends EntityResolver {
@@ -49,7 +49,7 @@ final class DocumentParserUsingSax(
   val saxParserCreator: SAXParserFactory => SAXParser,
   val defaultHandler: ElemProducingSaxHandler) extends DocumentParser {
 
-  /** Parses the input stream into a yaidom Document. Closes the input stream afterwards. */
+  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     try {
       val sp: SAXParser = saxParserCreator(saxParserFactory)
@@ -65,20 +65,20 @@ final class DocumentParserUsingSax(
 
 object DocumentParserUsingSax {
 
-  /** Returns a new instance. Same as <code>newInstance(SAXParserFactory.newInstance)</code>. */
+  /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`. */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
     DocumentParserUsingSax.newInstance(spf)
   }
 
-  /** Returns <code>newInstance(spf, new DefaultElemProducingSaxHandler {})</code>. */
+  /** Returns `newInstance(spf, new DefaultElemProducingSaxHandler {})`. */
   def newInstance(spf: SAXParserFactory): DocumentParserUsingSax =
     newInstance(spf, new DefaultElemProducingSaxHandler {})
 
   /**
-   * Invokes the constructur on <code>spf</code>, a <code>SAXParserFactory => SAXParser</code> "SAX parser creator", and
-   * <code>handler</code>. The "SAX parser creator" invokes <code>spf.newSAXParser()</code>, but it also recognizes if the handler is a
-   * <code>LexicalHandler</code>, and, if so, registers that handler as <code>LexicalHandler</code>. The underlying assumption
+   * Invokes the constructur on `spf`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
+   * `handler`. The "SAX parser creator" invokes `spf.newSAXParser()`, but it also recognizes if the handler is a
+   * `LexicalHandler`, and, if so, registers that handler as `LexicalHandler`. The underlying assumption
    * is that in practice all SAX parsers support LexicalHandlers.
    */
   def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxHandler): DocumentParserUsingSax = {

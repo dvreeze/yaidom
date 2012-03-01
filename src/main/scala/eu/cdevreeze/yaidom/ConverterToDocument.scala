@@ -17,11 +17,13 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Converter from T (which can be anything) to [[eu.cdevreeze.yaidom.Document]].
+ * Converter from `A` (which can be anything) to [[eu.cdevreeze.yaidom.Document]].
+ *
+ * @tparam A the type of the value to convert
  *
  * @author Chris de Vreeze
  */
-trait ConverterToDocument[T] {
+trait ConverterToDocument[A] {
 
-  def convertToDocument(v: T): Document
+  def convertToDocument(v: A): Document
 }

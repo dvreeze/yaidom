@@ -22,7 +22,7 @@ import scala.collection.immutable
  * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.expanded.Elem]],
  * offering methods to obtain text from text children.
  *
- * The only abstract method is <code>textChildren</code>.
+ * The only abstract method is `textChildren`.
  * Based on this method alone, this trait offers a richer API for querying text.
  *
  * This API was inspired by the JDOM library. The methods offered by this trait to some extent hide the complexities of whitespace
@@ -32,6 +32,8 @@ import scala.collection.immutable
  * all contribute to the complexity of whitespace handling in XML. Again, this trait tries to hide some of those complexities.
  *
  * Typical element-like classes mix in this trait as well as [[eu.cdevreeze.yaidom.NodeAwareElemLike]].
+ *
+ * @tparam T the type of the text children
  */
 trait TextParentLike[T <: TextLike] {
 
@@ -47,9 +49,9 @@ trait TextParentLike[T <: TextLike] {
     textStrings.mkString
   }
 
-  /** Returns <code>text.trim</code>. */
+  /** Returns `text.trim`. */
   final def trimmedText: String = text.trim
 
-  /** Returns <code>XmlStringUtils.normalizeString(text)</code>. */
+  /** Returns `XmlStringUtils.normalizeString(text)`. */
   final def normalizedText: String = XmlStringUtils.normalizeString(text)
 }

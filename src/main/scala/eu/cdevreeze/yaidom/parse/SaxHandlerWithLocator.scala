@@ -23,7 +23,7 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom._
 
 /**
- * Mixin extending DefaultHandler that contains a Locator. Typically this Locator is used by an ErrorHandler mixed in after this trait.
+ * Mixin extending `DefaultHandler` that contains a `Locator`. Typically this `Locator` is used by an `ErrorHandler` mixed in after this trait.
  */
 trait SaxHandlerWithLocator extends DefaultHandler {
 
