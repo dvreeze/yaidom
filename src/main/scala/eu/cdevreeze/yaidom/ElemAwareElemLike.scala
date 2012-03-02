@@ -63,7 +63,7 @@ import scala.collection.{ immutable, mutable }
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.
  *
- * @tparam E the (self) type of the element, so the type of the `ElemAwareElemLike[E]` itself
+ * @tparam E the captured element subtype, which is the (self) type of the element, so the type of the `ElemAwareElemLike[E]` itself
  *
  * @author Chris de Vreeze
  */

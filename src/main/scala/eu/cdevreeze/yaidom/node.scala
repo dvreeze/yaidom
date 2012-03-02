@@ -216,7 +216,7 @@ final class Elem private (
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextParentLike[Text] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextAwareElemLike[Text] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -249,13 +249,10 @@ final class Elem private (
   /** Returns the comment children */
   def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
 
-  /** Creates a copy, but with the children passed as parameter newChildren */
-  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+  /** Creates a copy, but with (only) the children passed as parameter newChildren */
+  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(qname, attributes, scope, newChildren)
   }
-
-  /** Returns `withChildren(self.children :+ newChild)`. */
-  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)

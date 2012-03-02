@@ -25,7 +25,7 @@ import scala.collection.immutable
  * Based on these methods alone, this trait offers a rich API for "functional updates" (transformations) of elements.
  *
  * @tparam N the node type of the children of this element
- * @tparam E the (self) type of the element, so the type of the `NodeAwareElemLike[E]` itself
+ * @tparam E the captured element subtype, which is the (self) type of the element, so the type of the `NodeAwareElemLike[E]` itself
  *
  * @author Chris de Vreeze
  */
@@ -37,7 +37,11 @@ trait NodeAwareElemLike[N, E <: N with NodeAwareElemLike[N, E]] extends ElemAwar
    */
   def children: immutable.IndexedSeq[N]
 
+  /** Creates a copy, but with (only) the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
+
+  /** Returns `withChildren(self.children :+ newChild)`. */
+  final def plusChild(newChild: N): E = withChildren(self.children :+ newChild)
 
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed partial function to the elements

@@ -22,132 +22,272 @@ import scala.collection.immutable
 import XLink._
 
 /**
- * `Elem` at the level of XLink awareness. It is either an `XLink` or not. It wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
+ * Node at the level of XLink awareness. An `Elem` at this level is either an `XLink` or not. A `Node` wraps a yaidom [[eu.cdevreeze.yaidom.Node]]
+ * (without the children, if applicable).
  *
  * When using the traits and classes in this package, prefix them with the last part of the package name. So,
  * write `xlink.Elem` instead of globally importing classes/traits in the [[eu.cdevreeze.yaidom.xlink]] package.
  * This is analogous to the good practice of writing for example `immutable.IndexedSeq[T]` and
  * `mutable.IndexedSeq[T]` for Scala Collections.
  *
- * It is advisable not to use these `xlink.Elem`s "globally" at a large scale, because that may cause a lot of wrapping of yaidom
- * `Elem`s as `xlink.Elem`s. Rather use `xlink.XLink`s "locally" as short-lived objects where they are useful.
- *
  * @author Chris de Vreeze
  */
-sealed trait Elem extends Immutable {
+sealed trait Node extends Immutable {
 
-  val wrappedElem: eu.cdevreeze.yaidom.Elem
+  type NormalNode <: eu.cdevreeze.yaidom.Node
 
-  require(wrappedElem ne null)
-
-  final def resolvedName: ExpandedName = wrappedElem.resolvedName
-
-  final def resolvedAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes
+  def toNormalNode: NormalNode
 }
 
-/** XLink */
-trait XLink extends Elem {
-  require(wrappedElem.attributeOption(XLinkTypeExpandedName).isDefined, "Missing %s".format(XLinkTypeExpandedName))
+trait ParentNode extends Node {
 
-  def xlinkType: String = wrappedElem.attribute(XLinkTypeExpandedName)
+  def children: immutable.IndexedSeq[Node]
+}
 
-  def xlinkAttributes: Map[ExpandedName, String] = wrappedElem.resolvedAttributes filterKeys { a => a.namespaceUriOption == Some(XLinkNamespace.toString) }
+final class Document(
+  val baseUriOption: Option[URI],
+  val documentElement: Elem,
+  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
+  val comments: immutable.IndexedSeq[Comment]) extends ParentNode {
 
-  def arcroleOption: Option[String] = wrappedElem.attributeOption(XLinkArcroleExpandedName)
+  require(baseUriOption ne null)
+  require(documentElement ne null)
+  require(processingInstructions ne null)
+  require(comments ne null)
+
+  type NormalNode = eu.cdevreeze.yaidom.Document
+
+  override def children: immutable.IndexedSeq[Node] =
+    processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
+
+  def toNormalNode: eu.cdevreeze.yaidom.Document =
+    new eu.cdevreeze.yaidom.Document(
+      baseUriOption,
+      documentElement.toNormalNode,
+      processingInstructions map { pi => pi.toNormalNode },
+      comments map { c => c.toNormalNode })
+}
+
+class Elem(
+  val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextAwareElemLike[Text] { self =>
+
+  require(wrappedElemWithoutChildren ne null)
+  require(children ne null)
+
+  require(wrappedElemWithoutChildren.children.isEmpty, "No children allowed in wrappedElemWithoutChildren")
+
+  type NormalNode = eu.cdevreeze.yaidom.Elem
+
+  final def qname: QName = wrappedElemWithoutChildren.qname
+
+  final def attributes: Map[QName, String] = wrappedElemWithoutChildren.attributes
+
+  final def scope: Scope = wrappedElemWithoutChildren.scope
+
+  final override def resolvedName: ExpandedName = wrappedElemWithoutChildren.resolvedName
+
+  final override def resolvedAttributes: Map[ExpandedName, String] = wrappedElemWithoutChildren.resolvedAttributes
+
+  final override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
+
+  final override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
+
+  final override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+    new Elem(wrappedElemWithoutChildren, newChildren)
+  }
+
+  final override def toNormalNode: eu.cdevreeze.yaidom.Elem =
+    eu.cdevreeze.yaidom.Elem(
+      qname,
+      attributes,
+      scope,
+      children map { ch => ch.toNormalNode })
+}
+
+final case class Text(text: String, isCData: Boolean) extends Node with TextLike {
+  require(text ne null)
+  if (isCData) require(!text.containsSlice("]]>"))
+
+  type NormalNode = eu.cdevreeze.yaidom.Text
+
+  override def toNormalNode: eu.cdevreeze.yaidom.Text = eu.cdevreeze.yaidom.Text(text, isCData)
+
+  override def toString: String = toNormalNode.toString
+}
+
+final case class ProcessingInstruction(target: String, data: String) extends Node {
+  require(target ne null)
+  require(data ne null)
+
+  type NormalNode = eu.cdevreeze.yaidom.ProcessingInstruction
+
+  override def toNormalNode: eu.cdevreeze.yaidom.ProcessingInstruction = eu.cdevreeze.yaidom.ProcessingInstruction(target, data)
+
+  override def toString: String = toNormalNode.toString
+}
+
+final case class EntityRef(entity: String) extends Node {
+  require(entity ne null)
+
+  type NormalNode = eu.cdevreeze.yaidom.EntityRef
+
+  override def toNormalNode: eu.cdevreeze.yaidom.EntityRef = eu.cdevreeze.yaidom.EntityRef(entity)
+
+  override def toString: String = toNormalNode.toString
+}
+
+final case class Comment(text: String) extends Node {
+  require(text ne null)
+
+  type NormalNode = eu.cdevreeze.yaidom.Comment
+
+  override def toNormalNode: eu.cdevreeze.yaidom.Comment = eu.cdevreeze.yaidom.Comment(text)
+
+  override def toString: String = toNormalNode.toString
+}
+
+class XLink(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends Elem(wrappedElemWithoutChildren, children) {
+
+  require(wrappedElemWithoutChildren.attributeOption(XLinkTypeExpandedName).isDefined, "Missing %s".format(XLinkTypeExpandedName))
+
+  final def xlinkType: String = wrappedElemWithoutChildren.attribute(XLinkTypeExpandedName)
+
+  final def xlinkAttributes: Map[ExpandedName, String] = wrappedElemWithoutChildren.resolvedAttributes filterKeys { a => a.namespaceUriOption == Some(XLinkNamespace.toString) }
+
+  final def arcroleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkArcroleExpandedName)
 }
 
 /** Simple or extended link */
-trait Link extends XLink
-
-final case class SimpleLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends Link {
-  require(xlinkType == "simple")
-  require(wrappedElem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
-
-  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
-  def showOption: Option[String] = wrappedElem.attributeOption(XLinkShowExpandedName)
-  def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateExpandedName)
+abstract class Link(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
 }
 
-final case class ExtendedLink(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends Link {
+final case class SimpleLink(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends Link(wrappedElemWithoutChildren, children) {
+
+  require(xlinkType == "simple")
+  require(wrappedElemWithoutChildren.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
+
+  def href: URI = wrappedElemWithoutChildren.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
+  def roleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkRoleExpandedName)
+  def titleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkTitleExpandedName)
+  def showOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkShowExpandedName)
+  def actuateOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkActuateExpandedName)
+}
+
+final case class ExtendedLink(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends Link(wrappedElemWithoutChildren, children) {
+
   require(xlinkType == "extended")
 
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
+  def roleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkRoleExpandedName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
-  def locatorXLinks: immutable.IndexedSeq[Locator] = wrappedElem.allChildElems collect { case e if XLink.mustBeLocator(e) => Locator(e) }
-  def arcXLinks: immutable.IndexedSeq[Arc] = wrappedElem.allChildElems collect { case e if XLink.mustBeArc(e) => Arc(e) }
-  def resourceXLinks: immutable.IndexedSeq[Resource] = wrappedElem.allChildElems collect { case e if XLink.mustBeResource(e) => Resource(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def locatorXLinks: immutable.IndexedSeq[Locator] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeLocator(e) => Locator(e) }
+  def arcXLinks: immutable.IndexedSeq[Arc] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeArc(e) => Arc(e) }
+  def resourceXLinks: immutable.IndexedSeq[Resource] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeResource(e) => Resource(e) }
 }
 
-final case class Arc(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
+final case class Arc(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+
   require(xlinkType == "arc")
   require(arcroleOption.isDefined, "Missing %s".format(XLinkArcroleExpandedName))
-  require(wrappedElem.attributeOption(XLinkFromExpandedName).isDefined, "Missing %s".format(XLinkFromExpandedName))
-  require(wrappedElem.attributeOption(XLinkToExpandedName).isDefined, "Missing %s".format(XLinkToExpandedName))
+  require(wrappedElemWithoutChildren.attributeOption(XLinkFromExpandedName).isDefined, "Missing %s".format(XLinkFromExpandedName))
+  require(wrappedElemWithoutChildren.attributeOption(XLinkToExpandedName).isDefined, "Missing %s".format(XLinkToExpandedName))
 
-  def from: String = wrappedElem.attributeOption(XLinkFromExpandedName).getOrElse(sys.error("Missing %s".format(XLinkFromExpandedName)))
-  def to: String = wrappedElem.attributeOption(XLinkToExpandedName).getOrElse(sys.error("Missing %s".format(XLinkToExpandedName)))
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
-  def showOption: Option[String] = wrappedElem.attributeOption(XLinkShowExpandedName)
-  def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateExpandedName)
-  def orderOption: Option[String] = wrappedElem.attributeOption(XLinkOrderExpandedName)
-  def useOption: Option[String] = wrappedElem.attributeOption(XLinkUseExpandedName)
-  def priorityOption: Option[String] = wrappedElem.attributeOption(XLinkPriorityExpandedName)
+  def from: String = wrappedElemWithoutChildren.attributeOption(XLinkFromExpandedName).getOrElse(sys.error("Missing %s".format(XLinkFromExpandedName)))
+  def to: String = wrappedElemWithoutChildren.attributeOption(XLinkToExpandedName).getOrElse(sys.error("Missing %s".format(XLinkToExpandedName)))
+  def titleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkTitleExpandedName)
+  def showOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkShowExpandedName)
+  def actuateOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkActuateExpandedName)
+  def orderOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkOrderExpandedName)
+  def useOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkUseExpandedName)
+  def priorityOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkPriorityExpandedName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
-final case class Locator(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
+final case class Locator(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+
   require(xlinkType == "locator")
-  require(wrappedElem.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
-  require(wrappedElem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
+  require(wrappedElemWithoutChildren.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
+  require(wrappedElemWithoutChildren.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
-  def href: URI = wrappedElem.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
-  def label: String = wrappedElem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
+  def href: URI = wrappedElemWithoutChildren.attributeOption(XLinkHrefExpandedName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefExpandedName)))
+  def label: String = wrappedElemWithoutChildren.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
+  def roleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkRoleExpandedName)
+  def titleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkTitleExpandedName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
-final case class Resource(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
+final case class Resource(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+
   require(xlinkType == "resource")
-  require(wrappedElem.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
+  require(wrappedElemWithoutChildren.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
 
-  def label: String = wrappedElem.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
-  def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleExpandedName)
-  def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleExpandedName)
+  def label: String = wrappedElemWithoutChildren.attributeOption(XLinkLabelExpandedName).getOrElse(sys.error("Missing %s".format(XLinkLabelExpandedName)))
+  def roleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkRoleExpandedName)
+  def titleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkTitleExpandedName)
 }
 
-final case class Title(override val wrappedElem: eu.cdevreeze.yaidom.Elem) extends XLink {
+final case class Title(
+  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+
   require(xlinkType == "title")
+}
+
+object Node {
+
+  def apply(n: eu.cdevreeze.yaidom.Node): Node = n match {
+    case t: eu.cdevreeze.yaidom.Text => Text(t.text, t.isCData)
+    case pi: eu.cdevreeze.yaidom.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
+    case er: eu.cdevreeze.yaidom.EntityRef => EntityRef(er.entity)
+    case c: eu.cdevreeze.yaidom.Comment => Comment(c.text)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeSimpleLink(e) => SimpleLink(e)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeExtendedLink(e) => ExtendedLink(e)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeTitle(e) => Title(e)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeLocator(e) => Locator(e)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeArc(e) => Arc(e)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeResource(e) => Resource(e)
+    case e: eu.cdevreeze.yaidom.Elem if mustBeXLink(e) => XLink(e)
+    case e: eu.cdevreeze.yaidom.Elem => Elem(e)
+  }
 }
 
 object Elem {
 
-  def apply(e: eu.cdevreeze.yaidom.Elem): Elem = e match {
-    case e if mustBeSimpleLink(e) => SimpleLink(e)
-    case e if mustBeExtendedLink(e) => ExtendedLink(e)
-    case e if mustBeTitle(e) => Title(e)
-    case e if mustBeLocator(e) => Locator(e)
-    case e if mustBeArc(e) => Arc(e)
-    case e if mustBeResource(e) => Resource(e)
-    case e if mustBeXLink(e) => {
-      new {
-        val wrappedElem: eu.cdevreeze.yaidom.Elem = e
-      } with XLink
-    }
-    case e => {
-      new {
-        val wrappedElem: eu.cdevreeze.yaidom.Elem = e
-      } with Elem
-    }
+  def apply(e: eu.cdevreeze.yaidom.Elem): Elem = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    new Elem(elmWithoutChildren, children)
   }
 }
 
 object XLink {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): XLink = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    new XLink(elmWithoutChildren, children)
+  }
 
   val XLinkNamespace = URI.create("http://www.w3.org/1999/xlink")
 
@@ -180,4 +320,70 @@ object XLink {
   def mustBeArc(e: eu.cdevreeze.yaidom.Elem): Boolean = e.attributeOption(XLinkTypeExpandedName) == Some("arc")
 
   def mustBeResource(e: eu.cdevreeze.yaidom.Elem): Boolean = e.attributeOption(XLinkTypeExpandedName) == Some("resource")
+}
+
+object SimpleLink {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): SimpleLink = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    SimpleLink(elmWithoutChildren, children)
+  }
+}
+
+object ExtendedLink {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): ExtendedLink = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    ExtendedLink(elmWithoutChildren, children)
+  }
+}
+
+object Title {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): Title = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    Title(elmWithoutChildren, children)
+  }
+}
+
+object Locator {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): Locator = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    Locator(elmWithoutChildren, children)
+  }
+}
+
+object Arc {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): Arc = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    Arc(elmWithoutChildren, children)
+  }
+}
+
+object Resource {
+
+  def apply(e: eu.cdevreeze.yaidom.Elem): Resource = {
+    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
+    // Recursive calls of XLink Node factory methods
+    val children = e.children map { ch => Node(ch) }
+
+    Resource(elmWithoutChildren, children)
+  }
 }

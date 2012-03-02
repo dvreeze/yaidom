@@ -35,7 +35,7 @@ import scala.collection.immutable
  *
  * @tparam T the type of the text children
  */
-trait TextParentLike[T <: TextLike] {
+trait TextAwareElemLike[T <: TextLike] {
 
   /** Returns the text children (including CData), in the correct order */
   def textChildren: immutable.IndexedSeq[T]
