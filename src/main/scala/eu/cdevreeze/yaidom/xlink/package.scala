@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 /**
  * XLink-aware wrappers around [[eu.cdevreeze.yaidom.Node]].
  *
- * The `Node`s in this layer wrap the yaidom `Node`. Like the wrapped `Node`s, they are immutable.
+ * The `Node`s in this layer wrap the yaidom `Node` (without the children, if applicable). Like the wrapped `Node`s, they are immutable.
  * Each `Elem` in this layer that is an XLink is indeed of type [[eu.cdevreeze.yaidom.xlink.XLink]] (typically of a subtype).
  *
  * The `Node` companion object in this package has a factory method to quickly transform a yaidom `Node` into an

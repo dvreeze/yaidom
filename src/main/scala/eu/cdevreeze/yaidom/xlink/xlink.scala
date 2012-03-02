@@ -188,10 +188,10 @@ final case class ExtendedLink(
 
   def roleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkRoleExpandedName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
-  def locatorXLinks: immutable.IndexedSeq[Locator] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeLocator(e) => Locator(e) }
-  def arcXLinks: immutable.IndexedSeq[Arc] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeArc(e) => Arc(e) }
-  def resourceXLinks: immutable.IndexedSeq[Resource] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeResource(e) => Resource(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = children collect { case e: Title => e }
+  def locatorXLinks: immutable.IndexedSeq[Locator] = children collect { case e: Locator => e }
+  def arcXLinks: immutable.IndexedSeq[Arc] = children collect { case e: Arc => e }
+  def resourceXLinks: immutable.IndexedSeq[Resource] = children collect { case e: Resource => e }
 }
 
 final case class Arc(
@@ -212,7 +212,7 @@ final case class Arc(
   def useOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkUseExpandedName)
   def priorityOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkPriorityExpandedName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = children collect { case e: Title => e }
 }
 
 final case class Locator(
@@ -228,7 +228,7 @@ final case class Locator(
   def roleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkRoleExpandedName)
   def titleOption: Option[String] = wrappedElemWithoutChildren.attributeOption(XLinkTitleExpandedName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElemWithoutChildren.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = children collect { case e: Title => e }
 }
 
 final case class Resource(
