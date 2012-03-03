@@ -23,9 +23,9 @@ import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.{ StreamSource, StreamResult }
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import parse._
 import print._
@@ -74,6 +74,18 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc)
+  }
+
+  /** A even more memory-intensive test (disabled by default) */
+  @Ignore @Test def testProcessAndConvertLargeXmlUsingSax() {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
+
+    doTest(doc)
 
     val xlDoc = xlink.Document(doc)
 
@@ -87,6 +99,39 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val doc2 = xlDoc.toNormalNode
 
     doTest(doc2)
+  }
+
+  /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
+  @Ignore @Test def testParseLargeXmlRepeatedly() {
+    for (i <- (0 until 200).par) {
+      val parser = DocumentParserUsingSax.newInstance
+
+      val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+      logger.info("Parsed Document (%d) in thread %s".format(i + 1, Thread.currentThread.getName))
+
+      (i % 5) match {
+        case 0 =>
+          val firstNameElms = doc.documentElement.elems("firstName".ename)
+          logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
+        case 1 =>
+          val lastNameElms = doc.documentElement.elems("lastName".ename)
+          logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
+        case 2 =>
+          val contactElms = doc.documentElement elemsOrSelfWhere { e => e.resolvedName == "contact".ename }
+          logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
+        case 3 =>
+          val emails = {
+            val result = doc.documentElement collectFromElemsOrSelf {
+              case e if e.resolvedName == "email".ename => e.trimmedText
+            }
+            result.toSet
+          }
+          logger.info("Different e-mails (%d): %s. Thread %s".format(emails.size, emails, Thread.currentThread.getName))
+        case 4 =>
+          val firstNameElms = doc.documentElement elemsOrSelfWhere { e => e.resolvedName == "firstName".ename }
+          logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
+      }
+    }
   }
 
   @Test def testProcessLargeXmlUsingStax() {
