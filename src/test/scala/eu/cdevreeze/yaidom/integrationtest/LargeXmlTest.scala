@@ -74,6 +74,19 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc)
+
+    val xlDoc = xlink.Document(doc)
+
+    expect(0) {
+      val result = xlDoc.documentElement collectFromElemsOrSelf { case xl: xlink.XLink => xl }
+      result.size
+    }
+
+    assert(xlDoc.documentElement.allElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
+
+    val doc2 = xlDoc.toNormalNode
+
+    doTest(doc2)
   }
 
   @Test def testProcessLargeXmlUsingStax() {

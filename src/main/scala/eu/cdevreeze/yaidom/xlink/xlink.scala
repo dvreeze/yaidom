@@ -69,21 +69,20 @@ final class Document(
 }
 
 class Elem(
-  val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
+  val qname: QName,
+  val attributes: Map[QName, String],
+  val scope: Scope,
   override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextAwareElemLike[Text] { self =>
 
-  require(wrappedElemWithoutChildren ne null)
+  require(qname ne null)
+  require(attributes ne null)
+  require(scope ne null)
   require(children ne null)
-
-  require(wrappedElemWithoutChildren.children.isEmpty, "No children allowed in wrappedElemWithoutChildren")
 
   type NormalNode = eu.cdevreeze.yaidom.Elem
 
-  final def qname: QName = wrappedElemWithoutChildren.qname
-
-  final def attributes: Map[QName, String] = wrappedElemWithoutChildren.attributes
-
-  final def scope: Scope = wrappedElemWithoutChildren.scope
+  final val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem =
+    eu.cdevreeze.yaidom.Elem(qname, attributes, scope, immutable.IndexedSeq())
 
   final override def resolvedName: ExpandedName = wrappedElemWithoutChildren.resolvedName
 
@@ -94,7 +93,7 @@ class Elem(
   final override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
   final override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
-    new Elem(wrappedElemWithoutChildren, newChildren)
+    new Elem(qname, attributes, scope, newChildren)
   }
 
   final override def toNormalNode: eu.cdevreeze.yaidom.Elem =
@@ -148,8 +147,10 @@ final case class Comment(text: String) extends Node {
 }
 
 class XLink(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends Elem(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends Elem(qname, attributes, scope, children) {
 
   require(wrappedElemWithoutChildren.attributeOption(XLinkTypeExpandedName).isDefined, "Missing %s".format(XLinkTypeExpandedName))
 
@@ -162,13 +163,17 @@ class XLink(
 
 /** Simple or extended link */
 abstract class Link(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(qname, attributes, scope, children) {
 }
 
 final case class SimpleLink(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends Link(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends Link(qname, attributes, scope, children) {
 
   require(xlinkType == "simple")
   require(wrappedElemWithoutChildren.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
@@ -181,8 +186,10 @@ final case class SimpleLink(
 }
 
 final case class ExtendedLink(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends Link(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends Link(qname, attributes, scope, children) {
 
   require(xlinkType == "extended")
 
@@ -195,8 +202,10 @@ final case class ExtendedLink(
 }
 
 final case class Arc(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(qname, attributes, scope, children) {
 
   require(xlinkType == "arc")
   require(arcroleOption.isDefined, "Missing %s".format(XLinkArcroleExpandedName))
@@ -216,8 +225,10 @@ final case class Arc(
 }
 
 final case class Locator(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(qname, attributes, scope, children) {
 
   require(xlinkType == "locator")
   require(wrappedElemWithoutChildren.attributeOption(XLinkHrefExpandedName).isDefined, "Missing %s".format(XLinkHrefExpandedName))
@@ -232,8 +243,10 @@ final case class Locator(
 }
 
 final case class Resource(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(qname, attributes, scope, children) {
 
   require(xlinkType == "resource")
   require(wrappedElemWithoutChildren.attributeOption(XLinkLabelExpandedName).isDefined, "Missing %s".format(XLinkLabelExpandedName))
@@ -244,8 +257,10 @@ final case class Resource(
 }
 
 final case class Title(
-  override val wrappedElemWithoutChildren: eu.cdevreeze.yaidom.Elem,
-  override val children: immutable.IndexedSeq[Node]) extends XLink(wrappedElemWithoutChildren, children) {
+  override val qname: QName,
+  override val attributes: Map[QName, String],
+  override val scope: Scope,
+  override val children: immutable.IndexedSeq[Node]) extends XLink(qname, attributes, scope, children) {
 
   require(xlinkType == "title")
 }
@@ -253,6 +268,7 @@ final case class Title(
 object Node {
 
   def apply(n: eu.cdevreeze.yaidom.Node): Node = n match {
+    case d: eu.cdevreeze.yaidom.Document => Document(d)
     case t: eu.cdevreeze.yaidom.Text => Text(t.text, t.isCData)
     case pi: eu.cdevreeze.yaidom.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
     case er: eu.cdevreeze.yaidom.EntityRef => EntityRef(er.entity)
@@ -268,25 +284,34 @@ object Node {
   }
 }
 
+object Document {
+
+  def apply(d: eu.cdevreeze.yaidom.Document): Document = {
+    new Document(
+      d.baseUriOption,
+      Elem(d.documentElement),
+      d.processingInstructions map { pi => ProcessingInstruction(pi.target, pi.data) },
+      d.comments map { c => Comment(c.text) })
+  }
+}
+
 object Elem {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): Elem = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    new Elem(elmWithoutChildren, children)
+    new Elem(e.qname, e.attributes, e.scope, children)
   }
 }
 
 object XLink {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): XLink = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    new XLink(elmWithoutChildren, children)
+    new XLink(e.qname, e.attributes, e.scope, children)
   }
 
   val XLinkNamespace = URI.create("http://www.w3.org/1999/xlink")
@@ -325,65 +350,59 @@ object XLink {
 object SimpleLink {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): SimpleLink = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    SimpleLink(elmWithoutChildren, children)
+    SimpleLink(e.qname, e.attributes, e.scope, children)
   }
 }
 
 object ExtendedLink {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): ExtendedLink = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    ExtendedLink(elmWithoutChildren, children)
+    ExtendedLink(e.qname, e.attributes, e.scope, children)
   }
 }
 
 object Title {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): Title = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    Title(elmWithoutChildren, children)
+    Title(e.qname, e.attributes, e.scope, children)
   }
 }
 
 object Locator {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): Locator = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    Locator(elmWithoutChildren, children)
+    Locator(e.qname, e.attributes, e.scope, children)
   }
 }
 
 object Arc {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): Arc = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    Arc(elmWithoutChildren, children)
+    Arc(e.qname, e.attributes, e.scope, children)
   }
 }
 
 object Resource {
 
   def apply(e: eu.cdevreeze.yaidom.Elem): Resource = {
-    val elmWithoutChildren = e.withChildren(immutable.IndexedSeq())
     // Recursive calls of XLink Node factory methods
     val children = e.children map { ch => Node(ch) }
 
-    Resource(elmWithoutChildren, children)
+    Resource(e.qname, e.attributes, e.scope, children)
   }
 }
