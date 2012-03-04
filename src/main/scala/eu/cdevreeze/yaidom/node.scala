@@ -210,13 +210,15 @@ final class Document(
  * No notion of (value) equality has been defined. When thinking about it, it is very hard to come up with any useful
  * notion of equality for representations of XML elements. Think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
  *
- * The constructor is private. See the apply factory method on the companion object, and its documentation.
+ * Use the constructor with care, because it is easy to use incorrectly (regarding passed Scopes).
+ * To construct `Elem`s by hand, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
+ * Typically, however, `Elem`s are constructed by parsing an XML source.
  */
-final class Elem private (
+final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with NodeAwareElemLike[Node, Elem] with TextAwareElemLike[Text] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemAsElemContainer[Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -244,14 +246,106 @@ final class Elem private (
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   /** Returns the text children */
-  override def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
+  def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
   /** Returns the comment children */
   def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
 
+  /**
+   * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
+   * If there are no text children, the empty string is returned.
+   */
+  final def text: String = {
+    val textStrings = textChildren map { t => t.text }
+    textStrings.mkString
+  }
+
+  /** Returns `text.trim`. */
+  final def trimmedText: String = text.trim
+
+  /** Returns `XmlStringUtils.normalizeString(text)`. */
+  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+
   /** Creates a copy, but with (only) the children passed as parameter newChildren */
-  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(qname, attributes, scope, newChildren)
+  }
+
+  /** Returns `withChildren(self.children :+ newChild)`. */
+  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
+
+  /**
+   * "Functionally updates" the tree with this element as root element, by applying the passed partial function to the elements
+   * for which the partial function is defined. The partial function is defined for an element if that element has an [[eu.cdevreeze.yaidom.ElemPath]]
+   * (w.r.t. this element as root) for which it is defined. Tree traversal is top-down.
+   *
+   * This is an expensive method.
+   */
+  def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
+    def updated(currentPath: ElemPath): Elem = {
+      val elm: Elem = self.findWithElemPath(currentPath).getOrElse(sys.error("Undefined path %s for root element %s".format(currentPath, self)))
+
+      currentPath match {
+        case p if pf.isDefinedAt(p) => pf(p)
+        case p =>
+          val childResults: immutable.IndexedSeq[Node] = elm.children map {
+            case e: Elem =>
+              val ownPathEntry = e.ownElemPathEntry(elm)
+              val ownPath = currentPath.append(ownPathEntry)
+
+              // Recursive call, but not tail-recursive
+              val updatedElm = updated(ownPath)
+              updatedElm
+            case n => n
+          }
+
+          elm.withChildren(childResults)
+      }
+    }
+
+    updated(ElemPath.Root)
+  }
+
+  /**
+   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
+   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). The method throws an exception
+   * if no element is found with the given path.
+   */
+  def updated(path: ElemPath)(f: Elem => Elem): Elem = {
+    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
+    // "functional updates" (among other efficient operations).
+
+    if (path.entries.isEmpty) f(self) else {
+      val firstEntry = path.firstEntry
+      val idx = childIndexOf(firstEntry)
+      require(idx >= 0, "The path %s does not exist".format(path))
+      val childElm = children(idx).asInstanceOf[Elem]
+
+      // Recursive, but not tail-recursive
+      val updatedChildren = children.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
+      self.withChildren(updatedChildren)
+    }
+  }
+
+  /** Returns `updated(path) { e => elm }` */
+  def updated(path: ElemPath, elm: Elem): Elem = updated(path) { e => elm }
+
+  /**
+   * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
+   * Must be fast.
+   */
+  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
+    var cnt = 0
+    var idx = -1
+    while (cnt <= pathEntry.index) {
+      val newIdx = children indexWhere ({
+        case e: Elem if e.resolvedName == pathEntry.elementName => true
+        case _ => false
+      }, idx + 1)
+      idx = newIdx
+      cnt += 1
+    }
+    idx
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
@@ -325,9 +419,15 @@ final class Elem private (
   }
 }
 
-final case class Text(text: String, isCData: Boolean) extends Node with TextLike {
+final case class Text(text: String, isCData: Boolean) extends Node {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
+
+  /** Returns `text.trim`. */
+  final def trimmedText: String = text.trim
+
+  /** Returns `XmlStringUtils.normalizeString(text)` .*/
+  final def normalizedText: String = XmlStringUtils.normalizeString(text)
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     if (isCData) {

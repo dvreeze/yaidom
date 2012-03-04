@@ -29,11 +29,6 @@ package eu.cdevreeze
  * Querying yaidom trees is easy to achieve using Scala <code>for</code> comprehensions,
  * manipulating immutable Scala collections. It should often even be attractive to use this API instead of
  * XPath, XSLT and/or XQuery, at the cost of somewhat more verbosity and loss of (schema) typing information.</li>
- * <li>Yaidom supports <em>multiple implementations</em> of nodes. In this package, the default implementations of nodes
- * (and elements, documents, texts etc.) are offered. Yet in the [[eu.cdevreeze.yaidom.expanded]] sub-package elements contain no prefixes.
- * To support these and other node implementations, this package offers some traits that provide partial implementations.
- * Typical "element node" implementations mix in traits [[eu.cdevreeze.yaidom.NodeAwareElemLike]] and [[eu.cdevreeze.yaidom.TextAwareElemLike]],
- * and typical "text node" implementations mix in trait [[eu.cdevreeze.yaidom.TextLike]].</li>
  * <li>This API explicitly models <em>qualified names</em>, <em>expanded names</em> and <em>namespace scopes</em>.
  * See for example http://www.w3.org/TR/xml-names11/. By explicitly offering these concepts as classes, this API
  * can hide some XML complexities (like predefined namespaces) behind the implementations of these classes. These concepts
@@ -78,10 +73,9 @@ package eu.cdevreeze
  * <ol>
  * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.ExpandedName]] and
  * [[eu.cdevreeze.yaidom.Scope]].</li>
- * <li>Traits for partial implementations of DOM-like trees, such as [[eu.cdevreeze.yaidom.ElemAwareElemLike]], [[eu.cdevreeze.yaidom.NodeAwareElemLike]] and
- * [[eu.cdevreeze.yaidom.TextAwareElemLike]] (for "element nodes"), and [[eu.cdevreeze.yaidom.TextLike]] (for "text nodes").</li>
- * <li>The default "node implementation", as trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
- * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned traits for "element nodes").</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.ElemAsElemContainer]], which partly implements "element nodes".</li>
+ * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
+ * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned trait `ElemAsElemContainer`).</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
  * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s,
  * whereas the `Node`s that they create all must have a fixed `Scope`, so node builders are indeed intended to be handy for creation
@@ -96,8 +90,7 @@ package eu.cdevreeze
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]. At the same level
  * is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Traits [[eu.cdevreeze.yaidom.ElemAwareElemLike]], [[eu.cdevreeze.yaidom.NodeAwareElemLike]] and [[eu.cdevreeze.yaidom.TextAwareElemLike]].
- * Trait [[eu.cdevreeze.yaidom.TextLike]] is also at this level.</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.ElemAsElemContainer]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
  * [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>

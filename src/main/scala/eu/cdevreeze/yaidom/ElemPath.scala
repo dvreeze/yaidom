@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * Unique identification of a descendant (or self) `ElemAwareElemLike` given a root `ElemAwareElemLike`. It is used for transformations
+ * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It is used for transformations
  * from one node tree to another collection of nodes.
  *
  * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),

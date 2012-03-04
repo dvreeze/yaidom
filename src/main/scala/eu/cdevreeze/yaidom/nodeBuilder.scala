@@ -134,7 +134,7 @@ final class ElemBuilder(
   }
 }
 
-final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder with TextLike {
+final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
 

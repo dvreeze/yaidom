@@ -76,31 +76,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc)
   }
 
-  /** A even more memory-intensive test (disabled by default) */
-  @Ignore @Test def testProcessAndConvertLargeXmlUsingSax() {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val endMs = System.currentTimeMillis()
-    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
-
-    doTest(doc)
-
-    val xlDoc = xlink.Document(doc)
-
-    expect(0) {
-      val result = xlDoc.documentElement collectFromElemsOrSelf { case xl: xlink.XLink => xl }
-      result.size
-    }
-
-    assert(xlDoc.documentElement.allElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
-
-    val doc2 = xlDoc.toNormalNode
-
-    doTest(doc2)
-  }
-
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
   @Ignore @Test def testParseLargeXmlRepeatedly() {
     for (i <- (0 until 200).par) {

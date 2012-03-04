@@ -19,14 +19,14 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * Supertrait for [[eu.cdevreeze.yaidom.Elem]] and other element-like classes, such as [[eu.cdevreeze.yaidom.xlink.Elem]].
- * Below, we refer to these element-like objects as elements.
+ * Element as Element container. This trait implements the corresponding `Elem` methods. It could in principle also be used
+ * for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]].
  *
  * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
- * general. Hence the name `ElemAwareElemLike`.
+ * general. Hence the name `ElemAsElemContainer`.
  *
  * This trait offers public element retrieval methods to obtain:
  * <ul>
@@ -63,11 +63,11 @@ import scala.collection.{ immutable, mutable }
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.
  *
- * @tparam E the captured element subtype, which is the (self) type of the element, so the type of the `ElemAwareElemLike[E]` itself
+ * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
+trait ElemAsElemContainer[E <: ElemAsElemContainer[E]] { self: E =>
 
   /** Resolved name of the element, as `ExpandedName` */
   def resolvedName: ExpandedName
@@ -75,7 +75,7 @@ trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
   /** The attributes as a `Map` from `ExpandedName`s (instead of `QName`s) to values */
   def resolvedAttributes: Map[ExpandedName, String]
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemAwareElemLike` methods will be. */
+  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemAsElemContainer` methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */
