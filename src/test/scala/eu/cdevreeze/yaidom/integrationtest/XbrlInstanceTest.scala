@@ -51,6 +51,17 @@ class XbrlInstanceTest extends Suite {
       val result = topLevelFacts map { fact => fact.resolvedName.namespaceUriOption }
       result.toSet
     }
+
+    val remaining = xbrlInstance.wrappedElm childElemsWhere { e =>
+      !XbrlInstance.mustBeTopLevelFact(e)(xbrlInstance) && !XbrlInstance.mustBeContext(e)(xbrlInstance) && !XbrlInstance.mustBeUnit(e)(xbrlInstance)
+    }
+    expect(4) {
+      remaining.size
+    }
+    expect(Set(nsLink.ename("schemaRef"), nsLink.ename("linkbaseRef"), nsLink.ename("footnoteLink"))) {
+      val result = remaining map { _.resolvedName }
+      result.toSet
+    }
   }
 }
 
