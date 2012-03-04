@@ -30,7 +30,7 @@ import XLink._
  * `mutable.IndexedSeq[T]` for Scala Collections.
  *
  * It is advisable not to use these `xlink.Elem`s "globally" at a large scale, because that may cause a lot of wrapping of yaidom
- * Elems as `xlink.Elem<`s. Rather use `xlink.XLink`s "locally" as short-lived objects where they are useful.
+ * Elems as `xlink.Elem`s. Rather use `xlink.XLink`s "locally" as short-lived objects where they are useful.
  *
  * @author Chris de Vreeze
  */

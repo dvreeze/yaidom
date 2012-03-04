@@ -255,16 +255,16 @@ final class Elem(
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
    * If there are no text children, the empty string is returned.
    */
-  final def text: String = {
+  def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
   }
 
   /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  def trimmedText: String = text.trim
 
   /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  def normalizedText: String = XmlStringUtils.normalizeString(text)
 
   /** Creates a copy, but with (only) the children passed as parameter newChildren */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
@@ -424,10 +424,10 @@ final case class Text(text: String, isCData: Boolean) extends Node {
   if (isCData) require(!text.containsSlice("]]>"))
 
   /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  def trimmedText: String = text.trim
 
   /** Returns `XmlStringUtils.normalizeString(text)` .*/
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  def normalizedText: String = XmlStringUtils.normalizeString(text)
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     if (isCData) {
