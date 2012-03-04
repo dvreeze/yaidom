@@ -130,6 +130,9 @@ package object yaidom {
   /** Namespace. It offers a method to create an [[eu.cdevreeze.yaidom.ExpandedName]] with that namespace from a given localPart */
   final class Namespace(val ns: String) {
     def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
+
+    /** Returns `ns`, that is, the namespace URI as `String` */
+    override def toString: String = ns
   }
 
   /** "Implicit class" for converting a `String` to a `Namespace` */
