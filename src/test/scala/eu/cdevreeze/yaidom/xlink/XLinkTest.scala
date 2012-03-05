@@ -33,17 +33,16 @@ import org.scalatest.junit.JUnitRunner
 class XLinkTest extends Suite {
 
   @Test def testRetrieval() {
-    doTest(sampleXml)
+    doTest(sampleXml.wrappedElem)
   }
 
   @Test def testConversions() {
-    val normalRoot: eu.cdevreeze.yaidom.Elem = sampleXml.wrappedElem
-    val root = xlink.Elem(normalRoot)
+    val root: eu.cdevreeze.yaidom.Elem = sampleXml.wrappedElem
 
     doTest(root)
   }
 
-  private def doTest(root: xlink.Elem) {
+  private def doTest(root: eu.cdevreeze.yaidom.Elem) {
     expect(Set("courseload".ename, "tooltip".ename, "person".ename, "course".ename, "gpa".ename, "go".ename)) {
       val enames = sampleXml.wrappedElem collectFromElemsOrSelf { case e => e.resolvedName }
       enames.toSet

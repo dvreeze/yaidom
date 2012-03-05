@@ -38,7 +38,7 @@ class XbrlInstanceTest extends Suite {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: Document = parser.parse(classOf[XbrlInstanceTest].getResourceAsStream("sample-xbrl-instance.xml"))
 
-    val xbrlInstance = new XbrlInstance(doc.documentElement)
+    val xbrlInstance = XbrlInstance.fromElem(doc.documentElement)
 
     assert(xbrlInstance.topLevelFacts.size >= 10)
     assert(xbrlInstance.contexts.size >= 30)
@@ -52,8 +52,9 @@ class XbrlInstanceTest extends Suite {
       result.toSet
     }
 
-    val remaining = xbrlInstance.wrappedElm childElemsWhere { e =>
-      !XbrlInstance.mustBeTopLevelFact(e)(xbrlInstance) && !XbrlInstance.mustBeContext(e)(xbrlInstance) && !XbrlInstance.mustBeUnit(e)(xbrlInstance)
+    val root = xbrlInstance.toElem
+    val remaining = root childElemsWhere { e =>
+      !XbrlInstance.mustBeTopLevelFact(e)(root) && !XbrlInstance.mustBeContext(e)(root) && !XbrlInstance.mustBeUnit(e)(root)
     }
     expect(4) {
       remaining.size
@@ -61,6 +62,16 @@ class XbrlInstanceTest extends Suite {
     expect(Set(nsLink.ename("schemaRef"), nsLink.ename("linkbaseRef"), nsLink.ename("footnoteLink"))) {
       val result = remaining map { _.resolvedName }
       result.toSet
+    }
+
+    expect(1) {
+      xbrlInstance.schemaRefs.size
+    }
+    expect(1) {
+      xbrlInstance.linkbaseRefs.size
+    }
+    expect(2) {
+      xbrlInstance.footnoteLinks.size
     }
   }
 }
@@ -71,24 +82,47 @@ object XbrlInstanceTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase".ns
   val nsXLink = "http://www.w3.org/1999/xlink".ns
 
-  final class XbrlInstance(val wrappedElm: Elem) extends Immutable { self =>
-    import XbrlInstance._
+  import XbrlInstance._
 
-    require(wrappedElm ne null)
-    require(mustBeInstance(wrappedElm))
+  final class XbrlInstance(
+    val contexts: Map[String, XbrlContext],
+    val units: Map[String, XbrlUnit],
+    val topLevelFacts: immutable.IndexedSeq[Elem],
+    val schemaRefs: immutable.IndexedSeq[xlink.SimpleLink],
+    val linkbaseRefs: immutable.IndexedSeq[xlink.SimpleLink],
+    val roleRefs: immutable.IndexedSeq[xlink.SimpleLink],
+    val arcroleRefs: immutable.IndexedSeq[xlink.SimpleLink],
+    val footnoteLinks: immutable.IndexedSeq[xlink.ExtendedLink]) extends Immutable { self =>
 
-    def contexts: Map[String, XbrlContext] = {
-      val result = wrappedElm collectFromChildElems { case e if mustBeContext(e)(self) => (e.attribute("id".ename) -> new XbrlContext(e)) }
-      result.toMap
+    require(contexts ne null)
+    require(units ne null)
+    require(topLevelFacts ne null)
+    require(schemaRefs ne null)
+    require(linkbaseRefs ne null)
+    require(roleRefs ne null)
+    require(arcroleRefs ne null)
+    require(footnoteLinks ne null)
+
+    def toElem: Elem = {
+      val children = {
+        val contextElms = contexts.values map { _.wrappedElm }
+        val unitElms = units.values map { _.wrappedElm }
+        val schemaRefElms = schemaRefs map { _.wrappedElem }
+        val linkbaseRefElms = linkbaseRefs map { _.wrappedElem }
+        val roleRefElms = roleRefs map { _.wrappedElem }
+        val arcroleRefElms = arcroleRefs map { _.wrappedElem }
+        val footnoteLinkElms = footnoteLinks map { _.wrappedElem }
+
+        contextElms.toIndexedSeq ++ unitElms.toIndexedSeq ++ schemaRefElms ++ linkbaseRefElms ++
+          roleRefElms ++ arcroleRefElms ++ topLevelFacts ++ footnoteLinkElms
+      }
+
+      Elem(
+        qname = "xbrli:xbrl".qname,
+        attributes = Map(),
+        scope = Map("xbrli" -> "http://www.xbrl.org/2003/instance").scope,
+        children = children)
     }
-
-    def units: Map[String, XbrlUnit] = {
-      val result = wrappedElm collectFromChildElems { case e if mustBeUnit(e)(self) => (e.attribute("id".ename) -> new XbrlUnit(e)) }
-      result.toMap
-    }
-
-    def topLevelFacts: immutable.IndexedSeq[Elem] =
-      wrappedElm childElemsWhere { e => mustBeTopLevelFact(e)(self) }
   }
 
   final class XbrlContext(val wrappedElm: Elem) extends Immutable {
@@ -107,18 +141,100 @@ object XbrlInstanceTest {
 
     def mustBeInstance(e: Elem): Boolean = e.resolvedName == nsXbrli.ename("xbrl")
 
-    def mustBeTopLevelFact(e: Elem)(xbrlInstance: XbrlInstance): Boolean = {
+    def mustBeTopLevelFact(e: Elem)(root: Elem): Boolean = {
       // Approximation
-      val childElms = xbrlInstance.wrappedElm.allChildElems
+      val childElms = root.allChildElems
 
       if (!childElms.contains(e)) false else {
-        !Set(nsXbrli.toString, nsLink.toString, nsXLink.toString).contains(e.resolvedName.namespaceUriOption.getOrElse(nsXbrli.toString)) &&
-          !xlink.XLink.mustBeXLink(e)
+        !Set(nsXbrli.toString, nsLink.toString).contains(e.resolvedName.namespaceUriOption.getOrElse(nsXbrli.toString))
       }
     }
 
-    def mustBeContext(e: Elem)(xbrlInstance: XbrlInstance): Boolean = e.resolvedName == nsXbrli.ename("context")
+    def mustBeContext(e: Elem)(root: Elem): Boolean = e.resolvedName == nsXbrli.ename("context")
 
-    def mustBeUnit(e: Elem)(xbrlInstance: XbrlInstance): Boolean = e.resolvedName == nsXbrli.ename("unit")
+    def mustBeUnit(e: Elem)(root: Elem): Boolean = e.resolvedName == nsXbrli.ename("unit")
+
+    def mustBeSchemaRef(e: Elem)(root: Elem): Boolean = {
+      val result = e.resolvedName == nsLink.ename("schemaRef")
+      if (result) {
+        require(xlink.XLink.mustBeSimpleLink(e))
+        require(root.allChildElems.contains(e))
+      }
+      result
+    }
+
+    def mustBeLinkbaseRef(e: Elem)(root: Elem): Boolean = {
+      val result = e.resolvedName == nsLink.ename("linkbaseRef")
+      if (result) {
+        require(xlink.XLink.mustBeSimpleLink(e))
+        require(root.allChildElems.contains(e))
+      }
+      result
+    }
+
+    def mustBeRoleRef(e: Elem)(root: Elem): Boolean = {
+      val result = e.resolvedName == nsLink.ename("roleRef")
+      if (result) {
+        require(xlink.XLink.mustBeSimpleLink(e))
+        require(root.allChildElems.contains(e))
+      }
+      result
+    }
+
+    def mustBeArcroleRef(e: Elem)(root: Elem): Boolean = {
+      val result = e.resolvedName == nsLink.ename("arcroleRef")
+      if (result) {
+        require(xlink.XLink.mustBeSimpleLink(e))
+        require(root.allChildElems.contains(e))
+      }
+      result
+    }
+
+    def mustBeFootnoteLink(e: Elem)(root: Elem): Boolean = {
+      val result = e.resolvedName == nsLink.ename("footnoteLink")
+      if (result) {
+        require(xlink.XLink.mustBeExtendedLink(e))
+        require(root.allChildElems.contains(e))
+      }
+      result
+    }
+
+    def fromElem(root: Elem): XbrlInstance = {
+      require(mustBeInstance(root))
+
+      val contexts: Map[String, XbrlContext] = {
+        val result = root collectFromChildElems { case e if mustBeContext(e)(root) => (e.attribute("id".ename) -> new XbrlContext(e)) }
+        result.toMap
+      }
+
+      val units: Map[String, XbrlUnit] = {
+        val result = root collectFromChildElems { case e if mustBeUnit(e)(root) => (e.attribute("id".ename) -> new XbrlUnit(e)) }
+        result.toMap
+      }
+
+      val topLevelFacts: immutable.IndexedSeq[Elem] =
+        root childElemsWhere { e => mustBeTopLevelFact(e)(root) }
+
+      val schemaRefs: immutable.IndexedSeq[xlink.SimpleLink] =
+        root collectFromChildElems { case e if mustBeSchemaRef(e)(root) => xlink.SimpleLink(e) }
+      val linkbaseRefs: immutable.IndexedSeq[xlink.SimpleLink] =
+        root collectFromChildElems { case e if mustBeLinkbaseRef(e)(root) => xlink.SimpleLink(e) }
+      val roleRefs: immutable.IndexedSeq[xlink.SimpleLink] =
+        root collectFromChildElems { case e if mustBeRoleRef(e)(root) => xlink.SimpleLink(e) }
+      val arcroleRefs: immutable.IndexedSeq[xlink.SimpleLink] =
+        root collectFromChildElems { case e if mustBeArcroleRef(e)(root) => xlink.SimpleLink(e) }
+      val footnoteLinks: immutable.IndexedSeq[xlink.ExtendedLink] =
+        root collectFromChildElems { case e if mustBeFootnoteLink(e)(root) => xlink.ExtendedLink(e) }
+
+      new XbrlInstance(
+        contexts = contexts,
+        units = units,
+        topLevelFacts = topLevelFacts,
+        schemaRefs = schemaRefs,
+        linkbaseRefs = linkbaseRefs,
+        roleRefs = roleRefs,
+        arcroleRefs = arcroleRefs,
+        footnoteLinks = footnoteLinks)
+    }
   }
 }

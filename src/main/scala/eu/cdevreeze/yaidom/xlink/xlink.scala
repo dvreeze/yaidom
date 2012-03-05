@@ -36,6 +36,8 @@ import XLink._
  */
 sealed trait Elem extends Immutable {
 
+  // TODO Remove this Elem class! Look at XbrlInstance in XbrlInstanceTest for inspiration instead!
+
   val wrappedElem: eu.cdevreeze.yaidom.Elem
 
   require(wrappedElem ne null)
@@ -140,6 +142,7 @@ object Elem {
       } with XLink
     }
     case e => {
+      // TODO No recursion?
       new {
         val wrappedElem: eu.cdevreeze.yaidom.Elem = e
       } with Elem
