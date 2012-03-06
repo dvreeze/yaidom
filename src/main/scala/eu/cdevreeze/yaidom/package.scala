@@ -99,7 +99,7 @@ package eu.cdevreeze
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
  * In this package are some ("explicit" and therefore safe) implicit conversions, for treating a `String` as `QName`,
- * `ExpandedName`, `Scope.Declarations`, `Scope`, etc.
+ * `ExpandedName` or `Namespace`, and for treating a `Map[String, String]` as `Scope.Declarations` or `Scope`.
  *
  * Parsing and printing of XML is not handled in this package. Even the `toString` methods for nodes
  * use the `NodeBuilder` DSL syntax rather than XML string syntax. Hence the complex details of character escaping,

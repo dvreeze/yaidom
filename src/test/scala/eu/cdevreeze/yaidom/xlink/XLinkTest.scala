@@ -36,20 +36,14 @@ class XLinkTest extends Suite {
     doTest(sampleXml.wrappedElem)
   }
 
-  @Test def testConversions() {
-    val root: eu.cdevreeze.yaidom.Elem = sampleXml.wrappedElem
-
-    doTest(root)
-  }
-
-  private def doTest(root: eu.cdevreeze.yaidom.Elem) {
+  private def doTest(root: Elem) {
     expect(Set("courseload".ename, "tooltip".ename, "person".ename, "course".ename, "gpa".ename, "go".ename)) {
       val enames = sampleXml.wrappedElem collectFromElemsOrSelf { case e => e.resolvedName }
       enames.toSet
     }
 
-    expect(Some(sampleXml)) {
-      sampleXml.wrappedElem collectFromElemsOrSelf { case e if XLink.mustBeExtendedLink(e) => ExtendedLink(e) } headOption
+    expect(Some(sampleXml.wrappedElem)) {
+      sampleXml.wrappedElem collectFromElemsOrSelf { case e if XLink.mustBeExtendedLink(e) => e } headOption
     }
 
     expect(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
@@ -64,9 +58,9 @@ class XLinkTest extends Suite {
 
     val fromToHrefPairs: immutable.IndexedSeq[(String, String)] =
       for {
-        arc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeArc(e) && Arc(e).from == "CS-101" && Arc(e).to == "student62" => Arc(e) }
-        fromLoc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeLocator(e) && Locator(e).label == arc.from => Locator(e) }
-        toLoc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeLocator(e) && Locator(e).label == arc.to => Locator(e) }
+        arc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeArc(e) && Arc(e).fromOption == Some("CS-101") && Arc(e).toOption == Some("student62") => Arc(e) }
+        fromLoc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.fromOption => Locator(e) }
+        toLoc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.toOption => Locator(e) }
       } yield (fromLoc.href.toString, toLoc.href.toString)
 
     expect(Some("courses/cs101.xml")) {
@@ -84,7 +78,7 @@ class XLinkTest extends Suite {
     // Example from http://www.w3.org/TR/xlink/ (adapted)
     // In the original example, some xlink attributes are set in the DTD but not in the XML document. That's not supported here.
 
-    val rootBuilder: eu.cdevreeze.yaidom.ElemBuilder =
+    val rootBuilder: ElemBuilder =
       elem(
         qname = "courseload".qname,
         attributes = Map("xlink:type".qname -> "extended"),
@@ -157,7 +151,7 @@ class XLinkTest extends Suite {
               "xlink:actuate".qname -> "onRequest",
               "xlink:title".qname -> "Dr. Jay Smith, advisor"))))
 
-    val root: eu.cdevreeze.yaidom.Elem = rootBuilder.build()
+    val root: Elem = rootBuilder.build()
 
     xlink.ExtendedLink(root)
   }

@@ -113,8 +113,9 @@ object XbrlInstanceTest {
         val arcroleRefElms = arcroleRefs map { _.wrappedElem }
         val footnoteLinkElms = footnoteLinks map { _.wrappedElem }
 
-        contextElms.toIndexedSeq ++ unitElms.toIndexedSeq ++ schemaRefElms ++ linkbaseRefElms ++
-          roleRefElms ++ arcroleRefElms ++ topLevelFacts ++ footnoteLinkElms
+        schemaRefElms ++ linkbaseRefElms ++ roleRefElms ++ arcroleRefElms ++
+          contextElms.toIndexedSeq ++ unitElms.toIndexedSeq ++
+          topLevelFacts ++ footnoteLinkElms
       }
 
       Elem(
