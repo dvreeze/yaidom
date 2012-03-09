@@ -19,14 +19,14 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * Element as Element container. This trait implements the corresponding `Elem` methods. It could in principle also be used
- * for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]].
+ * Implementation trait for Elems as containers of elements. This trait implements the corresponding `Elem` methods.
+ * It could in principle also be used for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]].
  *
  * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
- * general. Hence the name `ElemAsElemContainer`.
+ * general. Hence the single type parameter, for the captured element type itself.
  *
  * This trait offers public element retrieval methods to obtain:
  * <ul>
@@ -67,7 +67,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ElemAsElemContainer[E <: ElemAsElemContainer[E]] { self: E =>
+trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Resolved name of the element, as `ExpandedName` */
   def resolvedName: ExpandedName
@@ -75,7 +75,7 @@ trait ElemAsElemContainer[E <: ElemAsElemContainer[E]] { self: E =>
   /** The attributes as a `Map` from `ExpandedName`s (instead of `QName`s) to values */
   def resolvedAttributes: Map[ExpandedName, String]
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemAsElemContainer` methods will be. */
+  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemLike` methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */

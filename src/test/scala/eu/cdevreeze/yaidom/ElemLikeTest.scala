@@ -24,7 +24,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 
 /**
- * ElemAsElemContainer test case.
+ * ElemLike test case.
  *
  * Acknowledgments: The sample XML and original XPath and XQuery queries are part of the online course
  * "Introduction to Databases", by professor Widom at Stanford University. Many thanks for letting me use
@@ -33,7 +33,7 @@ import org.scalatest.junit.JUnitRunner
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ElemAsElemContainerTest extends Suite {
+class ElemLikeTest extends Suite {
 
   private val ns = "http://bookstore"
 

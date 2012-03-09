@@ -218,7 +218,7 @@ final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemAsElemContainer[Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)

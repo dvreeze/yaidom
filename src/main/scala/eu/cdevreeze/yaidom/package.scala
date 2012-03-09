@@ -73,9 +73,9 @@ package eu.cdevreeze
  * <ol>
  * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.ExpandedName]] and
  * [[eu.cdevreeze.yaidom.Scope]].</li>
- * <li>Trait [[eu.cdevreeze.yaidom.ElemAsElemContainer]], which partly implements "element nodes".</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]], which partly implements "element nodes".</li>
  * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
- * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned trait `ElemAsElemContainer`).</li>
+ * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned trait `ElemLike`).</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
  * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s,
  * whereas the `Node`s that they create all must have a fixed `Scope`, so node builders are indeed intended to be handy for creation
@@ -90,7 +90,7 @@ package eu.cdevreeze
  * <li>Class [[eu.cdevreeze.yaidom.ExpandedName]]</li>
  * <li>Classes [[eu.cdevreeze.yaidom.Scope]] and [[eu.cdevreeze.yaidom.Scope.Declarations]]. At the same level
  * is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Trait [[eu.cdevreeze.yaidom.ElemAsElemContainer]].</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as [[eu.cdevreeze.yaidom.Elem]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]]. At the same level are
  * [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
