@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLinks, wrapping an [[eu.cdevreeze.yaidom.Elem]].
+ * XLinks, wrapping an [[eu.cdevreeze.yaidom.Elem]]. The XLink support is without any support for XPointer.
  *
  * In Java speak, this package depends on the [[eu.cdevreeze.yaidom]] package, and not the other way around.
  * In Scala speak, this package is in the [[eu.cdevreeze.yaidom]] namespace.

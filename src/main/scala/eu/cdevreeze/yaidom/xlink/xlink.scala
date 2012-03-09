@@ -23,6 +23,7 @@ import XLink._
 
 /**
  * XLink. See See http://www.w3.org/TR/xlink11/. An `XLink` wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
+ * The XLink support is without any support for XPointer.
  *
  * @author Chris de Vreeze
  */
