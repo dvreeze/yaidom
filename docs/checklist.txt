@@ -32,8 +32,8 @@ General principles:
 + API must coexist peacefully with platform (JVM, JDK, Scala etc.)
 
 Class design:
-+ minimize mutability (which is obvious in a functional style of programming)
-+ subclass only where it makes sense (IS-A relationship must hold), consider prohibiting inheritance
++ minimize mutability (which is obviously the case in a functional style of programming)
++ subclass only where it makes sense (IS-A relationship must hold), consider prohibiting inheritance where not designing for inheritance
 
 Method design:
 + do not make the client do what the module could do
@@ -64,22 +64,25 @@ see also http://clojure.org/state
 Check use of Maven best practices:
 + write pom.xml as documented in https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
 + do not use other Maven repositories (than Maven Central), whenever possible
++ clear unidirectional dependencies between Maven modules
 
-Check dependencies:
-+ pom.xml with as few dependencies as possible
-+ dependencies between packages and inside packages unidirectional, and as obvious as possible
+Check use of Spring best practices:
++ dependencies between packages (and inside packages) unidirectional, and as obvious as possible
++ emulate Spring "templates" where appropriate, leaving resource management to "template", without taking away control from the user
+of the API
++ programming against contracts is (still) good, especially at layer boundaries (also for testability)
 
 Check API documentation:
 + use package objects, and document them (as overview of the package/namespace)
 
-Check some other practices as well:
+Check some other practices as well (where some of them apply more to applications than to libraries):
 + this should be obvious: software should just work (so a web application against a database should respect that database,
-and an XML parser should still be configurable)
+a web application should work as multi-user app, an XML parser should still be configurable, and a data processing library should be able
+to handle larger data volumes)
 + so consider not using any abstractions that leak too much, no matter how popular they might be
 + when using frameworks, still remain in the driver seat (take charge of the architecture, choose what to use, how to use it, what not to use)
 + consider maintenance costs (of the software in production) when choosing an architecture; how hard are version migrations? how hard
 is it to reason about the state of a stopped system?
 + when mixing Scala and Java, be explicit at boundaries between idiomatic Scala and idiomatic Java
 + choose layers wisely (if applicable), typically based on abstraction levels
-+ programming against contracts is (still) good, especially at layer boundaries (also for testability)
-+ less is often more: do you need multiple Maven modules? do you need to implement Serializable (sometimes a hidden web framework cost)?
++ less is often more: do you need multiple Maven modules? do you really need to implement Serializable (sometimes a hidden web framework cost)?
