@@ -12,16 +12,12 @@ object XmlStringUtils {
     }
   }
 
-  /** Returns true if the string starts with "xml" (case-insensitive) */
-  def isReserved(s: String): Boolean = s.take(3).equalsIgnoreCase("xml")
-
   def containsColon(s: String): Boolean = s.indexOf(":") >= 0
 
   /** Returns true if the name is probably a valid XML name which is not reserved and contains no colon. */
   def isAllowedElementLocalName(s: String): Boolean = {
     require(s ne null)
-    // Name "xmlns" allowed for default namespace declarations.
-    (s.length > 0) && (!isReserved(s) || (s == "xmlns")) && !containsColon(s) && isProbablyValidXmlName(s)
+    (s.length > 0) && !containsColon(s) && isProbablyValidXmlName(s)
   }
 
   /** Returns true if the name is probably a valid XML name which contains no colon. */
