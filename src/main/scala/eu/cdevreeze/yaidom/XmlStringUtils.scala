@@ -14,7 +14,7 @@ object XmlStringUtils {
 
   def containsColon(s: String): Boolean = s.indexOf(":") >= 0
 
-  /** Returns true if the name is probably a valid XML name which is not reserved and contains no colon. */
+  /** Returns true if the name is probably a valid XML name which contains no colon. */
   def isAllowedElementLocalName(s: String): Boolean = {
     require(s ne null)
     (s.length > 0) && !containsColon(s) && isProbablyValidXmlName(s)
