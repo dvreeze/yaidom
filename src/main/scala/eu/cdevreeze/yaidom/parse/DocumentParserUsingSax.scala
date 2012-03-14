@@ -43,6 +43,8 @@ import org.xml.sax.ext.LexicalHandler
  *   }
  * }
  * }}}
+ *
+ * A `DocumentParserUsingSax` instance can not be re-used multiple times, not even from the same thread!
  */
 final class DocumentParserUsingSax(
   val saxParserFactory: SAXParserFactory,

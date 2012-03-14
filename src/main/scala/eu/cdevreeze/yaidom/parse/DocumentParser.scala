@@ -30,6 +30,9 @@ import java.io.InputStream
  * typical usage is easy, and complex scenarios are still possible.
  *
  * Method `parse` takes an `InputStream` instead of `Source` object, because that works better with a DOM implementation.
+ *
+ * It can not be assumed that a `DocumentParser` instance can be re-used multiple times. Implementing classes should indicate
+ * to what extent re-use of a parser instance is supported.
  */
 trait DocumentParser {
 

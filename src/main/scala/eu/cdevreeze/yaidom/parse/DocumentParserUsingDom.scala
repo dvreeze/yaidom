@@ -23,7 +23,7 @@ import org.w3c.dom.Element
 import jinterop.DomConversions._
 
 /**
- * DOM-based Document parser
+ * DOM-based Document parser.
  *
  * Typical non-trivial creation is as follows, assuming class `MyEntityResolver`, which extends `EntityResolver`,
  * and class `MyErrorHandler`, which extends `ErrorHandler`:
@@ -49,6 +49,8 @@ import jinterop.DomConversions._
  *   }
  * }
  * }}}
+ *
+ * A `DocumentParserUsingDom` instance can be re-used multiple times, from the same thread.
  */
 final class DocumentParserUsingDom(
   val documentBuilderFactory: DocumentBuilderFactory,
