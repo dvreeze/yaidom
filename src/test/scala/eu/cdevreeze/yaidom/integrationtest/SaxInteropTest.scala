@@ -487,7 +487,7 @@ class SaxInteropTest extends Suite {
     }
 
     def doChecks(rootElm: Elem): Unit = {
-      val childElms = rootElm.firstElems(ns.ename("child"))
+      val childElms = rootElm.topmostElems(ns.ename("child"))
       expect(2) {
         childElms.size
       }

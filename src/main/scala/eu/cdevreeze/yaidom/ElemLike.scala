@@ -33,11 +33,9 @@ import scala.collection.{ immutable, mutable }
  * <li>child elements</li>
  * <li>descendant elements</li>
  * <li>descendant or self elements</li>
- * <li>first found descendant elements obeying a predicate, meaning that
- * they have no ancestors obeying that predicate</li>
+ * <li>topmost descendant elements obeying a predicate, meaning that they have no ancestors obeying that predicate</li>
  * </ul>
- * In the method names, "elems" stands for descendant elements, and "first elems" stands for first found descendant
- * elements as explained above.
+ * In the method names, "elems" stands for descendant elements.
  *
  * There are also attribute retrieval methods, methods for indexing the element tree and finding subtrees,
  * and methods dealing with ElemPaths.
@@ -137,18 +135,18 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     elemsWhere { e => pf.isDefinedAt(e) } collect pf
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def firstElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch firstElemsOrSelfSeqWhere p }
+  final def topmostElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
+    allChildElems flatMap { ch => ch topmostElemsOrSelfSeqWhere p }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def firstElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = firstElemsWhere { e => e.resolvedName == expandedName }
+  final def topmostElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = topmostElemsWhere { e => e.resolvedName == expandedName }
 
-  /** Returns the first found descendant element obeying the given predicate, if any, wrapped in an `Option` */
+  /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def firstElemOptionWhere(p: E => Boolean): Option[E] = {
     self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
   }
 
-  /** Returns the first found descendant element with the given expanded name, if any, wrapped in an `Option` */
+  /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
   final def firstElemOption(expandedName: ExpandedName): Option[E] = firstElemOptionWhere { e => e.resolvedName == expandedName }
 
   /**
@@ -248,9 +246,9 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns an `IndexedSeq` of those of this element and its descendant elements that obey the given predicate,
    * such that no ancestor obeys the predicate.
    */
-  private final def firstElemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
+  private final def topmostElemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    if (p(self)) immutable.IndexedSeq(self) else self.allChildElems flatMap { ch => ch firstElemsOrSelfSeqWhere p }
+    if (p(self)) immutable.IndexedSeq(self) else self.allChildElems flatMap { ch => ch topmostElemsOrSelfSeqWhere p }
   }
 
   /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
