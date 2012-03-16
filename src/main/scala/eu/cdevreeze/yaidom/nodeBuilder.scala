@@ -75,7 +75,10 @@ trait ParentNodeBuilder extends NodeBuilder {
   def children: immutable.IndexedSeq[NodeBuilder]
 }
 
-final class DocumentBuilder(
+/**
+ * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
+ */
+final class DocBuilder(
   val baseUriOption: Option[URI],
   val documentElement: ElemBuilder,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
@@ -96,9 +99,9 @@ final class DocumentBuilder(
 
     Document(
       baseUriOption = self.baseUriOption,
-      documentElement.build(parentScope),
-      processingInstructions map { pi => pi.build(parentScope) },
-      comments map { c => c.build(parentScope) })
+      documentElement = documentElement.build(parentScope),
+      processingInstructions = processingInstructions map { pi => pi.build(parentScope) },
+      comments = comments map { c => c.build(parentScope) })
   }
 }
 
@@ -174,9 +177,9 @@ object NodeBuilder {
     baseUriOption: Option[String],
     documentElement: ElemBuilder,
     processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
-    comments: immutable.IndexedSeq[CommentBuilder]): DocumentBuilder = {
+    comments: immutable.IndexedSeq[CommentBuilder]): DocBuilder = {
 
-    new DocumentBuilder(
+    new DocBuilder(
       baseUriOption map { uriString => new URI(uriString) },
       documentElement,
       processingInstructions,
@@ -218,7 +221,7 @@ object NodeBuilder {
       require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
 
       // Recursive calls, but not tail-recursive
-      new DocumentBuilder(
+      new DocBuilder(
         baseUriOption = d.baseUriOption,
         documentElement = fromNode(d.documentElement)(parentScope).asInstanceOf[ElemBuilder],
         processingInstructions = d.processingInstructions collect { case pi: ProcessingInstruction => fromNode(pi)(parentScope).asInstanceOf[ProcessingInstructionBuilder] },
@@ -234,7 +237,7 @@ object NodeBuilder {
         children = e.children map { ch => fromNode(ch)(e.scope) })
   }
 
-  def fromDocument(doc: Document)(parentScope: Scope): DocumentBuilder = fromNode(doc)(parentScope).asInstanceOf[DocumentBuilder]
+  def fromDocument(doc: Document)(parentScope: Scope): DocBuilder = fromNode(doc)(parentScope).asInstanceOf[DocBuilder]
 
   def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = fromNode(elm)(parentScope).asInstanceOf[ElemBuilder]
 }
