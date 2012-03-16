@@ -44,6 +44,15 @@ import org.xml.sax.ext.LexicalHandler
  * }
  * }}}
  *
+ * For completeness, a custom `ErrorHandler` trait that simply prints parse exceptions to standard output:
+ * {{{
+ * trait MyErrorHandler extends ErrorHandler {
+ *   override def warning(exc: SAXParseException) { println(exc) }
+ *   override def error(exc: SAXParseException) { println(exc) }
+ *   override def fatalError(exc: SAXParseException) { println(exc) }
+ * }
+ * }}}
+ *
  * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXParserFactory` is thread-safe, it can even be re-used from multiple threads.
  */
