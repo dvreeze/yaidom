@@ -116,6 +116,13 @@ final class Document(
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
+  /** Creates a copy, but with the new baseUriOption passed as parameter newBaseUriOption */
+  def withBaseUriOption(newBaseUriOption: Option[URI]): Document = new Document(
+    baseUriOption = newBaseUriOption,
+    documentElement = this.documentElement,
+    processingInstructions = this.processingInstructions,
+    comments = this.comments)
+
   /** Returns `withDocumentElement(this.documentElement updated pf)` */
   def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
 

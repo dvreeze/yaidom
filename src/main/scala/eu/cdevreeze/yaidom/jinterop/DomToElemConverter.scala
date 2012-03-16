@@ -32,7 +32,9 @@ import scala.collection.{ immutable, mutable }
 trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocument[org.w3c.dom.Document] {
 
   def convertToDocument(v: org.w3c.dom.Document): Document = {
-    val baseUriOption: Option[URI] = Option(v.getDocumentURI) map { uriString => new URI(uriString) }
+    // It seems that the DOM Document does not keep the URI from which it was loaded. Related (but not the same) is bug
+    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4916415.
+    val baseUriOption: Option[URI] = Option(v.getDocumentURI) orElse (Option(v.getBaseURI)) map { uriString => new URI(uriString) }
 
     Document(
       baseUriOption = baseUriOption,
