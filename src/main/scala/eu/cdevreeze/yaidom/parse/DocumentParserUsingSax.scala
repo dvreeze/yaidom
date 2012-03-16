@@ -96,7 +96,7 @@ object DocumentParserUsingSax {
    * `handlerCreator`. The "SAX parser creator" invokes `parserFactory.newSAXParser()`.
    */
   def newInstance(parserFactory: SAXParserFactory, handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
-    DocumentParserUsingSax.newInstance(
+    newInstance(
       parserFactory = parserFactory,
       parserCreator = { (spf: SAXParserFactory) =>
         val parser = spf.newSAXParser()

@@ -37,27 +37,20 @@ import jinterop.DomConversions._
  * val transformerFactory: TransformerFactory = TransformerFactory.newInstance
  * transformerFactory.setAttribute("indent-number", java.lang.Integer.valueOf(2))
  *
- * val documentPrinter = new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
+ * val documentPrinter = DocumentPrinterUsingDom.newInstance(documentBuilderFactory, transformerFactory)
  * }}}
+ *
+ * A `DocumentPrinterUsingDom` instance can be re-used multiple times, from the same thread.
+ * If the `DocumentBuilderFactory` and `TransformerFactory` are thread-safe, it can even be re-used from multiple threads.
  */
 final class DocumentPrinterUsingDom(
-  val documentBuilderFactory: DocumentBuilderFactory,
-  val documentBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
+  val docBuilderFactory: DocumentBuilderFactory,
+  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
   val transformerFactory: TransformerFactory,
   val transformerCreator: TransformerFactory => Transformer) extends DocumentPrinter {
 
-  def this(dbf: DocumentBuilderFactory, tf: TransformerFactory) = this(
-    documentBuilderFactory = dbf,
-    documentBuilderCreator = { docBuilderFactory => docBuilderFactory.newDocumentBuilder() },
-    transformerFactory = tf,
-    transformerCreator = { transFactory =>
-      val t = transFactory.newTransformer()
-      t.setOutputProperty(OutputKeys.INDENT, "yes")
-      t
-    })
-
   def print(doc: Document): String = {
-    val docBuilder = documentBuilderCreator(documentBuilderFactory)
+    val docBuilder = docBuilderCreator(docBuilderFactory)
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
 
     val transformer = transformerCreator(transformerFactory)
@@ -77,9 +70,36 @@ final class DocumentPrinterUsingDom(
 
 object DocumentPrinterUsingDom {
 
+  /** Returns `newInstance(DocumentBuilderFactory.newInstance, TransformerFactory.newInstance)` */
   def newInstance(): DocumentPrinterUsingDom = {
-    val documentBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
+    val docBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
     val transformerFactory: TransformerFactory = TransformerFactory.newInstance
-    new DocumentPrinterUsingDom(documentBuilderFactory, transformerFactory)
+    newInstance(docBuilderFactory, transformerFactory)
+  }
+
+  /** Invokes the 4-arg `newInstance` method, with trivial "docBuilderCreator" and (indenting) "transformerCreator" */
+  def newInstance(
+    docBuilderFactory: DocumentBuilderFactory,
+    transformerFactory: TransformerFactory): DocumentPrinterUsingDom = {
+
+    newInstance(
+      docBuilderFactory,
+      { dbf => dbf.newDocumentBuilder() },
+      transformerFactory,
+      { tf =>
+        val t = tf.newTransformer()
+        t.setOutputProperty(OutputKeys.INDENT, "yes")
+        t
+      })
+  }
+
+  /** Returns a new instance, by invoking the primary constructor */
+  def newInstance(
+    docBuilderFactory: DocumentBuilderFactory,
+    docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
+    transformerFactory: TransformerFactory,
+    transformerCreator: TransformerFactory => Transformer): DocumentPrinterUsingDom = {
+
+    new DocumentPrinterUsingDom(docBuilderFactory, docBuilderCreator, transformerFactory, transformerCreator)
   }
 }

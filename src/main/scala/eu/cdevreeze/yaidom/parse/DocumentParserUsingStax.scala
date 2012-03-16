@@ -84,7 +84,7 @@ object DocumentParserUsingStax {
   def newInstance(): DocumentParserUsingStax = {
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    DocumentParserUsingStax.newInstance(xmlInputFactory)
+    newInstance(xmlInputFactory)
   }
 
   /** Returns a new instance, by invoking the primary constructor */

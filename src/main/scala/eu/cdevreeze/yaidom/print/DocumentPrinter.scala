@@ -26,6 +26,9 @@ package print
  * Typical implementations use DOM or StAX, but make them easier to use in the tradition of the "template" classes
  * of the Spring framework. That is, resource management is done as much as possible by the `DocumentPrinter`,
  * typical usage is easy, and complex scenarios are still possible.
+ *
+ * `DocumentPrinter` instances should be re-usable multiple times. Yet implementing classes are encouraged to indicate
+ * to what extent re-use of a `DocumentPrinter` instance is indeed supported (single-threaded, or even multi-threaded).
  */
 trait DocumentPrinter {
 

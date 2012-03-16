@@ -23,7 +23,14 @@ import javax.xml.stream.events.XMLEvent
 import scala.collection.immutable
 import jinterop.StaxConversions._
 
-/** StAX-based [[eu.cdevreeze.yaidom.Document]] printer. Note: this XML printer does not pretty-print! */
+/**
+ * StAX-based [[eu.cdevreeze.yaidom.Document]] printer.
+ *
+ * Note: this XML printer does not pretty-print!
+ *
+ * A `DocumentPrinterUsingStax` instance can be re-used multiple times, from the same thread.
+ * If the `XMLEventFactory` and `XMLOutputFactory` are thread-safe, it can even be re-used from multiple threads.
+ */
 final class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,
   val outputFactory: XMLOutputFactory) extends DocumentPrinter {
@@ -46,9 +53,18 @@ final class DocumentPrinterUsingStax(
 
 object DocumentPrinterUsingStax {
 
+  /** Returns `newInstance(XMLEventFactory.newFactory, XMLOutputFactory.newFactory)` */
   def newInstance(): DocumentPrinterUsingStax = {
     val eventFactory: XMLEventFactory = XMLEventFactory.newFactory
     val outputFactory: XMLOutputFactory = XMLOutputFactory.newFactory
+    newInstance(eventFactory, outputFactory)
+  }
+
+  /** Returns a new instance, by invoking the primary constructor */
+  def newInstance(
+    eventFactory: XMLEventFactory,
+    outputFactory: XMLOutputFactory): DocumentPrinterUsingStax = {
+
     new DocumentPrinterUsingStax(eventFactory, outputFactory)
   }
 }
