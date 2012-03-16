@@ -123,6 +123,10 @@ object XLink {
   val XLinkUseEName = XLinkNamespace.ename("use")
   val XLinkPriorityEName = XLinkNamespace.ename("priority")
 
+  def mustBeXLink(e: Elem): Boolean = {
+    mustBeLink(e) || mustBeTitle(e) || mustBeLocator(e) || mustBeArc(e) || mustBeResource(e)
+  }
+
   def mustBeLink(e: Elem): Boolean = mustBeSimpleLink(e) || mustBeExtendedLink(e)
 
   def mustBeSimpleLink(e: Elem): Boolean = {
@@ -150,6 +154,14 @@ object XLink {
     case e if mustBeArc(e) => Arc(e)
     case e if mustBeResource(e) => Resource(e)
     case e => sys.error("Not an XLink: %s".format(e))
+  }
+}
+
+object Link {
+
+  def apply(e: Elem): Link = e match {
+    case e if mustBeSimpleLink(e) => SimpleLink(e)
+    case e if mustBeExtendedLink(e) => ExtendedLink(e)
   }
 }
 
