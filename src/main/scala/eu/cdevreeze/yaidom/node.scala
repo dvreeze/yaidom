@@ -488,6 +488,8 @@ object Document {
 
     new Document(baseUriOption, documentElement, processingInstructions, comments)
   }
+
+  def apply(documentElement: Elem): Document = apply(None, documentElement)
 }
 
 object Elem {
