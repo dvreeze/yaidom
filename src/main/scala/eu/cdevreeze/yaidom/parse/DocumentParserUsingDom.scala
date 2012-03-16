@@ -50,6 +50,15 @@ import jinterop.DomConversions._
  * }
  * }}}
  *
+ * For completeness, a custom `ErrorHandler` class that simply prints parse exceptions to standard output:
+ * {{{
+ * class MyErrorHandler extends ErrorHandler {
+ *   def warning(exc: SAXParseException) { println(exc) }
+ *   def error(exc: SAXParseException) { println(exc) }
+ *   def fatalError(exc: SAXParseException) { println(exc) }
+ * }
+ * }}}
+ *
  * A `DocumentParserUsingDom` instance can be re-used multiple times, from the same thread.
  */
 final class DocumentParserUsingDom(
