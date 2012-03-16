@@ -30,7 +30,7 @@ import org.xml.sax.ext.LexicalHandler
  * {{{
  * val parser = DocumentParserUsingSax.newInstance(
  *   SAXParserFactory.newInstance,
- *   new DefaultElemProducingSaxHandler with MyEntityResolver with MyErrorHandler
+ *   () => new DefaultElemProducingSaxHandler with MyEntityResolver with MyErrorHandler
  * )
  * }}}
  *
@@ -44,20 +44,34 @@ import org.xml.sax.ext.LexicalHandler
  * }
  * }}}
  *
- * A `DocumentParserUsingSax` instance can not be re-used multiple times, not even from the same thread!
+ * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.
+ * If the `SAXParserFactory` is thread-safe, it can even be re-used from multiple threads.
  */
 final class DocumentParserUsingSax(
-  val saxParserFactory: SAXParserFactory,
-  val saxParserCreator: SAXParserFactory => SAXParser,
-  val defaultHandler: ElemProducingSaxHandler) extends DocumentParser {
+  val parserFactory: SAXParserFactory,
+  val parserCreator: SAXParserFactory => SAXParser,
+  val handlerCreator: () => ElemProducingSaxHandler) extends DocumentParser {
 
-  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
+  /**
+   * Parses the input stream into a yaidom `Document`. Closes the input stream afterwards.
+   *
+   * If the created `DefaultHandler` is a `LexicalHandler`, this `LexicalHandler` is registered. In practice all SAX parsers
+   * should support LexicalHandlers.
+   */
   def parse(inputStream: jio.InputStream): Document = {
     try {
-      val sp: SAXParser = saxParserCreator(saxParserFactory)
-      sp.parse(inputStream, defaultHandler)
+      val sp: SAXParser = parserCreator(parserFactory)
+      val handler = handlerCreator()
 
-      val doc: Document = defaultHandler.resultingDocument
+      if (handler.isInstanceOf[LexicalHandler]) {
+        // Property "http://xml.org/sax/properties/lexical-handler" registers a LexicalHandler. See the corresponding API documentation.
+        // It is assumed here that in practice all SAX parsers support LexicalHandlers.
+        sp.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
+      }
+
+      sp.parse(inputStream, handler)
+
+      val doc: Document = handler.resultingDocument
       doc
     } finally {
       if (inputStream ne null) inputStream.close()
@@ -70,33 +84,33 @@ object DocumentParserUsingSax {
   /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`. */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
-    DocumentParserUsingSax.newInstance(spf)
+    newInstance(spf)
   }
 
-  /** Returns `newInstance(spf, new DefaultElemProducingSaxHandler {})`. */
-  def newInstance(spf: SAXParserFactory): DocumentParserUsingSax =
-    newInstance(spf, new DefaultElemProducingSaxHandler {})
+  /** Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`. */
+  def newInstance(parserFactory: SAXParserFactory): DocumentParserUsingSax =
+    newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {})
 
   /**
-   * Invokes the constructur on `spf`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
-   * `handler`. The "SAX parser creator" invokes `spf.newSAXParser()`, but it also recognizes if the handler is a
-   * `LexicalHandler`, and, if so, registers that handler as `LexicalHandler`. The underlying assumption
-   * is that in practice all SAX parsers support LexicalHandlers.
+   * Invokes the 3-arg `newInstance` method on `parserFactory`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
+   * `handlerCreator`. The "SAX parser creator" invokes `parserFactory.newSAXParser()`.
    */
-  def newInstance(spf: SAXParserFactory, handler: ElemProducingSaxHandler): DocumentParserUsingSax = {
-    new DocumentParserUsingSax(
-      saxParserFactory = spf,
-      saxParserCreator = { spf =>
+  def newInstance(parserFactory: SAXParserFactory, handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
+    DocumentParserUsingSax.newInstance(
+      parserFactory = parserFactory,
+      parserCreator = { (spf: SAXParserFactory) =>
         val parser = spf.newSAXParser()
-
-        if (handler.isInstanceOf[LexicalHandler]) {
-          // Property "http://xml.org/sax/properties/lexical-handler" registers a LexicalHandler. See the corresponding API documentation.
-          // It is assumed here that in practice all SAX parsers support LexicalHandlers.
-          parser.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
-        }
-
         parser
       },
-      defaultHandler = handler)
+      handlerCreator = handlerCreator)
+  }
+
+  /** Returns a new instance, by invoking the primary constructor */
+  def newInstance(
+    parserFactory: SAXParserFactory,
+    parserCreator: SAXParserFactory => SAXParser,
+    handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
+
+    new DocumentParserUsingSax(parserFactory, parserCreator, handlerCreator)
   }
 }

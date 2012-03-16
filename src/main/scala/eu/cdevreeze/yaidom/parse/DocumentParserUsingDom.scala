@@ -28,16 +28,16 @@ import jinterop.DomConversions._
  * Typical non-trivial creation is as follows, assuming class `MyEntityResolver`, which extends `EntityResolver`,
  * and class `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
- * val dbf = DocumentBuilderFactory.newInstance
+ * val dbf = DocumentBuilderFactory.newInstance()
  *
- * def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
- *   val db = documentBuilderFactory.newDocumentBuilder()
+ * def createDocumentBuilder(dbf: DocumentBuilderFactory): DocumentBuilder = {
+ *   val db = dbf.newDocumentBuilder()
  *   db.setEntityResolver(new MyEntityResolver)
  *   db.setErrorHandler(new MyErrorHandler)
  *   db
  * }
  *
- * val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+ * val docParser = DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder _)
  * }}}
  *
  * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
@@ -60,19 +60,16 @@ import jinterop.DomConversions._
  * }}}
  *
  * A `DocumentParserUsingDom` instance can be re-used multiple times, from the same thread.
+ * If the `DocumentBuilderFactory` is thread-safe, it can even be re-used from multiple threads.
  */
 final class DocumentParserUsingDom(
-  val documentBuilderFactory: DocumentBuilderFactory,
-  val documentBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends DocumentParser {
-
-  def this(dbf: DocumentBuilderFactory) = this(
-    documentBuilderFactory = dbf,
-    documentBuilderCreator = { dbf => dbf.newDocumentBuilder() })
+  val docBuilderFactory: DocumentBuilderFactory,
+  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends DocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     try {
-      val db: DocumentBuilder = documentBuilderCreator(documentBuilderFactory)
+      val db: DocumentBuilder = docBuilderCreator(docBuilderFactory)
       val domDoc: org.w3c.dom.Document = db.parse(inputStream)
 
       convertToDocument(domDoc)
@@ -86,12 +83,21 @@ object DocumentParserUsingDom {
 
   /** Returns `newInstance(DocumentBuilderFactory.newInstance)` */
   def newInstance(): DocumentParserUsingDom = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     newInstance(dbf)
   }
 
   /** Returns a new instance, using the given `DocumentBuilderFactory`, without any further configuration */
-  def newInstance(dbf: DocumentBuilderFactory): DocumentParserUsingDom = {
-    new DocumentParserUsingDom(dbf)
+  def newInstance(docBuilderFactory: DocumentBuilderFactory): DocumentParserUsingDom = {
+    val dbc = (dbf: DocumentBuilderFactory) => dbf.newDocumentBuilder()
+    newInstance(docBuilderFactory, dbc)
+  }
+
+  /** Returns a new instance, by invoking the primary constructor */
+  def newInstance(
+    docBuilderFactory: DocumentBuilderFactory,
+    docBuilderCreator: DocumentBuilderFactory => DocumentBuilder): DocumentParserUsingDom = {
+
+    new DocumentParserUsingDom(docBuilderFactory, docBuilderCreator)
   }
 }

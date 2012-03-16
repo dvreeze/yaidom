@@ -56,7 +56,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
 
@@ -101,7 +101,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("strangeXml.xml")
 
@@ -128,7 +128,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXml.xml")
 
@@ -207,7 +207,7 @@ class SaxInteropTest extends Suite {
     }
 
     // We use the SuppressingEntityResolver
-    val saxParser = DocumentParserUsingSax.newInstance(spf, new DefaultElemProducingSaxHandler with SuppressingEntityResolver)
+    val saxParser = DocumentParserUsingSax.newInstance(spf, () => new DefaultElemProducingSaxHandler with SuppressingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -402,7 +402,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
@@ -445,7 +445,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
@@ -473,7 +473,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
 
@@ -529,7 +529,7 @@ class SaxInteropTest extends Suite {
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
 
@@ -646,11 +646,11 @@ class SaxInteropTest extends Suite {
       }
     }
 
-    val handler = new DefaultElemProducingSaxHandler with LoggingEntityResolver with SaxHandlerWithLocator with MyErrorHandler
+    val handlerCreator = () => new DefaultElemProducingSaxHandler with LoggingEntityResolver with SaxHandlerWithLocator with MyErrorHandler
 
     val saxParser = DocumentParserUsingSax.newInstance(
       SAXParserFactory.newInstance,
-      handler)
+      handlerCreator)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 
@@ -669,9 +669,9 @@ class SaxInteropTest extends Suite {
       warningCount
     }
     expect(2) {
-      handler.locator.getLineNumber
+      lineNumber
     }
-    assert(handler.locator.getColumnNumber >= 16, "Expected the column number to be 16 or larger")
+    assert(columnNumber >= 16, "Expected the column number to be 16 or larger")
   }
 
   trait LoggingEntityResolver extends EntityResolver {

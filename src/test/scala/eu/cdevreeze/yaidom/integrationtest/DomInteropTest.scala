@@ -76,7 +76,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
+    val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val domDoc2: org.w3c.dom.Document = db2.newDocument
     val element = convertElem(root)(domDoc2)
 
@@ -168,7 +168,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
+    val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
 
@@ -222,7 +222,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
+    val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = convertDocument(document)(db2.newDocument)
 
     // 3. Convert DOM element into Elem
@@ -554,7 +554,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
+    val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
 
@@ -588,7 +588,7 @@ class DomInteropTest extends Suite {
 
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setExpandEntityReferences(false)
-    val domParser = new DocumentParserUsingDom(dbf)
+    val domParser = DocumentParserUsingDom.newInstance(dbf)
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -673,7 +673,7 @@ class DomInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val db2 = domParser.documentBuilderCreator(domParser.documentBuilderFactory)
+    val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
 
@@ -703,7 +703,7 @@ class DomInteropTest extends Suite {
 
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setCoalescing(true)
-    val domParser = new DocumentParserUsingDom(dbf)
+    val domParser = DocumentParserUsingDom.newInstance(dbf)
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
 
     val root: Elem = domParser.parse(is).documentElement

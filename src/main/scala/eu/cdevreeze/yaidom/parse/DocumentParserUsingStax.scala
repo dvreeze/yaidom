@@ -23,7 +23,42 @@ import javax.xml.stream.events.XMLEvent
 import scala.util.control.Exception._
 import jinterop.StaxConversions._
 
-/** StAX-based `Document` parser */
+/**
+ * StAX-based `Document` parser.
+ *
+ * Typical non-trivial creation is as follows, assuming a class `MyXmlResolver`, which extends `XMLResolver`,
+ * and a class `MyXmlReporter`, which extends `XMLReporter`:
+ * {{{
+ * val xmlInputFactory = XMLInputFactory.newFactory()
+ * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
+ * xmlInputFactory.setXMLResolver(new MyXmlResolver)
+ * xmlInputFactory.setXMLReporter(new MyXmlReporter)
+ *
+ * val docParser = DocumentParserUsingStax.newInstance(xmlInputFactory)
+ * }}}
+ *
+ * A custom `XMLResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * The latter can be coded as follows (compare with http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
+ * {{{
+ * class MyXmlResolver extends XMLResolver {
+ *   override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): InputSource = {
+ *     new InputSource(new java.io.StringReader(""))
+ *   }
+ * }
+ * }}}
+ *
+ * A trivial `XMLReporter` could look like this:
+ * {{{
+ * class MyXmlReporter extends XMLReporter {
+ *   override def report(message: String, errorType: String, relatedInformation: AnyRef, location: Location) {
+ *     println("Location: %s. Error type: %s. Message: %s.".format(location, errorType, message))
+ *   }
+ * }
+ * }}}
+ *
+ * A `DocumentParserUsingStax` instance can be re-used multiple times, from the same thread.
+ * If the `XMLInputFactory` is thread-safe, it can even be re-used from multiple threads.
+ */
 final class DocumentParserUsingStax(val xmlInputFactory: XMLInputFactory) extends DocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
@@ -49,6 +84,9 @@ object DocumentParserUsingStax {
   def newInstance(): DocumentParserUsingStax = {
     val xmlInputFactory = XMLInputFactory.newFactory
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    new DocumentParserUsingStax(xmlInputFactory)
+    DocumentParserUsingStax.newInstance(xmlInputFactory)
   }
+
+  /** Returns a new instance, by invoking the primary constructor */
+  def newInstance(xmlInputFactory: XMLInputFactory): DocumentParserUsingStax = new DocumentParserUsingStax(xmlInputFactory)
 }
