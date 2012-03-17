@@ -171,5 +171,6 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
 
 object ElemToStaxEventsConverter {
 
+  /** Producer of an `IndexedSeq[XMLEvent]`, given a `XMLEventFactory` as factory of StAX events */
   type XmlEventsProducer = (XMLEventFactory => immutable.IndexedSeq[XMLEvent])
 }

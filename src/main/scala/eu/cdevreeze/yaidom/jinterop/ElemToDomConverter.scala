@@ -152,7 +152,9 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
 
 object ElemToDomConverter {
 
+  /** Producer of a DOM `Element`, given a DOM `Document` as factory of DOM objects */
   type ElementProducer = (org.w3c.dom.Document => Element)
 
+  /** Producer of a DOM `Document`, given the DOM `Document` as factory of DOM objects */
   type DocumentProducer = (org.w3c.dom.Document => org.w3c.dom.Document)
 }
