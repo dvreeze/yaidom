@@ -126,6 +126,7 @@ Note that some of the following good practices apply more to applications than t
   * An XML parser should be configurable
   * A data processing library should be able to handle larger data volumes
   * A general-purpose library should make as few assumptions as possible about the runtime environment in which it runs
+  * Consider corner cases: character encoding issues etc.
 
 * Seriously consider not using any abstractions that leak too much, no matter how popular they might be
 * When using frameworks, still remain in the driver seat
@@ -145,3 +146,5 @@ Note that some of the following good practices apply more to applications than t
 
   * Do you need multiple Maven modules?
   * Do you really need to implement Serializable (sometimes a hidden web framework cost)?
+  
+* Controversial: Write only a few targeted unit tests. Mostly write realistic integration tests

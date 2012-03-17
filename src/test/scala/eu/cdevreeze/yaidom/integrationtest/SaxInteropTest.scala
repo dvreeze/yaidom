@@ -524,6 +524,52 @@ class SaxInteropTest extends Suite {
     doChecks(root2)
   }
 
+  @Test def testParseXmlWithSpecialChars() {
+    // 1. Parse XML file into Elem
+
+    val saxParser = DocumentParserUsingSax.newInstance(
+      SAXParserFactory.newInstance,
+      () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
+
+    val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEuro.xml")
+
+    val root: Elem = saxParser.parse(is).documentElement
+
+    val ns = "urn:foo:bar".ns
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def doChecks(rootElm: Elem): Unit = {
+      val childElms = rootElm.topmostElems(ns.ename("child"))
+      expect(2) {
+        childElms.size
+      }
+
+      val text = "\u20AC 200"
+
+      expect(Set(text)) {
+        val result = childElms map { e => e.trimmedText }
+        result.toSet
+      }
+    }
+
+    doChecks(root)
+
+    // 2. Convert to NodeBuilder and back, and check again
+
+    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    doChecks(root2)
+  }
+
   @Test def testParseGeneratedHtml() {
     // 1. Parse XML file into Elem
 
