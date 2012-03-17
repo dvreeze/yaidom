@@ -42,11 +42,11 @@ Process of API design, according to Joshua Bloch
 
 * Write to the API early and often (and to SPI as well, if applicable)
 
-General principles
-------------------
+General principles, according to Joshua Bloch
+---------------------------------------------
 
 * The API must do one thing, and do it well. Good names drive development
-* When in doubt, leave it out;. Look for a good power-to-weight ratio
+* When in doubt, leave it out. Look for a good power-to-weight ratio
 * Implementation details should not leak into the API
 * Minimize accessibility of everything
 * Names matter, and code should read like prose
@@ -55,14 +55,14 @@ General principles
 * Consider performance consequences of API design decisions (but do not optimize prematurely)
 * The API must coexist peacefully with the platform (JVM, JDK, Scala etc.)
 
-Class design
-------------
+Class design, according to Joshua Bloch
+---------------------------------------
 
 * Minimize mutability (which is obviously the case in a functional style of programming)
 * Subclass only where it makes sense (IS-A relationship must hold), consider prohibiting inheritance where not designing for inheritance
 
-Method design
--------------
+Method design, according to Joshua Bloch
+----------------------------------------
 
 * Do not make the client do what the module could do
 * Do not violate the principle of least astonishment
@@ -74,8 +74,8 @@ Method design
 * Avoid long parameter lists
 * Avoid return values that demand exceptional processing
 
-Exception design
-----------------
+Exception design, according to Joshua Bloch
+-------------------------------------------
 
 * Throw exceptions to indicate exceptional conditions
 * Favor unchecked exceptions
@@ -89,12 +89,14 @@ Some Scala best practices
   * Prefer immutability
   * Prefer side-effect free functions (or keep side-effects localized inside functions)
   * Think in expressions rather than statements
-  * Clojure inventor Rich Hickey even calls "mutable" `the new spaghetti code`_. I tend to agree
+  * Clojure inventor Rich Hickey even calls "mutable" the `new spaghetti code`_. I tend to agree
+  * Hickey's paper on `Identity and State (in Clojure)`_ is also a nice criticism of common Java practices
   
 * Document immutability, e.g. with marker interface Immutable, and do not violate any promise of immutability
 * Prefer Option over null
 
-.. _`the new spaghetti code`: http://clojure.org/state
+.. _`new spaghetti code`: http://clojure.org/rationale
+.. _`Identity and State (in Clojure)`: http://clojure.org/state
 
 Some Maven best practices
 =========================
@@ -109,8 +111,7 @@ Some Spring best practices
 ==========================
 
 * Dependencies between packages (and inside packages) must be unidirectional, and as obvious as possible
-* Emulate Spring "templates" where appropriate, leaving resource management to "template", without taking away control from the user
-of the API
+* Emulate Spring "templates" where appropriate, leaving resource management to "template", without taking away control from the user of the API
 * Programming against contracts is (still) good, especially at layer boundaries (this is also good for testability)
 
 Some other good practices
