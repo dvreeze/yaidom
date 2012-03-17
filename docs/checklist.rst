@@ -11,7 +11,7 @@ Checking the completeness of the source files:
 
 * License file
 * License info in every source file
-* Documentation in every source file
+* Documentation in every source file, including the author
 * Up-to-date README.rst
 * When tagging, up-to-date change log
 * Use package objects, and document them (as overview of the package/namespace)
