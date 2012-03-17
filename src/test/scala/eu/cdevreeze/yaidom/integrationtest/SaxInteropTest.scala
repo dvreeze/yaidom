@@ -587,9 +587,7 @@ class SaxInteropTest extends Suite {
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
 
-    // New SAX parser!!
-    val saxParser2 = DocumentParserUsingSax.newInstance
-    val htmlRoot: Elem = saxParser2.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
+    val htmlRoot: Elem = saxParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
 
     // 4. Check the parsed HTML
 
