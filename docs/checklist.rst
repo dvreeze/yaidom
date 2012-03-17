@@ -53,7 +53,7 @@ General principles, according to Joshua Bloch
 * Documentation matters
 * Document the state space carefully (which becomes less of an issue with functional programming)
 * Consider performance consequences of API design decisions (but do not optimize prematurely)
-* The API must coexist peacefully with the platform (JVM, JDK, Scala etc.)
+* The API must coexist peacefully with the platform (JVM, JDK, Scala, application server, etc.)
 
 Class design, according to Joshua Bloch
 ---------------------------------------
@@ -125,12 +125,14 @@ Note that some of the following good practices apply more to applications than t
   * A (multi-user) web application should indeed work as a multi-user app
   * An XML parser should be configurable
   * A data processing library should be able to handle larger data volumes
+  * A general-purpose library should make as few assumptions as possible about the runtime environment in which it runs
 
 * Seriously consider not using any abstractions that leak too much, no matter how popular they might be
 * When using frameworks, still remain in the driver seat
 
   * Take charge of the architecture
   * Choose what to use, how to use it, what not to use
+  * Consider the costs (complexity, build costs etc.) of the framework's own dependencies
   
 * Consider maintenance costs (of the software in production) when choosing an architecture
 
