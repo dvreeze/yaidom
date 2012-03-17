@@ -59,13 +59,13 @@ import jinterop.StaxConversions._
  * A `DocumentParserUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLInputFactory` is thread-safe, it can even be re-used from multiple threads.
  */
-final class DocumentParserUsingStax(val xmlInputFactory: XMLInputFactory) extends DocumentParser {
+final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends DocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     var xmlEventReader: XMLEventReader = null
     try {
-      xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
+      xmlEventReader = inputFactory.createXMLEventReader(inputStream)
       convertToDocument(xmlEventReader.toIndexedSeq)
     } finally {
       ignoring(classOf[Exception]) {
@@ -88,5 +88,5 @@ object DocumentParserUsingStax {
   }
 
   /** Returns a new instance, by invoking the primary constructor */
-  def newInstance(xmlInputFactory: XMLInputFactory): DocumentParserUsingStax = new DocumentParserUsingStax(xmlInputFactory)
+  def newInstance(inputFactory: XMLInputFactory): DocumentParserUsingStax = new DocumentParserUsingStax(inputFactory)
 }
