@@ -23,7 +23,7 @@ import org.w3c.dom.Element
 import jinterop.DomConversions._
 
 /**
- * DOM-based Document parser.
+ * DOM-based `Document` parser.
  *
  * Typical non-trivial creation is as follows, assuming class `MyEntityResolver`, which extends `EntityResolver`,
  * and class `MyErrorHandler`, which extends `ErrorHandler`:
@@ -38,6 +38,20 @@ import jinterop.DomConversions._
  * }
  *
  * val docParser = DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder _)
+ * }}}
+ *
+ * If we want the `DocumentBuilderFactory` to be a validating one, using an XML Schema, we could obtain the `DocumentBuilderFactory` as follows:
+ * {{{
+ * val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+ * val schemaSource = new StreamSource(new File(pathToSchema))
+ * val schema = schemaFactory.newSchema(schemaSource)
+ *
+ * val dbf = {
+ *   val result = DocumentBuilderFactory.newInstance()
+ *   result.setNamespaceAware(true)
+ *   result.setSchema(schema)
+ *   result
+ * }
  * }}}
  *
  * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.

@@ -34,6 +34,20 @@ import org.xml.sax.ext.LexicalHandler
  * )
  * }}}
  *
+ * If we want the `SAXParserFactory` to be a validating one, using an XML Schema, we could obtain the `SAXParserFactory` as follows:
+ * {{{
+ * val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+ * val schemaSource = new StreamSource(new File(pathToSchema))
+ * val schema = schemaFactory.newSchema(schemaSource)
+ *
+ * val spf = {
+ *   val result = SAXParserFactory.newInstance()
+ *   result.setNamespaceAware(true)
+ *   result.setSchema(schema)
+ *   result
+ * }
+ * }}}
+ *
  * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
  * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
  * {{{
