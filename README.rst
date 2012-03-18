@@ -42,7 +42,7 @@ Some characteristics of yaidom are:
 
 * **Conceptually simple**
 
-  *  Few concepts to learn and understand
+  *  Few new concepts to learn and understand
   *  Also easy to implement
   *  Less ambitious than Scala's XML library and Anti-XML (no XPath-like support, no value equality)
   *  Leaves many hard parts to Java's JAXP, such as parsing and printing, but via easy to use wrappers
