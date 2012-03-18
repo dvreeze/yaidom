@@ -10,11 +10,11 @@ CHANGELOG
 
   * Added ``Link.apply`` and ``XLink.mustBeXLink`` methods
 
-* API change: renamed ``DocumentBuilder`` to ``DocBuilder`` to prevent conflict with DOM ``DocumentBuilder`` (whcih may well be in scope)
+* API change: renamed ``DocumentBuilder`` to ``DocBuilder`` to prevent conflict with DOM ``DocumentBuilder`` (which may well be in scope)
 * API changes (and documentation updates) in ``parse`` package
 
   * The ``DocumentParser`` implementations have only 1 constructor, and several ``newInstance`` factory methods, one of which calls the constructor
-  * ``DocumentParserUsingSax`` instances are now re-usable, because now ``ElemProducingSaxHandler`` producing functions are passed
+  * ``DocumentParserUsingSax`` instances are now re-usable, because now ``ElemProducingSaxHandler`` producing functions (instead of instances) are passed
   
 * API changes (and documentation updates) in ``print`` package
 
