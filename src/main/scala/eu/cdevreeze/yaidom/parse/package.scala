@@ -21,6 +21,9 @@ package eu.cdevreeze.yaidom
  * trait, as well as several implementations. Those implementations use JAXP (SAX, DOM or StAX), and the `jinterop` package
  * to convert JAXP artifacts to yaidom `Document`s.
  *
+ * Having these different JAXP-based implementations shows that yaidom is pessimistic about the transparency of parsing and
+ * printing XML, but optimistic about the available (heap) memory and processing power.
+ *
  * This package depends on the [[eu.cdevreeze.yaidom]] and [[eu.cdevreeze.yaidom.jinterop]] packages, and not the other way around.
  *
  * @author Chris de Vreeze
