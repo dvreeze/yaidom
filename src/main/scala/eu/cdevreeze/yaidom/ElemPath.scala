@@ -46,8 +46,14 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
   /** Prepends a given `Entry` to this `ElemPath` */
   def prepend(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
 
-  /** Returns the `ElemPath` with the first path entry removed (if any, otherwise throwing an exception). */
-  def withoutFirstEntry: ElemPath = ElemPath(entries.tail)
+  /** Returns the `ElemPath` with the first path entry (if any) removed, wrapped in an `Option`. */
+  def withoutFirstEntryOption: Option[ElemPath] = entries match {
+    case xs if xs.isEmpty => None
+    case _ => Some(ElemPath(entries.tail))
+  }
+
+  /** Like `withoutFirstEntryOption`, but unwrapping the result (or throwing an exception otherwise) */
+  def withoutFirstEntry: ElemPath = withoutFirstEntryOption.getOrElse(sys.error("The root path has no first entry to remove"))
 
   /** Appends a given `Entry` to this `ElemPath` */
   def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries :+ entry)
