@@ -22,12 +22,12 @@ import scala.collection.immutable
 import XLink._
 
 /**
- * XLink. See See http://www.w3.org/TR/xlink11/. An `XLink` wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
+ * Immutable XLink. See See http://www.w3.org/TR/xlink11/. An `XLink` wraps a yaidom [[eu.cdevreeze.yaidom.Elem]].
  * The XLink support is without any support for XPointer.
  *
  * @author Chris de Vreeze
  */
-sealed abstract class XLink(val wrappedElem: Elem) {
+sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
   require(wrappedElem ne null)
   require(
     wrappedElem.attributeOption(XLinkTypeEName).isDefined || wrappedElem.attributeOption(XLinkHrefEName).isDefined,

@@ -21,6 +21,7 @@ import org.xml.sax.{ ContentHandler, Attributes, Locator }
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
 import scala.collection.{ immutable, mutable }
+import net.jcip.annotations.NotThreadSafe
 import eu.cdevreeze.yaidom._
 import NodeBuilder._
 import DefaultElemProducingSaxHandler._
@@ -30,6 +31,7 @@ import DefaultElemProducingSaxHandler._
  *
  * This is a trait instead of a class, so it is easy to mix in `EntityResolver`s, `ErrorHandler`s, etc.
  */
+@NotThreadSafe
 trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {
 
   // This content handler has a relatively simple state space, so is rather easy to reason about.
@@ -40,21 +42,21 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   // It is also a good fit for the implementation of "parsing state", because we need stable object identities,
   // but rapidly changing state of those objects. Hence old-fashioned mutable objects.
 
-  @volatile private var topLevelProcessingInstructions: immutable.IndexedSeq[MutableProcessingInstruction] = immutable.IndexedSeq()
+  private var topLevelProcessingInstructions: immutable.IndexedSeq[InternalProcessingInstruction] = immutable.IndexedSeq()
 
-  @volatile private var topLevelComments: immutable.IndexedSeq[MutableComment] = immutable.IndexedSeq()
+  private var topLevelComments: immutable.IndexedSeq[InternalComment] = immutable.IndexedSeq()
 
-  @volatile private var currentRoot: MutableElem = _
+  private var currentRoot: InternalElem = _
 
-  @volatile private var currentElem: MutableElem = _
+  private var currentElem: InternalElem = _
 
-  @volatile private var currentlyInCData: Boolean = false
+  private var currentlyInCData: Boolean = false
 
   final override def startDocument() = ()
 
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
     val parentScope = if (currentElem eq null) Scope.Empty else currentElem.scope
-    val elm: MutableElem = startElementToMutableElem(uri, localName, qName, atts, parentScope)
+    val elm: InternalElem = startElementToInternalElem(uri, localName, qName, atts, parentScope)
 
     if (currentRoot eq null) {
       require(currentElem eq null)
@@ -74,12 +76,12 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     require(currentRoot ne null)
     require(currentElem ne null)
 
-    currentElem = currentElem.parentOption collect { case e: MutableElem => e } getOrElse null
+    currentElem = currentElem.parentOption collect { case e: InternalElem => e } getOrElse null
   }
 
   final override def characters(ch: Array[Char], start: Int, length: Int) {
     val isCData = this.currentlyInCData
-    val txt: MutableText = MutableText(new String(ch, start, length), isCData)
+    val txt: InternalText = new InternalText(new String(ch, start, length), isCData)
 
     if (currentRoot eq null) {
       // Ignore
@@ -92,7 +94,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   final override def processingInstruction(target: String, data: String) {
-    val pi = MutableProcessingInstruction(target, data)
+    val pi = new InternalProcessingInstruction(target, data)
 
     if (currentRoot eq null) {
       require(currentElem eq null)
@@ -124,7 +126,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   final override def comment(ch: Array[Char], start: Int, length: Int) {
-    val comment = MutableComment(new String(ch, start, length))
+    val comment = new InternalComment(new String(ch, start, length))
 
     if (currentRoot eq null) {
       require(currentElem eq null)
@@ -161,7 +163,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     new Document(None, docElem, pis, comments)
   }
 
-  private def startElementToMutableElem(uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope): MutableElem = {
+  private def startElementToInternalElem(uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope): InternalElem = {
     require(uri ne null)
     require(localName ne null)
     require(qName ne null)
@@ -173,7 +175,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
     val newScope = parentScope.resolve(nsDecls)
 
-    new MutableElem(
+    new InternalElem(
       parentOption = None,
       qname = elmQName,
       attributes = attrMap,
@@ -216,21 +218,21 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
 object DefaultElemProducingSaxHandler {
 
-  trait MutableNode {
+  private[parse] trait InternalNode {
     def toNode: Node
   }
 
-  trait MutableParentNode extends MutableNode {
+  private[parse] trait InternalParentNode extends InternalNode {
 
-    def children: mutable.IndexedSeq[MutableNode]
+    def children: mutable.IndexedSeq[InternalNode]
   }
 
-  class MutableElem(
-    var parentOption: Option[MutableElem],
+  private[parse] final class InternalElem(
+    var parentOption: Option[InternalElem],
     val qname: QName,
     val attributes: Map[QName, String],
     val scope: Scope,
-    var children: mutable.IndexedSeq[MutableNode]) extends MutableParentNode {
+    var children: mutable.IndexedSeq[InternalNode]) extends InternalParentNode {
 
     def toNode: Elem = {
       // Recursive (not tail-recursive)
@@ -242,22 +244,22 @@ object DefaultElemProducingSaxHandler {
     }
   }
 
-  case class MutableText(text: String, isCData: Boolean) extends MutableNode {
+  private[parse] final class InternalText(text: String, isCData: Boolean) extends InternalNode {
 
     def toNode: Text = Text(text, isCData)
   }
 
-  case class MutableProcessingInstruction(target: String, data: String) extends MutableNode {
+  private[parse] final class InternalProcessingInstruction(target: String, data: String) extends InternalNode {
 
     def toNode: ProcessingInstruction = ProcessingInstruction(target, data)
   }
 
-  case class MutableEntityRef(entity: String) extends MutableNode {
+  private[parse] final class InternalEntityRef(entity: String) extends InternalNode {
 
     def toNode: EntityRef = EntityRef(entity)
   }
 
-  case class MutableComment(text: String) extends MutableNode {
+  private[parse] final class InternalComment(text: String) extends InternalNode {
 
     def toNode: Comment = Comment(text)
   }

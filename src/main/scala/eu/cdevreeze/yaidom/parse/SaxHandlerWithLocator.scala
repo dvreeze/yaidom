@@ -20,14 +20,16 @@ package parse
 import org.xml.sax.{ ContentHandler, Locator }
 import org.xml.sax.helpers.DefaultHandler
 import scala.collection.immutable
+import net.jcip.annotations.NotThreadSafe
 import eu.cdevreeze.yaidom._
 
 /**
  * Mixin extending `DefaultHandler` that contains a `Locator`. Typically this `Locator` is used by an `ErrorHandler` mixed in after this trait.
  */
+@NotThreadSafe
 trait SaxHandlerWithLocator extends DefaultHandler {
 
-  @volatile var locator: Locator = _
+  var locator: Locator = _
 
   final override def setDocumentLocator(locator: Locator) {
     this.locator = locator
