@@ -42,13 +42,13 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   // It is also a good fit for the implementation of "parsing state", because we need stable object identities,
   // but rapidly changing state of those objects. Hence old-fashioned mutable objects.
 
-  private var topLevelProcessingInstructions: immutable.IndexedSeq[InternalProcessingInstruction] = immutable.IndexedSeq()
+  private var topLevelProcessingInstructions: immutable.IndexedSeq[InternalProcessingInstructionNode] = immutable.IndexedSeq()
 
-  private var topLevelComments: immutable.IndexedSeq[InternalComment] = immutable.IndexedSeq()
+  private var topLevelComments: immutable.IndexedSeq[InternalCommentNode] = immutable.IndexedSeq()
 
-  private var currentRoot: InternalElem = _
+  private var currentRoot: InternalElemNode = _
 
-  private var currentElem: InternalElem = _
+  private var currentElem: InternalElemNode = _
 
   private var currentlyInCData: Boolean = false
 
@@ -56,7 +56,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
     val parentScope = if (currentElem eq null) Scope.Empty else currentElem.scope
-    val elm: InternalElem = startElementToInternalElem(uri, localName, qName, atts, parentScope)
+    val elm: InternalElemNode = startElementToInternalElemNode(uri, localName, qName, atts, parentScope)
 
     if (currentRoot eq null) {
       require(currentElem eq null)
@@ -76,12 +76,12 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     require(currentRoot ne null)
     require(currentElem ne null)
 
-    currentElem = currentElem.parentOption collect { case e: InternalElem => e } getOrElse null
+    currentElem = currentElem.parentOption collect { case e: InternalElemNode => e } getOrElse null
   }
 
   final override def characters(ch: Array[Char], start: Int, length: Int) {
     val isCData = this.currentlyInCData
-    val txt: InternalText = new InternalText(new String(ch, start, length), isCData)
+    val txt: InternalTextNode = new InternalTextNode(new String(ch, start, length), isCData)
 
     if (currentRoot eq null) {
       // Ignore
@@ -94,7 +94,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   final override def processingInstruction(target: String, data: String) {
-    val pi = new InternalProcessingInstruction(target, data)
+    val pi = new InternalProcessingInstructionNode(target, data)
 
     if (currentRoot eq null) {
       require(currentElem eq null)
@@ -126,7 +126,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   final override def comment(ch: Array[Char], start: Int, length: Int) {
-    val comment = new InternalComment(new String(ch, start, length))
+    val comment = new InternalCommentNode(new String(ch, start, length))
 
     if (currentRoot eq null) {
       require(currentElem eq null)
@@ -163,7 +163,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     new Document(None, docElem, pis, comments)
   }
 
-  private def startElementToInternalElem(uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope): InternalElem = {
+  private def startElementToInternalElemNode(uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope): InternalElemNode = {
     require(uri ne null)
     require(localName ne null)
     require(qName ne null)
@@ -175,7 +175,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
     val newScope = parentScope.resolve(nsDecls)
 
-    new InternalElem(
+    new InternalElemNode(
       parentOption = None,
       qname = elmQName,
       attributes = attrMap,
@@ -227,8 +227,8 @@ object DefaultElemProducingSaxHandler {
     def children: mutable.IndexedSeq[InternalNode]
   }
 
-  private[parse] final class InternalElem(
-    var parentOption: Option[InternalElem],
+  private[parse] final class InternalElemNode(
+    var parentOption: Option[InternalElemNode],
     val qname: QName,
     val attributes: Map[QName, String],
     val scope: Scope,
@@ -244,22 +244,22 @@ object DefaultElemProducingSaxHandler {
     }
   }
 
-  private[parse] final class InternalText(text: String, isCData: Boolean) extends InternalNode {
+  private[parse] final class InternalTextNode(text: String, isCData: Boolean) extends InternalNode {
 
     def toNode: Text = Text(text, isCData)
   }
 
-  private[parse] final class InternalProcessingInstruction(target: String, data: String) extends InternalNode {
+  private[parse] final class InternalProcessingInstructionNode(target: String, data: String) extends InternalNode {
 
     def toNode: ProcessingInstruction = ProcessingInstruction(target, data)
   }
 
-  private[parse] final class InternalEntityRef(entity: String) extends InternalNode {
+  private[parse] final class InternalEntityRefNode(entity: String) extends InternalNode {
 
     def toNode: EntityRef = EntityRef(entity)
   }
 
-  private[parse] final class InternalComment(text: String) extends InternalNode {
+  private[parse] final class InternalCommentNode(text: String) extends InternalNode {
 
     def toNode: Comment = Comment(text)
   }
