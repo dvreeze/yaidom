@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 /**
  * Support for "printing" yaidom `Document`s and `Elem`s. This package offers the [[eu.cdevreeze.yaidom.print.DocumentPrinter]]
  * trait, as well as several implementations. Most of those implementations use the `jinterop` package to convert yaidom `Document`s to
- * JAXP artifacts, and all use JAXP (DOM, SAX or StAX) to convert those JAXP objects to XML Strings.
+ * JAXP artifacts, and all use JAXP (DOM, SAX or StAX).
  *
  * Having these different fully configurable JAXP-based implementations shows that yaidom is pessimistic about the transparency of parsing and
  * printing XML. It also shows that yaidom is optimistic about the available (heap) memory and processing power, because of the 2 separated
