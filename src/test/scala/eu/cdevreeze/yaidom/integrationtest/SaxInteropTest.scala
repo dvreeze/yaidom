@@ -28,6 +28,7 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.{ DocumentParserUsingSax, DefaultElemProducingSaxHandler, SaxHandlerWithLocator }
+import print.DocumentPrinterUsingSax
 
 /**
  * SAX interoperability test case.
@@ -75,9 +76,19 @@ class SaxInteropTest extends Suite {
       root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(root))
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(root.allElems map { e => e.qname.localPart } toSet) {
       root2.allElems map { e => e.qname.localPart } toSet
@@ -92,6 +103,54 @@ class SaxInteropTest extends Suite {
       root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     } {
       root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(root.allElems map { e => e.qname.localPart } toSet) {
+      root3.allElems map { e => e.qname.localPart } toSet
+    }
+    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
+      root3.allElemsOrSelf map { e => e.qname.localPart } toSet
+    }
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
+    }
+    expect {
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+    } {
+      root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+    }
+
+    // 6. Print to XML and parse back, and check again
+
+    val doc = new Document(
+      baseUriOption = None,
+      documentElement = root3,
+      processingInstructions = immutable.IndexedSeq(),
+      comments = immutable.IndexedSeq())
+
+    val xmlString2 = printer.print(doc)
+
+    val doc2 = saxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+
+    val root4 = doc2.documentElement
+
+    expect(root.allElems map { e => e.qname.localPart } toSet) {
+      root4.allElems map { e => e.qname.localPart } toSet
+    }
+    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
+      root4.allElemsOrSelf map { e => e.qname.localPart } toSet
+    }
+    expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
+      root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
+    }
+    expect {
+      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+    } {
+      root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
     }
   }
 
@@ -112,12 +171,31 @@ class SaxInteropTest extends Suite {
       result.toSet
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(root))
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
       val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set("bar".ename, nsGoogle.ns.ename("foo"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
   }
@@ -152,10 +230,42 @@ class SaxInteropTest extends Suite {
       result.mkString
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val document2: eu.cdevreeze.yaidom.Document = NodeBuilder.fromDocument(document)(Scope.Empty).build()
-    val root3: Elem = document2.documentElement
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(document)
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val document2: Document = saxParser.parse(bis)
+    val root2: Elem = document2.documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
+
+    expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
+      val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+    expect(Set("root".qname, "child".qname)) {
+      val result = root2.allElemsOrSelf map { e => e.qname }
+      result.toSet
+    }
+    expect("This is trivial XML") {
+      val result = document2.comments map { com => com.text.trim }
+      result.mkString
+    }
+    expect("Trivial XML") {
+      val result = root2.allElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      result.mkString
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val document3: Document = NodeBuilder.fromDocument(document2)(Scope.Empty).build()
+    val root3: Elem = document3.documentElement
 
     expect(Set(nsFooBar.ns.ename("root"), nsFooBar.ns.ename("child"))) {
       val result = root3.allElemsOrSelf map { e => e.resolvedName }
@@ -166,7 +276,7 @@ class SaxInteropTest extends Suite {
       result.toSet
     }
     expect("This is trivial XML") {
-      val result = document2.comments map { com => com.text.trim }
+      val result = document3.comments map { com => com.text.trim }
       result.mkString
     }
     expect("Trivial XML") {
@@ -381,9 +491,19 @@ class SaxInteropTest extends Suite {
 
     checkFieldPattern(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(None, root))
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(xsElmENames) {
       val result = root2 elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
@@ -395,6 +515,21 @@ class SaxInteropTest extends Suite {
     checkIdentityConstraintElm(root2)
     checkComplexTypeElm(root2)
     checkFieldPattern(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(xsElmENames) {
+      val result = root3 elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkForChoiceDocumentation(root3)
+    checkCommentWithEscapedChar(root3)
+    checkIdentityConstraintElm(root3)
+    checkComplexTypeElm(root3)
+    checkFieldPattern(root3)
   }
 
   @Test def testParseXmlWithExpandedEntityRef() {
@@ -428,9 +563,19 @@ class SaxInteropTest extends Suite {
 
     checkChildText(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(None, root))
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(Set(ns.ename("root"), ns.ename("child"))) {
       val result = root2.allElemsOrSelf map { e => e.resolvedName }
@@ -438,6 +583,17 @@ class SaxInteropTest extends Suite {
     }
 
     checkChildText(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    checkChildText(root3)
   }
 
   @Test def testParseXmlWithNamespaceUndeclarations() {
@@ -458,12 +614,31 @@ class SaxInteropTest extends Suite {
       result.toSet
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(root))
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
       val result = root2.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
   }
@@ -512,9 +687,19 @@ class SaxInteropTest extends Suite {
 
     doChecks(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Write Elem to an XML string
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(root))
+
+    // 3. Parse XML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(Set(ns.ename("root"), ns.ename("child"))) {
       val result = root2.allElemsOrSelf map { e => e.resolvedName }
@@ -522,6 +707,17 @@ class SaxInteropTest extends Suite {
     }
 
     doChecks(root2)
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    expect(Set(ns.ename("root"), ns.ename("child"))) {
+      val result = root3.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    doChecks(root3)
   }
 
   @Test def testParseXmlWithSpecialChars() {
