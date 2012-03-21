@@ -24,7 +24,7 @@ import scala.collection.immutable
 import jinterop.StaxConversions._
 
 /**
- * StAX-based [[eu.cdevreeze.yaidom.Document]] printer.
+ * StAX-based `Document` printer.
  *
  * Note: this XML printer does not pretty-print!
  *

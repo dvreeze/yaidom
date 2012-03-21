@@ -40,9 +40,9 @@ sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
 }
 
 /** Simple or extended link */
-trait Link extends XLink
+abstract class Link(override val wrappedElem: Elem) extends XLink(wrappedElem)
 
-final class SimpleLink(override val wrappedElem: Elem) extends XLink(wrappedElem) with Link {
+final class SimpleLink(override val wrappedElem: Elem) extends Link(wrappedElem) {
   require(xlinkType == "simple")
   require(
     wrappedElem.attributeOption(XLinkTypeEName).isDefined || wrappedElem.attributeOption(XLinkHrefEName).isDefined,
@@ -56,7 +56,7 @@ final class SimpleLink(override val wrappedElem: Elem) extends XLink(wrappedElem
   def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateEName)
 }
 
-final class ExtendedLink(override val wrappedElem: Elem) extends XLink(wrappedElem) with Link {
+final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedElem) {
   require(xlinkType == "extended")
 
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)

@@ -34,9 +34,7 @@ import scala.collection.immutable
  * a child index instead of an element name plus child index (of children with the given name). Yet that would
  * be far less easy to use. Hence `ElemPath.Entry` instances each contain an element name plus index.
  */
-final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
-
-  // TODO ElemPath is a case class, but contains an IndexedSeq. Is that correct?
+final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
 
   require(entries ne null)
 
@@ -94,6 +92,14 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
   /** Convenience method returning true if at least one entry has the given element name */
   def containsName(ename: ExpandedName): Boolean = entries exists { entry => entry.elementName == ename }
 
+  override def equals(obj: Any): Boolean = obj match {
+    case other: ElemPath =>
+      if (hashCode != other.hashCode) false else entries == other.entries
+    case _ => false
+  }
+
+  override def hashCode: Int = entries.hashCode
+
   /**
    * Given a `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).
    * The modification is that the root element is written as a slash followed by an asterisk.
@@ -109,6 +115,8 @@ final case class ElemPath(entries: immutable.IndexedSeq[ElemPath.Entry]) extends
 object ElemPath {
 
   val Root: ElemPath = ElemPath(immutable.IndexedSeq())
+
+  def apply(entries: immutable.IndexedSeq[ElemPath.Entry]): ElemPath = new ElemPath(entries)
 
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath` */
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
