@@ -229,7 +229,7 @@ class AirportExampleTest extends Suite {
       staxParser.parse(is)
     }
 
-    // 2. Transform the XML. We do it in small steps, but still using for-comprehensions.
+    // 2. Transform the XML. We do it in relatively small steps, but still using a for-comprehension.
 
     val scope = Scope.fromMap(Map("" -> "http://www.webserviceX.NET"))
 
@@ -255,21 +255,85 @@ class AirportExampleTest extends Suite {
       result.toList sortBy { e => airportCodes.indexOf(airportCode(e)) }
     }
 
+    val airportLatLons: Map[String, LatLon] = {
+      val result = airportCodes map { airport =>
+        val airportElm: Elem = {
+          val result: Option[Elem] = airportElms find { e => airportCode(e) == airport }
+          result.getOrElse(sys.error("Airport %s must exist".format(airport)))
+        }
+
+        val lat = airportLatitude(airportElm)
+        val lon = airportLongitude(airportElm)
+
+        (airport -> LatLon(lat, lon))
+      }
+      result.toMap
+    }
+
     import NodeBuilder._
 
-    // TODO Complete the summary, and make some assertions about it
+    def distancesElemBuilder(airportElm: Elem): ElemBuilder = {
+      val lat = airportLatitude(airportElm)
+      val lon = airportLongitude(airportElm)
+      val latLon = LatLon(lat, lon)
+
+      val distances: immutable.IndexedSeq[(String, Double)] =
+        airportCodes.toIndexedSeq map { (airportCode: String) =>
+          val otherLatLon = airportLatLons(airportCode)
+          val dist = latLon.distance(otherLatLon)
+
+          (airportCode -> dist)
+        }
+
+      elem(
+        qname = "Distances".qname,
+        children = distances map {
+          case (airportCode, dist) =>
+            elem(
+              qname = "Distance".qname,
+              children = immutable.IndexedSeq(
+                elem(
+                  qname = "Airport".qname,
+                  attributes = Map("code".qname -> airportCode),
+                  children = immutable.IndexedSeq(text(dist.toString)))))
+        })
+    }
 
     val airportSummaryElms: immutable.Seq[Elem] =
       for {
         airportElm <- airportElms
       } yield {
+        val airportOrCityName = airportElm.childElem(nsWebServiceX.ename("CityOrAirportName")).trimmedText
+        val country = airportElm.childElem(nsWebServiceX.ename("Country")).trimmedText
+        val countryAbbreviation = airportElm.childElem(nsWebServiceX.ename("CountryAbbrviation")).trimmedText
+
+        val lat = airportLatitude(airportElm)
+        val lon = airportLongitude(airportElm)
+
         val elmBuilder: ElemBuilder =
           elem(
             qname = "Airport".qname,
             children = immutable.IndexedSeq(
               elem(
                 qname = "AirportCode".qname,
-                children = immutable.IndexedSeq(text(airportCode(airportElm))))))
+                children = immutable.IndexedSeq(text(airportCode(airportElm)))),
+              elem(
+                qname = "AirportOrCityName".qname,
+                children = immutable.IndexedSeq(text(airportOrCityName))),
+              elem(
+                qname = "Country".qname,
+                children = immutable.IndexedSeq(text(country))),
+              elem(
+                qname = "CountryAbbreviation".qname,
+                children = immutable.IndexedSeq(text(countryAbbreviation))),
+              elem(
+                qname = "Position".qname,
+                children = immutable.IndexedSeq(
+                  elem(
+                    qname = "Lat".qname, children = immutable.IndexedSeq(text(lat.toString))),
+                  elem(
+                    qname = "Lon".qname, children = immutable.IndexedSeq(text(lon.toString))))),
+              distancesElemBuilder(airportElm)))
 
         elmBuilder.build(scope)
       }
@@ -285,6 +349,27 @@ class AirportExampleTest extends Suite {
 
     val summaryXmlString = domPrinter.print(Document(airportSummaryRoot))
     println(summaryXmlString)
+
+    val distanceFrankfurtBrussels: Double = {
+      val airportElms =
+        for {
+          airportElm <- airportSummaryRoot.allChildElems
+          val airportCodeElm = airportElm.childElem(nsWebServiceX.ename("AirportCode"))
+          if airportCodeElm.trimmedText == "FRA"
+        } yield airportElm
+      val airportElm = airportElms.headOption.getOrElse(sys.error("Expected airport FRA"))
+
+      val distances =
+        for {
+          distanceElm <- airportElm.elems(nsWebServiceX.ename("Distance"))
+          airportElm <- distanceElm.childElems(nsWebServiceX.ename("Airport"))
+          if airportElm.attribute("code".ename) == "BRU"
+        } yield airportElm.trimmedText.toDouble
+      val distance = distances.headOption.getOrElse(sys.error("Expected distance to BRU"))
+      distance
+    }
+
+    assert(distanceFrankfurtBrussels > 300 && distanceFrankfurtBrussels < 320)
   }
 
   private def validateDocumentStructure(root: Elem) {
@@ -378,7 +463,10 @@ class AirportExampleTest extends Suite {
   final case class LatLon(val lat: Double, val lon: Double) {
     import scala.math._
 
-    /** Returns the distance to another LatLon. See http://en.wikipedia.org/wiki/Haversine_formula. */
+    /**
+     * Returns the distance to another LatLon. See http://en.wikipedia.org/wiki/Haversine_formula,
+     * and http://www.movable-type.co.uk/scripts/latlong.html.
+     */
     def distance(other: LatLon): Double = {
       val radiusEarth = 6371.0
 
