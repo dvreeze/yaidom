@@ -106,13 +106,35 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns this element followed by all descendant elements */
-  final def allElemsOrSelf: immutable.IndexedSeq[E] = allElemsOrSelfSeq
+  final def allElemsOrSelf: immutable.IndexedSeq[E] = {
+    var result = mutable.ArrayBuffer[E]()
+
+    // Not tail-recursive, but the depth should typically be limited
+    def accumulateElemsOrSelf(elm: E) {
+      result += elm
+      elm.allChildElems foreach { e => accumulateElemsOrSelf(e) }
+    }
+
+    accumulateElemsOrSelf(self)
+    result.toIndexedSeq
+  }
 
   /**
    * Returns those elements among this element and its descendant elements that obey the given predicate.
    * That is, the result is equivalent to `allElemsOrSelf filter p`.
    */
-  final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = elemsOrSelfSeqWhere(p)
+  final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
+    var result = mutable.ArrayBuffer[E]()
+
+    // Not tail-recursive, but the depth should typically be limited
+    def accumulateMatchingElemsOrSelf(elm: E) {
+      if (p(elm)) result += elm
+      elm.allChildElems foreach { e => accumulateMatchingElemsOrSelf(e) }
+    }
+
+    accumulateMatchingElemsOrSelf(self)
+    result.toIndexedSeq
+  }
 
   /** Returns those elements among this element and its descendant elements that have the given expanded name */
   final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
@@ -134,12 +156,52 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     elemsWhere { e => pf.isDefinedAt(e) } collect pf
 
+  /**
+   * Returns an `IndexedSeq` of those elements among this element and its descendant elements that obey the given predicate,
+   * such that no ancestor obeys the predicate.
+   */
+  final def topmostElemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
+    var result = mutable.ArrayBuffer[E]()
+
+    // Not tail-recursive, but the depth should typically be limited
+    def accumulateMatchingTopmostElemsOrSelf(elm: E) {
+      if (p(elm)) result += elm else {
+        elm.allChildElems foreach { e => accumulateMatchingTopmostElemsOrSelf(e) }
+      }
+    }
+
+    accumulateMatchingTopmostElemsOrSelf(self)
+    result.toIndexedSeq
+  }
+
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def topmostElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch topmostElemsOrSelfSeqWhere p }
+    allChildElems flatMap { ch => ch topmostElemsOrSelfWhere p }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def topmostElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = topmostElemsWhere { e => e.resolvedName == expandedName }
+
+  /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
+  final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
+    // Not tail-recursive, but the depth should typically be limited
+    def findMatchingFirstElemOrSelf(elm: E): Option[E] = {
+      if (p(elm)) Some(elm) else {
+        val childElms = elm.allChildElems
+
+        var i = 0
+        var result: Option[E] = None
+
+        while ((result.isEmpty) && (i < childElms.size)) {
+          result = findMatchingFirstElemOrSelf(childElms(i))
+          i += 1
+        }
+
+        result
+      }
+    }
+
+    findMatchingFirstElemOrSelf(self)
+  }
 
   /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def firstElemOptionWhere(p: E => Boolean): Option[E] = {
@@ -221,39 +283,5 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     val idx = parent.childElems(self.resolvedName) indexWhere { e => e == self }
     require(idx >= 0, "Expected %s to have parent %s".format(self.toString, parent.toString))
     ElemPath.Entry(self.resolvedName, idx)
-  }
-
-  /** Returns an `IndexedSeq` of this element followed by all descendant elements */
-  private final def allElemsOrSelfSeq: immutable.IndexedSeq[E] = {
-    // Not tail-recursive, but the depth should typically be limited
-    immutable.IndexedSeq(self) ++ {
-      self.allChildElems flatMap { ch => ch.allElemsOrSelfSeq }
-    }
-  }
-
-  /**
-   * Returns an `IndexedSeq` of those of this element and its descendant elements that obey the given predicate.
-   * That is, the result is equivalent to `allElemsOrSelfSeq filter p`.
-   */
-  private final def elemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
-    // Not tail-recursive, but the depth should typically be limited
-    val includesSelf = p(self)
-    val resultWithoutSelf = self.allChildElems flatMap { ch => ch elemsOrSelfSeqWhere p }
-    if (includesSelf) self +: resultWithoutSelf else resultWithoutSelf
-  }
-
-  /**
-   * Returns an `IndexedSeq` of those of this element and its descendant elements that obey the given predicate,
-   * such that no ancestor obeys the predicate.
-   */
-  private final def topmostElemsOrSelfSeqWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
-    // Not tail-recursive, but the depth should typically be limited
-    if (p(self)) immutable.IndexedSeq(self) else self.allChildElems flatMap { ch => ch topmostElemsOrSelfSeqWhere p }
-  }
-
-  /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
-  private final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
-    // Not tail-recursive, but the depth should typically be limited
-    if (p(self)) Some(self) else self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
   }
 }
