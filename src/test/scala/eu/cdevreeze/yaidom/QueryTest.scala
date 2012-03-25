@@ -39,7 +39,7 @@ class QueryTest extends Suite {
   @Test def testQueryBookTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookTitles: immutable.IndexedSeq[Elem] =
       bookstore.childElems("Book".ename) map { e => e.childElem("Title".ename) }
@@ -56,7 +56,7 @@ class QueryTest extends Suite {
   @Test def testQueryBookOrMagazineTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookOrMagazineTitles: immutable.IndexedSeq[Elem] =
       for {
@@ -77,7 +77,7 @@ class QueryTest extends Suite {
   @Test def testQueryTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val titles: immutable.IndexedSeq[Elem] =
       for (ch <- bookstore.allChildElems) yield ch.childElem("Title".ename)
@@ -96,7 +96,7 @@ class QueryTest extends Suite {
   @Test def testQueryAllTitles() {
     // XPath: doc("bookstore.xml")//Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val titles: immutable.IndexedSeq[Elem] =
       for (title <- bookstore.elems("Title".ename)) yield title
@@ -115,7 +115,7 @@ class QueryTest extends Suite {
   @Test def testQueryAllElements() {
     // XPath: doc("bookstore.xml")//*
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elements: immutable.IndexedSeq[Elem] = bookstore.allElems :+ bookstore
 
@@ -132,7 +132,7 @@ class QueryTest extends Suite {
   @Test def testQueryBookIsbns() {
     // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val isbns: immutable.IndexedSeq[String] =
       for (book <- bookstore.childElems("Book".ename)) yield book.attribute("ISBN".ename)
@@ -149,7 +149,7 @@ class QueryTest extends Suite {
   @Test def testQueryCheapBooks() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val books: immutable.IndexedSeq[Elem] =
       for {
@@ -169,7 +169,7 @@ class QueryTest extends Suite {
   @Test def testQueryCheapBookTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val titles: immutable.IndexedSeq[Elem] =
       for {
@@ -188,7 +188,7 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfBooksWithRemarks() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookTitles: immutable.IndexedSeq[Elem] =
       for {
@@ -206,7 +206,7 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfCheapBooksByUllman() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookTitles: immutable.IndexedSeq[Elem] =
       for {
@@ -235,7 +235,7 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfCheapBooksByJeffreyUllman() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookTitles: immutable.IndexedSeq[Elem] =
       for {
@@ -266,7 +266,7 @@ class QueryTest extends Suite {
   @Test def testQueryTitlesOfBooksByJeffreyUllmanButNotWidom() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookTitles: immutable.IndexedSeq[Elem] =
       for {
@@ -288,7 +288,7 @@ class QueryTest extends Suite {
   @Test def testQuerySecondAuthors() {
     // XPath: doc("bookstore.xml")//Authors/Author[2]
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val secondAuthors: immutable.IndexedSeq[Elem] =
       for {
@@ -311,7 +311,7 @@ class QueryTest extends Suite {
   @Test def testQueryGreatBooks() {
     // XPath: doc("bookstore.xml")//Book[contains(Remark, "great")]/Title
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val titles: immutable.IndexedSeq[Elem] =
       for {
@@ -328,7 +328,7 @@ class QueryTest extends Suite {
   @Test def testQueryMagazinesWithSameNameAsBook() {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val magazines: immutable.IndexedSeq[Elem] =
       for {
@@ -352,7 +352,7 @@ class QueryTest extends Suite {
 
     // Inefficient implementation, with expensive method calls to retrieve parent nodes.
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] =
       for {
@@ -376,7 +376,7 @@ class QueryTest extends Suite {
 
     // This implementation should be more efficient than the preceding one, in particular in much larger XML trees.
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
       Elem(
@@ -418,7 +418,7 @@ class QueryTest extends Suite {
   @Test def testQueryBooksOrMagazinesWithNonUniqueTitles() {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val booksAndMagazines: immutable.IndexedSeq[Elem] =
       for {
@@ -444,7 +444,7 @@ class QueryTest extends Suite {
   @Test def testQueryBooksOrMagazinesWithTitleAsOtherBook() {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val booksAndMagazines: immutable.IndexedSeq[Elem] =
       for {
@@ -477,7 +477,7 @@ class QueryTest extends Suite {
    * </pre>
    */
   @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val books: immutable.IndexedSeq[Elem] =
       for {
@@ -500,7 +500,7 @@ class QueryTest extends Suite {
   @Test def testQueryBooksFromUllmanButNotWidom() {
     // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val titles: immutable.IndexedSeq[Elem] =
       for {
@@ -530,7 +530,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBooksWithAuthorInTitle() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -569,7 +569,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryAverageBookPrice() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -600,7 +600,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBooksPricedBelowAverage() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -648,7 +648,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBooksOrderedByPrice() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -696,7 +696,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryLastNames() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val lastNameValues: immutable.IndexedSeq[String] =
       for {
@@ -725,7 +725,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBookPairsFromSameAuthor() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -800,7 +800,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryInvertedBookstore() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -853,7 +853,7 @@ class QueryTest extends Suite {
 
   @Test def testQueryBookAndMagazineTitlesRelabeled() {
     // Taken from the XSLT demo
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -888,7 +888,7 @@ class QueryTest extends Suite {
 
     // Transforms the XML tree, leaving out book prices
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     def removePrice(book: Elem): Elem = {
       require(book.resolvedName == "Book".ename)
@@ -921,7 +921,7 @@ class QueryTest extends Suite {
 
     // Transforms the XML tree, combining first and last names into Name elements
 
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 

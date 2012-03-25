@@ -120,7 +120,7 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
   private def createElementWithoutChildren(elm: Elem, doc: org.w3c.dom.Document, parentScope: Scope): Element = {
     val element =
       if (elm.resolvedName.namespaceUriOption.isEmpty) {
-        doc.createElement(elm.qname.localPart)
+        doc.createElement(elm.localName)
       } else {
         doc.createElementNS(elm.resolvedName.namespaceUriOption.get, elm.qname.toString)
       }

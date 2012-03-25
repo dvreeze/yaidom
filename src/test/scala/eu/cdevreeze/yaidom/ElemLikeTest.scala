@@ -38,7 +38,7 @@ class ElemLikeTest extends Suite {
   private val ns = "http://bookstore"
 
   @Test def testChildElems() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms: immutable.IndexedSeq[Elem] = bookstore.allChildElems
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
@@ -91,7 +91,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testCollectFromChildElems() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms: immutable.IndexedSeq[Elem] = bookstore.allChildElems
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore collectFromChildElems {
@@ -135,7 +135,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testElems() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore elemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
@@ -186,7 +186,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testCollectFromElems() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore collectFromElems {
@@ -223,7 +223,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testElemsOrSelf() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElemsOrSelf
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
@@ -278,7 +278,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testCollectFromElemsOrSelf() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElemsOrSelf
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore collectFromElemsOrSelf {
@@ -319,7 +319,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testFirstElems() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
     val magazineElms: immutable.IndexedSeq[Elem] = bookstore topmostElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
@@ -393,7 +393,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testFindParentInTree() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookElms = bookstore.elems(ns.ns.ename("Book"))
 
@@ -419,7 +419,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testGetIndex() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndex { e => e.resolvedName }
 
@@ -440,7 +440,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testGetIndexToParent() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndexToParent { e => e.resolvedName }
 
@@ -463,7 +463,7 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testFindByElemPath() {
-    require(bookstore.qname.localPart == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     expect(Some(bookstore)) {
       bookstore.findWithElemPath(ElemPath.Root)

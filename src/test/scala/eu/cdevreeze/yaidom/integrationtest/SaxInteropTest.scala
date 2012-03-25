@@ -64,10 +64,10 @@ class SaxInteropTest extends Suite {
     val root: Elem = saxParser.parse(is).documentElement
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.allElems map { e => e.qname.localPart } toSet
+      root.allElems map { e => e.localName } toSet
     }
     expect(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.allElemsOrSelf map { e => e.qname.localPart } toSet
+      root.allElemsOrSelf map { e => e.localName } toSet
     }
     expect(8) {
       root.elemsOrSelf(nsBookstore.ns.ename("Title")).size
@@ -90,11 +90,11 @@ class SaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(root.allElems map { e => e.qname.localPart } toSet) {
-      root2.allElems map { e => e.qname.localPart } toSet
+    expect(root.allElems map { e => e.localName } toSet) {
+      root2.allElems map { e => e.localName } toSet
     }
-    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
-      root2.allElemsOrSelf map { e => e.qname.localPart } toSet
+    expect(root.allElemsOrSelf map { e => e.localName } toSet) {
+      root2.allElemsOrSelf map { e => e.localName } toSet
     }
     expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
       root2.elemsOrSelf(nsBookstore.ns.ename("Title")).size
@@ -109,11 +109,11 @@ class SaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(root.allElems map { e => e.qname.localPart } toSet) {
-      root3.allElems map { e => e.qname.localPart } toSet
+    expect(root.allElems map { e => e.localName } toSet) {
+      root3.allElems map { e => e.localName } toSet
     }
-    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
-      root3.allElemsOrSelf map { e => e.qname.localPart } toSet
+    expect(root.allElemsOrSelf map { e => e.localName } toSet) {
+      root3.allElemsOrSelf map { e => e.localName } toSet
     }
     expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
       root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
@@ -138,11 +138,11 @@ class SaxInteropTest extends Suite {
 
     val root4 = doc2.documentElement
 
-    expect(root.allElems map { e => e.qname.localPart } toSet) {
-      root4.allElems map { e => e.qname.localPart } toSet
+    expect(root.allElems map { e => e.localName } toSet) {
+      root4.allElems map { e => e.localName } toSet
     }
-    expect(root.allElemsOrSelf map { e => e.qname.localPart } toSet) {
-      root4.allElemsOrSelf map { e => e.qname.localPart } toSet
+    expect(root.allElemsOrSelf map { e => e.localName } toSet) {
+      root4.allElemsOrSelf map { e => e.localName } toSet
     }
     expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
       root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
@@ -777,7 +777,7 @@ class SaxInteropTest extends Suite {
 
     val root: Elem = saxParser.parse(is).documentElement
 
-    require(root.qname.localPart == "Bookstore")
+    require(root.localName == "Bookstore")
 
     // 2. Create HTML string
 

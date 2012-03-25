@@ -106,7 +106,7 @@ final class DocumentPrinterUsingSax(
 
   private def generateStartElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler) {
     val uri = elm.resolvedName.namespaceUriOption.getOrElse("")
-    val localName = elm.qname.localPart // Correct?
+    val localName = elm.localName // Correct?
     val qname = elm.qname.toString
 
     val attrs: Attributes = getAttributesAndNamespaceDeclarations(elm, parentScope)
@@ -116,7 +116,7 @@ final class DocumentPrinterUsingSax(
 
   private def generateEndElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler) {
     val uri = elm.resolvedName.namespaceUriOption.getOrElse("")
-    val localName = elm.qname.localPart // Correct?
+    val localName = elm.localName // Correct?
     val qname = elm.qname.toString
 
     handler.endElement(uri, localName, qname)
