@@ -131,11 +131,7 @@ class SaxInteropTest extends Suite {
 
     // 6. Print to XML and parse back, and check again
 
-    val doc = new Document(
-      baseUriOption = None,
-      documentElement = root3,
-      processingInstructions = immutable.IndexedSeq(),
-      comments = immutable.IndexedSeq())
+    val doc = Document(root3)
 
     val xmlString2 = printer.print(doc)
 
@@ -817,13 +813,13 @@ class SaxInteropTest extends Suite {
     def bookHtmlString(bookElm: Elem): String = {
       val authorNames: immutable.IndexedSeq[String] =
         bookElm.elems("{http://bookstore}Author".ename) map { e =>
-          "%s %s".format(e.childElem("{http://bookstore}First_Name".ename).trimmedText, e.childElem("{http://bookstore}Last_Name".ename).trimmedText)
+          "%s %s".format(e.singleChildElem("{http://bookstore}First_Name".ename).trimmedText, e.singleChildElem("{http://bookstore}Last_Name".ename).trimmedText)
         }
 
       val authors = authorNames.mkString(", ")
 
       val result = bookFormatString.format(
-        bookElm.childElem("{http://bookstore}Title".ename).trimmedText,
+        bookElm.singleChildElem("{http://bookstore}Title".ename).trimmedText,
         bookElm.attributeOption("ISBN".ename).getOrElse(""),
         bookElm.attributeOption("Edition".ename).getOrElse(""),
         authors,

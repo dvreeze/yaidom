@@ -72,21 +72,21 @@ class ElemLikeTest extends Suite {
       cheapBookElm.attribute("ISBN".ename)
     }
     expect("Hector and Jeff's Database Hints") {
-      cheapBookElm.childElem(ns.ns.ename("Title")).trimmedText
+      cheapBookElm.singleChildElem(ns.ns.ename("Title")).trimmedText
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm.childElem(ns.ns.ename("Remark")).trimmedText
+      cheapBookElm.singleChildElem(ns.ns.ename("Remark")).trimmedText
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
-      val authorLastNameElms = authorElms map { e => e.childElem(ns.ns.ename("Last_Name")) }
+      val authorElms = cheapBookElm.singleChildElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
+      val authorLastNameElms = authorElms map { e => e.singleChildElem(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
-      val authorLastNameElms = authorElms flatMap { e => e.childElemOption(ns.ns.ename("Last_Name")) }
+      val authorElms = cheapBookElm.singleChildElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
+      val authorLastNameElms = authorElms flatMap { e => e.singleChildElemOption(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
@@ -182,7 +182,7 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
+      val authorElms = cheapBookElm.singleChildElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.elems(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
@@ -277,7 +277,7 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
+      val authorElms = cheapBookElm.singleChildElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.elemsOrSelf(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
@@ -370,13 +370,13 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).topmostElems(ns.ns.ename("Author"))
+      val authorElms = cheapBookElm.singleChildElem(ns.ns.ename("Authors")).topmostElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.firstElemOption(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).topmostElems(ns.ns.ename("Author"))
+      val authorElms = cheapBookElm.singleChildElem(ns.ns.ename("Authors")).topmostElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.topmostElems(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet

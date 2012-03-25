@@ -124,7 +124,7 @@ class AirportExampleTest extends Suite {
 
     def highestAirport(root: Elem): Elem = {
       val sorted = root.elemsOrSelf(enameTable) sortBy { e =>
-        e.childElemOption(enameRunwayElevationFeet) map { e => e.trimmedText.toInt } getOrElse (0)
+        e.singleChildElemOption(enameRunwayElevationFeet) map { e => e.trimmedText.toInt } getOrElse (0)
       }
       sorted.last
     }
@@ -135,7 +135,7 @@ class AirportExampleTest extends Suite {
 
     def airportElevationInFeet(e: Elem): Int = {
       require(e.resolvedName == enameTable)
-      e.childElem(enameRunwayElevationFeet).trimmedText.toInt
+      e.singleChildElem(enameRunwayElevationFeet).trimmedText.toInt
     }
 
     // The highest German airport is Oberpfaffenhofen (Munich)
@@ -303,9 +303,9 @@ class AirportExampleTest extends Suite {
       for {
         airportElm <- airportElms
       } yield {
-        val airportOrCityName = airportElm.childElem(nsWebServiceX.ename("CityOrAirportName")).trimmedText
-        val country = airportElm.childElem(nsWebServiceX.ename("Country")).trimmedText
-        val countryAbbreviation = airportElm.childElem(nsWebServiceX.ename("CountryAbbrviation")).trimmedText
+        val airportOrCityName = airportElm.singleChildElem(nsWebServiceX.ename("CityOrAirportName")).trimmedText
+        val country = airportElm.singleChildElem(nsWebServiceX.ename("Country")).trimmedText
+        val countryAbbreviation = airportElm.singleChildElem(nsWebServiceX.ename("CountryAbbrviation")).trimmedText
 
         val lat = airportLatitude(airportElm)
         val lon = airportLongitude(airportElm)
@@ -354,7 +354,7 @@ class AirportExampleTest extends Suite {
       val airportElms =
         for {
           airportElm <- airportSummaryRoot.allChildElems
-          val airportCodeElm = airportElm.childElem(nsWebServiceX.ename("AirportCode"))
+          val airportCodeElm = airportElm.singleChildElem(nsWebServiceX.ename("AirportCode"))
           if airportCodeElm.trimmedText == "FRA"
         } yield airportElm
       val airportElm = airportElms.headOption.getOrElse(sys.error("Expected airport FRA"))
@@ -425,12 +425,12 @@ class AirportExampleTest extends Suite {
   private def airportLatitude(e: Elem): Double = {
     require(e.resolvedName == nsWebServiceX.ename("Table"))
 
-    val degree = e.childElem(nsWebServiceX.ename("LatitudeDegree")).trimmedText.toDouble
-    val minute = e.childElem(nsWebServiceX.ename("LatitudeMinute")).trimmedText.toDouble
-    val second = e.childElem(nsWebServiceX.ename("LatitudeSecond")).trimmedText.toDouble
+    val degree = e.singleChildElem(nsWebServiceX.ename("LatitudeDegree")).trimmedText.toDouble
+    val minute = e.singleChildElem(nsWebServiceX.ename("LatitudeMinute")).trimmedText.toDouble
+    val second = e.singleChildElem(nsWebServiceX.ename("LatitudeSecond")).trimmedText.toDouble
 
     val north = {
-      val result = e.childElem(nsWebServiceX.ename("LatitudeNpeerS")).trimmedText
+      val result = e.singleChildElem(nsWebServiceX.ename("LatitudeNpeerS")).trimmedText
       (result != "S")
     }
 
@@ -441,12 +441,12 @@ class AirportExampleTest extends Suite {
   private def airportLongitude(e: Elem): Double = {
     require(e.resolvedName == nsWebServiceX.ename("Table"))
 
-    val degree = e.childElem(nsWebServiceX.ename("LongitudeDegree")).trimmedText.toDouble
-    val minute = e.childElem(nsWebServiceX.ename("LongitudeMinute")).trimmedText.toDouble
-    val second = e.childElem(nsWebServiceX.ename("LongitudeSeconds")).trimmedText.toDouble
+    val degree = e.singleChildElem(nsWebServiceX.ename("LongitudeDegree")).trimmedText.toDouble
+    val minute = e.singleChildElem(nsWebServiceX.ename("LongitudeMinute")).trimmedText.toDouble
+    val second = e.singleChildElem(nsWebServiceX.ename("LongitudeSeconds")).trimmedText.toDouble
 
     val east = {
-      val result = e.childElem(nsWebServiceX.ename("LongitudeEperW")).trimmedText
+      val result = e.singleChildElem(nsWebServiceX.ename("LongitudeEperW")).trimmedText
       (result != "W")
     }
 
@@ -457,7 +457,7 @@ class AirportExampleTest extends Suite {
   private def airportCode(e: Elem): String = {
     require(e.resolvedName == nsWebServiceX.ename("Table"))
 
-    e.childElem(nsWebServiceX.ename("AirportCode")).trimmedText
+    e.singleChildElem(nsWebServiceX.ename("AirportCode")).trimmedText
   }
 
   final case class LatLon(val lat: Double, val lon: Double) {

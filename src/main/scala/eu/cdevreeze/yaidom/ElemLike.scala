@@ -91,15 +91,29 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
+  /** Returns the single child element obeying the given predicate, if any, wrapped in an `Option` */
+  final def singleChildElemOptionWhere(p: E => Boolean): Option[E] = {
+    val result = childElemsWhere(p)
+    require(result.size <= 1, "Expected at most 1 matching child element, but found %d of them".format(result.size))
+    result.headOption
+  }
+
+  /** Returns the single child element with the given expanded name, and throws an exception otherwise */
+  final def singleChildElemWhere(p: E => Boolean): E = {
+    val result = childElemsWhere(p)
+    require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
+    result.head
+  }
+
   /** Returns the single child element with the given expanded name, if any, wrapped in an `Option` */
-  final def childElemOption(expandedName: ExpandedName): Option[E] = {
+  final def singleChildElemOption(expandedName: ExpandedName): Option[E] = {
     val result = childElems(expandedName)
     require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.headOption
   }
 
   /** Returns the single child element with the given expanded name, and throws an exception otherwise */
-  final def childElem(expandedName: ExpandedName): E = {
+  final def singleChildElem(expandedName: ExpandedName): E = {
     val result = childElems(expandedName)
     require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.head
