@@ -105,6 +105,7 @@ Some Scala best practices
   * Good habit: preferring immutability
   * Good habit: preferring side-effect free functions (or at least keeping side-effects localized inside functions)
   * Good habit: thinking in expressions rather than statements
+  * Good habit: thinking in transformations of (immutable) collections, using higher-order functions such as map and filter
   * Clojure inventor Rich Hickey even calls "mutable" the `new spaghetti code`_. I tend to agree, if not taken to the extreme by banning "mutability" everywhere
   * Hickey's paper on `Identity and State (in Clojure)`_ is also a nice criticism of common "old school" Java practices
   * Code hotspots can profit from an "imperative" style, but mostly the side-effects can be kept local inside function implementations
