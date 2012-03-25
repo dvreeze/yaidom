@@ -101,7 +101,7 @@ Some Scala best practices
   * See `A Postfunctional Language`_, for the notion of "functional" meant here
   * Also see `Programming in Scala`_, for its advice about a more functional style of programming
   * Category theory and scalaz, both of which I currently know nothing about, are not meant here
-  * Goal: fewer bugs because of code that is easier to reason to about
+  * Goals: fewer bugs because of code that is easier to reason to about, and more productivity
   * Good habit: preferring immutability
   * Good habit: preferring side-effect free functions (or at least keeping side-effects localized inside functions)
   * Good habit: thinking in expressions rather than statements
