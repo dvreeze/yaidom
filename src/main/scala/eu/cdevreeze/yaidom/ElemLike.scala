@@ -98,7 +98,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     result.headOption
   }
 
-  /** Returns the single child element with the given expanded name, and throws an exception otherwise */
+  /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
   final def singleChildElemWhere(p: E => Boolean): E = {
     val result = childElemsWhere(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
