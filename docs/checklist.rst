@@ -84,24 +84,39 @@ Exception design, according to Joshua Bloch
 Some Scala best practices
 =========================
 
-* Code should be as functional as possible
+* A very nice guide on effective use of Scala is the `Twitter Effective Scala`_ guide
+* Joshua Suereth mentions the following things to avoid (in `Scala sink or swim`_)
 
-  * Prefer immutability
-  * Prefer side-effect free functions (or keep side-effects localized inside functions)
-  * Think in expressions rather than statements
-  * Clojure inventor Rich Hickey even calls "mutable" the `new spaghetti code`_. I tend to agree
-  * Hickey's paper on `Identity and State (in Clojure)`_ is also a nice criticism of common Java practices
+  * The use of val or var in traits is problematic, because of the subtle initialization requirements
+  * Implicit views are best avoided as well, according to him
+  * Vars that are not method-local are also a source of bugs
+* Code should be as functional as possible, unless there is a good reason to use an "imperative" style of programming
+
+  * See `A Postfunctional Language`_, for the notion of "functional" meant here
+  * Also see `Programming in Scala`_, for its advice about a more functional style of programming
+  * Category theory and scalaz, both of which I currently know nothing about, are not meant here
+  * Goal: fewer bugs because of code that is easier to reason to about
+  * Good habit: preferring immutability
+  * Good habit: preferring side-effect free functions (or at least keeping side-effects localized inside functions)
+  * Good habit: thinking in expressions rather than statements
+  * Clojure inventor Rich Hickey even calls "mutable" the `new spaghetti code`_. I tend to agree, if not taken to the extreme by banning "mutability" everywhere
+  * Hickey's paper on `Identity and State (in Clojure)`_ is also a nice criticism of common "old school" Java practices
+  * Code hotspots can profit from an "imperative" style, but mostly the side-effects can be kept local inside function implementations
   
 * Document immutability, e.g. with marker interface Immutable, and do not violate any promise of immutability
 * Prefer Option over null
 
+.. _`Twitter Effective Scala`: http://twitter.github.com/effectivescala/
+.. _`Scala sink or swim`: http://zeroturnaround.com/blog/scala-sink-or-swim-part-1/#comment-469461952
+.. _`A Postfunctional Language`: http://www.scala-lang.org/node/4960
+.. _`Programming in Scala`: http://www.artima.com/shop/programming_in_scala
 .. _`new spaghetti code`: http://clojure.org/rationale
 .. _`Identity and State (in Clojure)`: http://clojure.org/state
 
 Some Maven best practices
 =========================
 
-* Write pom.xml as documented in the `Maven Repository Usage Guide`_
+* Write pom.xml as documented in the `Maven Repository Usage Guide`_, whenever appropriate
 * Do not use other Maven repositories (than Maven Central), whenever possible
 * There must be clear unidirectional dependencies between Maven modules
 

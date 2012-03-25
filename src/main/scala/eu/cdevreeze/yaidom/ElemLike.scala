@@ -181,7 +181,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def topmostElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = topmostElemsWhere { e => e.resolvedName == expandedName }
 
-  /** Returns the first found descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
+  /** Returns the first found (topmost) descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
   final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatchingFirstElemOrSelf(elm: E): Option[E] = {
