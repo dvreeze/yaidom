@@ -137,7 +137,8 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     assert(doc.documentElement.allElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
     expect(Set("contacts".ename, "contact".ename, "firstName".ename, "lastName".ename, "email".ename, "phone".ename)) {
-      doc.documentElement.allElemsOrSelf map { e => e.resolvedName } toSet
+      val result = doc.documentElement.allElemsOrSelf map { e => e.resolvedName }
+      result.toSet
     }
 
     val s = "b" * (2000 + 46)

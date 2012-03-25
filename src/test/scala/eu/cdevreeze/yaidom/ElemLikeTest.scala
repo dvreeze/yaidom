@@ -81,12 +81,14 @@ class ElemLikeTest extends Suite {
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms map { e => e.childElem(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.trimmedText } toSet
+      val result = authorLastNameElms map { e => e.trimmedText }
+      result.toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).childElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.childElemOption(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.trimmedText } toSet
+      val result = authorLastNameElms map { e => e.trimmedText }
+      result.toSet
     }
   }
 
@@ -158,7 +160,8 @@ class ElemLikeTest extends Suite {
     expect(Set(ns.ns.ename("Book"), ns.ns.ename("Magazine"), ns.ns.ename("Title"),
       ns.ns.ename("Authors"), ns.ns.ename("Author"), ns.ns.ename("First_Name"), ns.ns.ename("Last_Name"),
       ns.ns.ename("Remark"))) {
-      elms map { e => e.resolvedName } toSet
+      val result = elms map { e => e.resolvedName }
+      result.toSet
     }
     assert(magazineElms.toSet.subsetOf(elms.toSet))
     assert(bookElms.toSet.subsetOf(elms.toSet))
@@ -181,7 +184,8 @@ class ElemLikeTest extends Suite {
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.elems(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.trimmedText } toSet
+      val result = authorLastNameElms map { e => e.trimmedText }
+      result.toSet
     }
   }
 
@@ -215,7 +219,8 @@ class ElemLikeTest extends Suite {
     expect(Set(ns.ns.ename("Book"), ns.ns.ename("Magazine"), ns.ns.ename("Title"),
       ns.ns.ename("Authors"), ns.ns.ename("Author"), ns.ns.ename("First_Name"), ns.ns.ename("Last_Name"),
       ns.ns.ename("Remark"))) {
-      elms map { e => e.resolvedName } toSet
+      val result = elms map { e => e.resolvedName }
+      result.toSet
     }
     assert(magazineElms.toSet.subsetOf(elms.toSet))
     assert(bookElms.toSet.subsetOf(elms.toSet))
@@ -250,7 +255,8 @@ class ElemLikeTest extends Suite {
     expect(Set(ns.ns.ename("Bookstore"), ns.ns.ename("Book"), ns.ns.ename("Magazine"), ns.ns.ename("Title"),
       ns.ns.ename("Authors"), ns.ns.ename("Author"), ns.ns.ename("First_Name"), ns.ns.ename("Last_Name"),
       ns.ns.ename("Remark"))) {
-      elms map { e => e.resolvedName } toSet
+      val result = elms map { e => e.resolvedName }
+      result.toSet
     }
     assert(magazineElms.toSet.subsetOf(elms.toSet))
     assert(bookElms.toSet.subsetOf(elms.toSet))
@@ -273,7 +279,8 @@ class ElemLikeTest extends Suite {
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).elems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.elemsOrSelf(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.trimmedText } toSet
+      val result = authorLastNameElms map { e => e.trimmedText }
+      result.toSet
     }
   }
 
@@ -311,7 +318,8 @@ class ElemLikeTest extends Suite {
     expect(Set(ns.ns.ename("Bookstore"), ns.ns.ename("Book"), ns.ns.ename("Magazine"), ns.ns.ename("Title"),
       ns.ns.ename("Authors"), ns.ns.ename("Author"), ns.ns.ename("First_Name"), ns.ns.ename("Last_Name"),
       ns.ns.ename("Remark"))) {
-      elms map { e => e.resolvedName } toSet
+      val result = elms map { e => e.resolvedName }
+      result.toSet
     }
     assert(magazineElms.toSet.subsetOf(elms.toSet))
     assert(bookElms.toSet.subsetOf(elms.toSet))
@@ -364,12 +372,14 @@ class ElemLikeTest extends Suite {
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).topmostElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.firstElemOption(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.trimmedText } toSet
+      val result = authorLastNameElms map { e => e.trimmedText }
+      result.toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.childElem(ns.ns.ename("Authors")).topmostElems(ns.ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e.topmostElems(ns.ns.ename("Last_Name")) }
-      authorLastNameElms map { e => e.trimmedText } toSet
+      val result = authorLastNameElms map { e => e.trimmedText }
+      result.toSet
     }
 
     val ullmanAncestors: immutable.IndexedSeq[Elem] =
@@ -387,7 +397,8 @@ class ElemLikeTest extends Suite {
       ullmanAncestors.map(_.resolvedName).toSet
     }
     expect(Set(ns.ns.ename("Authors"))) {
-      firstUllmanAncestors map { _.resolvedName } toSet
+      val result = firstUllmanAncestors map { _.resolvedName }
+      result.toSet
     }
     assert(firstUllmanAncestors.toSet.subsetOf(ullmanAncestors.toSet))
   }
@@ -405,7 +416,8 @@ class ElemLikeTest extends Suite {
     val lastNameElms = bookstore.elems(ns.ns.ename("Last_Name"))
 
     expect(Set(ns.ns.ename("Author"))) {
-      lastNameElms map { e => e.findParentInTree(bookstore) } flatMap { eOption => eOption map { _.resolvedName } } toSet
+      val result = lastNameElms map { e => e.findParentInTree(bookstore) } flatMap { eOption => eOption map { _.resolvedName } }
+      result.toSet
     }
 
     val cheapBookElms: immutable.IndexedSeq[Elem] =
@@ -414,7 +426,8 @@ class ElemLikeTest extends Suite {
     val cheapBookAuthorElms: immutable.IndexedSeq[Elem] = cheapBookElm.elems(ns.ns.ename("Author"))
 
     expect(cheapBookAuthorElms.toSet) {
-      lastNameElms flatMap { e => e.findParentInTree(cheapBookElm) } toSet
+      val result = lastNameElms flatMap { e => e.findParentInTree(cheapBookElm) }
+      result.toSet
     }
   }
 

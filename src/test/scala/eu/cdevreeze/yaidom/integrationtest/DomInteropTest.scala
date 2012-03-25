@@ -62,16 +62,17 @@ class DomInteropTest extends Suite {
     val root: Elem = domParser.parse(is).documentElement
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.allElems map { e => e.localName } toSet
+      (root.allElems map (e => e.localName)).toSet
     }
     expect(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      root.allElemsOrSelf map { e => e.localName } toSet
+      (root.allElemsOrSelf map (e => e.localName)).toSet
     }
     expect(8) {
       root.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect(3) {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     }
 
     // 2. Convert Elem to a DOM element
@@ -86,47 +87,47 @@ class DomInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expect(root.allElems map { e => e.localName } toSet) {
-      root2.allElems map { e => e.localName } toSet
+    expect((root.allElems map (e => e.localName)).toSet) {
+      (root2.allElems map (e => e.localName)).toSet
     }
-    expect(root.allElemsOrSelf map { e => e.localName } toSet) {
-      root2.allElemsOrSelf map { e => e.localName } toSet
+    expect((root.allElemsOrSelf map (e => e.localName)).toSet) {
+      (root2.allElemsOrSelf map (e => e.localName)).toSet
     }
     expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
       root2.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     } {
-      root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     }
 
     // 5. Convert to NodeBuilder and back, and check again
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(root.allElems map { e => e.localName } toSet) {
-      root3.allElems map { e => e.localName } toSet
+    expect((root.allElems map (e => e.localName)).toSet) {
+      (root3.allElems map (e => e.localName)).toSet
     }
-    expect(root.allElemsOrSelf map { e => e.localName } toSet) {
-      root3.allElemsOrSelf map { e => e.localName } toSet
+    expect((root.allElemsOrSelf map (e => e.localName)).toSet) {
+      (root3.allElemsOrSelf map (e => e.localName)).toSet
     }
     expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
       root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     } {
-      root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     }
 
     // 6. Print to XML and parse back, and check again
 
-    val doc = new Document(
-      baseUriOption = None,
-      documentElement = root3,
-      processingInstructions = immutable.IndexedSeq(),
-      comments = immutable.IndexedSeq())
+    val doc = Document(root3)
 
     val printer = DocumentPrinterUsingDom.newInstance
     val xmlString2 = printer.print(doc)
@@ -136,19 +137,21 @@ class DomInteropTest extends Suite {
 
     val root4 = doc2.documentElement
 
-    expect(root.allElems map { e => e.localName } toSet) {
-      root4.allElems map { e => e.localName } toSet
+    expect((root.allElems map (e => e.localName)).toSet) {
+      (root4.allElems map (e => e.localName)).toSet
     }
-    expect(root.allElemsOrSelf map { e => e.localName } toSet) {
-      root4.allElemsOrSelf map { e => e.localName } toSet
+    expect((root.allElemsOrSelf map (e => e.localName)).toSet) {
+      (root4.allElemsOrSelf map (e => e.localName)).toSet
     }
     expect(root.elemsOrSelf(nsBookstore.ns.ename("Title")).size) {
       root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     } {
-      root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" } size
+      val result = root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
     }
   }
 

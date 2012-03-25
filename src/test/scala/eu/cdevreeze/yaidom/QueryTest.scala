@@ -49,7 +49,8 @@ class QueryTest extends Suite {
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      bookTitles map { _.trimmedText } toSet
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -70,7 +71,8 @@ class QueryTest extends Suite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      bookOrMagazineTitles map { _.trimmedText } toSet
+      val result = bookOrMagazineTitles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -89,7 +91,8 @@ class QueryTest extends Suite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      titles map { _.trimmedText } toSet
+      val result = titles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -108,7 +111,8 @@ class QueryTest extends Suite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      titles map { _.trimmedText } toSet
+      val result = titles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -162,7 +166,8 @@ class QueryTest extends Suite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      books flatMap { book => book.firstElemOption("Title".ename) map { _.trimmedText } } toSet
+      val result = books flatMap { book => book.firstElemOption("Title".ename) map { _.trimmedText } }
+      result.toSet
     }
   }
 
@@ -181,7 +186,8 @@ class QueryTest extends Suite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      titles map { _.trimmedText } toSet
+      val result = titles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -199,7 +205,8 @@ class QueryTest extends Suite {
     expect(Set(
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
-      bookTitles map { _.trimmedText } toSet
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -228,7 +235,8 @@ class QueryTest extends Suite {
     expect(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      bookTitles map { _.trimmedText } toSet
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -259,7 +267,8 @@ class QueryTest extends Suite {
     expect(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      bookTitles map { _.trimmedText } toSet
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -281,7 +290,8 @@ class QueryTest extends Suite {
 
     expect(Set(
       "Hector and Jeff's Database Hints")) {
-      bookTitles map { _.trimmedText } toSet
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -304,7 +314,8 @@ class QueryTest extends Suite {
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
-      secondAuthorLastNames map { _.trimmedText } toSet
+      val result = secondAuthorLastNames map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -321,7 +332,8 @@ class QueryTest extends Suite {
       } yield book.childElem("Title".ename)
 
     expect(Set("Database Systems: The Complete Book")) {
-      titles map { _.trimmedText } toSet
+      val result = titles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -343,7 +355,8 @@ class QueryTest extends Suite {
       } yield magazine
 
     expect(Set("Hector and Jeff's Database Hints")) {
-      magazines flatMap { mag => mag.firstElemOption("Title".ename) map { _.trimmedText } } toSet
+      val result = magazines flatMap { mag => mag.firstElemOption("Title".ename) map { _.trimmedText } }
+      result.toSet
     }
   }
 
@@ -437,7 +450,8 @@ class QueryTest extends Suite {
       } yield bookOrMagazine
 
     expect(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      booksAndMagazines flatMap { mag => mag.firstElemOption("Title".ename) map { _.trimmedText } } toSet
+      val result = booksAndMagazines flatMap { mag => mag.firstElemOption("Title".ename) map { _.trimmedText } }
+      result.toSet
     }
   }
 
@@ -460,7 +474,8 @@ class QueryTest extends Suite {
       } yield bookOrMagazine
 
     expect(Set("Hector and Jeff's Database Hints")) {
-      booksAndMagazines flatMap { mag => mag.firstElemOption("Title".ename) map { _.trimmedText } } toSet
+      val result = booksAndMagazines flatMap { mag => mag.firstElemOption("Title".ename) map { _.trimmedText } }
+      result.toSet
     }
   }
 
@@ -493,7 +508,8 @@ class QueryTest extends Suite {
       } yield book
 
     expect(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
-      books flatMap { book => book.firstElemOption("Title".ename) map { _.trimmedText } } toSet
+      val result = books flatMap { book => book.firstElemOption("Title".ename) map { _.trimmedText } }
+      result.toSet
     }
   }
 
@@ -514,7 +530,8 @@ class QueryTest extends Suite {
 
     expect(Set(
       "Hector and Jeff's Database Hints")) {
-      titles map { _.trimmedText } toSet
+      val result = titles map { _.trimmedText }
+      result.toSet
     }
   }
 
@@ -554,8 +571,9 @@ class QueryTest extends Suite {
       titleAndFirstNames.size
     }
     expect(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val result = titleAndFirstNames map { e => e.elems("Title".ename) }
-      result.flatten map { e => e.trimmedText } toSet
+      val titleElms = titleAndFirstNames map { e => e.elems("Title".ename) }
+      val result = titleElms.flatten map { e => e.trimmedText }
+      result.toSet
     }
   }
 
@@ -629,10 +647,12 @@ class QueryTest extends Suite {
       cheapBooks.size
     }
     expect(Set(50, 25)) {
-      cheapBooks flatMap { e => e.elems("Price".ename) } map { e => e.trimmedText.toDouble.intValue } toSet
+      val result = cheapBooks flatMap { e => e.elems("Price".ename) } map { e => e.trimmedText.toDouble.intValue }
+      result.toSet
     }
     expect(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      cheapBooks flatMap { e => e.elems("Title".ename) } map { e => e.trimmedText } toSet
+      val result = cheapBooks flatMap { e => e.elems("Title".ename) } map { e => e.trimmedText }
+      result.toSet
     }
   }
 
@@ -948,7 +968,8 @@ class QueryTest extends Suite {
       }
 
     expect(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
-      bookstoreWithCombinedNames.elems("Name".ename) map { _.trimmedText } toSet
+      val result = bookstoreWithCombinedNames.elems("Name".ename) map { _.trimmedText }
+      result.toSet
     }
   }
 

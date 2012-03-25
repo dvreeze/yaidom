@@ -85,6 +85,12 @@ Some Scala best practices
 =========================
 
 * A very nice guide on effective use of Scala is the `Twitter Effective Scala`_ guide
+* Some language features should be used only with good reason, and could/should be absent in most code
+
+  * See for example `SIP 18`_, about modularization of language features
+  * For example, postfix operators are best avoided (outside DSLs), for their poor interaction with semicolon inference
+  * As another example, implicit conversions should be used with care
+  * Yet some implicit conversions are "more explicit" and safer than others. See for example JavaConverters versus JavaConversions
 * Joshua Suereth mentions the following things to avoid (in `Scala sink or swim`_)
 
   * The use of val or var in traits is problematic, because of the subtle initialization requirements
@@ -107,6 +113,7 @@ Some Scala best practices
 * Prefer Option over null
 
 .. _`Twitter Effective Scala`: http://twitter.github.com/effectivescala/
+.. _`SIP 18`: http://docs.scala-lang.org/sips/pending/modularizing-language-features.html
 .. _`Scala sink or swim`: http://zeroturnaround.com/blog/scala-sink-or-swim-part-1/#comment-469461952
 .. _`A Postfunctional Language`: http://www.scala-lang.org/node/4960
 .. _`Programming in Scala`: http://www.artima.com/shop/programming_in_scala
