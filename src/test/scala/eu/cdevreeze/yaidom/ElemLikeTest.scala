@@ -66,6 +66,10 @@ class ElemLikeTest extends Suite {
     assert(bookElms.toSet.subsetOf(bookstoreChildElms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
+    expect(bookstore.allChildElems filter { e => e.resolvedName == ns.ns.ename("Magazine") }) {
+      bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    }
+
     val cheapBookElm: Elem = cheapBookElms(0)
 
     expect("ISBN-0-11-222222-3") {
@@ -167,6 +171,10 @@ class ElemLikeTest extends Suite {
     assert(bookElms.toSet.subsetOf(elms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
+    expect(bookstore.allElems filter { e => e.resolvedName != ns.ns.ename("Magazine") }) {
+      bookstore elemsWhere { e => e.resolvedName != ns.ns.ename("Magazine") }
+    }
+
     val cheapBookElm: Elem = cheapBookElms(0)
 
     expect("ISBN-0-11-222222-3") {
@@ -261,6 +269,10 @@ class ElemLikeTest extends Suite {
     assert(magazineElms.toSet.subsetOf(elms.toSet))
     assert(bookElms.toSet.subsetOf(elms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
+
+    expect(bookstore.allElemsOrSelf filter { e => e.resolvedName != ns.ns.ename("Magazine") }) {
+      bookstore elemsOrSelfWhere { e => e.resolvedName != ns.ns.ename("Magazine") }
+    }
 
     val cheapBookElm: Elem = cheapBookElms(0)
 

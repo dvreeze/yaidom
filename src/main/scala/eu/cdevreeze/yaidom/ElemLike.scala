@@ -74,6 +74,27 @@ import scala.collection.{ immutable, mutable }
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.
  *
+ * There are some obvious equalities, such as:
+ * {{{
+ * e.childElemsWhere(p) == e.allChildElems.filter(p)
+ * e.elemsWhere(p) == e.allElems.filter(p)
+ * e.elemsOrSelfWhere(p) == e.allElemsOrSelf.filter(p)
+ *
+ * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
+ * e.collectFromElems(pf) == e.allElems.collect(pf)
+ * e.collectFromElemsOrSelf(pf) == e.allElemsOrSelf.collect(pf)
+ * }}}
+ * Moreover, each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
+ * {{{
+ * e.elemsOrSelf(ename) == (e elemsOrSelfWhere (_.resolvedName == ename))
+ * }}}
+ * Finally, the methods returning at most one element trivially correspond to expressions containing calls to element collection
+ * retrieval methods. For example:
+ * {{{
+ * e.firstElemOrSelfOptionWhere(p) == e.elemsOrSelfWhere(p).headOption
+ * e.firstElemOrSelfOptionWhere(p) == e.topmostElemsOrSelfWhere(p).headOption
+ * }}}
+ *
  * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods for indexing the element tree and
  * finding subtrees, and methods dealing with `ElemPath`s.
  *
