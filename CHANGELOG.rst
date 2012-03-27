@@ -3,6 +3,23 @@ CHANGELOG
 =========
 
 
+0.4.4
+=====
+
+* Improved ``ElemLike``
+
+  * Better more consistent documentation
+  * Added some methods for consistency
+  * Far better performance
+  * Breaking API change: renamed ``childElemOption`` to ``singleChildElemOption`` and ``childElem`` to ``singleChildElem``
+  
+* Added `DocumentPrinterUsingSax`
+* Added `Elem.localName` convenience method
+* Introduced JCIP (Java Concurrency in Practice) annotation @NotThreadSafe (in SAX handlers)
+* Small documentation changes and refactorings (including banning of postfix operators)
+* More test code
+
+
 0.4.3
 =====
 

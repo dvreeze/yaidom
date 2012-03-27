@@ -156,7 +156,7 @@ Note that some of the following good practices apply more to applications than t
 
   * Take charge of the architecture
   * Choose what to use, how to use it, what not to use
-  * Consider the costs (complexity, build costs etc.) of the framework's own dependencies
+  * Consider the costs (complexity etc.) of the framework's own dependencies
   
 * Consider maintenance costs (of the software in production) when choosing an architecture
 

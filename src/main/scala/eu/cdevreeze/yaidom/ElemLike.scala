@@ -29,7 +29,7 @@ import scala.collection.{ immutable, mutable }
  * general. Hence the single type parameter, for the captured element type itself.
  *
  * Trait `ElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemLike`
- * has 3 associated "base element sets". They are somewhat like axes, in XPath speak, although that suggests "navigation" rather than
+ * has 3 associated "base element sets". They are somewhat like XPath axes, although that suggests "navigation" rather than
  * "element sets". The "base element sets" of an `ElemLike` are:
  * <ul>
  * <li>Child elements</li>
@@ -55,7 +55,8 @@ import scala.collection.{ immutable, mutable }
  * "childElems", "elems" and "elemsOrSelf" in the method names, respectively, and each of the above groups of methods correspond to some
  * prefix and/or suffix in the method names.
  *
- * There are also some `ElemLike` methods returning at most one element. They are:
+ * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
+ * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
  * <ul>
  * <li>'''Obeying some predicate''' (only for child elements): `singleChildElemOptionWhere` and `singleChildElemWhere`</li>
  * <li>'''Having some ExpandedName''' (special case of the former; only for child elements): `singleChildElemOption` and `singleChildElem`</li>
