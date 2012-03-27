@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * Implementation trait for Elems as containers of elements. This trait implements the corresponding `Elem` methods.
+ * Implementation trait for elements as containers of elements. This trait implements the corresponding `Elem` methods.
  * It could in principle also be used for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]].
  *
  * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
@@ -28,29 +28,42 @@ import scala.collection.{ immutable, mutable }
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
  *
- * This trait offers public element retrieval methods to obtain:
+ * Trait `ElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemLike`
+ * has 3 associated "base element sets". They are somewhat like axes, in XPath speak, although that suggests "navigation" rather than
+ * "element sets". The "base element sets" of an `ElemLike` are:
  * <ul>
- * <li>child elements</li>
- * <li>descendant elements</li>
- * <li>descendant or self elements</li>
- * <li>topmost descendant elements obeying a predicate, meaning that they have no ancestors obeying that predicate</li>
+ * <li>Child elements</li>
+ * <li>Descendant elements</li>
+ * <li>Descendant elements or self</li>
  * </ul>
- * In the method names, "elems" stands for descendant elements.
+ * Obviously, the set of child elements is a subset of the set of descendant elements, and the set of descendant elements is a
+ * proper subset of the set of "descendant elements or self". Many element retrieval methods have counterparts in all "base
+ * element sets".
  *
- * There are also attribute retrieval methods, methods for indexing the element tree and finding subtrees,
- * and methods dealing with ElemPaths.
+ * Below follows a summary of the groups of `ElemLike` element collection retrieval methods:
+ * <ul>
+ * <li>'''Unfiltered''': `allChildElems`, `allElems` and `allElemsOrSelf`</li>
+ * <li>'''Obeying some predicate''': `childElemsWhere`, `elemsWhere` and `elemsOrSelfWhere`</li>
+ * <li>'''Having some ExpandedName''' (special case of the former): `childElems`, `elems` and `elemsOrSelf`</li>
+ * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
+ * <li>'''Topmost obeying some predicate''' (not for child elements): `topmostElemsWhere` and `topmostElemsOrSelfWhere`</li>
+ * <li>'''Topmost having some ExpandedName''' (special case of the former; not for child elements): `topmostElems` and `topmostElemsOrSelf`</li>
+ * </ul>
  *
- * These element retrieval methods each have up to 3 variants (returning collections of elements):
- * <ol>
- * <li>A no argument variant, if applicable (typically with prefix "all" in the method name)</li>
- * <li>A variant taking a single `E => Boolean` predicate argument (with suffix "where" in the method name)</li>
- * <li>An variant taking an expanded name argument</li>
- * </ol>
- * The latter variant is implemented in terms of the variant that takes a single predicate argument.
- * Some methods also have variants that return a single element or an element `Option`, or that "collect" data by applying
- * a partial function.
+ * Note that above the only abstract method is `allChildElems` and the other methods are defined in terms of that method.
+ * Also note that "elems" stands for "descendant elements". The method names are quite predictable. The "base sets" correspond to
+ * "childElems", "elems" and "elemsOrSelf" in the method names, respectively, and each of the above groups of methods correspond to some
+ * prefix and/or suffix in the method names.
  *
- * These element finder methods process and return elements in the following (depth-first) order:
+ * There are also some `ElemLike` methods returning at most one element. They are:
+ * <ul>
+ * <li>'''Obeying some predicate''' (only for child elements): `singleChildElemOptionWhere` and `singleChildElemWhere`</li>
+ * <li>'''Having some ExpandedName''' (special case of the former; only for child elements): `singleChildElemOption` and `singleChildElem`</li>
+ * <li>'''First (depth-first) obeying some predicate''' (not for child elements): `firstElemOptionWhere` and `firstElemOrSelfOptionWhere`</li>
+ * <li>'''First (depth-first) having some ExpandedName''' (special case of the former; not for child elements): `firstElemOption` and `firstElemOrSelfOption`</li>
+ * </ul>
+ *
+ * These element (collection) retrieval methods process and return elements in the following (depth-first) order:
  * <ol>
  * <li>Parents are processed before their children</li>
  * <li>Children are processed before the next sibling</li>
@@ -60,6 +73,9 @@ import scala.collection.{ immutable, mutable }
  * Hence, the methods taking a predicate invoke that predicate on the elements in a predictable order.
  * Per visited element, the predicate is invoked only once. These properties are especially important
  * if the predicate has side-effects, which typically should not be the case.
+ *
+ * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods for indexing the element tree and
+ * finding subtrees, and methods dealing with `ElemPath`s.
  *
  * @tparam E The captured element subtype
  *
@@ -119,7 +135,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     result.head
   }
 
-  /** Returns this element followed by all descendant elements */
+  /** Returns this element followed by all descendant elements (that is, the descendant-or-self elements) */
   final def allElemsOrSelf: immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
 
@@ -134,7 +150,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /**
-   * Returns those elements among this element and its descendant elements that obey the given predicate.
+   * Returns the descendant-or-self elements that obey the given predicate.
    * That is, the result is equivalent to `allElemsOrSelf filter p`.
    */
   final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
@@ -150,7 +166,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     result.toIndexedSeq
   }
 
-  /** Returns those elements among this element and its descendant elements that have the given expanded name */
+  /** Returns the descendant-or-self elements that have the given expanded name */
   final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
 
   /** Returns (the equivalent of) `allElemsOrSelf collect pf` */
@@ -171,8 +187,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     elemsWhere { e => pf.isDefinedAt(e) } collect pf
 
   /**
-   * Returns an `IndexedSeq` of those elements among this element and its descendant elements that obey the given predicate,
-   * such that no ancestor obeys the predicate.
+   * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
    */
   final def topmostElemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
@@ -192,10 +207,15 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def topmostElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
     allChildElems flatMap { ch => ch topmostElemsOrSelfWhere p }
 
-  /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def topmostElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = topmostElemsWhere { e => e.resolvedName == expandedName }
+  /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
+  final def topmostElemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] =
+    topmostElemsOrSelfWhere { e => e.resolvedName == expandedName }
 
-  /** Returns the first found (topmost) descendant element or self obeying the given predicate, if any, wrapped in an `Option` */
+  /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
+  final def topmostElems(expandedName: ExpandedName): immutable.IndexedSeq[E] =
+    topmostElemsWhere { e => e.resolvedName == expandedName }
+
+  /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
   final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatchingFirstElemOrSelf(elm: E): Option[E] = {
@@ -222,8 +242,13 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
   }
 
+  /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */
+  final def firstElemOrSelfOption(expandedName: ExpandedName): Option[E] =
+    firstElemOrSelfOptionWhere { e => e.resolvedName == expandedName }
+
   /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
-  final def firstElemOption(expandedName: ExpandedName): Option[E] = firstElemOptionWhere { e => e.resolvedName == expandedName }
+  final def firstElemOption(expandedName: ExpandedName): Option[E] =
+    firstElemOptionWhere { e => e.resolvedName == expandedName }
 
   /**
    * Finds the parent element, if any, searching in the tree with the given root element.
