@@ -917,6 +917,83 @@ class SaxInteropTest extends Suite {
     assert(columnNumber >= 16, "Expected the column number to be 16 or larger")
   }
 
+  /**
+   * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is definitely less verbose.
+   * Should the current yaidom become the "backend" of a higher-level DSL?
+   */
+  @Test def testParseGroovyXmlExample() {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val doc = parser.parse(classOf[SaxInteropTest].getResourceAsStream("cars.xml"))
+
+    expect("records") {
+      doc.documentElement.localName
+    }
+
+    val recordsElm = doc.documentElement
+
+    expect(3) {
+      recordsElm.childElemsWhere(_.localName == "car").size
+    }
+
+    expect(10) {
+      recordsElm.allElemsOrSelf.size
+    }
+
+    val firstRecordElm = recordsElm.childElemsWhere(_.localName == "car")(0)
+
+    expect("car") {
+      firstRecordElm.localName
+    }
+
+    expect("Holden") {
+      firstRecordElm.attribute("make".ename)
+    }
+
+    expect("Australia") {
+      firstRecordElm.singleChildElemWhere(_.localName == "country").trimmedText
+    }
+
+    expect(2) {
+      val carElms = recordsElm childElemsWhere { _.localName == "car" }
+      val result = carElms filter { e => e.attributeOption("make".ename).getOrElse("").contains('e') }
+      result.size
+    }
+
+    expect(Set("Holden", "Peel")) {
+      val carElms = recordsElm childElemsWhere { _.localName == "car" }
+      val pattern = ".*s.*a.*".r.pattern
+
+      val resultElms = carElms filter { e =>
+        val s = e.singleChildElemWhere(_.localName == "country").trimmedText
+        pattern.matcher(s).matches
+      }
+
+      (resultElms map (e => e.attribute("make".ename))).toSet
+    }
+
+    expect(Set("speed", "size", "price")) {
+      val result = recordsElm collectFromElemsOrSelf { case e if e.attributeOption("type".ename).isDefined => e.attribute("type".ename) }
+      result.toSet
+    }
+
+    import NodeBuilder._
+
+    val countryPath = ElemPath.fromCanonicalXPath("/*/car[1]/country[1]")(Scope.Empty)
+    val updatedCountryElm = elem(qname = "country".qname, children = immutable.IndexedSeq(text("New Zealand"))).build()
+    val updatedDoc = doc.updated(countryPath, updatedCountryElm)
+
+    expect("New Zealand") {
+      updatedDoc.documentElement.childElemsWhere(_.localName == "car")(0).singleChildElemWhere(_.localName == "country").trimmedText
+    }
+
+    expect(List("Royale", "P50", "HSV Maloo")) {
+      val carElms = recordsElm childElemsWhere { _.localName == "car" }
+      val resultElms = carElms sortBy { e => e.attributeOption("year".ename).getOrElse("0").toInt }
+      resultElms map { e => e.attribute("name".ename) }
+    }
+  }
+
   trait LoggingEntityResolver extends EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
