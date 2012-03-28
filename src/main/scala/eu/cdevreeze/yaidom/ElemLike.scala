@@ -29,20 +29,19 @@ import scala.collection.{ immutable, mutable }
  * general. Hence the single type parameter, for the captured element type itself.
  *
  * Trait `ElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemLike`
- * has 3 associated "base element sets". They are somewhat like XPath axes, although that suggests "navigation" rather than
- * "element sets". The "base element sets" of an `ElemLike` are:
+ * has 3 '''core''' element collection retrieval methods. These 3 methods retrieve the following collections of elements, respectively:
  * <ul>
  * <li>Child elements</li>
  * <li>Descendant elements</li>
  * <li>Descendant elements or self</li>
  * </ul>
  * Obviously, the set of child elements is a subset of the set of descendant elements, and the set of descendant elements is a
- * proper subset of the set of "descendant elements or self". Many element retrieval methods have counterparts in all "base
- * element sets".
+ * proper subset of the set of "descendant elements or self". Many element retrieval methods have counterparts for all core
+ * element collection retrieval methods, filtering the results.
  *
  * Below follows a summary of the groups of `ElemLike` element collection retrieval methods:
  * <ul>
- * <li>'''Unfiltered''': `allChildElems`, `allElems` and `allElemsOrSelf`</li>
+ * <li>'''Core''' (see above): `allChildElems`, `allElems` and `allElemsOrSelf`</li>
  * <li>'''Obeying some predicate''': `childElemsWhere`, `elemsWhere` and `elemsOrSelfWhere`</li>
  * <li>'''Having some ExpandedName''' (special case of the former): `childElems`, `elems` and `elemsOrSelf`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
@@ -50,10 +49,10 @@ import scala.collection.{ immutable, mutable }
  * <li>'''Topmost having some ExpandedName''' (special case of the former; not for child elements): `topmostElems` and `topmostElemsOrSelf`</li>
  * </ul>
  *
- * Note that above the only abstract method is `allChildElems` and the other methods are defined in terms of that method.
- * Also note that "elems" stands for "descendant elements". The method names are quite predictable. The "base sets" correspond to
- * "childElems", "elems" and "elemsOrSelf" in the method names, respectively, and each of the above groups of methods correspond to some
- * prefix and/or suffix in the method names.
+ * Note that above the only abstract method is `allChildElems` and the other methods are defined in terms of that method (and `resolvedName`).
+ * Also note that "elems" stands for "descendant elements". The method names are quite predictable. The method names are derived
+ * from the core retrieval method names, stripping prefix "all", and each of the above groups of (non-core) methods correspond to some prefix and/or suffix
+ * added in the method names.
  *
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
  * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
