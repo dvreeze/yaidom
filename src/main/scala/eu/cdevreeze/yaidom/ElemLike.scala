@@ -29,70 +29,64 @@ import scala.collection.{ immutable, mutable }
  * general. Hence the single type parameter, for the captured element type itself.
  *
  * Trait `ElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemLike`
- * has 3 '''core''' element collection retrieval methods. These 3 methods retrieve the following collections of elements, respectively:
+ * has 3 '''core''' element collection retrieval methods. These 3 methods (in order of subset relation) are:
  * <ul>
- * <li>Child elements</li>
- * <li>Descendant elements</li>
- * <li>Descendant elements or self</li>
+ * <li>Abstract method `allChildElems`, returning all '''child''' elements</li>
+ * <li>Method `findAllElems`, finding all '''descendant''' elements</li>
+ * <li>Method `findAllElemsOrSelf`, finding all '''descendant''' elements '''or self'''</li>
  * </ul>
- * Obviously, the set of child elements is a subset of the set of descendant elements, and the set of descendant elements is a
- * proper subset of the set of "descendant elements or self". Many element retrieval methods have counterparts for all core
- * element collection retrieval methods, filtering the results.
+ * The latter 2 methods are implemented in terms of method `allChildElems`. The following equalities must hold:
+ * {{{
+ * elm.findAllElems == (elm.allChildElems flatMap (_.findAllElemsOrSelf))
+ * elm.findAllElemsOrSelf == (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf)))
+ * }}}
+ * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should be
+ * enough for all element collection needs. For conciseness and performance, there are more element (collection) retrieval methods.
  *
- * Below follows a summary of the groups of `ElemLike` element collection retrieval methods:
+ * Below follows a summary of those groups of `ElemLike` element collection retrieval methods:
  * <ul>
- * <li>'''Core''' (see above): `allChildElems`, `allElems` and `allElemsOrSelf`</li>
- * <li>'''Obeying some predicate''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
- * <li>'''Having some ExpandedName''' (special case of the former): `childElems`, `elems` and `elemsOrSelf`</li>
+ * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
+ * <li>'''Filtering on some ExpandedName''' (special case of the former): `filterChildElemsNamed`, `filterElemsNamed` and `filterElemsOrSelfNamed`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
- * <li>'''Topmost obeying some predicate''' (not for child elements): `topmostElemsWhere` and `topmostElemsOrSelfWhere`</li>
- * <li>'''Topmost having some ExpandedName''' (special case of the former; not for child elements): `topmostElems` and `topmostElemsOrSelf`</li>
+ * <li>'''Filtering topmost obeying some predicate''' (not for child elements): `filterTopmostElems` and `filterTopmostElemsOrSelf`</li>
+ * <li>'''Filtering topmost having some ExpandedName''' (special case of the former; not for child elements): `filterTopmostElemsNamed` and `filterTopmostElemsOrSelfNamed`</li>
  * </ul>
- *
- * Note that above the only abstract method is `allChildElems` and the other methods are defined in terms of that method (and `resolvedName`).
- * Also note that "elems" stands for "descendant elements". The method names are quite predictable. The method names are derived
- * from the core retrieval method names, stripping prefix "all", and each of the above groups of (non-core) methods correspond to some prefix and/or suffix
- * added in the method names.
  *
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
  * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
  * <ul>
- * <li>'''Obeying some predicate''' (only for child elements): `singleChildElemOptionWhere` and `singleChildElemWhere`</li>
- * <li>'''Having some ExpandedName''' (special case of the former; only for child elements): `singleChildElemOption` and `singleChildElem`</li>
- * <li>'''First (depth-first) obeying some predicate''' (not for child elements): `firstElemOptionWhere` and `firstElemOrSelfOptionWhere`</li>
- * <li>'''First (depth-first) having some ExpandedName''' (special case of the former; not for child elements): `firstElemOption` and `firstElemOrSelfOption`</li>
+ * <li>'''Obeying some predicate''' (only for child elements): `findChildElem` and `getChildElem`</li>
+ * <li>'''Having some ExpandedName''' (special case of the former; only for child elements): `findChildElemNamed` and `getChildElemNamed`</li>
+ * <li>'''First (depth-first) obeying some predicate''' (not for child elements): `findElem` and `findElemOrSelf`</li>
+ * <li>'''First (depth-first) having some ExpandedName''' (special case of the former; not for child elements): `findElemNamed` and `findElemOrSelfNamed`</li>
  * </ul>
  *
  * These element (collection) retrieval methods process and return elements in the following (depth-first) order:
  * <ol>
  * <li>Parents are processed before their children</li>
  * <li>Children are processed before the next sibling</li>
- * <li>The first child element is processed before the next child element, and so on</li>
+ * <li>The first child element (returned by method `allChildElems`) is processed before the next child element, and so on</li>
  * </ol>
- * assuming that the no-arg `allChildElems` method returns the child elements in the correct order.
- * Hence, the methods taking a predicate invoke that predicate on the elements in a predictable order.
- * Per visited element, the predicate is invoked only once. These properties are especially important
- * if the predicate has side-effects, which typically should not be the case.
  *
- * There are some obvious equalities, such as:
+ * There are some obvious equalities (in the absence of side-effects), such as:
  * {{{
  * e.filterChildElems(p) == e.allChildElems.filter(p)
- * e.filterElems(p) == e.allElems.filter(p)
- * e.filterElemsOrSelf(p) == e.allElemsOrSelf.filter(p)
+ * e.filterElems(p) == e.findAllElems.filter(p)
+ * e.filterElemsOrSelf(p) == e.findAllElemsOrSelf.filter(p)
  *
  * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
- * e.collectFromElems(pf) == e.allElems.collect(pf)
- * e.collectFromElemsOrSelf(pf) == e.allElemsOrSelf.collect(pf)
+ * e.collectFromElems(pf) == e.findAllElems.collect(pf)
+ * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
  * }}}
  * Moreover, each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
  * {{{
- * e.elemsOrSelf(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
+ * e.filterElemsOrSelfNamed(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
  * }}}
  * Finally, the methods returning at most one element trivially correspond to expressions containing calls to element collection
- * retrieval methods. For example:
+ * retrieval methods. For example (in the absence of side-effects) the following holds:
  * {{{
- * e.firstElemOrSelfOptionWhere(p) == e.filterElemsOrSelf(p).headOption
- * e.firstElemOrSelfOptionWhere(p) == e.topmostElemsOrSelfWhere(p).headOption
+ * e.findElemOrSelf(p) == e.filterElemsOrSelf(p).headOption
+ * e.findElemOrSelf(p) == e.filterTopmostElemsOrSelf(p).headOption
  * }}}
  *
  * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods for indexing the element tree and
@@ -122,42 +116,45 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the child elements obeying the given predicate */
   final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
 
+  /** Shorthand for `filterChildElems(p)` */
+  final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
+
   /** Returns the child elements with the given expanded name */
-  final def childElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
+  final def filterChildElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
   /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
   /** Returns the single child element obeying the given predicate, if any, wrapped in an `Option` */
-  final def singleChildElemOptionWhere(p: E => Boolean): Option[E] = {
+  final def findChildElem(p: E => Boolean): Option[E] = {
     val result = filterChildElems(p)
     require(result.size <= 1, "Expected at most 1 matching child element, but found %d of them".format(result.size))
     result.headOption
   }
 
   /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
-  final def singleChildElemWhere(p: E => Boolean): E = {
+  final def getChildElem(p: E => Boolean): E = {
     val result = filterChildElems(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
     result.head
   }
 
   /** Returns the single child element with the given expanded name, if any, wrapped in an `Option` */
-  final def singleChildElemOption(expandedName: ExpandedName): Option[E] = {
-    val result = childElems(expandedName)
+  final def findChildElemNamed(expandedName: ExpandedName): Option[E] = {
+    val result = filterChildElemsNamed(expandedName)
     require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.headOption
   }
 
   /** Returns the single child element with the given expanded name, and throws an exception otherwise */
-  final def singleChildElem(expandedName: ExpandedName): E = {
-    val result = childElems(expandedName)
+  final def getChildElemNamed(expandedName: ExpandedName): E = {
+    val result = filterChildElemsNamed(expandedName)
     require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.head
   }
 
   /** Returns this element followed by all descendant elements (that is, the descendant-or-self elements) */
-  final def allElemsOrSelf: immutable.IndexedSeq[E] = {
+  final def findAllElemsOrSelf: immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -172,7 +169,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /**
    * Returns the descendant-or-self elements that obey the given predicate.
-   * That is, the result is equivalent to `allElemsOrSelf filter p`.
+   * That is, the result is equivalent to `findAllElemsOrSelf filter p`.
    */
   final def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
@@ -188,29 +185,32 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the descendant-or-self elements that have the given expanded name */
-  final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
+  final def filterElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
 
-  /** Returns (the equivalent of) `allElemsOrSelf collect pf` */
+  /** Returns (the equivalent of) `findAllElemsOrSelf collect pf` */
   final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     filterElemsOrSelf { e => pf.isDefinedAt(e) } collect pf
 
-  /** Returns all descendant elements (not including this element). Same as `allElemsOrSelf.drop(1)` */
-  final def allElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
+  /** Returns all descendant elements (not including this element). Same as `findAllElemsOrSelf.drop(1)` */
+  final def findAllElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.findAllElemsOrSelf }
 
-  /** Returns the descendant elements obeying the given predicate, that is, `allElems filter p` */
+  /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
 
-  /** Returns the descendant elements with the given expanded name */
-  final def elems(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
+  /** Shorthand for `filterElems(p)` */
+  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElems(p)
 
-  /** Returns (the equivalent of) `allElems collect pf` */
+  /** Returns the descendant elements with the given expanded name */
+  final def filterElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
+
+  /** Returns (the equivalent of) `findAllElems collect pf` */
   final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     filterElems { e => pf.isDefinedAt(e) } collect pf
 
   /**
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
    */
-  final def topmostElemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
+  final def filterTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -225,19 +225,22 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def topmostElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch topmostElemsOrSelfWhere p }
+  final def filterTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
+    allChildElems flatMap { ch => ch filterTopmostElemsOrSelf p }
+
+  /** Shorthand for `filterTopmostElems(p)` */
+  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = filterTopmostElems(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
-  final def topmostElemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] =
-    topmostElemsOrSelfWhere { e => e.resolvedName == expandedName }
+  final def filterTopmostElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
+    filterTopmostElemsOrSelf { e => e.resolvedName == expandedName }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def topmostElems(expandedName: ExpandedName): immutable.IndexedSeq[E] =
-    topmostElemsWhere { e => e.resolvedName == expandedName }
+  final def filterTopmostElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
+    filterTopmostElems { e => e.resolvedName == expandedName }
 
   /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
-  final def firstElemOrSelfOptionWhere(p: E => Boolean): Option[E] = {
+  final def findElemOrSelf(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatchingFirstElemOrSelf(elm: E): Option[E] = {
       if (p(elm)) Some(elm) else {
@@ -259,32 +262,32 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
-  final def firstElemOptionWhere(p: E => Boolean): Option[E] = {
-    self.allChildElems.view flatMap { ch => ch firstElemOrSelfOptionWhere p } headOption
+  final def findElem(p: E => Boolean): Option[E] = {
+    self.allChildElems.view flatMap { ch => ch findElemOrSelf p } headOption
   }
 
   /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */
-  final def firstElemOrSelfOption(expandedName: ExpandedName): Option[E] =
-    firstElemOrSelfOptionWhere { e => e.resolvedName == expandedName }
+  final def findElemOrSelfNamed(expandedName: ExpandedName): Option[E] =
+    findElemOrSelf { e => e.resolvedName == expandedName }
 
   /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
-  final def firstElemOption(expandedName: ExpandedName): Option[E] =
-    firstElemOptionWhere { e => e.resolvedName == expandedName }
+  final def findElemNamed(expandedName: ExpandedName): Option[E] =
+    findElem { e => e.resolvedName == expandedName }
 
   /**
    * Finds the parent element, if any, searching in the tree with the given root element.
    * The implementation uses the `equals` method on the self type, and uses no index. Typically rather expensive.
    */
   final def findParentInTree(root: E): Option[E] = {
-    root firstElemOrSelfOptionWhere { e => e.allChildElems exists { ch => ch == self } }
+    root findElemOrSelf { e => e.allChildElems exists { ch => ch == self } }
   }
 
   /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
-  final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = allElemsOrSelf groupBy f
+  final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
 
   /** Computes an index to parent elements, on the given function applied to the child elements */
   final def getIndexToParent[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = {
-    val parentChildPairs = allElemsOrSelf flatMap { e => e.allChildElems map { ch => (e -> ch) } }
+    val parentChildPairs = findAllElemsOrSelf flatMap { e => e.allChildElems map { ch => (e -> ch) } }
     parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
   }
 
@@ -292,7 +295,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.
    */
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
-    val relevantChildElms = self.childElems(entry.elementName)
+    val relevantChildElms = self.filterChildElemsNamed(entry.elementName)
 
     if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
   }
@@ -340,7 +343,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * The implementation uses the equals method on the self type.
    */
   final def ownElemPathEntry(parent: E): ElemPath.Entry = {
-    val idx = parent.childElems(self.resolvedName) indexWhere { e => e == self }
+    val idx = parent.filterChildElemsNamed(self.resolvedName) indexWhere { e => e == self }
     require(idx >= 0, "Expected %s to have parent %s".format(self.toString, parent.toString))
     ElemPath.Entry(self.resolvedName, idx)
   }

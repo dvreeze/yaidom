@@ -86,10 +86,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
       (i % 5) match {
         case 0 =>
-          val firstNameElms = doc.documentElement.elems("firstName".ename)
+          val firstNameElms = doc.documentElement.filterElemsNamed("firstName".ename)
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
         case 1 =>
-          val lastNameElms = doc.documentElement.elems("lastName".ename)
+          val lastNameElms = doc.documentElement.filterElemsNamed("lastName".ename)
           logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
         case 2 =>
           val contactElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "contact".ename }
@@ -134,10 +134,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   private def doTest(doc: Document) {
     val startMs = System.currentTimeMillis()
 
-    assert(doc.documentElement.allElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
+    assert(doc.documentElement.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
     expect(Set("contacts".ename, "contact".ename, "firstName".ename, "lastName".ename, "email".ename, "phone".ename)) {
-      val result = doc.documentElement.allElemsOrSelf map { e => e.resolvedName }
+      val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
@@ -146,6 +146,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
 
     val endMs = System.currentTimeMillis()
-    logger.info("The test (invoking allElemsOrSelf twice, and filterElemsOrSelf once) took %d ms".format(endMs - startMs))
+    logger.info("The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took %d ms".format(endMs - startMs))
   }
 }

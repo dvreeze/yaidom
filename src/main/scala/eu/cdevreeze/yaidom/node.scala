@@ -96,7 +96,7 @@ final class Document(
   /** Expensive method to obtain all processing instructions */
   def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
     val result: immutable.IndexedSeq[immutable.IndexedSeq[ProcessingInstruction]] =
-      documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case pi: ProcessingInstruction => pi } }
+      documentElement.findAllElemsOrSelf collect { case e: Elem => e.children collect { case pi: ProcessingInstruction => pi } }
     val elemPIs = result.flatten
     processingInstructions ++ elemPIs
   }
@@ -104,7 +104,7 @@ final class Document(
   /** Expensive method to obtain all comments */
   def allComments: immutable.IndexedSeq[Comment] = {
     val result: immutable.IndexedSeq[immutable.IndexedSeq[Comment]] =
-      documentElement.allElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
+      documentElement.findAllElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
     val elemComments = result.flatten
     comments ++ elemComments
   }
