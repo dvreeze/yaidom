@@ -191,7 +191,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
     filterElemsOrSelf { e => pf.isDefinedAt(e) } collect pf
 
-  /** Returns all descendant elements (not including this element). Same as `findAllElemsOrSelf.drop(1)` */
+  /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
   final def findAllElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.findAllElemsOrSelf }
 
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
@@ -263,7 +263,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElem(p: E => Boolean): Option[E] = {
-    self.allChildElems.view flatMap { ch => ch findElemOrSelf p } headOption
+    val elms = self.allChildElems.view flatMap { ch => ch findElemOrSelf p }
+    elms.headOption
   }
 
   /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */

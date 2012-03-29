@@ -195,6 +195,10 @@ class ElemLikeTest extends Suite {
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
+
+    expect(bookstore.allChildElems flatMap (_.findAllElemsOrSelf)) {
+      bookstore.findAllElems
+    }
   }
 
   @Test def testCollectFromElems() {
@@ -293,6 +297,10 @@ class ElemLikeTest extends Suite {
       val authorLastNameElms = authorElms flatMap { e => e.filterElemsOrSelfNamed(ns.ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
+    }
+
+    expect(immutable.IndexedSeq(bookstore) ++ (bookstore.allChildElems flatMap (_.findAllElemsOrSelf))) {
+      bookstore.findAllElemsOrSelf
     }
   }
 

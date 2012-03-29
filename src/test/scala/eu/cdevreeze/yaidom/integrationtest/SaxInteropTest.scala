@@ -918,8 +918,8 @@ class SaxInteropTest extends Suite {
   }
 
   /**
-   * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is definitely less verbose.
-   * Should the current yaidom become the "backend" of a higher-level DSL?
+   * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
+   * The Scala counterpart is more type-safe.
    */
   @Test def testParseGroovyXmlExample() {
     val parser = DocumentParserUsingSax.newInstance
@@ -933,14 +933,14 @@ class SaxInteropTest extends Suite {
     val recordsElm = doc.documentElement
 
     expect(3) {
-      recordsElm.filterChildElems(_.localName == "car").size
+      (recordsElm \ (_.localName == "car")).size
     }
 
     expect(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = recordsElm.filterChildElems(_.localName == "car")(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
     expect("car") {
       firstRecordElm.localName
@@ -955,13 +955,13 @@ class SaxInteropTest extends Suite {
     }
 
     expect(2) {
-      val carElms = recordsElm filterChildElems { _.localName == "car" }
+      val carElms = recordsElm \ { _.localName == "car" }
       val result = carElms filter { e => e.attributeOption("make".ename).getOrElse("").contains('e') }
       result.size
     }
 
     expect(Set("Holden", "Peel")) {
-      val carElms = recordsElm filterChildElems { _.localName == "car" }
+      val carElms = recordsElm \ { _.localName == "car" }
       val pattern = ".*s.*a.*".r.pattern
 
       val resultElms = carElms filter { e =>
@@ -988,7 +988,7 @@ class SaxInteropTest extends Suite {
     }
 
     expect(List("Royale", "P50", "HSV Maloo")) {
-      val carElms = recordsElm filterChildElems { _.localName == "car" }
+      val carElms = recordsElm \ { _.localName == "car" }
       val resultElms = carElms sortBy { e => e.attributeOption("year".ename).getOrElse("0").toInt }
       resultElms map { e => e.attribute("name".ename) }
     }
