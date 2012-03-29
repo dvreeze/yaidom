@@ -3,6 +3,25 @@ CHANGELOG
 =========
 
 
+0.5.0
+=====
+
+* Breaking changes in ``ElemLike`` API, renaming almost all methods!
+
+  * The core element collection retrieval methods are (abstract) ``allChildElems`` (not renamed), and ``findAllElems`` and ``findAllElemsOrSelf`` (after renaming)
+  * The other (renamed) element collection retrieval methods taking a predicate are ``filterTopmostElems`` and ``filterTopmostElemsOrSelf``
+  * The element (collection) retrieval methods taking an ExpandedName are now called ``filterChildElemsNamed`` etc.
+  * There are shorthand operator notations for methods ``filterChildElems``, ``filterElems`` and ``filterTopmostElems``
+  * Methods returning at most one element are now called ``findChildElem``, ``getChildElem`` etc.
+  * Why all this method renaming?
+  
+    * Except for "property" ``allChildElems``, the retrieval methods now start with verbs, as should be the case
+    * Those verbs are closer to Scala's Collections API vocabulary, and thus convey more meaning
+    * Since method names start with verbs, name clashes with variables holding retrieval method results are far less likely
+    * The core element collection retrieval methods are easy to distinguish from the other element (collection) retrieval methods
+    * Operator notation ```\```, ```\\``` and ```\!```, when used appropriately, can remove a lot of clutter
+
+
 0.4.4
 =====
 
