@@ -48,8 +48,8 @@ import scala.collection.{ immutable, mutable }
  * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
  * <li>'''Filtering on some ExpandedName''' (special case of the former): `filterChildElemsNamed`, `filterElemsNamed` and `filterElemsOrSelfNamed`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
- * <li>'''Filtering topmost obeying some predicate''' (not for child elements): `filterTopmostElems` and `filterTopmostElemsOrSelf`</li>
- * <li>'''Filtering topmost having some ExpandedName''' (special case of the former; not for child elements): `filterTopmostElemsNamed` and `filterTopmostElemsOrSelfNamed`</li>
+ * <li>'''Finding topmost obeying some predicate''' (not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
+ * <li>'''Finding topmost having some ExpandedName''' (special case of the former; not for child elements): `findTopmostElemsNamed` and `findTopmostElemsOrSelfNamed`</li>
  * </ul>
  *
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
@@ -86,7 +86,7 @@ import scala.collection.{ immutable, mutable }
  * retrieval methods. For example (in the absence of side-effects) the following holds:
  * {{{
  * e.findElemOrSelf(p) == e.filterElemsOrSelf(p).headOption
- * e.findElemOrSelf(p) == e.filterTopmostElemsOrSelf(p).headOption
+ * e.findElemOrSelf(p) == e.findTopmostElemsOrSelf(p).headOption
  * }}}
  *
  * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods for indexing the element tree and
@@ -210,7 +210,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /**
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
    */
-  final def filterTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
+  final def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -225,19 +225,19 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def filterTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch filterTopmostElemsOrSelf p }
+  final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
+    allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
-  /** Shorthand for `filterTopmostElems(p)`. Use this shorthand only if the predicate is a short expression. */
-  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = filterTopmostElems(p)
+  /** Shorthand for `findTopmostElems(p)`. Use this shorthand only if the predicate is a short expression. */
+  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElems(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
-  final def filterTopmostElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
-    filterTopmostElemsOrSelf { e => e.resolvedName == expandedName }
+  final def findTopmostElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
+    findTopmostElemsOrSelf { e => e.resolvedName == expandedName }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def filterTopmostElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
-    filterTopmostElems { e => e.resolvedName == expandedName }
+  final def findTopmostElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
+    findTopmostElems { e => e.resolvedName == expandedName }
 
   /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElemOrSelf(p: E => Boolean): Option[E] = {

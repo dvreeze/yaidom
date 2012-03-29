@@ -719,7 +719,7 @@ class DomInteropTest extends Suite {
     }
 
     def doChecks(rootElm: Elem): Unit = {
-      val childElms = rootElm.filterTopmostElemsNamed(ns.ename("child"))
+      val childElms = rootElm.findTopmostElemsNamed(ns.ename("child"))
       expect(2) {
         childElms.size
       }
@@ -793,7 +793,7 @@ class DomInteropTest extends Suite {
     }
 
     def doChecks(rootElm: Elem): Unit = {
-      val childElms = rootElm.filterTopmostElemsNamed(ns.ename("child"))
+      val childElms = rootElm.findTopmostElemsNamed(ns.ename("child"))
       expect(2) {
         childElms.size
       }

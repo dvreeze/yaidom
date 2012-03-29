@@ -353,9 +353,9 @@ class ElemLikeTest extends Suite {
 
     val elms = bookstore.findAllElems
     val magazineElms = bookstore \\! { _.localName == "Magazine" }
-    val bookElms = bookstore.filterTopmostElemsNamed(ns.ename("Book"))
+    val bookElms = bookstore.findTopmostElemsNamed(ns.ename("Book"))
     val cheapBookElms =
-      bookstore filterTopmostElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
+      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
 
     expect(46) {
       elms.size
@@ -392,14 +392,14 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).filterTopmostElemsNamed(ns.ename("Author"))
+      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).findTopmostElemsNamed(ns.ename("Author"))
       val authorLastNameElms = authorElms flatMap { e => e findElem (_.localName == "Last_Name") }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).filterTopmostElemsNamed(ns.ename("Author"))
-      val authorLastNameElms = authorElms flatMap { e => e.filterTopmostElemsNamed(ns.ename("Last_Name")) }
+      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).findTopmostElemsNamed(ns.ename("Author"))
+      val authorLastNameElms = authorElms flatMap { e => e.findTopmostElemsNamed(ns.ename("Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
@@ -407,7 +407,7 @@ class ElemLikeTest extends Suite {
     val ullmanAncestors =
       cheapBookElm filterElems { e => e.findAllElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
     val firstUllmanAncestors =
-      cheapBookElm filterTopmostElems { e => e.findAllElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
+      cheapBookElm findTopmostElems { e => e.findAllElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
 
     expect(3) {
       ullmanAncestors.size
@@ -443,7 +443,7 @@ class ElemLikeTest extends Suite {
     }
 
     val cheapBookElms =
-      bookstore filterTopmostElems { e => e.resolvedName == ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
+      bookstore findTopmostElems { e => e.resolvedName == ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
     val cheapBookElm: Elem = cheapBookElms(0)
     val cheapBookAuthorElms = cheapBookElm.filterElemsNamed(ns.ename("Author"))
 
