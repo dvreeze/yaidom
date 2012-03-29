@@ -116,7 +116,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the child elements obeying the given predicate */
   final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
 
-  /** Shorthand for `filterChildElems(p)` */
+  /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
 
   /** Returns the child elements with the given expanded name */
@@ -197,7 +197,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
 
-  /** Shorthand for `filterElems(p)` */
+  /** Shorthand for `filterElems(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElems(p)
 
   /** Returns the descendant elements with the given expanded name */
@@ -228,7 +228,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def filterTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
     allChildElems flatMap { ch => ch filterTopmostElemsOrSelf p }
 
-  /** Shorthand for `filterTopmostElems(p)` */
+  /** Shorthand for `filterTopmostElems(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = filterTopmostElems(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
