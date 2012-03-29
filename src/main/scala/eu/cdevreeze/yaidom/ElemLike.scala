@@ -42,7 +42,7 @@ import scala.collection.{ immutable, mutable }
  * Below follows a summary of the groups of `ElemLike` element collection retrieval methods:
  * <ul>
  * <li>'''Core''' (see above): `allChildElems`, `allElems` and `allElemsOrSelf`</li>
- * <li>'''Obeying some predicate''': `childElemsWhere`, `elemsWhere` and `elemsOrSelfWhere`</li>
+ * <li>'''Obeying some predicate''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
  * <li>'''Having some ExpandedName''' (special case of the former): `childElems`, `elems` and `elemsOrSelf`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
  * <li>'''Topmost obeying some predicate''' (not for child elements): `topmostElemsWhere` and `topmostElemsOrSelfWhere`</li>
@@ -76,9 +76,9 @@ import scala.collection.{ immutable, mutable }
  *
  * There are some obvious equalities, such as:
  * {{{
- * e.childElemsWhere(p) == e.allChildElems.filter(p)
- * e.elemsWhere(p) == e.allElems.filter(p)
- * e.elemsOrSelfWhere(p) == e.allElemsOrSelf.filter(p)
+ * e.filterChildElems(p) == e.allChildElems.filter(p)
+ * e.filterElems(p) == e.allElems.filter(p)
+ * e.filterElemsOrSelf(p) == e.allElemsOrSelf.filter(p)
  *
  * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
  * e.collectFromElems(pf) == e.allElems.collect(pf)
@@ -86,12 +86,12 @@ import scala.collection.{ immutable, mutable }
  * }}}
  * Moreover, each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
  * {{{
- * e.elemsOrSelf(ename) == (e elemsOrSelfWhere (_.resolvedName == ename))
+ * e.elemsOrSelf(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
  * }}}
  * Finally, the methods returning at most one element trivially correspond to expressions containing calls to element collection
  * retrieval methods. For example:
  * {{{
- * e.firstElemOrSelfOptionWhere(p) == e.elemsOrSelfWhere(p).headOption
+ * e.firstElemOrSelfOptionWhere(p) == e.filterElemsOrSelf(p).headOption
  * e.firstElemOrSelfOptionWhere(p) == e.topmostElemsOrSelfWhere(p).headOption
  * }}}
  *
@@ -120,24 +120,24 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def attribute(expandedName: ExpandedName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
   /** Returns the child elements obeying the given predicate */
-  final def childElemsWhere(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
+  final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
 
   /** Returns the child elements with the given expanded name */
-  final def childElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = childElemsWhere { e => e.resolvedName == expandedName }
+  final def childElems(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
   /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
   /** Returns the single child element obeying the given predicate, if any, wrapped in an `Option` */
   final def singleChildElemOptionWhere(p: E => Boolean): Option[E] = {
-    val result = childElemsWhere(p)
+    val result = filterChildElems(p)
     require(result.size <= 1, "Expected at most 1 matching child element, but found %d of them".format(result.size))
     result.headOption
   }
 
   /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
   final def singleChildElemWhere(p: E => Boolean): E = {
-    val result = childElemsWhere(p)
+    val result = filterChildElems(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
     result.head
   }
@@ -174,7 +174,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns the descendant-or-self elements that obey the given predicate.
    * That is, the result is equivalent to `allElemsOrSelf filter p`.
    */
-  final def elemsOrSelfWhere(p: E => Boolean): immutable.IndexedSeq[E] = {
+  final def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -188,24 +188,24 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the descendant-or-self elements that have the given expanded name */
-  final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsOrSelfWhere { e => e.resolvedName == expandedName }
+  final def elemsOrSelf(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
 
   /** Returns (the equivalent of) `allElemsOrSelf collect pf` */
   final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
-    elemsOrSelfWhere { e => pf.isDefinedAt(e) } collect pf
+    filterElemsOrSelf { e => pf.isDefinedAt(e) } collect pf
 
   /** Returns all descendant elements (not including this element). Same as `allElemsOrSelf.drop(1)` */
   final def allElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.allElemsOrSelf }
 
   /** Returns the descendant elements obeying the given predicate, that is, `allElems filter p` */
-  final def elemsWhere(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch elemsOrSelfWhere p }
+  final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
 
   /** Returns the descendant elements with the given expanded name */
-  final def elems(expandedName: ExpandedName): immutable.IndexedSeq[E] = elemsWhere { e => e.resolvedName == expandedName }
+  final def elems(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
 
   /** Returns (the equivalent of) `allElems collect pf` */
   final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
-    elemsWhere { e => pf.isDefinedAt(e) } collect pf
+    filterElems { e => pf.isDefinedAt(e) } collect pf
 
   /**
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.

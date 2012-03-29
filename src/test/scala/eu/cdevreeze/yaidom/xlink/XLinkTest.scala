@@ -52,7 +52,7 @@ class XLinkTest extends Suite {
     }
 
     expect(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
-      val result = sampleXml.wrappedElem elemsWhere { e => XLink.mustBeLocator(e) } map { e => Locator(e).href.toString }
+      val result = sampleXml.wrappedElem filterElems { e => XLink.mustBeLocator(e) } map { e => Locator(e).href.toString }
       result.toSet
     }
 

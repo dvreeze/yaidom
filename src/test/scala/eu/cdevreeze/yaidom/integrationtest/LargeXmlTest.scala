@@ -92,7 +92,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
           val lastNameElms = doc.documentElement.elems("lastName".ename)
           logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
         case 2 =>
-          val contactElms = doc.documentElement elemsOrSelfWhere { e => e.resolvedName == "contact".ename }
+          val contactElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "contact".ename }
           logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
         case 3 =>
           val emails = {
@@ -103,7 +103,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
           }
           logger.info("Different e-mails (%d): %s. Thread %s".format(emails.size, emails, Thread.currentThread.getName))
         case 4 =>
-          val firstNameElms = doc.documentElement elemsOrSelfWhere { e => e.resolvedName == "firstName".ename }
+          val firstNameElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "firstName".ename }
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
       }
     }
@@ -142,10 +142,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
 
     val s = "b" * (2000 + 46)
-    val elms1 = doc.documentElement elemsOrSelfWhere { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+    val elms1 = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
 
     val endMs = System.currentTimeMillis()
-    logger.info("The test (invoking allElemsOrSelf twice, and elemsOrSelfWhere once) took %d ms".format(endMs - startMs))
+    logger.info("The test (invoking allElemsOrSelf twice, and filterElemsOrSelf once) took %d ms".format(endMs - startMs))
   }
 }

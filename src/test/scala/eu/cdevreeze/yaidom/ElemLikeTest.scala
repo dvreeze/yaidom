@@ -41,10 +41,10 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms: immutable.IndexedSeq[Elem] = bookstore.allChildElems
-    val magazineElms: immutable.IndexedSeq[Elem] = bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore filterChildElems { e => e.resolvedName == ns.ns.ename("Magazine") }
     val bookElms: immutable.IndexedSeq[Elem] = bookstore.childElems(ns.ns.ename("Book"))
     val cheapBookElms: immutable.IndexedSeq[Elem] =
-      bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
+      bookstore filterChildElems { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(8) {
       bookstoreChildElms.size
@@ -67,7 +67,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
     expect(bookstore.allChildElems filter { e => e.resolvedName == ns.ns.ename("Magazine") }) {
-      bookstore childElemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+      bookstore filterChildElems { e => e.resolvedName == ns.ns.ename("Magazine") }
     }
 
     val cheapBookElm: Elem = cheapBookElms(0)
@@ -144,10 +144,10 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElems
-    val magazineElms: immutable.IndexedSeq[Elem] = bookstore elemsWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore filterElems { e => e.resolvedName == ns.ns.ename("Magazine") }
     val bookElms: immutable.IndexedSeq[Elem] = bookstore.elems(ns.ns.ename("Book"))
     val cheapBookElms: immutable.IndexedSeq[Elem] =
-      bookstore elemsWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
+      bookstore filterElems { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(46) {
       elms.size
@@ -172,7 +172,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
     expect(bookstore.allElems filter { e => e.resolvedName != ns.ns.ename("Magazine") }) {
-      bookstore elemsWhere { e => e.resolvedName != ns.ns.ename("Magazine") }
+      bookstore filterElems { e => e.resolvedName != ns.ns.ename("Magazine") }
     }
 
     val cheapBookElm: Elem = cheapBookElms(0)
@@ -239,16 +239,16 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val elms: immutable.IndexedSeq[Elem] = bookstore.allElemsOrSelf
-    val magazineElms: immutable.IndexedSeq[Elem] = bookstore elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Magazine") }
+    val magazineElms: immutable.IndexedSeq[Elem] = bookstore filterElemsOrSelf { e => e.resolvedName == ns.ns.ename("Magazine") }
     val bookElms: immutable.IndexedSeq[Elem] = bookstore.elemsOrSelf(ns.ns.ename("Book"))
     val cheapBookElms: immutable.IndexedSeq[Elem] =
-      bookstore elemsOrSelfWhere { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
+      bookstore filterElemsOrSelf { e => e.resolvedName == ns.ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
 
     expect(47) {
       elms.size
     }
     expect(47) {
-      val elms = bookstore elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(ns) }
+      val elms = bookstore filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(ns) }
       elms.size
     }
     expect(4) {
@@ -271,7 +271,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
     expect(bookstore.allElemsOrSelf filter { e => e.resolvedName != ns.ns.ename("Magazine") }) {
-      bookstore elemsOrSelfWhere { e => e.resolvedName != ns.ns.ename("Magazine") }
+      bookstore filterElemsOrSelf { e => e.resolvedName != ns.ns.ename("Magazine") }
     }
 
     val cheapBookElm: Elem = cheapBookElms(0)
@@ -315,7 +315,7 @@ class ElemLikeTest extends Suite {
       elms.size
     }
     expect(47) {
-      val elms = bookstore elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(ns) }
+      val elms = bookstore filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(ns) }
       elms.size
     }
     expect(4) {
@@ -395,7 +395,7 @@ class ElemLikeTest extends Suite {
     }
 
     val ullmanAncestors: immutable.IndexedSeq[Elem] =
-      cheapBookElm elemsWhere { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
+      cheapBookElm filterElems { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
     val firstUllmanAncestors: immutable.IndexedSeq[Elem] =
       cheapBookElm topmostElemsWhere { e => e.allElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
 

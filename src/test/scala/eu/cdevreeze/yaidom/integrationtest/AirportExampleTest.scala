@@ -248,7 +248,7 @@ class AirportExampleTest extends Suite {
 
     val airportElms: immutable.Seq[Elem] = {
       // Contains duplicates
-      val elms = airportRootElm childElemsWhere { e => airportCodes.contains(airportCode(e)) }
+      val elms = airportRootElm filterChildElems { e => airportCodes.contains(airportCode(e)) }
       val groups = elms groupBy { e => airportCode(e) }
       // No more duplicates
       val result = groups.values map { grp => grp.head }

@@ -61,7 +61,7 @@ class QueryTest extends Suite {
 
     val bookOrMagazineTitles: immutable.IndexedSeq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
       } yield bookOrMagazine.singleChildElem("Title".ename)
 
     expect(Set(
@@ -419,10 +419,10 @@ class QueryTest extends Suite {
 
     val booksAndMagazines: immutable.IndexedSeq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+        bookOrMagazine <- bookstore filterChildElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
         val titleString: String = bookOrMagazine.singleChildElem("Title".ename).trimmedText
         val otherBooksAndMagazines = {
-          val result = bookstore childElemsWhere { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+          val result = bookstore filterChildElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
           result.toSet -- Set(bookOrMagazine)
         }
         val titles = otherBooksAndMagazines map { e => e.singleChildElem("Title".ename) }
@@ -446,7 +446,7 @@ class QueryTest extends Suite {
 
     val booksAndMagazines: immutable.IndexedSeq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
         val titleString: String = bookOrMagazine.singleChildElem("Title".ename).trimmedText
         val otherBooks = bookstore.childElems("Book".ename).toSet -- Set(bookOrMagazine)
         val titles = otherBooks map { e => e.singleChildElem("Title".ename) }
@@ -863,7 +863,7 @@ class QueryTest extends Suite {
 
     val bookOrMagazineTitles: immutable.IndexedSeq[Elem] =
       for {
-        bookOrMagazine <- bookstore childElemsWhere { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
       } yield {
         val titleString = bookOrMagazine.singleChildElem("Title".ename).trimmedText
 

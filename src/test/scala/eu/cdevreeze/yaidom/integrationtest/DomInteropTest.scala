@@ -71,7 +71,7 @@ class DomInteropTest extends Suite {
       root.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect(3) {
-      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -97,10 +97,10 @@ class DomInteropTest extends Suite {
       root2.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root2 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root2 filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -118,10 +118,10 @@ class DomInteropTest extends Suite {
       root3.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root3 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root3 filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -147,10 +147,10 @@ class DomInteropTest extends Suite {
       root4.elemsOrSelf(nsBookstore.ns.ename("Title")).size
     }
     expect {
-      val result = root elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root4 elemsOrSelfWhere { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
+      val result = root4 filterElemsOrSelf { e => e.resolvedName == nsBookstore.ns.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
   }
@@ -321,17 +321,17 @@ class DomInteropTest extends Suite {
         ns.ename("notation"))
 
     expect(xsElmENames) {
-      val result = root elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {
-      val result = root elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root filterElemsOrSelf { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
     def checkForChoiceDocumentation(rootElm: Elem): Unit = {
       val forChoiceDefOption: Option[Elem] =
-        rootElm childElemsWhere { e => e.resolvedName == ns.ename("simpleType") && e.attribute("name".ename) == "formChoice" } headOption
+        rootElm filterChildElems { e => e.resolvedName == ns.ename("simpleType") && e.attribute("name".ename) == "formChoice" } headOption
 
       expect(true) {
         forChoiceDefOption.isDefined
@@ -367,12 +367,12 @@ class DomInteropTest extends Suite {
     def checkIdentityConstraintElm(rootElm: Elem): Unit = {
       val identityConstraintElms =
         for {
-          schemaElm <- rootElm elemsWhere { e =>
+          schemaElm <- rootElm filterElems { e =>
             e.resolvedName == ns.ename("element") &&
               e.attributeOption("name".ename) == Some("schema") &&
               e.attributeOption("id".ename) == Some("schema")
           }
-          idConstraintElm <- schemaElm childElemsWhere { e =>
+          idConstraintElm <- schemaElm filterChildElems { e =>
             e.resolvedName == ns.ename("key") &&
               e.attributeOption("name".ename) == Some("identityConstraint")
           }
@@ -397,7 +397,7 @@ class DomInteropTest extends Suite {
 
     def checkComplexTypeElm(rootElm: Elem): Unit = {
       val complexTypeElms =
-        rootElm elemsWhere { e =>
+        rootElm filterElems { e =>
           e.resolvedName == ns.ename("complexType") &&
             e.attributeOption("name".ename) == Some("element") &&
             e.attributeOption("abstract".ename) == Some("true")
@@ -458,7 +458,7 @@ class DomInteropTest extends Suite {
     checkComplexTypeElm(root)
 
     def checkFieldPattern(rootElm: Elem): Unit = {
-      val fieldElms = rootElm elemsWhere { e =>
+      val fieldElms = rootElm filterElems { e =>
         e.resolvedName == ns.ename("element") &&
           e.attributeOption("name".ename) == Some("field") &&
           e.attributeOption("id".ename) == Some("field")
@@ -490,11 +490,11 @@ class DomInteropTest extends Suite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     expect(xsElmENames) {
-      val result = root2 elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root2 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {
-      val result = root2 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root2 filterElemsOrSelf { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -509,11 +509,11 @@ class DomInteropTest extends Suite {
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
     expect(xsElmENames) {
-      val result = root3 elemsOrSelfWhere { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root3 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {
-      val result = root3 elemsOrSelfWhere { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root3 filterElemsOrSelf { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -968,14 +968,14 @@ class DomInteropTest extends Suite {
     val recordsElm = doc.documentElement
 
     expect(3) {
-      recordsElm.childElemsWhere(_.localName == "car").size
+      recordsElm.filterChildElems(_.localName == "car").size
     }
 
     expect(10) {
       recordsElm.allElemsOrSelf.size
     }
 
-    val firstRecordElm = recordsElm.childElemsWhere(_.localName == "car")(0)
+    val firstRecordElm = recordsElm.filterChildElems(_.localName == "car")(0)
 
     expect("car") {
       firstRecordElm.localName
@@ -990,13 +990,13 @@ class DomInteropTest extends Suite {
     }
 
     expect(2) {
-      val carElms = recordsElm childElemsWhere { _.localName == "car" }
+      val carElms = recordsElm filterChildElems { _.localName == "car" }
       val result = carElms filter { e => e.attributeOption("make".ename).getOrElse("").contains('e') }
       result.size
     }
 
     expect(Set("Holden", "Peel")) {
-      val carElms = recordsElm childElemsWhere { _.localName == "car" }
+      val carElms = recordsElm filterChildElems { _.localName == "car" }
       val pattern = ".*s.*a.*".r.pattern
 
       val resultElms = carElms filter { e =>
@@ -1019,11 +1019,11 @@ class DomInteropTest extends Suite {
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
     expect("New Zealand") {
-      updatedDoc.documentElement.childElemsWhere(_.localName == "car")(0).singleChildElemWhere(_.localName == "country").trimmedText
+      updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).singleChildElemWhere(_.localName == "country").trimmedText
     }
 
     expect(List("Royale", "P50", "HSV Maloo")) {
-      val carElms = recordsElm childElemsWhere { _.localName == "car" }
+      val carElms = recordsElm filterChildElems { _.localName == "car" }
       val resultElms = carElms sortBy { e => e.attributeOption("year".ename).getOrElse("0").toInt }
       resultElms map { e => e.attribute("name".ename) }
     }
