@@ -21,7 +21,7 @@ CHANGELOG
       refer to the operation on that data ("filter", "find topmost", "collect from" etc.)
     * Since method names start with verbs, name clashes with variables holding retrieval method results are far less likely
     * The core element collection retrieval methods are easy to distinguish from the other element (collection) retrieval methods
-    * Operator notation ```\```, ```\\``` and ```\!```, when used appropriately, can remove a lot of clutter
+    * Operator notation ```\```, ```\\``` and ```\\!```, when used appropriately, can remove a lot of clutter
 
 
 0.4.4
