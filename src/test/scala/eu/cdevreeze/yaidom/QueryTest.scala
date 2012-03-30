@@ -41,8 +41,8 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val bookTitles: immutable.IndexedSeq[Elem] =
-      bookstore.filterChildElemsNamed("Book".ename) map { e => e.getChildElemNamed("Title".ename) }
+    val bookTitles =
+      (bookstore \ (_.localName == "Book")) map { e => e getChildElem (_.localName == "Title") }
 
     expect(Set(
       "A First Course in Database Systems",
@@ -59,9 +59,9 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val bookOrMagazineTitles: immutable.IndexedSeq[Elem] =
+    val bookOrMagazineTitles =
       for {
-        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
       } yield bookOrMagazine.getChildElemNamed("Title".ename)
 
     expect(Set(
@@ -81,7 +81,7 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val titles: immutable.IndexedSeq[Elem] =
+    val titles =
       for (ch <- bookstore.allChildElems) yield ch.getChildElemNamed("Title".ename)
 
     expect(Set(
@@ -101,8 +101,8 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val titles: immutable.IndexedSeq[Elem] =
-      for (title <- bookstore.filterElemsNamed("Title".ename)) yield title
+    val titles =
+      for (title <- bookstore filterElems (_.localName == "Title")) yield title
 
     expect(Set(
       "A First Course in Database Systems",
@@ -121,7 +121,7 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val elements: immutable.IndexedSeq[Elem] = bookstore.findAllElemsOrSelf
+    val elements = bookstore.findAllElemsOrSelf
 
     assert(elements.contains(bookstore), "Expected element 'Bookstore', among others")
     assert(elements.size > 10, "Expected more than 10 elements")
@@ -138,8 +138,8 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val isbns: immutable.IndexedSeq[String] =
-      for (book <- bookstore.filterChildElemsNamed("Book".ename)) yield book.attribute("ISBN".ename)
+    val isbns =
+      for (book <- bookstore \ (_.localName == "Book")) yield book.attribute("ISBN".ename)
 
     expect(Set(
       "ISBN-0-13-713526-2",
@@ -155,9 +155,9 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val books: immutable.IndexedSeq[Elem] =
+    val books =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val price = book.attribute("Price".ename)
         if price.toInt < 90
       } yield book
@@ -176,9 +176,9 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val titles: immutable.IndexedSeq[Elem] =
+    val titles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         if book.attribute("Price".ename).toInt < 90
       } yield book.getChildElemNamed("Title".ename)
 
@@ -196,9 +196,9 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val bookTitles: immutable.IndexedSeq[Elem] =
+    val bookTitles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         if !book.filterChildElemsNamed("Remark".ename).isEmpty
       } yield book.getChildElemNamed("Title".ename)
 
@@ -215,12 +215,12 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val bookTitles: immutable.IndexedSeq[Elem] =
+    val bookTitles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         if book.attribute("Price".ename).toInt < 90
-        val authors = book.getChildElemNamed("Authors".ename)
-        authorLastName <- authors.filterChildElemsNamed("Author".ename) map { e => e.getChildElemNamed("Last_Name".ename) } map { _.trimmedText }
+        val authors = book getChildElem { _.localName == "Authors" }
+        authorLastName <- authors filterChildElems { _.localName == "Author" } flatMap { e => e \ { _.localName == "Last_Name" } } map { _.trimmedText }
         if authorLastName == "Ullman"
       } yield book.getChildElemNamed("Title".ename)
 
@@ -237,14 +237,14 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val bookTitles: immutable.IndexedSeq[Elem] =
+    val bookTitles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         if book.attribute("Price".ename).toInt < 90
-        val authors = book.getChildElemNamed("Authors".ename)
-        authorLastName <- authors.filterChildElemsNamed("Author".ename) map { e => e.getChildElemNamed("Last_Name".ename) } map { _.trimmedText }
+        val authors = book getChildElem { _.localName == "Authors" }
+        authorLastName <- authors filterChildElems { _.localName == "Author" } flatMap { e => e \ { _.localName == "Last_Name" } } map { _.trimmedText }
         if authorLastName == "Ullman"
-        authorFirstName <- authors.filterChildElemsNamed("Author".ename) map { e => e.getChildElemNamed("First_Name".ename) } map { _.trimmedText }
+        authorFirstName <- authors filterChildElems { _.localName == "Author" } flatMap { e => e \ { _.localName == "First_Name" } } map { _.trimmedText }
         if authorFirstName == "Jeffrey"
       } yield book.getChildElemNamed("Title".ename)
 
@@ -261,12 +261,12 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val bookTitles: immutable.IndexedSeq[Elem] =
+    val bookTitles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val authors = book.getChildElemNamed("Authors".ename)
         val lastNameStrings: immutable.IndexedSeq[String] = for {
-          author <- authors.filterChildElemsNamed("Author".ename)
+          author <- authors \ { _.localName == "Author" }
           val lastNameString = author.getChildElemNamed("Last_Name".ename).trimmedText
         } yield lastNameString
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
@@ -284,16 +284,16 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val secondAuthors: immutable.IndexedSeq[Elem] =
+    val secondAuthors =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val authors = book.getChildElemNamed("Authors".ename)
-        val authorColl = authors.filterChildElemsNamed("Author".ename)
+        val authorColl = authors \ { _.localName == "Author" }
         if authorColl.size >= 2
         secondAuthor <- authorColl.drop(1).headOption
       } yield secondAuthor
 
-    val secondAuthorLastNames: immutable.IndexedSeq[Elem] = secondAuthors map { e => e.getChildElemNamed("Last_Name".ename) }
+    val secondAuthorLastNames = secondAuthors map { e => e getChildElem { _.localName == "Last_Name" } }
     expect(Set(
       "Widom",
       "Ullman",
@@ -308,10 +308,10 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val titles: immutable.IndexedSeq[Elem] =
+    val titles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
-        remark <- book.filterChildElemsNamed("Remark".ename)
+        book <- bookstore \ { _.localName == "Book" }
+        remark <- book \ { _.localName == "Remark" }
         if remark.trimmedText.indexOf("great") >= 0
       } yield book.getChildElemNamed("Title".ename)
 
@@ -326,12 +326,12 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val magazines: immutable.IndexedSeq[Elem] =
+    val magazines =
       for {
-        magazine <- bookstore.filterChildElemsNamed("Magazine".ename)
+        magazine <- bookstore \ { _.localName == "Magazine" }
         val magazineTitle: String = magazine.getChildElemNamed("Title".ename).trimmedText
         val booksWithSameName = for {
-          book <- bookstore.filterChildElemsNamed("Book".ename)
+          book <- bookstore \ { _.localName == "Book" }
           val bookTitle: String = book.getChildElemNamed("Title".ename).trimmedText
           if magazineTitle == bookTitle
         } yield book
@@ -351,7 +351,7 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val elms: immutable.IndexedSeq[Elem] =
+    val elms =
       for {
         desc <- bookstore.findAllElems
         parent <- desc.findParentInTree(bookstore) // Inefficient
@@ -394,7 +394,7 @@ class QueryTest extends Suite {
     // Not using method Elem.updated here
     val bookStoreWithPaths = addElemPaths(bookstore, ElemPath.Root, Scope.Empty)
 
-    val elms: immutable.IndexedSeq[Elem] =
+    val elms =
       for {
         desc <- bookStoreWithPaths.findAllElems
         val path = ElemPath.fromCanonicalXPath(desc.attribute("elemPath".ename))(Scope.Empty)
@@ -417,15 +417,15 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val booksAndMagazines: immutable.IndexedSeq[Elem] =
+    val booksAndMagazines =
       for {
-        bookOrMagazine <- bookstore filterChildElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+        bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
         val titleString: String = bookOrMagazine.getChildElemNamed("Title".ename).trimmedText
         val otherBooksAndMagazines = {
-          val result = bookstore filterChildElems { e => Set("Book".ename, "Magazine".ename).contains(e.resolvedName) }
+          val result = bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
           result.toSet -- Set(bookOrMagazine)
         }
-        val titles = otherBooksAndMagazines map { e => e.getChildElemNamed("Title".ename) }
+        val titles = otherBooksAndMagazines map { e => e getChildElem { _.localName == "Title" } }
         val titleStrings: Set[String] = {
           val result = titles map { _.trimmedText }
           result.toSet
@@ -444,12 +444,12 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val booksAndMagazines: immutable.IndexedSeq[Elem] =
+    val booksAndMagazines =
       for {
-        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
         val titleString: String = bookOrMagazine.getChildElemNamed("Title".ename).trimmedText
         val otherBooks = bookstore.filterChildElemsNamed("Book".ename).toSet -- Set(bookOrMagazine)
-        val titles = otherBooks map { e => e.getChildElemNamed("Title".ename) }
+        val titles = otherBooks map { e => e getChildElem { _.localName == "Title" } }
         val titleStrings: Set[String] = {
           val result = titles map { _.trimmedText }
           result.toSet
@@ -478,9 +478,9 @@ class QueryTest extends Suite {
   @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ() {
     require(bookstore.localName == "Bookstore")
 
-    val books: immutable.IndexedSeq[Elem] =
+    val books =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val authorNames: Set[String] = {
           val result = for {
             author <- book.filterElemsNamed("Author".ename)
@@ -502,9 +502,9 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    val titles: immutable.IndexedSeq[Elem] =
+    val titles =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val authorNames: Set[String] = {
           val result = book.filterElemsNamed("Author".ename) map { _.getChildElemNamed("Last_Name".ename).trimmedText }
           result.toSet
@@ -535,9 +535,9 @@ class QueryTest extends Suite {
 
     import NodeBuilder._
 
-    val titleAndFirstNames: immutable.IndexedSeq[Elem] =
+    val titleAndFirstNames =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val title = book.getChildElemNamed("Title".ename)
         val authorFirstNames: Set[String] = {
           val result = book.filterElemsNamed("Author".ename) map { _.getChildElemNamed("First_Name".ename).trimmedText }
@@ -577,7 +577,7 @@ class QueryTest extends Suite {
 
     val prices: immutable.IndexedSeq[Double] =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val price = book.attribute("Price".ename).toDouble
       } yield price
     val averagePrice =
@@ -608,15 +608,15 @@ class QueryTest extends Suite {
 
     val prices: immutable.IndexedSeq[Double] =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val price = book.attribute("Price".ename).toDouble
       } yield price
 
     val avg: Double = prices.sum.toDouble / prices.size
 
-    val cheapBooks: immutable.IndexedSeq[Elem] =
+    val cheapBooks =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         val price = book.attribute("Price".ename).toDouble
         if price < avg
       } yield elem(
@@ -662,9 +662,9 @@ class QueryTest extends Suite {
       price1 < price2
     }
 
-    val books: immutable.IndexedSeq[Elem] = {
+    val books = {
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename) sortWith { cheaper _ }
+        book <- bookstore \ { _.localName == "Book" } sortWith { cheaper _ }
         val price = book.attribute("Price".ename).toDouble
       } yield elem(
         qname = "Book".qname,
@@ -704,7 +704,7 @@ class QueryTest extends Suite {
 
     val lastNameValues: immutable.IndexedSeq[String] =
       for {
-        lastName <- bookstore.filterElemsNamed("Last_Name".ename) map { e => e.trimmedText } distinct
+        lastName <- (bookstore.filterElemsNamed("Last_Name".ename) map (e => e.trimmedText)).distinct
       } yield lastName
 
     expect(Set(
@@ -736,8 +736,8 @@ class QueryTest extends Suite {
     def bookAuthorLastNames(book: Elem): Set[String] = {
       val authors = book.getChildElemNamed("Authors".ename)
       val result = for {
-        author <- authors.filterChildElemsNamed("Author".ename)
-        val lastName = author.getChildElemNamed("Last_Name".ename)
+        author <- authors \ { _.localName == "Author" }
+        val lastName = author getChildElem { _.localName == "Last_Name" }
         val lastNameValue: String = lastName.trimmedText
       } yield lastNameValue
       result.toSet
@@ -745,10 +745,10 @@ class QueryTest extends Suite {
 
     def bookTitle(book: Elem): String = book.getChildElemNamed("Title".ename).trimmedText
 
-    val pairs: immutable.IndexedSeq[Elem] =
+    val pairs =
       for {
-        book1 <- bookstore.filterChildElemsNamed("Book".ename)
-        book2 <- bookstore.filterChildElemsNamed("Book".ename)
+        book1 <- bookstore \ { _.localName == "Book" }
+        book2 <- bookstore \ { _.localName == "Book" }
         if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
         if bookTitle(book1) < bookTitle(book2)
       } yield elem(
@@ -808,9 +808,9 @@ class QueryTest extends Suite {
 
     import NodeBuilder._
 
-    def books(authorLastName: String): immutable.IndexedSeq[Elem] =
+    def books(authorLastName: String) =
       for {
-        book <- bookstore.filterChildElemsNamed("Book".ename)
+        book <- bookstore \ { _.localName == "Book" }
         author <- book.filterElemsNamed("Author".ename)
         if author.getChildElemNamed("Last_Name".ename).trimmedText == authorLastName
       } yield {
@@ -821,7 +821,7 @@ class QueryTest extends Suite {
           withChildNodes(book.filterChildElemsNamed("Title".ename))(Scope.Empty).build()
       }
 
-    val authorsWithBooks: immutable.IndexedSeq[Elem] =
+    val authorsWithBooks =
       for {
         lastNameValue <- bookstore.filterElemsNamed("Author".ename) map { e => e.getChildElemNamed("Last_Name".ename).trimmedText } distinct
       } yield {
@@ -861,9 +861,9 @@ class QueryTest extends Suite {
 
     import NodeBuilder._
 
-    val bookOrMagazineTitles: immutable.IndexedSeq[Elem] =
+    val bookOrMagazineTitles =
       for {
-        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
       } yield {
         val titleString = bookOrMagazine.getChildElemNamed("Title".ename).trimmedText
 

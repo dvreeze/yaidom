@@ -428,14 +428,14 @@ class ElemLikeTest extends Suite {
   @Test def testFindParentInTree() {
     require(bookstore.localName == "Bookstore")
 
-    val bookElms = bookstore.filterElemsNamed(ns.ename("Book"))
+    val bookElms = bookstore filterElems { _.localName == "Book" }
 
     expect(Set(bookstore)) {
-      val result = bookElms map { e => e.findParentInTree(bookstore) }
+      val result = bookElms map { _.findParentInTree(bookstore) }
       result.flatten.toSet
     }
 
-    val lastNameElms = bookstore.filterElemsNamed(ns.ename("Last_Name"))
+    val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
     expect(Set(ns.ename("Author"))) {
       val result = lastNameElms map { e => e.findParentInTree(bookstore) } flatMap { eOption => eOption map { _.resolvedName } }
@@ -443,9 +443,9 @@ class ElemLikeTest extends Suite {
     }
 
     val cheapBookElms =
-      bookstore findTopmostElems { e => e.resolvedName == ns.ename("Book") && e.attribute("Price".ename).toInt <= 50 }
+      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
     val cheapBookElm: Elem = cheapBookElms(0)
-    val cheapBookAuthorElms = cheapBookElm.filterElemsNamed(ns.ename("Author"))
+    val cheapBookAuthorElms = cheapBookElm filterElems { _.localName == "Author" }
 
     expect(cheapBookAuthorElms.toSet) {
       val result = lastNameElms flatMap { e => e.findParentInTree(cheapBookElm) }
@@ -456,7 +456,7 @@ class ElemLikeTest extends Suite {
   @Test def testGetIndex() {
     require(bookstore.localName == "Bookstore")
 
-    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndex { e => e.resolvedName }
+    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndex { _.resolvedName }
 
     expect {
       val result = bookstore.findAllElemsOrSelf map { _.resolvedName }
@@ -469,7 +469,7 @@ class ElemLikeTest extends Suite {
       index forall { kv =>
         val ename: ExpandedName = kv._1
         val elms: immutable.IndexedSeq[Elem] = kv._2
-        elms forall { e => e.resolvedName == ename }
+        elms forall { _.resolvedName == ename }
       }
     }
   }
@@ -477,7 +477,7 @@ class ElemLikeTest extends Suite {
   @Test def testGetIndexToParent() {
     require(bookstore.localName == "Bookstore")
 
-    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndexToParent { e => e.resolvedName }
+    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndexToParent { _.resolvedName }
 
     expect {
       val result = bookstore.findAllElems map { _.resolvedName }
@@ -490,8 +490,8 @@ class ElemLikeTest extends Suite {
       index forall { kv =>
         val ename: ExpandedName = kv._1
         val elms: immutable.IndexedSeq[Elem] = kv._2
-        val childElms = elms flatMap { e => e.allChildElems }
-        val result = childElms exists { e => e.resolvedName == ename }
+        val childElms = elms flatMap { _.allChildElems }
+        val result = childElms exists { _.resolvedName == ename }
         result
       }
     }

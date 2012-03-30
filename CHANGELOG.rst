@@ -17,8 +17,8 @@ CHANGELOG
   
     * Except for "property" ``allChildElems``, the retrieval methods now start with verbs, as should be the case
     * Those verbs are closer to Scala's Collections API vocabulary, and thus convey more meaning
-    * In method names, nouns refer to the "core element set" (children, descendants, decendants-or-self), and verbs (and optional adverb)
-      refer to the operation on that data (filter, find topmost, collect etc.)
+    * In method names, nouns refer to the "core element set" (children, descendants, decendants-or-self), and verbs (and optional adjective, preposition etc.)
+      refer to the operation on that data ("filter", "find topmost", "collect from" etc.)
     * Since method names start with verbs, name clashes with variables holding retrieval method results are far less likely
     * The core element collection retrieval methods are easy to distinguish from the other element (collection) retrieval methods
     * Operator notation ```\```, ```\\``` and ```\!```, when used appropriately, can remove a lot of clutter

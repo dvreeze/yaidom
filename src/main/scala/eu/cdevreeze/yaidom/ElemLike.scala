@@ -77,7 +77,7 @@ import scala.collection.{ immutable, mutable }
  * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
  * e.collectFromElems(pf) == e.findAllElems.collect(pf)
  * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
- * 
+ *
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  *
@@ -203,7 +203,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
 
-  /** Shorthand for `filterElems(p)`. Use this shorthand only if the predicate is a short expression. */
+  /** Shorthand for `filterElems(p)`. Use this shorthand only if the predicate is a short expression. Do not confuse this with the double forward slash in XPath! */
   final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElems(p)
 
   /** Returns the descendant elements with the given expanded name */
