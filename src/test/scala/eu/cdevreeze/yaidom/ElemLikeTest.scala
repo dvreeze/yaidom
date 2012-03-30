@@ -548,6 +548,92 @@ class ElemLikeTest extends Suite {
     }
   }
 
+  @Test def testEqualities() {
+    require(bookstore.localName == "Bookstore")
+
+    val allElms = bookstore.findAllElemsOrSelf
+
+    expect(47) {
+      allElms.size
+    }
+
+    val p = (e: Elem) => e.localName == "Last_Name"
+    val pf: PartialFunction[Elem, String] = { case e: Elem if e.localName == "Last_Name" => e.trimmedText }
+
+    expect(8) {
+      val result = bookstore.filterElems(p)
+      result.size
+    }
+
+    expect(8) {
+      val result = bookstore.collectFromElems(pf)
+      result.size
+    }
+
+    for (elm <- allElms) {
+      expect((elm.allChildElems flatMap (_.findAllElemsOrSelf))) {
+        elm.findAllElems
+      }
+
+      expect((immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf)))) {
+        elm.findAllElemsOrSelf
+      }
+
+      expect(elm.allChildElems.filter(p)) {
+        elm.filterChildElems(p)
+      }
+
+      expect(elm.findAllElems.filter(p)) {
+        elm.filterElems(p)
+      }
+
+      expect(elm.findAllElemsOrSelf.filter(p)) {
+        elm.filterElemsOrSelf(p)
+      }
+
+      expect(elm.allChildElems.collect(pf)) {
+        elm.collectFromChildElems(pf)
+      }
+
+      expect(elm.findAllElems.collect(pf)) {
+        elm.collectFromElems(pf)
+      }
+
+      expect(elm.findAllElemsOrSelf.collect(pf)) {
+        elm.collectFromElemsOrSelf(pf)
+      }
+
+      expect(elm.filterElems(p)) {
+        (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)))
+      }
+
+      expect(elm.filterElemsOrSelf(p)) {
+        (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p)))
+      }
+
+      expect(elm.allChildElems flatMap (_.filterElemsOrSelf(p))) {
+        elm.filterElems(p)
+      }
+
+      expect((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))) {
+        elm.filterElemsOrSelf(p)
+      }
+
+      val ename = "Last_Name".ename
+      expect(elm filterElemsOrSelf (_.resolvedName == ename)) {
+        elm.filterElemsOrSelfNamed(ename)
+      }
+
+      expect(elm.filterElemsOrSelf(p).headOption) {
+        elm.findElemOrSelf(p)
+      }
+
+      expect(elm.findTopmostElemsOrSelf(p).headOption) {
+        elm.findElemOrSelf(p)
+      }
+    }
+  }
+
   private val book1: ElemBuilder = {
     import NodeBuilder._
 

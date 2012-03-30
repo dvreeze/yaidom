@@ -77,6 +77,12 @@ import scala.collection.{ immutable, mutable }
  * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
  * e.collectFromElems(pf) == e.findAllElems.collect(pf)
  * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
+ * 
+ * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
+ *
+ * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * elm.filterElemsOrSelf(p) == ((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))))
  * }}}
  * Moreover, each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
  * {{{

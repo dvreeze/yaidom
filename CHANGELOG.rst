@@ -9,7 +9,7 @@ CHANGELOG
 * Breaking changes in ``ElemLike`` API, renaming almost all methods!
 
   * The core element collection retrieval methods are (abstract) ``allChildElems`` (not renamed), and ``findAllElems`` and ``findAllElemsOrSelf`` (after renaming)
-  * The other (renamed) element collection retrieval methods taking a predicate are ``findTopmostElems`` and ``findTopmostElemsOrSelf``
+  * The other (renamed) element collection retrieval methods taking a predicate are ``filterChildElems``, ``filterElems``, ``filterElemsOrself``, ``findTopmostElems`` and ``findTopmostElemsOrSelf``
   * The element (collection) retrieval methods taking an ExpandedName are now called ``filterChildElemsNamed`` etc.
   * There are shorthand operator notations for methods ``filterChildElems``, ``filterElems`` and ``findTopmostElems``
   * Methods returning at most one element are now called ``findChildElem``, ``getChildElem`` etc.
