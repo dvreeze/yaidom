@@ -291,11 +291,11 @@ class AirportExampleTest extends Suite {
           case (airportCode, dist) =>
             elem(
               qname = "Distance".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "Airport".qname,
                   attributes = Map("code".qname -> airportCode),
-                  children = immutable.IndexedSeq(text(dist.toString)))))
+                  children = List(text(dist.toString)))))
         })
     }
 
@@ -313,26 +313,26 @@ class AirportExampleTest extends Suite {
         val elmBuilder: ElemBuilder =
           elem(
             qname = "Airport".qname,
-            children = immutable.IndexedSeq(
+            children = List(
               elem(
                 qname = "AirportCode".qname,
-                children = immutable.IndexedSeq(text(airportCode(airportElm)))),
+                children = List(text(airportCode(airportElm)))),
               elem(
                 qname = "AirportOrCityName".qname,
-                children = immutable.IndexedSeq(text(airportOrCityName))),
+                children = List(text(airportOrCityName))),
               elem(
                 qname = "Country".qname,
-                children = immutable.IndexedSeq(text(country))),
+                children = List(text(country))),
               elem(
                 qname = "CountryAbbreviation".qname,
-                children = immutable.IndexedSeq(text(countryAbbreviation))),
+                children = List(text(countryAbbreviation))),
               elem(
                 qname = "Position".qname,
-                children = immutable.IndexedSeq(
+                children = List(
                   elem(
-                    qname = "Lat".qname, children = immutable.IndexedSeq(text(lat.toString))),
+                    qname = "Lat".qname, children = List(text(lat.toString))),
                   elem(
-                    qname = "Lon".qname, children = immutable.IndexedSeq(text(lon.toString))))),
+                    qname = "Lon".qname, children = List(text(lon.toString))))),
               distancesElemBuilder(airportElm)))
 
         elmBuilder.build(scope)

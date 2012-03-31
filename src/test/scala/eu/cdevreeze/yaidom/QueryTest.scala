@@ -547,9 +547,9 @@ class QueryTest extends Suite {
         if !searchedForFirstNames.isEmpty
       } yield elem(
         qname = "Book".qname,
-        children = immutable.IndexedSeq(
+        children = List(
           fromElem(title)(Scope.Empty),
-          elem(qname = "First_Name".qname, children = immutable.IndexedSeq(text(searchedForFirstNames.head))))).build()
+          elem(qname = "First_Name".qname, children = List(text(searchedForFirstNames.head))))).build()
 
     expect(2) {
       titleAndFirstNames.size
@@ -582,7 +582,7 @@ class QueryTest extends Suite {
       } yield price
     val averagePrice =
       elem(qname = "Average".qname,
-        children = immutable.IndexedSeq(text((prices.sum.toDouble / prices.size).toString))).build()
+        children = List(text((prices.sum.toDouble / prices.size).toString))).build()
 
     expect(65) {
       averagePrice.trimmedText.toDouble.intValue
@@ -621,11 +621,11 @@ class QueryTest extends Suite {
         if price < avg
       } yield elem(
         qname = "Book".qname,
-        children = immutable.IndexedSeq(
+        children = List(
           fromElem(book.getChildElemNamed("Title".ename))(Scope.Empty),
           elem(
             qname = "Price".qname,
-            children = immutable.IndexedSeq(text(price.toString))))).build()
+            children = List(text(price.toString))))).build()
 
     expect(2) {
       cheapBooks.size
@@ -668,11 +668,11 @@ class QueryTest extends Suite {
         val price = book.attribute("Price".ename).toDouble
       } yield elem(
         qname = "Book".qname,
-        children = immutable.IndexedSeq(
+        children = List(
           fromElem(book.getChildElemNamed("Title".ename))(Scope.Empty),
           elem(
             qname = "Price".qname,
-            children = immutable.IndexedSeq(text(price.toString))))).build()
+            children = List(text(price.toString))))).build()
     }
 
     expect(4) {
@@ -753,13 +753,13 @@ class QueryTest extends Suite {
         if bookTitle(book1) < bookTitle(book2)
       } yield elem(
         qname = "BookPair".qname,
-        children = immutable.IndexedSeq(
+        children = List(
           elem(
             qname = "Title1".qname,
-            children = immutable.IndexedSeq(text(bookTitle(book1)))),
+            children = List(text(bookTitle(book1)))),
           elem(
             qname = "Title2".qname,
-            children = immutable.IndexedSeq(text(bookTitle(book2)))))).build()
+            children = List(text(bookTitle(book2)))))).build()
 
     expect(5) {
       pairs.size
@@ -839,13 +839,13 @@ class QueryTest extends Suite {
 
         elem(
           qname = "Author".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "First_Name".qname,
-              children = immutable.IndexedSeq(text(firstNameValue))),
+              children = List(text(firstNameValue))),
             elem(
               qname = "Last_Name".qname,
-              children = immutable.IndexedSeq(text(lastNameValue)))) ++ bookBuilders).build()
+              children = List(text(lastNameValue)))) ++ bookBuilders).build()
       }
 
     val invertedBookstore: Elem = Elem(qname = "InvertedBookstore".qname, children = authorsWithBooks)
@@ -870,11 +870,11 @@ class QueryTest extends Suite {
         if (bookOrMagazine.resolvedName == "Book".ename) {
           elem(
             qname = "BookTitle".qname,
-            children = immutable.IndexedSeq(text(titleString))).build()
+            children = List(text(titleString))).build()
         } else {
           elem(
             qname = "MagazineTitle".qname,
-            children = immutable.IndexedSeq(text(titleString))).build()
+            children = List(text(titleString))).build()
         }
       }
 
@@ -935,13 +935,13 @@ class QueryTest extends Suite {
       val firstNameValue: String = author.getChildElemNamed("First_Name".ename).trimmedText
       val lastNameValue: String = author.getChildElemNamed("Last_Name".ename).trimmedText
       val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
-      val name: ElemBuilder = elem(qname = "Name".qname, children = immutable.IndexedSeq(text(nameValue)))
+      val name: ElemBuilder = elem(qname = "Name".qname, children = List(text(nameValue)))
 
       elem(
         qname = author.qname,
         attributes = author.attributes,
         namespaces = Scope.Empty.relativize(author.scope),
-        children = immutable.IndexedSeq(name)).build()
+        children = List(name)).build()
     }
 
     val bookstoreWithCombinedNames: Elem =
@@ -963,32 +963,32 @@ class QueryTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-13-713526-2", "Price".qname -> "85", "Edition".qname -> "3rd"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("A First Course in Database Systems"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jeffrey"))),
+                  children = List(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Ullman"))))),
+                  children = List(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jennifer"))),
+                  children = List(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Widom")))))))))
+                  children = List(text("Widom")))))))))
   }
 
   private val book2: ElemBuilder = {
@@ -997,44 +997,44 @@ class QueryTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-13-815504-6", "Price".qname -> "100"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("Database Systems: The Complete Book"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Hector"))),
+                  children = List(text("Hector"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Garcia-Molina"))))),
+                  children = List(text("Garcia-Molina"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jeffrey"))),
+                  children = List(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Ullman"))))),
+                  children = List(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jennifer"))),
+                  children = List(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Widom"))))))),
+                  children = List(text("Widom"))))))),
         elem(
           qname = "Remark".qname,
-          children = immutable.IndexedSeq(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
+          children = List(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
   }
 
   private val book3: ElemBuilder = {
@@ -1043,35 +1043,35 @@ class QueryTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-11-222222-3", "Price".qname -> "50"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("Hector and Jeff's Database Hints"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jeffrey"))),
+                  children = List(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Ullman"))))),
+                  children = List(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Hector"))),
+                  children = List(text("Hector"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Garcia-Molina"))))))),
+                  children = List(text("Garcia-Molina"))))))),
         elem(
           qname = "Remark".qname,
-          children = immutable.IndexedSeq(text("An indispensable companion to your textbook")))))
+          children = List(text("An indispensable companion to your textbook")))))
   }
 
   private val book4: ElemBuilder = {
@@ -1080,23 +1080,23 @@ class QueryTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-9-88-777777-6", "Price".qname -> "25"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("Jennifer's Economical Database Hints"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jennifer"))),
+                  children = List(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Widom")))))))))
+                  children = List(text("Widom")))))))))
   }
 
   private val magazine1: ElemBuilder = {
@@ -1105,10 +1105,10 @@ class QueryTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "January", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("National Geographic")))))
+          children = List(text("National Geographic")))))
   }
 
   private val magazine2: ElemBuilder = {
@@ -1117,10 +1117,10 @@ class QueryTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("National Geographic")))))
+          children = List(text("National Geographic")))))
   }
 
   private val magazine3: ElemBuilder = {
@@ -1129,10 +1129,10 @@ class QueryTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("Newsweek")))))
+          children = List(text("Newsweek")))))
   }
 
   private val magazine4: ElemBuilder = {
@@ -1141,10 +1141,10 @@ class QueryTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "March", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("Hector and Jeff's Database Hints")))))
+          children = List(text("Hector and Jeff's Database Hints")))))
   }
 
   private val bookstore: Elem = {
@@ -1152,7 +1152,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = "Bookstore".qname,
-      children = immutable.IndexedSeq(
+      children = List(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
   }
 }

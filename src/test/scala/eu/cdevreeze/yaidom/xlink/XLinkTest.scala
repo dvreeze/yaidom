@@ -83,11 +83,11 @@ class XLinkTest extends Suite {
         qname = "courseload".qname,
         attributes = Map("xlink:type".qname -> "extended"),
         namespaces = Map("xlink" -> "http://www.w3.org/1999/xlink").namespaces,
-        children = immutable.IndexedSeq(
+        children = List(
           elem(
             qname = "tooltip".qname,
             attributes = Map("xlink:type".qname -> "title"),
-            children = immutable.IndexedSeq(text("Course Load for Pat Jones"))),
+            children = List(text("Course Load for Pat Jones"))),
           elem(
             qname = "person".qname,
             attributes = Map(
@@ -119,7 +119,7 @@ class XLinkTest extends Suite {
               "xlink:type".qname -> "resource",
               "xlink:label".qname -> "PatJonesGPA",
               "xlink:role".qname -> "http://www.example.com/linkprops/gpa"),
-            children = immutable.IndexedSeq(text("3.5"))),
+            children = List(text("3.5"))),
           elem(
             qname = "go".qname,
             attributes = Map(

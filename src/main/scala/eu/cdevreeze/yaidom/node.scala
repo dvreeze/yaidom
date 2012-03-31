@@ -144,14 +144,14 @@ final class Document(
          |%s,
          |""".stripMargin
 
-    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = immutable.IndexedSeq(%s),""" + newline else
-      """|  processingInstructions = immutable.IndexedSeq(
+    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = List(%s),""" + newline else
+      """|  processingInstructions = List(
          |%s
          |  ),
          |""".stripMargin
 
-    val commentsFormatString = if (comments.isEmpty) """  comments = immutable.IndexedSeq(%s)""" + newline else
-      """|  comments = immutable.IndexedSeq(
+    val commentsFormatString = if (comments.isEmpty) """  comments = List(%s)""" + newline else
+      """|  comments = List(
          |%s
          |  )
          |""".stripMargin
@@ -370,8 +370,8 @@ final class Elem(
          |  namespaces = %s,
          |""".stripMargin
 
-    val childrenFormatString = if (self.children.isEmpty) """  children = immutable.IndexedSeq(%s)""" + newline else
-      """|  children = immutable.IndexedSeq(
+    val childrenFormatString = if (self.children.isEmpty) """  children = List(%s)""" + newline else
+      """|  children = List(
          |%s
          |  )
          |""".stripMargin

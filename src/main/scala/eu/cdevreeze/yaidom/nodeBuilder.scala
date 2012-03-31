@@ -29,10 +29,10 @@ import scala.collection.immutable
  *   qname = "Magazine".qname,
  *   attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
  *   namespaces = Map("dbclass" -> "http://www.db-class.org").namespaces,
- *   children = immutable.IndexedSeq(
+ *   children = List(
  *     elem(
  *       qname = "Title".qname,
- *       children = immutable.IndexedSeq(text("Newsweek"))))).build()
+ *       children = List(text("Newsweek"))))).build()
  * }}}
  *
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
@@ -92,7 +92,7 @@ final class DocBuilder(
   type NodeType = Document
 
   override def children: immutable.IndexedSeq[NodeBuilder] =
-    processingInstructions ++ comments ++ immutable.IndexedSeq[NodeBuilder](documentElement)
+    (processingInstructions ++ comments) :+ documentElement
 
   def build(parentScope: Scope): Document = {
     require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
@@ -100,8 +100,8 @@ final class DocBuilder(
     Document(
       baseUriOption = self.baseUriOption,
       documentElement = documentElement.build(parentScope),
-      processingInstructions = processingInstructions map { pi => pi.build(parentScope) },
-      comments = comments map { c => c.build(parentScope) })
+      processingInstructions = processingInstructions map { (pi: ProcessingInstructionBuilder) => pi.build(parentScope) },
+      comments = comments map { (c: CommentBuilder) => c.build(parentScope) })
   }
 }
 
@@ -176,23 +176,23 @@ object NodeBuilder {
   def document(
     baseUriOption: Option[String],
     documentElement: ElemBuilder,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
-    comments: immutable.IndexedSeq[CommentBuilder]): DocBuilder = {
+    processingInstructions: immutable.Seq[ProcessingInstructionBuilder],
+    comments: immutable.Seq[CommentBuilder]): DocBuilder = {
 
     new DocBuilder(
       baseUriOption map { uriString => new URI(uriString) },
       documentElement,
-      processingInstructions,
-      comments)
+      processingInstructions.toIndexedSeq,
+      comments.toIndexedSeq)
   }
 
   def elem(
     qname: QName,
     attributes: Map[QName, String] = Map(),
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
-    children: immutable.IndexedSeq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
+    children: immutable.Seq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, children)
+    new ElemBuilder(qname, attributes, namespaces, children.toIndexedSeq)
   }
 
   def text(textValue: String): TextBuilder = TextBuilder(text = textValue, isCData = false)

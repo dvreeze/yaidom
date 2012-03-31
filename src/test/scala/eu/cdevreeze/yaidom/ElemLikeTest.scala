@@ -632,32 +632,32 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-13-713526-2", "Price".qname -> "85", "Edition".qname -> "3rd"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("A First Course in Database Systems"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jeffrey"))),
+                  children = List(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Ullman"))))),
+                  children = List(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jennifer"))),
+                  children = List(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Widom")))))))))
+                  children = List(text("Widom")))))))))
   }
 
   private val book2: ElemBuilder = {
@@ -666,44 +666,44 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-13-815504-6", "Price".qname -> "100"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("Database Systems: The Complete Book"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Hector"))),
+                  children = List(text("Hector"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Garcia-Molina"))))),
+                  children = List(text("Garcia-Molina"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jeffrey"))),
+                  children = List(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Ullman"))))),
+                  children = List(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jennifer"))),
+                  children = List(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Widom"))))))),
+                  children = List(text("Widom"))))))),
         elem(
           qname = "Remark".qname,
-          children = immutable.IndexedSeq(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
+          children = List(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
   }
 
   private val book3: ElemBuilder = {
@@ -712,35 +712,35 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-0-11-222222-3", "Price".qname -> "50"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("Hector and Jeff's Database Hints"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jeffrey"))),
+                  children = List(text("Jeffrey"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Ullman"))))),
+                  children = List(text("Ullman"))))),
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Hector"))),
+                  children = List(text("Hector"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Garcia-Molina"))))))),
+                  children = List(text("Garcia-Molina"))))))),
         elem(
           qname = "Remark".qname,
-          children = immutable.IndexedSeq(text("An indispensable companion to your textbook")))))
+          children = List(text("An indispensable companion to your textbook")))))
   }
 
   private val book4: ElemBuilder = {
@@ -749,23 +749,23 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Book".qname,
       attributes = Map("ISBN".qname -> "ISBN-9-88-777777-6", "Price".qname -> "25"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             text("Jennifer's Economical Database Hints"))),
         elem(
           qname = "Authors".qname,
-          children = immutable.IndexedSeq(
+          children = List(
             elem(
               qname = "Author".qname,
-              children = immutable.IndexedSeq(
+              children = List(
                 elem(
                   qname = "First_Name".qname,
-                  children = immutable.IndexedSeq(text("Jennifer"))),
+                  children = List(text("Jennifer"))),
                 elem(
                   qname = "Last_Name".qname,
-                  children = immutable.IndexedSeq(text("Widom")))))))))
+                  children = List(text("Widom")))))))))
   }
 
   private val magazine1: ElemBuilder = {
@@ -774,10 +774,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "January", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("National Geographic")))))
+          children = List(text("National Geographic")))))
   }
 
   private val magazine2: ElemBuilder = {
@@ -786,10 +786,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("National Geographic")))))
+          children = List(text("National Geographic")))))
   }
 
   private val magazine3: ElemBuilder = {
@@ -798,10 +798,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("Newsweek")))))
+          children = List(text("Newsweek")))))
   }
 
   private val magazine4: ElemBuilder = {
@@ -810,10 +810,10 @@ class ElemLikeTest extends Suite {
     elem(
       qname = "Magazine".qname,
       attributes = Map("Month".qname -> "March", "Year".qname -> "2009"),
-      children = immutable.IndexedSeq(
+      children = List(
         elem(
           qname = "Title".qname,
-          children = immutable.IndexedSeq(text("Hector and Jeff's Database Hints")))))
+          children = List(text("Hector and Jeff's Database Hints")))))
   }
 
   private val bookstore: Elem = {
@@ -823,7 +823,7 @@ class ElemLikeTest extends Suite {
       elem(
         qname = "books:Bookstore".qname,
         namespaces = Map("" -> ns.toString, "books" -> ns.toString).namespaces,
-        children = immutable.IndexedSeq(
+        children = List(
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
 
     require {
