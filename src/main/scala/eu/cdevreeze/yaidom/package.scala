@@ -49,7 +49,7 @@ package eu.cdevreeze
  * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
  * <li>Yaidom does not simplify printing/parsing of XML. The upside is that yaidom has a very good power-to-weight ratio.</li>
  * <li>Yaidom only knows about XML, not about HTML.</li>
- * <li>Yaidom does not know about types (XML Schema types, DTD types), for example types of attribute.</li>
+ * <li>Yaidom does not know about XML Schema types (or DTD types), for example types of attribute.</li>
  * <li>APIs such as JAXP, JDOM and XOM are more feature-rich, for example in support for base URIs.</li>
  * </ul>
  *
@@ -94,7 +94,6 @@ package eu.cdevreeze
  * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s,
  * whereas the `Node`s that they create all must have a fixed `Scope`, so node builders are indeed intended to be handy for creation
  * of node trees. At the same level are [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
- * <li>Contracts (as traits) for conversions from and to `Document`s or `Elem`s</li>
  * </ol>
  * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
