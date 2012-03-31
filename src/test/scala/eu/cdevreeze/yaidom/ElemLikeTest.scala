@@ -504,20 +504,14 @@ class ElemLikeTest extends Suite {
       bookstore.findWithElemPath(ElemPath.Root)
     }
 
+    val scope = Scope.fromMap(Map("b" -> ns.toString))
+
     expect(Some("Last_Name".qname)) {
-      val path = ElemPath(immutable.IndexedSeq(
-        ElemPath.Entry(ns.ename("Book"), 0),
-        ElemPath.Entry(ns.ename("Authors"), 0),
-        ElemPath.Entry(ns.ename("Author"), 0),
-        ElemPath.Entry(ns.ename("Last_Name"), 0)))
+      val path = ElemPath.fromXPaths(List("/b:Book[1]", "/b:Authors[1]", "/b:Author[1]", "/b:Last_Name[1]"))(scope)
       bookstore.findWithElemPath(path) map { _.qname }
     }
     expect(Some("Ullman")) {
-      val path = ElemPath(immutable.IndexedSeq(
-        ElemPath.Entry(ns.ename("Book"), 0),
-        ElemPath.Entry(ns.ename("Authors"), 0),
-        ElemPath.Entry(ns.ename("Author"), 0),
-        ElemPath.Entry(ns.ename("Last_Name"), 0)))
+      val path = ElemPath.fromXPaths(List("/b:Book[1]", "/b:Authors[1]", "/b:Author[1]", "/b:Last_Name[1]"))(scope)
       bookstore.findWithElemPath(path) map { _.trimmedText }
     }
 
@@ -541,10 +535,8 @@ class ElemLikeTest extends Suite {
       }
     }
     expect(None) {
-      val p = ElemPath(immutable.IndexedSeq(
-        ElemPath.Entry(ns.ename("Book"), 2),
-        ElemPath.Entry(ns.ename("Title"), 2)))
-      bookstore.findWithElemPath(p)
+      val path = ElemPath.fromXPaths(List("/b:Book[3]", "/b:Title[3]"))(scope)
+      bookstore.findWithElemPath(path)
     }
   }
 

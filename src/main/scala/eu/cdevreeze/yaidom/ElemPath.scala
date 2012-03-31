@@ -118,6 +118,15 @@ object ElemPath {
 
   def apply(entries: immutable.IndexedSeq[ElemPath.Entry]): ElemPath = new ElemPath(entries)
 
+  /** Returns `fromCanonicalXPath(s)(scope)` */
+  def apply(s: String)(scope: Scope): ElemPath = fromCanonicalXPath(s)(scope)
+
+  /** Creates an `ElemPath` from a sequence of entry XPath strings */
+  def fromXPaths(paths: immutable.Seq[String])(scope: Scope): ElemPath = {
+    val entries = paths map { path => ElemPath.Entry(path)(scope) }
+    apply(entries.toIndexedSeq)
+  }
+
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath` */
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
@@ -174,6 +183,9 @@ object ElemPath {
   }
 
   object Entry {
+
+    /** Returns `fromCanonicalXPath(s)(scope)` */
+    def apply(s: String)(scope: Scope): Entry = fromCanonicalXPath(s)(scope)
 
     /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `ElemPath.Entry`, given a `Scope` */
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
