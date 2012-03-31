@@ -69,7 +69,7 @@ package eu.cdevreeze
  *     bookElm <- bookstoreElm \ { _.localName == "Book" }
  *     val price = bookElm.attribute("Price".ename)
  *     if price.toInt < 90
- *   } yield book
+ *   } yield bookElm
  * }}}
  * Note the implicit conversions from Strings to namespace URIs and to expanded names.
  *
@@ -80,7 +80,7 @@ package eu.cdevreeze
  *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
  *     val price = bookElm.attribute("Price".ename)
  *     if price.toInt < 90
- *   } yield book
+ *   } yield bookElm
  * }}}
  *
  * This package contains the following parts, in order of dependencies (starting with the class without any dependencies):
