@@ -93,7 +93,7 @@ package eu.cdevreeze
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
  * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s,
  * whereas the `Node`s that they create all must have a fixed `Scope`, so node builders are indeed intended to be handy for creation
- * of node trees.</li>
+ * of node trees. At the same level are [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
  * <li>Contracts (as traits) for conversions from and to `Document`s or `Elem`s</li>
  * </ol>
  * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
