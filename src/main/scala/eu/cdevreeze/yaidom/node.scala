@@ -25,9 +25,8 @@ import scala.collection.immutable
  * Immutable XML node. The API is inspired by Anti-XML, but it is less ambitious,
  * and differs in some key respects. Like Anti-XML:
  * <ul>
- * <li>Nodes in this API are truly immutable and thread-safe, backed by immutable
- * Scala collections.</li>
- * <li>Nodes have no reference to their parent/ancestor nodes. Hence, for example, you cannot
+ * <li>Nodes in this API are truly immutable, and thread-safe, backed by immutable Scala collections.</li>
+ * <li>The immutable strictly evaluated nodes have no reference to their parent/ancestor nodes. Hence, for example, you cannot
  * ask a `Node` for its "owning" document. Yet these nodes can be re-used in several XML trees.</li>
  * </ul>
  * Unlike Anti-XML:

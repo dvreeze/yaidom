@@ -22,6 +22,9 @@ CHANGELOG
     * Since method names start with verbs, name clashes with variables holding retrieval method results are far less likely
     * The core element collection retrieval methods are easy to distinguish from the other element (collection) retrieval methods
     * Operator notation ```\```, ```\\``` and ```\\!```, when used appropriately, can remove a lot of clutter
+    
+* Made ``ElemPath`` easier to construct
+* Small improvements, such as slightly less verbose ``ElemBuilder`` construction
 
 
 0.4.4
