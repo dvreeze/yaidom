@@ -43,7 +43,8 @@ class XLinkTest extends Suite {
     }
 
     expect(Some(sampleXml.wrappedElem)) {
-      sampleXml.wrappedElem collectFromElemsOrSelf { case e if XLink.mustBeExtendedLink(e) => e } headOption
+      val result = sampleXml.wrappedElem collectFromElemsOrSelf { case e if XLink.mustBeExtendedLink(e) => e }
+      result.headOption
     }
 
     expect(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {

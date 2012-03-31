@@ -119,12 +119,10 @@ class AirportExampleTest extends Suite {
 
     // 3. Check elevation query results
 
-    val enameTable = nsWebServiceX.ename("Table")
-    val enameRunwayElevationFeet = nsWebServiceX.ename("RunwayElevationFeet")
-
     def highestAirport(root: Elem): Elem = {
-      val sorted = root.filterElemsOrSelfNamed(enameTable) sortBy { e =>
-        e.findChildElemNamed(enameRunwayElevationFeet) map { e => e.trimmedText.toInt } getOrElse (0)
+      val tableElms = root filterElemsOrSelf { _.localName == "Table" }
+      val sorted = tableElms sortBy { (e: Elem) =>
+        e findChildElem { _.localName == "RunwayElevationFeet" } map { e => e.trimmedText.toInt } getOrElse (0)
       }
       sorted.last
     }
@@ -134,8 +132,8 @@ class AirportExampleTest extends Suite {
     val highestDeAirport = highestAirport(deAirportsDoc.documentElement)
 
     def airportElevationInFeet(e: Elem): Int = {
-      require(e.resolvedName == enameTable)
-      e.getChildElemNamed(enameRunwayElevationFeet).trimmedText.toInt
+      require(e.localName == "Table")
+      e.getChildElem(_.localName == "RunwayElevationFeet").trimmedText.toInt
     }
 
     // The highest German airport is Oberpfaffenhofen (Munich)
@@ -303,9 +301,9 @@ class AirportExampleTest extends Suite {
       for {
         airportElm <- airportElms
       } yield {
-        val airportOrCityName = airportElm.getChildElemNamed(nsWebServiceX.ename("CityOrAirportName")).trimmedText
-        val country = airportElm.getChildElemNamed(nsWebServiceX.ename("Country")).trimmedText
-        val countryAbbreviation = airportElm.getChildElemNamed(nsWebServiceX.ename("CountryAbbrviation")).trimmedText
+        val airportOrCityName = (airportElm getChildElem (_.localName == "CityOrAirportName")).trimmedText
+        val country = (airportElm getChildElem (_.localName == "Country")).trimmedText
+        val countryAbbreviation = (airportElm getChildElem (_.localName == "CountryAbbrviation")).trimmedText
 
         val lat = airportLatitude(airportElm)
         val lon = airportLongitude(airportElm)
@@ -354,15 +352,15 @@ class AirportExampleTest extends Suite {
       val airportElms =
         for {
           airportElm <- airportSummaryRoot.allChildElems
-          val airportCodeElm = airportElm.getChildElemNamed(nsWebServiceX.ename("AirportCode"))
+          val airportCodeElm = airportElm getChildElem (_.localName == "AirportCode")
           if airportCodeElm.trimmedText == "FRA"
         } yield airportElm
       val airportElm = airportElms.headOption.getOrElse(sys.error("Expected airport FRA"))
 
       val distances =
         for {
-          distanceElm <- airportElm.filterElemsNamed(nsWebServiceX.ename("Distance"))
-          airportElm <- distanceElm.filterChildElemsNamed(nsWebServiceX.ename("Airport"))
+          distanceElm <- airportElm \\ (_.localName == "Distance")
+          airportElm <- distanceElm \ (_.localName == "Airport")
           if airportElm.attribute("code".ename) == "BRU"
         } yield airportElm.trimmedText.toDouble
       val distance = distances.headOption.getOrElse(sys.error("Expected distance to BRU"))
