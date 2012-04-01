@@ -55,10 +55,9 @@ import scala.collection.{ immutable, mutable }
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
  * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
  * <ul>
- * <li>'''Obeying some predicate''' (only for child elements): `findChildElem` and `getChildElem`</li>
- * <li>'''Having some ExpandedName''' (special case of the former; only for child elements): `findChildElemNamed` and `getChildElemNamed`</li>
- * <li>'''First (depth-first) obeying some predicate''' (not for child elements): `findElem` and `findElemOrSelf`</li>
- * <li>'''First (depth-first) having some ExpandedName''' (special case of the former; not for child elements): `findElemNamed` and `findElemOrSelfNamed`</li>
+ * <li>'''Finding first obeying some predicate''' (depth-first search): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
+ * <li>'''Finding first having some ExpandedName''' (special case of the former): `findChildElemNamed` and `getChildElemNamed`, `findElemNamed`
+ * and `findElemOrSelfNamed`</li>
  * </ul>
  *
  * These element (collection) retrieval methods process and return elements in the following (depth-first) order:
@@ -131,11 +130,15 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
-  /** Returns the single child element obeying the given predicate, if any, wrapped in an `Option` */
+  /** Returns the first found child element obeying the given predicate, if any, wrapped in an `Option` */
   final def findChildElem(p: E => Boolean): Option[E] = {
     val result = filterChildElems(p)
-    require(result.size <= 1, "Expected at most 1 matching child element, but found %d of them".format(result.size))
     result.headOption
+  }
+
+  /** Returns the first found child element with the given expanded name, if any, wrapped in an `Option` */
+  final def findChildElemNamed(expandedName: ExpandedName): Option[E] = {
+    findChildElem { e => e.resolvedName == expandedName }
   }
 
   /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
@@ -143,13 +146,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     val result = filterChildElems(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
     result.head
-  }
-
-  /** Returns the single child element with the given expanded name, if any, wrapped in an `Option` */
-  final def findChildElemNamed(expandedName: ExpandedName): Option[E] = {
-    val result = filterChildElemsNamed(expandedName)
-    require(result.size <= 1, "Expected at most 1 child element %s, but found %d of them".format(expandedName, result.size))
-    result.headOption
   }
 
   /** Returns the single child element with the given expanded name, and throws an exception otherwise */
