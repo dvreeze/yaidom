@@ -77,6 +77,9 @@ import scala.collection.{ immutable, mutable }
  * e.collectFromElems(pf) == e.findAllElems.collect(pf)
  * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
  *
+ * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
+ *
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  *
