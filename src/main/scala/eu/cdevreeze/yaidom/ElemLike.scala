@@ -60,14 +60,19 @@ import scala.collection.{ immutable, mutable }
  * and `findElemOrSelfNamed`</li>
  * </ul>
  *
- * These element (collection) retrieval methods process and return elements in the following (depth-first) order:
- * <ol>
- * <li>Parents are processed before their children</li>
- * <li>Children are processed before the next sibling</li>
- * <li>The first child element (returned by method `allChildElems`) is processed before the next child element, and so on</li>
- * </ol>
+ * These element (collection) retrieval methods process and return elements in depth-first order
+ * (see http://en.wikipedia.org/wiki/Depth-first_search).
  *
- * There are some obvious equalities (in the absence of side-effects), such as:
+ * Assuming no side-effects, some obvious equalities, suggesting ways to construct the left-hand-side, are:
+ * {{{
+ * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * elm.filterElemsOrSelf(p) == ((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))))
+ *
+ * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
+ * }}}
+ *
+ * Assuming no side-effects, some obvious equalities, in terms of "core" element collections, are:
  * {{{
  * e.filterChildElems(p) == e.allChildElems.filter(p)
  * e.filterElems(p) == e.findAllElems.filter(p)
@@ -76,15 +81,11 @@ import scala.collection.{ immutable, mutable }
  * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
  * e.collectFromElems(pf) == e.findAllElems.collect(pf)
  * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
- *
- * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
- *
+ * }}}
+ * The following also holds:
+ * {{{
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
- *
- * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- * elm.filterElemsOrSelf(p) == ((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))))
  * }}}
  * Moreover, each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
  * {{{
@@ -163,12 +164,12 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulateElemsOrSelf(elm: E) {
+    def accumulate(elm: E) {
       result += elm
-      elm.allChildElems foreach { e => accumulateElemsOrSelf(e) }
+      elm.allChildElems foreach { e => accumulate(e) }
     }
 
-    accumulateElemsOrSelf(self)
+    accumulate(self)
     result.toIndexedSeq
   }
 
@@ -180,12 +181,12 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulateMatchingElemsOrSelf(elm: E) {
+    def accumulate(elm: E) {
       if (p(elm)) result += elm
-      elm.allChildElems foreach { e => accumulateMatchingElemsOrSelf(e) }
+      elm.allChildElems foreach { e => accumulate(e) }
     }
 
-    accumulateMatchingElemsOrSelf(self)
+    accumulate(self)
     result.toIndexedSeq
   }
 
@@ -219,13 +220,13 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     var result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulateMatchingTopmostElemsOrSelf(elm: E) {
+    def accumulate(elm: E) {
       if (p(elm)) result += elm else {
-        elm.allChildElems foreach { e => accumulateMatchingTopmostElemsOrSelf(e) }
+        elm.allChildElems foreach { e => accumulate(e) }
       }
     }
 
-    accumulateMatchingTopmostElemsOrSelf(self)
+    accumulate(self)
     result.toIndexedSeq
   }
 
@@ -247,7 +248,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElemOrSelf(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
-    def findMatchingFirstElemOrSelf(elm: E): Option[E] = {
+    def findMatch(elm: E): Option[E] = {
       if (p(elm)) Some(elm) else {
         val childElms = elm.allChildElems
 
@@ -255,7 +256,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
         var result: Option[E] = None
 
         while ((result.isEmpty) && (i < childElms.size)) {
-          result = findMatchingFirstElemOrSelf(childElms(i))
+          result = findMatch(childElms(i))
           i += 1
         }
 
@@ -263,7 +264,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
       }
     }
 
-    findMatchingFirstElemOrSelf(self)
+    findMatch(self)
   }
 
   /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
@@ -291,10 +292,25 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
   final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
 
-  /** Computes an index to parent elements, on the given function applied to the child elements */
-  final def getIndexToParent[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = {
-    val parentChildPairs = findAllElemsOrSelf flatMap { e => e.allChildElems map { ch => (e -> ch) } }
-    parentChildPairs groupBy { pair => f(pair._2) } mapValues { pairs => pairs map { _._1 } } mapValues { _.distinct }
+  /** Returns a "unique" index on `ElemPath` */
+  final def getIndexByElemPath: Map[ElemPath, E] = {
+    var result = mutable.Map[ElemPath, E]()
+
+    // Not tail-recursive, but the depth should typically be limited
+    def accumulate(path: ElemPath, elm: E) {
+      result += (path -> elm)
+
+      val childPaths = elm.allChildElemPathEntries map { entry => path.append(entry) }
+      val childElms = elm.allChildElems
+      require(childPaths.size == childElms.size)
+
+      val childPathElmPairs = childPaths.zip(childElms)
+
+      childPathElmPairs foreach { pair => accumulate(pair._1, pair._2) }
+    }
+
+    accumulate(ElemPath.Root, self)
+    result.toMap
   }
 
   /**

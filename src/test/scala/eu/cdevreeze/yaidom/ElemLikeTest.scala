@@ -474,25 +474,18 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testGetIndexToParent() {
+  @Test def testGetIndexByElemPath() {
     require(bookstore.localName == "Bookstore")
 
-    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndexToParent { _.resolvedName }
+    val index: Map[ElemPath, Elem] = bookstore.getIndexByElemPath
 
-    expect {
-      val result = bookstore.findAllElems map { _.resolvedName }
-      result.toSet.size
-    } {
+    expect(bookstore.findAllElemsOrSelf.size) {
       index.size
     }
 
-    expect(true) {
-      index forall { kv =>
-        val ename: ExpandedName = kv._1
-        val elms: immutable.IndexedSeq[Elem] = kv._2
-        val childElms = elms flatMap { _.allChildElems }
-        val result = childElms exists { _.resolvedName == ename }
-        result
+    for ((path, elm) <- index) {
+      expect(Some(elm)) {
+        bookstore.findWithElemPath(path)
       }
     }
   }

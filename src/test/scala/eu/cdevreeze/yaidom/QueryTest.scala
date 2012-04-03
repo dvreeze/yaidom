@@ -368,7 +368,7 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingElemPaths() {
+  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     // This implementation should be more efficient than the preceding one, in particular in much larger XML trees.
@@ -398,6 +398,32 @@ class QueryTest extends Suite {
       for {
         desc <- bookStoreWithPaths.findAllElems
         val path = ElemPath.fromCanonicalXPath(desc.attribute("elemPath".ename))(Scope.Empty)
+        parent <- bookstore.findWithElemPath(path.parentPath)
+        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
+      } yield desc
+
+    assert(elms.size > 10, "Expected more than 10 matching elements")
+    val qnames: Set[QName] = {
+      val result = elms map { _.qname }
+      result.toSet
+    }
+    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
+      qnames
+    }
+  }
+
+  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingElemPaths() {
+    // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
+
+    // This implementation is less verbose and still relatively efficient (comparing to the 2 preceding ones).
+
+    require(bookstore.localName == "Bookstore")
+
+    val indexOnPath: Map[ElemPath, Elem] = bookstore.getIndexByElemPath
+
+    val elms =
+      for {
+        (path, desc) <- (indexOnPath - ElemPath.Root)
         parent <- bookstore.findWithElemPath(path.parentPath)
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
       } yield desc
