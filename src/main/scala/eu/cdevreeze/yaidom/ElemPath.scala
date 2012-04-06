@@ -16,7 +16,8 @@
 
 package eu.cdevreeze.yaidom
 
-import scala.collection.immutable
+import scala.collection.{ immutable, mutable }
+import scala.annotation.tailrec
 
 /**
  * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It is used for transformations
@@ -70,6 +71,20 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
 
   /** Like `parentPathOption`, but unwrapping the result (or throwing an exception otherwise) */
   def parentPath: ElemPath = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
+
+  /** Returns the ancestor-or-self paths, starting with this path, then the parent (if any), and ending with the root path */
+  def ancestorOrSelfPaths: immutable.IndexedSeq[ElemPath] = {
+    @tailrec
+    def accumulate(path: ElemPath, acc: mutable.ArrayBuffer[ElemPath]): mutable.ArrayBuffer[ElemPath] = {
+      acc :+ path
+      if (path.isRoot) acc else accumulate(path.parentPath, acc)
+    }
+
+    accumulate(self, mutable.ArrayBuffer[ElemPath]()).toIndexedSeq
+  }
+
+  /** Returns the ancestor paths, starting with the parent path (if any), and ending with the root path */
+  def ancestorPaths: immutable.IndexedSeq[ElemPath] = ancestorOrSelfPaths.drop(1)
 
   /** Returns the first entry, if any, wrapped in an `Option` */
   def firstEntryOption: Option[ElemPath.Entry] = entries.headOption
