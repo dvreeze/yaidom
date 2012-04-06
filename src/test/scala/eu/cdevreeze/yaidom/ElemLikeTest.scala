@@ -610,15 +610,13 @@ class ElemLikeTest extends Suite {
         elm.findTopmostElemsOrSelf(p)
       }
 
-      /*
-      expect(elm.filterElems(p) filterNot (e => elm.findAllElemsOrSelf forall ())) { // TODO
+      expect(elm.filterElems(p) filter (e => elm.filterElems(p) forall (_.findElem(_ == e).isEmpty))) {
         elm.findTopmostElems(p)
       }
 
-      expect(if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))) { // TODO
+      expect(elm.filterElemsOrSelf(p) filter (e => elm.filterElemsOrSelf(p) forall (_.findElem(_ == e).isEmpty))) {
         elm.findTopmostElemsOrSelf(p)
       }
-      */
 
       expect(elm.filterElems(p)) {
         (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)))

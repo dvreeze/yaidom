@@ -72,7 +72,7 @@ import scala.collection.{ immutable, mutable }
  * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
  * }}}
  *
- * Assuming no side-effects, some obvious equalities, in terms of "core" element collections, are:
+ * Assuming no side-effects, some obvious equalities, (directly or indirectly) in terms of "core" element collections, are:
  * {{{
  * e.filterChildElems(p) == e.allChildElems.filter(p)
  * e.filterElems(p) == e.findAllElems.filter(p)
@@ -81,8 +81,11 @@ import scala.collection.{ immutable, mutable }
  * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
  * e.collectFromElems(pf) == e.findAllElems.collect(pf)
  * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
+ *
+ * elm.findTopmostElems(p) == (elm.filterElems(p) filter (e => elm.filterElems(p) forall (_.findElem(_ == e).isEmpty)))
+ * elm.findTopmostElemsOrSelf(p) == (elm.filterElemsOrSelf(p) filter (e => elm.filterElemsOrSelf(p) forall (_.findElem(_ == e).isEmpty)))
  * }}}
- * The following also holds:
+ * The latter put differently:
  * {{{
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
