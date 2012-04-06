@@ -38,7 +38,10 @@ import scala.collection.{ immutable, mutable }
  * The latter 2 methods are implemented in terms of method `allChildElems`. The following equalities must hold:
  * {{{
  * elm.findAllElems == (elm.allChildElems flatMap (_.findAllElemsOrSelf))
- * elm.findAllElemsOrSelf == (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf)))
+ *
+ * elm.findAllElemsOrSelf == {
+ *   immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))
+ * }
  * }}}
  * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should be
  * enough for all element collection needs. For conciseness and performance, there are more element (collection) retrieval methods.
@@ -98,10 +101,19 @@ import scala.collection.{ immutable, mutable }
  * (far) more efficient:
  * {{{
  * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- * elm.filterElemsOrSelf(p) == ((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))))
+ *
+ * elm.filterElemsOrSelf(p) == {
+ *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * }
  *
  * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
+ *
+ * elm.findTopmostElemsOrSelf(p) == {
+ *   if (p(elm))
+ *     immutable.IndexedSeq(elm)
+ *   else
+ *     (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * }
  * }}}
  *
  * Each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
