@@ -281,14 +281,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def findElemNamed(expandedName: ExpandedName): Option[E] =
     findElem { e => e.resolvedName == expandedName }
 
-  /**
-   * Finds the parent element, if any, searching in the tree with the given root element.
-   * The implementation uses the `equals` method on the self type, and uses no index. Typically rather expensive.
-   */
-  final def findParentInTree(root: E): Option[E] = {
-    root findElemOrSelf { e => e.allChildElems exists { ch => ch == self } }
-  }
-
   /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
   final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
 

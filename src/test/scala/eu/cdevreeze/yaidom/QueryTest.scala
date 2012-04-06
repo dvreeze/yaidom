@@ -344,34 +344,8 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryElementsWithParentNotBookOrBookstore() {
-    // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
-
-    // Inefficient implementation, with expensive method calls to retrieve parent nodes.
-
-    require(bookstore.localName == "Bookstore")
-
-    val elms =
-      for {
-        desc <- bookstore.findAllElems
-        parent <- desc.findParentInTree(bookstore) // Inefficient
-        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
-      } yield desc
-
-    assert(elms.size > 10, "Expected more than 10 matching elements")
-    val qnames: Set[QName] = {
-      val result = elms map { _.qname }
-      result.toSet
-    }
-    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
-      qnames
-    }
-  }
-
   @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
-
-    // This implementation should be more efficient than the preceding one, in particular in much larger XML trees.
 
     require(bookstore.localName == "Bookstore")
 
@@ -415,7 +389,7 @@ class QueryTest extends Suite {
   @Test def testQueryElementsWithParentNotBookOrBookstoreUsingElemPaths() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
-    // This implementation is less verbose and still relatively efficient (comparing to the 2 preceding ones).
+    // This implementation is similar to the preceding one, except that the index on ElemPath is easily obtained, but not stored
 
     require(bookstore.localName == "Bookstore")
 

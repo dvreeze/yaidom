@@ -430,15 +430,22 @@ class ElemLikeTest extends Suite {
 
     val bookElms = bookstore filterElems { _.localName == "Book" }
 
+    val indexOnElemPath: Map[ElemPath, Elem] = bookstore.getIndexByElemPath
+
+    def findParentInTree(e: Elem): Option[Elem] = {
+      val indexEntryOption = indexOnElemPath find { kv => kv._2 == e }
+      indexEntryOption flatMap { kv => kv._1.parentPathOption } flatMap { path => bookstore.findWithElemPath(path) }
+    }
+
     expect(Set(bookstore)) {
-      val result = bookElms map { _.findParentInTree(bookstore) }
+      val result = bookElms map { e => findParentInTree(e) }
       result.flatten.toSet
     }
 
     val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
     expect(Set(ns.ename("Author"))) {
-      val result = lastNameElms map { e => e.findParentInTree(bookstore) } flatMap { eOption => eOption map { _.resolvedName } }
+      val result = lastNameElms map { e => findParentInTree(e) } flatMap { eOption => eOption map { _.resolvedName } }
       result.toSet
     }
 
@@ -448,7 +455,14 @@ class ElemLikeTest extends Suite {
     val cheapBookAuthorElms = cheapBookElm filterElems { _.localName == "Author" }
 
     expect(cheapBookAuthorElms.toSet) {
-      val result = lastNameElms flatMap { e => e.findParentInTree(cheapBookElm) }
+      val indexOnElemPath: Map[ElemPath, Elem] = cheapBookElm.getIndexByElemPath
+
+      def findParentInTree(e: Elem): Option[Elem] = {
+        val indexEntryOption = indexOnElemPath find { kv => kv._2 == e }
+        indexEntryOption flatMap { kv => kv._1.parentPathOption } flatMap { path => cheapBookElm.findWithElemPath(path) }
+      }
+
+      val result = lastNameElms flatMap { e => findParentInTree(e) }
       result.toSet
     }
   }
@@ -595,6 +609,16 @@ class ElemLikeTest extends Suite {
       expect(if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))) {
         elm.findTopmostElemsOrSelf(p)
       }
+
+      /*
+      expect(elm.filterElems(p) filterNot (e => elm.findAllElemsOrSelf forall ())) { // TODO
+        elm.findTopmostElems(p)
+      }
+
+      expect(if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))) { // TODO
+        elm.findTopmostElemsOrSelf(p)
+      }
+      */
 
       expect(elm.filterElems(p)) {
         (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)))
