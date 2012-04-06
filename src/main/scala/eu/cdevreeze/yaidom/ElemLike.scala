@@ -63,16 +63,7 @@ import scala.collection.{ immutable, mutable }
  * These element (collection) retrieval methods process and return elements in depth-first order
  * (see http://en.wikipedia.org/wiki/Depth-first_search).
  *
- * Assuming no side-effects, some obvious equalities, suggesting ways to construct the left-hand-side, are:
- * {{{
- * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- * elm.filterElemsOrSelf(p) == ((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))))
- *
- * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
- * }}}
- *
- * Assuming no side-effects, some obvious equalities, (directly or indirectly) in terms of "core" element collections, are:
+ * Assuming no side-effects, some equalities defining the meaning of the left-hand-side are:
  * {{{
  * e.filterChildElems(p) == e.allChildElems.filter(p)
  * e.filterElems(p) == e.findAllElems.filter(p)
@@ -82,15 +73,38 @@ import scala.collection.{ immutable, mutable }
  * e.collectFromElems(pf) == e.findAllElems.collect(pf)
  * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
  *
- * elm.findTopmostElems(p) == (elm.filterElems(p) filter (e => elm.filterElems(p) forall (_.findElem(_ == e).isEmpty)))
- * elm.findTopmostElemsOrSelf(p) == (elm.filterElemsOrSelf(p) filter (e => elm.filterElemsOrSelf(p) forall (_.findElem(_ == e).isEmpty)))
+ * elm.findTopmostElems(p) == {
+ *   elm.filterElems(p) filter { e =>
+ *     val hasNoMatchingAncestor = elm.filterElems(p) forall { _.findElem(_ == e).isEmpty }
+ *     hasNoMatchingAncestor
+ *   }
+ * }
+ *
+ * elm.findTopmostElemsOrSelf(p) == {
+ *   elm.filterElemsOrSelf(p) filter { e =>
+ *     val hasNoMatchingAncestor = elm.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
+ *     hasNoMatchingAncestor
+ *   }
+ * }
  * }}}
  * The latter put differently:
  * {{{
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  * }}}
- * Moreover, each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
+ *
+ * The equalities above give meaning to the left-hand sides, but do not necessarily suggest how to construct them.
+ * The following equalities do hint at possible ways to construct the left-hand-sides, although the real implementations may be
+ * (far) more efficient:
+ * {{{
+ * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * elm.filterElemsOrSelf(p) == ((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))))
+ *
+ * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * elm.findTopmostElemsOrSelf(p) == (if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))))
+ * }}}
+ *
+ * Each method taking an ExpandedName trivially corresponds to a call to a method taking a predicate. For example:
  * {{{
  * e.filterElemsOrSelfNamed(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
  * }}}

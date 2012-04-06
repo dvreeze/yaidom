@@ -610,11 +610,25 @@ class ElemLikeTest extends Suite {
         elm.findTopmostElemsOrSelf(p)
       }
 
-      expect(elm.filterElems(p) filter (e => elm.filterElems(p) forall (_.findElem(_ == e).isEmpty))) {
+      val expectedTopmostElems = {
+        elm.filterElems(p) filter { e =>
+          val hasNoMatchingAncestor = elm.filterElems(p) forall { _.findElem(_ == e).isEmpty }
+          hasNoMatchingAncestor
+        }
+      }
+
+      expect(expectedTopmostElems) {
         elm.findTopmostElems(p)
       }
 
-      expect(elm.filterElemsOrSelf(p) filter (e => elm.filterElemsOrSelf(p) forall (_.findElem(_ == e).isEmpty))) {
+      val expectedTopmostElemsOrSelf = {
+        elm.filterElemsOrSelf(p) filter { e =>
+          val hasNoMatchingAncestor = elm.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
+          hasNoMatchingAncestor
+        }
+      }
+
+      expect(expectedTopmostElemsOrSelf) {
         elm.findTopmostElemsOrSelf(p)
       }
 
