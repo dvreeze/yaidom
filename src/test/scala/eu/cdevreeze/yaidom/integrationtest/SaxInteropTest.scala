@@ -27,6 +27,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import org.ccil.cowan.tagsoup.jaxp.{ SAXFactoryImpl => TagSoupSAXFactoryImpl }
 import parse.{ DocumentParserUsingSax, DefaultElemProducingSaxHandler, SaxHandlerWithLocator }
 import print.DocumentPrinterUsingSax
 
@@ -990,6 +991,78 @@ class SaxInteropTest extends Suite {
       val carElms = recordsElm \ { _.localName == "car" }
       val resultElms = carElms sortBy { e => e.attributeOption("year".ename).getOrElse("0").toInt }
       resultElms map { e => e.attribute("name".ename) }
+    }
+  }
+
+  @Test def testParseHtmlUsingTagSoup() {
+    // 1. Parse HTML using TagSoup
+
+    val saxParser = DocumentParserUsingSax.newInstance(new TagSoupSAXFactoryImpl)
+
+    val doc = saxParser.parse(classOf[SaxInteropTest].getResourceAsStream("badHtmlExample.html"))
+
+    val root = doc.documentElement
+    val ulElms = root.filterElemsNamed("ul".ename)
+
+    expect(1) {
+      ulElms.size
+    }
+
+    val ulElm = ulElms.head
+
+    val liElms = ulElm.allChildElems
+
+    expect(List("li")) {
+      val result = liElms map { _.localName }
+      result.distinct
+    }
+
+    // 2. Write Elem to an XML/HTML string
+
+    val printer = DocumentPrinterUsingSax.newInstance
+
+    val xmlString = printer.print(Document(root))
+
+    // 3. Parse XML/HTML string into Elem
+
+    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+
+    val root2: Elem = saxParser.parse(bis).documentElement
+
+    // 4. Perform the checks of the parsed XML string as Elem against the originally parsed HTML file as Elem
+
+    val ulElms2 = root2.filterElemsNamed("ul".ename)
+
+    expect(1) {
+      ulElms2.size
+    }
+
+    val ulElm2 = ulElms2.head
+
+    val liElms2 = ulElm2.allChildElems
+
+    expect(List("li")) {
+      val result = liElms2 map { _.localName }
+      result.distinct
+    }
+
+    // 5. Convert to NodeBuilder and back, and check again
+
+    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+
+    val ulElms3 = root3.filterElemsNamed("ul".ename)
+
+    expect(1) {
+      ulElms3.size
+    }
+
+    val ulElm3 = ulElms3.head
+
+    val liElms3 = ulElm3.allChildElems
+
+    expect(List("li")) {
+      val result = liElms3 map { _.localName }
+      result.distinct
     }
   }
 

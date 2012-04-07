@@ -25,7 +25,7 @@ Some characteristics of yaidom are:
 * **DOM-like**
 
   *  Like DOM, Yaidom represents XML as trees of nodes, stored entirely in memory
-  *  Only XML is modeled, not HTML
+  *  Only XML is modeled, not HTML (yet TagSoup can be used as SAX parser)
 
 * **Scala-ish**
 

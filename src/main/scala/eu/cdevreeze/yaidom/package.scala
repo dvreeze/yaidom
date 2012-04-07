@@ -48,7 +48,7 @@ package eu.cdevreeze
  * That makes code using yaidom more verbose than XPath(-like) code found in APIs like Scala's XML library or
  * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
  * <li>Yaidom does not simplify printing/parsing of XML. The upside is that yaidom has a very good power-to-weight ratio.</li>
- * <li>Yaidom only knows about XML, not about HTML.</li>
+ * <li>Yaidom only knows about XML, not about HTML. On the other hand, TagSoup can be used as SAX Parser.</li>
  * <li>Yaidom does not know about XML Schema types (or DTD types), for example types of attribute.</li>
  * <li>APIs such as JAXP, JDOM and XOM are more feature-rich, for example in support for base URIs.</li>
  * </ul>
