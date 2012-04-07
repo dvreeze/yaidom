@@ -35,7 +35,7 @@ import scala.collection.{ immutable, mutable }
  * <li>Method `findAllElems`, finding all '''descendant''' elements</li>
  * <li>Method `findAllElemsOrSelf`, finding all '''descendant''' elements '''or self'''</li>
  * </ul>
- * The latter 2 methods are implemented in terms of method `allChildElems`. The following equalities define their meaning more formally:
+ * The latter 2 methods are implemented in terms of method `allChildElems`. The following equalities define their semantics more formally:
  * {{{
  * elm.findAllElems == (elm.allChildElems flatMap (_.findAllElemsOrSelf))
  *
@@ -66,7 +66,7 @@ import scala.collection.{ immutable, mutable }
  * These element (collection) retrieval methods process and return elements in depth-first order
  * (see http://en.wikipedia.org/wiki/Depth-first_search).
  *
- * Assuming no side-effects, some equalities defining the meaning of the left-hand-side are:
+ * Assuming no side-effects, some equalities defining the semantics of the left-hand-side are:
  * {{{
  * e.filterChildElems(p) == e.allChildElems.filter(p)
  * e.filterElems(p) == e.findAllElems.filter(p)
@@ -96,9 +96,9 @@ import scala.collection.{ immutable, mutable }
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  * }}}
  *
- * The equalities above give meaning to the left-hand sides, but do not necessarily suggest how to construct them. Assuming no
- * side-effects, the following (now provable) equalities hint at possible ways to construct the left-hand-sides, although the real
- * implementations may be (far) more efficient:
+ * The equalities above give semantics to the left-hand sides, but do not necessarily suggest how they are implemented.
+ * Assuming no side-effects, the following (provable) equalities hint at possible implementations of the left-hand-sides, although
+ * the real implementations may be (far) more efficient:
  * {{{
  * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
  *
