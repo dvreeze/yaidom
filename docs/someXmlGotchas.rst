@@ -38,7 +38,7 @@ XML namespaces come with many surprises, complexities and issues, such as the fo
   * Yaidom itself does not really consider DTDs first-class citizens (although the underlying JAXP parser may retrieve and use DTDs)
 * Confusion w.r.t. names (of elements and attributes), such as qualified names (QNames) and expanded names:
 
-  * Each XML library seems to redefine/re-implement the notion of qualified names, often interpreting them as resolved names
+  * Each XML library seems to redefine/re-implement the notion of qualified names, often interpreting them as expanded names
   * Expanded names rarely explicitly occur in XML libraries, although they should be at least as prominent as qualified names
   * There is no official string representation of expanded names, although `James Clark`_ notation is often used in documentation
   * Yaidom considers namespaces first-class citizens, and distinguishes qualified names, expanded names, namespace scopes and namespace declarations (including undeclarations)
@@ -82,7 +82,7 @@ If there is no clear robust and easy way out of this excessive DTD traffic situa
 Compare this to (relational) databases. Just imagine that during constraint checking ("schema validation") the constraints themselves
 had to be looked up (on the internet) and assembled. That sounds pretty unreasonable, but it is nevertheless to some extent a fair analogy.
 In all fairness, and in defense of XML, the design goals differ vastly between database and XML, of course.
-In the case of XML, validation against a schema or DTD, and lookup/resolution of the complete schema/DTD set, are intertwined.
+In the case of XML, validation against a schema or DTD, and lookup/resolution of the complete schema/DTD set, are indeed intertwined.
 Add hardly supported XML standards such as XLink and XPointer to the mix, and entity resolution gets even more hairy.
 
 The excessive DTD traffic problem is most pressing when using XML parsers for parsing HTML. Yaidom recommends the use of a TagSoup SAXParserFactory
