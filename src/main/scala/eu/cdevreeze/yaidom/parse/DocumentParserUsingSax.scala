@@ -49,7 +49,8 @@ import org.xml.sax.ext.LexicalHandler
  * }}}
  *
  * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
- * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
+ * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds),
+ * risking some loss of information:
  * {{{
  * trait MyEntityResolver extends EntityResolver {
  *   override def resolveEntity(publicId: String, systemId: String): InputSource = {
@@ -65,6 +66,12 @@ import org.xml.sax.ext.LexicalHandler
  *   override def error(exc: SAXParseException) { println(exc) }
  *   override def fatalError(exc: SAXParseException) { println(exc) }
  * }
+ * }}}
+ *
+ * It is even possible to parse HTML (including very poor HTML) into well-formed Documents by using a `SAXParserFactory` from the TagSoup library.
+ * For example:
+ * {{{
+ * val parser = DocumentParserUsingSax.newInstance(new org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl)
  * }}}
  *
  * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.

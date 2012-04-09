@@ -55,7 +55,8 @@ import jinterop.DomConversions._
  * }}}
  *
  * A custom `EntityResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
- * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds):
+ * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds),
+ * risking some loss of information:
  * {{{
  * class MyEntityResolver extends EntityResolver {
  *   override def resolveEntity(publicId: String, systemId: String): InputSource = {

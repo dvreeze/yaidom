@@ -24,7 +24,7 @@ package eu.cdevreeze.yaidom
  * Having these different fully configurable JAXP-based implementations shows that yaidom is pessimistic about the transparency of parsing and
  * printing XML. It also shows that yaidom is optimistic about the available (heap) memory and processing power, because of the 2 separated
  * steps of JAXP parsing/printing and (in-memory) `jinterop` conversions. Using JAXP means that escaping of characters is something
- * that JAXP deals with, and that's definitely a good thing.
+ * that JAXP deals with, and that's definitely better than trying to do it yourself.
  *
  * One `DocumentPrinter` implementation does not use any `jinterop` conversion. That is `DocumentPrinterUsingSax`. It is likely the
  * fastest of the `DocumentPrinter` implementations, as well as the one using the least memory.
