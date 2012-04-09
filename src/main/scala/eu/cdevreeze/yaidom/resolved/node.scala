@@ -35,7 +35,8 @@ trait ParentNode extends Node {
 }
 
 /**
- * Element as abstract data type. It contains only expanded names, not qualified names.
+ * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
+ * for XML trees and expanded names, where qualified names are absent.
  *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
  */

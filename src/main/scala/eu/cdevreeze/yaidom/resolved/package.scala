@@ -20,8 +20,10 @@ package eu.cdevreeze.yaidom
  * This package contains element representations that can be compared for (some notion of) equality.
  *
  * The most important difference with normal `Elem`s is that qualified names do not occur,
- * but only expanded (element and attribute) names. Moreover, the only nodes in this package are
- * element and text nodes.
+ * but only expanded (element and attribute) names. This reminds of James Clark notation for XML trees and
+ * expanded names, where qualified names are absent.
+ *
+ * Moreover, the only nodes in this package are element and text nodes.
  *
  * Do not do this:
  * {{{

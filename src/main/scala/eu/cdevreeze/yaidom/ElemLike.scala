@@ -20,7 +20,8 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * Implementation trait for elements as containers of elements. This trait implements the corresponding `Elem` methods.
- * It could in principle also be used for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]].
+ * It is also used for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]], such as
+ * [[eu.cdevreeze.yaidom.resolved.Elem]].
  *
  * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
