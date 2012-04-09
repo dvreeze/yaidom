@@ -157,6 +157,27 @@ class DomInteropTest extends Suite {
       val result = root4 filterElemsOrSelf { e => e.resolvedName == nsBookstore.ename("Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+
+    // 7. Convert to resolved.Elem, and check again
+
+    val root5: resolved.Elem = resolved.Elem(doc.documentElement)
+
+    expect((root.findAllElems map (e => e.localName)).toSet) {
+      (root5.findAllElems map (e => e.localName)).toSet
+    }
+    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+      (root5.findAllElemsOrSelf map (e => e.localName)).toSet
+    }
+    expect(root.filterElemsOrSelfNamed(nsBookstore.ename("Title")).size) {
+      root5.filterElemsOrSelfNamed(nsBookstore.ename("Title")).size
+    }
+    expect {
+      val result = root filterElemsOrSelf { e => e.resolvedName == nsBookstore.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    } {
+      val result = root5 filterElemsOrSelf { e => e.resolvedName == nsBookstore.ename("Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    }
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
