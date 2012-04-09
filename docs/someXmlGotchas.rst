@@ -19,13 +19,14 @@ Some areas in which XML can be quite complex or counter-intuitive are:
 There are more areas of XML that are full of surprises or complexities, such as XPointer,
 XML catalogs etc., but these areas are not considered here.
 
-What I am trying to achieve here is to illustrate why yaidom has a low ambition level in trying
-to make XML easier to deal with. It sticks to representing parsed XML as Scala-ish DOM-like
-trees, that can be queried in a Scala-friendly way. Increasing the scope of yaidom could
-easily lead to far more bugs and far more maintenance effort, and that is not necessarily
-a good idea.
+In this document some of those XML surprises are described, and briefly it is described what
+yaidom's approach is w.r.t. those issues, if applicable. Very often, yaidom tries to avoid the issue,
+for example by leaving it to JAXP (or to JAXP and the yaidom user!) to deal with the issue.
 
-Hence, to use yaidom effectively, one must be familiar with JAXP, and with configuration of
+Foremost yaidom does only one thing, and tries to do that well, namely represent parsed XML as
+Scala-ish immutable thread-safe DOM-like trees, that can be queried well.
+
+In any case, to use yaidom effectively, one must be familiar with JAXP, and with configuration of
 JAXP parsers and transformers.
 
 Namespaces
@@ -34,22 +35,18 @@ Namespaces
 XML namespaces come with many surprises, complexities and issues, such as the following:
 
 * Simply put: DTDs do not understand XML namespaces. See for example `Why don't namespaces support DTDs?`_ or `XML namespaces and DTDs`_
-
-  * Yaidom itself does not really consider DTDs first-class citizens (although the underlying JAXP parser may retrieve and use DTDs)
 * Confusion w.r.t. names (of elements and attributes), such as qualified names (QNames) and expanded names:
 
   * Each XML library seems to redefine/re-implement the notion of qualified names, often interpreting them as expanded names
   * Expanded names rarely explicitly occur in XML libraries, although they should be at least as prominent as qualified names
   * There is no official string representation of expanded names, although `James Clark`_ notation is often used in documentation
-  * Yaidom considers namespaces first-class citizens, and distinguishes qualified names, expanded names, namespace scopes and namespace declarations (including undeclarations)
 * Namespace URIs mostly look like URLs, but are just identifiers:
 
-  * URLs suggest the possibility of looking something up on the web, but namespace URIs do not make any such promise
+  * URLs suggest the possibility of looking something up on the web, but namespace URIs do not entail any such promise
   * URL comparison is not strictly string comparison, but namespace URI comparison is string comparison (be careful with trailing slashes, for example)
-* Conceptual circularity: namespace declarations are considered to be attributes, but attribute names can themselves have a namespace, depending on namespace declarations
+* Conceptual circularity: namespace declarations are considered to be attributes, but attribute names can themselves have a namespace, thus depending on namespace declarations
 
-  * Namespace declarations are easy to recognize in XML, but distinguish between prefixed namespace declarations and default namespace declarations
-  * Yaidom does not consider namespace declarations to be attributes!
+  * Namespace declarations are fortunately easy to recognize in XML, but mind the distinction between prefixed namespace declarations and default namespace declarations
 * Prefixes themselves are considered to be insignificant, but be careful with DTD validation and some attribute values
 * Unprefixed attributes, unlike unprefixed elements (when using a default namespace), are not in any namespace
 * Some namespaces are reserved, namely the "xml" namespace (namespace URI: "http://www.w3.org/XML/1998/namespace") and the "xmlns" namespace (namespace URI: "http://www.w3.org/2000/xmlns/")
@@ -57,6 +54,13 @@ XML namespaces come with many surprises, complexities and issues, such as the fo
 
 Looking at namespaces alone, it is already clear that reasoning about "equality" of XML documents (in isolation)
 is very hard in general.
+
+Yaidom's approach w.r.t. namespaces (and DTDs) can be summarized as follows:
+
+* Yaidom does not consider DTDs first-class citizens (although the underlying JAXP parser may retrieve and use DTDs)
+* Yaidom considers namespaces first-class citizens
+* Yaidom clearly distinguishes among qualified names, expanded names, namespace scopes and namespace declarations (including undeclarations)
+* Yaidom does not consider namespace declarations to be attributes!
 
 .. _`Why don't namespaces support DTDs?`: http://www.oreillynet.com/xml/blog/2007/04/why_dont_namespaces_support_dt.html
 .. _`XML namespaces and DTDs`: http://www.rpbourret.com/xml/NamespacesFAQ.htm#dtd
@@ -79,15 +83,19 @@ just for parsing the simplest of X(HT)ML documents? Sounds unreasonable to me.
 
 If there is no clear robust and easy way out of this excessive DTD traffic situation, then maybe there is a fundamental underlying problem?
 
+To me, it does not feel right that "during" schema/DTD validation the complete schema/DTD set is looked up and resolved.
 Compare this to (relational) databases. Just imagine that during constraint checking ("schema validation") the constraints themselves
-had to be looked up (on the internet) and assembled. That sounds pretty unreasonable, but it is nevertheless to some extent a fair analogy.
+had to be looked up (on the internet) and assembled. For databases, that sounds absurd, but it is nevertheless to some extent a good analogy.
 In all fairness, and in defense of XML, the design goals differ vastly between database and XML, of course.
-In the case of XML, validation against a schema or DTD, and lookup/resolution of the complete schema/DTD set, are indeed intertwined.
-Add hardly supported XML standards such as XLink and XPointer to the mix, and entity resolution gets even more hairy.
 
-The excessive DTD traffic problem is most pressing when using XML parsers for parsing HTML. Yaidom recommends the use of a TagSoup SAXParserFactory
-when dealing with HTML, and turning them into yaidom Documents. For parsing normal XML, yaidom recommends considering suppression of DTD lookup
-(using an EntityResolver) altogether, weighing that against the risk of some loss of information (entities, default attribute values, etc.).
+Now add hardly supported XML standards such as XLink and XPointer to the mix, and entity resolution gets even more hairy.
+
+The excessive DTD traffic problem is most pressing when using XML parsers for parsing HTML.
+
+Yaidom limits itself to the following recommendations w.r.t. entity resolution:
+
+* When parsing HTML, yaidom recommends the use of the TagSoup SAXParserFactory, which not only successfully parses the worst of HTML documents, but also does not bombard the W3C servers
+* When parsing normal (well-formed) XML, consider using a dummy EntityResolver that does not resolve any entities (see scaladoc documentation), risking some loss of information (entities, default attribute values, etc.)
 
 .. _`W3C's Excessive DTD Traffic`: http://www.w3.org/blog/systeam/2008/02/08/w3c_s_excessive_dtd_traffic/
 
@@ -101,6 +109,12 @@ characters() method or to the ignorableWhitespace() method? See `Ignorable White
 Looking at whitespace handling alone, it is already clear that reasoning about "equality" of XML documents (in isolation)
 is next to impossible in general.
 
+Yaidom's approach w.r.t. whitespace handling is summarized as follows:
+
+* Yaidom leaves this to JAXP
+* Hence the user of yaidom is responsible for proper JAXP parser/transformer configuration
+* Yet, inspired by "Spring templates", such parser/transformer configuration needs to be done only once
+
 .. _`Ignorable White Space`: http://www.cafeconleche.org/books/xmljava/chapters/ch06s10.html
 
 XML as data description format
@@ -113,10 +127,15 @@ for (the complexity of) schema languages as well.
 There are several degrees of freedom in how to represent data as XML, but this freedom does not necessarily help in better interpreting the data.
 For one, there is the distinction between elements and attributes. When to use what?
 
+Then there are empty tags and non-empty tags without any children. When to use what? It may matter, for example in the case of
+XHTML where the script tag must be non-empty.
+
 Thinking in terms of "programming language types", such as Maps, Lists, Sets etc. it is often not clear from an XML document which is
 which, without validating against a schema. In the XML document a parent element may have several children, but without consulting the
 schema it is hard to tell if the order of child elements matters, how many of them may occur, etc. This does not make XML ideal for
 representation of data.
+
+Of course, there is not much yaidom can do here. Put simply, whatever the XML parser passed to yaidom is stored as yaidom Documents.
 
 XML Schema
 ==========
@@ -129,6 +148,8 @@ Part of what makes XML Schema so complex is revealed in `MSL. A Model for W3C XM
 restriction in XML Schema is not transitive, which is quite counter-intuitive. The set of rules defining restriction is of enormous
 complexity, and according to the authors of the MSL paper ad-hoc as well. No wonder it is so hard to gain an in-depth understanding
 of XML Schema.
+
+Yaidom is unaware of schema types (or DTD types). Attribute values are simply strings in yaidom.
 
 .. _`W3C XML Schema: DOs and DON'Ts`: http://www.kohsuke.org/xmlschema/XMLSchemaDOsAndDONTs.html
 .. _`W3C XML Schema Design Patterns: Avoiding Complexity`: http://msdn.microsoft.com/en-us/library/aa468564.aspx
@@ -148,4 +169,4 @@ control the XML ourselves, the more we can keep it simple.
 
 In any case, I prefer to leave many hairy details of dealing with XML to JAXP. That's why yaidom has a rather limited scope.
 It tries to do one thing well, and that is representing XML DOM-like trees in such a way that they can be queried and manipulated
-easily, in a thread-safe manner.
+easily, in a thread-safe manner. To the yaidom user this means that JAXP knowledge is essential.

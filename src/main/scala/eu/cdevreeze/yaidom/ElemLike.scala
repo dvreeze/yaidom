@@ -43,8 +43,8 @@ import scala.collection.{ immutable, mutable }
  *   immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))
  * }
  * }}}
- * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should be
- * enough for all element collection needs. For conciseness and performance, there are more element (collection) retrieval methods.
+ * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should in theory
+ * be enough for all element collection needs. For conciseness and performance, there are more element (collection) retrieval methods.
  *
  * Below follows a summary of those groups of `ElemLike` element collection retrieval methods:
  * <ul>
