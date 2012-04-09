@@ -135,7 +135,7 @@ class SaxInteropTest extends Suite {
 
     val xmlString2 = printer.print(doc)
 
-    val xmlString3 = printer.omittingXmlDeclaration.print(doc.documentElement)
+    val xmlString3 = printer.print(doc.documentElement)
     assert(xmlString2.startsWith("<?xml "))
     assert(!xmlString3.startsWith("<?xml "))
     assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
