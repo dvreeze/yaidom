@@ -135,6 +135,11 @@ class SaxInteropTest extends Suite {
 
     val xmlString2 = printer.print(doc)
 
+    val xmlString3 = printer.omittingXmlDeclaration.print(doc.documentElement)
+    assert(xmlString2.startsWith("<?xml "))
+    assert(!xmlString3.startsWith("<?xml "))
+    assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
+
     val doc2 = saxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
 
     val root4 = doc2.documentElement

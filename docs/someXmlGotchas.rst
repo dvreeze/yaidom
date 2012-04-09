@@ -103,7 +103,7 @@ Whitespace handling
 ===================
 
 XML can be prettified by indentation, so by adding ("ignorable") whitespace. Yet how is an XML parser to know if the whitespace can
-be ignored or not? If the parser does not validate, it is hard to tell what a SAX parser will do: pass this whitespace text to the
+be ignored or not? If the SAX parser does not validate, it is hard to tell what this parser will do: pass this whitespace text to the
 characters() method or to the ignorableWhitespace() method? See `Ignorable White Space`_.
 
 Looking at whitespace handling alone, it is already clear that reasoning about "equality" of XML documents (in isolation)
@@ -130,7 +130,9 @@ For one, there is the distinction between elements and attributes. When to use w
 Then there are empty tags and non-empty tags without any children. When to use what? It may matter, for example in the case of
 XHTML where the script tag must be non-empty.
 
-Thinking in terms of "programming language types", such as Maps, Lists, Sets etc. it is often not clear from an XML document which is
+There is also the choice of leaving data out by either using the xsi:nil attribute, or by simply leaving the element out.
+
+Thinking in terms of "programming language types", such as Maps, Lists, Sets etc. it is usually not clear from an XML document which is
 which, without validating against a schema. In the XML document a parent element may have several children, but without consulting the
 schema it is hard to tell if the order of child elements matters, how many of them may occur, etc. This does not make XML ideal for
 representation of data.

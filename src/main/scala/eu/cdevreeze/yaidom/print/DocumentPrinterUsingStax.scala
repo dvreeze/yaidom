@@ -31,23 +31,46 @@ import jinterop.StaxConversions._
  * A `DocumentPrinterUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLEventFactory` and `XMLOutputFactory` are thread-safe, it can even be re-used from multiple threads.
  */
-final class DocumentPrinterUsingStax(
+sealed class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,
   val outputFactory: XMLOutputFactory) extends DocumentPrinter {
+
+  val omitXmlDeclaration: Boolean = false
 
   def print(doc: Document): String = {
     val events: immutable.IndexedSeq[XMLEvent] = convertDocument(doc)(eventFactory)
 
     val sw = new jio.StringWriter
     var xmlEventWriter: XMLEventWriter = null
-    try {
-      xmlEventWriter = outputFactory.createXMLEventWriter(sw)
-      for (ev <- events) xmlEventWriter.add(ev)
-      val result = sw.toString
-      result
-    } finally {
-      if (xmlEventWriter ne null) xmlEventWriter.close()
+
+    val xmlString =
+      try {
+        xmlEventWriter = outputFactory.createXMLEventWriter(sw)
+        for (ev <- events) xmlEventWriter.add(ev)
+        val result = sw.toString
+        result
+      } finally {
+        if (xmlEventWriter ne null) xmlEventWriter.close()
+      }
+
+    if (omitXmlDeclaration) removeXmlDeclaration(xmlString) else xmlString
+  }
+
+  def omittingXmlDeclaration: DocumentPrinterUsingStax = {
+    new DocumentPrinterUsingStax(eventFactory, outputFactory) {
+      override val omitXmlDeclaration: Boolean = true
     }
+  }
+
+  /** Low tech solution for removing the XML declaration, if any */
+  private def removeXmlDeclaration(xmlString: String): String = {
+    val linesIterator = xmlString.linesWithSeparators
+    require(linesIterator.hasNext, "Expected at least one line")
+    val firstLine = linesIterator.next()
+
+    if (firstLine.trim.startsWith("<?xml")) {
+      xmlString.drop(firstLine.size).trim
+    } else xmlString
   }
 }
 

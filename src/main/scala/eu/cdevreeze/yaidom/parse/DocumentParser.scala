@@ -27,11 +27,12 @@ import java.io.InputStream
  *
  * Typical implementations use DOM, StAX or SAX, but make them easier to use in the tradition of the "template" classes
  * of the Spring framework. That is, resource management is done as much as possible by the DocumentParser,
- * typical usage is easy, and complex scenarios are still possible.
+ * typical usage is easy, and complex scenarios are still possible. The idea is that the parser is configured once, and
+ * that it should be re-usable multiple times.
  *
  * Method `parse` takes an `InputStream` instead of `Source` object, because that works better with a DOM implementation.
  *
- * `DocumentParser` instances should be re-usable multiple times. Yet implementing classes are encouraged to indicate
+ * Although `DocumentParser` instances should be re-usable multiple times, implementing classes are encouraged to indicate
  * to what extent re-use of a parser instance is indeed supported (single-threaded, or even multi-threaded).
  */
 trait DocumentParser {

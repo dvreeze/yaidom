@@ -131,6 +131,11 @@ class DomInteropTest extends Suite {
     val printer = DocumentPrinterUsingDom.newInstance
     val xmlString2 = printer.print(doc)
 
+    val xmlString3 = printer.omittingXmlDeclaration.print(doc.documentElement)
+    assert(xmlString2.startsWith("<?xml "))
+    assert(!xmlString3.startsWith("<?xml "))
+    assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
+
     val bis = new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8"))
     val doc2 = domParser.parse(bis)
 

@@ -20,7 +20,7 @@ package print
 import java.{ io => jio, util => jutil }
 import org.xml.sax.{ Attributes, XMLReader }
 import org.xml.sax.helpers.AttributesImpl
-import javax.xml.transform.{ TransformerFactory, URIResolver }
+import javax.xml.transform.{ TransformerFactory, URIResolver, OutputKeys }
 import javax.xml.transform.sax.{ SAXTransformerFactory, TransformerHandler }
 import javax.xml.transform.stream.StreamResult
 
@@ -33,10 +33,11 @@ import javax.xml.transform.stream.StreamResult
  * If the `SAXTransformerFactory` is thread-safe, it can even be re-used from multiple threads.
  */
 final class DocumentPrinterUsingSax(
-  val saxTransformerFactory: SAXTransformerFactory) extends DocumentPrinter {
+  val saxTransformerFactory: SAXTransformerFactory,
+  val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler) extends DocumentPrinter {
 
   def print(doc: Document): String = {
-    val handler = saxTransformerFactory.newTransformerHandler()
+    val handler = transformerHandlerCreator(saxTransformerFactory)
 
     // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
     val sw = new jio.StringWriter
@@ -47,6 +48,18 @@ final class DocumentPrinterUsingSax(
 
     val result = sw.toString
     result
+  }
+
+  def omittingXmlDeclaration: DocumentPrinterUsingSax = {
+    val newTransformerHandlerCreator = { tf: SAXTransformerFactory =>
+      val transformerHandler = transformerHandlerCreator(tf)
+      transformerHandler.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+      transformerHandler
+    }
+
+    new DocumentPrinterUsingSax(
+      saxTransformerFactory,
+      newTransformerHandlerCreator)
   }
 
   private def generateEventsForDocument(doc: Document, handler: TransformerHandler) {
@@ -168,7 +181,17 @@ object DocumentPrinterUsingSax {
     newInstance(stf)
   }
 
-  /** Returns a new instance, by invoking the primary constructor */
+  /** Invokes the 2-arg `newInstance` method, with trivial "transformerHandlerCreator" */
   def newInstance(saxTransformerFactory: SAXTransformerFactory): DocumentPrinterUsingSax =
-    new DocumentPrinterUsingSax(saxTransformerFactory)
+    newInstance(
+      saxTransformerFactory,
+      { tf => tf.newTransformerHandler() })
+
+  /** Returns a new instance, by invoking the primary constructor */
+  def newInstance(
+    saxTransformerFactory: SAXTransformerFactory,
+    transformerHandlerCreator: SAXTransformerFactory => TransformerHandler): DocumentPrinterUsingSax = {
+
+    new DocumentPrinterUsingSax(saxTransformerFactory, transformerHandlerCreator)
+  }
 }
