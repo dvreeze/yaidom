@@ -94,6 +94,14 @@ final case class Text(text: String) extends Node {
 
 object Node {
 
+  /**
+   * Converts a yaidom `Node` to a "resolved" `Node`.
+   * Note the entity references, comments, processing instructions and top-level documents are lost.
+   * All that remains are elements (without qualified names) and text nodes.
+   *
+   * Hence, if there are unresolved entities in the yaidom `Node`, those entity references are silently ignored!
+   * This is definitely something to keep in mind!
+   */
   def apply(n: eu.cdevreeze.yaidom.Node): Node = n match {
     case e: eu.cdevreeze.yaidom.Elem => Elem(e)
     case t: eu.cdevreeze.yaidom.Text => Text(t)

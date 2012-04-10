@@ -86,7 +86,7 @@ If there is no clear robust and easy way out of this excessive DTD traffic situa
 To me, it does not feel right that "during" schema/DTD validation the complete schema/DTD set is looked up and resolved.
 Compare this to (relational) databases. Just imagine that during constraint checking ("schema validation") the constraints themselves
 had to be looked up (on the internet) and assembled. For databases, that sounds absurd, but it is nevertheless to some extent a good analogy.
-In all fairness, and in defense of XML, the design goals differ vastly between database and XML, of course.
+In all fairness, and in defense of XML, the design goals differ vastly between databases and XML, of course.
 
 Now add hardly supported XML standards such as XLink and XPointer to the mix, and entity resolution gets even more hairy.
 
