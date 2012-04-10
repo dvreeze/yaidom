@@ -103,7 +103,8 @@ object Node {
    * Converts a yaidom `Node` to a "resolved" `Node`.
    * Note that the entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
-   * Losing the qualified names means that the prefixes are lost.
+   * Losing the qualified names means that the prefixes are lost. Losing the prefixes not only affects serialization of
+   * the `Node` to an XML string, but also affects attribute values and text nodes in which those prefixes are used.
    *
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
