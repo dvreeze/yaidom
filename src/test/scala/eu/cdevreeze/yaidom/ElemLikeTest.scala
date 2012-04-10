@@ -430,22 +430,17 @@ class ElemLikeTest extends Suite {
 
     val bookElms = bookstore filterElems { _.localName == "Book" }
 
-    val indexOnElemPath: Map[ElemPath, Elem] = bookstore.getIndexByElemPath
-
-    def findParentInTree(e: Elem): Option[Elem] = {
-      val indexEntryOption = indexOnElemPath find { kv => kv._2 == e }
-      indexEntryOption flatMap { kv => kv._1.parentPathOption } flatMap { path => bookstore.findWithElemPath(path) }
-    }
+    val indexedBookstoreDoc = new IndexedDocument(Document(bookstore))
 
     expect(Set(bookstore)) {
-      val result = bookElms map { e => findParentInTree(e) }
+      val result = bookElms map { e => indexedBookstoreDoc.findParent(e) }
       result.flatten.toSet
     }
 
     val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
     expect(Set(ns.ename("Author"))) {
-      val result = lastNameElms map { e => findParentInTree(e) } flatMap { eOption => eOption map { _.resolvedName } }
+      val result = lastNameElms map { e => indexedBookstoreDoc.findParent(e) } flatMap { eOption => eOption map { _.resolvedName } }
       result.toSet
     }
 
@@ -455,14 +450,9 @@ class ElemLikeTest extends Suite {
     val cheapBookAuthorElms = cheapBookElm filterElems { _.localName == "Author" }
 
     expect(cheapBookAuthorElms.toSet) {
-      val indexOnElemPath: Map[ElemPath, Elem] = cheapBookElm.getIndexByElemPath
+      val indexedCheapBookDoc = new IndexedDocument(Document(cheapBookElm))
 
-      def findParentInTree(e: Elem): Option[Elem] = {
-        val indexEntryOption = indexOnElemPath find { kv => kv._2 == e }
-        indexEntryOption flatMap { kv => kv._1.parentPathOption } flatMap { path => cheapBookElm.findWithElemPath(path) }
-      }
-
-      val result = lastNameElms flatMap { e => findParentInTree(e) }
+      val result = lastNameElms flatMap { e => indexedCheapBookDoc.findParent(e) }
       result.toSet
     }
   }
