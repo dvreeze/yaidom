@@ -19,11 +19,16 @@ package resolved
 import scala.collection.immutable
 
 /**
- * Immutable "resolved" Node. It can be compared for equality. This (arbitrary?) notion of equality only considers elements and
+ * Immutable "resolved" Node. It can be compared for equality. This (somewhat arbitrary) notion of equality only considers elements and
  * text nodes.
+ *
+ * The notion of equality roughly reminds of the standard XQuery function `fn:deep-equal`, but text and attribute values are untyped
+ * in yaidom's case.
  *
  * Documents, comments, processing instructions and entity references do not occur in this node hierarchy.
  * Moreover, text nodes do not know whether they originate from (or must be serialized as) CDATA sections or not.
+ *
+ * TODO "Ignorable whitespace", "coalescing"
  *
  * @author Chris de Vreeze
  */
@@ -96,10 +101,11 @@ object Node {
 
   /**
    * Converts a yaidom `Node` to a "resolved" `Node`.
-   * Note the entity references, comments, processing instructions and top-level documents are lost.
+   * Note that the entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
+   * Losing the qualified names means that the prefixes are lost.
    *
-   * Hence, if there are unresolved entities in the yaidom `Node`, those entity references are silently ignored!
+   * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
   def apply(n: eu.cdevreeze.yaidom.Node): Node = n match {
