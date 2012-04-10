@@ -115,6 +115,8 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
 
   override def hashCode: Int = entries.hashCode
 
+  override def toString: String = entries.toString
+
   /**
    * Given a `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).
    * The modification is that the root element is written as a slash followed by an asterisk.
