@@ -371,7 +371,7 @@ final class Elem(
     idx
   }
 
-  /** Returns a `Map` from the element UIDs on the tree with this element as root to the `ElemPath`s relative to this root */
+  /** Returns a `Map` from the element UIDs in the tree with this element as root to the `ElemPath`s relative to this root */
   def getElemPaths: Map[UID, ElemPath] = {
     val result = mutable.Map[UID, ElemPath]()
 
