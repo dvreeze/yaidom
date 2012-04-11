@@ -128,8 +128,7 @@ import scala.collection.{ immutable, mutable }
  * e.findElemOrSelf(p) == e.findTopmostElemsOrSelf(p).headOption
  * }}}
  *
- * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods for indexing the element tree and
- * finding subtrees, and methods dealing with `ElemPath`s.
+ * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods dealing with `ElemPath`s, etc.
  *
  * @tparam E The captured element subtype
  *
@@ -313,27 +312,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
   final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
-
-  /** Returns a "unique" index on `ElemPath` */
-  final def getIndexByElemPath: Map[ElemPath, E] = {
-    var result = mutable.Map[ElemPath, E]()
-
-    // Not tail-recursive, but the depth should typically be limited
-    def accumulate(path: ElemPath, elm: E) {
-      result += (path -> elm)
-
-      val childPaths = elm.allChildElemPathEntries map { entry => path.append(entry) }
-      val childElms = elm.allChildElems
-      require(childPaths.size == childElms.size)
-
-      val childPathElmPairs = childPaths.zip(childElms)
-
-      childPathElmPairs foreach { pair => accumulate(pair._1, pair._2) }
-    }
-
-    accumulate(ElemPath.Root, self)
-    result.toMap
-  }
 
   /**
    * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.

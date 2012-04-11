@@ -386,21 +386,21 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingElemPaths() {
+  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingIndexedDocument() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     // This implementation is similar to the preceding one, except that the index on ElemPath is easily obtained, but not stored
 
     require(bookstore.localName == "Bookstore")
 
-    val indexOnPath: Map[ElemPath, Elem] = bookstore.getIndexByElemPath
+    val indexedDoc = new IndexedDocument(Document(bookstore))
 
     val elms =
       for {
-        (path, desc) <- (indexOnPath - ElemPath.Root)
-        parent <- bookstore.findWithElemPath(path.parentPath)
+        elm <- indexedDoc.document.documentElement.findAllElems
+        parent <- indexedDoc.findParent(elm)
         if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
-      } yield desc
+      } yield elm
 
     assert(elms.size > 10, "Expected more than 10 matching elements")
     val qnames: Set[QName] = {

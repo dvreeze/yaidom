@@ -20,7 +20,7 @@ import java.{ util => jutil }
 import java.net.URI
 import java.rmi.server.UID
 import scala.annotation.tailrec
-import scala.collection.immutable
+import scala.collection.{ immutable, mutable }
 
 /**
  * Immutable XML node. The API is inspired by Anti-XML, but it is less ambitious,
@@ -49,6 +49,9 @@ sealed trait Node extends Immutable {
   /**
    * Returns a unique ID of the node. It can be used to associate metadata such as `ElemPath`s with elements, for example.
    * The UIDs would then be the Map keys, and the metadata the mapped values.
+   *
+   * Be careful: if a node is "functionally updated", effectively creating a new node, the old UID still only refers to the old
+   * node before the "update".
    */
   def uid: UID
 
@@ -366,6 +369,27 @@ final class Elem(
       cnt += 1
     }
     idx
+  }
+
+  /** Returns a `Map` from the element UIDs on the tree with this element as root to the `ElemPath`s relative to this root */
+  def getElemPaths: Map[UID, ElemPath] = {
+    val result = mutable.Map[UID, ElemPath]()
+
+    // Not tail-recursive, but the depth should typically be limited
+    def accumulate(elm: Elem, path: ElemPath): Unit = {
+      result += (elm.uid -> path)
+
+      val childPaths = elm.allChildElemPathEntries map { entry => path.append(entry) }
+      val childElms = elm.allChildElems
+      require(childPaths.size == childElms.size)
+
+      val childElmPathPairs = childElms.zip(childPaths)
+
+      childElmPathPairs foreach { pair => accumulate(pair._1, pair._2) }
+    }
+
+    accumulate(self, ElemPath.Root)
+    result.toMap
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {

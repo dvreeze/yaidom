@@ -478,22 +478,6 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testGetIndexByElemPath() {
-    require(bookstore.localName == "Bookstore")
-
-    val index: Map[ElemPath, Elem] = bookstore.getIndexByElemPath
-
-    expect(bookstore.findAllElemsOrSelf.size) {
-      index.size
-    }
-
-    for ((path, elm) <- index) {
-      expect(Some(elm)) {
-        bookstore.findWithElemPath(path)
-      }
-    }
-  }
-
   @Test def testFindByElemPath() {
     require(bookstore.localName == "Bookstore")
 
