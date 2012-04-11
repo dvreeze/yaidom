@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom
 
 import java.{ util => jutil }
 import java.net.URI
+import java.rmi.server.UID
 import scala.annotation.tailrec
 import scala.collection.immutable
 
@@ -44,6 +45,12 @@ import scala.collection.immutable
  * @author Chris de Vreeze
  */
 sealed trait Node extends Immutable {
+
+  /**
+   * Returns a unique ID of the node. It can be used to associate metadata such as `ElemPath`s with elements, for example.
+   * The UIDs would then be the Map keys, and the metadata the mapped values.
+   */
+  def uid: UID
 
   /**
    * Returns the AST (abstract syntax tree) as `String`, conforming to the DSL for `NodeBuilder`s.
@@ -88,6 +95,8 @@ final class Document(
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
+
+  override val uid: UID = new UID
 
   override def children: immutable.IndexedSeq[Node] =
     processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
@@ -230,6 +239,8 @@ final class Elem(
   require(attributes ne null)
   require(scope ne null)
   require(children ne null)
+
+  override val uid: UID = new UID
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespaceOption = None)
@@ -432,6 +443,8 @@ final case class Text(text: String, isCData: Boolean) extends Node {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
 
+  override val uid: UID = new UID
+
   /** Returns `text.trim`. */
   def trimmedText: String = text.trim
 
@@ -453,6 +466,8 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
   require(target ne null)
   require(data ne null)
 
+  override val uid: UID = new UID
+
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "processingInstruction(\"\"\"%s\"\"\", \"\"\"%s\"\"\")".format(target, data)
     (" " * numberOfSpaces) + result
@@ -472,6 +487,8 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
 
+  override val uid: UID = new UID
+
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "entityRef(\"\"\"%s\"\"\")".format(entity)
     (" " * numberOfSpaces) + result
@@ -480,6 +497,8 @@ final case class EntityRef(entity: String) extends Node {
 
 final case class Comment(text: String) extends Node {
   require(text ne null)
+
+  override val uid: UID = new UID
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val result = "comment(\"\"\"%s\"\"\")".format(text)
