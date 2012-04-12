@@ -371,7 +371,10 @@ final class Elem(
     idx
   }
 
-  /** Returns a `Map` from the element UIDs in the tree with this element as root to the `ElemPath`s relative to this root */
+  /**
+   * Returns a `Map` from the element UIDs in the tree with this element as root to the `ElemPath`s relative to this root.
+   * This effectively enriches this element and its descendant elements with their `ElemPath`s relative to this element.
+   */
   def getElemPaths: Map[UID, ElemPath] = {
     val result = mutable.Map[UID, ElemPath]()
 
@@ -390,6 +393,28 @@ final class Elem(
 
     accumulate(self, ElemPath.Root)
     result.toMap
+  }
+
+  /** Returns a copy where inter-element whitespace has been (recursively) removed */
+  def withoutInterElementWhitespace: Elem = {
+    def isWhitespaceText(n: Node): Boolean = (n.isInstanceOf[Text]) && (n.asInstanceOf[Text].trimmedText.isEmpty)
+
+    def isElem(n: Node): Boolean = n.isInstanceOf[Elem]
+
+    val doStripWhitespace = children forall { n => isWhitespaceText(n) || isElem(n) }
+
+    // Recursive, but not tail-recursive
+
+    val newChildren = {
+      val remainder = if (doStripWhitespace) allChildElems else children
+
+      remainder collect {
+        case e: Elem => e.withoutInterElementWhitespace
+        case n => n
+      }
+    }
+
+    self.withChildren(newChildren)
   }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
