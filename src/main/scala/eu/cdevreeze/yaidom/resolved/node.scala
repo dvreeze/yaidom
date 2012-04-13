@@ -22,8 +22,8 @@ import scala.collection.{ immutable, mutable }
  * Immutable "resolved" Node. It can be compared for equality. This notion of equality only considers elements and text nodes.
  *
  * The notion of equality defined here is simple to understand, but "naive". The user is of the API must take control over what is
- * compared for equality. The "magic" in the equality relation is gone, but the API user has to work harder to compare apples to apples,
- * as explained below.
+ * compared for equality. Much of the "magic" in the equality relation is gone, but the API user has to work harder to compare apples to
+ * apples, as explained below. Other "magic" is introduced because the text and attribute values here are untyped.
  *
  * The notion of equality remotely reminds of the standard XQuery function `fn:deep-equal`, but text and attribute values are untyped
  * in yaidom's case, among many other differences.
@@ -33,14 +33,18 @@ import scala.collection.{ immutable, mutable }
  *
  * There are several reasons why equality returns false for 2 elements that should be considered equal, such as:
  * <ul>
- * <li>The text values are untyped, so equality of numbers 2 and 2.0 is not detected</li>
+ * <li>The text and attribute values are untyped, so equality of numbers 2 and 2.0 is not detected</li>
  * <li>"Ignorable whitespace", meant only for pretty-printing</li>
  * <li>Text that is possibly divided over several adjacent text nodes (possibly including CDATA text nodes), but should be "coalesced"</li>
  * <li>Text that is only equal after normalizing</li>
  * </ul>
+ * Note that a validating parser knows the content model, so knows precisely which whitespace is "ignorable", for example, but once the parsed
+ * XML is turned into untyped yaidom nodes, this information is lost. (Of course in principle PSVI data could be added to `Elem`s,
+ * just like `ElemPath`s are added to elements in class `IndexedDocument`, using the element UIDs as keys, but that is beyond the scope
+ * of yaidom.)
  *
- * Class [[eu.cdevreeze.yaidom.resolved.Elem]] has some methods to mitigate those small differences among elements (except for the first
- * difference related to untyped data).
+ * Class [[eu.cdevreeze.yaidom.resolved.Elem]] has some methods to mitigate the above-mentioned small differences among elements (except
+ * for the first difference, related to untyped data).
  *
  * @author Chris de Vreeze
  */
