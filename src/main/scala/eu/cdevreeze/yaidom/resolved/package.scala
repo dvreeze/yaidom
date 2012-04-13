@@ -17,7 +17,9 @@
 package eu.cdevreeze.yaidom
 
 /**
- * This package contains element representations that can be compared for (some notion of) equality.
+ * This package contains element representations that can be compared for (some notion of) equality, unlike normal yaidom nodes.
+ * That notion of equality is simple to understand, but "naive". The user is of the API must take control over what is compared
+ * for equality.
  *
  * The most important difference with normal `Elem`s is that qualified names do not occur,
  * but only expanded (element and attribute) names. This reminds of James Clark notation for XML trees and
@@ -37,6 +39,23 @@ package eu.cdevreeze.yaidom
  * val resolvedRootElm = resolved.Elem(rootElm)
  * }}}
  *
+ * Or:
+ * {{{
+ * import eu.cdevreeze.yaidom.resolved
+ * import eu.cdevreeze.yaidom.resolved.toResolvedElem
+ *
+ * val resolvedRootElm = rootElm.resolvedElem
+ * }}}
+ *
  * @author Chris de Vreeze
  */
-package object resolved
+package object resolved {
+
+  /** "Implicit class" for converting a normal yaidom `Elem` to a [[eu.cdevreeze.yaidom.resolved.Elem]] */
+  final class ToResolvedElem(val e: eu.cdevreeze.yaidom.Elem) {
+    def resolvedElem: Elem = Elem(e)
+  }
+
+  /** Implicit conversion enriching a normal yaidom `Elem` with a `resolvedElem` method that turns the yaidom `Elem` into a [[eu.cdevreeze.yaidom.resolved.Elem]] */
+  implicit def toResolvedElem(e: eu.cdevreeze.yaidom.Elem): ToResolvedElem = new ToResolvedElem(e)
+}

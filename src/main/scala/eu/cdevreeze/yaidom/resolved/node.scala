@@ -16,19 +16,31 @@
 package eu.cdevreeze.yaidom
 package resolved
 
-import scala.collection.immutable
+import scala.collection.{ immutable, mutable }
 
 /**
- * Immutable "resolved" Node. It can be compared for equality. This (somewhat arbitrary) notion of equality only considers elements and
- * text nodes.
+ * Immutable "resolved" Node. It can be compared for equality. This notion of equality only considers elements and text nodes.
  *
- * The notion of equality roughly reminds of the standard XQuery function `fn:deep-equal`, but text and attribute values are untyped
- * in yaidom's case.
+ * The notion of equality defined here is simple to understand, but "naive". The user is of the API must take control over what is
+ * compared for equality. The "magic" in the equality relation is gone, but the API user has to work harder to compare apples to apples,
+ * as explained below.
  *
- * Documents, comments, processing instructions and entity references do not occur in this node hierarchy.
+ * The notion of equality remotely reminds of the standard XQuery function `fn:deep-equal`, but text and attribute values are untyped
+ * in yaidom's case, among many other differences.
+ *
+ * As mentioned above, documents, comments, processing instructions and entity references do not occur in this node hierarchy.
  * Moreover, text nodes do not know whether they originate from (or must be serialized as) CDATA sections or not.
  *
- * TODO "Ignorable whitespace", "coalescing"
+ * There are several reasons why equality returns false for 2 elements that should be considered equal, such as:
+ * <ul>
+ * <li>The text values are untyped, so equality of numbers 2 and 2.0 is not detected</li>
+ * <li>"Ignorable whitespace", meant only for pretty-printing</li>
+ * <li>Text that is possibly divided over several adjacent text nodes (possibly including CDATA text nodes), but should be "coalesced"</li>
+ * <li>Text that is only equal after normalizing</li>
+ * </ul>
+ *
+ * Class [[eu.cdevreeze.yaidom.resolved.Elem]] has some methods to mitigate those small differences among elements (except for the first
+ * difference related to untyped data).
  *
  * @author Chris de Vreeze
  */
@@ -85,6 +97,89 @@ final case class Elem(
 
   /** Returns `withChildren(self.children :+ newChild)`. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
+
+  /** Returns a copy where inter-element whitespace has been (recursively) removed */
+  def removeAllInterElementWhitespace: Elem = {
+    def isWhitespaceText(n: Node): Boolean = n match {
+      case t: Text if t.trimmedText.isEmpty => true
+      case _ => false
+    }
+
+    def isElem(n: Node): Boolean = n match {
+      case e: Elem => true
+      case _ => false
+    }
+
+    val doStripWhitespace = children forall { n => isWhitespaceText(n) || isElem(n) }
+
+    // Recursive, but not tail-recursive
+
+    val newChildren = {
+      val remainder = if (doStripWhitespace) allChildElems else children
+
+      remainder map {
+        case e: Elem => e.removeAllInterElementWhitespace
+        case n => n
+      }
+    }
+
+    self.withChildren(newChildren)
+  }
+
+  /** Returns a copy where adjacent text nodes have been (recursively) combined into one text node */
+  def coalesceAllAdjacentText: Elem = {
+    val newChildren = mutable.ArrayBuffer[Node]()
+
+    // Recursive, but not tail-recursive
+
+    def accumulate(childNodes: Seq[Node]) {
+      if (!childNodes.isEmpty) {
+        val head = childNodes.head
+
+        head match {
+          case t: Text =>
+            val (textNodes, remainder) = childNodes span {
+              case t: Text => true
+              case _ => false
+            }
+
+            val combinedText: String = textNodes collect { case t: Text => t } mkString ""
+
+            newChildren += Text(combinedText)
+            accumulate(remainder)
+          case e: Elem =>
+            newChildren += e
+            accumulate(childNodes.tail)
+        }
+      }
+    }
+
+    accumulate(self.children)
+
+    val resultChildren = newChildren.toIndexedSeq[Node] map {
+      case e: Elem => e.coalesceAllAdjacentText
+      case n => n
+    }
+
+    self.withChildren(resultChildren)
+  }
+
+  /** Returns a copy where recursively text nodes have been normalized. Do not call before `coalesceAllAdjacentText`, because that makes no sense. */
+  def normalizeAllText: Elem = {
+    // Recursive, but not tail-recursive
+
+    val newChildren: immutable.IndexedSeq[Node] = {
+      self.children map { (n: Node) =>
+        n match {
+          case e: Elem => e.normalizeAllText
+          case t: Text => Text(t.normalizedText)
+          case n => n
+        }
+      }
+    }
+
+    self.withChildren(newChildren)
+  }
 }
 
 final case class Text(text: String) extends Node {
