@@ -19,7 +19,12 @@ package resolved
 import scala.collection.{ immutable, mutable }
 
 /**
- * Immutable "resolved" Node. It can be compared for equality. This notion of equality only considers elements and text nodes.
+ * Immutable "resolved" Node. It is called "resolved" because the element nodes in this package only contain resolved names for
+ * elements and attributes. Qualified names (and therefore prefixes) are gone in this representation.
+ *
+ * "Resolved" nodes can be compared for equality. This notion of equality only considers elements and text nodes.
+ * By removing qualified names and namespace declarations from this node representation, one source of complexity for equality
+ * comparisons is gone.
  *
  * The notion of equality defined here is simple to understand, but "naive". The user is of the API must take control over what is
  * compared for equality. Much of the "magic" in the equality relation is gone, but the API user has to work harder to compare apples to

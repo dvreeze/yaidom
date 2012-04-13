@@ -21,6 +21,8 @@ package eu.cdevreeze.yaidom
  * That notion of equality is simple to understand, but "naive". The user is of the API must take control over what is compared
  * for equality.
  *
+ * See [[eu.cdevreeze.yaidom.resolved.Node]] for why this package is named `resolved`.
+ *
  * The most important difference with normal `Elem`s is that qualified names do not occur,
  * but only expanded (element and attribute) names. This reminds of James Clark notation for XML trees and
  * expanded names, where qualified names are absent.
