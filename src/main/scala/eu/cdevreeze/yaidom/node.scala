@@ -396,7 +396,7 @@ final class Elem(
   }
 
   /** Returns a copy where inter-element whitespace has been (recursively) removed */
-  def withoutInterElementWhitespace: Elem = {
+  def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
       case _ => false
@@ -415,7 +415,7 @@ final class Elem(
       val remainder = if (doStripWhitespace) allChildElems else children
 
       remainder map {
-        case e: Elem => e.withoutInterElementWhitespace
+        case e: Elem => e.removeAllInterElementWhitespace
         case n => n
       }
     }
