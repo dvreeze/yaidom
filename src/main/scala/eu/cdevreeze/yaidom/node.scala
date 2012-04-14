@@ -395,34 +395,6 @@ final class Elem(
     result.toMap
   }
 
-  /** Returns a copy where inter-element whitespace has been (recursively) removed */
-  def removeAllInterElementWhitespace: Elem = {
-    def isWhitespaceText(n: Node): Boolean = n match {
-      case t: Text if t.trimmedText.isEmpty => true
-      case _ => false
-    }
-
-    def isElem(n: Node): Boolean = n match {
-      case e: Elem => true
-      case _ => false
-    }
-
-    val doStripWhitespace = children forall { n => isWhitespaceText(n) || isElem(n) }
-
-    // Recursive, but not tail-recursive
-
-    val newChildren = {
-      val remainder = if (doStripWhitespace) allChildElems else children
-
-      remainder map {
-        case e: Elem => e.removeAllInterElementWhitespace
-        case n => n
-      }
-    }
-
-    self.withChildren(newChildren)
-  }
-
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
 

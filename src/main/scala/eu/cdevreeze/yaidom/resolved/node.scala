@@ -189,6 +189,47 @@ final case class Elem(
 
     self.withChildren(newChildren)
   }
+
+  /**
+   * Returns a copy where adjacent text nodes have been (recursively) combined into one text node, and where all
+   * text is normalized. Same as calling `coalesceAllAdjacentText` followed by `normalizeAllText`, but less inefficient.
+   */
+  def coalesceAndNormalizeAllText: Elem = {
+    val newChildren = mutable.ArrayBuffer[Node]()
+
+    // Recursive, but not tail-recursive
+
+    def accumulate(childNodes: Seq[Node]) {
+      if (!childNodes.isEmpty) {
+        val head = childNodes.head
+
+        head match {
+          case t: Text =>
+            val (textNodes, remainder) = childNodes span {
+              case t: Text => true
+              case _ => false
+            }
+
+            val combinedText: String = textNodes collect { case t: Text => t } mkString ""
+
+            newChildren += Text(XmlStringUtils.normalizeString(combinedText))
+            accumulate(remainder)
+          case e: Elem =>
+            newChildren += e
+            accumulate(childNodes.tail)
+        }
+      }
+    }
+
+    accumulate(self.children)
+
+    val resultChildren = newChildren.toIndexedSeq[Node] map {
+      case e: Elem => e.coalesceAndNormalizeAllText
+      case n => n
+    }
+
+    self.withChildren(resultChildren)
+  }
 }
 
 final case class Text(text: String) extends Node {

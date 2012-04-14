@@ -47,7 +47,7 @@ XML namespaces come with many surprises, complexities and issues, such as the fo
 * Conceptual circularity: namespace declarations are considered to be attributes, but attribute names can themselves have a namespace, thus depending on namespace declarations
 
   * Namespace declarations are fortunately easy to recognize in XML, but mind the distinction between prefixed namespace declarations and default namespace declarations
-* Prefixes themselves are considered to be insignificant, but be careful with DTD validation and some attribute values
+* Prefixes themselves are considered to be insignificant, but be careful with DTD validation, and with attribute values containing prefixes
 * Unprefixed attributes, unlike unprefixed elements (when using a default namespace), are not in any namespace
 * Some namespaces are reserved, namely the "xml" namespace (namespace URI: "http://www.w3.org/XML/1998/namespace") and the "xmlns" namespace (namespace URI: "http://www.w3.org/2000/xmlns/")
 * Even text strings in XML can be subject to namespace interpretation (for example in XML Schemas), although that is the responsibility of the application
@@ -61,6 +61,9 @@ Yaidom's approach w.r.t. namespaces (and DTDs) can be summarized as follows:
 * Yaidom considers namespaces first-class citizens
 * Yaidom clearly distinguishes among qualified names, expanded names, namespace scopes and namespace declarations (including undeclarations)
 * Yaidom does not consider namespace declarations to be attributes!
+
+The latter shows that yaidom does not try to be "correct" at all costs. "Conceptual circularities" such as those arising from namespace
+declarations being attributes are so confusing that yaidom does not treat namespace declarations as attributes.
 
 .. _`Why don't namespaces support DTDs?`: http://www.oreillynet.com/xml/blog/2007/04/why_dont_namespaces_support_dt.html
 .. _`XML namespaces and DTDs`: http://www.rpbourret.com/xml/NamespacesFAQ.htm#dtd
@@ -107,7 +110,7 @@ be ignored or not? If the SAX parser does not validate, it is hard to tell what 
 characters() method or to the ignorableWhitespace() method? See `Ignorable White Space`_.
 
 Looking at whitespace handling alone, it is already clear that reasoning about "equality" of XML documents (in isolation)
-is next to impossible in general.
+is next to impossible in general. The same XML document may lead to very different DOM trees, depending on XML parser configuration.
 
 Yaidom's approach w.r.t. whitespace handling is summarized as follows:
 
@@ -151,7 +154,7 @@ restriction in XML Schema is not transitive, which is quite counter-intuitive. T
 complexity, and according to the authors of the MSL paper ad-hoc as well. No wonder it is so hard to gain an in-depth understanding
 of XML Schema.
 
-Yaidom is unaware of schema types (or DTD types). Attribute values are simply strings in yaidom.
+Yaidom is unaware of schema types (or DTD types). Attribute values and text node content are simply strings in yaidom.
 
 .. _`W3C XML Schema: DOs and DON'Ts`: http://www.kohsuke.org/xmlschema/XMLSchemaDOsAndDONTs.html
 .. _`W3C XML Schema Design Patterns: Avoiding Complexity`: http://msdn.microsoft.com/en-us/library/aa468564.aspx
