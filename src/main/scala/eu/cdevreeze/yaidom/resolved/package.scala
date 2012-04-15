@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * This package contains element representations that can be compared for (some notion of) equality, unlike normal yaidom nodes.
+ * This package contains element representations that can be compared for (some notion of "value") equality, unlike normal yaidom nodes.
  * That notion of equality is simple to understand, but "naive". The user is of the API must take control over what is compared
  * for equality.
  *

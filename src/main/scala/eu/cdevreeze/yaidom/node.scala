@@ -289,7 +289,7 @@ final class Elem(
   /** Returns `XmlStringUtils.normalizeString(text)`. */
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 
-  /** Creates a copy, but with (only) the children passed as parameter newChildren */
+  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(qname, attributes, scope, newChildren)
   }
@@ -395,7 +395,7 @@ final class Elem(
     result.toMap
   }
 
-  /** Returns a copy where inter-element whitespace has been (recursively) removed */
+  /** Returns a copy where inter-element whitespace has been removed throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true

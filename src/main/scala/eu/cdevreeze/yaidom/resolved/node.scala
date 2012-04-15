@@ -19,16 +19,16 @@ package resolved
 import scala.collection.{ immutable, mutable }
 
 /**
- * Immutable "resolved" Node. It is called "resolved" because the element nodes in this package only contain resolved names for
- * elements and attributes. Qualified names (and therefore prefixes) are gone in this representation.
+ * Immutable "resolved" Node. It is called "resolved" because the element trees in this package only contain resolved element and
+ * attribute names. Qualified names (and therefore prefixes) are gone in this representation.
  *
  * "Resolved" nodes can be compared for equality. This notion of equality only considers elements and text nodes.
  * By removing qualified names and namespace declarations from this node representation, one source of complexity for equality
  * comparisons is gone.
  *
- * The notion of equality defined here is simple to understand, but "naive". The user is of the API must take control over what is
+ * The notion of equality defined here is simple to understand, but "naive". The user of the API must take control over what is
  * compared for equality. Much of the "magic" in the equality relation is gone, but the API user has to work harder to compare apples to
- * apples, as explained below. Other "magic" is introduced because the text and attribute values here are untyped.
+ * apples, as explained below. Other "magic" remains, because the text and attribute values here are untyped.
  *
  * The notion of equality remotely reminds of the standard XQuery function `fn:deep-equal`, but text and attribute values are untyped
  * in yaidom's case, among many other differences.
@@ -36,10 +36,10 @@ import scala.collection.{ immutable, mutable }
  * As mentioned above, documents, comments, processing instructions and entity references do not occur in this node hierarchy.
  * Moreover, text nodes do not know whether they originate from (or must be serialized as) CDATA sections or not.
  *
- * There are several reasons why equality returns false for 2 elements that should be considered equal, such as:
+ * There are several reasons why equality would return false for 2 elements that should be considered equal, such as:
  * <ul>
  * <li>The text and attribute values are untyped, so equality of numbers 2 and 2.0 is not detected</li>
- * <li>"Ignorable whitespace", meant only for pretty-printing</li>
+ * <li>Differences in "ignorable whitespace", meant only for pretty-printing</li>
  * <li>Text that is possibly divided over several adjacent text nodes (possibly including CDATA text nodes), but should be "coalesced"</li>
  * <li>Text that is only equal after normalizing</li>
  * </ul>
@@ -99,7 +99,7 @@ final case class Elem(
   /** Returns `XmlStringUtils.normalizeString(text)`. */
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 
-  /** Creates a copy, but with (only) the children passed as parameter newChildren */
+  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(resolvedName, resolvedAttributes, newChildren)
   }
@@ -107,7 +107,7 @@ final case class Elem(
   /** Returns `withChildren(self.children :+ newChild)`. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
-  /** Returns a copy where inter-element whitespace has been (recursively) removed */
+  /** Returns a copy where inter-element whitespace has been removed throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
@@ -135,7 +135,7 @@ final case class Elem(
     self.withChildren(newChildren)
   }
 
-  /** Returns a copy where adjacent text nodes have been (recursively) combined into one text node */
+  /** Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree */
   def coalesceAllAdjacentText: Elem = {
     val newChildren = mutable.ArrayBuffer[Node]()
 
@@ -173,7 +173,10 @@ final case class Elem(
     self.withChildren(resultChildren)
   }
 
-  /** Returns a copy where recursively text nodes have been normalized. Do not call before `coalesceAllAdjacentText`, because that makes no sense. */
+  /**
+   * Returns a copy where text nodes have been normalized, throughout the node tree.
+   * Note that it makes little sense to call this method before `coalesceAllAdjacentText`.
+   */
   def normalizeAllText: Elem = {
     // Recursive, but not tail-recursive
 
@@ -191,8 +194,9 @@ final case class Elem(
   }
 
   /**
-   * Returns a copy where adjacent text nodes have been (recursively) combined into one text node, and where all
-   * text is normalized. Same as calling `coalesceAllAdjacentText` followed by `normalizeAllText`, but less inefficient.
+   * Returns a copy where adjacent text nodes have been combined into one text node, and where all
+   * text is normalized, throughout the node tree. Same as calling `coalesceAllAdjacentText` followed by `normalizeAllText`,
+   * but more efficient.
    */
   def coalesceAndNormalizeAllText: Elem = {
     val newChildren = mutable.ArrayBuffer[Node]()
