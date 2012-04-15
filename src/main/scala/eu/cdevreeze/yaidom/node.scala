@@ -395,7 +395,7 @@ final class Elem(
     result.toMap
   }
 
-  /** Returns a copy where inter-element whitespace has been removed throughout the node tree */
+  /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
@@ -407,7 +407,7 @@ final class Elem(
       case _ => false
     }
 
-    val doStripWhitespace = children forall { n => isWhitespaceText(n) || isElem(n) }
+    val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!allChildElems.isEmpty)
 
     // Recursive, but not tail-recursive
 

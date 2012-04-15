@@ -392,5 +392,9 @@ class EqualityTest extends Suite {
     expect(root1.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       root2.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
+
+    expect(root1.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      root2.resolvedElem.removeAllInterElementWhitespace.coalesceAllAdjacentText.normalizeAllText
+    }
   }
 }

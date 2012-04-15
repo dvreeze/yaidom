@@ -107,7 +107,7 @@ final case class Elem(
   /** Returns `withChildren(self.children :+ newChild)`. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
-  /** Returns a copy where inter-element whitespace has been removed throughout the node tree */
+  /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
@@ -119,7 +119,7 @@ final case class Elem(
       case _ => false
     }
 
-    val doStripWhitespace = children forall { n => isWhitespaceText(n) || isElem(n) }
+    val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!allChildElems.isEmpty)
 
     // Recursive, but not tail-recursive
 
