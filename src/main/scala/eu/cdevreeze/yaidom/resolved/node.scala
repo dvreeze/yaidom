@@ -152,7 +152,7 @@ final case class Elem(
               case _ => false
             }
 
-            val combinedText: String = textNodes collect { case t: Text => t } mkString ""
+            val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
 
             newChildren += Text(combinedText)
             accumulate(remainder)
@@ -210,7 +210,7 @@ final case class Elem(
               case _ => false
             }
 
-            val combinedText: String = textNodes collect { case t: Text => t } mkString ""
+            val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
 
             newChildren += Text(XmlStringUtils.normalizeString(combinedText))
             accumulate(remainder)

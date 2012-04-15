@@ -148,18 +148,19 @@ object ElemPath {
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
 
-    require(s.startsWith("/"))
-    require(s.drop(1).startsWith("*"))
+    require(s.startsWith("/"), "The canonical XPath must start with a slash")
+    require(s.drop(1).startsWith("*"), "The canonical XPath must have an asterisk after the starting slash")
     val remainder = s.drop(2)
+    require(remainder.headOption.forall(_ == '/'), "The canonical XPath's third character, if any, must be a slash")
 
     def getEntryStrings(str: String): List[String] = str match {
       case "" => Nil
       case _ =>
         val idx = str indexWhere { c => c == ']' }
-        require(idx > 0)
+        require(idx > 0, "The canonical XPath must have positions for each 'entry', such as [1]")
         val curr = str.take(idx + 1)
         val rest = str.drop(idx + 1)
-        require(rest.size == 0 || rest.startsWith("/"))
+        require(rest.size == 0 || rest.startsWith("/"), "In the canonical XPath, after a position, either nothing or a slash follows")
         curr :: getEntryStrings(rest)
     }
 
@@ -208,13 +209,13 @@ object ElemPath {
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
       // We use the fact that "/", "[" and "]" are never part of qualified names!
 
-      require(s.startsWith("/"))
+      require(s.startsWith("/"), "The canonical XPath for the 'entry' must start with a slash")
       val remainder = s.drop(1)
-      require(remainder.size > 3)
+      require(remainder.size > 3, "The canonical XPath for the 'entry' must contain at least 4 characters")
       val (qnameString, positionString) = remainder span { c => c != '[' }
-      require(positionString.size >= 3)
-      require(positionString.startsWith("["))
-      require(positionString.endsWith("]"))
+      require(positionString.size >= 3, "The canonical XPath for the 'entry' must have a position of at least 3 characters, such as [1]")
+      require(positionString.startsWith("["), "The canonical XPath for the 'entry' must have a position starting with '[', such as [1]")
+      require(positionString.endsWith("]"), "The canonical XPath for the 'entry' must have a position ending with ']', such as [1]")
 
       val qname = QName.parse(qnameString)
       val elementName = scope.resolveQName(qname).getOrElse(sys.error("Could not resolve QName '%s'".format(qname)))

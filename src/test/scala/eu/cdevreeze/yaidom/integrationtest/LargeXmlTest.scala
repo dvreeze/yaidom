@@ -73,7 +73,21 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
-    doTest(doc)
+    doTest(doc.documentElement)
+  }
+
+  @Test def testProcessLargeXmlIntoResolvedElemUsingSax() {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
+
+    import resolved.toResolvedElem
+
+    val resolvedRoot = doc.documentElement.resolvedElem
+    doTest(resolvedRoot)
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
@@ -117,7 +131,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
-    doTest(doc)
+    doTest(doc.documentElement)
   }
 
   @Test def testProcessLargeXmlUsingDom() {
@@ -128,21 +142,22 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
-    doTest(doc)
+    doTest(doc.documentElement)
   }
 
-  private def doTest(doc: Document) {
+  private def doTest[E <: ElemLike[E]](elm: E) {
     val startMs = System.currentTimeMillis()
 
-    assert(doc.documentElement.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
+    assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
     expect(Set("contacts".ename, "contact".ename, "firstName".ename, "lastName".ename, "email".ename, "phone".ename)) {
-      val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = elm.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     val s = "b" * (2000 + 46)
-    val elms1 = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+    // Hack
+    val elms1 = elm filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.asInstanceOf[{ def trimmedText: String }].trimmedText == s }
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
 
     val endMs = System.currentTimeMillis()

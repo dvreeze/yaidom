@@ -24,7 +24,7 @@ yaidom's approach is w.r.t. those issues, if applicable. Very often, yaidom trie
 for example by leaving it to JAXP (or to JAXP and the yaidom user!) to deal with the issue.
 
 Foremost yaidom does only one thing, and tries to do that well, namely represent parsed XML as
-Scala-ish immutable thread-safe DOM-like trees, that can be queried well.
+Scala-ish immutable thread-safe DOM-like trees, that can be queried in a Scala-ish way.
 
 In any case, to use yaidom effectively, one must be familiar with JAXP, and with configuration of
 JAXP parsers and transformers.
@@ -125,7 +125,9 @@ XML as data description format
 
 As the successor to the supposedly even more complex SGML, XML can be document-oriented or data-oriented. So it can mix tags and text
 freely, or it can limit the occurrence of text to the content of leaf element nodes only. Servicing those "2 worlds" must have implications
-for (the complexity of) schema languages as well.
+for (the complexity of) schema languages as well. Indeed it does, as the "ignorable whitespace" issues show. After all, in "data-oriented"
+XML inter-element whitespace is normally "ignorable", but of course there is no automatic way of determining whether XML is "data-oriented"
+or "document-oriented".
 
 There are several degrees of freedom in how to represent data as XML, but this freedom does not necessarily help in better interpreting the data.
 For one, there is the distinction between elements and attributes. When to use what?
@@ -168,6 +170,13 @@ Put very negatively, XML technology is an ongoing story of scope creep, technica
 
 It is telling that it is extremely hard to come up with a solid notion of "equality" for XML documents (yes, I know, there is an
 XPath function fn:deep-equal).
+
+It is also telling that depending on the configuration of a DOM parser, the same XML document may be parsed into quite different
+DOM trees.
+
+Moreover, validation against a DTD or schema may trigger the downloading of a chain of DTDs or schema documents, maybe for
+something as mundane as the determination of which whitespace is "ignorable". And if you want to prevent that downloading from the
+internet, be prepared to spend a lot of time to set up proper caching of those DTDs and schemas.
 
 Fortunately, in practice most XML (out of our control) that we deal with is "reasonably sane". On the other hand, the more we
 control the XML ourselves, the more we can keep it simple.
