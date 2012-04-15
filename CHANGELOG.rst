@@ -13,11 +13,11 @@ CHANGELOG
   * Breaking API changes: removed methods ``getIndexToParent``, ``findParentInTree`` and ``getIndexByElemPath``
   * Fixed inconsistency: method ``findChildElem`` returns the first found child element obeying the given predicate, no longer assuming that there is at most one such element
   
-* Yaidom ``Node``s (again) have UIDs, enabling the extension of nodes with additional data, using the UID as key
+* A yaidom ``Node`` (again) has a UID, thus enabling the extension of nodes with additional data, using the UID as key
 * Added ``IndexedDocument``, whose ``findParent`` method is efficient (leveraging the UIDs mentioned above)
-* Small additions to ``ElemPath``: methods ``ancestorOrSelfPaths`` and ``ancestorPaths``
+* Small additions to ``ElemPath``: new methods ``ancestorOrSelfPaths`` and ``ancestorPaths``
 * Documentation recommends use of TagSoup for parsing HTML (also added test case method using TagSoup)
-* Added support for printing ``Elem``s without XML declarations
+* Added support for printing an ``Elem`` without XML declaration
 * Added document about some XML gotchas
 
 
