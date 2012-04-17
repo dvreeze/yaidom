@@ -125,7 +125,7 @@ XML as data description format
 
 As the successor to the supposedly even more complex SGML, XML can be document-oriented or data-oriented. So it can mix tags and text
 freely, or it can limit the occurrence of text to the content of leaf element nodes only. Servicing those "2 worlds" must have implications
-for (the complexity of) schema languages as well. Indeed it does, as the "ignorable whitespace" issues show. After all, in "data-oriented"
+for the complexity of XML technology. Indeed it does, as the "ignorable whitespace" issues show. After all, in "data-oriented"
 XML inter-element whitespace is normally "ignorable", but of course there is no automatic way of determining whether XML is "data-oriented"
 or "document-oriented".
 
@@ -140,9 +140,10 @@ There is also the choice of leaving data out by either using the xsi:nil attribu
 Thinking in terms of "programming language types", such as Maps, Lists, Sets etc. it is usually not clear from an XML document which is
 which, without validating against a schema. In the XML document a parent element may have several children, but without consulting the
 schema it is hard to tell if the order of child elements matters, how many of them may occur, etc. This does not make XML ideal for
-representation of data.
+representation of data. Of course, an XML dialect for "data" could be developed (inspired by JSON, and/or Scala Collections),
+but this is not how XML is used in practice.
 
-Of course, there is not much yaidom can do here. Put simply, whatever the XML parser passed to yaidom is stored as yaidom Documents.
+Obviously, there is not much yaidom can do here. Put simply, whatever the XML parser passed to yaidom is stored as yaidom Documents.
 
 XML Schema
 ==========
@@ -178,7 +179,7 @@ Moreover, validation against a DTD or schema may trigger the downloading of a ch
 something as mundane as the determination of which whitespace is "ignorable". And if you want to prevent that downloading from the
 internet, be prepared to spend a lot of time to set up proper caching of those DTDs and schemas.
 
-Fortunately, in practice most XML (out of our control) that we deal with is "reasonably sane". On the other hand, the more we
+Fortunately, in practice most XML (out of our control) that we deal with is "reasonably sane". Besides, the more we
 control the XML ourselves, the more we can keep it simple.
 
 In any case, I prefer to leave many hairy details of dealing with XML to JAXP. That's why yaidom has a rather limited scope.
