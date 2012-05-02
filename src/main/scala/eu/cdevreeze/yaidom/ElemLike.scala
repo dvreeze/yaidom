@@ -232,8 +232,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
 
-  /** Shorthand for `filterElems(p)`. Use this shorthand only if the predicate is a short expression. Do not confuse this with the double forward slash in XPath! */
-  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElems(p)
+  /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
+  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
   /** Returns the descendant elements with the given expanded name */
   final def filterElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
@@ -263,8 +263,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
     allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
-  /** Shorthand for `findTopmostElems(p)`. Use this shorthand only if the predicate is a short expression. */
-  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElems(p)
+  /** Shorthand for `findTopmostElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
+  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
