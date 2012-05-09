@@ -21,7 +21,7 @@ import java.{ util => jutil, io => jio }
 import javax.xml.stream._
 import javax.xml.stream.events.XMLEvent
 import scala.collection.immutable
-import jinterop.StaxConversions._
+import convert.StaxConversions._
 
 /**
  * StAX-based `Document` printer.

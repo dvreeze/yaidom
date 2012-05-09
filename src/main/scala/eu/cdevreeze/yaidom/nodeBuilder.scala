@@ -46,7 +46,7 @@ import scala.collection.immutable
  *
  * Another reason that the above-mentioned impedance mismatch is less of a problem in practice is that typically the XML
  * trees (as `NodeBuilder`s or directly as `Node`s) are built in a top-down manner. The [[eu.cdevreeze.yaidom.ConverterToDocument]]s
- * in package [[eu.cdevreeze.yaidom.jinterop]] recursively build `Elem`s in a top-down manner, possibly creating an `Elem`
+ * in package [[eu.cdevreeze.yaidom.convert]] recursively build `Elem`s in a top-down manner, possibly creating an `Elem`
  * instance (for each element) twice (first without children, and finally as a copy with children added).
  *
  * When using `NodeBuilder`s to create a `Document`, this `Document` typically contains no "ignorable whitespace". This may cause

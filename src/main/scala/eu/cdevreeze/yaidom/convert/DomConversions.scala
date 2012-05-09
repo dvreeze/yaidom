@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package convert
 
 /**
  * Conversions between [[eu.cdevreeze.yaidom.Elem]]s of this API and DOM Elements.

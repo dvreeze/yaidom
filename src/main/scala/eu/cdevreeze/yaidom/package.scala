@@ -104,7 +104,7 @@ package eu.cdevreeze
  * Parsing and printing of XML is not handled in this package. Even the `toString` methods for nodes
  * use the `NodeBuilder` DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
  * "ignorable whitespace" etc. are not handled in this package. Parsing and printing of XML are offered by the
- * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.jinterop]] subpackage.
+ * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.convert]] subpackage.
  * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
  *
  * @author Chris de Vreeze

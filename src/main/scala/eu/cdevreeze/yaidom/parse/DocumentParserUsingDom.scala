@@ -20,7 +20,7 @@ package parse
 import java.{ io => jio }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import org.w3c.dom.Element
-import jinterop.DomConversions._
+import convert.DomConversions._
 
 /**
  * DOM-based `Document` parser.

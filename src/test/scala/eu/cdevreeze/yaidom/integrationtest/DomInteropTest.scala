@@ -29,7 +29,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingDom
 import print.DocumentPrinterUsingDom
-import jinterop.DomConversions._
+import convert.DomConversions._
 
 /**
  * DOM interoperability test case.

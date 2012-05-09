@@ -18,18 +18,18 @@ package eu.cdevreeze.yaidom
 
 /**
  * Support for parsing XML into yaidom `Document`s and `Elem`s. This package offers the [[eu.cdevreeze.yaidom.parse.DocumentParser]]
- * trait, as well as several implementations. Those implementations use JAXP (SAX, DOM or StAX), and most of them use the `jinterop` package
+ * trait, as well as several implementations. Those implementations use JAXP (SAX, DOM or StAX), and most of them use the `convert` package
  * to convert JAXP artifacts to yaidom `Document`s.
  *
  * Having these different fully configurable JAXP-based implementations shows that yaidom is pessimistic about the transparency of parsing and
  * printing XML. It also shows that yaidom is optimistic about the available (heap) memory and processing power, because of the 2 separated
- * steps of JAXP parsing/printing and (in-memory) `jinterop` conversions. Using JAXP means that escaping of characters is something
+ * steps of JAXP parsing/printing and (in-memory) `convert` conversions. Using JAXP means that escaping of characters is something
  * that JAXP deals with, and that's definitely better than trying to do it yourself.
  *
- * One `DocumentParser` implementation does not use any `jinterop` conversion. That is `DocumentParserUsingSax`. It is likely the
+ * One `DocumentParser` implementation does not use any `convert` conversion. That is `DocumentParserUsingSax`. It is likely the
  * fastest of the `DocumentParser` implementations.
  *
- * This package depends on the [[eu.cdevreeze.yaidom]] and [[eu.cdevreeze.yaidom.jinterop]] packages, and not the other way around.
+ * This package depends on the [[eu.cdevreeze.yaidom]] and [[eu.cdevreeze.yaidom.convert]] packages, and not the other way around.
  *
  * @author Chris de Vreeze
  */

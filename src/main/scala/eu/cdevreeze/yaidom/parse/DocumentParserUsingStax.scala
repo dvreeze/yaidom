@@ -21,7 +21,7 @@ import java.{ io => jio }
 import javax.xml.stream.{ XMLInputFactory, XMLEventReader }
 import javax.xml.stream.events.XMLEvent
 import scala.util.control.Exception._
-import jinterop.StaxConversions._
+import convert.StaxConversions._
 
 /**
  * StAX-based `Document` parser.

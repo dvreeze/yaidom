@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package jinterop
+package convert
 
 import java.{ util => jutil }
 import javax.xml.stream.XMLEventReader

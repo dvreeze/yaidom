@@ -29,7 +29,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingStax
 import print.DocumentPrinterUsingStax
-import jinterop.StaxConversions._
+import convert.StaxConversions._
 
 /**
  * StAX interoperability test case.

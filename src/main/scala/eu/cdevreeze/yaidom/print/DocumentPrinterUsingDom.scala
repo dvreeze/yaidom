@@ -23,7 +23,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
-import jinterop.DomConversions._
+import convert.DomConversions._
 
 /**
  * DOM-based `Document` printer.
