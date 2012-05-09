@@ -171,3 +171,8 @@ Note that some of the following good practices apply more to applications than t
   * Do you really need to implement Serializable (sometimes a hidden web framework cost)?
   
 * Controversial: Write only a few targeted unit tests. Mostly write realistic integration tests
+
+For one summary of some software design principles, see `Software Design Principles`_.
+
+.. _`Software Design Principles`: http://jinaldesai.net/software-design-principles/
+
