@@ -33,8 +33,8 @@ import print._
  * Example http://www.javacodegeeks.com/2012/05/scala-basic-xml-processing.html (for Scala's XML library) "ported" to
  * yaidom, as test case.
  *
- * Yaidom definitely is more verbose than Scala's XML API, but also easier to reason about. It is more verbose, but more precise,
- * especially when it comes to names (qualified names and expanded names).
+ * Yaidom definitely is more verbose than Scala's XML API, but also easier to reason about. It is more verbose, but more
+ * precise, especially when it comes to names (qualified names and expanded names).
  *
  * The precision of yaidom becomes more apparent when using namespaces, but they are not used in this test case.
  *
@@ -71,10 +71,10 @@ class BasicXmlProcessingTest extends Suite {
       foo.allChildElems.map(_.text).mkString
     }
     expect("hi1yellow") {
-      foo.findAllElems.map(_.text).mkString
+      foo.removeAllInterElementWhitespace.findAllElems.map(_.text).mkString
     }
     expect("hi1yellow") {
-      foo.findAllElemsOrSelf.map(_.text).mkString
+      foo.removeAllInterElementWhitespace.findAllElemsOrSelf.map(_.text).mkString
     }
 
     val bars = foo \ { _.localName == "bar" }
