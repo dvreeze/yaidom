@@ -170,9 +170,11 @@ final class Document(
     val unshiftedFormatString = startFormatString + pisFormatString + commentsFormatString + ")"
 
     val formatString = {
-      val result = unshiftedFormatString.lines.toIndexedSeq[String] collect {
-        case ln if ln.trim == "%s" => ln // "%s" not indented here!
-        case ln => (" " * numberOfSpaces) + ln
+      val result = unshiftedFormatString.lines.toIndexedSeq collect { (ln: String) =>
+        ln match {
+          case ln if ln.trim == "%s" => ln // "%s" not indented here!
+          case ln => (" " * numberOfSpaces) + ln
+        }
       }
       result.mkString("%n".format())
     }
@@ -444,9 +446,11 @@ final class Elem(
     val unshiftedFormatString = startFormatString + childrenFormatString + ")"
 
     val formatString = {
-      val result = unshiftedFormatString.lines.toIndexedSeq[String] collect {
-        case ln if ln.trim == "%s" => ln // "%s" not indented here!
-        case ln => (" " * numberOfSpaces) + ln
+      val result = unshiftedFormatString.lines.toIndexedSeq collect { (ln: String) =>
+        ln match {
+          case ln if ln.trim == "%s" => ln // "%s" not indented here!
+          case ln => (" " * numberOfSpaces) + ln
+        }
       }
       result.mkString("%n".format())
     }

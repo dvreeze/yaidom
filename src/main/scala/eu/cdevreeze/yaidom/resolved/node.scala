@@ -165,9 +165,11 @@ final case class Elem(
 
     accumulate(self.children)
 
-    val resultChildren = newChildren.toIndexedSeq[Node] map {
-      case e: Elem => e.coalesceAllAdjacentText
-      case n => n
+    val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
+      n match {
+        case e: Elem => e.coalesceAllAdjacentText
+        case n => n
+      }
     }
 
     self.withChildren(resultChildren)
@@ -227,9 +229,11 @@ final case class Elem(
 
     accumulate(self.children)
 
-    val resultChildren = newChildren.toIndexedSeq[Node] map {
-      case e: Elem => e.coalesceAndNormalizeAllText
-      case n => n
+    val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
+      n match {
+        case e: Elem => e.coalesceAndNormalizeAllText
+        case n => n
+      }
     }
 
     self.withChildren(resultChildren)
