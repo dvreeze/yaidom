@@ -19,6 +19,7 @@ package xlink
 
 import java.net.URI
 import scala.collection.immutable
+import eu.cdevreeze.yaidom.Predef._
 import XLink._
 
 /**

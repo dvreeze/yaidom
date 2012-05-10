@@ -27,6 +27,7 @@ import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
+import eu.cdevreeze.yaidom.Predef._
 import parse._
 import print._
 
@@ -84,7 +85,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
-    import resolved.toResolvedElem
+    import resolved.Predef.toResolvedElem
 
     val resolvedRoot = doc.documentElement.resolvedElem
     doTest(resolvedRoot)

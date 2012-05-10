@@ -44,20 +44,11 @@ package eu.cdevreeze.yaidom
  * Or:
  * {{{
  * import eu.cdevreeze.yaidom.resolved
- * import eu.cdevreeze.yaidom.resolved.toResolvedElem
+ * import eu.cdevreeze.yaidom.resolved.Predef._
  *
  * val resolvedRootElm = rootElm.resolvedElem
  * }}}
  *
  * @author Chris de Vreeze
  */
-package object resolved {
-
-  /** "Implicit class" for converting a normal yaidom `Elem` to a [[eu.cdevreeze.yaidom.resolved.Elem]] */
-  final class ToResolvedElem(val e: eu.cdevreeze.yaidom.Elem) {
-    def resolvedElem: Elem = Elem(e)
-  }
-
-  /** Implicit conversion enriching a normal yaidom `Elem` with a `resolvedElem` method that turns the yaidom `Elem` into a [[eu.cdevreeze.yaidom.resolved.Elem]] */
-  implicit def toResolvedElem(e: eu.cdevreeze.yaidom.Elem): ToResolvedElem = new ToResolvedElem(e)
-}
+package object resolved
