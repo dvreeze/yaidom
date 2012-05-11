@@ -3,6 +3,26 @@ CHANGELOG
 =========
 
 
+0.5.2
+=====
+
+* Breaking API change: renamed the ``jinterop`` package to ``convert``:
+
+  * In principle we could later add conversions from/to Scala standard library XML to this package, without the need to rename this package again
+  
+* The ``ElemLike`` operators now stand for ``filterElemsOrSelf`` and ``findTopmostElemsOrSelf`` (instead of ``filterElems`` and ``findTopmostElems``, resp.):
+
+  * This is more consistent with XPath, so less surprising
+
+* Some QA by the Scala 2.10.0-M3 compiler, fixing some warnings:
+
+  * This includes the removal of the (remaining) postfix operators
+  * API change: the implicit conversions are now in ``Predef`` objects that must be explicitly imported
+  * Also removed keyword ``val`` from ``for`` comprehensions
+
+* More tests
+
+
 0.5.1
 =====
 
