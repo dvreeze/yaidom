@@ -233,7 +233,7 @@ class BasicXmlProcessingTest extends Suite {
     val docPrinter = DocumentPrinterUsingSax.newInstance
     val musicXml = docPrinter.print(musicElm2)
 
-    val musicElm3 = docParser.parse(new jio.ByteArrayInputStream(musicXml.getBytes(Codec.UTF8))).documentElement
+    val musicElm3 = docParser.parse(new jio.ByteArrayInputStream(musicXml.getBytes(Codec.UTF8.toString))).documentElement
 
     val musicElmWithoutLinks: Elem =
       musicElm updated {
