@@ -146,7 +146,11 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  private def doTest[E <: ElemLike[E]](elm: E) {
+  private type HasText = {
+    def trimmedText: String
+  }
+
+  private def doTest[E <: ElemLike[E] with HasText](elm: E) {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -157,8 +161,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
 
     val s = "b" * (2000 + 46)
-    // Hack
-    val elms1 = elm filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.asInstanceOf[{ def trimmedText: String }].trimmedText == s }
+    val elms1 = elm filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
 
     val endMs = System.currentTimeMillis()
