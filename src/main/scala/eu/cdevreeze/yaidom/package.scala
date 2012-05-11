@@ -69,7 +69,7 @@ package eu.cdevreeze
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm \ { _.localName == "Book" }
- *     val price = bookElm.attribute("Price".ename)
+ *     price = bookElm.attribute("Price".ename)
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}
@@ -80,7 +80,7 @@ package eu.cdevreeze
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
- *     val price = bookElm.attribute("Price".ename)
+ *     price = bookElm.attribute("Price".ename)
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}

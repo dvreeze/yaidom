@@ -347,13 +347,12 @@ class AirportExampleTest extends Suite {
     }
 
     val summaryXmlString = domPrinter.print(Document(airportSummaryRoot))
-    println(summaryXmlString)
 
     val distanceFrankfurtBrussels: Double = {
       val airportElms =
         for {
           airportElm <- airportSummaryRoot.allChildElems
-          val airportCodeElm = airportElm getChildElem (_.localName == "AirportCode")
+          airportCodeElm = airportElm getChildElem (_.localName == "AirportCode")
           if airportCodeElm.trimmedText == "FRA"
         } yield airportElm
       val airportElm = airportElms.headOption.getOrElse(sys.error("Expected airport FRA"))

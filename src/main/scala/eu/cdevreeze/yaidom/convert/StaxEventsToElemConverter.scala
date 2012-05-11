@@ -219,7 +219,10 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
 
       val declaredScope: Scope = {
-        val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ != "" } headOption
+        val defaultNs = {
+          val result = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ != "" }
+          result.headOption
+        }
         val prefScope = {
           val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 != "" }
           result.toMap
@@ -227,7 +230,10 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
         new Scope(defaultNamespaceOption = defaultNs, prefixScope = prefScope)
       }
       val undeclaredOptionalPrefixes: Set[Option[String]] = {
-        val defaultNs = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ == "" } headOption
+        val defaultNs = {
+          val result = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ == "" }
+          result.headOption
+        }
         val defaultNsUndeclared = defaultNs.isDefined
 
         val undeclaredPrefixOptions: Set[Option[String]] = {

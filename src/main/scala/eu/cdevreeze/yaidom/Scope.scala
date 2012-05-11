@@ -92,7 +92,7 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
       val defaultNs: Option[String] = (Scope.this.defaultNamespaceOption, scope.defaultNamespaceOption) match {
         case (None, _) => scope.defaultNamespaceOption
         case (_, None) => None
-        case (Some(ns1), Some(ns2)) if ns1 == ns2 => None
+        case (someNs1, someNs2) if someNs1.get == someNs2.get => None
         case (_, _) => scope.defaultNamespaceOption
       }
       val prefixScope: Map[String, String] = scope.prefixScope collect {
@@ -161,7 +161,7 @@ object Scope {
 
     def defaultNamespaceUndeclared: Boolean = undeclaredOptionalPrefixes.contains(None)
 
-    def undeclaredPrefixes: Set[String] = undeclaredOptionalPrefixes collect { case Some(pref) => pref }
+    def undeclaredPrefixes: Set[String] = undeclaredOptionalPrefixes collect { case prefOption if prefOption.isDefined => prefOption.get }
 
     /** Returns the `Set` of undeclared prefixes, with an undeclared default namespace represented by the empty `String` */
     def undeclaredSet: Set[String] = defaultNamespaceUndeclared match {
@@ -210,7 +210,10 @@ object Scope {
         val defaultNs = m.get("")
         defaultNs == Some("")
       }
-      val undeclaredPrefixes = m filterKeys { pref => pref != "" } filter { kv => kv._2 == "" } keySet
+      val undeclaredPrefixes = {
+        val result = m filterKeys { pref => pref != "" } filter { kv => kv._2 == "" }
+        result.keySet
+      }
       val undeclaredOptionalPrefixes = {
         undeclaredPrefixes map { pref => Some(pref) }
       } ++ (if (defaultNamespaceUndeclared) Set(None) else Set())

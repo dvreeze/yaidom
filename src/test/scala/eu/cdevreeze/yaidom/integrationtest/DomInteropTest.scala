@@ -356,15 +356,17 @@ class DomInteropTest extends Suite {
     }
 
     def checkForChoiceDocumentation(rootElm: Elem): Unit = {
-      val forChoiceDefOption: Option[Elem] =
-        rootElm filterChildElems { e => e.resolvedName == ns.ename("simpleType") && e.attribute("name".ename) == "formChoice" } headOption
+      val forChoiceDefOption: Option[Elem] = {
+        val result = rootElm filterChildElems { e => e.resolvedName == ns.ename("simpleType") && e.attribute("name".ename) == "formChoice" }
+        result.headOption
+      }
 
       expect(true) {
         forChoiceDefOption.isDefined
       }
 
       val forChoiceDefDocumentation: String =
-        forChoiceDefOption.get.filterElemsNamed(ns.ename("documentation")) flatMap { e => e.trimmedText } mkString
+        forChoiceDefOption.get.filterElemsNamed(ns.ename("documentation")) flatMap { e => e.trimmedText } mkString ""
 
       expect("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
