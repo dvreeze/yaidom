@@ -21,6 +21,7 @@ import java.{ util => jutil, io => jio }
 import javax.xml.parsers._
 import javax.xml.transform.TransformerFactory
 import scala.collection.immutable
+import scala.io.Codec
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
@@ -154,4 +155,115 @@ class BasicXmlProcessingTest extends Suite {
       fooResolved == fooFromStringResolved
     }
   }
+
+  @Test def testConversions() {
+    val docParser = DocumentParserUsingSax.newInstance
+    val musicElm: Elem = docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
+
+    val songs = (musicElm \\ (_.localName == "song")) map { songElm =>
+      Song(songElm.attribute("title".ename), songElm.attribute("length".ename))
+    }
+
+    val totalTime = songs.map(_.timeInSeconds).sum
+
+    expect(11311) {
+      totalTime
+    }
+
+    val artists = (musicElm \ (_.localName == "artist")) map { artistElm =>
+      val name = artistElm.attribute("name".ename)
+
+      val albums = (artistElm \ (_.localName == "album")) map { albumElm =>
+        val title = albumElm.attribute("title".ename)
+        val description = albumElm.getChildElemNamed("description".ename).text
+
+        val songs = (albumElm \ (_.localName == "song")) map { songElm =>
+          Song(songElm.attribute("title".ename), songElm.attribute("length".ename))
+        }
+
+        Album(title, songs, description)
+      }
+
+      Artist(name, albums)
+    }
+
+    val albumLengths = artists flatMap { artist =>
+      artist.albums map { album => (artist.name, album.title, album.length) }
+    }
+
+    expect(4) {
+      albumLengths.size
+    }
+    expect(("Radiohead", "The King of Limbs", "37:34")) {
+      albumLengths(0)
+    }
+    expect(("Portishead", "Third", "48:50")) {
+      albumLengths(3)
+    }
+
+    // Marshalling the NodeBuilder way
+
+    val musicElm2 =
+      elem(
+        qname = "music".qname,
+        children = artists map { artist =>
+          elem(
+            qname = "artist".qname,
+            attributes = Map("name".qname -> artist.name),
+            children = artist.albums map { album =>
+              elem(
+                qname = "album".qname,
+                attributes = Map("title".qname -> album.title),
+                children = {
+                  val songChildren: immutable.Seq[NodeBuilder] = album.songs map { song =>
+                    elem(
+                      qname = "song".qname,
+                      attributes = Map("title".qname -> song.title, "length".qname -> song.length))
+                  }
+
+                  val descriptionElm = elem(
+                    qname = "description".qname,
+                    children = List(text(album.description)))
+
+                  songChildren :+ descriptionElm
+                })
+            })
+        }).build()
+
+    val docPrinter = DocumentPrinterUsingSax.newInstance
+    val musicXml = docPrinter.print(musicElm2)
+
+    val musicElm3 = docParser.parse(new jio.ByteArrayInputStream(musicXml.getBytes(Codec.UTF8))).documentElement
+
+    val musicElmWithoutLinks: Elem =
+      musicElm updated {
+        case path: ElemPath if path.lastEntryOption.map(_.elementName.localPart).getOrElse("") == "description" =>
+          val e = musicElm.findWithElemPath(path).get
+          Elem(e.qname, e.attributes - "link".qname, e.scope, e.children)
+      }
+
+    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {
+      resolved.Elem(musicElm2).removeAllInterElementWhitespace
+    }
+    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {
+      resolved.Elem(musicElm3).removeAllInterElementWhitespace
+    }
+  }
+
+  final case class Song(val title: String, val length: String) extends Immutable {
+    val timeInSeconds: Int = {
+      val arr = length.split(":")
+      require(arr.length == 2)
+      val minutes = arr(0).toInt
+      val seconds = arr(1).toInt
+      (minutes * 60) + seconds
+    }
+  }
+
+  final case class Album(val title: String, val songs: immutable.Seq[Song], val description: String) extends Immutable {
+    val timeInSeconds: Int = songs.map(_.timeInSeconds).sum
+    val length: String = (timeInSeconds / 60).toString + ":" + (timeInSeconds % 60).toString
+  }
+
+  final case class Artist(val name: String, val albums: immutable.Seq[Album]) extends Immutable
 }
