@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- From https://www.ibm.com/developerworks/library/x-scalaxml/, with permission 
+	of the author Michael Galpin -->
+<feed>
+	<entry>
+		<updated>2008-03-26T05:06:36Z</updated>
+		<service>
+			<profileUrl>http://twitter.com/karlerikson</profileUrl>
+			<id>twitter</id>
+			<name>Twitter</name>
+		</service>
+		<title>Listening to Panic at the Disco on Kimmel</title>
+		<link>http://twitter.com/karlerikson/statuses/777188586</link>
+		<published>2008-03-26T05:06:36Z</published>
+		<id>f18ebf10-06be-98e2-6059-fa78fa44584b</id>
+		<user>
+			<profileUrl>http://friendfeed.com/karlerikson</profileUrl>
+			<nickname>karlerikson</nickname>
+			<id>f294a86c-e6f3-11dc-8203-003048343a40</id>
+			<name>Karl Erikson</name>
+		</user>
+	</entry>
+	<entry>
+		<updated>2008-03-26T05:06:35Z</updated>
+		<service>
+			<profileUrl>http://twitter.com/asfaq</profileUrl>
+			<id>twitter</id>
+			<name>Twitter</name>
+		</service>
+		<title>@ceetee lol</title>
+		<link>http://twitter.com/asfaq/statuses/777188582</link>
+		<published>2008-03-26T05:06:35Z</published>
+		<id>d4099bb0-8186-5aa1-ce1f-672246c0fe9c</id>
+		<user>
+			<profileUrl>http://friendfeed.com/asfaq</profileUrl>
+			<nickname>asfaq</nickname>
+			<id>41e24568-ee6b-11dc-a88d-003048343a40</id>
+			<name>Asfaq</name>
+		</user>
+	</entry>
+	<entry>
+		<updated>2008-03-26T05:06:31Z</updated>
+		<service>
+			<profileUrl>http://twitter.com/chrisjlee</profileUrl>
+			<id>twitter</id>
+			<name>Twitter</name>
+		</service>
+		<title>sleep..</title>
+		<link>http://twitter.com/chrisjlee/statuses/777188561</link>
+		<published>2008-03-26T05:06:31Z</published>
+		<id>8c4ec232-3ad5-28e1-16c0-00a428294c9c</id>
+		<user>
+			<profileUrl>http://friendfeed.com/chrisjlee</profileUrl>
+			<nickname>chrisjlee</nickname>
+			<id>5af39ad4-53b6-45d8-ae25-ef7c50fe9568</id>
+			<name>Chris</name>
+		</user>
+	</entry>
+	<entry>
+		<updated>2008-03-26T05:06:49Z</updated>
+		<service>
+			<profileUrl>
+				http://www.google.com/reader/shared/09566745492004297397
+			</profileUrl>
+			<id>googlereader</id>
+			<name>Google Reader</name>
+		</service>
+		<title>Poketo First Editions Show!!</title>
+		<link>
+			http://www.poketo.com/blog/2008/03/24/poketo-first-editions-show/
+		</link>
+		<published>2008-03-26T05:06:49Z</published>
+		<id>4caefceb-d71c-59c9-8199-45c5adbc60f2</id>
+		<user>
+			<profileUrl>http://friendfeed.com/misterjt</profileUrl>
+			<nickname>misterjt</nickname>
+			<id>e745cc8a-f9e4-11dc-a477-003048343a40</id>
+			<name>Jason Toney</name>
+		</user>
+	</entry>
+</feed>
