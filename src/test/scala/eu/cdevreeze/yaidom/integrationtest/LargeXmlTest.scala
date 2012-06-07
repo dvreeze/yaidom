@@ -146,6 +146,68 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
+  @Test def testFind() {
+    val parser = DocumentParserUsingDom.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
+
+    val rootElm = doc.documentElement
+    val allElms = rootElm.findAllElemsOrSelf
+    assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
+
+    val s = "b" * (2000 + 46)
+
+    // Note: Do not take the durations logged below too literally. This is not a properly set up performance test in any way!
+
+    // Finding the fast way
+    val start2Ms = System.currentTimeMillis()
+    val foundElm2 = {
+      val result = rootElm findElemOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      result.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+    }
+    val end2Ms = System.currentTimeMillis()
+    logger.info("Finding an element the fast way (using findElemOrSelf) took %d ms".format(end2Ms - start2Ms))
+
+    // Finding the fast way (again)
+    val start3Ms = System.currentTimeMillis()
+    val foundElm3 = {
+      val result = rootElm findElem { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      result.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+    }
+    val end3Ms = System.currentTimeMillis()
+    logger.info("Finding an element the fast way (using findElem) took %d ms".format(end3Ms - start3Ms))
+
+    // Finding the slower way
+    val start4Ms = System.currentTimeMillis()
+    val foundElm4 = {
+      val result = rootElm findTopmostElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+    }
+    val end4Ms = System.currentTimeMillis()
+    logger.info("Finding an element the slower way (using findTopmostElemsOrSelf) took %d ms".format(end4Ms - start4Ms))
+
+    // Finding the still slower way (in theory)
+    val start5Ms = System.currentTimeMillis()
+    val foundElm5 = {
+      val result = rootElm filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+    }
+    val end5Ms = System.currentTimeMillis()
+    logger.info("Finding an element the (theoretically) still slower way (using filterElemsOrSelf) took %d ms".format(end5Ms - start5Ms))
+
+    // Finding the slowest way (in theory)
+    val start6Ms = System.currentTimeMillis()
+    val foundElm6 = {
+      val result = rootElm.findAllElemsOrSelf filter { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+    }
+    val end6Ms = System.currentTimeMillis()
+    logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
+  }
+
   private type HasText = {
     def trimmedText: String
   }
