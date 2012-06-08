@@ -160,6 +160,12 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the child elements with the given expanded name */
   final def filterChildElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
+  /** Shorthand for `filterChildElemsNamed(expandedName)`. */
+  final def \(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterChildElemsNamed(expandedName)
+
+  /** Shorthand for `filterChildElems { _.resolvedName.localPart == localName }`. */
+  final def \(localName: String): immutable.IndexedSeq[E] = filterChildElems { _.resolvedName.localPart == localName }
+
   /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
 
@@ -219,8 +225,17 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     result.toIndexedSeq
   }
 
+  /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
+  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
+
   /** Returns the descendant-or-self elements that have the given expanded name */
   final def filterElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
+
+  /** Shorthand for `filterElemsOrSelfNamed(expandedName)`. */
+  final def \\(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElemsOrSelfNamed(expandedName)
+
+  /** Shorthand for `filterElemsOrSelf { _.resolvedName.localPart == localName }`. */
+  final def \\(localName: String): immutable.IndexedSeq[E] = filterElemsOrSelf { _.resolvedName.localPart == localName }
 
   /** Returns (the equivalent of) `findAllElemsOrSelf collect pf` */
   final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
@@ -231,9 +246,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
-
-  /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
-  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
   /** Returns the descendant elements with the given expanded name */
   final def filterElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
@@ -259,16 +271,22 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     result.toIndexedSeq
   }
 
-  /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
-
   /** Shorthand for `findTopmostElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElemsOrSelfNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =
     findTopmostElemsOrSelf { e => e.resolvedName == expandedName }
+
+  /** Shorthand for `findTopmostElemsOrSelfNamed(expandedName)`. */
+  final def \\!(expandedName: ExpandedName): immutable.IndexedSeq[E] = findTopmostElemsOrSelfNamed(expandedName)
+
+  /** Shorthand for `findTopmostElemsOrSelf { _.resolvedName.localPart == localName }`. */
+  final def \\!(localName: String): immutable.IndexedSeq[E] = findTopmostElemsOrSelf { _.resolvedName.localPart == localName }
+
+  /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
+  final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
+    allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElemsNamed(expandedName: ExpandedName): immutable.IndexedSeq[E] =

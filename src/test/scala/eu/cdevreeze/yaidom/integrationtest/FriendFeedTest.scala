@@ -181,15 +181,15 @@ class FriendFeedTest extends Suite {
       // Typical usage of yaidom
       val result =
         for {
-          serviceElm <- entryElm \ { _.localName == "service" }
-          serviceIdElm <- serviceElm \ { _.localName == "id" }
+          serviceElm <- entryElm \ "service"
+          serviceIdElm <- serviceElm \ "id"
         } yield serviceIdElm.text.trim
       result.headOption.getOrElse(sys.error("Expected service id"))
     }
 
     val stats2Elm: Elem = {
       val serviceIds = {
-        val result = feedElm \ { _.localName == "entry" } map { entryElm => getEntryServiceId(entryElm) }
+        val result = feedElm \ "entry" map { entryElm => getEntryServiceId(entryElm) }
         result.distinct
       }
 
@@ -223,7 +223,7 @@ class FriendFeedTest extends Suite {
   private def filterFeedEntriesOnServiceName(feedElm: Elem, serviceName: String): immutable.IndexedSeq[Elem] = {
     require(feedElm.localName == "feed")
 
-    val entryElms = feedElm \ { _.localName == "entry" }
+    val entryElms = feedElm \ "entry"
 
     entryElms filter { entryElm =>
       // Assuming precisely 1 "service" child elem with precisely 1 "id" child elem
