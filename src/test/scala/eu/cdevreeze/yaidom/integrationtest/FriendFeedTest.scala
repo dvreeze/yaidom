@@ -174,6 +174,50 @@ class FriendFeedTest extends Suite {
     val statsXml: String = docPrinter.print(statsElm)
 
     logger.info("Statistics:%n%s".format(statsXml))
+
+    // 5. Creating statistics again, but now directly (yet inefficiently)
+
+    def getEntryServiceId(entryElm: Elem): String = {
+      // Typical usage of yaidom
+      val result =
+        for {
+          serviceElm <- entryElm \ { _.localName == "service" }
+          serviceIdElm <- serviceElm \ { _.localName == "id" }
+        } yield serviceIdElm.text.trim
+      result.headOption.getOrElse(sys.error("Expected service id"))
+    }
+
+    val stats2Elm: Elem = {
+      val serviceIds = {
+        val result = feedElm \ { _.localName == "entry" } map { entryElm => getEntryServiceId(entryElm) }
+        result.distinct
+      }
+
+      val serviceElms = serviceIds map { serviceId =>
+        val serviceCount = feedElm.allChildElems count { entryElm =>
+          getEntryServiceId(entryElm) == serviceId
+        }
+
+        elem(
+          qname = "Service".qname,
+          attributes = Map("id".qname -> serviceId, "cnt".qname -> serviceCount.toString)).build(statsScope)
+      }
+
+      Elem(
+        qname = "Stats".qname,
+        attributes = Map(),
+        scope = statsScope,
+        children = serviceElms)
+    }
+
+    expect(expectedStatsElm) {
+      // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
+      resolved.Elem(stats2Elm).removeAllInterElementWhitespace
+    }
+
+    val stats2Xml: String = docPrinter.print(stats2Elm)
+
+    logger.info("Statistics (again):%n%s".format(stats2Xml))
   }
 
   private def filterFeedEntriesOnServiceName(feedElm: Elem, serviceName: String): immutable.IndexedSeq[Elem] = {
