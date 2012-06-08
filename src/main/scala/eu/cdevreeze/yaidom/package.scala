@@ -68,7 +68,7 @@ package eu.cdevreeze
  *
  * val bookElms =
  *   for {
- *     bookElm <- bookstoreElm \ { _.localName == "Book" }
+ *     bookElm <- bookstoreElm \ "Book"
  *     price = bookElm.attribute("Price".ename)
  *     if price.toInt < 90
  *   } yield bookElm

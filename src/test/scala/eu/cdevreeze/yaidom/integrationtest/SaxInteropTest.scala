@@ -962,14 +962,14 @@ class SaxInteropTest extends Suite {
     val recordsElm = doc.documentElement
 
     expect(3) {
-      (recordsElm \ (_.localName == "car")).size
+      (recordsElm \ "car").size
     }
 
     expect(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ "car")(0)
 
     expect("car") {
       firstRecordElm.localName
@@ -984,13 +984,13 @@ class SaxInteropTest extends Suite {
     }
 
     expect(2) {
-      val carElms = recordsElm \ { _.localName == "car" }
+      val carElms = recordsElm \ "car"
       val result = carElms filter { e => e.attributeOption("make".ename).getOrElse("").contains('e') }
       result.size
     }
 
     expect(Set("Holden", "Peel")) {
-      val carElms = recordsElm \ { _.localName == "car" }
+      val carElms = recordsElm \ "car"
       val pattern = ".*s.*a.*".r.pattern
 
       val resultElms = carElms filter { e =>
@@ -1017,7 +1017,7 @@ class SaxInteropTest extends Suite {
     }
 
     expect(List("Royale", "P50", "HSV Maloo")) {
-      val carElms = recordsElm \ { _.localName == "car" }
+      val carElms = recordsElm \ "car"
       val resultElms = carElms sortBy { e => e.attributeOption("year".ename).getOrElse("0").toInt }
       resultElms map { e => e.attribute("name".ename) }
     }

@@ -359,8 +359,8 @@ class AirportExampleTest extends Suite {
 
       val distances =
         for {
-          distanceElm <- airportElm \\ (_.localName == "Distance")
-          airportElm <- distanceElm \ (_.localName == "Airport")
+          distanceElm <- airportElm \\ "Distance"
+          airportElm <- distanceElm \ "Airport"
           if airportElm.attribute("code".ename) == "BRU"
         } yield airportElm.trimmedText.toDouble
       val distance = distances.headOption.getOrElse(sys.error("Expected distance to BRU"))
