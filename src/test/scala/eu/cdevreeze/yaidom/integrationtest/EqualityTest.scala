@@ -43,10 +43,10 @@ class EqualityTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  private val nsBookstore = "http://bookstore".ns
-  private val nsGoogle = "http://www.google.com".ns
-  private val nsFooBar = "urn:foo:bar".ns
-  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema".ns
+  private val nsBookstore = "http://bookstore"
+  private val nsGoogle = "http://www.google.com"
+  private val nsFooBar = "urn:foo:bar"
+  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
   @Test def testBookstoreEquality() {
     // 1. Parse XML file into Document
@@ -109,7 +109,7 @@ class EqualityTest extends Suite {
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
-    expect(Set("bar".ename, nsGoogle.ename("foo"))) {
+    expect(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -118,7 +118,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = root.resolvedElem
 
-    expect(Set("bar".ename, "http://www.google.com".ns.ename("foo"))) {
+    expect(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { _.resolvedName }
       result.toSet
     }
@@ -134,7 +134,7 @@ class EqualityTest extends Suite {
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
-    expect(Set(nsFooBar.ename("root"), nsFooBar.ename("child"))) {
+    expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -143,7 +143,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = root.resolvedElem
 
-    expect(Set(nsFooBar.ename("root"), nsFooBar.ename("child"))) {
+    expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -183,17 +183,17 @@ class EqualityTest extends Suite {
     val ns = nsXmlSchema
 
     val xsElmENames: Set[EName] =
-      Set(ns.ename("schema"), ns.ename("annotation"), ns.ename("documentation"),
-        ns.ename("import"), ns.ename("complexType"), ns.ename("complexContent"),
-        ns.ename("extension"), ns.ename("sequence"), ns.ename("element"),
-        ns.ename("attribute"), ns.ename("choice"), ns.ename("group"),
-        ns.ename("simpleType"), ns.ename("restriction"), ns.ename("enumeration"),
-        ns.ename("list"), ns.ename("union"), ns.ename("key"),
-        ns.ename("selector"), ns.ename("field"), ns.ename("attributeGroup"),
-        ns.ename("anyAttribute"), ns.ename("whiteSpace"), ns.ename("fractionDigits"),
-        ns.ename("pattern"), ns.ename("any"), ns.ename("appinfo"),
-        ns.ename("minLength"), ns.ename("maxInclusive"), ns.ename("minInclusive"),
-        ns.ename("notation"))
+      Set(EName(ns, "schema"), EName(ns, "annotation"), EName(ns, "documentation"),
+        EName(ns, "import"), EName(ns, "complexType"), EName(ns, "complexContent"),
+        EName(ns, "extension"), EName(ns, "sequence"), EName(ns, "element"),
+        EName(ns, "attribute"), EName(ns, "choice"), EName(ns, "group"),
+        EName(ns, "simpleType"), EName(ns, "restriction"), EName(ns, "enumeration"),
+        EName(ns, "list"), EName(ns, "union"), EName(ns, "key"),
+        EName(ns, "selector"), EName(ns, "field"), EName(ns, "attributeGroup"),
+        EName(ns, "anyAttribute"), EName(ns, "whiteSpace"), EName(ns, "fractionDigits"),
+        EName(ns, "pattern"), EName(ns, "any"), EName(ns, "appinfo"),
+        EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
+        EName(ns, "notation"))
 
     expect(xsElmENames) {
       val result = root filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema.toString) } map { e => e.resolvedName }
@@ -219,9 +219,9 @@ class EqualityTest extends Suite {
     val doc1: Document = parser1.parse(is1)
     val root1 = doc1.documentElement
 
-    val ns = "urn:foo:bar".ns
+    val ns = "urn:foo:bar"
 
-    expect(Set(ns.ename("root"), ns.ename("child"))) {
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -234,7 +234,7 @@ class EqualityTest extends Suite {
     val doc2: Document = parser2.parse(is2)
     val root2 = doc2.documentElement
 
-    expect(Set(ns.ename("root"), ns.ename("child"))) {
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -293,9 +293,9 @@ class EqualityTest extends Suite {
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
-    val ns = "urn:foo:bar".ns
+    val ns = "urn:foo:bar"
 
-    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+    expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -304,7 +304,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = root.resolvedElem
 
-    expect(Set(ns.ename("root"), ns.ename("a"), "b".ename, "c".ename, ns.ename("d"))) {
+    expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -319,9 +319,9 @@ class EqualityTest extends Suite {
     val doc1: Document = parser1.parse(is1)
     val root1 = doc1.documentElement
 
-    val ns = "urn:foo:bar".ns
+    val ns = "urn:foo:bar"
 
-    expect(Set(ns.ename("root"), ns.ename("child"))) {
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -362,9 +362,9 @@ class EqualityTest extends Suite {
     val doc1: Document = parser1.parse(is1)
     val root1 = doc1.documentElement
 
-    val ns = "urn:foo:bar".ns
+    val ns = "urn:foo:bar"
 
-    expect(Set(ns.ename("root"), ns.ename("child"))) {
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }

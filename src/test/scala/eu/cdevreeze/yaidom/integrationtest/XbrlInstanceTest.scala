@@ -84,11 +84,11 @@ class XbrlInstanceTest extends Suite {
       iContexts ++ dContexts
     }
 
-    expect(Set(nsXbrli.ename("instant"))) {
+    expect(Set(EName(nsXbrli, "instant"))) {
       val result = iContexts.values flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
       result.toSet
     }
-    expect(Set(nsXbrli.ename("startDate"), nsXbrli.ename("endDate"))) {
+    expect(Set(EName(nsXbrli, "startDate"), EName(nsXbrli, "endDate"))) {
       val result = dContexts.values flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
       result.toSet
     }
@@ -127,9 +127,9 @@ class XbrlInstanceTest extends Suite {
 
 object XbrlInstanceTest {
 
-  val nsXbrli = "http://www.xbrl.org/2003/instance".ns
-  val nsLink = "http://www.xbrl.org/2003/linkbase".ns
-  val nsXLink = "http://www.w3.org/1999/xlink".ns
+  val nsXbrli = "http://www.xbrl.org/2003/instance"
+  val nsLink = "http://www.xbrl.org/2003/linkbase"
+  val nsXLink = "http://www.w3.org/1999/xlink"
 
   import XbrlInstance._
 
@@ -158,7 +158,7 @@ object XbrlInstanceTest {
     require(topLevelFacts ne null)
     require(footnoteLinks ne null)
 
-    require(rootScope.resolveQName(rootQName) == Some(nsXbrli.ename("xbrl")))
+    require(rootScope.resolveQName(rootQName) == Some(EName(nsXbrli, "xbrl")))
 
     require(schemaRefs forall { schemaRef => schemaRef.hrefOption.isDefined })
     require(linkbaseRefs forall { linkbaseRef => linkbaseRef.hrefOption.isDefined })
@@ -194,26 +194,26 @@ object XbrlInstanceTest {
 
   final class XbrlContext(val wrappedElem: Elem) extends Immutable {
     require(wrappedElem ne null)
-    require(wrappedElem.resolvedName == nsXbrli.ename("context"))
-    require(wrappedElem.attributeOption("id".ename).isDefined)
-    require(wrappedElem.findChildElemNamed(nsXbrli.ename("entity")).isDefined)
-    require(wrappedElem.findChildElemNamed(nsXbrli.ename("period")).isDefined)
+    require(wrappedElem.resolvedName == EName(nsXbrli, "context"))
+    require(wrappedElem.attributeOption(EName("id")).isDefined)
+    require(wrappedElem.findChildElemNamed(EName(nsXbrli, "entity")).isDefined)
+    require(wrappedElem.findChildElemNamed(EName(nsXbrli, "period")).isDefined)
 
-    def id: String = wrappedElem.attribute("id".ename)
+    def id: String = wrappedElem.attribute(EName("id"))
 
-    def entity: Elem = wrappedElem.getChildElemNamed(nsXbrli.ename("entity"))
+    def entity: Elem = wrappedElem.getChildElemNamed(EName(nsXbrli, "entity"))
 
-    def period: Elem = wrappedElem.getChildElemNamed(nsXbrli.ename("period"))
+    def period: Elem = wrappedElem.getChildElemNamed(EName(nsXbrli, "period"))
 
-    def scenarioOption: Option[Elem] = wrappedElem.findChildElemNamed(nsXbrli.ename("scenario"))
+    def scenarioOption: Option[Elem] = wrappedElem.findChildElemNamed(EName(nsXbrli, "scenario"))
   }
 
   final class XbrlUnit(val wrappedElem: Elem) extends Immutable {
     require(wrappedElem ne null)
-    require(wrappedElem.resolvedName == nsXbrli.ename("unit"))
-    require(wrappedElem.attributeOption("id".ename).isDefined)
+    require(wrappedElem.resolvedName == EName(nsXbrli, "unit"))
+    require(wrappedElem.attributeOption(EName("id")).isDefined)
 
-    def id: String = wrappedElem.attribute("id".ename)
+    def id: String = wrappedElem.attribute(EName("id"))
   }
 
   abstract class XbrlFact(val wrappedElem: Elem) extends Immutable {
@@ -224,32 +224,32 @@ object XbrlInstanceTest {
   object XbrlFact {
 
     def apply(e: Elem): XbrlFact =
-      if (e.attributeOption("contextRef".ename).isDefined) new XbrlItem(e) else new XbrlTuple(e)
+      if (e.attributeOption(EName("contextRef")).isDefined) new XbrlItem(e) else new XbrlTuple(e)
   }
 
   final class XbrlItem(override val wrappedElem: Elem) extends XbrlFact(wrappedElem) {
-    require(wrappedElem.attributeOption("contextRef".ename).isDefined)
+    require(wrappedElem.attributeOption(EName("contextRef")).isDefined)
 
-    def contextRef: String = wrappedElem.attribute("contextRef".ename)
+    def contextRef: String = wrappedElem.attribute(EName("contextRef"))
 
-    def unitRefOption: Option[String] = wrappedElem.attributeOption("unitRef".ename)
+    def unitRefOption: Option[String] = wrappedElem.attributeOption(EName("unitRef"))
 
     def isNumeric: Boolean = unitRefOption.isDefined
 
-    def precisionOption: Option[String] = wrappedElem.attributeOption("precision".ename)
+    def precisionOption: Option[String] = wrappedElem.attributeOption(EName("precision"))
 
-    def decimalsOption: Option[String] = wrappedElem.attributeOption("decimals".ename)
+    def decimalsOption: Option[String] = wrappedElem.attributeOption(EName("decimals"))
   }
 
   final class XbrlTuple(override val wrappedElem: Elem) extends XbrlFact(wrappedElem) {
-    require(wrappedElem.attributeOption("contextRef".ename).isEmpty)
+    require(wrappedElem.attributeOption(EName("contextRef")).isEmpty)
 
     def childFacts: immutable.IndexedSeq[XbrlFact] = wrappedElem.allChildElems map { e => XbrlFact(e) }
   }
 
   object XbrlInstance {
 
-    def mustBeInstance(e: Elem): Boolean = e.resolvedName == nsXbrli.ename("xbrl")
+    def mustBeInstance(e: Elem): Boolean = e.resolvedName == EName(nsXbrli, "xbrl")
 
     def mustBeTopLevelFact(e: Elem)(root: Elem): Boolean = {
       // Approximation
@@ -260,12 +260,12 @@ object XbrlInstanceTest {
       }
     }
 
-    def mustBeContext(e: Elem)(root: Elem): Boolean = e.resolvedName == nsXbrli.ename("context")
+    def mustBeContext(e: Elem)(root: Elem): Boolean = e.resolvedName == EName(nsXbrli, "context")
 
-    def mustBeUnit(e: Elem)(root: Elem): Boolean = e.resolvedName == nsXbrli.ename("unit")
+    def mustBeUnit(e: Elem)(root: Elem): Boolean = e.resolvedName == EName(nsXbrli, "unit")
 
     def mustBeSchemaRef(e: Elem)(root: Elem): Boolean = {
-      val result = e.resolvedName == nsLink.ename("schemaRef")
+      val result = e.resolvedName == EName(nsLink, "schemaRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
         require(root.allChildElems.contains(e))
@@ -274,7 +274,7 @@ object XbrlInstanceTest {
     }
 
     def mustBeLinkbaseRef(e: Elem)(root: Elem): Boolean = {
-      val result = e.resolvedName == nsLink.ename("linkbaseRef")
+      val result = e.resolvedName == EName(nsLink, "linkbaseRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
         require(root.allChildElems.contains(e))
@@ -283,7 +283,7 @@ object XbrlInstanceTest {
     }
 
     def mustBeRoleRef(e: Elem)(root: Elem): Boolean = {
-      val result = e.resolvedName == nsLink.ename("roleRef")
+      val result = e.resolvedName == EName(nsLink, "roleRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
         require(root.allChildElems.contains(e))
@@ -292,7 +292,7 @@ object XbrlInstanceTest {
     }
 
     def mustBeArcroleRef(e: Elem)(root: Elem): Boolean = {
-      val result = e.resolvedName == nsLink.ename("arcroleRef")
+      val result = e.resolvedName == EName(nsLink, "arcroleRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
         require(root.allChildElems.contains(e))
@@ -301,7 +301,7 @@ object XbrlInstanceTest {
     }
 
     def mustBeFootnoteLink(e: Elem)(root: Elem): Boolean = {
-      val result = e.resolvedName == nsLink.ename("footnoteLink")
+      val result = e.resolvedName == EName(nsLink, "footnoteLink")
       if (result) {
         require(xlink.XLink.mustBeExtendedLink(e))
         require(root.allChildElems.contains(e))
@@ -313,12 +313,12 @@ object XbrlInstanceTest {
       require(mustBeInstance(root))
 
       val contexts: Map[String, XbrlContext] = {
-        val result = root collectFromChildElems { case e if mustBeContext(e)(root) => (e.attribute("id".ename) -> new XbrlContext(e)) }
+        val result = root collectFromChildElems { case e if mustBeContext(e)(root) => (e.attribute(EName("id")) -> new XbrlContext(e)) }
         result.toMap
       }
 
       val units: Map[String, XbrlUnit] = {
-        val result = root collectFromChildElems { case e if mustBeUnit(e)(root) => (e.attribute("id".ename) -> new XbrlUnit(e)) }
+        val result = root collectFromChildElems { case e if mustBeUnit(e)(root) => (e.attribute(EName("id")) -> new XbrlUnit(e)) }
         result.toMap
       }
 

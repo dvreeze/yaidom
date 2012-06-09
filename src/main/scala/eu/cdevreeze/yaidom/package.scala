@@ -59,17 +59,13 @@ package eu.cdevreeze
  *
  * Example usage:
  * {{{
- * import eu.cdevreeze.yaidom.Predef._
- *
- * val ns = "http://bookstore".ns
- *
  * val bookstoreElm = doc.documentElement
  * require(bookstoreElm.localName == "Bookstore")
  *
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm \ "Book"
- *     price = bookElm.attribute("Price".ename)
+ *     price = bookElm.attribute(EName("Price"))
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}
@@ -80,7 +76,7 @@ package eu.cdevreeze
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
- *     price = bookElm.attribute("Price".ename)
+ *     price = bookElm.attribute(EName("Price"))
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}

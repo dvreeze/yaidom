@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.Predef._
 @RunWith(classOf[JUnitRunner])
 class ElemLikeTest extends Suite {
 
-  private val ns = "http://bookstore".ns
+  private val ns = "http://bookstore"
 
   @Test def testChildElems() {
     require(bookstore.localName == "Bookstore")
@@ -45,7 +45,7 @@ class ElemLikeTest extends Suite {
     val magazineElms = bookstore \ "Magazine"
     val bookElms = bookstore \ "Book"
     val cheapBookElms =
-      bookstore filterChildElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
+      bookstore filterChildElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
 
     expect(8) {
       bookstoreChildElms.size
@@ -59,7 +59,7 @@ class ElemLikeTest extends Suite {
     expect(2) {
       cheapBookElms.size
     }
-    expect(Set(ns.ename("Book"), ns.ename("Magazine"))) {
+    expect(Set(EName(ns, "Book"), EName(ns, "Magazine"))) {
       val result = bookstoreChildElms map { _.resolvedName }
       result.toSet
     }
@@ -74,10 +74,10 @@ class ElemLikeTest extends Suite {
     val cheapBookElm: Elem = cheapBookElms(0)
 
     expect("ISBN-0-11-222222-3") {
-      cheapBookElm.attribute("ISBN".ename)
+      cheapBookElm.attribute(EName("ISBN"))
     }
     expect("Hector and Jeff's Database Hints") {
-      cheapBookElm.getChildElemNamed(ns.ename("Title")).trimmedText
+      cheapBookElm.getChildElemNamed(EName(ns, "Title")).trimmedText
     }
     expect("An indispensable companion to your textbook") {
       (cheapBookElm getChildElem (_.localName == "Remark")).trimmedText
@@ -111,12 +111,12 @@ class ElemLikeTest extends Suite {
     }
     val cheapBookElms =
       bookstore collectFromChildElems {
-        case e if e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 => e
+        case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
     val cheapBookPrices =
       bookstore collectFromChildElems {
-        case e if e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 =>
-          e.attribute("Price".ename).toInt
+        case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 =>
+          e.attribute(EName("Price")).toInt
       }
 
     expect(8) {
@@ -134,7 +134,7 @@ class ElemLikeTest extends Suite {
     expect(Set(25, 50)) {
       cheapBookPrices.toSet
     }
-    expect(Set(ns.ename("Book"), ns.ename("Magazine"))) {
+    expect(Set(EName(ns, "Book"), EName(ns, "Magazine"))) {
       val result = bookstoreChildElms map { _.resolvedName }
       result.toSet
     }
@@ -148,9 +148,9 @@ class ElemLikeTest extends Suite {
 
     val elms = bookstore.findAllElems
     val magazineElms = bookstore \\ "Magazine"
-    val bookElms = bookstore.filterElemsNamed(ns.ename("Book"))
+    val bookElms = bookstore.filterElemsNamed(EName(ns, "Book"))
     val cheapBookElms =
-      bookstore filterElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
+      bookstore filterElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
 
     expect(46) {
       elms.size
@@ -164,9 +164,9 @@ class ElemLikeTest extends Suite {
     expect(2) {
       cheapBookElms.size
     }
-    expect(Set(ns.ename("Book"), ns.ename("Magazine"), ns.ename("Title"),
-      ns.ename("Authors"), ns.ename("Author"), ns.ename("First_Name"), ns.ename("Last_Name"),
-      ns.ename("Remark"))) {
+    expect(Set(EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
+      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
+      EName(ns, "Remark"))) {
       val result = elms map { _.resolvedName }
       result.toSet
     }
@@ -181,7 +181,7 @@ class ElemLikeTest extends Suite {
     val cheapBookElm: Elem = cheapBookElms(0)
 
     expect("ISBN-0-11-222222-3") {
-      cheapBookElm.attribute("ISBN".ename)
+      cheapBookElm.attribute(EName("ISBN"))
     }
     expect("Hector and Jeff's Database Hints") {
       val result = cheapBookElm filterElems { _.localName == "Title" } map { _.trimmedText }
@@ -216,7 +216,7 @@ class ElemLikeTest extends Suite {
     }
     val cheapBookElms =
       bookstore collectFromElems {
-        case e if e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 => e
+        case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
 
     expect(46) {
@@ -231,9 +231,9 @@ class ElemLikeTest extends Suite {
     expect(2) {
       cheapBookElms.size
     }
-    expect(Set(ns.ename("Book"), ns.ename("Magazine"), ns.ename("Title"),
-      ns.ename("Authors"), ns.ename("Author"), ns.ename("First_Name"), ns.ename("Last_Name"),
-      ns.ename("Remark"))) {
+    expect(Set(EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
+      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
+      EName(ns, "Remark"))) {
       val result = elms map { _.resolvedName }
       result.toSet
     }
@@ -247,9 +247,9 @@ class ElemLikeTest extends Suite {
 
     val elms = bookstore.findAllElemsOrSelf
     val magazineElms = bookstore filterElemsOrSelf { _.localName == "Magazine" }
-    val bookElms = bookstore.filterElemsOrSelfNamed(ns.ename("Book"))
+    val bookElms = bookstore.filterElemsOrSelfNamed(EName(ns, "Book"))
     val cheapBookElms =
-      bookstore filterElemsOrSelf { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
+      bookstore filterElemsOrSelf { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
 
     expect(47) {
       elms.size
@@ -267,9 +267,9 @@ class ElemLikeTest extends Suite {
     expect(2) {
       cheapBookElms.size
     }
-    expect(Set(ns.ename("Bookstore"), ns.ename("Book"), ns.ename("Magazine"), ns.ename("Title"),
-      ns.ename("Authors"), ns.ename("Author"), ns.ename("First_Name"), ns.ename("Last_Name"),
-      ns.ename("Remark"))) {
+    expect(Set(EName(ns, "Bookstore"), EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
+      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
+      EName(ns, "Remark"))) {
       val result = elms map { _.resolvedName }
       result.toSet
     }
@@ -284,10 +284,10 @@ class ElemLikeTest extends Suite {
     val cheapBookElm: Elem = cheapBookElms(0)
 
     expect("ISBN-0-11-222222-3") {
-      cheapBookElm.attribute("ISBN".ename)
+      cheapBookElm.attribute(EName("ISBN"))
     }
     expect("Hector and Jeff's Database Hints") {
-      val result = cheapBookElm.filterElemsOrSelfNamed(ns.ename("Title")) map { _.trimmedText }
+      val result = cheapBookElm.filterElemsOrSelfNamed(EName(ns, "Title")) map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Title"))
     }
     expect("An indispensable companion to your textbook") {
@@ -296,7 +296,7 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).filterElemsNamed(ns.ename("Author"))
+      val authorElms = cheapBookElm.getChildElemNamed(EName(ns, "Authors")).filterElemsNamed(EName(ns, "Author"))
       val authorLastNameElms = authorElms flatMap { e => e filterElemsOrSelf (_.localName == "Last_Name") }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
@@ -319,7 +319,7 @@ class ElemLikeTest extends Suite {
     }
     val cheapBookElms =
       bookstore collectFromElemsOrSelf {
-        case e if e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 => e
+        case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
 
     expect(47) {
@@ -338,9 +338,9 @@ class ElemLikeTest extends Suite {
     expect(2) {
       cheapBookElms.size
     }
-    expect(Set(ns.ename("Bookstore"), ns.ename("Book"), ns.ename("Magazine"), ns.ename("Title"),
-      ns.ename("Authors"), ns.ename("Author"), ns.ename("First_Name"), ns.ename("Last_Name"),
-      ns.ename("Remark"))) {
+    expect(Set(EName(ns, "Bookstore"), EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
+      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
+      EName(ns, "Remark"))) {
       val result = elms map { _.resolvedName }
       result.toSet
     }
@@ -354,9 +354,9 @@ class ElemLikeTest extends Suite {
 
     val elms = bookstore.findAllElems
     val magazineElms = bookstore \\! "Magazine"
-    val bookElms = bookstore.findTopmostElemsNamed(ns.ename("Book"))
+    val bookElms = bookstore.findTopmostElemsNamed(EName(ns, "Book"))
     val cheapBookElms =
-      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
+      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
 
     expect(46) {
       elms.size
@@ -377,13 +377,13 @@ class ElemLikeTest extends Suite {
     val cheapBookElm: Elem = cheapBookElms(0)
 
     expect("ISBN-0-11-222222-3") {
-      cheapBookElm.attribute("ISBN".ename)
+      cheapBookElm.attribute(EName("ISBN"))
     }
     expect("Hector and Jeff's Database Hints") {
-      cheapBookElm.findElemNamed(ns.ename("Title")) map { _.trimmedText } getOrElse (sys.error("Missing Title"))
+      cheapBookElm.findElemNamed(EName(ns, "Title")) map { _.trimmedText } getOrElse (sys.error("Missing Title"))
     }
     expect("An indispensable companion to your textbook") {
-      cheapBookElm.findElemNamed(ns.ename("Remark")) map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm.findElemNamed(EName(ns, "Remark")) map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
     }
     expect("An indispensable companion to your textbook") {
       cheapBookElm findElem { _.localName == "Remark" } map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
@@ -393,14 +393,14 @@ class ElemLikeTest extends Suite {
     }
 
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).findTopmostElemsNamed(ns.ename("Author"))
+      val authorElms = cheapBookElm.getChildElemNamed(EName(ns, "Authors")).findTopmostElemsNamed(EName(ns, "Author"))
       val authorLastNameElms = authorElms flatMap { e => e findElem (_.localName == "Last_Name") }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
     expect(Set("Ullman", "Garcia-Molina")) {
-      val authorElms = cheapBookElm.getChildElemNamed(ns.ename("Authors")).findTopmostElemsNamed(ns.ename("Author"))
-      val authorLastNameElms = authorElms flatMap { e => e.findTopmostElemsNamed(ns.ename("Last_Name")) }
+      val authorElms = cheapBookElm.getChildElemNamed(EName(ns, "Authors")).findTopmostElemsNamed(EName(ns, "Author"))
+      val authorLastNameElms = authorElms flatMap { e => e.findTopmostElemsNamed(EName(ns, "Last_Name")) }
       val result = authorLastNameElms map { e => e.trimmedText }
       result.toSet
     }
@@ -416,10 +416,10 @@ class ElemLikeTest extends Suite {
     expect(1) {
       firstUllmanAncestors.size
     }
-    expect(Set(ns.ename("Authors"), ns.ename("Author"), ns.ename("Last_Name"))) {
+    expect(Set(EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "Last_Name"))) {
       ullmanAncestors.map(_.resolvedName).toSet
     }
-    expect(Set(ns.ename("Authors"))) {
+    expect(Set(EName(ns, "Authors"))) {
       val result = firstUllmanAncestors map { _.resolvedName }
       result.toSet
     }
@@ -440,13 +440,13 @@ class ElemLikeTest extends Suite {
 
     val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
-    expect(Set(ns.ename("Author"))) {
+    expect(Set(EName(ns, "Author"))) {
       val result = lastNameElms map { e => indexedBookstoreDoc.findParent(e) } flatMap { eOption => eOption map { _.resolvedName } }
       result.toSet
     }
 
     val cheapBookElms =
-      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute("Price".ename).toInt <= 50 }
+      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
     val cheapBookElm: Elem = cheapBookElms(0)
     val cheapBookAuthorElms = cheapBookElm filterElems { _.localName == "Author" }
 
@@ -502,7 +502,7 @@ class ElemLikeTest extends Suite {
     expect(8) {
       bookstoreChildIndexes.size
     }
-    expect(Set(ns.ename("Book"), ns.ename("Magazine"))) {
+    expect(Set(EName(ns, "Book"), EName(ns, "Magazine"))) {
       val result = bookstoreChildIndexes map { idx => idx.elementName }
       result.toSet
     }
@@ -623,7 +623,7 @@ class ElemLikeTest extends Suite {
         elm.filterElemsOrSelf(p)
       }
 
-      val ename = "Last_Name".ename
+      val ename = EName("Last_Name")
       expect(elm filterElemsOrSelf (_.resolvedName == ename)) {
         elm.filterElemsOrSelfNamed(ename)
       }

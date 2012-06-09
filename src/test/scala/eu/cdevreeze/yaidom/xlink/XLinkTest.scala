@@ -38,7 +38,7 @@ class XLinkTest extends Suite {
   }
 
   private def doTest(root: Elem) {
-    expect(Set("courseload".ename, "tooltip".ename, "person".ename, "course".ename, "gpa".ename, "go".ename)) {
+    expect(Set(EName("courseload"), EName("tooltip"), EName("person"), EName("course"), EName("gpa"), EName("go"))) {
       val enames = sampleXml.wrappedElem collectFromElemsOrSelf { case e => e.resolvedName }
       enames.toSet
     }

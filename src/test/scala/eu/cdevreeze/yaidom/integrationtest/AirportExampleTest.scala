@@ -43,7 +43,7 @@ class AirportExampleTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  private val nsWebServiceX = "http://www.webserviceX.NET".ns
+  private val nsWebServiceX = "http://www.webserviceX.NET"
 
   @Test def testDocumentStructure() {
     // 1. Parse XML files into Documents
@@ -361,7 +361,7 @@ class AirportExampleTest extends Suite {
         for {
           distanceElm <- airportElm \\ "Distance"
           airportElm <- distanceElm \ "Airport"
-          if airportElm.attribute("code".ename) == "BRU"
+          if airportElm.attribute(EName("code")) == "BRU"
         } yield airportElm.trimmedText.toDouble
       val distance = distances.headOption.getOrElse(sys.error("Expected distance to BRU"))
       distance
@@ -371,8 +371,8 @@ class AirportExampleTest extends Suite {
   }
 
   private def validateDocumentStructure(root: Elem) {
-    val enameNewDataSet = nsWebServiceX.ename("NewDataSet")
-    val enameTable = nsWebServiceX.ename("Table")
+    val enameNewDataSet = EName(nsWebServiceX, "NewDataSet")
+    val enameTable = EName(nsWebServiceX, "Table")
 
     // The root element must be named NewDataSet
     expect(enameNewDataSet) {
@@ -390,22 +390,22 @@ class AirportExampleTest extends Suite {
     val tablePropertyElms = tableElms flatMap { e => e.allChildElems }
 
     val propertyENames = Set(
-      nsWebServiceX.ename("AirportCode"),
-      nsWebServiceX.ename("CityOrAirportName"),
-      nsWebServiceX.ename("Country"),
-      nsWebServiceX.ename("CountryAbbrviation"),
-      nsWebServiceX.ename("CountryCode"),
-      nsWebServiceX.ename("GMTOffset"),
-      nsWebServiceX.ename("RunwayLengthFeet"),
-      nsWebServiceX.ename("RunwayElevationFeet"),
-      nsWebServiceX.ename("LatitudeDegree"),
-      nsWebServiceX.ename("LatitudeMinute"),
-      nsWebServiceX.ename("LatitudeSecond"),
-      nsWebServiceX.ename("LatitudeNpeerS"),
-      nsWebServiceX.ename("LongitudeDegree"),
-      nsWebServiceX.ename("LongitudeMinute"),
-      nsWebServiceX.ename("LongitudeSeconds"),
-      nsWebServiceX.ename("LongitudeEperW"))
+      EName(nsWebServiceX, "AirportCode"),
+      EName(nsWebServiceX, "CityOrAirportName"),
+      EName(nsWebServiceX, "Country"),
+      EName(nsWebServiceX, "CountryAbbrviation"),
+      EName(nsWebServiceX, "CountryCode"),
+      EName(nsWebServiceX, "GMTOffset"),
+      EName(nsWebServiceX, "RunwayLengthFeet"),
+      EName(nsWebServiceX, "RunwayElevationFeet"),
+      EName(nsWebServiceX, "LatitudeDegree"),
+      EName(nsWebServiceX, "LatitudeMinute"),
+      EName(nsWebServiceX, "LatitudeSecond"),
+      EName(nsWebServiceX, "LatitudeNpeerS"),
+      EName(nsWebServiceX, "LongitudeDegree"),
+      EName(nsWebServiceX, "LongitudeMinute"),
+      EName(nsWebServiceX, "LongitudeSeconds"),
+      EName(nsWebServiceX, "LongitudeEperW"))
 
     // The root grandchild elements must all have names mentioned above (in Set propertyENames)
     expect(propertyENames) {
@@ -421,14 +421,14 @@ class AirportExampleTest extends Suite {
   }
 
   private def airportLatitude(e: Elem): Double = {
-    require(e.resolvedName == nsWebServiceX.ename("Table"))
+    require(e.resolvedName == EName(nsWebServiceX, "Table"))
 
-    val degree = e.getChildElemNamed(nsWebServiceX.ename("LatitudeDegree")).trimmedText.toDouble
-    val minute = e.getChildElemNamed(nsWebServiceX.ename("LatitudeMinute")).trimmedText.toDouble
-    val second = e.getChildElemNamed(nsWebServiceX.ename("LatitudeSecond")).trimmedText.toDouble
+    val degree = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeDegree")).trimmedText.toDouble
+    val minute = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeMinute")).trimmedText.toDouble
+    val second = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeSecond")).trimmedText.toDouble
 
     val north = {
-      val result = e.getChildElemNamed(nsWebServiceX.ename("LatitudeNpeerS")).trimmedText
+      val result = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeNpeerS")).trimmedText
       (result != "S")
     }
 
@@ -437,14 +437,14 @@ class AirportExampleTest extends Suite {
   }
 
   private def airportLongitude(e: Elem): Double = {
-    require(e.resolvedName == nsWebServiceX.ename("Table"))
+    require(e.resolvedName == EName(nsWebServiceX, "Table"))
 
-    val degree = e.getChildElemNamed(nsWebServiceX.ename("LongitudeDegree")).trimmedText.toDouble
-    val minute = e.getChildElemNamed(nsWebServiceX.ename("LongitudeMinute")).trimmedText.toDouble
-    val second = e.getChildElemNamed(nsWebServiceX.ename("LongitudeSeconds")).trimmedText.toDouble
+    val degree = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeDegree")).trimmedText.toDouble
+    val minute = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeMinute")).trimmedText.toDouble
+    val second = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeSeconds")).trimmedText.toDouble
 
     val east = {
-      val result = e.getChildElemNamed(nsWebServiceX.ename("LongitudeEperW")).trimmedText
+      val result = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeEperW")).trimmedText
       (result != "W")
     }
 
@@ -453,9 +453,9 @@ class AirportExampleTest extends Suite {
   }
 
   private def airportCode(e: Elem): String = {
-    require(e.resolvedName == nsWebServiceX.ename("Table"))
+    require(e.resolvedName == EName(nsWebServiceX, "Table"))
 
-    e.getChildElemNamed(nsWebServiceX.ename("AirportCode")).trimmedText
+    e.getChildElemNamed(EName(nsWebServiceX, "AirportCode")).trimmedText
   }
 
   final case class LatLon(val lat: Double, val lon: Double) {

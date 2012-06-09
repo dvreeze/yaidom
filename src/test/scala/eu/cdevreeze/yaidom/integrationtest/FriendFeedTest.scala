@@ -44,7 +44,7 @@ class FriendFeedTest extends Suite {
 
   private val NsFriendFeedStats = {
     // Bogus namespace
-    "http://friendfeed-stats".ns
+    "http://friendfeed-stats"
   }
 
   private val statsScope = Scope.fromMap(Map("" -> NsFriendFeedStats.toString))
@@ -99,16 +99,16 @@ class FriendFeedTest extends Suite {
 
     val expectedTwitterSummaryElm: resolved.Elem =
       resolved.Elem(
-        "Service".ename,
-        Map("id".ename -> "twitter"),
+        EName("Service"),
+        Map(EName("id") -> "twitter"),
         immutable.IndexedSeq(
           resolved.Elem(
-            "UserList".ename,
+            EName("UserList"),
             Map(),
             immutable.IndexedSeq(
-              resolved.Elem("nickname".ename, Map(), immutable.IndexedSeq(resolved.Text("karlerikson"))),
-              resolved.Elem("nickname".ename, Map(), immutable.IndexedSeq(resolved.Text("asfaq"))),
-              resolved.Elem("nickname".ename, Map(), immutable.IndexedSeq(resolved.Text("chrisjlee")))))))
+              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("karlerikson"))),
+              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("asfaq"))),
+              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("chrisjlee")))))))
 
     expect(expectedTwitterSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
@@ -119,14 +119,14 @@ class FriendFeedTest extends Suite {
 
     val expectedGoogleReaderSummaryElm: resolved.Elem =
       resolved.Elem(
-        "Service".ename,
-        Map("id".ename -> "googlereader"),
+        EName("Service"),
+        Map(EName("id") -> "googlereader"),
         immutable.IndexedSeq(
           resolved.Elem(
-            "UserList".ename,
+            EName("UserList"),
             Map(),
             immutable.IndexedSeq(
-              resolved.Elem("nickname".ename, Map(), immutable.IndexedSeq(resolved.Text("misterjt")))))))
+              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("misterjt")))))))
 
     expect(expectedGoogleReaderSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
@@ -160,11 +160,11 @@ class FriendFeedTest extends Suite {
 
     val expectedStatsElm: resolved.Elem =
       resolved.Elem(
-        NsFriendFeedStats.ename("Stats"),
+        EName(NsFriendFeedStats, "Stats"),
         Map(),
         immutable.IndexedSeq(
-          resolved.Elem(NsFriendFeedStats.ename("Service"), Map("cnt".ename -> 3.toString, "id".ename -> "twitter"), immutable.IndexedSeq()),
-          resolved.Elem(NsFriendFeedStats.ename("Service"), Map("cnt".ename -> 1.toString, "id".ename -> "googlereader"), immutable.IndexedSeq())))
+          resolved.Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"), immutable.IndexedSeq()),
+          resolved.Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"), immutable.IndexedSeq())))
 
     expect(expectedStatsElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
@@ -238,7 +238,7 @@ class FriendFeedTest extends Suite {
 
     // Assuming precisely 1 "user" child elem with precisely 1 "nickname" child elem
     // Now using method getChildElemNamed repeatedly
-    val nickNameElm = entryElm.getChildElemNamed("user".ename).getChildElemNamed("nickname".ename)
+    val nickNameElm = entryElm.getChildElemNamed(EName("user")).getChildElemNamed(EName("nickname"))
     nickNameElm.text.trim
   }
 

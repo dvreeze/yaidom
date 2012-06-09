@@ -108,21 +108,21 @@ final class Title(override val wrappedElem: Elem) extends XLink(wrappedElem) {
 
 object XLink {
 
-  val XLinkNamespace = URI.create("http://www.w3.org/1999/xlink").toString.ns
+  val XLinkNamespace = URI.create("http://www.w3.org/1999/xlink").toString
 
-  val XLinkTypeEName = XLinkNamespace.ename("type")
-  val XLinkHrefEName = XLinkNamespace.ename("href")
-  val XLinkArcroleEName = XLinkNamespace.ename("arcrole")
-  val XLinkRoleEName = XLinkNamespace.ename("role")
-  val XLinkTitleEName = XLinkNamespace.ename("title")
-  val XLinkShowEName = XLinkNamespace.ename("show")
-  val XLinkActuateEName = XLinkNamespace.ename("actuate")
-  val XLinkFromEName = XLinkNamespace.ename("from")
-  val XLinkToEName = XLinkNamespace.ename("to")
-  val XLinkLabelEName = XLinkNamespace.ename("label")
-  val XLinkOrderEName = XLinkNamespace.ename("order")
-  val XLinkUseEName = XLinkNamespace.ename("use")
-  val XLinkPriorityEName = XLinkNamespace.ename("priority")
+  val XLinkTypeEName = EName(XLinkNamespace, "type")
+  val XLinkHrefEName = EName(XLinkNamespace, "href")
+  val XLinkArcroleEName = EName(XLinkNamespace, "arcrole")
+  val XLinkRoleEName = EName(XLinkNamespace, "role")
+  val XLinkTitleEName = EName(XLinkNamespace, "title")
+  val XLinkShowEName = EName(XLinkNamespace, "show")
+  val XLinkActuateEName = EName(XLinkNamespace, "actuate")
+  val XLinkFromEName = EName(XLinkNamespace, "from")
+  val XLinkToEName = EName(XLinkNamespace, "to")
+  val XLinkLabelEName = EName(XLinkNamespace, "label")
+  val XLinkOrderEName = EName(XLinkNamespace, "order")
+  val XLinkUseEName = EName(XLinkNamespace, "use")
+  val XLinkPriorityEName = EName(XLinkNamespace, "priority")
 
   def mustBeXLink(e: Elem): Boolean = {
     mustBeLink(e) || mustBeTitle(e) || mustBeLocator(e) || mustBeArc(e) || mustBeResource(e)

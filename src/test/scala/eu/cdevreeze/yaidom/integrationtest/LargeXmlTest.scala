@@ -101,24 +101,24 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
       (i % 5) match {
         case 0 =>
-          val firstNameElms = doc.documentElement.filterElemsNamed("firstName".ename)
+          val firstNameElms = doc.documentElement.filterElemsNamed(EName("firstName"))
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
         case 1 =>
-          val lastNameElms = doc.documentElement.filterElemsNamed("lastName".ename)
+          val lastNameElms = doc.documentElement.filterElemsNamed(EName("lastName"))
           logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
         case 2 =>
-          val contactElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "contact".ename }
+          val contactElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == EName("contact") }
           logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
         case 3 =>
           val emails = {
             val result = doc.documentElement collectFromElemsOrSelf {
-              case e if e.resolvedName == "email".ename => e.trimmedText
+              case e if e.resolvedName == EName("email") => e.trimmedText
             }
             result.toSet
           }
           logger.info("Different e-mails (%d): %s. Thread %s".format(emails.size, emails, Thread.currentThread.getName))
         case 4 =>
-          val firstNameElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == "firstName".ename }
+          val firstNameElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == EName("firstName") }
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
       }
     }
@@ -165,7 +165,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Finding the fast way
     val start2Ms = System.currentTimeMillis()
     val foundElm2 = {
-      val result = rootElm findElemOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      val result = rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
     }
     val end2Ms = System.currentTimeMillis()
@@ -174,7 +174,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Finding the fast way (again)
     val start3Ms = System.currentTimeMillis()
     val foundElm3 = {
-      val result = rootElm findElem { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      val result = rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
     }
     val end3Ms = System.currentTimeMillis()
@@ -183,7 +183,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Finding the slower way
     val start4Ms = System.currentTimeMillis()
     val foundElm4 = {
-      val result = rootElm findTopmostElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      val result = rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
     }
     val end4Ms = System.currentTimeMillis()
@@ -192,7 +192,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Finding the still slower way (in theory)
     val start5Ms = System.currentTimeMillis()
     val foundElm5 = {
-      val result = rootElm filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      val result = rootElm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
     }
     val end5Ms = System.currentTimeMillis()
@@ -201,7 +201,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Finding the slowest way (in theory)
     val start6Ms = System.currentTimeMillis()
     val foundElm6 = {
-      val result = rootElm.findAllElemsOrSelf filter { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+      val result = rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
     }
     val end6Ms = System.currentTimeMillis()
@@ -217,13 +217,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    expect(Set("contacts".ename, "contact".ename, "firstName".ename, "lastName".ename, "email".ename, "phone".ename)) {
+    expect(Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))) {
       val result = elm.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     val s = "b" * (2000 + 46)
-    val elms1 = elm filterElemsOrSelf { e => e.resolvedName == "phone".ename && e.trimmedText == s }
+    val elms1 = elm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
 
     val endMs = System.currentTimeMillis()

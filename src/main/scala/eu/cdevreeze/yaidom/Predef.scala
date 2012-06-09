@@ -11,30 +11,6 @@ package eu.cdevreeze.yaidom
  */
 object Predef {
 
-  /** "Implicit class" for converting a `String` to an [[eu.cdevreeze.yaidom.EName]] */
-  final class ToParsedEName(val s: String) {
-    def ename: EName = EName.parse(s)
-  }
-
-  /** Implicit conversion enriching a `String` with a `ename` method that turns the `String` into an [[eu.cdevreeze.yaidom.EName]] */
-  implicit def toParsedEName(s: String): ToParsedEName = new ToParsedEName(s)
-
-  /** Namespace. It offers a method to create an [[eu.cdevreeze.yaidom.EName]] with that namespace from a given localPart */
-  final class Namespace(val ns: String) {
-    def ename(localPart: String): EName = EName(ns, localPart)
-
-    /** Returns `ns`, that is, the namespace URI as `String` */
-    override def toString: String = ns
-  }
-
-  /** "Implicit class" for converting a `String` to a `Namespace` */
-  final class ToNamespace(val s: String) {
-    def ns: Namespace = new Namespace(s)
-  }
-
-  /** Implicit conversion enriching a `String` with a `ns` method that turns the `String` into a `Namespace` */
-  implicit def toNamespace(s: String): ToNamespace = new ToNamespace(s)
-
   /** "Implicit class" for converting a `Map[String, String]` to a [[eu.cdevreeze.yaidom.Scope.Declarations]] */
   final class ToNamespaces(val m: Map[String, String]) {
     def namespaces: Scope.Declarations = Scope.Declarations.fromMap(m)

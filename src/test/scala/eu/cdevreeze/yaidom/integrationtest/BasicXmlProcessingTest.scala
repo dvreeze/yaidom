@@ -91,15 +91,15 @@ class BasicXmlProcessingTest extends Suite {
     }
 
     expect(List("greet", "count", "color")) {
-      (foo \ "bar") map { _.attributeOption("type".ename).getOrElse("") }
+      (foo \ "bar") map { _.attributeOption(EName("type")).getOrElse("") }
     }
     expect(List("greet", "count", "color")) {
       // Knowing that the attribute "type" is always present
-      (foo \ "bar") map { _.attribute("type".ename) }
+      (foo \ "bar") map { _.attribute(EName("type")) }
     }
 
     expect(List("greet" -> "hi", "count" -> "1", "color" -> "yellow")) {
-      (foo \ "bar") map { e => (e.attribute("type".ename) -> e.text) }
+      (foo \ "bar") map { e => (e.attribute(EName("type")) -> e.text) }
     }
 
     // Again verbose but "precise" creation of an Elem
@@ -133,7 +133,7 @@ class BasicXmlProcessingTest extends Suite {
     }
 
     expect(List("1", "2", "3", "4")) {
-      (baz \\ "z") map { _.attribute("x".ename) }
+      (baz \\ "z") map { _.attribute(EName("x")) }
     }
 
     val fooString = """<foo><bar type="greet">hi</bar><bar type="count">1</bar><bar type="color">yellow</bar></foo>"""
@@ -161,7 +161,7 @@ class BasicXmlProcessingTest extends Suite {
     val musicElm: Elem = docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
 
     val songs = (musicElm \\ "song") map { songElm =>
-      Song(songElm.attribute("title".ename), songElm.attribute("length".ename))
+      Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))
     }
 
     val totalTime = songs.map(_.timeInSeconds).sum
@@ -171,14 +171,14 @@ class BasicXmlProcessingTest extends Suite {
     }
 
     val artists = (musicElm \ "artist") map { artistElm =>
-      val name = artistElm.attribute("name".ename)
+      val name = artistElm.attribute(EName("name"))
 
       val albums = (artistElm \ "album") map { albumElm =>
-        val title = albumElm.attribute("title".ename)
-        val description = albumElm.getChildElemNamed("description".ename).text
+        val title = albumElm.attribute(EName("title"))
+        val description = albumElm.getChildElemNamed(EName("description")).text
 
         val songs = (albumElm \ "song") map { songElm =>
-          Song(songElm.attribute("title".ename), songElm.attribute("length".ename))
+          Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))
         }
 
         Album(title, songs, description)
