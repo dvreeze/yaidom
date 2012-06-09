@@ -72,7 +72,7 @@ class QNameTest extends Suite {
       qname3.hashCode
     }
 
-    val qname4 = QName.parse("Bookstore")
+    val qname4 = QName("Bookstore")
 
     expect("Bookstore") {
       qname4.localPart
@@ -87,7 +87,7 @@ class QNameTest extends Suite {
       qname4.hashCode
     }
 
-    val qname5 = "Bookstore".qname
+    val qname5 = QName("Bookstore")
 
     expect("Bookstore") {
       qname5.localPart
@@ -112,10 +112,10 @@ class QNameTest extends Suite {
       UnprefixedName("a:b")
     }
     intercept[Exception] {
-      "".qname
+      QName.parse("")
     }
     intercept[Exception] {
-      ":".qname
+      QName.parse(":")
     }
   }
 
@@ -186,7 +186,7 @@ class QNameTest extends Suite {
       qname4.hashCode
     }
 
-    val qname5 = "books:Bookstore".qname.asInstanceOf[PrefixedName]
+    val qname5 = QName.parse("books:Bookstore").asInstanceOf[PrefixedName]
 
     expect("Bookstore") {
       qname5.localPart
@@ -229,10 +229,10 @@ class QNameTest extends Suite {
       PrefixedName("a", "b:c")
     }
     intercept[Exception] {
-      "a:".qname
+      QName.parse("a:")
     }
     intercept[Exception] {
-      ":b".qname
+      QName.parse(":b")
     }
   }
 }

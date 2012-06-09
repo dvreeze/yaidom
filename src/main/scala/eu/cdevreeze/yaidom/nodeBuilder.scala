@@ -26,12 +26,12 @@ import scala.collection.immutable
  * import NodeBuilder._
  *
  * elem(
- *   qname = "Magazine".qname,
- *   attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
+ *   qname = QName("Magazine"),
+ *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Map("dbclass" -> "http://www.db-class.org").namespaces,
  *   children = List(
  *     elem(
- *       qname = "Title".qname,
+ *       qname = QName("Title"),
  *       children = List(text("Newsweek"))))).build()
  * }}}
  *

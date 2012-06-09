@@ -331,15 +331,15 @@ class EqualityTest extends Suite {
     val scope = Scope.fromMap(Map("" -> "urn:foo:bar"))
     val root2 =
       elem(
-        qname = "root".qname,
+        qname = QName("root"),
         children = List(
           elem(
-            qname = "child".qname,
-            attributes = Map("about".qname -> "Jansen & co"),
+            qname = QName("child"),
+            attributes = Map(QName("about") -> "Jansen & co"),
             children = List(text("Jansen & co"))),
           elem(
-            qname = "child".qname,
-            attributes = Map("about".qname -> "Jansen & co"),
+            qname = QName("child"),
+            attributes = Map(QName("about") -> "Jansen & co"),
             children = List(text("Jansen & co"))))).build(scope)
 
     // Check equalities
@@ -375,13 +375,13 @@ class EqualityTest extends Suite {
     val txt = "\u20AC 200"
     val root2 =
       elem(
-        qname = "root".qname,
+        qname = QName("root"),
         children = List(
           elem(
-            qname = "child".qname,
+            qname = QName("child"),
             children = List(text(txt))),
           elem(
-            qname = "child".qname,
+            qname = QName("child"),
             children = List(text(txt))))).build(scope)
 
     // Check equalities

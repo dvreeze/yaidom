@@ -82,76 +82,76 @@ class XLinkTest extends Suite {
 
     val rootBuilder: ElemBuilder =
       elem(
-        qname = "courseload".qname,
-        attributes = Map("xlink:type".qname -> "extended"),
+        qname = QName("courseload"),
+        attributes = Map(QName.parse("xlink:type") -> "extended"),
         namespaces = Map("xlink" -> "http://www.w3.org/1999/xlink").namespaces,
         children = List(
           elem(
-            qname = "tooltip".qname,
-            attributes = Map("xlink:type".qname -> "title"),
+            qname = QName("tooltip"),
+            attributes = Map(QName.parse("xlink:type") -> "title"),
             children = List(text("Course Load for Pat Jones"))),
           elem(
-            qname = "person".qname,
+            qname = QName("person"),
             attributes = Map(
-              "xlink:type".qname -> "locator",
-              "xlink:href".qname -> "students/patjones62.xml",
-              "xlink:label".qname -> "student62",
-              "xlink:role".qname -> "http://www.example.com/linkprops/student",
-              "xlink:title".qname -> "Pat Jones")),
+              QName.parse("xlink:type") -> "locator",
+              QName.parse("xlink:href") -> "students/patjones62.xml",
+              QName.parse("xlink:label") -> "student62",
+              QName.parse("xlink:role") -> "http://www.example.com/linkprops/student",
+              QName.parse("xlink:title") -> "Pat Jones")),
           elem(
-            qname = "person".qname,
+            qname = QName("person"),
             attributes = Map(
-              "xlink:type".qname -> "locator",
-              "xlink:href".qname -> "profs/jaysmith7.xml",
-              "xlink:label".qname -> "prof7",
-              "xlink:role".qname -> "http://www.example.com/linkprops/professor",
-              "xlink:title".qname -> "Dr. Jay Smith")),
+              QName.parse("xlink:type") -> "locator",
+              QName.parse("xlink:href") -> "profs/jaysmith7.xml",
+              QName.parse("xlink:label") -> "prof7",
+              QName.parse("xlink:role") -> "http://www.example.com/linkprops/professor",
+              QName.parse("xlink:title") -> "Dr. Jay Smith")),
           comment(" more remote resources for professors, teaching assistants, etc. "),
           elem(
-            qname = "course".qname,
+            qname = QName("course"),
             attributes = Map(
-              "xlink:type".qname -> "locator",
-              "xlink:href".qname -> "courses/cs101.xml",
-              "xlink:label".qname -> "CS-101",
-              "xlink:title".qname -> "Computer Science 101")),
+              QName.parse("xlink:type") -> "locator",
+              QName.parse("xlink:href") -> "courses/cs101.xml",
+              QName.parse("xlink:label") -> "CS-101",
+              QName.parse("xlink:title") -> "Computer Science 101")),
           comment(" more remote resources for courses, seminars, etc. "),
           elem(
-            qname = "gpa".qname,
+            qname = QName("gpa"),
             attributes = Map(
-              "xlink:type".qname -> "resource",
-              "xlink:label".qname -> "PatJonesGPA",
-              "xlink:role".qname -> "http://www.example.com/linkprops/gpa"),
+              QName.parse("xlink:type") -> "resource",
+              QName.parse("xlink:label") -> "PatJonesGPA",
+              QName.parse("xlink:role") -> "http://www.example.com/linkprops/gpa"),
             children = List(text("3.5"))),
           elem(
-            qname = "go".qname,
+            qname = QName("go"),
             attributes = Map(
-              "xlink:type".qname -> "arc",
-              "xlink:from".qname -> "student62",
-              "xlink:arcrole".qname -> "", // Required??
-              "xlink:to".qname -> "PatJonesGPA",
-              "xlink:show".qname -> "new",
-              "xlink:actuate".qname -> "onRequest",
-              "xlink:title".qname -> "Pat Jones's GPA")),
+              QName.parse("xlink:type") -> "arc",
+              QName.parse("xlink:from") -> "student62",
+              QName.parse("xlink:arcrole") -> "", // Required??
+              QName.parse("xlink:to") -> "PatJonesGPA",
+              QName.parse("xlink:show") -> "new",
+              QName.parse("xlink:actuate") -> "onRequest",
+              QName.parse("xlink:title") -> "Pat Jones's GPA")),
           elem(
-            qname = "go".qname,
+            qname = QName("go"),
             attributes = Map(
-              "xlink:type".qname -> "arc",
-              "xlink:from".qname -> "CS-101",
-              "xlink:arcrole".qname -> "http://www.example.com/linkprops/auditor",
-              "xlink:to".qname -> "student62",
-              "xlink:show".qname -> "replace",
-              "xlink:actuate".qname -> "onRequest",
-              "xlink:title".qname -> "Pat Jones, auditing the course")),
+              QName.parse("xlink:type") -> "arc",
+              QName.parse("xlink:from") -> "CS-101",
+              QName.parse("xlink:arcrole") -> "http://www.example.com/linkprops/auditor",
+              QName.parse("xlink:to") -> "student62",
+              QName.parse("xlink:show") -> "replace",
+              QName.parse("xlink:actuate") -> "onRequest",
+              QName.parse("xlink:title") -> "Pat Jones, auditing the course")),
           elem(
-            qname = "go".qname,
+            qname = QName("go"),
             attributes = Map(
-              "xlink:type".qname -> "arc",
-              "xlink:from".qname -> "student62",
-              "xlink:arcrole".qname -> "http://www.example.com/linkprops/advisor",
-              "xlink:to".qname -> "prof7",
-              "xlink:show".qname -> "replace",
-              "xlink:actuate".qname -> "onRequest",
-              "xlink:title".qname -> "Dr. Jay Smith, advisor"))))
+              QName.parse("xlink:type") -> "arc",
+              QName.parse("xlink:from") -> "student62",
+              QName.parse("xlink:arcrole") -> "http://www.example.com/linkprops/advisor",
+              QName.parse("xlink:to") -> "prof7",
+              QName.parse("xlink:show") -> "replace",
+              QName.parse("xlink:actuate") -> "onRequest",
+              QName.parse("xlink:title") -> "Dr. Jay Smith, advisor"))))
 
     val root: Elem = rootBuilder.build()
 

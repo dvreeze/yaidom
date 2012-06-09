@@ -53,19 +53,19 @@ class BasicXmlProcessingTest extends Suite {
 
     val foo =
       elem(
-        qname = "foo".qname,
+        qname = QName("foo"),
         children = List(
           elem(
-            qname = "bar".qname,
-            attributes = Map("type".qname -> "greet"),
+            qname = QName("bar"),
+            attributes = Map(QName("type") -> "greet"),
             children = List(text("hi"))),
           elem(
-            qname = "bar".qname,
-            attributes = Map("type".qname -> "count"),
+            qname = QName("bar"),
+            attributes = Map(QName("type") -> "count"),
             children = List(text("1"))),
           elem(
-            qname = "bar".qname,
-            attributes = Map("type".qname -> "color"),
+            qname = QName("bar"),
+            attributes = Map(QName("type") -> "color"),
             children = List(text("yellow"))))).build()
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
@@ -105,26 +105,26 @@ class BasicXmlProcessingTest extends Suite {
     // Again verbose but "precise" creation of an Elem
     val baz =
       elem(
-        qname = "a".qname,
+        qname = QName("a"),
         children = List(
           elem(
-            qname = "z".qname,
-            attributes = Map("x".qname -> "1")),
+            qname = QName("z"),
+            attributes = Map(QName("x") -> "1")),
           elem(
-            qname = "b".qname,
+            qname = QName("b"),
             children = List(
               elem(
-                qname = "z".qname,
-                attributes = Map("x".qname -> "2")),
+                qname = QName("z"),
+                attributes = Map(QName("x") -> "2")),
               elem(
-                qname = "c".qname,
+                qname = QName("c"),
                 children = List(
                   elem(
-                    qname = "z".qname,
-                    attributes = Map("x".qname -> "3")))),
+                    qname = QName("z"),
+                    attributes = Map(QName("x") -> "3")))),
               elem(
-                qname = "z".qname,
-                attributes = Map("x".qname -> "4")))))).build()
+                qname = QName("z"),
+                attributes = Map(QName("x") -> "4")))))).build()
 
     val zs = baz \\ "z"
 
@@ -205,24 +205,24 @@ class BasicXmlProcessingTest extends Suite {
 
     val musicElm2 =
       elem(
-        qname = "music".qname,
+        qname = QName("music"),
         children = artists map { artist =>
           elem(
-            qname = "artist".qname,
-            attributes = Map("name".qname -> artist.name),
+            qname = QName("artist"),
+            attributes = Map(QName("name") -> artist.name),
             children = artist.albums map { album =>
               elem(
-                qname = "album".qname,
-                attributes = Map("title".qname -> album.title),
+                qname = QName("album"),
+                attributes = Map(QName("title") -> album.title),
                 children = {
                   val songChildren: immutable.Seq[NodeBuilder] = album.songs map { song =>
                     elem(
-                      qname = "song".qname,
-                      attributes = Map("title".qname -> song.title, "length".qname -> song.length))
+                      qname = QName("song"),
+                      attributes = Map(QName("title") -> song.title, QName("length") -> song.length))
                   }
 
                   val descriptionElm = elem(
-                    qname = "description".qname,
+                    qname = QName("description"),
                     children = List(text(album.description)))
 
                   songChildren :+ descriptionElm
@@ -239,7 +239,7 @@ class BasicXmlProcessingTest extends Suite {
       musicElm updated {
         case path: ElemPath if path.lastEntryOption.map(_.elementName.localPart).getOrElse("") == "description" =>
           val e = musicElm.findWithElemPath(path).get
-          Elem(e.qname, e.attributes - "link".qname, e.scope, e.children)
+          Elem(e.qname, e.attributes - QName("link"), e.scope, e.children)
       }
 
     expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {

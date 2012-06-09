@@ -11,14 +11,6 @@ package eu.cdevreeze.yaidom
  */
 object Predef {
 
-  /** "Implicit class" for converting a `String` to a [[eu.cdevreeze.yaidom.QName]] */
-  final class ToParsedQName(val s: String) {
-    def qname: QName = QName.parse(s)
-  }
-
-  /** Implicit conversion enriching a `String` with a `qname` method that turns the `String` into a [[eu.cdevreeze.yaidom.QName]] */
-  implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
-
   /** "Implicit class" for converting a `String` to an [[eu.cdevreeze.yaidom.EName]] */
   final class ToParsedEName(val s: String) {
     def ename: EName = EName.parse(s)

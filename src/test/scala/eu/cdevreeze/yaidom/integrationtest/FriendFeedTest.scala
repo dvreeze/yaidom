@@ -199,12 +199,12 @@ class FriendFeedTest extends Suite {
         }
 
         elem(
-          qname = "Service".qname,
-          attributes = Map("id".qname -> serviceId, "cnt".qname -> serviceCount.toString)).build(statsScope)
+          qname = QName("Service"),
+          attributes = Map(QName("id") -> serviceId, QName("cnt") -> serviceCount.toString)).build(statsScope)
       }
 
       Elem(
-        qname = "Stats".qname,
+        qname = QName("Stats"),
         attributes = Map(),
         scope = statsScope,
         children = serviceElms)
@@ -248,13 +248,13 @@ class FriendFeedTest extends Suite {
     val userElms: immutable.Seq[ElemBuilder] =
       nickNames map { name =>
         elem(
-          qname = "nickname".qname,
+          qname = QName("nickname"),
           children = List(text(name)))
       }
 
     val userListElm: ElemBuilder =
       elem(
-        qname = "UserList".qname,
+        qname = QName("UserList"),
         children = userElms)
 
     // Building an Elem from the ElemBuilder
@@ -269,8 +269,8 @@ class FriendFeedTest extends Suite {
 
     // Creating an Elem directly
     Elem(
-      qname = "Service".qname,
-      attributes = Map("id".qname -> serviceName),
+      qname = QName("Service"),
+      attributes = Map(QName("id") -> serviceName),
       scope = Scope.Empty,
       children = immutable.IndexedSeq(userListElm))
   }
@@ -282,8 +282,8 @@ class FriendFeedTest extends Suite {
 
     val serviceElm: ElemBuilder =
       elem(
-        qname = "Service".qname,
-        attributes = Map("cnt".qname -> entryElms.size.toString, "id".qname -> serviceName))
+        qname = QName("Service"),
+        attributes = Map(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName))
 
     serviceElm.build(statsScope)
   }
@@ -294,7 +294,7 @@ class FriendFeedTest extends Suite {
     val serviceStatisticsElms = serviceNames map { serviceName => createStatisticsForService(feedElm, serviceName) }
 
     Elem(
-      qname = "Stats".qname,
+      qname = QName("Stats"),
       attributes = Map(),
       scope = statsScope,
       children = serviceStatisticsElms.toIndexedSeq)

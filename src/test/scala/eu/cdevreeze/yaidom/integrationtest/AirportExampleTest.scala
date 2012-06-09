@@ -234,7 +234,7 @@ class AirportExampleTest extends Suite {
 
     val airportRootElm =
       Elem(
-        qname = "NewDataSet".qname,
+        qname = QName("NewDataSet"),
         scope = scope,
         children = deAirportsDoc.documentElement.allChildElems ++ beAirportsDoc.documentElement.allChildElems ++ nlAirportsDoc.documentElement.allChildElems)
 
@@ -285,15 +285,15 @@ class AirportExampleTest extends Suite {
         }
 
       elem(
-        qname = "Distances".qname,
+        qname = QName("Distances"),
         children = distances map {
           case (airportCode, dist) =>
             elem(
-              qname = "Distance".qname,
+              qname = QName("Distance"),
               children = List(
                 elem(
-                  qname = "Airport".qname,
-                  attributes = Map("code".qname -> airportCode),
+                  qname = QName("Airport"),
+                  attributes = Map(QName("code") -> airportCode),
                   children = List(text(dist.toString)))))
         })
     }
@@ -311,33 +311,33 @@ class AirportExampleTest extends Suite {
 
         val elmBuilder: ElemBuilder =
           elem(
-            qname = "Airport".qname,
+            qname = QName("Airport"),
             children = List(
               elem(
-                qname = "AirportCode".qname,
+                qname = QName("AirportCode"),
                 children = List(text(airportCode(airportElm)))),
               elem(
-                qname = "AirportOrCityName".qname,
+                qname = QName("AirportOrCityName"),
                 children = List(text(airportOrCityName))),
               elem(
-                qname = "Country".qname,
+                qname = QName("Country"),
                 children = List(text(country))),
               elem(
-                qname = "CountryAbbreviation".qname,
+                qname = QName("CountryAbbreviation"),
                 children = List(text(countryAbbreviation))),
               elem(
-                qname = "Position".qname,
+                qname = QName("Position"),
                 children = List(
                   elem(
-                    qname = "Lat".qname, children = List(text(lat.toString))),
+                    qname = QName("Lat"), children = List(text(lat.toString))),
                   elem(
-                    qname = "Lon".qname, children = List(text(lon.toString))))),
+                    qname = QName("Lon"), children = List(text(lon.toString))))),
               distancesElemBuilder(airportElm)))
 
         elmBuilder.build(scope)
       }
 
-    val airportSummaryRoot = Elem(qname = "Airports".qname, scope = scope, children = airportSummaryElms.toIndexedSeq)
+    val airportSummaryRoot = Elem(qname = QName("Airports"), scope = scope, children = airportSummaryElms.toIndexedSeq)
 
     val domPrinter = {
       val dbf = DocumentBuilderFactory.newInstance

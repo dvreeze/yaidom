@@ -247,7 +247,7 @@ class SaxInteropTest extends Suite {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set("root".qname, "child".qname)) {
+    expect(Set(QName("root"), QName("child"))) {
       val result = root.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
@@ -279,7 +279,7 @@ class SaxInteropTest extends Suite {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set("root".qname, "child".qname)) {
+    expect(Set(QName("root"), QName("child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
@@ -301,7 +301,7 @@ class SaxInteropTest extends Suite {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set("root".qname, "child".qname)) {
+    expect(Set(QName("root"), QName("child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
@@ -1009,7 +1009,7 @@ class SaxInteropTest extends Suite {
     import NodeBuilder._
 
     val countryPath = ElemPath.fromCanonicalXPath("/*/car[1]/country[1]")(Scope.Empty)
-    val updatedCountryElm = elem(qname = "country".qname, children = List(text("New Zealand"))).build()
+    val updatedCountryElm = elem(qname = QName("country"), children = List(text("New Zealand"))).build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
     expect("New Zealand") {

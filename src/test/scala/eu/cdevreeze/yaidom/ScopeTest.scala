@@ -176,28 +176,28 @@ class ScopeTest extends Suite {
     val scope1 = Map[String, String]().scope
 
     expect(Some("book".ename)) {
-      scope1.resolveQName("book".qname)
+      scope1.resolveQName(QName("book"))
     }
     expect(None) {
-      scope1.resolveQName("book:book".qname)
+      scope1.resolveQName(QName.parse("book:book"))
     }
 
     val scope2 = Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d").scope
 
     expect(Some("{http://a}book".ename)) {
-      scope2.resolveQName("book".qname)
+      scope2.resolveQName(QName("book"))
     }
     expect(None) {
-      scope2.resolveQName("book:book".qname)
+      scope2.resolveQName(QName.parse("book:book"))
     }
     expect(Some("{http://a}book".ename)) {
-      scope2.resolveQName("a:book".qname)
+      scope2.resolveQName(QName.parse("a:book"))
     }
     expect(Some("{http://ccc}bookstore".ename)) {
-      scope2.resolveQName("c:bookstore".qname)
+      scope2.resolveQName(QName.parse("c:bookstore"))
     }
     expect(Some("{http://www.w3.org/XML/1998/namespace}lang".ename)) {
-      scope2.resolveQName("xml:lang".qname)
+      scope2.resolveQName(QName.parse("xml:lang"))
     }
   }
 }

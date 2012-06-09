@@ -353,7 +353,7 @@ class QueryTest extends Suite {
     def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
       Elem(
         qname = e.qname,
-        attributes = e.attributes + ("elemPath".qname -> path.toCanonicalXPath(scope)),
+        attributes = e.attributes + (QName("elemPath") -> path.toCanonicalXPath(scope)),
         scope = e.scope,
         children = e.children map { ch =>
           ch match {
@@ -374,7 +374,7 @@ class QueryTest extends Suite {
         desc <- bookStoreWithPaths.findAllElems
         path = ElemPath.fromCanonicalXPath(desc.attribute("elemPath".ename))(Scope.Empty)
         parent <- bookstore.findWithElemPath(path.parentPath)
-        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
+        if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
       } yield desc
 
     assert(elms.size > 10, "Expected more than 10 matching elements")
@@ -382,7 +382,7 @@ class QueryTest extends Suite {
       val result = elms map { _.qname }
       result.toSet
     }
-    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
+    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       qnames
     }
   }
@@ -400,7 +400,7 @@ class QueryTest extends Suite {
       for {
         elm <- indexedDoc.document.documentElement.findAllElems
         parent <- indexedDoc.findParent(elm)
-        if parent.qname != "Bookstore".qname && parent.qname != "Book".qname
+        if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
       } yield elm
 
     assert(elms.size > 10, "Expected more than 10 matching elements")
@@ -408,7 +408,7 @@ class QueryTest extends Suite {
       val result = elms map { _.qname }
       result.toSet
     }
-    expect(Set("Title".qname, "Author".qname, "First_Name".qname, "Last_Name".qname)) {
+    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       qnames
     }
   }
@@ -547,10 +547,10 @@ class QueryTest extends Suite {
         searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
         if !searchedForFirstNames.isEmpty
       } yield elem(
-        qname = "Book".qname,
+        qname = QName("Book"),
         children = List(
           fromElem(title)(Scope.Empty),
-          elem(qname = "First_Name".qname, children = List(text(searchedForFirstNames.head))))).build()
+          elem(qname = QName("First_Name"), children = List(text(searchedForFirstNames.head))))).build()
 
     expect(2) {
       titleAndFirstNames.size
@@ -582,7 +582,7 @@ class QueryTest extends Suite {
         price = book.attribute("Price".ename).toDouble
       } yield price
     val averagePrice =
-      elem(qname = "Average".qname,
+      elem(qname = QName("Average"),
         children = List(text((prices.sum.toDouble / prices.size).toString))).build()
 
     expect(65) {
@@ -621,11 +621,11 @@ class QueryTest extends Suite {
         price = book.attribute("Price".ename).toDouble
         if price < avg
       } yield elem(
-        qname = "Book".qname,
+        qname = QName("Book"),
         children = List(
           fromElem(book.getChildElemNamed("Title".ename))(Scope.Empty),
           elem(
-            qname = "Price".qname,
+            qname = QName("Price"),
             children = List(text(price.toString))))).build()
 
     expect(2) {
@@ -668,11 +668,11 @@ class QueryTest extends Suite {
         book <- bookstore \ "Book" sortWith { cheaper _ }
         price = book.attribute("Price".ename).toDouble
       } yield elem(
-        qname = "Book".qname,
+        qname = QName("Book"),
         children = List(
           fromElem(book.getChildElemNamed("Title".ename))(Scope.Empty),
           elem(
-            qname = "Price".qname,
+            qname = QName("Price"),
             children = List(text(price.toString))))).build()
     }
 
@@ -753,13 +753,13 @@ class QueryTest extends Suite {
         if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
         if bookTitle(book1) < bookTitle(book2)
       } yield elem(
-        qname = "BookPair".qname,
+        qname = QName("BookPair"),
         children = List(
           elem(
-            qname = "Title1".qname,
+            qname = QName("Title1"),
             children = List(text(bookTitle(book1)))),
           elem(
-            qname = "Title2".qname,
+            qname = QName("Title2"),
             children = List(text(bookTitle(book2)))))).build()
 
     expect(5) {
@@ -815,9 +815,9 @@ class QueryTest extends Suite {
         author <- book.filterElemsNamed("Author".ename)
         if author.getChildElemNamed("Last_Name".ename).trimmedText == authorLastName
       } yield {
-        val attrs = book.attributes filterKeys { a => Set("ISBN".qname, "Price".qname).contains(a) }
+        val attrs = book.attributes filterKeys { a => Set(QName("ISBN"), QName("Price")).contains(a) }
         elem(
-          qname = "Book".qname,
+          qname = QName("Book"),
           attributes = attrs).
           withChildNodes(book.filterChildElemsNamed("Title".ename))(Scope.Empty).build()
       }
@@ -842,17 +842,17 @@ class QueryTest extends Suite {
         val bookBuilders = foundBooks map { book => fromElem(book)(Scope.Empty) }
 
         elem(
-          qname = "Author".qname,
+          qname = QName("Author"),
           children = List(
             elem(
-              qname = "First_Name".qname,
+              qname = QName("First_Name"),
               children = List(text(firstNameValue))),
             elem(
-              qname = "Last_Name".qname,
+              qname = QName("Last_Name"),
               children = List(text(lastNameValue)))) ++ bookBuilders).build()
       }
 
-    val invertedBookstore: Elem = Elem(qname = "InvertedBookstore".qname, children = authorsWithBooks)
+    val invertedBookstore: Elem = Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks)
 
     expect(3) {
       invertedBookstore.allChildElems.size
@@ -873,11 +873,11 @@ class QueryTest extends Suite {
 
         if (bookOrMagazine.resolvedName == "Book".ename) {
           elem(
-            qname = "BookTitle".qname,
+            qname = QName("BookTitle"),
             children = List(text(titleString))).build()
         } else {
           elem(
-            qname = "MagazineTitle".qname,
+            qname = QName("MagazineTitle"),
             children = List(text(titleString))).build()
         }
       }
@@ -902,7 +902,7 @@ class QueryTest extends Suite {
       require(book.resolvedName == "Book".ename)
       Elem(
         qname = book.qname,
-        attributes = book.attributes filterKeys { a => a != "Price".qname },
+        attributes = book.attributes filterKeys { a => a != QName("Price") },
         scope = book.scope,
         children = book.children)
     }
@@ -939,7 +939,7 @@ class QueryTest extends Suite {
       val firstNameValue: String = author.getChildElemNamed("First_Name".ename).trimmedText
       val lastNameValue: String = author.getChildElemNamed("Last_Name".ename).trimmedText
       val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
-      val name: ElemBuilder = elem(qname = "Name".qname, children = List(text(nameValue)))
+      val name: ElemBuilder = elem(qname = QName("Name"), children = List(text(nameValue)))
 
       elem(
         qname = author.qname,
@@ -965,33 +965,33 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-0-13-713526-2", "Price".qname -> "85", "Edition".qname -> "3rd"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("A First Course in Database Systems"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Ullman"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Widom")))))))))
   }
 
@@ -999,45 +999,45 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-0-13-815504-6", "Price".qname -> "100"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("Database Systems: The Complete Book"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Hector"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Garcia-Molina"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Ullman"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Widom"))))))),
         elem(
-          qname = "Remark".qname,
+          qname = QName("Remark"),
           children = List(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
   }
 
@@ -1045,36 +1045,36 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-0-11-222222-3", "Price".qname -> "50"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("Hector and Jeff's Database Hints"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Ullman"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Hector"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Garcia-Molina"))))))),
         elem(
-          qname = "Remark".qname,
+          qname = QName("Remark"),
           children = List(text("An indispensable companion to your textbook")))))
   }
 
@@ -1082,24 +1082,24 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-9-88-777777-6", "Price".qname -> "25"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("Jennifer's Economical Database Hints"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Widom")))))))))
   }
 
@@ -1107,11 +1107,11 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "January", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("National Geographic")))))
   }
 
@@ -1119,11 +1119,11 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("National Geographic")))))
   }
 
@@ -1131,11 +1131,11 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("Newsweek")))))
   }
 
@@ -1143,11 +1143,11 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "March", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("Hector and Jeff's Database Hints")))))
   }
 
@@ -1155,7 +1155,7 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Bookstore".qname,
+      qname = QName("Bookstore"),
       children = List(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
   }

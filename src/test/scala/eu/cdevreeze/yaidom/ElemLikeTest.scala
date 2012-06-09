@@ -488,7 +488,7 @@ class ElemLikeTest extends Suite {
 
     val scope = Scope.fromMap(Map("b" -> ns.toString))
 
-    expect(Some("Last_Name".qname)) {
+    expect(Some(QName("Last_Name"))) {
       val path = ElemPath.fromXPaths(List("/b:Book[1]", "/b:Authors[1]", "/b:Author[1]", "/b:Last_Name[1]"))(scope)
       bookstore.findWithElemPath(path) map { _.qname }
     }
@@ -642,33 +642,33 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-0-13-713526-2", "Price".qname -> "85", "Edition".qname -> "3rd"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("A First Course in Database Systems"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Ullman"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Widom")))))))))
   }
 
@@ -676,45 +676,45 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-0-13-815504-6", "Price".qname -> "100"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("Database Systems: The Complete Book"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Hector"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Garcia-Molina"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Ullman"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Widom"))))))),
         elem(
-          qname = "Remark".qname,
+          qname = QName("Remark"),
           children = List(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
   }
 
@@ -722,36 +722,36 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-0-11-222222-3", "Price".qname -> "50"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("Hector and Jeff's Database Hints"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jeffrey"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Ullman"))))),
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Hector"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Garcia-Molina"))))))),
         elem(
-          qname = "Remark".qname,
+          qname = QName("Remark"),
           children = List(text("An indispensable companion to your textbook")))))
   }
 
@@ -759,24 +759,24 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Book".qname,
-      attributes = Map("ISBN".qname -> "ISBN-9-88-777777-6", "Price".qname -> "25"),
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(
             text("Jennifer's Economical Database Hints"))),
         elem(
-          qname = "Authors".qname,
+          qname = QName("Authors"),
           children = List(
             elem(
-              qname = "Author".qname,
+              qname = QName("Author"),
               children = List(
                 elem(
-                  qname = "First_Name".qname,
+                  qname = QName("First_Name"),
                   children = List(text("Jennifer"))),
                 elem(
-                  qname = "Last_Name".qname,
+                  qname = QName("Last_Name"),
                   children = List(text("Widom")))))))))
   }
 
@@ -784,11 +784,11 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "January", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("National Geographic")))))
   }
 
@@ -796,11 +796,11 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("National Geographic")))))
   }
 
@@ -808,11 +808,11 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "February", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("Newsweek")))))
   }
 
@@ -820,11 +820,11 @@ class ElemLikeTest extends Suite {
     import NodeBuilder._
 
     elem(
-      qname = "Magazine".qname,
-      attributes = Map("Month".qname -> "March", "Year".qname -> "2009"),
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = List(
         elem(
-          qname = "Title".qname,
+          qname = QName("Title"),
           children = List(text("Hector and Jeff's Database Hints")))))
   }
 
@@ -833,7 +833,7 @@ class ElemLikeTest extends Suite {
 
     val result: Elem =
       elem(
-        qname = "books:Bookstore".qname,
+        qname = QName.parse("books:Bookstore"),
         namespaces = Map("" -> ns.toString, "books" -> ns.toString).namespaces,
         children = List(
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)

@@ -169,7 +169,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     require(localName ne null)
     require(qName ne null)
 
-    val elmQName: QName = if (qName != "") qName.qname else localName.qname
+    val elmQName: QName = if (qName != "") QName.parse(qName) else QName.parse(localName)
 
     val nsDecls = extractDeclarations(atts)
     val attrMap = extractAttributeMap(atts)
@@ -186,7 +186,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   private def extractDeclarations(atts: Attributes): Scope.Declarations = {
     val result = attributeOrDeclarationMap(atts) filterKeys { qname => isNamespaceDeclaration(qname) } map { kv =>
-      val key = kv._1.qname
+      val key = QName.parse(kv._1)
       val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
       val nsUri = kv._2
       (prefix -> nsUri)
@@ -196,7 +196,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   private def extractAttributeMap(atts: Attributes): Map[QName, String] = {
     val result = attributeOrDeclarationMap(atts) filterKeys { qname => !isNamespaceDeclaration(qname) } map { kv =>
-      val qname = kv._1.qname
+      val qname = QName.parse(kv._1)
       val attValue = kv._2
       (qname -> attValue)
     }

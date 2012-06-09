@@ -455,13 +455,13 @@ final class Elem(
       result.mkString("%n".format())
     }
 
-    val qnameString = "\"\"\"%s\"\"\".qname".format(self.qname.toString)
+    val qnameString = "QName.parse(\"\"\"%s\"\"\")".format(self.qname.toString)
 
     val attributesString = {
       val result = self.attributes map { kv =>
         val qn: QName = kv._1
         val value: String = kv._2
-        val qnameString = "\"\"\"%s\"\"\".qname".format(qn.toString)
+        val qnameString = "QName.parse(\"\"\"%s\"\"\")".format(qn.toString)
         val valueString = "\"\"\"%s\"\"\"".format(value)
         (qnameString -> valueString)
       }
