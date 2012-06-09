@@ -889,8 +889,8 @@ class DomInteropTest extends Suite {
     def bookHtmlString(bookElm: Elem): String = {
       val authorNames: immutable.IndexedSeq[String] =
         bookElm.filterElemsNamed(EName.parse("{http://bookstore}Author")) map { e =>
-          "%s %s".format(e.getChildElemNamed(
-            EName.parse("{http://bookstore}First_Name")).trimmedText,
+          "%s %s".format(
+            e.getChildElemNamed(EName.parse("{http://bookstore}First_Name")).trimmedText,
             e.getChildElemNamed(EName.parse("{http://bookstore}Last_Name")).trimmedText)
         }
 
