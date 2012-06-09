@@ -355,7 +355,7 @@ class SaxInteropTest extends Suite {
 
     val ns = nsXmlSchema
 
-    val xsElmENames: Set[ExpandedName] =
+    val xsElmENames: Set[EName] =
       Set(ns.ename("schema"), ns.ename("annotation"), ns.ename("documentation"),
         ns.ename("import"), ns.ename("complexType"), ns.ename("complexContent"),
         ns.ename("extension"), ns.ename("sequence"), ns.ename("element"),

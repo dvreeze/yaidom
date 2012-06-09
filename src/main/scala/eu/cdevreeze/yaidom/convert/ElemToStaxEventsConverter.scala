@@ -113,9 +113,9 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
       val result = elm.attributes map { kv =>
         val attrQName = kv._1
         val value = kv._2
-        val attrExpandedName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
-          "Attribute name '%s' should resolve to an ExpandedName in scope [%s]".format(attrQName, elm.attributeScope)))
-        val attrJavaQName = attrExpandedName.toJavaQName(attrQName.prefixOption)
+        val attrEName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
+          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, elm.attributeScope)))
+        val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
 
         (attrQName -> xmlEventFactory.createAttribute(attrJavaQName, value))
       }

@@ -87,7 +87,7 @@ package eu.cdevreeze
  *
  * This package contains the following parts, in order of dependencies (starting with the class without any dependencies):
  * <ol>
- * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.ExpandedName]] and
+ * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.EName]] and
  * [[eu.cdevreeze.yaidom.Scope]]. At the same level is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
  * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]], which partly implements "element nodes".</li>
  * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
@@ -101,7 +101,7 @@ package eu.cdevreeze
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
  * In this package are some ("explicit" and therefore safe) implicit conversions, for treating a `String` as `QName`,
- * `ExpandedName` or `Namespace`, and for treating a `Map[String, String]` as `Scope.Declarations` or `Scope`.
+ * `EName` or `Namespace`, and for treating a `Map[String, String]` as `Scope.Declarations` or `Scope`.
  *
  * Parsing and printing of XML is not handled in this package. Even the `toString` methods for nodes
  * use the `NodeBuilder` DSL syntax rather than XML string syntax. Hence the complex details of character escaping,

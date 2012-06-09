@@ -23,12 +23,15 @@ import javax.xml.namespace.{ QName => JQName }
  * Expanded name. See http://www.w3.org/TR/xml-names11/. It has a localPart and an optional namespace URI.
  * Semantically like a `QName` in Java, but not keeping the prefix.
  *
- * To get an [[eu.cdevreeze.yaidom.ExpandedName]] from a [[eu.cdevreeze.yaidom.QName]],
+ * To get an [[eu.cdevreeze.yaidom.EName]] from a [[eu.cdevreeze.yaidom.QName]],
  * the latter needs to be resolved against a [[eu.cdevreeze.yaidom.Scope]].
+ *
+ * The short class name illustrates that expanded names are at least as important as qualified names, and should be
+ * equally easy to construct (using the companion object).
  *
  * @author Chris de Vreeze
  */
-final case class ExpandedName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
+final case class EName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
   require(namespaceUriOption ne null)
   require {
     namespaceUriOption forall { ns => (ns ne null) && (ns.length > 0) }
@@ -36,13 +39,13 @@ final case class ExpandedName(namespaceUriOption: Option[String], localPart: Str
   require(localPart ne null)
   require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
-  /** Given an optional prefix, creates a `QName` from this `ExpandedName` */
+  /** Given an optional prefix, creates a `QName` from this `EName` */
   def toQName(prefixOption: Option[String]): QName = {
     require(namespaceUriOption.isDefined || prefixOption.isEmpty)
     QName(prefixOption, localPart)
   }
 
-  /** Given an optional prefix, creates a [[javax.xml.namespace.QName]] from this ExpandedName */
+  /** Given an optional prefix, creates a [[javax.xml.namespace.QName]] from this EName */
   def toJavaQName(prefixOption: Option[String]): JQName = {
     require(namespaceUriOption.isDefined || prefixOption.isEmpty)
     new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
@@ -52,19 +55,19 @@ final case class ExpandedName(namespaceUriOption: Option[String], localPart: Str
   override def toString: String = toJavaQName(None).toString
 }
 
-object ExpandedName {
+object EName {
 
-  /** Creates an `ExpandedName` from a namespaceUri and a localPart */
-  def apply(namespaceUri: String, localPart: String): ExpandedName = ExpandedName(Some(namespaceUri), localPart)
+  /** Creates an `EName` from a namespaceUri and a localPart */
+  def apply(namespaceUri: String, localPart: String): EName = EName(Some(namespaceUri), localPart)
 
-  /** Creates an `ExpandedName` from a localPart only */
-  def apply(localPart: String): ExpandedName = ExpandedName(None, localPart)
+  /** Creates an `EName` from a localPart only */
+  def apply(localPart: String): EName = EName(None, localPart)
 
-  /** Creates an `ExpandedName` from a [[javax.xml.namespace.QName]] */
-  def fromJavaQName(jqname: JQName): ExpandedName = jqname match {
+  /** Creates an `EName` from a [[javax.xml.namespace.QName]] */
+  def fromJavaQName(jqname: JQName): EName = jqname match {
     case jqname: JQName if (jqname.getNamespaceURI eq null) || (jqname.getNamespaceURI == XMLConstants.NULL_NS_URI) =>
-      ExpandedName(jqname.getLocalPart)
-    case _ => ExpandedName(jqname.getNamespaceURI, jqname.getLocalPart)
+      EName(jqname.getLocalPart)
+    case _ => EName(jqname.getNamespaceURI, jqname.getLocalPart)
   }
 
   /** Gets an optional prefix from a [[javax.xml.namespace.QName]] */
@@ -73,17 +76,17 @@ object ExpandedName {
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
 
-  /** Parses a `String` into an `ExpandedName`. The `String` must conform to the `toString` format of an `ExpandedName` */
-  def parse(s: String): ExpandedName = s match {
+  /** Parses a `String` into an `EName`. The `String` must conform to the `toString` format of an `EName` */
+  def parse(s: String): EName = s match {
     case s if s.startsWith("{") =>
       val idx = s indexWhere { c => c == '}' }
       require(idx >= 2 && idx < s.length - 1)
       val ns = s.slice(1, idx)
       val localPart = s.slice(idx + 1, s.length)
-      ExpandedName(ns, localPart)
+      EName(ns, localPart)
     case _ =>
       require(s.indexOf("{") < 0)
       require(s.indexOf("}") < 0)
-      ExpandedName(s)
+      EName(s)
   }
 }

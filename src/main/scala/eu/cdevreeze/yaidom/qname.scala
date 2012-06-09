@@ -26,7 +26,7 @@ package eu.cdevreeze.yaidom
  * <li>[[eu.cdevreeze.yaidom.PrefixedName]], which combines a non-empty prefix with a local part</li>
  * </ul>
  *
- * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.ExpandedName]].
+ * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.EName]].
  *
  * @author Chris de Vreeze
  */

@@ -99,13 +99,13 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   def lastEntry: ElemPath.Entry = lastEntryOption.getOrElse(sys.error("There are no entries"))
 
   /** Convenience method returning true if the first entry (if any) has the given element name */
-  def startsWithName(ename: ExpandedName): Boolean = firstEntryOption exists { entry => entry.elementName == ename }
+  def startsWithName(ename: EName): Boolean = firstEntryOption exists { entry => entry.elementName == ename }
 
   /** Convenience method returning true if the last entry (if any) has the given element name */
-  def endsWithName(ename: ExpandedName): Boolean = lastEntryOption exists { entry => entry.elementName == ename }
+  def endsWithName(ename: EName): Boolean = lastEntryOption exists { entry => entry.elementName == ename }
 
   /** Convenience method returning true if at least one entry has the given element name */
-  def containsName(ename: ExpandedName): Boolean = entries exists { entry => entry.elementName == ename }
+  def containsName(ename: EName): Boolean = entries exists { entry => entry.elementName == ename }
 
   override def equals(obj: Any): Boolean = obj match {
     case other: ElemPath =>
@@ -170,7 +170,7 @@ object ElemPath {
   }
 
   /** An entry in an `ElemPath`, as an expanded element name plus zero-based index of the elem as child (with that name) of the parent. */
-  final case class Entry(elementName: ExpandedName, index: Int) extends Immutable {
+  final case class Entry(elementName: EName, index: Int) extends Immutable {
 
     require(elementName ne null)
     require(index >= 0)

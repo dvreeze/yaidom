@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 /**
  * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace.
  *
- * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.ExpandedName]]s.
+ * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.EName]]s.
  *
  * A `Scope` must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
  *
@@ -63,11 +63,11 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
   def superScopeOf(scope: Scope): Boolean = scope.subScopeOf(this)
 
   /** Tries to resolve the given `QName` against this `Scope`, returning `None` otherwise */
-  def resolveQName(qname: QName): Option[ExpandedName] = qname match {
-    case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(ExpandedName(unprefixedName.localPart))
-    case unprefixedName: UnprefixedName => Some(ExpandedName(defaultNamespaceOption.get, unprefixedName.localPart))
+  def resolveQName(qname: QName): Option[EName] = qname match {
+    case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(EName(unprefixedName.localPart))
+    case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
-      completePrefixScope.get(prefixedName.prefix) map { nsUri => ExpandedName(nsUri, prefixedName.localPart) }
+      completePrefixScope.get(prefixedName.prefix) map { nsUri => EName(nsUri, prefixedName.localPart) }
   }
 
   /**

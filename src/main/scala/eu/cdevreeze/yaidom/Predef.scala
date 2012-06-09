@@ -19,17 +19,17 @@ object Predef {
   /** Implicit conversion enriching a `String` with a `qname` method that turns the `String` into a [[eu.cdevreeze.yaidom.QName]] */
   implicit def toParsedQName(s: String): ToParsedQName = new ToParsedQName(s)
 
-  /** "Implicit class" for converting a `String` to an [[eu.cdevreeze.yaidom.ExpandedName]] */
-  final class ToParsedExpandedName(val s: String) {
-    def ename: ExpandedName = ExpandedName.parse(s)
+  /** "Implicit class" for converting a `String` to an [[eu.cdevreeze.yaidom.EName]] */
+  final class ToParsedEName(val s: String) {
+    def ename: EName = EName.parse(s)
   }
 
-  /** Implicit conversion enriching a `String` with a `ename` method that turns the `String` into an [[eu.cdevreeze.yaidom.ExpandedName]] */
-  implicit def toParsedExpandedName(s: String): ToParsedExpandedName = new ToParsedExpandedName(s)
+  /** Implicit conversion enriching a `String` with a `ename` method that turns the `String` into an [[eu.cdevreeze.yaidom.EName]] */
+  implicit def toParsedEName(s: String): ToParsedEName = new ToParsedEName(s)
 
-  /** Namespace. It offers a method to create an [[eu.cdevreeze.yaidom.ExpandedName]] with that namespace from a given localPart */
+  /** Namespace. It offers a method to create an [[eu.cdevreeze.yaidom.EName]] with that namespace from a given localPart */
   final class Namespace(val ns: String) {
-    def ename(localPart: String): ExpandedName = ExpandedName(ns, localPart)
+    def ename(localPart: String): EName = EName(ns, localPart)
 
     /** Returns `ns`, that is, the namespace URI as `String` */
     override def toString: String = ns

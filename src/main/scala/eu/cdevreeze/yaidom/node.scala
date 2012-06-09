@@ -35,9 +35,9 @@ import scala.collection.{ immutable, mutable }
  * <li>This is just a DOM-like API, around immutable nodes and immutable Scala Collections of nodes,
  * without any XPath(-like) support. Despite the absence of selectors like those in Anti-XML, this DOM-like API
  * is still quite expressive, be it somewhat more verbose.</li>
- * <li>This API distinguishes between [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.ExpandedName]], making both
+ * <li>This API distinguishes between [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.EName]], making both
  * first-class citizens in the API. Moreover, the concept of a [[eu.cdevreeze.yaidom.Scope]] is a first-class citizen as well.
- * By explicitly modeling `QName`s, `ExpandedName`s and `Scope`s, the user of the API is somewhat shielded from some XML quirks.</li>
+ * By explicitly modeling `QName`s, `EName`s and `Scope`s, the user of the API is somewhat shielded from some XML quirks.</li>
  * <li>This API is less ambitious. Like said above, XPath(-like) support is absent. So is support for "updates" through
  * zippers. So is "true" equality based on the exact tree.</li>
  * </ul>
@@ -250,16 +250,16 @@ final class Elem(
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.copy(defaultNamespaceOption = None)
 
-  /** The `Elem` name as `ExpandedName`, obtained by resolving the element `QName` against the `Scope` */
-  override val resolvedName: ExpandedName =
-    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an ExpandedName in scope [%s]".format(qname, scope)))
+  /** The `Elem` name as `EName`, obtained by resolving the element `QName` against the `Scope` */
+  override val resolvedName: EName =
+    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
 
-  /** The attributes as a `Map` from `ExpandedName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
-  override val resolvedAttributes: Map[ExpandedName, String] = {
+  /** The attributes as a `Map` from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
+  override val resolvedAttributes: Map[EName, String] = {
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attributeScope.resolveQName(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an ExpandedName in scope [%s]".format(attName, attributeScope)))
+      val expandedName = attributeScope.resolveQName(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
       (expandedName -> attValue)
     }
   }

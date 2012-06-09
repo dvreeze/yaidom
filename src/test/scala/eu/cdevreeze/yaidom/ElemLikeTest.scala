@@ -461,7 +461,7 @@ class ElemLikeTest extends Suite {
   @Test def testGetIndex() {
     require(bookstore.localName == "Bookstore")
 
-    val index: Map[ExpandedName, immutable.IndexedSeq[Elem]] = bookstore getIndex { _.resolvedName }
+    val index: Map[EName, immutable.IndexedSeq[Elem]] = bookstore getIndex { _.resolvedName }
 
     expect {
       val result = bookstore.findAllElemsOrSelf map { _.resolvedName }
@@ -472,7 +472,7 @@ class ElemLikeTest extends Suite {
 
     assert {
       index forall { kv =>
-        val ename: ExpandedName = kv._1
+        val ename: EName = kv._1
         val elms: immutable.IndexedSeq[Elem] = kv._2
         elms forall { _.resolvedName == ename }
       }

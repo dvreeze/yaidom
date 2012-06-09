@@ -139,9 +139,9 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
       if (attrQName.prefixOption.isEmpty) {
         element.setAttribute(attrQName.localPart, attrValue)
       } else {
-        val attrExpandedName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
-          "Attribute name '%s' should resolve to an ExpandedName in scope [%s]".format(attrQName, elm.attributeScope)))
-        val attrJavaQName = attrExpandedName.toJavaQName(attrQName.prefixOption)
+        val attrEName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
+          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, elm.attributeScope)))
+        val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
         element.setAttributeNS(attrJavaQName.getNamespaceURI, attrQName.toString, attrValue)
       }
     }
