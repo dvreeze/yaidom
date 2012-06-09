@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import org.ccil.cowan.tagsoup.jaxp.{ SAXFactoryImpl => TagSoupSAXFactoryImpl }
-import eu.cdevreeze.yaidom.Predef._
 import parse.{ DocumentParserUsingSax, DefaultElemProducingSaxHandler, SaxHandlerWithLocator }
 import print.DocumentPrinterUsingSax
 

@@ -22,7 +22,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.Predef._
 
 /**
  * ElemLike test case.
@@ -830,11 +829,12 @@ class ElemLikeTest extends Suite {
 
   private val bookstore: Elem = {
     import NodeBuilder._
+    import Scope._
 
     val result: Elem =
       elem(
         qname = QName.parse("books:Bookstore"),
-        namespaces = Map("" -> ns.toString, "books" -> ns.toString).namespaces,
+        namespaces = Declarations.from("" -> ns.toString, "books" -> ns.toString),
         children = List(
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
 

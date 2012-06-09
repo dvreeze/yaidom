@@ -24,11 +24,12 @@ import scala.collection.immutable
  * Example:
  * {{{
  * import NodeBuilder._
+ * import Scope._
  *
  * elem(
  *   qname = QName("Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
- *   namespaces = Map("dbclass" -> "http://www.db-class.org").namespaces,
+ *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = List(
  *     elem(
  *       qname = QName("Title"),

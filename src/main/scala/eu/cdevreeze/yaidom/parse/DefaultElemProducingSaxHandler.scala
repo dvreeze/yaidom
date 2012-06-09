@@ -23,7 +23,6 @@ import org.xml.sax.ext.LexicalHandler
 import scala.collection.{ immutable, mutable }
 import net.jcip.annotations.NotThreadSafe
 import eu.cdevreeze.yaidom._
-import eu.cdevreeze.yaidom.Predef._
 import NodeBuilder._
 import DefaultElemProducingSaxHandler._
 

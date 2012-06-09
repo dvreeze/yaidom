@@ -479,7 +479,7 @@ final class Elem(
           val nsUriString = "\"\"\"%s\"\"\"".format(nsUri)
           (prefixString -> nsUriString)
         }
-        "%s.namespaces".format(result.toString)
+        "Declarations.fromMap(%s)".format(result.toString)
       }
     }
 

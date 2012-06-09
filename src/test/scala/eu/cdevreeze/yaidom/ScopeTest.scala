@@ -22,7 +22,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.Predef._
 
 /**
  * Scope test case.
@@ -34,26 +33,26 @@ class ScopeTest extends Suite {
 
   @Test def testCreateScope() {
     intercept[Exception] {
-      Map("" -> null).scope
+      Scope.from("" -> null)
     }
     intercept[Exception] {
       val prefix: String = null
-      Map(prefix -> "a").scope
+      Scope.from(prefix -> "a")
     }
     intercept[Exception] {
-      Map("a" -> "").scope
+      Scope.from("a" -> "")
     }
     expect(Map("" -> "http://a")) {
-      Map("" -> "http://a").scope.toMap
+      Scope.from("" -> "http://a").toMap
     }
     expect(Map("" -> "http://a", "b" -> "http://b")) {
-      Map("" -> "http://a", "b" -> "http://b").scope.toMap
+      Scope.from("" -> "http://a", "b" -> "http://b").toMap
     }
     expect(Some("http://a")) {
-      Map("" -> "http://a", "b" -> "http://b").scope.defaultNamespaceOption
+      Scope.from("" -> "http://a", "b" -> "http://b").defaultNamespaceOption
     }
     expect(Map("b" -> "http://b")) {
-      Map("b" -> "http://b").scope.prefixScope
+      Scope.from("b" -> "http://b").prefixScope
     }
   }
 
@@ -61,32 +60,32 @@ class ScopeTest extends Suite {
     import Scope._
 
     intercept[Exception] {
-      Map("" -> null).namespaces
+      Declarations.from("" -> null)
     }
     intercept[Exception] {
       val prefix: String = null
-      Map(prefix -> "a").namespaces
+      Declarations.from(prefix -> "a")
     }
     intercept[Exception] {
-      Declarations(Map("" -> "http://a").scope, Set(None))
+      Declarations(Scope.from("" -> "http://a"), Set(None))
     }
     intercept[Exception] {
-      Declarations(Map("a" -> "http://a").scope, Set(Some("a")))
+      Declarations(Scope.from("a" -> "http://a"), Set(Some("a")))
     }
     expect(Map("a" -> "")) {
-      Map("a" -> "").namespaces.toMap
+      Declarations.from("a" -> "").toMap
     }
     expect(Map("" -> "http://a")) {
-      Map("" -> "http://a").namespaces.toMap
+      Declarations.from("" -> "http://a").toMap
     }
     expect(Map("" -> "http://a", "b" -> "http://b")) {
-      Map("" -> "http://a", "b" -> "http://b").namespaces.toMap
+      Declarations.from("" -> "http://a", "b" -> "http://b").toMap
     }
-    expect(Map("" -> "http://a", "b" -> "http://b").scope) {
-      Map("" -> "http://a", "b" -> "http://b").namespaces.declared
+    expect(Scope.from("" -> "http://a", "b" -> "http://b")) {
+      Declarations.from("" -> "http://a", "b" -> "http://b").declared
     }
     expect(Map("b" -> "http://b")) {
-      Map("b" -> "http://b").namespaces.toMap
+      Declarations.from("b" -> "http://b").toMap
     }
   }
 
@@ -99,7 +98,7 @@ class ScopeTest extends Suite {
       scope1.toMap.size
     }
 
-    val declarations2 = Map("" -> "http://a", "a" -> "http://a").namespaces
+    val declarations2 = Declarations.from("" -> "http://a", "a" -> "http://a")
     val scope2 = scope1.resolve(declarations2)
 
     expect(Some("http://a")) {
@@ -118,10 +117,10 @@ class ScopeTest extends Suite {
       scope2.subScopeOf(scope1)
     }
     expect(Scope.Empty) {
-      scope2.resolve(Map("" -> "").namespaces).resolve(Map("a" -> "").namespaces)
+      scope2.resolve(Declarations.from("" -> "")).resolve(Declarations.from("a" -> ""))
     }
 
-    val declarations3 = Map("b" -> "http://b", "c" -> "http://c").namespaces
+    val declarations3 = Declarations.from("b" -> "http://b", "c" -> "http://c")
     val scope3 = scope2.resolve(declarations3)
 
     expect(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
@@ -137,10 +136,10 @@ class ScopeTest extends Suite {
       scope3.subScopeOf(scope2)
     }
     expect(scope2) {
-      scope3.resolve(Map("b" -> "", "c" -> "").namespaces)
+      scope3.resolve(Declarations.from("b" -> "", "c" -> ""))
     }
 
-    val declarations4 = Map("c" -> "http://ccc", "d" -> "http://d").namespaces
+    val declarations4 = Declarations.from("c" -> "http://ccc", "d" -> "http://d")
     val scope4 = scope3.resolve(declarations4)
 
     expect(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
@@ -159,21 +158,21 @@ class ScopeTest extends Suite {
       scope4.subScopeOf(scope3)
     }
     expect(scope3) {
-      scope4.resolve(Map("c" -> "http://c", "d" -> "").namespaces)
+      scope4.resolve(Declarations.from("c" -> "http://c", "d" -> ""))
     }
     expect(scope2) {
-      scope4.resolve(Map("b" -> "", "c" -> "", "d" -> "").namespaces)
+      scope4.resolve(Declarations.from("b" -> "", "c" -> "", "d" -> ""))
     }
     expect(scope1) {
-      scope4.resolve(Map("" -> "", "a" -> "", "b" -> "", "c" -> "", "d" -> "").namespaces)
+      scope4.resolve(Declarations.from("" -> "", "a" -> "", "b" -> "", "c" -> "", "d" -> ""))
     }
-    expect(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d").scope) {
+    expect(Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
       scope4
     }
   }
 
   @Test def testResolveQName() {
-    val scope1 = Map[String, String]().scope
+    val scope1 = Scope.from()
 
     expect(Some(EName("book"))) {
       scope1.resolveQName(QName("book"))
@@ -182,7 +181,7 @@ class ScopeTest extends Suite {
       scope1.resolveQName(QName.parse("book:book"))
     }
 
-    val scope2 = Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d").scope
+    val scope2 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
     expect(Some(EName.parse("{http://a}book"))) {
       scope2.resolveQName(QName("book"))

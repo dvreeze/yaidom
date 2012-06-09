@@ -22,7 +22,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.Predef._
 
 /**
  * Query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat

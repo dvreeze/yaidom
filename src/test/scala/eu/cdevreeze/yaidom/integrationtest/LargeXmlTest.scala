@@ -27,7 +27,6 @@ import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.Predef._
 import parse._
 import print._
 

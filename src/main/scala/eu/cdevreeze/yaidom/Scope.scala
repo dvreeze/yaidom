@@ -123,6 +123,8 @@ object Scope {
   /** The "empty" `Scope` */
   val Empty = Scope(defaultNamespaceOption = None, prefixScope = Map())
 
+  def from(m: (String, String)*): Scope = fromMap(Map[String, String](m: _*))
+
   /** Parses the given `Map` into a `Scope`. The `Map` must follow the `Scope.toMap` format. */
   def fromMap(m: Map[String, String]): Scope = {
     require {
@@ -193,6 +195,8 @@ object Scope {
 
     /** The "empty" `Declarations` */
     val Empty = Declarations(declared = Scope.Empty, undeclaredOptionalPrefixes = Set())
+
+    def from(m: (String, String)*): Declarations = fromMap(Map[String, String](m: _*))
 
     def fromMap(m: Map[String, String]): Declarations = {
       require {

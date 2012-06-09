@@ -23,7 +23,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.Predef._
 
 /**
  * XLink test case.
@@ -76,6 +75,7 @@ class XLinkTest extends Suite {
 
   private val sampleXml: xlink.ExtendedLink = {
     import NodeBuilder._
+    import Scope._
 
     // Example from http://www.w3.org/TR/xlink/ (adapted)
     // In the original example, some xlink attributes are set in the DTD but not in the XML document. That's not supported here.
@@ -84,7 +84,7 @@ class XLinkTest extends Suite {
       elem(
         qname = QName("courseload"),
         attributes = Map(QName.parse("xlink:type") -> "extended"),
-        namespaces = Map("xlink" -> "http://www.w3.org/1999/xlink").namespaces,
+        namespaces = Declarations.from("xlink" -> "http://www.w3.org/1999/xlink"),
         children = List(
           elem(
             qname = QName("tooltip"),
