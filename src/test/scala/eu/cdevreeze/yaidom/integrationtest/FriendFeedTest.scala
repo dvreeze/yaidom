@@ -41,10 +41,8 @@ class FriendFeedTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  private val NsFriendFeedStats = {
-    // Bogus namespace
-    "http://friendfeed-stats"
-  }
+  // Bogus namespace
+  private val NsFriendFeedStats = "http://friendfeed-stats"
 
   private val statsScope = Scope.fromMap(Map("" -> NsFriendFeedStats.toString))
 
@@ -96,18 +94,21 @@ class FriendFeedTest extends Suite {
 
     val twitterSummaryElm: Elem = createServiceSummary(feedElm, "twitter")
 
-    val expectedTwitterSummaryElm: resolved.Elem =
-      resolved.Elem(
+    val expectedTwitterSummaryElm: resolved.Elem = {
+      import resolved._
+
+      Elem(
         EName("Service"),
         Map(EName("id") -> "twitter"),
-        immutable.IndexedSeq(
-          resolved.Elem(
+        Vector(
+          Elem(
             EName("UserList"),
             Map(),
-            immutable.IndexedSeq(
-              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("karlerikson"))),
-              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("asfaq"))),
-              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("chrisjlee")))))))
+            Vector(
+              Elem(EName("nickname"), Map(), Vector(Text("karlerikson"))),
+              Elem(EName("nickname"), Map(), Vector(Text("asfaq"))),
+              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
+    }
 
     expect(expectedTwitterSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
@@ -116,16 +117,19 @@ class FriendFeedTest extends Suite {
 
     val googleReaderSummaryElm: Elem = createServiceSummary(feedElm, "googlereader")
 
-    val expectedGoogleReaderSummaryElm: resolved.Elem =
-      resolved.Elem(
+    val expectedGoogleReaderSummaryElm: resolved.Elem = {
+      import resolved._
+
+      Elem(
         EName("Service"),
         Map(EName("id") -> "googlereader"),
-        immutable.IndexedSeq(
-          resolved.Elem(
+        Vector(
+          Elem(
             EName("UserList"),
             Map(),
-            immutable.IndexedSeq(
-              resolved.Elem(EName("nickname"), Map(), immutable.IndexedSeq(resolved.Text("misterjt")))))))
+            Vector(
+              Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
+    }
 
     expect(expectedGoogleReaderSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
@@ -157,13 +161,16 @@ class FriendFeedTest extends Suite {
 
     val statsElm: Elem = createStatistics(feedElm, List("twitter", "googlereader"))
 
-    val expectedStatsElm: resolved.Elem =
-      resolved.Elem(
+    val expectedStatsElm: resolved.Elem = {
+      import resolved._
+
+      Elem(
         EName(NsFriendFeedStats, "Stats"),
         Map(),
-        immutable.IndexedSeq(
-          resolved.Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"), immutable.IndexedSeq()),
-          resolved.Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"), immutable.IndexedSeq())))
+        Vector(
+          Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"), Vector()),
+          Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"), Vector())))
+    }
 
     expect(expectedStatsElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
@@ -176,8 +183,8 @@ class FriendFeedTest extends Suite {
 
     // 5. Creating statistics again, but now directly (yet inefficiently)
 
+    // Typical usage of yaidom, using a for-comprehension
     def getEntryServiceId(entryElm: Elem): String = {
-      // Typical usage of yaidom
       val result =
         for {
           serviceElm <- entryElm \ "service"
@@ -204,7 +211,6 @@ class FriendFeedTest extends Suite {
 
       Elem(
         qname = QName("Stats"),
-        attributes = Map(),
         scope = statsScope,
         children = serviceElms)
     }
@@ -270,8 +276,7 @@ class FriendFeedTest extends Suite {
     Elem(
       qname = QName("Service"),
       attributes = Map(QName("id") -> serviceName),
-      scope = Scope.Empty,
-      children = immutable.IndexedSeq(userListElm))
+      children = Vector(userListElm))
   }
 
   private def createStatisticsForService(feedElm: Elem, serviceName: String): Elem = {
@@ -294,7 +299,6 @@ class FriendFeedTest extends Suite {
 
     Elem(
       qname = QName("Stats"),
-      attributes = Map(),
       scope = statsScope,
       children = serviceStatisticsElms.toIndexedSeq)
   }
