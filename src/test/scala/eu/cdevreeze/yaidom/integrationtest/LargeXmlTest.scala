@@ -157,9 +157,20 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    val s = "b" * (2000 + 46)
+    expect(true) {
+      val phoneElms = rootElm \\ "phone" filter { e => e.text.size == 1000 }
+      phoneElms.size < 4000
+    }
+    expect(true) {
+      val phoneElms = rootElm \\ "phone" filter { e => e.text.size == 2046 }
+      phoneElms.size > 15000
+    }
+
+    val s = "b" * (1000)
 
     // Note: Do not take the durations logged below too literally. This is not a properly set up performance test in any way!
+
+    rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
 
     // Finding the fast way
     val start2Ms = System.currentTimeMillis()
