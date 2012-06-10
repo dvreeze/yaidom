@@ -174,7 +174,7 @@ class BasicXmlProcessingTest extends Suite {
 
       val albums = (artistElm \ "album") map { albumElm =>
         val title = albumElm.attribute(EName("title"))
-        val description = albumElm.getChildElemNamed(EName("description")).text
+        val description = albumElm.getChildElem(EName("description")).text
 
         val songs = (albumElm \ "song") map { songElm =>
           Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))

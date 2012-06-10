@@ -69,7 +69,6 @@ package eu.cdevreeze
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}
- * Note the implicit conversions from Strings to namespace URIs and to expanded names.
  *
  * The <em>for</em>-comprehension is equivalent to:
  * {{{
@@ -95,9 +94,6 @@ package eu.cdevreeze
  * </ol>
  * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
- *
- * In this package are some ("explicit" and therefore safe) implicit conversions, for treating a `String` as `QName`,
- * `EName` or `Namespace`, and for treating a `Map[String, String]` as `Scope.Declarations` or `Scope`.
  *
  * Parsing and printing of XML is not handled in this package. Even the `toString` methods for nodes
  * use the `NodeBuilder` DSL syntax rather than XML string syntax. Hence the complex details of character escaping,

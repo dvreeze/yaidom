@@ -242,8 +242,8 @@ class FriendFeedTest extends Suite {
     require(entryElm.localName == "entry")
 
     // Assuming precisely 1 "user" child elem with precisely 1 "nickname" child elem
-    // Now using method getChildElemNamed repeatedly
-    val nickNameElm = entryElm.getChildElemNamed(EName("user")).getChildElemNamed(EName("nickname"))
+    // Now using method getChildElem repeatedly
+    val nickNameElm = entryElm.getChildElem(EName("user")).getChildElem(EName("nickname"))
     nickNameElm.text.trim
   }
 

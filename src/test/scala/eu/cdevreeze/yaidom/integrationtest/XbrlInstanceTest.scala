@@ -195,16 +195,16 @@ object XbrlInstanceTest {
     require(wrappedElem ne null)
     require(wrappedElem.resolvedName == EName(nsXbrli, "context"))
     require(wrappedElem.attributeOption(EName("id")).isDefined)
-    require(wrappedElem.findChildElemNamed(EName(nsXbrli, "entity")).isDefined)
-    require(wrappedElem.findChildElemNamed(EName(nsXbrli, "period")).isDefined)
+    require(wrappedElem.findChildElem(EName(nsXbrli, "entity")).isDefined)
+    require(wrappedElem.findChildElem(EName(nsXbrli, "period")).isDefined)
 
     def id: String = wrappedElem.attribute(EName("id"))
 
-    def entity: Elem = wrappedElem.getChildElemNamed(EName(nsXbrli, "entity"))
+    def entity: Elem = wrappedElem.getChildElem(EName(nsXbrli, "entity"))
 
-    def period: Elem = wrappedElem.getChildElemNamed(EName(nsXbrli, "period"))
+    def period: Elem = wrappedElem.getChildElem(EName(nsXbrli, "period"))
 
-    def scenarioOption: Option[Elem] = wrappedElem.findChildElemNamed(EName(nsXbrli, "scenario"))
+    def scenarioOption: Option[Elem] = wrappedElem.findChildElem(EName(nsXbrli, "scenario"))
   }
 
   final class XbrlUnit(val wrappedElem: Elem) extends Immutable {

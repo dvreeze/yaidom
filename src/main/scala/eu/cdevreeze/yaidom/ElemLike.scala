@@ -50,18 +50,17 @@ import scala.collection.{ immutable, mutable }
  * Below follows a summary of those groups of `ElemLike` element collection retrieval methods:
  * <ul>
  * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
- * <li>'''Filtering on some EName''' (special case of the former): `filterChildElemsNamed`, `filterElemsNamed` and `filterElemsOrSelfNamed`</li>
+ * <li>'''Filtering on some EName''' (special case of the former): `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
  * <li>'''Finding topmost obeying some predicate''' (not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
- * <li>'''Finding topmost having some EName''' (special case of the former; not for child elements): `findTopmostElemsNamed` and `findTopmostElemsOrSelfNamed`</li>
+ * <li>'''Finding topmost having some EName''' (special case of the former; not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
  * </ul>
  *
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
  * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
  * <ul>
  * <li>'''Finding first obeying some predicate''' (depth-first search): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
- * <li>'''Finding first having some EName''' (special case of the former): `findChildElemNamed` and `getChildElemNamed`, `findElemNamed`
- * and `findElemOrSelfNamed`</li>
+ * <li>'''Finding first having some EName''' (special case of the former): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
  * </ul>
  *
  * These element (collection) retrieval methods process and return elements in depth-first order
@@ -119,7 +118,7 @@ import scala.collection.{ immutable, mutable }
  *
  * Each method taking an EName trivially corresponds to a call to a method taking a predicate. For example:
  * {{{
- * e.filterElemsOrSelfNamed(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
+ * e.filterElemsOrSelf(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
  * }}}
  * Finally, the methods returning at most one element trivially correspond to expressions containing calls to element collection
  * retrieval methods. For example (in the absence of side-effects) the following holds:
@@ -158,10 +157,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
 
   /** Returns the child elements with the given expanded name */
-  final def filterChildElemsNamed(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
+  final def filterChildElems(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
-  /** Shorthand for `filterChildElemsNamed(expandedName)`. */
-  final def \(expandedName: EName): immutable.IndexedSeq[E] = filterChildElemsNamed(expandedName)
+  /** Shorthand for `filterChildElems(expandedName)`. */
+  final def \(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems(expandedName)
 
   /** Shorthand for `filterChildElems { _.resolvedName.localPart == localName }`. */
   final def \(localName: String): immutable.IndexedSeq[E] = filterChildElems { _.resolvedName.localPart == localName }
@@ -176,7 +175,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the first found child element with the given expanded name, if any, wrapped in an `Option` */
-  final def findChildElemNamed(expandedName: EName): Option[E] = {
+  final def findChildElem(expandedName: EName): Option[E] = {
     findChildElem { e => e.resolvedName == expandedName }
   }
 
@@ -188,8 +187,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the single child element with the given expanded name, and throws an exception otherwise */
-  final def getChildElemNamed(expandedName: EName): E = {
-    val result = filterChildElemsNamed(expandedName)
+  final def getChildElem(expandedName: EName): E = {
+    val result = filterChildElems(expandedName)
     require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.head
   }
@@ -229,10 +228,10 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
   /** Returns the descendant-or-self elements that have the given expanded name */
-  final def filterElemsOrSelfNamed(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
+  final def filterElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
 
-  /** Shorthand for `filterElemsOrSelfNamed(expandedName)`. */
-  final def \\(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelfNamed(expandedName)
+  /** Shorthand for `filterElemsOrSelf(expandedName)`. */
+  final def \\(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf(expandedName)
 
   /** Shorthand for `filterElemsOrSelf { _.resolvedName.localPart == localName }`. */
   final def \\(localName: String): immutable.IndexedSeq[E] = filterElemsOrSelf { _.resolvedName.localPart == localName }
@@ -248,7 +247,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
 
   /** Returns the descendant elements with the given expanded name */
-  final def filterElemsNamed(expandedName: EName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
+  final def filterElems(expandedName: EName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
 
   /** Returns (the equivalent of) `findAllElems collect pf` */
   final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
@@ -275,11 +274,11 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
-  final def findTopmostElemsOrSelfNamed(expandedName: EName): immutable.IndexedSeq[E] =
+  final def findTopmostElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] =
     findTopmostElemsOrSelf { e => e.resolvedName == expandedName }
 
-  /** Shorthand for `findTopmostElemsOrSelfNamed(expandedName)`. */
-  final def \\!(expandedName: EName): immutable.IndexedSeq[E] = findTopmostElemsOrSelfNamed(expandedName)
+  /** Shorthand for `findTopmostElemsOrSelf(expandedName)`. */
+  final def \\!(expandedName: EName): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(expandedName)
 
   /** Shorthand for `findTopmostElemsOrSelf { _.resolvedName.localPart == localName }`. */
   final def \\!(localName: String): immutable.IndexedSeq[E] = findTopmostElemsOrSelf { _.resolvedName.localPart == localName }
@@ -289,7 +288,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  final def findTopmostElemsNamed(expandedName: EName): immutable.IndexedSeq[E] =
+  final def findTopmostElems(expandedName: EName): immutable.IndexedSeq[E] =
     findTopmostElems { e => e.resolvedName == expandedName }
 
   /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
@@ -321,11 +320,11 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   }
 
   /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */
-  final def findElemOrSelfNamed(expandedName: EName): Option[E] =
+  final def findElemOrSelf(expandedName: EName): Option[E] =
     findElemOrSelf { e => e.resolvedName == expandedName }
 
   /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
-  final def findElemNamed(expandedName: EName): Option[E] =
+  final def findElem(expandedName: EName): Option[E] =
     findElem { e => e.resolvedName == expandedName }
 
   /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
@@ -335,7 +334,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.
    */
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
-    val relevantChildElms = self.filterChildElemsNamed(entry.elementName)
+    val relevantChildElms = self.filterChildElems(entry.elementName)
 
     if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
   }
@@ -383,7 +382,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * The implementation uses the equals method on the self type.
    */
   final def ownElemPathEntry(parent: E): ElemPath.Entry = {
-    val idx = parent.filterChildElemsNamed(self.resolvedName) indexWhere { e => e == self }
+    val idx = parent.filterChildElems(self.resolvedName) indexWhere { e => e == self }
     require(idx >= 0, "Expected %s to have parent %s".format(self.toString, parent.toString))
     ElemPath.Entry(self.resolvedName, idx)
   }

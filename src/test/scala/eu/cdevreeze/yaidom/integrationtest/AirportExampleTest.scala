@@ -422,12 +422,12 @@ class AirportExampleTest extends Suite {
   private def airportLatitude(e: Elem): Double = {
     require(e.resolvedName == EName(nsWebServiceX, "Table"))
 
-    val degree = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeDegree")).trimmedText.toDouble
-    val minute = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeMinute")).trimmedText.toDouble
-    val second = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeSecond")).trimmedText.toDouble
+    val degree = e.getChildElem(EName(nsWebServiceX, "LatitudeDegree")).trimmedText.toDouble
+    val minute = e.getChildElem(EName(nsWebServiceX, "LatitudeMinute")).trimmedText.toDouble
+    val second = e.getChildElem(EName(nsWebServiceX, "LatitudeSecond")).trimmedText.toDouble
 
     val north = {
-      val result = e.getChildElemNamed(EName(nsWebServiceX, "LatitudeNpeerS")).trimmedText
+      val result = e.getChildElem(EName(nsWebServiceX, "LatitudeNpeerS")).trimmedText
       (result != "S")
     }
 
@@ -438,12 +438,12 @@ class AirportExampleTest extends Suite {
   private def airportLongitude(e: Elem): Double = {
     require(e.resolvedName == EName(nsWebServiceX, "Table"))
 
-    val degree = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeDegree")).trimmedText.toDouble
-    val minute = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeMinute")).trimmedText.toDouble
-    val second = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeSeconds")).trimmedText.toDouble
+    val degree = e.getChildElem(EName(nsWebServiceX, "LongitudeDegree")).trimmedText.toDouble
+    val minute = e.getChildElem(EName(nsWebServiceX, "LongitudeMinute")).trimmedText.toDouble
+    val second = e.getChildElem(EName(nsWebServiceX, "LongitudeSeconds")).trimmedText.toDouble
 
     val east = {
-      val result = e.getChildElemNamed(EName(nsWebServiceX, "LongitudeEperW")).trimmedText
+      val result = e.getChildElem(EName(nsWebServiceX, "LongitudeEperW")).trimmedText
       (result != "W")
     }
 
@@ -454,7 +454,7 @@ class AirportExampleTest extends Suite {
   private def airportCode(e: Elem): String = {
     require(e.resolvedName == EName(nsWebServiceX, "Table"))
 
-    e.getChildElemNamed(EName(nsWebServiceX, "AirportCode")).trimmedText
+    e.getChildElem(EName(nsWebServiceX, "AirportCode")).trimmedText
   }
 
   final case class LatLon(val lat: Double, val lon: Double) {

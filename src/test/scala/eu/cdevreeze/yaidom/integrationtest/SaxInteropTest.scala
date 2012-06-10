@@ -70,7 +70,7 @@ class SaxInteropTest extends Suite {
       (root.findAllElemsOrSelf map (e => e.localName)).toSet
     }
     expect(8) {
-      root.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size
+      root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect(3) {
       val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
@@ -97,8 +97,8 @@ class SaxInteropTest extends Suite {
     expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root2.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size) {
-      root2.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size
+    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      root2.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
       val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
@@ -118,8 +118,8 @@ class SaxInteropTest extends Suite {
     expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root3.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size) {
-      root3.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size
+    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      root3.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
       val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
@@ -150,8 +150,8 @@ class SaxInteropTest extends Suite {
     expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root4.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size) {
-      root4.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size
+    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      root4.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
       val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
@@ -171,8 +171,8 @@ class SaxInteropTest extends Suite {
     expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root5.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size) {
-      root5.filterElemsOrSelfNamed(EName(nsBookstore, "Title")).size
+    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      root5.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
       val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
@@ -383,7 +383,7 @@ class SaxInteropTest extends Suite {
       }
 
       val forChoiceDefDocumentation: String =
-        forChoiceDefOption.get.filterElemsNamed(EName(ns, "documentation")) flatMap { e => e.trimmedText } mkString ""
+        forChoiceDefOption.get.filterElems(EName(ns, "documentation")) flatMap { e => e.trimmedText } mkString ""
 
       expect("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
@@ -395,8 +395,8 @@ class SaxInteropTest extends Suite {
     def checkCommentWithEscapedChar(rootElm: Elem): Unit = {
       val documentationElms =
         for {
-          annotationElm <- rootElm.filterChildElemsNamed(EName(ns, "annotation"))
-          documentationElm <- annotationElm.filterChildElemsNamed(EName(ns, "documentation"))
+          annotationElm <- rootElm.filterChildElems(EName(ns, "annotation"))
+          documentationElm <- annotationElm.filterChildElems(EName(ns, "documentation"))
         } yield documentationElm
 
       val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
@@ -427,7 +427,7 @@ class SaxInteropTest extends Suite {
         identityConstraintElms.size
       }
 
-      val selectorElms = identityConstraintElms.head.filterChildElemsNamed(EName(ns, "selector"))
+      val selectorElms = identityConstraintElms.head.filterChildElems(EName(ns, "selector"))
 
       expect(1) {
         selectorElms.size
@@ -452,13 +452,13 @@ class SaxInteropTest extends Suite {
         complexTypeElms.size
       }
 
-      val extensionElms = complexTypeElms.head.filterElemsNamed(EName(ns, "extension"))
-      val sequenceElms = complexTypeElms.head.filterElemsNamed(EName(ns, "sequence"))
-      val choiceElms = complexTypeElms.head.filterElemsNamed(EName(ns, "choice"))
-      val elementElms = complexTypeElms.head.filterElemsNamed(EName(ns, "element"))
-      val groupElms = complexTypeElms.head.filterElemsNamed(EName(ns, "group"))
-      val attributeElms = complexTypeElms.head.filterElemsNamed(EName(ns, "attribute"))
-      val attributeGroupElms = complexTypeElms.head.filterElemsNamed(EName(ns, "attributeGroup"))
+      val extensionElms = complexTypeElms.head.filterElems(EName(ns, "extension"))
+      val sequenceElms = complexTypeElms.head.filterElems(EName(ns, "sequence"))
+      val choiceElms = complexTypeElms.head.filterElems(EName(ns, "choice"))
+      val elementElms = complexTypeElms.head.filterElems(EName(ns, "element"))
+      val groupElms = complexTypeElms.head.filterElems(EName(ns, "group"))
+      val attributeElms = complexTypeElms.head.filterElems(EName(ns, "attribute"))
+      val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
       expect(Set(EName("base"))) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.keySet }
@@ -509,7 +509,7 @@ class SaxInteropTest extends Suite {
           e.attributeOption(EName("id")) == Some("field")
       }
 
-      val patternElms = fieldElms flatMap { e => e.filterElemsNamed(EName(ns, "pattern")) }
+      val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
 
       expect(1) {
         patternElms.size
@@ -582,7 +582,7 @@ class SaxInteropTest extends Suite {
     }
 
     def checkChildText(rootElm: Elem): Unit = {
-      val childOption = rootElm.findElemNamed(EName(ns, "child"))
+      val childOption = rootElm.findElem(EName(ns, "child"))
       expect(true) {
         childOption.isDefined
       }
@@ -693,7 +693,7 @@ class SaxInteropTest extends Suite {
     }
 
     def doChecks(rootElm: Elem): Unit = {
-      val childElms = rootElm.findTopmostElemsNamed(EName(ns, "child"))
+      val childElms = rootElm.findTopmostElems(EName(ns, "child"))
       expect(2) {
         childElms.size
       }
@@ -770,7 +770,7 @@ class SaxInteropTest extends Suite {
     }
 
     def doChecks(rootElm: Elem): Unit = {
-      val childElms = rootElm.findTopmostElemsNamed(EName(ns, "child"))
+      val childElms = rootElm.findTopmostElems(EName(ns, "child"))
       expect(2) {
         childElms.size
       }
@@ -840,16 +840,16 @@ class SaxInteropTest extends Suite {
 
     def bookHtmlString(bookElm: Elem): String = {
       val authorNames: immutable.IndexedSeq[String] =
-        bookElm.filterElemsNamed(EName.parse("{http://bookstore}Author")) map { e =>
+        bookElm.filterElems(EName.parse("{http://bookstore}Author")) map { e =>
           "%s %s".format(
-            e.getChildElemNamed(EName.parse("{http://bookstore}First_Name")).trimmedText,
-            e.getChildElemNamed(EName.parse("{http://bookstore}Last_Name")).trimmedText)
+            e.getChildElem(EName.parse("{http://bookstore}First_Name")).trimmedText,
+            e.getChildElem(EName.parse("{http://bookstore}Last_Name")).trimmedText)
         }
 
       val authors = authorNames.mkString(", ")
 
       val result = bookFormatString.format(
-        bookElm.getChildElemNamed(EName.parse("{http://bookstore}Title")).trimmedText,
+        bookElm.getChildElem(EName.parse("{http://bookstore}Title")).trimmedText,
         bookElm.attributeOption(EName("ISBN")).getOrElse(""),
         bookElm.attributeOption(EName("Edition")).getOrElse(""),
         authors,
@@ -857,7 +857,7 @@ class SaxInteropTest extends Suite {
       result
     }
 
-    val booksHtmlString = root.filterElemsNamed(EName.parse("{http://bookstore}Book")) map { e => bookHtmlString(e) } mkString ("\n")
+    val booksHtmlString = root.filterElems(EName.parse("{http://bookstore}Book")) map { e => bookHtmlString(e) } mkString ("\n")
     val htmlString = htmlFormatString.format(booksHtmlString)
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
@@ -866,20 +866,20 @@ class SaxInteropTest extends Suite {
 
     // 4. Check the parsed HTML
 
-    val tableRowElms = htmlRoot.filterElemsNamed(EName("tr")).drop(1)
+    val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
 
     expect(4) {
       tableRowElms.size
     }
 
-    val isbnElms = tableRowElms flatMap { rowElm => rowElm.filterChildElemsNamed(EName("td")).drop(1).headOption }
+    val isbnElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(1).headOption }
     val isbns = isbnElms map { e => e.trimmedText }
 
     expect(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
       isbns.toSet
     }
 
-    val authorsElms = tableRowElms flatMap { rowElm => rowElm.filterChildElemsNamed(EName("td")).drop(3).headOption }
+    val authorsElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(3).headOption }
     val authors = authorsElms map { e => e.trimmedText }
 
     expect(Set(
@@ -1032,7 +1032,7 @@ class SaxInteropTest extends Suite {
     val doc = saxParser.parse(classOf[SaxInteropTest].getResourceAsStream("badHtmlExample.html"))
 
     val root = doc.documentElement
-    val ulElms = root.filterElemsNamed(EName("ul"))
+    val ulElms = root.filterElems(EName("ul"))
 
     expect(1) {
       ulElms.size
@@ -1061,7 +1061,7 @@ class SaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed HTML file as Elem
 
-    val ulElms2 = root2.filterElemsNamed(EName("ul"))
+    val ulElms2 = root2.filterElems(EName("ul"))
 
     expect(1) {
       ulElms2.size
@@ -1080,7 +1080,7 @@ class SaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    val ulElms3 = root3.filterElemsNamed(EName("ul"))
+    val ulElms3 = root3.filterElems(EName("ul"))
 
     expect(1) {
       ulElms3.size

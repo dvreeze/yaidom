@@ -100,10 +100,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
       (i % 5) match {
         case 0 =>
-          val firstNameElms = doc.documentElement.filterElemsNamed(EName("firstName"))
+          val firstNameElms = doc.documentElement.filterElems(EName("firstName"))
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
         case 1 =>
-          val lastNameElms = doc.documentElement.filterElemsNamed(EName("lastName"))
+          val lastNameElms = doc.documentElement.filterElems(EName("lastName"))
           logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
         case 2 =>
           val contactElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == EName("contact") }
