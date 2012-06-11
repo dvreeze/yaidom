@@ -171,6 +171,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Note: Do not take the durations logged below too literally. This is not a properly set up performance test in any way!
 
     rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
+    rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
+    (rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
+    (rootElm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
+    (rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
 
     // Finding the fast way
     val start2Ms = System.currentTimeMillis()
