@@ -84,7 +84,7 @@ package eu.cdevreeze
  * <ol>
  * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.EName]] and
  * [[eu.cdevreeze.yaidom.Scope]]. At the same level is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]], which partly implements "element nodes".</li>
+ * <li>Trait [[eu.cdevreeze.yaidom.ElemLike]], which partly implements "element nodes". This trait offers the core yaidom querying API.</li>
  * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
  * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned trait `ElemLike`).</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].

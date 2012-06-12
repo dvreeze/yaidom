@@ -191,6 +191,43 @@ class QueryTest extends Suite {
     }
   }
 
+  @Test def testQueryCheapBookAuthors() {
+    // Own example..
+
+    require(bookstore.localName == "Bookstore")
+
+    val cheapBookElms =
+      for {
+        bookElm <- bookstore \ "Book"
+        price = bookElm.attribute(EName("Price"))
+        if price.toInt < 90
+      } yield bookElm
+
+    val cheapBookAuthors = {
+      val result =
+        for {
+          cheapBookElm <- cheapBookElms
+          authorElm <- cheapBookElm \\ "Author"
+        } yield {
+          val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
+          val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
+
+          val firstName = firstNameElmOption.map(_.text).getOrElse("")
+          val lastName = lastNameElmOption.map(_.text).getOrElse("")
+          (firstName + " " + lastName).trim
+        }
+
+      result.toSet
+    }
+
+    expect(Set(
+      "Jeffrey Ullman",
+      "Jennifer Widom",
+      "Hector Garcia-Molina")) {
+      cheapBookAuthors
+    }
+  }
+
   @Test def testQueryTitlesOfBooksWithRemarks() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
 

@@ -23,6 +23,55 @@ import scala.collection.{ immutable, mutable }
  * It is also used for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]], such as
  * [[eu.cdevreeze.yaidom.resolved.Elem]].
  *
+ * Example usage (where the `text` method is not offered by the `ElemLike` API itself):
+ * {{{
+ * val bookstoreElm = doc.documentElement
+ * require(bookstoreElm.localName == "Bookstore")
+ *
+ * val cheapBookElms =
+ *   for {
+ *     bookElm <- bookstoreElm \ "Book"
+ *     price = bookElm.attribute(EName("Price"))
+ *     if price.toInt < 90
+ *   } yield bookElm
+ *
+ * val cheapBookAuthors = {
+ *   val result =
+ *     for {
+ *       cheapBookElm <- cheapBookElms
+ *       authorElm <- cheapBookElm \\ "Author"
+ *     } yield {
+ *       val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
+ *       val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
+ *
+ *       val firstName = firstNameElmOption.map(_.text).getOrElse("")
+ *       val lastName = lastNameElmOption.map(_.text).getOrElse("")
+ *       (firstName + " " + lastName).trim
+ *     }
+ *
+ *   result.toSet
+ * }
+ * }}}
+ *
+ * Above, shorthand operator notation is used for querying child elements and descendant-or-self elements.
+ * {{{
+ * bookstoreElm \ "Book"
+ * }}}
+ * is equivalent to:
+ * {{{
+ * bookstoreElm filterChildElems { _.localName == "Book" }
+ * }}}
+ * Moreover:
+ * {{{
+ * cheapBookElm \\ "Author"
+ * }}}
+ * is equivalent to:
+ * {{{
+ * cheapBookElm filterElemsOrSelf { _.localName == "Author" }
+ * }}}
+ *
+ * ==ElemLike more formally==
+ *
  * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
@@ -45,15 +94,13 @@ import scala.collection.{ immutable, mutable }
  * }
  * }}}
  * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should in theory
- * be enough for all element collection needs. For conciseness and performance, there are more element (collection) retrieval methods.
+ * be enough for all element collection needs. For conciseness (and performance), there are more element (collection) retrieval methods.
  *
  * Below follows a summary of those groups of `ElemLike` element collection retrieval methods:
  * <ul>
  * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
- * <li>'''Filtering on some EName''' (special case of the former): `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
  * <li>'''Finding topmost obeying some predicate''' (not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
- * <li>'''Finding topmost having some EName''' (special case of the former; not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
  * </ul>
  *
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
@@ -144,6 +191,9 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemLike` methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
+  /** The local name (or local part). Convenience method. */
+  final def localName: String = resolvedName.localPart
+
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */
   final def attributeOption(expandedName: EName): Option[String] = resolvedAttributes.get(expandedName)
 
@@ -162,8 +212,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Shorthand for `filterChildElems(expandedName)`. */
   final def \(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems(expandedName)
 
-  /** Shorthand for `filterChildElems { _.resolvedName.localPart == localName }`. */
-  final def \(localName: String): immutable.IndexedSeq[E] = filterChildElems { _.resolvedName.localPart == localName }
+  /** Shorthand for `filterChildElems { _.localName == localName }`. */
+  final def \(localName: String): immutable.IndexedSeq[E] = filterChildElems { _.localName == localName }
 
   /** Returns `allChildElems collect pf` */
   final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
@@ -233,8 +283,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Shorthand for `filterElemsOrSelf(expandedName)`. */
   final def \\(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf(expandedName)
 
-  /** Shorthand for `filterElemsOrSelf { _.resolvedName.localPart == localName }`. */
-  final def \\(localName: String): immutable.IndexedSeq[E] = filterElemsOrSelf { _.resolvedName.localPart == localName }
+  /** Shorthand for `filterElemsOrSelf { _.localName == localName }`. */
+  final def \\(localName: String): immutable.IndexedSeq[E] = filterElemsOrSelf { _.localName == localName }
 
   /** Returns (the equivalent of) `findAllElemsOrSelf collect pf` */
   final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
@@ -280,8 +330,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Shorthand for `findTopmostElemsOrSelf(expandedName)`. */
   final def \\!(expandedName: EName): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(expandedName)
 
-  /** Shorthand for `findTopmostElemsOrSelf { _.resolvedName.localPart == localName }`. */
-  final def \\!(localName: String): immutable.IndexedSeq[E] = findTopmostElemsOrSelf { _.resolvedName.localPart == localName }
+  /** Shorthand for `findTopmostElemsOrSelf { _.localName == localName }`. */
+  final def \\!(localName: String): immutable.IndexedSeq[E] = findTopmostElemsOrSelf { _.localName == localName }
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =

@@ -264,9 +264,6 @@ final class Elem(
     }
   }
 
-  /** The local name (or local part). Convenience method. */
-  def localName: String = qname.localPart
-
   /** Returns all child elements */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
