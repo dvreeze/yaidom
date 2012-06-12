@@ -40,10 +40,18 @@ Some characteristics of yaidom are:
   *  Namespaces are first-class citizens in the API
   *  DTDs are not first-class citizens
 
+* **Element-centric querying**
+
+  *  Querying is offered by the ElemLike (implementation) trait (used together with the Scala Collections API)
+  *  This trait is centered around elements only, which keeps this API simple (but still powerful)
+  *  Other nodes (text, comments, etc.) are queried by querying for their parent elements
+  *  Most ElemLike methods return/filter/transform elements in one of 3 "core" element sets: child elements, descendant elements, or descendant-or-self elements
+  *  The ElemLike trait makes yaidom extensible, facilitating the definition of custom element trees
+
 * **Conceptually simple**
 
-  *  Few new concepts to learn and understand
-  *  Also easy to implement
+  *  Few concepts in the API to learn and understand
+  *  Also easy to implement, which helps in avoiding many hard to fix bugs
   *  Less ambitious than Scala's XML library and Anti-XML (no XPath-like support, no value equality)
   *  Leaves many hard parts to Java's JAXP, such as parsing and printing, but via easy to use wrappers
   *  Good interop with Java
