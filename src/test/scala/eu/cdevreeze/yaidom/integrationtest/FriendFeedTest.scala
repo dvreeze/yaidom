@@ -98,16 +98,16 @@ class FriendFeedTest extends Suite {
       import resolved._
 
       Elem(
-        EName("Service"),
-        Map(EName("id") -> "twitter"),
-        Vector(
+        resolvedName = EName("Service"),
+        resolvedAttributes = Map(EName("id") -> "twitter"),
+        children = Vector(
           Elem(
-            EName("UserList"),
-            Map(),
-            Vector(
-              Elem(EName("nickname"), Map(), Vector(Text("karlerikson"))),
-              Elem(EName("nickname"), Map(), Vector(Text("asfaq"))),
-              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
+            resolvedName = EName("UserList"),
+            resolvedAttributes = Map(),
+            children = Vector(
+              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(Text("karlerikson"))),
+              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(Text("asfaq"))),
+              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(Text("chrisjlee")))))))
     }
 
     expect(expectedTwitterSummaryElm) {
@@ -121,14 +121,14 @@ class FriendFeedTest extends Suite {
       import resolved._
 
       Elem(
-        EName("Service"),
-        Map(EName("id") -> "googlereader"),
-        Vector(
+        resolvedName = EName("Service"),
+        resolvedAttributes = Map(EName("id") -> "googlereader"),
+        children = Vector(
           Elem(
-            EName("UserList"),
-            Map(),
-            Vector(
-              Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
+            resolvedName = EName("UserList"),
+            resolvedAttributes = Map(),
+            children = Vector(
+              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(resolved.Text("misterjt")))))))
     }
 
     expect(expectedGoogleReaderSummaryElm) {
@@ -165,11 +165,17 @@ class FriendFeedTest extends Suite {
       import resolved._
 
       Elem(
-        EName(NsFriendFeedStats, "Stats"),
-        Map(),
-        Vector(
-          Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"), Vector()),
-          Elem(EName(NsFriendFeedStats, "Service"), Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"), Vector())))
+        resolvedName = EName(NsFriendFeedStats, "Stats"),
+        resolvedAttributes = Map(),
+        children = Vector(
+          Elem(
+            resolvedName = EName(NsFriendFeedStats, "Service"),
+            resolvedAttributes = Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
+            children = Vector()),
+          Elem(
+            resolvedName = EName(NsFriendFeedStats, "Service"),
+            resolvedAttributes = Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
+            children = Vector())))
     }
 
     expect(expectedStatsElm) {
@@ -232,7 +238,7 @@ class FriendFeedTest extends Suite {
 
     entryElms filter { entryElm =>
       // Assuming precisely 1 "service" child elem with precisely 1 "id" child elem
-      // Using method getChildElem repeatedly
+      // Using method getChildElem (taking a predicate on elements) repeatedly
       val serviceIdElm = entryElm getChildElem { _.localName == "service" } getChildElem { _.localName == "id" }
       serviceIdElm.text.trim == serviceName
     }
@@ -242,7 +248,7 @@ class FriendFeedTest extends Suite {
     require(entryElm.localName == "entry")
 
     // Assuming precisely 1 "user" child elem with precisely 1 "nickname" child elem
-    // Now using method getChildElem repeatedly
+    // Now using method getChildElem (taking an EName) repeatedly
     val nickNameElm = entryElm.getChildElem(EName("user")).getChildElem(EName("nickname"))
     nickNameElm.text.trim
   }
