@@ -17,9 +17,11 @@
 package eu.cdevreeze.yaidom
 package parse
 
-import java.{ io => jio }
+import java.{ io => jio, util => jutil }
 import javax.xml.stream.{ XMLInputFactory, XMLEventReader }
 import javax.xml.stream.events.XMLEvent
+import scala.collection.immutable
+import scala.collection.JavaConverters._
 import scala.util.control.Exception._
 import convert.StaxConversions._
 
@@ -67,7 +69,7 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends D
     var xmlEventReader: XMLEventReader = null
     try {
       xmlEventReader = inputFactory.createXMLEventReader(inputStream)
-      convertToDocument(xmlEventReader.toIndexedSeq)
+      convertToDocument(toIndexedSeq(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
         if (xmlEventReader ne null) xmlEventReader.close()
@@ -76,6 +78,10 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends D
         if (inputStream ne null) inputStream.close()
       }
     }
+  }
+
+  private def toIndexedSeq(xmlEventReader: XMLEventReader): immutable.IndexedSeq[XMLEvent] = {
+    xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]].asScala.toIndexedSeq
   }
 }
 

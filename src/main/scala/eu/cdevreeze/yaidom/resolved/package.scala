@@ -41,14 +41,6 @@ package eu.cdevreeze.yaidom
  * val resolvedRootElm = resolved.Elem(rootElm)
  * }}}
  *
- * Or:
- * {{{
- * import eu.cdevreeze.yaidom.resolved
- * import eu.cdevreeze.yaidom.resolved.Predef._
- *
- * val resolvedRootElm = rootElm.resolvedElem
- * }}}
- *
  * @author Chris de Vreeze
  */
 package object resolved

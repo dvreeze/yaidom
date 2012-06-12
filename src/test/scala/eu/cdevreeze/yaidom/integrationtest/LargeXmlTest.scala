@@ -84,9 +84,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info("Parsing (into a Document) took %d ms".format(endMs - startMs))
 
-    import resolved.Predef.toResolvedElem
-
-    val resolvedRoot = doc.documentElement.resolvedElem
+    val resolvedRoot = resolved.Elem(doc.documentElement)
     doTest(resolvedRoot)
   }
 

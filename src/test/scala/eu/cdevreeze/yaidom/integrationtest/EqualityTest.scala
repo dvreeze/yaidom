@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.resolved.Predef._
 
 /**
  * Node equality test case.
@@ -78,8 +77,8 @@ class EqualityTest extends Suite {
 
     // 4. Check that the `resolved` trees (after removing element content whitespace) are equal
 
-    val resolvedRoot1 = root1.resolvedElem
-    val resolvedRoot2 = root2.resolvedElem
+    val resolvedRoot1 = resolved.Elem(root1)
+    val resolvedRoot2 = resolved.Elem(root2)
 
     assert(resolvedRoot1.children.size > resolvedRoot2.children.size)
     assert(resolvedRoot1.textChildren.size > resolvedRoot2.textChildren.size)
@@ -115,7 +114,7 @@ class EqualityTest extends Suite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = root.resolvedElem
+    val resolvedRoot = resolved.Elem(root)
 
     expect(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { _.resolvedName }
@@ -140,7 +139,7 @@ class EqualityTest extends Suite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = root.resolvedElem
+    val resolvedRoot = resolved.Elem(root)
 
     expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
@@ -201,7 +200,7 @@ class EqualityTest extends Suite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = root.resolvedElem
+    val resolvedRoot = resolved.Elem(root)
 
     expect(xsElmENames) {
       val result = resolvedRoot filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema.toString) } map { e => e.resolvedName }
@@ -248,8 +247,8 @@ class EqualityTest extends Suite {
 
     // 2. Now check equalities for `resolved` counterparts
 
-    val resolvedRoot1 = root1.resolvedElem
-    val resolvedRoot2 = root2.resolvedElem
+    val resolvedRoot1 = resolved.Elem(root1)
+    val resolvedRoot2 = resolved.Elem(root2)
 
     expect(false) {
       resolvedRoot1 == resolvedRoot2
@@ -270,7 +269,7 @@ class EqualityTest extends Suite {
         e.withChildren(newChildren)
     }
 
-    val resolvedRoot3 = root3.resolvedElem
+    val resolvedRoot3 = resolved.Elem(root3)
 
     val adaptedResolvedRoot1 = resolvedRoot1.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     val adaptedResolvedRoot3 = resolvedRoot3.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
@@ -301,7 +300,7 @@ class EqualityTest extends Suite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = root.resolvedElem
+    val resolvedRoot = resolved.Elem(root)
 
     expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
@@ -344,11 +343,11 @@ class EqualityTest extends Suite {
     // Check equalities
 
     expect(false) {
-      root1.resolvedElem == root2.resolvedElem
+      resolved.Elem(root1) == resolved.Elem(root2)
     }
 
-    expect(root1.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      root2.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    expect(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
 
@@ -386,15 +385,15 @@ class EqualityTest extends Suite {
     // Check equalities
 
     expect(false) {
-      root1.resolvedElem == root2.resolvedElem
+      resolved.Elem(root1) == resolved.Elem(root2)
     }
 
-    expect(root1.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      root2.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    expect(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
 
-    expect(root1.resolvedElem.removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      root2.resolvedElem.removeAllInterElementWhitespace.coalesceAllAdjacentText.normalizeAllText
+    expect(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAllAdjacentText.normalizeAllText
     }
   }
 }
