@@ -217,7 +217,7 @@ object XbrlInstanceTest {
 
   abstract class XbrlFact(val wrappedElem: Elem) extends Immutable {
     require(wrappedElem ne null)
-    require(!Set(Option(nsXbrli.toString), Option(nsLink.toString)).contains(wrappedElem.resolvedName.namespaceUriOption))
+    require(!Set(Option(nsXbrli), Option(nsLink)).contains(wrappedElem.resolvedName.namespaceUriOption))
   }
 
   object XbrlFact {
@@ -255,7 +255,7 @@ object XbrlInstanceTest {
       val childElms = root.allChildElems
 
       if (!childElms.contains(e)) false else {
-        !Set(nsXbrli.toString, nsLink.toString).contains(e.resolvedName.namespaceUriOption.getOrElse(nsXbrli.toString))
+        !Set(nsXbrli, nsLink).contains(e.resolvedName.namespaceUriOption.getOrElse(nsXbrli))
       }
     }
 

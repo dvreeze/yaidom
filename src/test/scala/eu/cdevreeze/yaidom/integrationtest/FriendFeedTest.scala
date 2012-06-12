@@ -44,7 +44,7 @@ class FriendFeedTest extends Suite {
   // Bogus namespace
   private val NsFriendFeedStats = "http://friendfeed-stats"
 
-  private val statsScope = Scope.fromMap(Map("" -> NsFriendFeedStats.toString))
+  private val statsScope = Scope.fromMap(Map("" -> NsFriendFeedStats))
 
   @Test def testFilterFeedProcessing() {
     // Note the functional expression-oriented programming style, with many small expressions assigned to val variables.

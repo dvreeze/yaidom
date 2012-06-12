@@ -335,7 +335,7 @@ class StaxInteropTest extends Suite {
         EName(ns, "notation"))
 
     expect(xsElmENames) {
-      val result = root filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema.toString) } map { e => e.resolvedName }
+      val result = root filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     // Remember, coalescing is set to true!
@@ -509,7 +509,7 @@ class StaxInteropTest extends Suite {
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(xsElmENames) {
-      val result = root2 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema.toString) } map { e => e.resolvedName }
+      val result = root2 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {
@@ -528,7 +528,7 @@ class StaxInteropTest extends Suite {
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
     expect(xsElmENames) {
-      val result = root3 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema.toString) } map { e => e.resolvedName }
+      val result = root3 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {

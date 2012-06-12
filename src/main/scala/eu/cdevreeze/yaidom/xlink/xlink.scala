@@ -36,7 +36,7 @@ sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
   def xlinkType: String = wrappedElem.attributeOption(XLinkTypeEName).getOrElse("simple")
 
   def xlinkAttributes: Map[EName, String] =
-    wrappedElem.resolvedAttributes filterKeys { a => a.namespaceUriOption == Some(XLinkNamespace.toString) }
+    wrappedElem.resolvedAttributes filterKeys { a => a.namespaceUriOption == Some(XLinkNamespace) }
 }
 
 /** Simple or extended link */
