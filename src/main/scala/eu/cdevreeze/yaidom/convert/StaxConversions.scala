@@ -32,7 +32,7 @@ import scala.collection.JavaConverters._
  *
  * val xmlInputFactory = XMLInputFactory.newFactory
  * val xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
- * val root: Elem = convertToElem(xmlEventReader.toIndexedSeq)
+ * val root: Elem = convertToElem(toIndexedSeq(xmlEventReader)) // assuming a method toIndexedSeq
  *
  * xmlEventReader.close()
  * }}}

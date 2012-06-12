@@ -140,8 +140,8 @@ final class Document(
   /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
   def updated(path: ElemPath)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
 
-  /** Returns `updated(path) { e => docElm }` */
-  def updated(path: ElemPath, docElm: Elem): Document = updated(path) { e => docElm }
+  /** Returns `updated(path) { e => elm }` */
+  def updated(path: ElemPath, elm: Elem): Document = updated(path) { e => elm }
 
   override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
