@@ -107,7 +107,6 @@ import scala.collection.{ immutable, mutable }
  * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
  * <ul>
  * <li>'''Finding first obeying some predicate''' (depth-first search): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
- * <li>'''Finding first having some EName''' (special case of the former): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
  * </ul>
  *
  * These element (collection) retrieval methods process and return elements in depth-first order
