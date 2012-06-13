@@ -6,12 +6,12 @@ CHANGELOG
 0.6.0
 =====
 
+* Breaking API change: renamed ``ExpandedName`` to ``EName`` (after which some implicit conversions started to make less sense, and they have indeed been removed)
 * Breaking API change: removed all (!) implicit conversion methods
 
   * ``EName`` and ``QName`` factory methods work just fine
   * The ``Scope`` and ``Scope.Declarations`` factory methods ``from`` have been added, which are easy to use
 
-* Breaking API change: renamed ``ExpandedName`` to ``EName`` (after which some implicit conversions started to make less sense, and they have indeed been removed)
 * Breaking API change: renamed ``ElemLike`` method ``filterChildElemsNamed`` to ``filterChildElems``, etc.
 * Added overloaded ``\``, ``\\`` and ``\\!`` methods taking an expanded name, or even a local name, to ``ElemLike``
 * Moved method ``localName`` to ``ElemLike``
