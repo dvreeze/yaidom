@@ -238,7 +238,7 @@ final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -277,16 +277,10 @@ final class Elem(
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
    * If there are no text children, the empty string is returned.
    */
-  def text: String = {
+  override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
   }
-
-  /** Returns `text.trim`. */
-  def trimmedText: String = text.trim
-
-  /** Returns `XmlStringUtils.normalizeString(text)`. */
-  def normalizedText: String = XmlStringUtils.normalizeString(text)
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {

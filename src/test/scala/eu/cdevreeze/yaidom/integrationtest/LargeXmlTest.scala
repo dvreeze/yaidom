@@ -220,10 +220,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
   }
 
-  private type HasText = {
-    def trimmedText: String
-  }
-
   private def doTest[E <: ElemLike[E] with HasText](elm: E) {
     val startMs = System.currentTimeMillis()
 

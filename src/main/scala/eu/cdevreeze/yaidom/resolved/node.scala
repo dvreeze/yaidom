@@ -69,7 +69,7 @@ trait ParentNode extends Node {
 final case class Elem(
   val resolvedName: EName,
   val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -85,16 +85,10 @@ final case class Elem(
    * Returns the concatenation of the texts of text children, including whitespace. Non-text children are ignored.
    * If there are no text children, the empty string is returned.
    */
-  def text: String = {
+  override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
   }
-
-  /** Returns `text.trim`. */
-  def trimmedText: String = text.trim
-
-  /** Returns `XmlStringUtils.normalizeString(text)`. */
-  def normalizedText: String = XmlStringUtils.normalizeString(text)
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
