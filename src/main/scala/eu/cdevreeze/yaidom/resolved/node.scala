@@ -150,6 +150,7 @@ final case class Elem(
           case e: Elem =>
             newChildren += e
             accumulate(childNodes.tail)
+          case parentNode: ParentNode => sys.error("Non-element parent node found")
         }
       }
     }
@@ -214,6 +215,7 @@ final case class Elem(
           case e: Elem =>
             newChildren += e
             accumulate(childNodes.tail)
+          case parentNode: ParentNode => sys.error("Non-element parent node found")
         }
       }
     }
