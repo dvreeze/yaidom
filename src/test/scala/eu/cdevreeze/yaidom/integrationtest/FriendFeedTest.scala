@@ -98,16 +98,16 @@ class FriendFeedTest extends Suite {
       import resolved._
 
       Elem(
-        resolvedName = EName("Service"),
-        resolvedAttributes = Map(EName("id") -> "twitter"),
-        children = Vector(
+        EName("Service"),
+        Map(EName("id") -> "twitter"),
+        Vector(
           Elem(
-            resolvedName = EName("UserList"),
-            resolvedAttributes = Map(),
-            children = Vector(
-              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(Text("karlerikson"))),
-              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(Text("asfaq"))),
-              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(Text("chrisjlee")))))))
+            EName("UserList"),
+            Map(),
+            Vector(
+              Elem(EName("nickname"), Map(), Vector(Text("karlerikson"))),
+              Elem(EName("nickname"), Map(), Vector(Text("asfaq"))),
+              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
     }
 
     expect(expectedTwitterSummaryElm) {
@@ -121,14 +121,14 @@ class FriendFeedTest extends Suite {
       import resolved._
 
       Elem(
-        resolvedName = EName("Service"),
-        resolvedAttributes = Map(EName("id") -> "googlereader"),
-        children = Vector(
+        EName("Service"),
+        Map(EName("id") -> "googlereader"),
+        Vector(
           Elem(
-            resolvedName = EName("UserList"),
-            resolvedAttributes = Map(),
-            children = Vector(
-              Elem(resolvedName = EName("nickname"), resolvedAttributes = Map(), children = Vector(resolved.Text("misterjt")))))))
+            EName("UserList"),
+            Map(),
+            Vector(
+              Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
     }
 
     expect(expectedGoogleReaderSummaryElm) {
@@ -165,17 +165,17 @@ class FriendFeedTest extends Suite {
       import resolved._
 
       Elem(
-        resolvedName = EName(NsFriendFeedStats, "Stats"),
-        resolvedAttributes = Map(),
-        children = Vector(
+        EName(NsFriendFeedStats, "Stats"),
+        Map(),
+        Vector(
           Elem(
-            resolvedName = EName(NsFriendFeedStats, "Service"),
-            resolvedAttributes = Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
-            children = Vector()),
+            EName(NsFriendFeedStats, "Service"),
+            Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
+            Vector()),
           Elem(
-            resolvedName = EName(NsFriendFeedStats, "Service"),
-            resolvedAttributes = Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
-            children = Vector())))
+            EName(NsFriendFeedStats, "Service"),
+            Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
+            Vector())))
     }
 
     expect(expectedStatsElm) {
