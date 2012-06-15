@@ -120,7 +120,7 @@ class AirportExampleTest extends Suite {
     // 3. Check elevation query results
 
     def highestAirport(root: Elem): Elem = {
-      val tableElms = root filterElemsOrSelf { _.localName == "Table" }
+      val tableElms = root \\ "Table"
       val sorted = tableElms sortBy { (e: Elem) =>
         e findChildElem { _.localName == "RunwayElevationFeet" } map { e => e.trimmedText.toInt } getOrElse (0)
       }
@@ -246,7 +246,7 @@ class AirportExampleTest extends Suite {
 
     val airportElms: immutable.Seq[Elem] = {
       // Contains duplicates
-      val elms = airportRootElm filterChildElems { e => airportCodes.contains(airportCode(e)) }
+      val elms = airportRootElm \ { e => airportCodes.contains(airportCode(e)) }
       val groups = elms groupBy { e => airportCode(e) }
       // No more duplicates
       val result = groups.values map { grp => grp.head }

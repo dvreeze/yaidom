@@ -104,7 +104,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
           val lastNameElms = doc.documentElement.filterElems(EName("lastName"))
           logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
         case 2 =>
-          val contactElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == EName("contact") }
+          val contactElms = doc.documentElement \\ { e => e.resolvedName == EName("contact") }
           logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
         case 3 =>
           val emails = {
@@ -115,7 +115,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
           }
           logger.info("Different e-mails (%d): %s. Thread %s".format(emails.size, emails, Thread.currentThread.getName))
         case 4 =>
-          val firstNameElms = doc.documentElement filterElemsOrSelf { e => e.resolvedName == EName("firstName") }
+          val firstNameElms = doc.documentElement \\ { e => e.resolvedName == EName("firstName") }
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
       }
     }
@@ -171,7 +171,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
     rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
     (rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
-    (rootElm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
+    (rootElm \\ { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
     (rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
 
     // Finding the fast way
@@ -231,7 +231,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
 
     val s = "b" * (2000 + 46)
-    val elms1 = elm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
+    val elms1 = elm \\ { e => e.resolvedName == EName("phone") && e.trimmedText == s }
     assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
 
     val endMs = System.currentTimeMillis()

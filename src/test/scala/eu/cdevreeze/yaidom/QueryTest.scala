@@ -257,7 +257,7 @@ class QueryTest extends Suite {
         book <- bookstore \ "Book"
         if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors filterChildElems { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
+        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
@@ -279,9 +279,9 @@ class QueryTest extends Suite {
         book <- bookstore \ "Book"
         if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors filterChildElems { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
+        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
         if authorLastName == "Ullman"
-        authorFirstName <- authors filterChildElems { _.localName == "Author" } flatMap { e => e \ "First_Name" } map { _.trimmedText }
+        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e => e \ "First_Name" } map { _.trimmedText }
         if authorFirstName == "Jeffrey"
       } yield book.getChildElem(EName("Title"))
 

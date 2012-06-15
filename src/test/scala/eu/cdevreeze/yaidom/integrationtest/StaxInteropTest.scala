@@ -70,7 +70,7 @@ class StaxInteropTest extends Suite {
       root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect(3) {
-      val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -98,10 +98,10 @@ class StaxInteropTest extends Suite {
       root2.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
-      val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root2 filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root2 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -119,10 +119,10 @@ class StaxInteropTest extends Suite {
       root3.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
-      val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root3 filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root3 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -151,10 +151,10 @@ class StaxInteropTest extends Suite {
       root4.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
-      val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root4 filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root4 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
 
@@ -172,10 +172,10 @@ class StaxInteropTest extends Suite {
       root5.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     expect {
-      val result = root filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
-      val result = root5 filterElemsOrSelf { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root5 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
   }
@@ -335,12 +335,12 @@ class StaxInteropTest extends Suite {
         EName(ns, "notation"))
 
     expect(xsElmENames) {
-      val result = root filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     // Remember, coalescing is set to true!
     expect(Set(0, 1)) {
-      val result = root filterElemsOrSelf { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -367,8 +367,8 @@ class StaxInteropTest extends Suite {
     def checkCommentWithEscapedChar(rootElm: Elem): Unit = {
       val documentationElms =
         for {
-          annotationElm <- rootElm.filterChildElems(EName(ns, "annotation"))
-          documentationElm <- annotationElm.filterChildElems(EName(ns, "documentation"))
+          annotationElm <- rootElm \ EName(ns, "annotation")
+          documentationElm <- annotationElm \ EName(ns, "documentation")
         } yield documentationElm
 
       val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
@@ -399,7 +399,7 @@ class StaxInteropTest extends Suite {
         identityConstraintElms.size
       }
 
-      val selectorElms = identityConstraintElms.head.filterChildElems(EName(ns, "selector"))
+      val selectorElms = identityConstraintElms.head \ EName(ns, "selector")
 
       expect(1) {
         selectorElms.size
@@ -509,11 +509,11 @@ class StaxInteropTest extends Suite {
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     expect(xsElmENames) {
-      val result = root2 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root2 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {
-      val result = root2 filterElemsOrSelf { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root2 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -528,11 +528,11 @@ class StaxInteropTest extends Suite {
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
     expect(xsElmENames) {
-      val result = root3 filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root3 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     expect(Set(0, 1)) {
-      val result = root3 filterElemsOrSelf { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root3 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 

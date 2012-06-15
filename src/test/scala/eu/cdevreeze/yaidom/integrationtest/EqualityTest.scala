@@ -194,7 +194,7 @@ class EqualityTest extends Suite {
         EName(ns, "notation"))
 
     expect(xsElmENames) {
-      val result = root filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
 
@@ -203,7 +203,7 @@ class EqualityTest extends Suite {
     val resolvedRoot = resolved.Elem(root)
 
     expect(xsElmENames) {
-      val result = resolvedRoot filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = resolvedRoot \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
   }
