@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<scala.version>2.10.0-M3</scala.version>
+		<scala.version>2.10.0-M4</scala.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
-	<artifactId>yaidom_2.10.0-M3</artifactId>
+	<artifactId>yaidom_2.10.0-M4</artifactId>
 	<version>0.5.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
