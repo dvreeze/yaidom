@@ -286,11 +286,11 @@ class ElemLikeTest extends Suite {
       cheapBookElm.attribute(EName("ISBN"))
     }
     expect("Hector and Jeff's Database Hints") {
-      val result = cheapBookElm \\ EName(ns, "Title") map { _.trimmedText }
+      val result = (cheapBookElm \\ EName(ns, "Title")) map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Title"))
     }
     expect("An indispensable companion to your textbook") {
-      val result = cheapBookElm \\ "Remark" map { _.trimmedText }
+      val result = (cheapBookElm \\ "Remark") map { _.trimmedText }
       result.headOption.getOrElse(sys.error("Missing Remark"))
     }
 

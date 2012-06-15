@@ -201,7 +201,7 @@ class FriendFeedTest extends Suite {
 
     val stats2Elm: Elem = {
       val serviceIds = {
-        val result = feedElm \ "entry" map { entryElm => getEntryServiceId(entryElm) }
+        val result = (feedElm \ "entry") map { entryElm => getEntryServiceId(entryElm) }
         result.distinct
       }
 
