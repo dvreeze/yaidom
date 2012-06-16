@@ -28,6 +28,10 @@ package eu.cdevreeze.yaidom
  *
  * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.EName]].
  *
+ * Typical usage may lead to an explosion of different QName objects that are equal. That is a bit wasteful.
+ * Of course the user can define constants for QNames that are used often. Maybe in the future SIP-15 (value classes)
+ * can help make QNames completely inlined, thus making it efficient to use them at a large scale.
+ *
  * @author Chris de Vreeze
  */
 sealed trait QName extends Immutable {

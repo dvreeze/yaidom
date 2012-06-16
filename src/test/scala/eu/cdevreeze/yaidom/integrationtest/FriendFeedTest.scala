@@ -97,6 +97,8 @@ class FriendFeedTest extends Suite {
     val expectedTwitterSummaryElm: resolved.Elem = {
       import resolved._
 
+      // A bit wasteful to create the same EName again and again. Will SIP-15 (value classes) help in making EName usage efficient?
+
       Elem(
         EName("Service"),
         Map(EName("id") -> "twitter"),
@@ -163,6 +165,8 @@ class FriendFeedTest extends Suite {
 
     val expectedStatsElm: resolved.Elem = {
       import resolved._
+
+      // A bit wasteful to create the same EName again and again. Will SIP-15 (value classes) help in making EName usage efficient?
 
       Elem(
         EName(NsFriendFeedStats, "Stats"),

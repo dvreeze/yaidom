@@ -29,6 +29,10 @@ import javax.xml.namespace.{ QName => JQName }
  * The short class name illustrates that expanded names are at least as important as qualified names, and should be
  * equally easy to construct (using the companion object).
  *
+ * Typical usage may lead to an explosion of different EName objects that are equal. That is a bit wasteful.
+ * Of course the user can define constants for ENames that are used often. Maybe in the future SIP-15 (value classes)
+ * can help make ENames completely inlined, thus making it efficient to use them at a large scale.
+ *
  * @author Chris de Vreeze
  */
 final case class EName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
