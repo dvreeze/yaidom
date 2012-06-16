@@ -44,7 +44,7 @@ class FriendFeedTest extends Suite {
   // Bogus namespace
   private val NsFriendFeedStats = "http://friendfeed-stats"
 
-  private val statsScope = Scope.fromMap(Map("" -> NsFriendFeedStats))
+  private val StatsScope = Scope.from("" -> NsFriendFeedStats)
 
   @Test def testFilterFeedProcessing() {
     // Note the functional expression-oriented programming style, with many small expressions assigned to val variables.
@@ -216,12 +216,12 @@ class FriendFeedTest extends Suite {
 
         elem(
           qname = QName("Service"),
-          attributes = Map(QName("id") -> serviceId, QName("cnt") -> serviceCount.toString)).build(statsScope)
+          attributes = Map(QName("id") -> serviceId, QName("cnt") -> serviceCount.toString)).build(StatsScope)
       }
 
       Elem(
         qname = QName("Stats"),
-        scope = statsScope,
+        scope = StatsScope,
         children = serviceElms)
     }
 
@@ -299,7 +299,7 @@ class FriendFeedTest extends Suite {
         qname = QName("Service"),
         attributes = Map(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName))
 
-    serviceElm.build(statsScope)
+    serviceElm.build(StatsScope)
   }
 
   private def createStatistics(feedElm: Elem, serviceNames: immutable.Seq[String]): Elem = {
@@ -309,7 +309,7 @@ class FriendFeedTest extends Suite {
 
     Elem(
       qname = QName("Stats"),
-      scope = statsScope,
+      scope = StatsScope,
       children = serviceStatisticsElms.toIndexedSeq)
   }
 }
