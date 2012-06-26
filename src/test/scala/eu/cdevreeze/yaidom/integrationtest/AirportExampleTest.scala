@@ -289,11 +289,11 @@ class AirportExampleTest extends Suite {
           case (airportCode, dist) =>
             elem(
               qname = QName("Distance"),
-              children = List(
+              children = Vector(
                 elem(
                   qname = QName("Airport"),
                   attributes = Map(QName("code") -> airportCode),
-                  children = List(text(dist.toString)))))
+                  children = Vector(text(dist.toString)))))
         })
     }
 
@@ -311,26 +311,26 @@ class AirportExampleTest extends Suite {
         val elmBuilder: ElemBuilder =
           elem(
             qname = QName("Airport"),
-            children = List(
+            children = Vector(
               elem(
                 qname = QName("AirportCode"),
-                children = List(text(airportCode(airportElm)))),
+                children = Vector(text(airportCode(airportElm)))),
               elem(
                 qname = QName("AirportOrCityName"),
-                children = List(text(airportOrCityName))),
+                children = Vector(text(airportOrCityName))),
               elem(
                 qname = QName("Country"),
-                children = List(text(country))),
+                children = Vector(text(country))),
               elem(
                 qname = QName("CountryAbbreviation"),
-                children = List(text(countryAbbreviation))),
+                children = Vector(text(countryAbbreviation))),
               elem(
                 qname = QName("Position"),
-                children = List(
+                children = Vector(
                   elem(
-                    qname = QName("Lat"), children = List(text(lat.toString))),
+                    qname = QName("Lat"), children = Vector(text(lat.toString))),
                   elem(
-                    qname = QName("Lon"), children = List(text(lon.toString))))),
+                    qname = QName("Lon"), children = Vector(text(lon.toString))))),
               distancesElemBuilder(airportElm)))
 
         elmBuilder.build(scope)

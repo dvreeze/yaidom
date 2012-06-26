@@ -85,11 +85,11 @@ class XLinkTest extends Suite {
         qname = QName("courseload"),
         attributes = Map(QName.parse("xlink:type") -> "extended"),
         namespaces = Declarations.from("xlink" -> "http://www.w3.org/1999/xlink"),
-        children = List(
+        children = Vector(
           elem(
             qname = QName("tooltip"),
             attributes = Map(QName.parse("xlink:type") -> "title"),
-            children = List(text("Course Load for Pat Jones"))),
+            children = Vector(text("Course Load for Pat Jones"))),
           elem(
             qname = QName("person"),
             attributes = Map(
@@ -121,7 +121,7 @@ class XLinkTest extends Suite {
               QName.parse("xlink:type") -> "resource",
               QName.parse("xlink:label") -> "PatJonesGPA",
               QName.parse("xlink:role") -> "http://www.example.com/linkprops/gpa"),
-            children = List(text("3.5"))),
+            children = Vector(text("3.5"))),
           elem(
             qname = QName("go"),
             attributes = Map(

@@ -53,19 +53,19 @@ class BasicXmlProcessingTest extends Suite {
     val foo =
       elem(
         qname = QName("foo"),
-        children = List(
+        children = Vector(
           elem(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "greet"),
-            children = List(text("hi"))),
+            children = Vector(text("hi"))),
           elem(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "count"),
-            children = List(text("1"))),
+            children = Vector(text("1"))),
           elem(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "color"),
-            children = List(text("yellow"))))).build()
+            children = Vector(text("yellow"))))).build()
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
     expect("hi1yellow") {
@@ -105,19 +105,19 @@ class BasicXmlProcessingTest extends Suite {
     val baz =
       elem(
         qname = QName("a"),
-        children = List(
+        children = Vector(
           elem(
             qname = QName("z"),
             attributes = Map(QName("x") -> "1")),
           elem(
             qname = QName("b"),
-            children = List(
+            children = Vector(
               elem(
                 qname = QName("z"),
                 attributes = Map(QName("x") -> "2")),
               elem(
                 qname = QName("c"),
-                children = List(
+                children = Vector(
                   elem(
                     qname = QName("z"),
                     attributes = Map(QName("x") -> "3")))),
@@ -214,7 +214,7 @@ class BasicXmlProcessingTest extends Suite {
                 qname = QName("album"),
                 attributes = Map(QName("title") -> album.title),
                 children = {
-                  val songChildren: immutable.Seq[NodeBuilder] = album.songs map { song =>
+                  val songChildren: immutable.IndexedSeq[NodeBuilder] = album.songs map { song =>
                     elem(
                       qname = QName("song"),
                       attributes = Map(QName("title") -> song.title, QName("length") -> song.length))
@@ -222,7 +222,7 @@ class BasicXmlProcessingTest extends Suite {
 
                   val descriptionElm = elem(
                     qname = QName("description"),
-                    children = List(text(album.description)))
+                    children = Vector(text(album.description)))
 
                   songChildren :+ descriptionElm
                 })
@@ -259,10 +259,10 @@ class BasicXmlProcessingTest extends Suite {
     }
   }
 
-  final case class Album(val title: String, val songs: immutable.Seq[Song], val description: String) extends Immutable {
+  final case class Album(val title: String, val songs: immutable.IndexedSeq[Song], val description: String) extends Immutable {
     val timeInSeconds: Int = songs.map(_.timeInSeconds).sum
     val length: String = (timeInSeconds / 60).toString + ":" + (timeInSeconds % 60).toString
   }
 
-  final case class Artist(val name: String, val albums: immutable.Seq[Album]) extends Immutable
+  final case class Artist(val name: String, val albums: immutable.IndexedSeq[Album]) extends Immutable
 }

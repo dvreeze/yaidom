@@ -1044,7 +1044,7 @@ class DomInteropTest extends Suite {
     import NodeBuilder._
 
     val countryPath = ElemPath.fromCanonicalXPath("/*/car[1]/country[1]")(Scope.Empty)
-    val updatedCountryElm = elem(qname = QName("country"), children = List(text("New Zealand"))).build()
+    val updatedCountryElm = elem(qname = QName("country"), children = Vector(text("New Zealand"))).build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
     expect("New Zealand") {

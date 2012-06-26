@@ -30,10 +30,10 @@ import scala.collection.immutable
  *   qname = QName("Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
- *   children = List(
+ *   children = Vector(
  *     elem(
  *       qname = QName("Title"),
- *       children = List(text("Newsweek"))))).build()
+ *       children = Vector(text("Newsweek"))))).build()
  * }}}
  *
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
@@ -177,23 +177,23 @@ object NodeBuilder {
   def document(
     baseUriOption: Option[String],
     documentElement: ElemBuilder,
-    processingInstructions: immutable.Seq[ProcessingInstructionBuilder],
-    comments: immutable.Seq[CommentBuilder]): DocBuilder = {
+    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
+    comments: immutable.IndexedSeq[CommentBuilder]): DocBuilder = {
 
     new DocBuilder(
       baseUriOption map { uriString => new URI(uriString) },
       documentElement,
-      processingInstructions.toIndexedSeq,
-      comments.toIndexedSeq)
+      processingInstructions,
+      comments)
   }
 
   def elem(
     qname: QName,
     attributes: Map[QName, String] = Map(),
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
-    children: immutable.Seq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
+    children: immutable.IndexedSeq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, children.toIndexedSeq)
+    new ElemBuilder(qname, attributes, namespaces, children)
   }
 
   def text(textValue: String): TextBuilder = TextBuilder(text = textValue, isCData = false)

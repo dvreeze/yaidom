@@ -330,15 +330,15 @@ class EqualityTest extends Suite {
     val root2 =
       elem(
         qname = QName("root"),
-        children = List(
+        children = Vector(
           elem(
             qname = QName("child"),
             attributes = Map(QName("about") -> "Jansen & co"),
-            children = List(text("Jansen & co"))),
+            children = Vector(text("Jansen & co"))),
           elem(
             qname = QName("child"),
             attributes = Map(QName("about") -> "Jansen & co"),
-            children = List(text("Jansen & co"))))).build(scope)
+            children = Vector(text("Jansen & co"))))).build(scope)
 
     // Check equalities
 
@@ -374,13 +374,13 @@ class EqualityTest extends Suite {
     val root2 =
       elem(
         qname = QName("root"),
-        children = List(
+        children = Vector(
           elem(
             qname = QName("child"),
-            children = List(text(txt))),
+            children = Vector(text(txt))),
           elem(
             qname = QName("child"),
-            children = List(text(txt))))).build(scope)
+            children = Vector(text(txt))))).build(scope)
 
     // Check equalities
 

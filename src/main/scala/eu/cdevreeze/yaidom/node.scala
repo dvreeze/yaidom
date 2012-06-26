@@ -155,14 +155,14 @@ final class Document(
          |%s,
          |""".stripMargin
 
-    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = List(%s),""" + newline else
-      """|  processingInstructions = List(
+    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = Vector(%s),""" + newline else
+      """|  processingInstructions = Vector(
          |%s
          |  ),
          |""".stripMargin
 
-    val commentsFormatString = if (comments.isEmpty) """  comments = List(%s)""" + newline else
-      """|  comments = List(
+    val commentsFormatString = if (comments.isEmpty) """  comments = Vector(%s)""" + newline else
+      """|  comments = Vector(
          |%s
          |  )
          |""".stripMargin
@@ -186,21 +186,21 @@ final class Document(
 
     val pisString = {
       val indent = numberOfSpaces + 4
-      val pisStringList: Seq[String] =
+      val pisStringSeq: Seq[String] =
         processingInstructions map { ch => ch.toShiftedAstString(parentScope, indent) }
 
       val separator = ",%n".format()
-      val resultString: String = pisStringList.mkString(separator)
+      val resultString: String = pisStringSeq.mkString(separator)
       resultString
     }
 
     val commentsString = {
       val indent = numberOfSpaces + 4
-      val commentsStringList: Seq[String] =
+      val commentsStringSeq: Seq[String] =
         comments map { ch => ch.toShiftedAstString(parentScope, indent) }
 
       val separator = ",%n".format()
-      val resultString: String = commentsStringList.mkString(separator)
+      val resultString: String = commentsStringSeq.mkString(separator)
       resultString
     }
 
@@ -428,8 +428,8 @@ final class Elem(
          |  namespaces = %s,
          |""".stripMargin
 
-    val childrenFormatString = if (self.children.isEmpty) """  children = List(%s)""" + newline else
-      """|  children = List(
+    val childrenFormatString = if (self.children.isEmpty) """  children = Vector(%s)""" + newline else
+      """|  children = Vector(
          |%s
          |  )
          |""".stripMargin
@@ -476,11 +476,11 @@ final class Elem(
 
     val childrenString = {
       val indent = numberOfSpaces + 4
-      val childrenStringList: Seq[String] =
+      val childrenStringSeq: Seq[String] =
         self.children map { ch => ch.toShiftedAstString(self.scope, indent) }
 
       val separator = ",%n".format()
-      val resultString: String = childrenStringList.mkString(separator)
+      val resultString: String = childrenStringSeq.mkString(separator)
       resultString
     }
 
