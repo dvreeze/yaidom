@@ -64,11 +64,11 @@ sealed trait NodeBuilder extends Immutable {
 
   final def build(): NodeType = build(Scope.Empty)
 
-  /** Returns the AST as `String`. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
-  final def toAstString(parentScope: Scope): String = build(parentScope).toAstString(parentScope)
+  /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
+  final def toTreeRepr(parentScope: Scope): String = build(parentScope).toTreeRepr(parentScope)
 
-  /** Returns `toAstString` */
-  final override def toString: String = toAstString(Scope.Empty)
+  /** Returns `toTreeRepr` */
+  final override def toString: String = toTreeRepr(Scope.Empty)
 }
 
 trait ParentNodeBuilder extends NodeBuilder {

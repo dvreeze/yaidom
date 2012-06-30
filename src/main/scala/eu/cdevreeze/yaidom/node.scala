@@ -21,6 +21,7 @@ import java.net.URI
 import java.rmi.server.UID
 import scala.annotation.tailrec
 import scala.collection.{ immutable, mutable }
+import PrettyPrinting._
 
 /**
  * Immutable XML node. The API is inspired by Anti-XML, but it is less ambitious,
@@ -56,26 +57,26 @@ sealed trait Node extends Immutable {
   def uid: UID
 
   /**
-   * Returns the AST (abstract syntax tree) as `String`, conforming to the DSL for `NodeBuilder`s.
+   * Returns the tree representation String, conforming to the tree representation DSL that creates `NodeBuilder`s.
    *
-   * There are a couple of advantages of this method compared to a "toXmlString" method which returns the XML string:
+   * There are a couple of advantages of this method compared to some "toXmlString" method which returns the XML string:
    * <ul>
-   * <li>The AST is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
+   * <li>The parsed XML tree is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
    * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
-   * <li>Lower runtime costs</li>
-   * <li>The output of method `toAstString` is itself Scala ("NodeBuilder") DSL code (for instance useful in REPL or unit tests)</li>
+   * <li>The output of method `toTreeRepr` can be parsed into a `NodeBuilder`</li>
+   * <li>Likely lower runtime costs</li>
    * </ul>
    */
-  final def toAstString(parentScope: Scope): String = toShiftedAstString(parentScope, 0)
+  final def toTreeRepr(parentScope: Scope): String = toTreeReprAsLineSeq(parentScope, 0)(2).mkString
 
-  /** Same as `toAstString(emptyScope)` */
-  final def toAstString: String = toAstString(Scope.Empty)
+  /** Same as `toTreeRepr(emptyScope)` */
+  final def toTreeRepr: String = toTreeRepr(Scope.Empty)
 
-  /** Same as `toAstString(parentScope)`, but shifted numberOrSpaces to the right. Used for implementing `toAstString(parentScope)`. */
-  def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String
+  /** Returns the tree representation string corresponding to this element. Possibly expensive! */
+  final override def toString: String = toTreeRepr
 
-  /** Returns the AST string corresponding to this element. Possibly expensive! */
-  final override def toString: String = toAstString
+  /** Returns the tree representation as LineSeq, shifted indent spaces to the right */
+  def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq
 }
 
 /** `Document` or `Elem` node */
@@ -143,70 +144,60 @@ final class Document(
   /** Returns `updated(path) { e => elm }` */
   def updated(path: ElemPath, elm: Elem): Document = updated(path) { e => elm }
 
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
-    val newline = "%n".format()
-
-    val startFormatString =
-      """|document(
-         |  baseUriOption = %s,
-         |  documentElement =
-         |%s,
-         |""".stripMargin
-
-    val pisFormatString = if (processingInstructions.isEmpty) """  processingInstructions = Vector(%s),""" + newline else
-      """|  processingInstructions = Vector(
-         |%s
-         |  ),
-         |""".stripMargin
-
-    val commentsFormatString = if (comments.isEmpty) """  comments = Vector(%s)""" + newline else
-      """|  comments = Vector(
-         |%s
-         |  )
-         |""".stripMargin
-
-    val unshiftedFormatString = startFormatString + pisFormatString + commentsFormatString + ")"
-
-    val formatString = {
-      val result = unshiftedFormatString.lines.toIndexedSeq collect { (ln: String) =>
-        ln match {
-          case ln if ln.trim == "%s" => ln // "%s" not indented here!
-          case ln => (" " * numberOfSpaces) + ln
-        }
+    val baseUriLineSeqOption: Option[LineSeq] =
+      if (this.baseUriOption.isEmpty) None else {
+        val line = "baseUri = %s".format(toStringLiteral(this.baseUriOption.get.toString))
+        Some(LineSeq(line))
       }
-      result.mkString("%n".format())
+
+    val documentElementLineSeq: LineSeq = {
+      val firstLine = LineSeq("documentElement =")
+      val contentLines = this.documentElement.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
+      firstLine ++ contentLines
     }
 
-    val baseUriOptionString: String =
-      if (baseUriOption.isEmpty) "None" else """Some(%s%s%s)""".format("\"\"\"", baseUriOption.get.toString, "\"\"\"")
+    val piLineSeqOption: Option[LineSeq] =
+      if (this.processingInstructions.isEmpty) None else {
+        val firstLine = LineSeq("processingInstructions = Vector(")
+        val contentLines = {
+          val groups =
+            this.processingInstructions map { pi =>
+              pi.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
+            }
+          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
+          result
+        }
+        val lastLine = LineSeq(")")
 
-    val documentElementString: String = documentElement.toShiftedAstString(parentScope, numberOfSpaces + 4)
+        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
+      }
 
-    val pisString = {
-      val indent = numberOfSpaces + 4
-      val pisStringSeq: Seq[String] =
-        processingInstructions map { ch => ch.toShiftedAstString(parentScope, indent) }
+    val commentsLineSeqOption: Option[LineSeq] =
+      if (this.comments.isEmpty) None else {
+        val firstLine = LineSeq("comments = Vector(")
+        val contentLines = {
+          val groups =
+            this.comments map { comment =>
+              comment.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
+            }
+          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
+          result
+        }
+        val lastLine = LineSeq(")")
 
-      val separator = ",%n".format()
-      val resultString: String = pisStringSeq.mkString(separator)
-      resultString
-    }
+        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
+      }
 
-    val commentsString = {
-      val indent = numberOfSpaces + 4
-      val commentsStringSeq: Seq[String] =
-        comments map { ch => ch.toShiftedAstString(parentScope, indent) }
+    val contentParts: Vector[LineSeq] = Vector(baseUriLineSeqOption, Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
+    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
 
-      val separator = ",%n".format()
-      val resultString: String = commentsStringSeq.mkString(separator)
-      resultString
-    }
-
-    val result: String = formatString.format(
-      baseUriOptionString, documentElementString, pisString, commentsString)
-    result
+    LineSeqSeq(
+      LineSeq("document("),
+      content,
+      LineSeq(")")).mkLineSeq.shift(indent)
   }
 }
 
@@ -416,76 +407,68 @@ final class Elem(
     self.withChildren(newChildren)
   }
 
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+    val qnameLineSeq: LineSeq = {
+      val line = "qname = QName(%s)".format(toStringLiteral(this.qname.toString))
+      LineSeq(line)
+    }
+
+    val attributesLineSeqOption: Option[LineSeq] =
+      if (this.attributes.isEmpty) None else {
+        def attributeEntryString(qname: QName, attrValue: String): String = {
+          "QName(%s) -> %s".format(toStringLiteral(qname.toString), toStringLiteral(attrValue))
+        }
+
+        val attributeEntryStrings = {
+          val result = this.attributes map { kv => attributeEntryString(kv._1, kv._2) }
+          result.mkString(", ")
+        }
+
+        val line = "attributes = Map(%s)".format(attributeEntryStrings)
+        Some(LineSeq(line))
+      }
+
     val declarations: Scope.Declarations = parentScope.relativize(self.scope)
 
-    val newline = "%n".format()
-
-    val startFormatString =
-      """|elem(
-         |  qname = %s,
-         |  attributes = %s,
-         |  namespaces = %s,
-         |""".stripMargin
-
-    val childrenFormatString = if (self.children.isEmpty) """  children = Vector(%s)""" + newline else
-      """|  children = Vector(
-         |%s
-         |  )
-         |""".stripMargin
-
-    val unshiftedFormatString = startFormatString + childrenFormatString + ")"
-
-    val formatString = {
-      val result = unshiftedFormatString.lines.toIndexedSeq collect { (ln: String) =>
-        ln match {
-          case ln if ln.trim == "%s" => ln // "%s" not indented here!
-          case ln => (" " * numberOfSpaces) + ln
+    val namespacesLineSeqOption: Option[LineSeq] = {
+      if (declarations.toMap.isEmpty) None else {
+        def namespaceEntryString(prefix: String, nsUri: String): String = {
+          toStringLiteral(prefix) + " -> " + toStringLiteral(nsUri)
         }
-      }
-      result.mkString("%n".format())
-    }
 
-    val qnameString = "QName.parse(\"\"\"%s\"\"\")".format(self.qname.toString)
-
-    val attributesString = {
-      val result = self.attributes map { kv =>
-        val qn: QName = kv._1
-        val value: String = kv._2
-        val qnameString = "QName.parse(\"\"\"%s\"\"\")".format(qn.toString)
-        val valueString = "\"\"\"%s\"\"\"".format(value)
-        (qnameString -> valueString)
-      }
-      result.toString
-    }
-
-    val namespacesString = {
-      if (declarations.toMap.isEmpty) {
-        "Scope.Declarations.Empty"
-      } else {
-        val result = declarations.toMap map { kv =>
-          val prefix: String = kv._1
-          val nsUri: String = kv._2
-          val prefixString = "\"\"\"%s\"\"\"".format(prefix)
-          val nsUriString = "\"\"\"%s\"\"\"".format(nsUri)
-          (prefixString -> nsUriString)
+        val namespaceEntryStrings = {
+          val result = declarations.toMap map { kv => namespaceEntryString(kv._1, kv._2) }
+          result.mkString(", ")
         }
-        "Declarations.fromMap(%s)".format(result.toString)
+
+        val line = "namespaces = Declarations.from(%s)".format(namespaceEntryStrings)
+        Some(LineSeq(line))
       }
     }
 
-    val childrenString = {
-      val indent = numberOfSpaces + 4
-      val childrenStringSeq: Seq[String] =
-        self.children map { ch => ch.toShiftedAstString(self.scope, indent) }
+    val childrenLineSeqOption: Option[LineSeq] =
+      if (this.children.isEmpty) None else {
+        val firstLine = LineSeq("children = Vector(")
+        val contentLines = {
+          val groups =
+            self.children map { child =>
+              child.toTreeReprAsLineSeq(self.scope, indentStep)(indentStep)
+            }
+          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
+          result
+        }
+        val lastLine = LineSeq(")")
 
-      val separator = ",%n".format()
-      val resultString: String = childrenStringSeq.mkString(separator)
-      resultString
-    }
+        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
+      }
 
-    val resultString = formatString.format(qnameString, attributesString, namespacesString, childrenString)
-    resultString
+    val contentParts: Vector[LineSeq] = Vector(Some(qnameLineSeq), attributesLineSeqOption, namespacesLineSeqOption, childrenLineSeqOption).flatten
+    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
+
+    LineSeqSeq(
+      LineSeq("elem("),
+      content,
+      LineSeq(")")).mkLineSeq.shift(indent)
   }
 }
 
@@ -501,13 +484,11 @@ final case class Text(text: String, isCData: Boolean) extends Node {
   /** Returns `XmlStringUtils.normalizeString(text)` .*/
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
+  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     if (isCData) {
-      val result = "cdata(\"\"\"%s\"\"\")".format(text)
-      (" " * numberOfSpaces) + result
+      LineSeq("cdata(%s)".format(toStringLiteral(text))).shift(indent)
     } else {
-      val result = "text(\"\"\"%s\"\"\")".format(text)
-      (" " * numberOfSpaces) + result
+      LineSeq("text(%s)".format(toStringLiteral(text))).shift(indent)
     }
   }
 }
@@ -518,9 +499,10 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 
   override val uid: UID = new UID
 
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
-    val result = "processingInstruction(\"\"\"%s\"\"\", \"\"\"%s\"\"\")".format(target, data)
-    (" " * numberOfSpaces) + result
+  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+    val targetStringLiteral = toStringLiteral(target)
+    val dataStringLiteral = toStringLiteral(data)
+    LineSeq("processingInstruction(%s, %s)".format(targetStringLiteral, dataStringLiteral)).shift(indent)
   }
 }
 
@@ -539,9 +521,9 @@ final case class EntityRef(entity: String) extends Node {
 
   override val uid: UID = new UID
 
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
-    val result = "entityRef(\"\"\"%s\"\"\")".format(entity)
-    (" " * numberOfSpaces) + result
+  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+    val entityStringLiteral = toStringLiteral(entity)
+    LineSeq("entityRef(%s)".format(entityStringLiteral)).shift(indent)
   }
 }
 
@@ -550,9 +532,9 @@ final case class Comment(text: String) extends Node {
 
   override val uid: UID = new UID
 
-  override def toShiftedAstString(parentScope: Scope, numberOfSpaces: Int): String = {
-    val result = "comment(\"\"\"%s\"\"\")".format(text)
-    (" " * numberOfSpaces) + result
+  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+    val commentStringLiteral = toStringLiteral(text)
+    LineSeq("comment(%s)".format(commentStringLiteral)).shift(indent)
   }
 }
 
