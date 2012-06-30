@@ -64,14 +64,14 @@ object EName {
   /** Creates an `EName` from a namespaceUri and a localPart */
   def apply(namespaceUri: String, localPart: String): EName = EName(Some(namespaceUri), localPart)
 
-  /** Creates an `EName` from a localPart only */
-  def apply(localPart: String): EName = EName(None, localPart)
+  /** Shorthand for `parse(s)` */
+  def apply(s: String): EName = parse(s)
 
   /** Creates an `EName` from a [[javax.xml.namespace.QName]] */
   def fromJavaQName(jqname: JQName): EName = jqname match {
     case jqname: JQName if (jqname.getNamespaceURI eq null) || (jqname.getNamespaceURI == XMLConstants.NULL_NS_URI) =>
-      EName(jqname.getLocalPart)
-    case _ => EName(jqname.getNamespaceURI, jqname.getLocalPart)
+      EName(None, jqname.getLocalPart)
+    case _ => EName(Some(jqname.getNamespaceURI), jqname.getLocalPart)
   }
 
   /** Gets an optional prefix from a [[javax.xml.namespace.QName]] */
@@ -87,10 +87,10 @@ object EName {
       require(idx >= 2 && idx < s.length - 1)
       val ns = s.slice(1, idx)
       val localPart = s.slice(idx + 1, s.length)
-      EName(ns, localPart)
+      EName(Some(ns), localPart)
     case _ =>
       require(s.indexOf("{") < 0)
       require(s.indexOf("}") < 0)
-      EName(s)
+      EName(None, s)
   }
 }

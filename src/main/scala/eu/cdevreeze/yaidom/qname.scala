@@ -71,8 +71,8 @@ object QName {
   /** Creates a `PrefixedName` from a prefix and a localPart */
   def apply(prefix: String, localPart: String): QName = PrefixedName(prefix, localPart)
 
-  /** Creates an `UnprefixedName` from a localPart */
-  def apply(localPart: String): QName = UnprefixedName(localPart)
+  /** Shorthand for `parse(s)` */
+  def apply(s: String): QName = parse(s)
 
   /** Parses a `String` into a `QName`. The `String` must conform to the `toString` format of a `PrefixedName` or `UnprefixedName` */
   def parse(s: String): QName = {
@@ -80,8 +80,8 @@ object QName {
     require(arr.size <= 2, "Expected at most 1 colon in QName '%s'".format(s))
 
     arr.size match {
-      case 1 => QName(s)
-      case 2 => QName(arr(0), arr(1))
+      case 1 => UnprefixedName(s)
+      case 2 => PrefixedName(arr(0), arr(1))
       case _ => sys.error("Did not expect more than 1 colon in QName '%s'".format(s))
     }
   }
