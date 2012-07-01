@@ -8,12 +8,27 @@ import org.apache.commons.lang3.StringEscapeUtils
  * The utility is centered around operations on groups of lines, such as shifting.
  *
  * This API is safe to use, because of the use of "immutability everywhere". On the down-side, this very likely negatively
- * affects performance. Even immutable Strings are concatenated on a large scale when using this API intensively on large inputs.
- * On the other hand, without any profiling it is very hard to make any conclusions about performance of this pretty-printing utility.
+ * affects performance. On the other hand, the design is such that repeated nested indentation (shifting) does not cause
+ * any string concatenation, until the lines are all materialized.
  */
 object PrettyPrinting {
 
   private val NewLine = "%n".format()
+
+  final class Line(val indent: Int, val line: String) {
+    require(line ne null)
+
+    def this(line: String) = this(0, line)
+
+    /** Functionally adds an indent */
+    def plusIndent(addedIndent: Int): Line = new Line(addedIndent + indent, line)
+
+    /** Functionally adds a trailing string to this line */
+    def +(s: String): Line = new Line(indent, (line + s))
+
+    /** Returns the resulting line as complete String with indentation */
+    override def toString: String = (" " * indent) + line
+  }
 
   /**
    * Utility method wrapping a string in a Java string literal.
@@ -38,15 +53,13 @@ object PrettyPrinting {
   }
 
   /** Collection of lines, on which operations such as `shift` can be performed */
-  final class LineSeq(val lines: immutable.IndexedSeq[String]) {
+  final class LineSeq(val lines: immutable.IndexedSeq[Line]) {
 
     /** Shifts each of the lines `spaces` spaces to the right */
     def shift(spaces: Int): LineSeq = {
       require(spaces >= 0, "spaces must be >= 0")
 
-      val indent = (" " * spaces)
-
-      val result = lines map { line => indent + line }
+      val result = lines map { line => line.plusIndent(spaces) }
       new LineSeq(result)
     }
 
@@ -62,12 +75,14 @@ object PrettyPrinting {
     def ++(otherLineSeq: LineSeq): LineSeq = new LineSeq(this.lines ++ otherLineSeq.lines)
 
     /** Returns the String representation, concatenating all lines, and separating them by newlines */
-    def mkString: String = lines.mkString(NewLine)
+    def mkString: String = lines.map(_.toString).mkString(NewLine)
   }
 
   object LineSeq {
 
-    def apply(lines: String*): LineSeq = new LineSeq(Vector(lines: _*))
+    def apply(lines: Line*): LineSeq = new LineSeq(Vector(lines: _*))
+
+    def apply(line: String): LineSeq = new LineSeq(Vector(new Line(line)))
   }
 
   /** Collection of LineSeq instances, on which operations such as `mkLineSeq` can be performed */
@@ -82,7 +97,7 @@ object PrettyPrinting {
     /** Flattens this LineSeqSeq into a LineSeq, but first appends the separator to each non-last group */
     def mkLineSeq(separator: String): LineSeq = {
       if (groups.isEmpty) LineSeq() else {
-        val lines = mutable.ArrayBuffer[String]()
+        val lines = mutable.ArrayBuffer[Line]()
 
         val nonLastGroups = groups.dropRight(1)
         val lastGroup = groups.last
