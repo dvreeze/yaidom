@@ -62,9 +62,8 @@ sealed trait Node extends Immutable {
    * There are a couple of advantages of this method compared to some "toXmlString" method which returns the XML string:
    * <ul>
    * <li>The parsed XML tree is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
-   * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
-   * <li>The output of method `toTreeRepr` can be parsed into a `NodeBuilder`</li>
-   * <li>Potentially lower runtime costs (but not before we optimize the implementation)</li>
+   * <li>The output of method `toTreeRepr` clearly corresponds to a `NodeBuilder`, and can indeed be parsed into one</li>
+   * <li>When parsing the string into a `NodeBuilder`, the following is out of scope: character escaping (for XML), entity resolving, "ignorable" whitespace handling, etc.</li>
    * </ul>
    */
   final def toTreeRepr(parentScope: Scope): String = toTreeReprAsLineSeq(parentScope, 0)(2).mkString

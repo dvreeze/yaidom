@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringEscapeUtils
  */
 object TreeReprParsers extends JavaTokenParsers {
 
-  // Fixed stringLiteral. See https://issues.scala-lang.org/browse/SI-4138.
+  // Using a fixed version of stringLiteral. See https://issues.scala-lang.org/browse/SI-4138.
 
   def stringLiteral2: Parser[String] =
     ("\"" + """([^"\p{Cntrl}\\]|\\[\\/bfnrt"]|\\u[a-fA-F0-9]{4})*""" + "\"").r
