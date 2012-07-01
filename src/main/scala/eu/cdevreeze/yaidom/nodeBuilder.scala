@@ -175,10 +175,10 @@ final case class CommentBuilder(text: String) extends NodeBuilder {
 object NodeBuilder {
 
   def document(
-    baseUriOption: Option[String],
+    baseUriOption: Option[String] = None,
     documentElement: ElemBuilder,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
-    comments: immutable.IndexedSeq[CommentBuilder]): DocBuilder = {
+    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] = Vector(),
+    comments: immutable.IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
 
     new DocBuilder(
       baseUriOption map { uriString => new URI(uriString) },
@@ -191,7 +191,7 @@ object NodeBuilder {
     qname: QName,
     attributes: Map[QName, String] = Map(),
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
-    children: immutable.IndexedSeq[NodeBuilder] = immutable.IndexedSeq()): ElemBuilder = {
+    children: immutable.IndexedSeq[NodeBuilder] = Vector()): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, children)
   }

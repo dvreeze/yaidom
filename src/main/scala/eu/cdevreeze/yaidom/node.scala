@@ -64,7 +64,7 @@ sealed trait Node extends Immutable {
    * <li>The parsed XML tree is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
    * <li>No need to handle the details of character escaping, entity resolving, output configuration options, etc.</li>
    * <li>The output of method `toTreeRepr` can be parsed into a `NodeBuilder`</li>
-   * <li>Likely lower runtime costs</li>
+   * <li>Potentially lower runtime costs (but not before we optimize the implementation)</li>
    * </ul>
    */
   final def toTreeRepr(parentScope: Scope): String = toTreeReprAsLineSeq(parentScope, 0)(2).mkString
@@ -147,10 +147,13 @@ final class Document(
   override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
-    val baseUriLineSeqOption: Option[LineSeq] =
-      if (this.baseUriOption.isEmpty) None else {
-        val line = "baseUri = %s".format(toStringLiteral(this.baseUriOption.get.toString))
-        Some(LineSeq(line))
+    val baseUriOptionLineSeq: LineSeq =
+      if (this.baseUriOption.isEmpty) {
+        val line = "baseUriOption = None"
+        LineSeq(line)
+      } else {
+        val line = "baseUriOption = Some(%s)".format(toStringLiteral(this.baseUriOption.get.toString))
+        LineSeq(line)
       }
 
     val documentElementLineSeq: LineSeq = {
@@ -191,7 +194,7 @@ final class Document(
         Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
       }
 
-    val contentParts: Vector[LineSeq] = Vector(baseUriLineSeqOption, Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
+    val contentParts: Vector[LineSeq] = Vector(Some(baseUriOptionLineSeq), Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
     val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
 
     LineSeqSeq(

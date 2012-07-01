@@ -1,6 +1,7 @@
 package eu.cdevreeze.yaidom
 
 import scala.collection.immutable
+import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * Pretty printing utility, used in Node and NodeBuilder classes to print the tree representation.
@@ -8,12 +9,9 @@ import scala.collection.immutable
  */
 object PrettyPrinting {
 
-  /** Utility method wrapping a string in a (possibly multi-line) Scala string literal */
+  /** Utility method wrapping a string in a Java string literal */
   final def toStringLiteral(s: String): String = {
-    require(!s.contains("\"\"\""),
-      "Sorry, the string contains 3 double quotes in succession. This is not supported. Start of the string: '%s'".format(s.take(30)))
-
-    "\"\"\"" + s + "\"\"\""
+    "\"" + StringEscapeUtils.escapeJava(s) + "\""
   }
 
   /** Collection of lines, on which operations such as `shift` can be performed */
