@@ -1149,7 +1149,7 @@ class DomInteropTest extends Suite {
 
     // 5. Print to tree representation String and parse back that DSL String, and check again
 
-    val treeRepr: String = root.toString
+    val treeRepr: String = htmlRoot.toString
 
     assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
 
@@ -1160,7 +1160,7 @@ class DomInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    val tableRowElms2 = htmlRoot.filterElems(EName("tr")).drop(1)
+    val tableRowElms2 = htmlRoot2.filterElems(EName("tr")).drop(1)
 
     expect(4) {
       tableRowElms2.size
