@@ -66,7 +66,7 @@ sealed trait Node extends Immutable {
    * <li>When parsing the string into a `NodeBuilder`, the following is out of scope: character escaping (for XML), entity resolving, "ignorable" whitespace handling, etc.</li>
    * </ul>
    */
-  final def toTreeRepr(parentScope: Scope): String = toTreeReprAsLineSeq(parentScope, 0)(2).lines.map(_.toString).mkString
+  final def toTreeRepr(parentScope: Scope): String = toTreeReprAsLineSeq(parentScope, 0)(2).mkString
 
   /** Same as `toTreeRepr(emptyScope)` */
   final def toTreeRepr: String = toTreeRepr(Scope.Empty)
