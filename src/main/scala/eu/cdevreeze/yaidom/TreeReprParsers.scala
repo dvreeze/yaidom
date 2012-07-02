@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * Generator for parsers of "tree representation" expressions. The results from successful parses are `NodeBuilder` instances.
+ * 
+ * The "tree representation" expressions are themselves valid Scala code!
  */
 object TreeReprParsers extends JavaTokenParsers {
 
