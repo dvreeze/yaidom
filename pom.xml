@@ -111,6 +111,20 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<forkMode>once</forkMode>
+					<!-- The following commented out argLine must be uncommented for method 
+						LargeXmlTest.testProcessLargeTreeRepr -->
+					<!-- That would require a 64bit environment with 64bit JVM -->
+					<!-- See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993 
+						for the increased max stack size -->
+					<!-- <argLine>-Xmx4G -Xss20M</argLine> -->
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

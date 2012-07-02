@@ -14,6 +14,11 @@ object TreeReprParsers extends JavaTokenParsers {
   def stringLiteral2: Parser[String] =
     ("\"" + """([^"\p{Cntrl}\\]|\\[\\/bfnrt"]|\\u[a-fA-F0-9]{4})*""" + "\"").r
 
+  def concatenatedStringLiterals: Parser[String] = {
+    // Also first unwraps the String literals
+    repsep(stringLiteral2, "+") ^^ { xs => xs.map(s => unwrapStringLiteral(s)).mkString }
+  }
+
   // DocBuilder
 
   def document: Parser[DocBuilder] =
@@ -122,17 +127,17 @@ object TreeReprParsers extends JavaTokenParsers {
   // CommentBuilder
 
   def comment: Parser[CommentBuilder] =
-    "comment" ~> "(" ~> stringLiteral2 <~ ")" ^^ { x => CommentBuilder(unwrapStringLiteral(x)) }
+    "comment" ~> "(" ~> concatenatedStringLiterals <~ ")" ^^ { x => CommentBuilder(x) }
 
   // TextBuilder
 
   def text: Parser[TextBuilder] = (cdata | nonCData)
 
   def cdata: Parser[TextBuilder] =
-    "cdata" ~> "(" ~> stringLiteral2 <~ ")" ^^ { x => TextBuilder(unwrapStringLiteral(x), true) }
+    "cdata" ~> "(" ~> concatenatedStringLiterals <~ ")" ^^ { x => TextBuilder(x, true) }
 
   def nonCData: Parser[TextBuilder] =
-    "text" ~> "(" ~> stringLiteral2 <~ ")" ^^ { x => TextBuilder(unwrapStringLiteral(x), false) }
+    "text" ~> "(" ~> concatenatedStringLiterals <~ ")" ^^ { x => TextBuilder(x, false) }
 
   // EntityRefBuilder
 

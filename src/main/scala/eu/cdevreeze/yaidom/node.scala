@@ -488,9 +488,9 @@ final case class Text(text: String, isCData: Boolean) extends Node {
 
   override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     if (isCData) {
-      LineSeq("cdata(%s)".format(toStringLiteral(text))).shift(indent)
+      toConcatenatedStringLiterals(text).prepend("cdata(").append(")").shift(indent)
     } else {
-      LineSeq("text(%s)".format(toStringLiteral(text))).shift(indent)
+      toConcatenatedStringLiterals(text).prepend("text(").append(")").shift(indent)
     }
   }
 }
@@ -535,8 +535,7 @@ final case class Comment(text: String) extends Node {
   override val uid: UID = new UID
 
   override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
-    val commentStringLiteral = toStringLiteral(text)
-    LineSeq("comment(%s)".format(commentStringLiteral)).shift(indent)
+    toConcatenatedStringLiterals(text).prepend("comment(").append(")").shift(indent)
   }
 }
 

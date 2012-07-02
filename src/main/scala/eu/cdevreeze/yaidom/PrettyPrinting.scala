@@ -17,6 +17,7 @@ object PrettyPrinting {
 
   final class Line(val indent: Int, val line: String) {
     require(line ne null)
+    require(line.lines.size <= 1, "Expected no newlines in the passed string, starting with '%s'".format(line.take(30)))
 
     def this(line: String) = this(0, line)
 
@@ -56,6 +57,31 @@ object PrettyPrinting {
     result.toString
   }
 
+  /**
+   * Returns the parameter String as String literals with the concatenation operator ("+") in between, just like it
+   * would occur in Java code. The input String is first split into lines, and then each line is turned into a String literal
+   * (followed by "+", except for the last line).
+   */
+  final def toConcatenatedStringLiterals(s: String): LineSeq = {
+    val lines = s.linesWithSeparators.toIndexedSeq
+
+    val result = mutable.ArrayBuffer[Line]()
+
+    if (lines.isEmpty) LineSeq() else {
+      val linesButLast = lines.dropRight(1)
+      val lastLine = lines.last
+
+      for (line <- linesButLast) {
+        val resultLine = new Line("\"" + StringEscapeUtils.escapeJava(line) + "\" +")
+        result += resultLine
+      }
+
+      result += new Line("\"" + StringEscapeUtils.escapeJava(lastLine) + "\"")
+    }
+
+    new LineSeq(result.toIndexedSeq)
+  }
+
   /** Collection of lines, on which operations such as `shift` can be performed */
   final class LineSeq(val lines: immutable.IndexedSeq[Line]) {
 
@@ -67,11 +93,32 @@ object PrettyPrinting {
       new LineSeq(result)
     }
 
-    /** Appends the separator to the last line, if any */
-    def appendSeparator(separator: String): LineSeq = {
+    /**
+     * Appends the given String (which is typically a separator) to the last line, if any.
+     * The parameter String must not contain any newlines.
+     */
+    def append(s: String): LineSeq = {
+      require(s.lines.size <= 1, "The string to append must not have any newlines")
+
       if (lines.isEmpty) this else {
-        val result = lines.dropRight(1) :+ (lines.last + separator)
+        val result = lines.dropRight(1) :+ (lines.last + s)
         new LineSeq(result)
+      }
+    }
+
+    /**
+     * Prepends the given String to the first line, if any, and indenting the other lines with the size of the parameter String.
+     * The parameter String must not contain any newlines.
+     */
+    def prepend(s: String): LineSeq = {
+      require(s.lines.size <= 1, "The string to prepend must not have any newlines")
+
+      if (lines.isEmpty) this else {
+        val indent = s.size
+
+        val firstLine = new Line(lines(0).indent, (s + lines(0).line))
+        val linesButFirstOne = lines.drop(1) map { line => line.plusIndent(indent) }
+        new LineSeq(firstLine +: linesButFirstOne)
       }
     }
 
@@ -107,7 +154,7 @@ object PrettyPrinting {
         val lastGroup = groups.last
 
         for (grp <- nonLastGroups) {
-          // Same as: lines ++= (grp.appendSeparator(separator).lines)
+          // Same as: lines ++= (grp.append(separator).lines)
 
           if (!grp.lines.isEmpty) {
             lines ++= grp.lines.dropRight(1)

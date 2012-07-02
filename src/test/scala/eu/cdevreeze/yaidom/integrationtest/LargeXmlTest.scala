@@ -143,7 +143,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  /** A heavy test printing/parsing using the tree representation DSL (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
+  /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
   @Ignore @Test def testProcessLargeTreeRepr() {
     val parser = DocumentParserUsingSax.newInstance
 
