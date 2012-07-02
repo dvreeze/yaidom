@@ -21,10 +21,14 @@ object PrettyPrinting {
     def this(line: String) = this(0, line)
 
     /** Functionally adds an indent */
-    def plusIndent(addedIndent: Int): Line = new Line(addedIndent + indent, line)
+    def plusIndent(addedIndent: Int): Line = {
+      if (addedIndent == 0) this else new Line(addedIndent + indent, line)
+    }
 
     /** Functionally adds a trailing string to this line */
-    def +(s: String): Line = new Line(indent, (line + s))
+    def +(s: String): Line = {
+      if (s.isEmpty) this else new Line(indent, (line + s))
+    }
 
     /** Returns the resulting line as complete String with indentation */
     override def toString: String = (" " * indent) + line
