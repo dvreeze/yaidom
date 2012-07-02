@@ -26,12 +26,12 @@ object PrettyPrinting {
       if (addedIndent == 0) this else new Line(addedIndent + indent, line)
     }
 
-    /** Functionally adds a trailing string to this line */
+    /** Functionally adds a trailing string (which must contain no newline) to this line */
     def +(s: String): Line = {
       if (s.isEmpty) this else new Line(indent, (line + s))
     }
 
-    /** Returns the resulting line as complete String with indentation */
+    /** Returns the resulting line as complete materialized line String with indentation */
     override def toString: String = (" " * indent) + line
   }
 
