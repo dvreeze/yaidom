@@ -174,6 +174,74 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
+  @Test def testSerializeLargeNodeBuilder() {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs1 = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs1 = System.currentTimeMillis()
+    logger.info("[testSerializeLargeNodeBuilder] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
+
+    val startMs2 = System.currentTimeMillis()
+
+    val docBuilder = NodeBuilder.fromDocument(doc)(Scope.Empty)
+    val bos = new jio.ByteArrayOutputStream
+    val oos = new jio.ObjectOutputStream(bos)
+
+    oos.writeObject(docBuilder)
+
+    val objectBytes = bos.toByteArray
+
+    val endMs2 = System.currentTimeMillis()
+    logger.info("[testSerializeLargeNodeBuilder] Serializing took %d ms".format(endMs2 - startMs2))
+
+    val startMs3 = System.currentTimeMillis()
+
+    val bis = new jio.ByteArrayInputStream(objectBytes)
+    val ois = new jio.ObjectInputStream(bis)
+
+    val doc2Builder = ois.readObject().asInstanceOf[DocBuilder]
+    val doc2 = doc2Builder.build(Scope.Empty)
+
+    val endMs3 = System.currentTimeMillis()
+    logger.info("[testSerializeLargeNodeBuilder] Deserializing took %d ms".format(endMs3 - startMs3))
+
+    doTest(doc2.documentElement)
+  }
+
+  @Test def testSerializeLargeNode() {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs1 = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs1 = System.currentTimeMillis()
+    logger.info("[testSerializeLargeNode] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
+
+    val startMs2 = System.currentTimeMillis()
+
+    val bos = new jio.ByteArrayOutputStream
+    val oos = new jio.ObjectOutputStream(bos)
+
+    oos.writeObject(doc)
+
+    val objectBytes = bos.toByteArray
+
+    val endMs2 = System.currentTimeMillis()
+    logger.info("[testSerializeLargeNode] Serializing took %d ms".format(endMs2 - startMs2))
+
+    val startMs3 = System.currentTimeMillis()
+
+    val bis = new jio.ByteArrayInputStream(objectBytes)
+    val ois = new jio.ObjectInputStream(bis)
+
+    val doc2 = ois.readObject().asInstanceOf[Document]
+
+    val endMs3 = System.currentTimeMillis()
+    logger.info("[testSerializeLargeNode] Deserializing took %d ms".format(endMs3 - startMs3))
+
+    doTest(doc2.documentElement)
+  }
+
   @Test def testFind() {
     val parser = DocumentParserUsingDom.newInstance
 

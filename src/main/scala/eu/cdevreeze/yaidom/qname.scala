@@ -34,7 +34,7 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-sealed trait QName extends Immutable {
+sealed trait QName extends Immutable with Serializable {
 
   def localPart: String
   def prefixOption: Option[String]

@@ -43,9 +43,12 @@ import PrettyPrinting._
  * zippers. So is "true" equality based on the exact tree.</li>
  * </ul>
  *
+ * Nodes are serializable. Serialized Node instances may well be an interesting storage format for parsed XML stored
+ * in a database. Serialized NodeBuilders tend to be smaller than serialized Nodes, though.
+ *
  * @author Chris de Vreeze
  */
-sealed trait Node extends Immutable {
+sealed trait Node extends Immutable with Serializable {
 
   /**
    * Returns a unique ID of the node. It can be used to associate metadata such as `ElemPath`s with elements, for example.
@@ -89,6 +92,7 @@ trait ParentNode extends Node {
  * `Document` node. Although at first sight the document root element seems to be the root node, this is not entirely true.
  * For example, there may be comments at top level, outside the document root element.
  */
+@SerialVersionUID(1L)
 final class Document(
   val baseUriOption: Option[URI],
   val documentElement: Elem,
@@ -228,6 +232,7 @@ final class Document(
  * To construct `Elem`s by hand, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
  * Typically, however, `Elem`s are constructed by parsing an XML source.
  */
+@SerialVersionUID(1L)
 final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
@@ -475,6 +480,7 @@ final class Elem(
   }
 }
 
+@SerialVersionUID(1L)
 final case class Text(text: String, isCData: Boolean) extends Node {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
@@ -496,6 +502,7 @@ final case class Text(text: String, isCData: Boolean) extends Node {
   }
 }
 
+@SerialVersionUID(1L)
 final case class ProcessingInstruction(target: String, data: String) extends Node {
   require(target ne null)
   require(data ne null)
@@ -519,6 +526,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
  * EntityRef("hello")
  * }}}
  */
+@SerialVersionUID(1L)
 final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
 
@@ -530,6 +538,7 @@ final case class EntityRef(entity: String) extends Node {
   }
 }
 
+@SerialVersionUID(1L)
 final case class Comment(text: String) extends Node {
   require(text ne null)
 

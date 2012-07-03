@@ -212,6 +212,79 @@ class DomInteropTest extends Suite {
       val result = root6 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+
+    // 9. Serialize the corresponding NodeBuilder, deserialize it, and check again.
+
+    val rootDocBuilder = NodeBuilder.fromDocument(Document(root))(Scope.Empty)
+    val bos = new jio.ByteArrayOutputStream
+    val oos = new jio.ObjectOutputStream(bos)
+
+    oos.writeObject(rootDocBuilder)
+
+    val objectBytes = bos.toByteArray
+
+    assert(objectBytes.size >= 1000 && objectBytes.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
+    println(objectBytes.size)
+
+    val bis2 = new jio.ByteArrayInputStream(objectBytes)
+    val ois = new jio.ObjectInputStream(bis2)
+
+    val rootDocBuilder2 = ois.readObject().asInstanceOf[DocBuilder]
+    val doc7 = rootDocBuilder.build(Scope.Empty)
+    val root7 = doc7.documentElement
+
+    expect((root.findAllElems map (e => e.localName)).toSet) {
+      (root7.findAllElems map (e => e.localName)).toSet
+    }
+    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+      (root7.findAllElemsOrSelf map (e => e.localName)).toSet
+    }
+    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      root7.filterElemsOrSelf(EName(nsBookstore, "Title")).size
+    }
+    expect {
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    } {
+      val result = root7 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    }
+
+    // 10. Serialize the Document, deserialize it, and check again.
+
+    val rootDoc = Document(root)
+    val bos3 = new jio.ByteArrayOutputStream
+    val oos3 = new jio.ObjectOutputStream(bos3)
+
+    oos3.writeObject(rootDoc)
+
+    val objectBytes3 = bos3.toByteArray
+
+    assert(objectBytes3.size >= 1000 && objectBytes3.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
+    println(objectBytes3.size)
+
+    val bis3 = new jio.ByteArrayInputStream(objectBytes3)
+    val ois3 = new jio.ObjectInputStream(bis3)
+
+    val doc8 = ois3.readObject().asInstanceOf[Document]
+    val root8 = doc8.documentElement
+
+    expect((root.findAllElems map (e => e.localName)).toSet) {
+      (root8.findAllElems map (e => e.localName)).toSet
+    }
+    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+      (root8.findAllElemsOrSelf map (e => e.localName)).toSet
+    }
+    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      root8.filterElemsOrSelf(EName(nsBookstore, "Title")).size
+    }
+    expect {
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    } {
+      val result = root8 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    }
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */

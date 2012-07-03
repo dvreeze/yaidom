@@ -54,9 +54,12 @@ import scala.collection.immutable
  * the `Document` not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the `Document`
  * to an XML string. See also the classes in package [[eu.cdevreeze.yaidom.print]].
  *
+ * NodeBuilders are serializable. Serialized NodeBuilder instances may well be an interesting storage format for parsed XML stored
+ * in a database.
+ *
  * @author Chris de Vreeze
  */
-sealed trait NodeBuilder extends Immutable {
+sealed trait NodeBuilder extends Immutable with Serializable {
 
   type NodeType <: Node
 
@@ -79,6 +82,7 @@ trait ParentNodeBuilder extends NodeBuilder {
 /**
  * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
  */
+@SerialVersionUID(1L)
 final class DocBuilder(
   val baseUriOption: Option[URI],
   val documentElement: ElemBuilder,
@@ -106,6 +110,7 @@ final class DocBuilder(
   }
 }
 
+@SerialVersionUID(1L)
 final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
@@ -138,6 +143,7 @@ final class ElemBuilder(
   }
 }
 
+@SerialVersionUID(1L)
 final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
@@ -147,6 +153,7 @@ final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder
   def build(parentScope: Scope): Text = Text(text, isCData)
 }
 
+@SerialVersionUID(1L)
 final case class ProcessingInstructionBuilder(target: String, data: String) extends NodeBuilder {
   require(target ne null)
   require(data ne null)
@@ -156,6 +163,7 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
   def build(parentScope: Scope): ProcessingInstruction = ProcessingInstruction(target, data)
 }
 
+@SerialVersionUID(1L)
 final case class EntityRefBuilder(entity: String) extends NodeBuilder {
   require(entity ne null)
 
@@ -164,6 +172,7 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
   def build(parentScope: Scope): EntityRef = EntityRef(entity)
 }
 
+@SerialVersionUID(1L)
 final case class CommentBuilder(text: String) extends NodeBuilder {
   require(text ne null)
 
