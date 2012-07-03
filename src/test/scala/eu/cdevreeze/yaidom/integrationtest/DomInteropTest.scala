@@ -230,7 +230,7 @@ class DomInteropTest extends Suite {
     val ois = new jio.ObjectInputStream(bis2)
 
     val rootDocBuilder2 = ois.readObject().asInstanceOf[DocBuilder]
-    val doc7 = rootDocBuilder.build(Scope.Empty)
+    val doc7 = rootDocBuilder2.build(Scope.Empty)
     val root7 = doc7.documentElement
 
     expect((root.findAllElems map (e => e.localName)).toSet) {
