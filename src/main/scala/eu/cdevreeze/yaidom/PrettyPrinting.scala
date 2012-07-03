@@ -133,7 +133,10 @@ object PrettyPrinting {
 
     def apply(lines: Line*): LineSeq = new LineSeq(Vector(lines: _*))
 
-    def apply(line: String): LineSeq = new LineSeq(Vector(new Line(line)))
+    def apply(s: String): LineSeq = {
+      val lines = s.linesIterator.toIndexedSeq map { (ln: String) => new Line(ln) }
+      new LineSeq(lines)
+    }
   }
 
   /** Collection of LineSeq instances, on which operations such as `mkLineSeq` can be performed */
