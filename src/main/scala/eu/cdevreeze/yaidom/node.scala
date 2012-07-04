@@ -44,7 +44,9 @@ import PrettyPrinting._
  * </ul>
  *
  * Nodes are serializable. Serialized Node instances may well be an interesting storage format for parsed XML stored
- * in a database. Serialized NodeBuilders tend to be smaller than serialized Nodes, though.
+ * in a database. Of course, this would be a non-standard format. Moreover, as far as queries are concerned, these columns
+ * are mere BLOBs (unless using Java Stored Procedures written in Scala). Besides, serialized NodeBuilders tend to be smaller
+ * than serialized Nodes.
  *
  * @author Chris de Vreeze
  */
