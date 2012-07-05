@@ -6,27 +6,27 @@ CHANGELOG
 0.6.1
 =====
 
-* Small breaking API change, and (bigger) implementation change: renamed and re-implemented the `toAstString` methods:
+* Small breaking API change, and (bigger) implementation change: renamed and re-implemented the ``toAstString`` methods:
 
-  * They are now called `toTreeRepr` (for "tree representation"), for `Node`s and `NodeBuilder`s
-  * The implementation is easier to understand, using a new `PrettyPrinting` singleton object as `toTreeRepr` implementation detail
-  * The `toTreeRepr` output also slightly changed, for example child `List`s became child `Vector`s
+  * They are now called ``toTreeRepr`` (for "tree representation"), for ``Node``s and ``NodeBuilder``s
+  * The implementation is easier to understand, using a new ``PrettyPrinting`` singleton object as ``toTreeRepr`` implementation detail
+  * The ``toTreeRepr`` output also slightly changed, for example child ``List``s became child ``Vector``s
   
-* Added singleton object `TreeReprParsers`, generating parsers for the `toTreeRepr` String output
+* Added singleton object ``TreeReprParsers``, generating parsers for the ``toTreeRepr`` String output
 
-  * It uses the Scala parser combinator API, extending `JavaTokenParsers`
-  * These tree representations represent parsed XML trees, so they are much closer to `Node`s and `NodeBuilder`s
+  * It uses the Scala parser combinator API, extending ``JavaTokenParsers``
+  * These tree representations represent parsed XML trees, so they are much closer to ``Node``s and ``NodeBuilder``s
   * An extra dependency was added, namely Apache Commons Lang
 
-* `Node` and `NodeBuilder` are now serializable:
+* ``Node`` and ``NodeBuilder`` are now serializable:
 
   * So they could in principle be stored efficiently as a BLOB in the database, and quickly materialized again
   
 * Minor breaking API changes, tightening the collection type for child nodes:
 
-  * `NodeBuilder.elem` factory method now takes an `immutable.IndexedSeq[NodeBuilder]`
+  * ``NodeBuilder.elem`` factory method now takes an ``immutable.IndexedSeq[NodeBuilder]``
   
-* The `EName` and `QName` one-arg `apply` methods now behave like the `parse` methods, so they no longer require only a local part
+* The ``EName`` and ``QName`` one-arg ``apply`` methods now behave like the ``parse`` methods, so they no longer require only a local part
 
 
 0.6.0
