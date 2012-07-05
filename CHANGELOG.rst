@@ -8,14 +8,14 @@ CHANGELOG
 
 * Small breaking API change, and (bigger) implementation change: renamed and re-implemented the ``toAstString`` methods:
 
-  * They are now called ``toTreeRepr`` (for "tree representation"), for ``Node``s and ``NodeBuilder``s
+  * They are now called ``toTreeRepr`` (for "tree representation"), for ``Node`` and ``NodeBuilder``
   * The implementation is easier to understand, using a new ``PrettyPrinting`` singleton object as ``toTreeRepr`` implementation detail
   * The ``toTreeRepr`` output also slightly changed, for example child ``List``s became child ``Vector``s
   
 * Added singleton object ``TreeReprParsers``, generating parsers for the ``toTreeRepr`` String output
 
   * It uses the Scala parser combinator API, extending ``JavaTokenParsers``
-  * These tree representations represent parsed XML trees, so they are much closer to ``Node``s and ``NodeBuilder``s
+  * These tree representations represent parsed XML trees, so they are much closer to ``Node`` and ``NodeBuilder``
   * An extra dependency was added, namely Apache Commons Lang
 
 * ``Node`` and ``NodeBuilder`` are now serializable:
