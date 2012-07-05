@@ -81,7 +81,7 @@ sealed trait Node extends Immutable with Serializable {
   final override def toString: String = toTreeRepr
 
   /** Returns the tree representation as LineSeq, shifted indent spaces to the right */
-  def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq
+  private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq
 }
 
 /** `Document` or `Elem` node */
@@ -150,7 +150,7 @@ final class Document(
   /** Returns `updated(path) { e => elm }` */
   def updated(path: ElemPath, elm: Elem): Document = updated(path) { e => elm }
 
-  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
     val baseUriOptionLineSeq: LineSeq =
@@ -417,7 +417,7 @@ final class Elem(
     self.withChildren(newChildren)
   }
 
-  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val qnameLineSeq: LineSeq = {
       val line = "qname = QName(%s)".format(toStringLiteral(this.qname.toString))
       LineSeq(line)
@@ -495,7 +495,7 @@ final case class Text(text: String, isCData: Boolean) extends Node {
   /** Returns `XmlStringUtils.normalizeString(text)` .*/
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 
-  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     if (isCData) {
       toConcatenatedStringLiterals(text).prepend("cdata(").append(")").shift(indent)
     } else {
@@ -511,7 +511,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 
   override val uid: UID = new UID
 
-  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val targetStringLiteral = toStringLiteral(target)
     val dataStringLiteral = toStringLiteral(data)
     LineSeq("processingInstruction(%s, %s)".format(targetStringLiteral, dataStringLiteral)).shift(indent)
@@ -534,7 +534,7 @@ final case class EntityRef(entity: String) extends Node {
 
   override val uid: UID = new UID
 
-  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val entityStringLiteral = toStringLiteral(entity)
     LineSeq("entityRef(%s)".format(entityStringLiteral)).shift(indent)
   }
@@ -546,7 +546,7 @@ final case class Comment(text: String) extends Node {
 
   override val uid: UID = new UID
 
-  override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     toConcatenatedStringLiterals(text).prepend("comment(").append(")").shift(indent)
   }
 }

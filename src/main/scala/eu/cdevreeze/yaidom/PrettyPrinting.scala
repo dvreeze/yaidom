@@ -4,14 +4,14 @@ import scala.collection.{ immutable, mutable }
 import org.apache.commons.lang3.StringEscapeUtils
 
 /**
- * Pretty printing utility, used in Node and NodeBuilder classes to print the tree representation.
+ * Pretty printing utility, used in Node (and indirectly NodeBuilder) (sub)classes to print the tree representation.
  * The utility is centered around operations on groups of lines, such as shifting.
  *
  * This API is safe to use, because of the use of "immutability everywhere". On the down-side, this very likely negatively
  * affects performance. On the other hand, the design is such that repeated nested indentation (shifting) does not cause
  * any string concatenation, until the lines are all materialized.
  */
-object PrettyPrinting {
+private[yaidom] object PrettyPrinting {
 
   private val NewLine = "%n".format()
 
