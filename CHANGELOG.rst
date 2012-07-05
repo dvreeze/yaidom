@@ -10,12 +10,13 @@ CHANGELOG
 
   * They are now called ``toTreeRepr`` (for "tree representation"), for ``Node`` and ``NodeBuilder``
   * The implementation is easier to understand, using a new ``PrettyPrinting`` singleton object as ``toTreeRepr`` implementation detail
-  * The ``toTreeRepr`` output also slightly changed, for example child ``List``s became child ``Vector``s
+  * The ``toTreeRepr`` output has also slightly changed, for example child ``List`` became child ``Vector``
   
 * Added singleton object ``TreeReprParsers``, generating parsers for the ``toTreeRepr`` String output
 
   * It uses the Scala parser combinator API, extending ``JavaTokenParsers``
   * These tree representations represent parsed XML trees, so they are much closer to ``Node`` and ``NodeBuilder``
+  * The tree representations are valid Scala code themselves (using ``NodeBuilder`` methods)
   * An extra dependency was added, namely Apache Commons Lang
 
 * ``Node`` and ``NodeBuilder`` are now serializable:
@@ -24,7 +25,7 @@ CHANGELOG
   
 * Minor breaking API changes, tightening the collection type for child nodes:
 
-  * ``NodeBuilder.elem`` factory method now takes an ``immutable.IndexedSeq[NodeBuilder]``
+  * The ``NodeBuilder.elem`` factory method now takes an ``immutable.IndexedSeq[NodeBuilder]``
   
 * The ``EName`` and ``QName`` one-arg ``apply`` methods now behave like the ``parse`` methods, so they no longer require only a local part
 
