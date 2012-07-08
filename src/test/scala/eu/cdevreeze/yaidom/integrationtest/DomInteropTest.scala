@@ -224,7 +224,6 @@ class DomInteropTest extends Suite {
     val objectBytes = bos.toByteArray
 
     assert(objectBytes.size >= 1000 && objectBytes.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
-    println(objectBytes.size)
 
     val bis2 = new jio.ByteArrayInputStream(objectBytes)
     val ois = new jio.ObjectInputStream(bis2)
@@ -261,7 +260,6 @@ class DomInteropTest extends Suite {
     val objectBytes3 = bos3.toByteArray
 
     assert(objectBytes3.size >= 1000 && objectBytes3.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
-    println(objectBytes3.size)
 
     val bis3 = new jio.ByteArrayInputStream(objectBytes3)
     val ois3 = new jio.ObjectInputStream(bis3)
