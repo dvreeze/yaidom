@@ -150,7 +150,7 @@ The yaidom "query language" ``ElemLike`` is trivial in comparison, but still qui
 parent nodes, are achieved in a different way in yaidom, by first "indexing" the tree.
 
 The semantics of queries in yaidom are very easy to understand, and very close to Scala's Collections API, and these are "traits" that
-I value very much. It is not often that I want to power of XPath (or even XQuery) instead of yaidom's ``ElemLike`` API.
+I value very much. It is not often that I want the power of XPath (or even XQuery) instead of yaidom's ``ElemLike`` API.
 
 No correctness at all costs
 ===========================
