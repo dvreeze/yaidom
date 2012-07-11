@@ -122,6 +122,8 @@ does ``"foo" \ "bar" flatMap { _ \ "baz" }``
 No extra machinery to understand the expression from a Collections point of view. In yaidom, a node is a node, and a collection
 of nodes is a collection of nodes. That is very easy to understand, and in my opinion warrants a slight increase in verbosity.
 
+.. _`Working with Scala's XML support`: http://www.codecommit.com/blog/scala/working-with-scalas-xml-support
+
 The clarity of element-centric querying
 =======================================
 
