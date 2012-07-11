@@ -17,7 +17,7 @@ Yaidom was created because I feel strongly about some issues with XML processing
 
 * that respected those issues
 * that was centered around immutable and therefore thread-safe node trees
-* and that leverages Scala's Collections API.
+* and that leveraged Scala's Collections API.
 
 The remainder of this document motivates in more detail why yaidom was created, as such a Scala-esque DOM-like XML API.
 
@@ -28,8 +28,7 @@ Common themes
 
 Before discussing the issues that motivate why yaidom was created, I would like to mention some common themes:
 
-* Conciseness is good, but how far do we want to push it? If a small sacrifice in conciseness means much clearer semantics,
-it may well be worth making the sacrifice
+* Conciseness is good, but how far do we want to push it? If a small sacrifice in conciseness means much clearer semantics, it may well be worth making the sacrifice
 * Erroneously suggesting transparency is not a good thing
 * Power is good, but a good power-to-weight ratio may even be better
 
@@ -50,10 +49,8 @@ does not make any such suggestions:
 
 * Yaidom has no ``toString`` method for elements that (supposedly transparently) converts the DOM-like tree to XML strings.
 * Yaidom clearly exposes a JAXP DOM, SAX or StAX parser that can be configured in any way that they can be configured outside yaidom
-* Yaidom does not suggest in any way to do a better job of parsing and printing XML than JAXP does, instead strongly suggesting
-that some knowledge of JAXP parser configuration is essential
-* The yaidom node tree classes do not even live in the same package as the parsing and printing support (but yaidom is careful
-in keeping dependencies among packages unidirectional)
+* Yaidom does not suggest in any way to do a better job of parsing and printing XML than JAXP does, instead strongly suggesting that some knowledge of JAXP parser configuration is essential
+* The yaidom node tree classes do not even live in the same package as the parsing and printing support (but yaidom is careful in keeping dependencies among packages unidirectional)
 
 Therefore, parsing and printing XML are slightly more verbose in yaidom than in many other APIs, and I would argue that this
 is a good thing.
