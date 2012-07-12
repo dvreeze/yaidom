@@ -130,9 +130,7 @@ The Node and NodeSeq issue
 ==========================
 
 In Scala's standard XML library we can do very concise XPath-like quering, like:
-{{{
-"foo" \ "bar" \ "baz"
-}}}
+``"foo" \ "bar" \ "baz"``
 
 This concise syntax does not come for free. To blur the distinction between singleton node collections and single nodes,
 the library has a very strange inheritance hierarchy for nodes, where ``Node`` extends ``NodeSeq`` which in turn extends
@@ -143,20 +141,13 @@ also offers a similar concise XPath-like syntax, but in a different way. It does
 some (Anti-XML) concepts that have no relation to the "domain of XML", such as ``Group``
 
 Yaidom is less ambitious in this regard. In yaidom, the above XPath-like expression becomes:
-{{{
-"foo" \ "bar" flatMap { _ \ "baz" }
-}}}
+``"foo" \ "bar" flatMap { _ \ "baz" }``
 
 It could also be written using for-comprehensions, but, yes, this is more verbose than the XPath-like expression above.
 Yet it is also very clear semantically what is returned:
-{{{
-"foo" \ "bar"
-}}}
-returns an ``immutable.IndexedSeq[Elem]`` and so
-does
-{{{
-"foo" \ "bar" flatMap { _ \ "baz" }
-}}}
+``"foo" \ "bar"``
+returns an ``immutable.IndexedSeq[Elem]`` and so does
+``"foo" \ "bar" flatMap { _ \ "baz" }``
 
 Hence no extra machinery to understand the expression from a Collections point of view. In yaidom, a node is a node, and a collection
 of nodes is a collection of nodes. That is very easy to understand, and in my opinion warrants a slight increase in verbosity.
