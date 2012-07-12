@@ -2,6 +2,9 @@
 Motivation
 ==========
 
+Introduction
+============
+
 XML processing in Java using commonly known APIs is widely known to be rather clunky. Scala's standard XML API came as a
 welcome change. After all, Scala is a far more expressive and productive language than Java, so this should
 extend to Scala's XML API as well.
@@ -24,7 +27,7 @@ The remainder of this document motivates in more detail why yaidom was created, 
 .. _here: http://anti-xml.org/
 
 Common themes
--------------
+=============
 
 Before discussing the issues that motivate why yaidom was created, I would like to mention some common themes:
 
