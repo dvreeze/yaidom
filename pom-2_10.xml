@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<scala.version>2.10.0-M4</scala.version>
+		<scala.version>2.10.0-M5</scala.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
-	<artifactId>yaidom_2.10.0-M4</artifactId>
+	<artifactId>yaidom_2.10.0-M5</artifactId>
 	<version>0.6.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -171,7 +171,7 @@
 		<dependency>
 			<groupId>org.scalatest</groupId>
 			<artifactId>scalatest_${scala.version}</artifactId>
-			<version>1.8-SNAPSHOT</version>
+			<version>1.9-2.10.0-M5-B2</version>
 			<scope>test</scope>
 		</dependency>
 
