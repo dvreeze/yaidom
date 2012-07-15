@@ -123,6 +123,10 @@ class ImmutabilityTest extends Suite {
     val tpe: Type = typeOf[eu.cdevreeze.yaidom.Scope]
 
     val getters: Iterable[TermSymbol] = tpe.members collect { case m if m.isTerm => m.asTermSymbol } filter { _.isGetter }
+    // Case classes have getters too, of course
+    expect(true) {
+      getters.size >= 1
+    }
 
     checkImmutabilityOfType(tpe)
   }
