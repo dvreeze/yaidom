@@ -74,6 +74,47 @@ class ImmutabilityTest extends Suite {
     logger.info("Tree:%n%s".format(treeString))
   }
 
+  @Test def testReification() {
+    val tpe = typeOf[eu.cdevreeze.yaidom.Elem]
+
+    val childrenGetterResultType: Type = {
+      val getters = tpe.members collect { case m if m.isTerm => m.asTermSymbol } filter { _.isGetter }
+      val getter = getters find { m => m.name == newTermName("children") } getOrElse (sys.error("No getter method 'children' found"))
+      val resultType = getter.typeSignatureIn(tpe).resultType
+      resultType
+    }
+    logger.info("Result type of 'children' getter: " + childrenGetterResultType)
+
+    expect(typeOf[immutable.IndexedSeq[Node]]) {
+      childrenGetterResultType
+    }
+    expect(true) {
+      typeOf[immutable.IndexedSeq[Node]] =:= childrenGetterResultType
+    }
+    expect(false) {
+      typeOf[Vector[Node]] =:= childrenGetterResultType
+    }
+    expect(false) {
+      typeOf[immutable.IndexedSeq[eu.cdevreeze.yaidom.Elem]] =:= childrenGetterResultType
+    }
+
+    expect(true) {
+      typeOf[immutable.IndexedSeq[Node]] <:< childrenGetterResultType
+    }
+    expect(true) {
+      typeOf[Vector[Node]] <:< childrenGetterResultType
+    }
+    expect(true) {
+      typeOf[immutable.IndexedSeq[eu.cdevreeze.yaidom.Elem]] <:< childrenGetterResultType
+    }
+    expect(true) {
+      typeOf[Vector[eu.cdevreeze.yaidom.Elem]] <:< childrenGetterResultType
+    }
+    expect(false) {
+      typeOf[List[Node]] <:< childrenGetterResultType
+    }
+  }
+
   @Test def testSomeKnownTypesForImmutability() {
     expect(true) {
       isLikelyImmutableType(typeOf[String])
