@@ -135,6 +135,14 @@ final class ElemBuilder(
       children map { ch => ch.build(newScope) })
   }
 
+  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
+  def withChildren(newChildren: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    new ElemBuilder(qname, attributes, namespaces, newChildren)
+  }
+
+  /** Returns `withChildren(self.children :+ newChild)`. */
+  def plusChild(newChild: NodeBuilder): ElemBuilder = withChildren(self.children :+ newChild)
+
   def withChildNodes(childNodes: immutable.IndexedSeq[Node])(parentScope: Scope): ElemBuilder = {
     new ElemBuilder(
       qname = self.qname,
@@ -216,6 +224,15 @@ object NodeBuilder {
   def entityRef(entity: String): EntityRefBuilder = EntityRefBuilder(entity)
 
   def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
+
+  def elemWithText(
+    qname: QName,
+    attributes: Map[QName, String] = Map(),
+    namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
+    textValue: String): ElemBuilder = {
+
+    new ElemBuilder(qname, attributes, namespaces, Vector(text(textValue)))
+  }
 
   /**
    * Converts a `Node` to a `NodeBuilder`, given a parent scope.
