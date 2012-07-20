@@ -37,7 +37,7 @@ import scala.collection.immutable
  * }}}
  *
  * The latter expression could also be written as follows:
- *
+ * {{{
  * elem(
  *   qname = QName("Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
