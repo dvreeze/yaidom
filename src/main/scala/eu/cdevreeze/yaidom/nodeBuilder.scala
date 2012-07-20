@@ -36,6 +36,18 @@ import scala.collection.immutable
  *       children = Vector(text("Newsweek"))))).build()
  * }}}
  *
+ * The latter expression could also be written as follows:
+ *
+ * elem(
+ *   qname = QName("Magazine"),
+ *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
+ *   children = Vector(
+ *     elemWithText(
+ *       qname = QName("Title"),
+ *       txt = "Newsweek"))).build()
+ * }}}
+ *
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
  * (which are built bottom-up, from leaves to root). In the context of the Anti-XML library, Daniel Spiewak explained this
  * impedance mismatch in https://github.com/djspiewak/anti-xml/issues/78. In yaidom, however, this impedance mismatch
@@ -229,9 +241,9 @@ object NodeBuilder {
     qname: QName,
     attributes: Map[QName, String] = Map(),
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
-    textValue: String): ElemBuilder = {
+    txt: String): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, Vector(text(textValue)))
+    new ElemBuilder(qname, attributes, namespaces, Vector(text(txt)))
   }
 
   /**
