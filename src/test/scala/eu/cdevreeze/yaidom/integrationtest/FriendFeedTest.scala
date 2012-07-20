@@ -262,9 +262,9 @@ class FriendFeedTest extends Suite {
 
     val userElms: immutable.IndexedSeq[ElemBuilder] =
       nickNames map { name =>
-        elem(
+        elemWithText(
           qname = QName("nickname"),
-          children = Vector(text(name)))
+          txt = name)
       }
 
     val userListElm: ElemBuilder =

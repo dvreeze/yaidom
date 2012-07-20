@@ -167,7 +167,7 @@ class QNameTest extends Suite {
       qname3.hashCode
     }
 
-    val qname4 = QName.parse("books:Bookstore").asInstanceOf[PrefixedName]
+    val qname4 = QName("books:Bookstore").asInstanceOf[PrefixedName]
 
     expect("Bookstore") {
       qname4.localPart
@@ -185,7 +185,7 @@ class QNameTest extends Suite {
       qname4.hashCode
     }
 
-    val qname5 = QName.parse("books:Bookstore").asInstanceOf[PrefixedName]
+    val qname5 = QName("books:Bookstore").asInstanceOf[PrefixedName]
 
     expect("Bookstore") {
       qname5.localPart

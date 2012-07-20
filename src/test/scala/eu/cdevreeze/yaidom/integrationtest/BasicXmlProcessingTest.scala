@@ -54,18 +54,18 @@ class BasicXmlProcessingTest extends Suite {
       elem(
         qname = QName("foo"),
         children = Vector(
-          elem(
+          elemWithText(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "greet"),
-            children = Vector(text("hi"))),
-          elem(
+            txt = "hi"),
+          elemWithText(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "count"),
-            children = Vector(text("1"))),
-          elem(
+            txt = "1"),
+          elemWithText(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "color"),
-            children = Vector(text("yellow"))))).build()
+            txt = "yellow"))).build()
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
     expect("hi1yellow") {
@@ -220,9 +220,9 @@ class BasicXmlProcessingTest extends Suite {
                       attributes = Map(QName("title") -> song.title, QName("length") -> song.length))
                   }
 
-                  val descriptionElm = elem(
+                  val descriptionElm = elemWithText(
                     qname = QName("description"),
-                    children = Vector(text(album.description)))
+                    txt = album.description)
 
                   songChildren :+ descriptionElm
                 })

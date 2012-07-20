@@ -644,31 +644,30 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(
-            text("A First Course in Database Systems"))),
+          txt = "A First Course in Database Systems"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Jeffrey"))),
-                elem(
+                  txt = "Jeffrey"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Ullman"))))),
+                  txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Jennifer"))),
-                elem(
+                  txt = "Jennifer"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Widom")))))))))
+                  txt = "Widom")))))))
   }
 
   private val book2: ElemBuilder = {
@@ -678,43 +677,42 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(
-            text("Database Systems: The Complete Book"))),
+          txt = "Database Systems: The Complete Book"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Hector"))),
-                elem(
+                  txt = "Hector"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Garcia-Molina"))))),
+                  txt = "Garcia-Molina"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Jeffrey"))),
-                elem(
+                  txt = "Jeffrey"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Ullman"))))),
+                  txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Jennifer"))),
-                elem(
+                  txt = "Jennifer"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Widom"))))))),
-        elem(
+                  txt = "Widom"))))),
+        elemWithText(
           qname = QName("Remark"),
-          children = Vector(text("Buy this book bundled with \"A First Course\" - a great deal!")))))
+          txt = "Buy this book bundled with \"A First Course\" - a great deal!")))
   }
 
   private val book3: ElemBuilder = {
@@ -724,34 +722,33 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(
-            text("Hector and Jeff's Database Hints"))),
+          txt = "Hector and Jeff's Database Hints"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Jeffrey"))),
-                elem(
+                  txt = "Jeffrey"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Ullman"))))),
+                  txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Hector"))),
-                elem(
+                  txt = "Hector"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Garcia-Molina"))))))),
-        elem(
+                  txt = "Garcia-Molina"))))),
+        elemWithText(
           qname = QName("Remark"),
-          children = Vector(text("An indispensable companion to your textbook")))))
+          txt = "An indispensable companion to your textbook")))
   }
 
   private val book4: ElemBuilder = {
@@ -761,22 +758,21 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(
-            text("Jennifer's Economical Database Hints"))),
+          txt = "Jennifer's Economical Database Hints"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                elem(
+                elemWithText(
                   qname = QName("First_Name"),
-                  children = Vector(text("Jennifer"))),
-                elem(
+                  txt = "Jennifer"),
+                elemWithText(
                   qname = QName("Last_Name"),
-                  children = Vector(text("Widom")))))))))
+                  txt = "Widom")))))))
   }
 
   private val magazine1: ElemBuilder = {
@@ -786,9 +782,9 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(text("National Geographic")))))
+          txt = "National Geographic")))
   }
 
   private val magazine2: ElemBuilder = {
@@ -798,9 +794,9 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(text("National Geographic")))))
+          txt = "National Geographic")))
   }
 
   private val magazine3: ElemBuilder = {
@@ -810,9 +806,9 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(text("Newsweek")))))
+          txt = "Newsweek")))
   }
 
   private val magazine4: ElemBuilder = {
@@ -822,9 +818,9 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
-        elem(
+        elemWithText(
           qname = QName("Title"),
-          children = Vector(text("Hector and Jeff's Database Hints")))))
+          txt = "Hector and Jeff's Database Hints")))
   }
 
   private val bookstore: Elem = {
@@ -833,7 +829,7 @@ class ElemLikeTest extends Suite {
 
     val result: Elem =
       elem(
-        qname = QName.parse("books:Bookstore"),
+        qname = QName("books:Bookstore"),
         namespaces = Declarations.from("" -> ns.toString, "books" -> ns.toString),
         children = Vector(
           book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)

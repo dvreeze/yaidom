@@ -840,16 +840,16 @@ class SaxInteropTest extends Suite {
 
     def bookHtmlString(bookElm: Elem): String = {
       val authorNames: immutable.IndexedSeq[String] =
-        bookElm.filterElems(EName.parse("{http://bookstore}Author")) map { e =>
+        bookElm.filterElems(EName("{http://bookstore}Author")) map { e =>
           "%s %s".format(
-            e.getChildElem(EName.parse("{http://bookstore}First_Name")).trimmedText,
-            e.getChildElem(EName.parse("{http://bookstore}Last_Name")).trimmedText)
+            e.getChildElem(EName("{http://bookstore}First_Name")).trimmedText,
+            e.getChildElem(EName("{http://bookstore}Last_Name")).trimmedText)
         }
 
       val authors = authorNames.mkString(", ")
 
       val result = bookFormatString.format(
-        bookElm.getChildElem(EName.parse("{http://bookstore}Title")).trimmedText,
+        bookElm.getChildElem(EName("{http://bookstore}Title")).trimmedText,
         bookElm.attributeOption(EName("ISBN")).getOrElse(""),
         bookElm.attributeOption(EName("Edition")).getOrElse(""),
         authors,
@@ -857,7 +857,7 @@ class SaxInteropTest extends Suite {
       result
     }
 
-    val booksHtmlString = root.filterElems(EName.parse("{http://bookstore}Book")) map { e => bookHtmlString(e) } mkString ("\n")
+    val booksHtmlString = root.filterElems(EName("{http://bookstore}Book")) map { e => bookHtmlString(e) } mkString ("\n")
     val htmlString = htmlFormatString.format(booksHtmlString)
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
@@ -1010,7 +1010,7 @@ class SaxInteropTest extends Suite {
     import NodeBuilder._
 
     val countryPath = ElemPath.fromCanonicalXPath("/*/car[1]/country[1]")(Scope.Empty)
-    val updatedCountryElm = elem(qname = QName("country"), children = Vector(text("New Zealand"))).build()
+    val updatedCountryElm = elemWithText(qname = QName("country"), txt = "New Zealand").build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
     expect("New Zealand") {

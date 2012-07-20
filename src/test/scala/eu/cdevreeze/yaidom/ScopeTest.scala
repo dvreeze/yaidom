@@ -178,25 +178,25 @@ class ScopeTest extends Suite {
       scope1.resolveQName(QName("book"))
     }
     expect(None) {
-      scope1.resolveQName(QName.parse("book:book"))
+      scope1.resolveQName(QName("book:book"))
     }
 
     val scope2 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
-    expect(Some(EName.parse("{http://a}book"))) {
+    expect(Some(EName("{http://a}book"))) {
       scope2.resolveQName(QName("book"))
     }
     expect(None) {
-      scope2.resolveQName(QName.parse("book:book"))
+      scope2.resolveQName(QName("book:book"))
     }
-    expect(Some(EName.parse("{http://a}book"))) {
-      scope2.resolveQName(QName.parse("a:book"))
+    expect(Some(EName("{http://a}book"))) {
+      scope2.resolveQName(QName("a:book"))
     }
-    expect(Some(EName.parse("{http://ccc}bookstore"))) {
-      scope2.resolveQName(QName.parse("c:bookstore"))
+    expect(Some(EName("{http://ccc}bookstore"))) {
+      scope2.resolveQName(QName("c:bookstore"))
     }
-    expect(Some(EName.parse("{http://www.w3.org/XML/1998/namespace}lang"))) {
-      scope2.resolveQName(QName.parse("xml:lang"))
+    expect(Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))) {
+      scope2.resolveQName(QName("xml:lang"))
     }
   }
 }
