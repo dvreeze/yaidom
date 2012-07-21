@@ -217,24 +217,9 @@ object NodeBuilder {
 
   def elem(
     qname: QName,
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
-
-    elem(qname, Map[QName, String](), children)
-  }
-
-  def elem(
-    qname: QName,
-    attributes: Map[QName, String],
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
-
-    elem(qname, attributes, Scope.Declarations.Empty, children)
-  }
-
-  def elem(
-    qname: QName,
-    attributes: Map[QName, String],
-    namespaces: Scope.Declarations,
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    attributes: Map[QName, String] = Map(),
+    namespaces: Scope.Declarations = Scope.Declarations.Empty,
+    children: immutable.IndexedSeq[NodeBuilder] = Vector()): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, children)
   }
