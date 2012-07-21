@@ -586,7 +586,7 @@ class QueryTest extends Suite {
         qname = QName("Book"),
         children = Vector(
           fromElem(title)(Scope.Empty),
-          textElem(qname = QName("First_Name"), txt = searchedForFirstNames.head))).build()
+          textElem(QName("First_Name"), searchedForFirstNames.head))).build()
 
     expect(2) {
       titleAndFirstNames.size
@@ -618,9 +618,7 @@ class QueryTest extends Suite {
         price = book.attribute(EName("Price")).toDouble
       } yield price
     val averagePrice =
-      textElem(
-        qname = QName("Average"),
-        txt = (prices.sum.toDouble / prices.size).toString).build()
+      textElem(QName("Average"), (prices.sum.toDouble / prices.size).toString).build()
 
     expect(65) {
       averagePrice.trimmedText.toDouble.intValue
@@ -661,9 +659,7 @@ class QueryTest extends Suite {
         qname = QName("Book"),
         children = Vector(
           fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
-          textElem(
-            qname = QName("Price"),
-            txt = price.toString))).build()
+          textElem(QName("Price"), price.toString))).build()
 
     expect(2) {
       cheapBooks.size
@@ -708,9 +704,7 @@ class QueryTest extends Suite {
         qname = QName("Book"),
         children = Vector(
           fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
-          textElem(
-            qname = QName("Price"),
-            txt = price.toString))).build()
+          textElem(QName("Price"), price.toString))).build()
     }
 
     expect(4) {
@@ -792,12 +786,8 @@ class QueryTest extends Suite {
       } yield elem(
         qname = QName("BookPair"),
         children = Vector(
-          textElem(
-            qname = QName("Title1"),
-            txt = bookTitle(book1)),
-          textElem(
-            qname = QName("Title2"),
-            txt = bookTitle(book2)))).build()
+          textElem(QName("Title1"), bookTitle(book1)),
+          textElem(QName("Title2"), bookTitle(book2)))).build()
 
     expect(5) {
       pairs.size
@@ -881,12 +871,8 @@ class QueryTest extends Suite {
         elem(
           qname = QName("Author"),
           children = Vector(
-            textElem(
-              qname = QName("First_Name"),
-              txt = firstNameValue),
-            textElem(
-              qname = QName("Last_Name"),
-              txt = lastNameValue)) ++ bookBuilders).build()
+            textElem(QName("First_Name"), firstNameValue),
+            textElem(QName("Last_Name"), lastNameValue)) ++ bookBuilders).build()
       }
 
     val invertedBookstore: Elem = Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks)
@@ -909,13 +895,9 @@ class QueryTest extends Suite {
         val titleString = bookOrMagazine.getChildElem(EName("Title")).trimmedText
 
         if (bookOrMagazine.resolvedName == EName("Book")) {
-          textElem(
-            qname = QName("BookTitle"),
-            txt = titleString).build()
+          textElem(QName("BookTitle"), titleString).build()
         } else {
-          textElem(
-            qname = QName("MagazineTitle"),
-            txt = titleString).build()
+          textElem(QName("MagazineTitle"), titleString).build()
         }
       }
 
@@ -976,7 +958,7 @@ class QueryTest extends Suite {
       val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
       val lastNameValue: String = author.getChildElem(EName("Last_Name")).trimmedText
       val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
-      val name: ElemBuilder = textElem(qname = QName("Name"), txt = nameValue)
+      val name: ElemBuilder = textElem(QName("Name"), nameValue)
 
       elem(
         qname = author.qname,
@@ -1005,30 +987,20 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "A First Course in Database Systems"),
+        textElem(QName("Title"), "A First Course in Database Systems"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Jeffrey"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Ullman"))),
+                textElem(QName("First_Name"), "Jeffrey"),
+                textElem(QName("Last_Name"), "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Jennifer"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Widom")))))))
+                textElem(QName("First_Name"), "Jennifer"),
+                textElem(QName("Last_Name"), "Widom")))))))
   }
 
   private val book2: ElemBuilder = {
@@ -1038,42 +1010,26 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "Database Systems: The Complete Book"),
+        textElem(QName("Title"), "Database Systems: The Complete Book"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Hector"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Garcia-Molina"))),
+                textElem(QName("First_Name"), "Hector"),
+                textElem(QName("Last_Name"), "Garcia-Molina"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Jeffrey"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Ullman"))),
+                textElem(QName("First_Name"), "Jeffrey"),
+                textElem(QName("Last_Name"), "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Jennifer"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Widom"))))),
-        textElem(
-          qname = QName("Remark"),
-          txt = "Buy this book bundled with \"A First Course\" - a great deal!")))
+                textElem(QName("First_Name"), "Jennifer"),
+                textElem(QName("Last_Name"), "Widom"))))),
+        textElem(QName("Remark"), "Buy this book bundled with \"A First Course\" - a great deal!")))
   }
 
   private val book3: ElemBuilder = {
@@ -1083,33 +1039,21 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "Hector and Jeff's Database Hints"),
+        textElem(QName("Title"), "Hector and Jeff's Database Hints"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Jeffrey"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Ullman"))),
+                textElem(QName("First_Name"), "Jeffrey"),
+                textElem(QName("Last_Name"), "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Hector"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Garcia-Molina"))))),
-        textElem(
-          qname = QName("Remark"),
-          txt = "An indispensable companion to your textbook")))
+                textElem(QName("First_Name"), "Hector"),
+                textElem(QName("Last_Name"), "Garcia-Molina"))))),
+        textElem(QName("Remark"), "An indispensable companion to your textbook")))
   }
 
   private val book4: ElemBuilder = {
@@ -1119,21 +1063,15 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "Jennifer's Economical Database Hints"),
+        textElem(QName("Title"), "Jennifer's Economical Database Hints"),
         elem(
           qname = QName("Authors"),
           children = Vector(
             elem(
               qname = QName("Author"),
               children = Vector(
-                textElem(
-                  qname = QName("First_Name"),
-                  txt = "Jennifer"),
-                textElem(
-                  qname = QName("Last_Name"),
-                  txt = "Widom")))))))
+                textElem(QName("First_Name"), "Jennifer"),
+                textElem(QName("Last_Name"), "Widom")))))))
   }
 
   private val magazine1: ElemBuilder = {
@@ -1143,9 +1081,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "National Geographic")))
+        textElem(QName("Title"), "National Geographic")))
   }
 
   private val magazine2: ElemBuilder = {
@@ -1155,9 +1091,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "National Geographic")))
+        textElem(QName("Title"), "National Geographic")))
   }
 
   private val magazine3: ElemBuilder = {
@@ -1167,9 +1101,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "Newsweek")))
+        textElem(QName("Title"), "Newsweek")))
   }
 
   private val magazine4: ElemBuilder = {
@@ -1179,9 +1111,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
-        textElem(
-          qname = QName("Title"),
-          txt = "Hector and Jeff's Database Hints")))
+        textElem(QName("Title"), "Hector and Jeff's Database Hints")))
   }
 
   private val bookstore: Elem = {

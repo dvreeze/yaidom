@@ -220,9 +220,7 @@ class BasicXmlProcessingTest extends Suite {
                       attributes = Map(QName("title") -> song.title, QName("length") -> song.length))
                   }
 
-                  val descriptionElm = textElem(
-                    qname = QName("description"),
-                    txt = album.description)
+                  val descriptionElm = textElem(QName("description"), album.description)
 
                   songChildren :+ descriptionElm
                 })

@@ -43,9 +43,7 @@ import scala.collection.immutable
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = Vector(
- *     textElem(
- *       qname = QName("Title"),
- *       txt = "Newsweek"))).build()
+ *     textElem(QName("Title"), "Newsweek"))).build()
  * }}}
  *
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
@@ -237,10 +235,22 @@ object NodeBuilder {
 
   def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
 
+  def textElem(qname: QName, txt: String): ElemBuilder = {
+    textElem(qname, Map[QName, String](), txt)
+  }
+
   def textElem(
     qname: QName,
-    attributes: Map[QName, String] = Map(),
-    namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),
+    attributes: Map[QName, String],
+    txt: String): ElemBuilder = {
+
+    textElem(qname, attributes, Scope.Declarations.Empty, txt)
+  }
+
+  def textElem(
+    qname: QName,
+    attributes: Map[QName, String],
+    namespaces: Scope.Declarations,
     txt: String): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, Vector(text(txt)))

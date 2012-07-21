@@ -1011,7 +1011,7 @@ class SaxInteropTest extends Suite {
     import ElemPathBuilder.comp
 
     val countryPath = ElemPathBuilder.from(comp(QName("car"), 0), comp(QName("country"), 0)).build(Scope.Empty)
-    val updatedCountryElm = textElem(qname = QName("country"), txt = "New Zealand").build()
+    val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
     expect("New Zealand") {

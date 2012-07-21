@@ -312,25 +312,15 @@ class AirportExampleTest extends Suite {
           elem(
             qname = QName("Airport"),
             children = Vector(
-              textElem(
-                qname = QName("AirportCode"),
-                txt = airportCode(airportElm)),
-              textElem(
-                qname = QName("AirportOrCityName"),
-                txt = airportOrCityName),
-              textElem(
-                qname = QName("Country"),
-                txt = country),
-              textElem(
-                qname = QName("CountryAbbreviation"),
-                txt = countryAbbreviation),
+              textElem(QName("AirportCode"), airportCode(airportElm)),
+              textElem(QName("AirportOrCityName"), airportOrCityName),
+              textElem(QName("Country"), country),
+              textElem(QName("CountryAbbreviation"), countryAbbreviation),
               elem(
                 qname = QName("Position"),
                 children = Vector(
-                  textElem(
-                    qname = QName("Lat"), txt = lat.toString),
-                  textElem(
-                    qname = QName("Lon"), txt = lon.toString))),
+                  textElem(QName("Lat"), lat.toString),
+                  textElem(QName("Lon"), lon.toString))),
               distancesElemBuilder(airportElm)))
 
         elmBuilder.build(scope)
