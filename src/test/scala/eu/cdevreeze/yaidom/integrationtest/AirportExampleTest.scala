@@ -290,7 +290,7 @@ class AirportExampleTest extends Suite {
             elem(
               qname = QName("Distance"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("Airport"),
                   attributes = Map(QName("code") -> airportCode),
                   txt = dist.toString)))
@@ -312,24 +312,24 @@ class AirportExampleTest extends Suite {
           elem(
             qname = QName("Airport"),
             children = Vector(
-              elemWithText(
+              textElem(
                 qname = QName("AirportCode"),
                 txt = airportCode(airportElm)),
-              elemWithText(
+              textElem(
                 qname = QName("AirportOrCityName"),
                 txt = airportOrCityName),
-              elemWithText(
+              textElem(
                 qname = QName("Country"),
                 txt = country),
-              elemWithText(
+              textElem(
                 qname = QName("CountryAbbreviation"),
                 txt = countryAbbreviation),
               elem(
                 qname = QName("Position"),
                 children = Vector(
-                  elemWithText(
+                  textElem(
                     qname = QName("Lat"), txt = lat.toString),
-                  elemWithText(
+                  textElem(
                     qname = QName("Lon"), txt = lon.toString))),
               distancesElemBuilder(airportElm)))
 

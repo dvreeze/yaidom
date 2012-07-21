@@ -644,7 +644,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "A First Course in Database Systems"),
         elem(
@@ -653,19 +653,19 @@ class ElemLikeTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jeffrey"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jennifer"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Widom")))))))
   }
@@ -677,7 +677,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Database Systems: The Complete Book"),
         elem(
@@ -686,31 +686,31 @@ class ElemLikeTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Hector"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Garcia-Molina"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jeffrey"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jennifer"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Widom"))))),
-        elemWithText(
+        textElem(
           qname = QName("Remark"),
           txt = "Buy this book bundled with \"A First Course\" - a great deal!")))
   }
@@ -722,7 +722,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Hector and Jeff's Database Hints"),
         elem(
@@ -731,22 +731,22 @@ class ElemLikeTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jeffrey"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Hector"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Garcia-Molina"))))),
-        elemWithText(
+        textElem(
           qname = QName("Remark"),
           txt = "An indispensable companion to your textbook")))
   }
@@ -758,7 +758,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Jennifer's Economical Database Hints"),
         elem(
@@ -767,10 +767,10 @@ class ElemLikeTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jennifer"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Widom")))))))
   }
@@ -782,7 +782,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "National Geographic")))
   }
@@ -794,7 +794,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "National Geographic")))
   }
@@ -806,7 +806,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Newsweek")))
   }
@@ -818,7 +818,7 @@ class ElemLikeTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Hector and Jeff's Database Hints")))
   }

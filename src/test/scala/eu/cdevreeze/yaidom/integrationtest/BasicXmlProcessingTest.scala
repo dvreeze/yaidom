@@ -54,15 +54,15 @@ class BasicXmlProcessingTest extends Suite {
       elem(
         qname = QName("foo"),
         children = Vector(
-          elemWithText(
+          textElem(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "greet"),
             txt = "hi"),
-          elemWithText(
+          textElem(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "count"),
             txt = "1"),
-          elemWithText(
+          textElem(
             qname = QName("bar"),
             attributes = Map(QName("type") -> "color"),
             txt = "yellow"))).build()
@@ -220,7 +220,7 @@ class BasicXmlProcessingTest extends Suite {
                       attributes = Map(QName("title") -> song.title, QName("length") -> song.length))
                   }
 
-                  val descriptionElm = elemWithText(
+                  val descriptionElm = textElem(
                     qname = QName("description"),
                     txt = album.description)
 

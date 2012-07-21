@@ -43,7 +43,7 @@ import scala.collection.immutable
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = Vector(
- *     elemWithText(
+ *     textElem(
  *       qname = QName("Title"),
  *       txt = "Newsweek"))).build()
  * }}}
@@ -237,7 +237,7 @@ object NodeBuilder {
 
   def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
 
-  def elemWithText(
+  def textElem(
     qname: QName,
     attributes: Map[QName, String] = Map(),
     namespaces: Scope.Declarations = new Scope.Declarations(Scope.Empty),

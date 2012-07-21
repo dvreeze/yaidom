@@ -335,11 +335,11 @@ class EqualityTest extends Suite {
       elem(
         qname = QName("root"),
         children = Vector(
-          elemWithText(
+          textElem(
             qname = QName("child"),
             attributes = Map(QName("about") -> "Jansen & co"),
             txt = "Jansen & co"),
-          elemWithText(
+          textElem(
             qname = QName("child"),
             attributes = Map(QName("about") -> "Jansen & co"),
             txt = "Jansen & co"))).build(scope)
@@ -379,10 +379,10 @@ class EqualityTest extends Suite {
       elem(
         qname = QName("root"),
         children = Vector(
-          elemWithText(
+          textElem(
             qname = QName("child"),
             txt = txt),
-          elemWithText(
+          textElem(
             qname = QName("child"),
             txt = txt))).build(scope)
 

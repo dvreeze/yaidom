@@ -586,7 +586,7 @@ class QueryTest extends Suite {
         qname = QName("Book"),
         children = Vector(
           fromElem(title)(Scope.Empty),
-          elemWithText(qname = QName("First_Name"), txt = searchedForFirstNames.head))).build()
+          textElem(qname = QName("First_Name"), txt = searchedForFirstNames.head))).build()
 
     expect(2) {
       titleAndFirstNames.size
@@ -618,7 +618,7 @@ class QueryTest extends Suite {
         price = book.attribute(EName("Price")).toDouble
       } yield price
     val averagePrice =
-      elemWithText(
+      textElem(
         qname = QName("Average"),
         txt = (prices.sum.toDouble / prices.size).toString).build()
 
@@ -661,7 +661,7 @@ class QueryTest extends Suite {
         qname = QName("Book"),
         children = Vector(
           fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
-          elemWithText(
+          textElem(
             qname = QName("Price"),
             txt = price.toString))).build()
 
@@ -708,7 +708,7 @@ class QueryTest extends Suite {
         qname = QName("Book"),
         children = Vector(
           fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
-          elemWithText(
+          textElem(
             qname = QName("Price"),
             txt = price.toString))).build()
     }
@@ -792,10 +792,10 @@ class QueryTest extends Suite {
       } yield elem(
         qname = QName("BookPair"),
         children = Vector(
-          elemWithText(
+          textElem(
             qname = QName("Title1"),
             txt = bookTitle(book1)),
-          elemWithText(
+          textElem(
             qname = QName("Title2"),
             txt = bookTitle(book2)))).build()
 
@@ -881,10 +881,10 @@ class QueryTest extends Suite {
         elem(
           qname = QName("Author"),
           children = Vector(
-            elemWithText(
+            textElem(
               qname = QName("First_Name"),
               txt = firstNameValue),
-            elemWithText(
+            textElem(
               qname = QName("Last_Name"),
               txt = lastNameValue)) ++ bookBuilders).build()
       }
@@ -909,11 +909,11 @@ class QueryTest extends Suite {
         val titleString = bookOrMagazine.getChildElem(EName("Title")).trimmedText
 
         if (bookOrMagazine.resolvedName == EName("Book")) {
-          elemWithText(
+          textElem(
             qname = QName("BookTitle"),
             txt = titleString).build()
         } else {
-          elemWithText(
+          textElem(
             qname = QName("MagazineTitle"),
             txt = titleString).build()
         }
@@ -976,7 +976,7 @@ class QueryTest extends Suite {
       val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
       val lastNameValue: String = author.getChildElem(EName("Last_Name")).trimmedText
       val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
-      val name: ElemBuilder = elemWithText(qname = QName("Name"), txt = nameValue)
+      val name: ElemBuilder = textElem(qname = QName("Name"), txt = nameValue)
 
       elem(
         qname = author.qname,
@@ -1005,7 +1005,7 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "A First Course in Database Systems"),
         elem(
@@ -1014,19 +1014,19 @@ class QueryTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jeffrey"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jennifer"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Widom")))))))
   }
@@ -1038,7 +1038,7 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Database Systems: The Complete Book"),
         elem(
@@ -1047,31 +1047,31 @@ class QueryTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Hector"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Garcia-Molina"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jeffrey"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jennifer"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Widom"))))),
-        elemWithText(
+        textElem(
           qname = QName("Remark"),
           txt = "Buy this book bundled with \"A First Course\" - a great deal!")))
   }
@@ -1083,7 +1083,7 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Hector and Jeff's Database Hints"),
         elem(
@@ -1092,22 +1092,22 @@ class QueryTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jeffrey"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Ullman"))),
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Hector"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Garcia-Molina"))))),
-        elemWithText(
+        textElem(
           qname = QName("Remark"),
           txt = "An indispensable companion to your textbook")))
   }
@@ -1119,7 +1119,7 @@ class QueryTest extends Suite {
       qname = QName("Book"),
       attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Jennifer's Economical Database Hints"),
         elem(
@@ -1128,10 +1128,10 @@ class QueryTest extends Suite {
             elem(
               qname = QName("Author"),
               children = Vector(
-                elemWithText(
+                textElem(
                   qname = QName("First_Name"),
                   txt = "Jennifer"),
-                elemWithText(
+                textElem(
                   qname = QName("Last_Name"),
                   txt = "Widom")))))))
   }
@@ -1143,7 +1143,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "National Geographic")))
   }
@@ -1155,7 +1155,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "National Geographic")))
   }
@@ -1167,7 +1167,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Newsweek")))
   }
@@ -1179,7 +1179,7 @@ class QueryTest extends Suite {
       qname = QName("Magazine"),
       attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
-        elemWithText(
+        textElem(
           qname = QName("Title"),
           txt = "Hector and Jeff's Database Hints")))
   }
