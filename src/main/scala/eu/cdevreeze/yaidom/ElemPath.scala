@@ -213,6 +213,8 @@ object ElemPath {
 
       "%s%s[%d]".format("/", elementName.toQName(prefixOption).toString, position)
     }
+
+    def localName: String = elementName.localPart
   }
 
   object Entry {

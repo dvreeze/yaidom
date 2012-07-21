@@ -296,31 +296,39 @@ final class Elem(
    * for which the partial function is defined. The partial function is defined for an element if that element has an [[eu.cdevreeze.yaidom.ElemPath]]
    * (w.r.t. this element as root) for which it is defined. Tree traversal is top-down.
    *
-   * This is an expensive method.
+   * Only topmost elements for which the partial function is defined are "functionally updated", so their descendants, if any, are
+   * determined by the result of the partial function application, not by their occurrence in the original tree.
+   *
+   * This is potentially an expensive method.
    */
   def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
-    def updated(currentPath: ElemPath): Elem = {
-      val elm: Elem = self.findWithElemPath(currentPath).getOrElse(sys.error("Undefined path %s for root element %s".format(currentPath, self)))
+    def updated(currentPath: ElemPath, currentElm: Elem): Elem = {
+      val childNodes = currentElm.children
 
-      currentPath match {
-        case p if pf.isDefinedAt(p) => pf(p)
-        case p =>
-          val childResults: immutable.IndexedSeq[Node] = elm.children map {
+      if (pf.isDefinedAt(currentPath)) {
+        pf(currentPath)
+      } else if (childNodes.isEmpty) {
+        currentElm
+      } else {
+        val childElemsWithPaths: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = currentElm.allChildElemsWithPathEntries
+        var idx = 0
+
+        // Recursive, but not tail-recursive
+        val updatedChildNodes = childNodes map { n =>
+          n match {
             case e: Elem =>
-              val ownPathEntry = e.ownElemPathEntry(elm)
-              val ownPath = currentPath.append(ownPathEntry)
-
-              // Recursive call, but not tail-recursive
-              val updatedElm = updated(ownPath)
-              updatedElm
+              val pathEntry = childElemsWithPaths(idx)._2
+              idx += 1
+              val newPath = currentPath.append(pathEntry)
+              updated(newPath, e)
             case n => n
           }
-
-          elm.withChildren(childResults)
+        }
+        currentElm.withChildren(updatedChildNodes)
       }
     }
 
-    updated(ElemPath.Root)
+    updated(ElemPath.Root, self)
   }
 
   /**

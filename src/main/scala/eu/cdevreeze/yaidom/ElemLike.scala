@@ -409,16 +409,22 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns the `ElemPath` entries of all child elements, in the correct order */
   final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
+    allChildElemsWithPathEntries map { elmPathPair => elmPathPair._2 }
+  }
+
+  /** Returns all child elements with their `ElemPath` entries, in the correct order */
+  final def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)] = {
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
     val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[ElemPath.Entry]()
+    val acc = mutable.ArrayBuffer[(E, ElemPath.Entry)]()
 
     for (elm <- self.allChildElems) {
-      val countForName = elementNameCounts.getOrElse(elm.resolvedName, 0)
-      val entry = ElemPath.Entry(elm.resolvedName, countForName)
-      elementNameCounts.update(elm.resolvedName, countForName + 1)
-      acc += entry
+      val ename = elm.resolvedName
+      val countForName = elementNameCounts.getOrElse(ename, 0)
+      val entry = ElemPath.Entry(ename, countForName)
+      elementNameCounts.update(ename, countForName + 1)
+      acc += (elm -> entry)
     }
 
     acc.toIndexedSeq

@@ -84,6 +84,8 @@ object ElemPathBuilder {
       val ename: EName = scope.resolveQName(qname).getOrElse(sys.error("Could not resolve qname '%s' in scope %s".format(qname, scope)))
       ElemPath.Entry(ename, index)
     }
+
+    def localName: String = qname.localPart
   }
 
   /** Constructs an `ElemPathBuilder.Entry` component */

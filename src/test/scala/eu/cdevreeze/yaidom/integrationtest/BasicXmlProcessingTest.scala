@@ -234,7 +234,7 @@ class BasicXmlProcessingTest extends Suite {
 
     val musicElmWithoutLinks: Elem =
       musicElm updated {
-        case path: ElemPath if path.lastEntryOption.map(_.elementName.localPart).getOrElse("") == "description" =>
+        case path: ElemPath if path.lastEntryOption.map(_.localName).getOrElse("") == "description" =>
           val e = musicElm.findWithElemPath(path).get
           Elem(e.qname, e.attributes - QName("link"), e.scope, e.children)
       }
