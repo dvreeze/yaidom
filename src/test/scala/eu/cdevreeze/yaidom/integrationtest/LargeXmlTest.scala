@@ -319,6 +319,47 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
   }
 
+  @Test def testUpdate() {
+    val parser = DocumentParserUsingDom.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val endMs = System.currentTimeMillis()
+    logger.info("[testUpdate] Parsing (into a Document) took %d ms".format(endMs - startMs))
+
+    val rootElm = doc.documentElement
+    val allElms = rootElm.findAllElemsOrSelf
+    assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
+
+    import ElemPathBuilder.comp
+
+    val path = ElemPathBuilder.from(
+      comp(QName("contact"), 2499),
+      comp(QName("phone"), 0)).build(Scope.Empty)
+
+    val newPhone = "012-34567890"
+
+    val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    expect(false) {
+      oldPhoneElm.text == newPhone
+    }
+
+    // Update
+    val start2Ms = System.currentTimeMillis()
+    val updatedDoc: Document = doc.updated(path) { e =>
+      e.withChildren(Vector(Text(newPhone, false)))
+    }
+    val end2Ms = System.currentTimeMillis()
+    logger.info("Updating an element in the document took %d ms".format(end2Ms - start2Ms))
+
+    val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    expect(true) {
+      newPhoneElm.text == newPhone
+    }
+  }
+
   private def doTest[E <: ElemLike[E] with HasText](elm: E) {
     val startMs = System.currentTimeMillis()
 

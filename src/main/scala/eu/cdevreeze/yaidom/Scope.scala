@@ -52,6 +52,12 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
   /**
    * Returns true if the inverse exists, that is, each namespace URI has a unique prefix
    * (including the empty prefix for the default namespace, if applicable).
+   *
+   * In other words, returns true if the inverse of `toMap` is also a mathematical function, mapping namespace URIs to unique prefixes.
+   *
+   * Invertible scopes offer a one-to-one correspondence between QNames and ENames. This is needed, for example, for `ElemPaths`s.
+   * Only if there is such a one-to-one correspondence, the indexes in `ElemPath`s and `ElemPathBuilder`s are stable, when converting
+   * between the two.
    */
   def isInvertible: Boolean = {
     val m = toMap
