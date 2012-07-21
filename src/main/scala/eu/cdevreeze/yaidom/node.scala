@@ -318,6 +318,7 @@ final class Elem(
           n match {
             case e: Elem =>
               val pathEntry = childElemsWithPaths(idx)._2
+              assert(childElemsWithPaths(idx)._1 == e)
               idx += 1
               val newPath = currentPath.append(pathEntry)
               updated(newPath, e)
