@@ -255,7 +255,11 @@ class EqualityTest extends Suite {
     }
 
     val scope = Scope.fromMap(Map("foobar" -> "urn:foo:bar"))
-    val path = ElemPath.fromCanonicalXPath("/*/foobar:child[1]")(scope)
+
+    import ElemPathBuilder.comp
+
+    val path = ElemPathBuilder.from(comp(QName("foobar:child"), 0)).build(scope)
+
     val root3 = root2.updated(path) {
       e =>
         val newChildren: immutable.IndexedSeq[Node] = e.children flatMap { (n: Node) =>

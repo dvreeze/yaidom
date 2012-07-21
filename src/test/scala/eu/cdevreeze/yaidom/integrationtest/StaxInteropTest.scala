@@ -1019,8 +1019,9 @@ class StaxInteropTest extends Suite {
     }
 
     import NodeBuilder._
+    import ElemPathBuilder.comp
 
-    val countryPath = ElemPath.fromCanonicalXPath("/*/car[1]/country[1]")(Scope.Empty)
+    val countryPath = ElemPathBuilder.from(comp(QName("car"), 0), comp(QName("country"), 0)).build(Scope.Empty)
     val updatedCountryElm = elemWithText(qname = QName("country"), txt = "New Zealand").build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 

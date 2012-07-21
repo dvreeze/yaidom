@@ -118,12 +118,14 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   override def toString: String = entries.toString
 
   /**
-   * Given a `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).
+   * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).
    * The modification is that the root element is written as a slash followed by an asterisk.
    *
    * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
    */
   def toCanonicalXPath(scope: Scope): String = {
+    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+
     val entryXPaths = entries map { entry => entry.toCanonicalXPath(scope) }
     "/" + "*" + entryXPaths.mkString
   }
@@ -135,17 +137,28 @@ object ElemPath {
 
   def apply(entries: immutable.IndexedSeq[ElemPath.Entry]): ElemPath = new ElemPath(entries)
 
-  /** Returns `fromCanonicalXPath(s)(scope)` */
-  def apply(s: String)(scope: Scope): ElemPath = fromCanonicalXPath(s)(scope)
+  /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
+  def apply(s: String)(scope: Scope): ElemPath = {
+    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
-  /** Creates an `ElemPath` from a sequence of entry XPath strings */
+    fromCanonicalXPath(s)(scope)
+  }
+
+  /** Easy to use factory method for `ElemPath` instances */
+  def from(entries: ElemPath.Entry*): ElemPath = new ElemPath(Vector(entries: _*))
+
+  /** Creates an `ElemPath` from a sequence of entry XPath strings. The passed scope must be invertible. */
   def fromXPaths(paths: immutable.Seq[String])(scope: Scope): ElemPath = {
+    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+
     val entries = paths map { path => ElemPath.Entry(path)(scope) }
     apply(entries.toIndexedSeq)
   }
 
-  /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath` */
+  /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath`. The passed scope must be invertible. */
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
+    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
 
     require(s.startsWith("/"), "The canonical XPath must start with a slash")
@@ -178,8 +191,10 @@ object ElemPath {
     /** Position (1-based) of the element as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
-    /** Given a `Scope`, returns the corresponding canonical XPath */
+    /** Given an invertible `Scope`, returns the corresponding canonical XPath */
     def toCanonicalXPath(scope: Scope): String = {
+      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
           val nsUri: String = elementName.namespaceUriOption.get
@@ -202,11 +217,17 @@ object ElemPath {
 
   object Entry {
 
-    /** Returns `fromCanonicalXPath(s)(scope)` */
-    def apply(s: String)(scope: Scope): Entry = fromCanonicalXPath(s)(scope)
+    /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
+    def apply(s: String)(scope: Scope): Entry = {
+      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
-    /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `ElemPath.Entry`, given a `Scope` */
+      fromCanonicalXPath(s)(scope)
+    }
+
+    /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `ElemPath.Entry`, given an invertible `Scope` */
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
+      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+
       // We use the fact that "/", "[" and "]" are never part of qualified names!
 
       require(s.startsWith("/"), "The canonical XPath for the 'entry' must start with a slash")

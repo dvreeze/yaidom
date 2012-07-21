@@ -49,6 +49,15 @@ final case class Scope(defaultNamespaceOption: Option[String], prefixScope: Map[
     defaultNsMap ++ prefixScope
   }
 
+  /**
+   * Returns true if the inverse exists, that is, each namespace URI has a unique prefix
+   * (including the empty prefix for the default namespace, if applicable).
+   */
+  def isInvertible: Boolean = {
+    val m = toMap
+    m.keySet.size == m.values.toSet.size
+  }
+
   /** Returns true if this is a subscope of the given parameter `Scope`. A `Scope` is considered subscope of itself. */
   def subScopeOf(scope: Scope): Boolean = {
     val thisMap = toMap
