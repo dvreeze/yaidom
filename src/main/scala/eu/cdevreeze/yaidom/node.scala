@@ -239,7 +239,7 @@ final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -265,6 +265,11 @@ final class Elem(
     }
   }
 
+  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
+  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+    new Elem(qname, attributes, scope, newChildren)
+  }
+
   /** Returns all child elements */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
@@ -281,97 +286,6 @@ final class Elem(
   override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
-  }
-
-  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
-  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
-    new Elem(qname, attributes, scope, newChildren)
-  }
-
-  /** Returns `withChildren(self.children :+ newChild)`. */
-  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
-
-  /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed partial function to the elements
-   * for which the partial function is defined. The partial function is defined for an element if that element has an [[eu.cdevreeze.yaidom.ElemPath]]
-   * (w.r.t. this element as root) for which it is defined. Tree traversal is top-down.
-   *
-   * Only topmost elements for which the partial function is defined are "functionally updated", so their descendants, if any, are
-   * determined by the result of the partial function application, not by their occurrence in the original tree.
-   *
-   * This is potentially an expensive method.
-   */
-  def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
-    def updated(currentPath: ElemPath, currentElm: Elem): Elem = {
-      val childNodes = currentElm.children
-
-      if (pf.isDefinedAt(currentPath)) {
-        pf(currentPath)
-      } else if (childNodes.isEmpty) {
-        currentElm
-      } else {
-        val childElemsWithPaths: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = currentElm.allChildElemsWithPathEntries
-        var idx = 0
-
-        // Recursive, but not tail-recursive
-        val updatedChildNodes = childNodes map { n =>
-          n match {
-            case e: Elem =>
-              val pathEntry = childElemsWithPaths(idx)._2
-              assert(childElemsWithPaths(idx)._1 == e)
-              idx += 1
-              val newPath = currentPath.append(pathEntry)
-              updated(newPath, e)
-            case n => n
-          }
-        }
-        currentElm.withChildren(updatedChildNodes)
-      }
-    }
-
-    updated(ElemPath.Root, self)
-  }
-
-  /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). The method throws an exception
-   * if no element is found with the given path.
-   */
-  def updated(path: ElemPath)(f: Elem => Elem): Elem = {
-    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
-    // "functional updates" (among other efficient operations).
-
-    if (path.entries.isEmpty) f(self) else {
-      val firstEntry = path.firstEntry
-      val idx = childIndexOf(firstEntry)
-      require(idx >= 0, "The path %s does not exist".format(path))
-      val childElm = children(idx).asInstanceOf[Elem]
-
-      // Recursive, but not tail-recursive
-      val updatedChildren = children.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
-      self.withChildren(updatedChildren)
-    }
-  }
-
-  /** Returns `updated(path) { e => elm }` */
-  def updated(path: ElemPath, elm: Elem): Elem = updated(path) { e => elm }
-
-  /**
-   * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
-   * Must be fast.
-   */
-  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
-    var cnt = 0
-    var idx = -1
-    while (cnt <= pathEntry.index) {
-      val newIdx = children indexWhere ({
-        case e: Elem if e.resolvedName == pathEntry.elementName => true
-        case _ => false
-      }, idx + 1)
-      idx = newIdx
-      cnt += 1
-    }
-    idx
   }
 
   /**

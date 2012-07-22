@@ -69,7 +69,7 @@ trait ParentNode extends Node {
 final case class Elem(
   val resolvedName: EName,
   val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -91,12 +91,9 @@ final case class Elem(
   }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
-  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(resolvedName, resolvedAttributes, newChildren)
   }
-
-  /** Returns `withChildren(self.children :+ newChild)`. */
-  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
