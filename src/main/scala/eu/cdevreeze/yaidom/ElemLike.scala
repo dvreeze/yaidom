@@ -244,7 +244,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
 
   /** Returns this element followed by all descendant elements (that is, the descendant-or-self elements) */
   final def findAllElemsOrSelf: immutable.IndexedSeq[E] = {
-    var result = mutable.ArrayBuffer[E]()
+    val result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: E) {
@@ -261,7 +261,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * That is, the result is equivalent to `findAllElemsOrSelf filter p`.
    */
   final def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
-    var result = mutable.ArrayBuffer[E]()
+    val result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: E) {
@@ -306,7 +306,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
    */
   final def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
-    var result = mutable.ArrayBuffer[E]()
+    val result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: E) {

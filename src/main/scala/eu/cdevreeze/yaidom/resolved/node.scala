@@ -69,11 +69,71 @@ trait ParentNode extends Node {
 final case class Elem(
   val resolvedName: EName,
   val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with TransformableElemLike[Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
   require(children ne null)
+
+  /** Returns the element children */
+  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
+
+  override def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
+    def updated(currentPath: ElemPath, currentElm: Elem): Elem = {
+      val childNodes = currentElm.children
+
+      if (pf.isDefinedAt(currentPath)) {
+        pf(currentPath)
+      } else if (childNodes.isEmpty) {
+        currentElm
+      } else {
+        val childElemsWithPaths: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = currentElm.allChildElemsWithPathEntries
+        var idx = 0
+
+        // Recursive, but not tail-recursive
+        val updatedChildNodes: immutable.IndexedSeq[Node] = childNodes map { (n: Node) =>
+          n match {
+            case e: Elem =>
+              val pathEntry = childElemsWithPaths(idx)._2
+              assert(childElemsWithPaths(idx)._1 == e)
+              idx += 1
+              val newPath = currentPath.append(pathEntry)
+
+              updated(newPath, e)
+            case n => n
+          }
+        }
+        currentElm.withChildren(updatedChildNodes)
+      }
+    }
+
+    updated(ElemPath.Root, self)
+  }
+
+  override def updated(path: ElemPath)(f: Elem => Elem): Elem = {
+    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
+    // "functional updates" (among other efficient operations).
+
+    if (path.entries.isEmpty) f(self) else {
+      val firstEntry = path.firstEntry
+      val idx = childIndexOf(firstEntry)
+      require(idx >= 0, "The path %s does not exist".format(path))
+
+      val childNodes = children
+
+      assert(childNodes(idx).isInstanceOf[Elem])
+      val childElm = childNodes(idx).asInstanceOf[Elem]
+
+      // Recursive, but not tail-recursive
+      val updatedChildren: immutable.IndexedSeq[Node] = childNodes.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
+      self.withChildren(updatedChildren)
+    }
+  }
+
+  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
+  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+    new Elem(resolvedName, resolvedAttributes, newChildren)
+  }
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
@@ -87,9 +147,30 @@ final case class Elem(
     textStrings.mkString
   }
 
-  /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
-  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
-    new Elem(resolvedName, resolvedAttributes, newChildren)
+  /**
+   * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
+   * Must be fast.
+   */
+  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
+    val childNodes = children
+
+    var cnt = 0
+    var idx = -1
+    while (cnt <= pathEntry.index) {
+      val newIdx = childNodes indexWhere ({
+        case e: Elem =>
+          e.resolvedName == pathEntry.elementName
+        case _ => false
+      }, idx + 1)
+
+      idx = newIdx
+      if (idx < 0) {
+        assert(idx == -1)
+        return idx
+      }
+      cnt += 1
+    }
+    idx
   }
 
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
