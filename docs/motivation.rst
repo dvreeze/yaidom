@@ -5,24 +5,26 @@ Motivation
 Introduction
 ============
 
-XML processing in Java using commonly known APIs is known to be rather clunky. Scala's standard XML API therefore came as
+XML processing in Java using commonly known APIs is known to be rather clunky. Scala's standard XML API therefore initially came as
 a welcome change. After all, at least from my perspective, Scala is a far more expressive and productive language than Java,
 so this should at least to some extent hold for Scala's XML API as well.
 
 When doing non-trivial XML processing, Scala's XML API does not really shine, however. This was clearly shown
 here_, by Daniel Spiewak. In his view, the standard Scala XML API suffers from issues w.r.t usability, reliability and
 performance. These issues caused him to start working on an alternative Scala DOM-like XML API, called Anti-XML.
-To be fair, it must be said that Scala's standard XML API predates Scala 2.8, and therefore predates the Scala 2.8 Collections
+In all fairness, it must be said that Scala's standard XML API predates Scala 2.8, and therefore predates the Scala 2.8 Collections
 API.
 
-I am in need of a Scala DOM-like XML API, for a lot of non-trivial XML processing. If Scala's own XML API does
-not fit my needs for XML processing, why not use Anti-XML instead? Why create my own alternative, named yaidom?
+I am in need of a Scala DOM-like XML API, for a lot of non-trivial XML processing. Indeed Scala's own XML API does
+not fit my needs for XML processing, but why not use Anti-XML instead? Why create my own alternative, named yaidom?
 
 Yaidom was created because I feel strongly about some characteristics of XML processing, and I want a Scala DOM-like XML API:
 
 * that respects those characteristics
 * that is centered around immutable and therefore thread-safe node trees
 * and that leverages Scala's Collections API, both from the outside and on the inside.
+
+It is the first of these requirements that kept me from using Anti-XML.
 
 The remainder of this document motivates in more detail why yaidom has been created, as such a Scala-esque DOM-like XML API.
 
@@ -35,7 +37,7 @@ Before discussing the characteristics of XML that motivate why yaidom was create
 of yaidom:
 
 * Conciseness is good, but if a small sacrifice in conciseness means much clearer semantics, it may well be worth making the sacrifice
-* In my opinion, it is not good for an API to erroneously suggest transparency
+* In my opinion, it is not good for an API to suggest transparency where there hardly is any transparency (think "leaky abstractions")
 * Power is good, but a good power-to-weight ratio may even be better
 
 These common themes show that I may be willing to sacrifice a little bit of conciseness or power, if something else can be
@@ -57,7 +59,7 @@ So, XML parsing and printing are not transparent. Yet some XML libraries act lik
 does not make any such suggestions:
 
 * Yaidom has no ``toString`` method for elements that (supposedly transparently) converts the DOM-like tree to XML strings.
-* Yaidom clearly exposes a JAXP DOM, SAX or StAX parser that can be configured in any way that they can be configured outside yaidom
+* Yaidom clearly exposes a JAXP DOM, SAX or StAX parser that can be configured in any way that they can be configured outside of yaidom
 * Yaidom does not suggest to do a better job of parsing and printing XML than JAXP does, instead strongly suggesting that some knowledge of JAXP parser configuration is essential
 * The yaidom node tree classes do not even live in the same package as the parsing and printing support (but yaidom is careful in keeping dependencies among packages unidirectional)
 
@@ -75,12 +77,13 @@ Related to the previous issue is that there is no stable notion of equality for 
 This makes it very hard to define a stable notion of equality for XML. Yet Scala's standard XML library defines equality for
 XML, without it being clear what it means exactly for 2 XML trees to be equal. Anti-XML defines XML elements as case classes,
 suggesting a "true" notion of equality, based on the structure of the element alone. Moreover, in Anti-XML's case, namespace prefixes
-are significant for equality comparisons, yet it is very common to consider 2 XML documents equal if they only differ in the namespace
-prefixes used.
+are significant for equality comparisons, yet it is very common to consider 2 XML documents that only differ in namespace
+prefixes to be equal.
 
 Hence I do not want a DOM-like XML API to suggest in any way that there is a stable notion of equality for XML trees.
 The Scales XML library, while not being a DOM-like API, indeed does require the user to do some work telling the application how to
-compare 2 XML documents for equality. I think this is a good thing.
+compare 2 XML documents for equality. Also see the XMLUnit_ library, which also expects the user to take charge of equality comparisons
+for XML. I think this is a good thing.
 
 Yaidom does offer some notion of equality, but not for normal yaidom node trees. Yaidom has a separate node class hierarchy
 that is meant for equality comparisons, and that contains only element and text nodes, and only namespace URIs instead of
@@ -89,35 +92,37 @@ before making any equality comparisons.
 
 The XML equality issues also make me a bit skeptical about pattern matching for XML.
 
+.. _XMLUnit: http://xmlunit.sourceforge.net/
+
 Qualified versus expanded names
 ===============================
 
 The `XML Namespaces`_ specification clearly distinguishes between qualified names and expanded names. It is a very important
 distinction:
 
-* Qualified names are easy to use, but have no meaning if the prefixes are unbound
+* Qualified names are easy to use, but have no meaning without any context that binds the prefixes (if any)
 * Expanded names have meaning on their own, but are not as easy to use as qualified names
 
-When prefixes are bound to namespace URIs, qualified names are resolved as expanded names.
+Qualified names are resolved as expanded names by binding prefixes to namespace URIs.
 
 Unfortunately, the distinction between qualified and expanded names is not clear in most XML APIs. Very often, only
-qualified names are defined, and often (like in JAXP) a qualified name in the API is an expanded name, but also to some
+qualified names are defined, and often (like in JAXP) a qualified name in the API is really an expanded name, but also to some
 extent a qualified name, because it contains a prefix (which may be insignificant for equality comparisons on the QName).
 
 Yaidom clearly distinguishes between the 2 kinds of names. It is always clear in yaidom which of the 2 are meant.
-Expanded names are a first-class citizen in yaidom, so I can do very precise namespace-aware querying in yaidom, without
-caring about the prefixes used in the XML document.
+Just like qualified names, expanded names are first-class citizens in yaidom, so one could do very precise namespace-aware
+querying in yaidom, without caring about the prefixes used in the XML document.
 
 Another important distinction, at least in my opinion, is that between namespace (un)declarations and scopes. The latter
 map prefixes (or the empty string, for the default namespace) to namespace URIs.
 
-This distinction comes in handy when building a node tree from scratch. To construct a node tree, a scope must be given for
-each element. Typically it is one and the same scope that is passed to each element in the tree, which corresponds to an XML
-tree where only the root element introduces namespaces. Yet it is somewhat clumsy and error-prone to have to give each element
+This distinction comes in handy when building a node tree from scratch, as explained below. To construct a node tree, a scope must
+be given to each element. Typically it is one and the same scope that is passed to each element in the tree, which corresponds to an
+XML tree where only the root element introduces namespaces. Yet it is somewhat clumsy and error-prone to have to give each element
 in the tree a scope. See also the following `Anti-XML issue`_.
 
 Yaidom insists that each element node is valid in that its scope binds all qualified names (of the element, and of the attributes),
-if applicable. Yet the distinction between namespace (un)declarations and scopes comes in handy. If we do not want to pass scopes
+if applicable. Fortunately, the distinction between namespace (un)declarations and scopes comes in handy. If we do not want to pass scopes
 around when creating a node tree, yaidom offers an alternative. Yaidom not only has nodes, but also `NodeBuilders`. The latter
 have no scope, but do have namespace (un)declarations. When using NodeBuilders one should still remember which prefixes are used
 (and need to be resolved later), but at least "scope passing" can be postponed until the moment the root Node is built from the
@@ -140,7 +145,7 @@ In `Working with Scala's XML support`_ Daniel Spiewak (before his work on Anti-X
 also offers a similar concise XPath-like syntax, but in a different way. It does require the user of Anti-XML to understand
 some (Anti-XML) concepts that have no relation to the "domain of XML", such as ``Group``
 
-Yaidom is less ambitious in this regard. In yaidom, the above XPath-like expression becomes:
+Yaidom is less ambitious in this regard. In yaidom, the above XPath-like expression becomes the following somewhat more verbose expression:
 ``"foo" \ "bar" flatMap { _ \ "baz" }``
 
 It could also be written using for-comprehensions, but, yes, this is more verbose than the XPath-like expression above.
@@ -149,7 +154,7 @@ Yet it is also very clear semantically what is returned:
 returns an ``immutable.IndexedSeq[Elem]`` and so does
 ``"foo" \ "bar" flatMap { _ \ "baz" }``
 
-Hence no extra machinery to understand the expression from a Collections point of view. In yaidom, a node is a node, and a collection
+Hence it is trivial to understand the expression from a Collections point of view. In yaidom, a node is a node, and a collection
 of nodes is a collection of nodes. That is very easy to understand, and in my opinion warrants a slight increase in verbosity.
 
 .. _`Working with Scala's XML support`: http://www.codecommit.com/blog/scala/working-with-scalas-xml-support
@@ -161,26 +166,37 @@ Talking about simple semantics, we can take this a bit further, and consider ele
 of nodes. After all, whichever the configuration of the XML parser, it should always find the same element nodes, but that does not
 necessarily hold for text nodes, comments etc.
 
-Indeed, in yaidom querying is element-centric. If you want to query for some text nodes, you have to do so using a query for
-their parent element nodes, which would indeed make such queries more verbose. Yet the element-centric approach does have plenty of
-power at a very modest weight. Yaidom's ``ElemLike`` trait contains 1 type parameter (for the actual element type), and requires
-implementations of only 3 simple methods (getting expanded element name, the attributes and the child elements), yet offers a rich
-API for querying elements.
+It is surprising how easy it can be to create a powerful querying API, leveraging Scala's Collections API, in an element-only
+universe (at least from the perspective of the API). Indeed, yaidom offers trait ``ElemLike`` which knows only about elements
+(which is indeed the single type parameter of the trait, representing the captured element type itself). The trait turns a minimal
+API (abstract methods such as ``allChildElems``) into a rich element-centric querying API.
 
-Of course, XPath is a lot richer, but it is also quite different, because:
+Trait ``ElemLike`` could itself have been minimal. If it implemented only methods ``findAllElemsOrSelf`` and ``findTopmostElemsOrSelf``
+(in terms of method ``allChildElems``), Scala's Collections API could do the rest when querying for elements. For ease of use,
+and to a lesser extent for performance, the trait is a lot richer than that.
+
+Personally I like this element-centric approach in the core yaidom querying API a lot. The power-to-weight ratio is excellent.
+Of course querying for specific text nodes is somewhat more involved, but not that much more involved. (Trait ``ElemLike`` does not
+know about text nodes, but class ``Elem`` into which the trait is mixed in does know about them.) Using immutable element trees and
+eager evaluation, parent elements can not be queried for, but there are other means in yaidom to obtain element ancestors (after
+"indexing" the tree).
+
+Leveraging Scala's Collections API, a trait like ``ElemLike`` as general element query API (used as mixin in multiple element classes)
+was really a low hanging fruit.
+
+Of course, in comparison XPath is a lot richer than the ElemLike API, but it is also quite different, because:
 
 * XPath is more about "navigation" (in any direction, including up to ancestors) than "node set transformations"
 * In XPath, the notion of "root" is somewhat vague
-* XPath is not mainly about element nodes, but other kinds of nodes as well
+* XPath is not mainly about element nodes, but other kinds of nodes (including attribute nodes) as well
 * XPath blurs the distinction between singleton node collections and the single nodes themselves
 * There is a lot of (implicit) existential quantification in XPath
 * XPath 2.0 even leverages the very complex XML Schema type system
 
-The yaidom "query language" ``ElemLike`` is trivial in comparison, but still quite powerful for its size. Some things, like getting
-parent nodes, are achieved in a different way in yaidom, by first "indexing" the tree.
+The yaidom "query language" ``ElemLike`` is trivial in comparison, but still quite powerful for its size.
 
 The semantics of queries in yaidom are very easy to understand, and very close to Scala's Collections API, and these are "traits" that
-I value very much. It is not often that I want the power of XPath (or even XQuery) instead of yaidom's ``ElemLike`` API.
+I value very much. It is not often that I long for the power of XPath (or even XQuery) instead of yaidom's ``ElemLike`` API.
 
 No correctness at all costs
 ===========================
@@ -191,7 +207,7 @@ well with other ones? Case in point: DTDs and namespaces.
 Hence yaidom makes some pragmatics choices, such as:
 
 * For ease of use, attributes in yaidom are not nodes
-* Namespace declarations in yaidom are not attributes (avoiding the circularity between namespace declarations and attributes with namespaces)
+* Namespace declarations in yaidom are not attributes (avoiding the conceptual circularity between namespace declarations and attributes with namespaces)
 * Namespace undeclarations are allowed in yaidom, even if the XML version is 1.0
 
 No completeness at all costs
