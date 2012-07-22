@@ -135,6 +135,9 @@ final case class Elem(
     new Elem(resolvedName, resolvedAttributes, newChildren)
   }
 
+  /** Returns `withChildren(self.children :+ newChild)`. */
+  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
+
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 

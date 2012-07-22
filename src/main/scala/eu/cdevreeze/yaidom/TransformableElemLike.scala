@@ -22,11 +22,10 @@ import scala.collection.immutable
  * Transformable `ElemLike`. It augments `ElemLike` with a contract for "functional updates".
  *
  * Implementation notes: We could provide implementations of the `updated` methods, but not without any costs.
- * I tried several options, such as introducing another type parameter for the node supertype. That was successful, but not without
- * introducing some casts from the raw ElemLike type to the self type. Getting rid of those casts quickly became intrusive.
- * Another option was to move the node supertype out of the equation again, but trying to forget about other nodes than elements
- * in the implementation also became somewhat awkward. In the end, I returned to a simple solution of some code duplication,
- * hidden behind this trait that only defines the contract for transformable elements, and implements only one convenience update method.
+ * I tried several options, such as introducing another type parameter for the node supertype, or using abstract types,
+ * or getting rid of nodes altogether in the "update" trait. No such attempt led to a very satisfactory result: either
+ * casts deep inside the code were needed, or the solution was intrusive, or performance suffered. In the end, I accepted
+ * some code duplication, hidden by a common contract, namely this trait.
  *
  * @tparam E The captured element subtype
  *

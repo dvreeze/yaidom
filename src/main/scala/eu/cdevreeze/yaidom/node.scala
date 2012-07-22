@@ -325,6 +325,9 @@ final class Elem(
     new Elem(qname, attributes, scope, newChildren)
   }
 
+  /** Returns `withChildren(self.children :+ newChild)`. */
+  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
+
   /**
    * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
    * Must be fast.
