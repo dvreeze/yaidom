@@ -359,6 +359,26 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     expect(true) {
       newPhoneElm.text == newPhone
     }
+
+    // Comparing the corresponding resolved elements
+
+    val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
+
+    val resolvedElm2: resolved.Elem = resolved.Elem(doc.documentElement).updated(path) { e =>
+      e.withChildren(Vector(resolved.Text(newPhone)))
+    }
+
+    val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
+
+    expect(false) {
+      resolvedElm1 == resolvedElm2
+    }
+    expect(false) {
+      resolvedElm1 == resolvedElm3
+    }
+    expect(true) {
+      resolvedElm2 == resolvedElm3
+    }
   }
 
   @Test def testUpdateAgain() {
