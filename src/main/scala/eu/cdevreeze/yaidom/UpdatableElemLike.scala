@@ -20,9 +20,14 @@ import scala.collection.immutable
 
 /**
  * Updatable ElemLike. It augments an `ElemLike` with "functional update" support.
- * By implementing methods `children` and `withChildren`, this API offers several methods for "functional updates".
+ *
+ * The only abstract methods (ignoring those required by the `ElemLike` trait) are `children` and `withChildren`.
+ * Based on these methods alone, this trait offers a rich API for "functionally updating" elements.
  *
  * Typical element classes extend this trait.
+ *
+ * See method `children` for requirements on node type N and element type E that are not checked by the compiler
+ * (because we do not tell the compiler), but must hold in order for this trait to work.
  *
  * @tparam N The node type at the top of the node type hierarchy
  * @tparam E The captured element subtype
@@ -31,11 +36,29 @@ import scala.collection.immutable
  */
 trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike[E] { self: E =>
 
-  /** Returns all child nodes (elements and other nodes) in the correct order */
+  /**
+   * Returns all child nodes (elements and other nodes) in the correct order.
+   *
+   * Each child node is either an element of type `ElemLike[_]`, or not. The following must hold:
+   * if a child node is an element of type `ElemLike[_]`, it is also of self type `E` (and `ElemLike[E]`), and we can safely
+   * cast the node to that self type.
+   */
   def children: immutable.IndexedSeq[N]
 
   /** "Functionally updates" this element with the passed child nodes */
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
+
+  /**
+   * Returns all child elements, in the correct order (same order as method `children`, but filtering only elements).
+   * See method `children` for remarks about child element types.
+   *
+   * Note that this method is required by the `ElemLike` trait.
+   */
+  final def allChildElems: immutable.IndexedSeq[E] = children collect {
+    case e: ElemLike[_] =>
+      // We can safely cast e to type E, which is the subtype of N for elements
+      e.asInstanceOf[E]
+  }
 
   /** Returns `withChildren(self.children :+ newChild)`. */
   final def plusChild(newChild: N): E = withChildren(self.children :+ newChild)
@@ -70,6 +93,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
               assert(childElemsWithPaths(idx)._1 == e)
               idx += 1
               val newPath = currentPath.append(pathEntry)
+
               // We can safely cast e to type E, which is the subtype of N for elements
               updated(newPath, e.asInstanceOf[E])
             case n => n
@@ -95,12 +119,15 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
       val firstEntry = path.firstEntry
       val idx = childIndexOf(firstEntry)
       require(idx >= 0, "The path %s does not exist".format(path))
-      assert(children(idx).isInstanceOf[ElemLike[_]])
+
+      val childNodes = children
+
+      assert(childNodes(idx).isInstanceOf[ElemLike[_]])
       // We can safely cast children(idx) to type E, which is the subtype of N for elements
-      val childElm = children(idx).asInstanceOf[E]
+      val childElm = childNodes(idx).asInstanceOf[E]
 
       // Recursive, but not tail-recursive
-      val updatedChildren: immutable.IndexedSeq[N] = children.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
+      val updatedChildren: immutable.IndexedSeq[N] = childNodes.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
       self.withChildren(updatedChildren)
     }
   }
@@ -113,16 +140,23 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
    * Must be fast.
    */
   final def childIndexOf(pathEntry: ElemPath.Entry): Int = {
+    val childNodes = children
+
     var cnt = 0
     var idx = -1
     while (cnt <= pathEntry.index) {
-      val newIdx = children indexWhere ({
+      val newIdx = childNodes indexWhere ({
         case e: ElemLike[_] =>
           // We can safely cast e to type E, which is the subtype of N for elements
           e.asInstanceOf[E].resolvedName == pathEntry.elementName
         case _ => false
       }, idx + 1)
+
       idx = newIdx
+      if (idx < 0) {
+        assert(idx == -1)
+        return idx
+      }
       cnt += 1
     }
     idx

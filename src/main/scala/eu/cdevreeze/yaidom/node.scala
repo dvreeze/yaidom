@@ -270,9 +270,6 @@ final class Elem(
     new Elem(qname, attributes, scope, newChildren)
   }
 
-  /** Returns all child elements */
-  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 

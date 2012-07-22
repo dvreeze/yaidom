@@ -75,9 +75,6 @@ final case class Elem(
   require(resolvedAttributes ne null)
   require(children ne null)
 
-  /** Returns all child elements */
-  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
