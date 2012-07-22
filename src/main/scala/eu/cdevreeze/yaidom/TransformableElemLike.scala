@@ -19,19 +19,19 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * Transformable `ElemLike`. It augments `ElemLike` with a contract for "functional updates".
+ * Transformable element. It defines a contract for "functional updates".
  *
  * Implementation notes: We could provide implementations of the `updated` methods, but not without any costs.
- * I tried several options, such as introducing another type parameter for the node supertype, or using abstract types,
- * or getting rid of nodes altogether in the "update" trait. No such attempt led to a very satisfactory result: either
+ * I tried several options, such as introducing another type parameter for the node supertype, or using abstract type members,
+ * or getting rid of nodes altogether in the "update" trait. No such attempt led to a sufficiently satisfactory result: either
  * casts deep inside the code were needed, or the solution was intrusive, or performance suffered. In the end, I accepted
- * some code duplication, hidden by a common contract, namely this trait.
+ * some code duplication, hidden behind a common contract, namely this trait.
  *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait TransformableElemLike[E <: TransformableElemLike[E]] extends ElemLike[E] { self: E =>
+trait TransformableElemLike[E <: TransformableElemLike[E]] {
 
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed partial function to the elements
