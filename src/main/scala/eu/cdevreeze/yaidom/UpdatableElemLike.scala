@@ -65,11 +65,12 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
         // Recursive, but not tail-recursive
         val updatedChildNodes: immutable.IndexedSeq[N] = childNodes map { (n: N) =>
           n match {
-            case e: ElemLike[E] =>
+            case e: ElemLike[_] =>
               val pathEntry = childElemsWithPaths(idx)._2
               assert(childElemsWithPaths(idx)._1 == e)
               idx += 1
               val newPath = currentPath.append(pathEntry)
+              // We can safely cast e to type E, which is the subtype of N for elements
               updated(newPath, e.asInstanceOf[E])
             case n => n
           }
@@ -94,7 +95,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
       val firstEntry = path.firstEntry
       val idx = childIndexOf(firstEntry)
       require(idx >= 0, "The path %s does not exist".format(path))
-      assert(children(idx).isInstanceOf[ElemLike[E]])
+      assert(children(idx).isInstanceOf[ElemLike[_]])
+      // We can safely cast children(idx) to type E, which is the subtype of N for elements
       val childElm = children(idx).asInstanceOf[E]
 
       // Recursive, but not tail-recursive
@@ -115,7 +117,9 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
     var idx = -1
     while (cnt <= pathEntry.index) {
       val newIdx = children indexWhere ({
-        case e: ElemLike[E] if e.asInstanceOf[E].resolvedName == pathEntry.elementName => true
+        case e: ElemLike[_] =>
+          // We can safely cast e to type E, which is the subtype of N for elements
+          e.asInstanceOf[E].resolvedName == pathEntry.elementName
         case _ => false
       }, idx + 1)
       idx = newIdx
