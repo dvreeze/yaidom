@@ -581,3 +581,91 @@ object Elem {
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 }
+
+/**
+ * This singleton object contains a DSL to easily create deeply nested Elems.
+ * It looks a lot like the DSL for NodeBuilders, but using prefix "mk" in the method names. For example: `mkElem`.
+ *
+ * There is a catch, though. When using this DSL, scopes must be passed throughout the tree. These Scopes had better be
+ * the same (or parent element scopes should be subscopes of child element scopes), because otherwise the corresponding XML
+ * may contain a lot of namespace undeclarations.
+ *
+ * In other words, choose your poison. The NodeBuilder DSL does have the advantage over this DSL that scopes do not have to be
+ * passed around.
+ *
+ * Example:
+ * {{{
+ * import Node._
+ * import Scope._
+ *
+ * val scope = Scope.from("dbclass" -> "http://www.db-class.org")
+ *
+ * mkElem(
+ *   qname = QName("Magazine"),
+ *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   scope = scope,
+ *   children = Vector(
+ *     mkElem(
+ *       qname = QName("Title"),
+ *       scope = scope,
+ *       children = Vector(mkText("Newsweek"))))).build()
+ * }}}
+ *
+ * The latter expression could also be written as follows:
+ * {{{
+ * mkElem(
+ *   qname = QName("Magazine"),
+ *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   scope = scope,
+ *   children = Vector(
+ *     mkTextElem(QName("Title"), scope, "Newsweek"))).build()
+ * }}}
+ */
+object Node {
+
+  def mkDocument(
+    baseUriOption: Option[String] = None,
+    documentElement: Elem,
+    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
+    comments: immutable.IndexedSeq[Comment] = Vector()): Document = {
+
+    new Document(
+      baseUriOption map { uriString => new URI(uriString) },
+      documentElement,
+      processingInstructions,
+      comments)
+  }
+
+  def mkElem(
+    qname: QName,
+    attributes: Map[QName, String] = Map(),
+    scope: Scope,
+    children: immutable.IndexedSeq[Node] = Vector()): Elem = {
+
+    new Elem(qname, attributes, scope, children)
+  }
+
+  def mkText(textValue: String): Text = Text(text = textValue, isCData = false)
+
+  def mkCData(textValue: String): Text = Text(text = textValue, isCData = true)
+
+  def mkProcessingInstruction(target: String, data: String): ProcessingInstruction =
+    ProcessingInstruction(target, data)
+
+  def mkEntityRef(entity: String): EntityRef = EntityRef(entity)
+
+  def mkComment(textValue: String): Comment = Comment(textValue)
+
+  def mkTextElem(qname: QName, scope: Scope, txt: String): Elem = {
+    mkTextElem(qname, Map[QName, String](), scope, txt)
+  }
+
+  def mkTextElem(
+    qname: QName,
+    attributes: Map[QName, String],
+    scope: Scope,
+    txt: String): Elem = {
+
+    new Elem(qname, attributes, scope, Vector(mkText(txt)))
+  }
+}
