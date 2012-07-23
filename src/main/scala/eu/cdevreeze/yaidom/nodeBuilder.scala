@@ -27,23 +27,23 @@ import scala.collection.immutable
  * import Scope._
  *
  * elem(
- *   qname = QName("Magazine"),
+ *   qname = QName("dbclass:Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = Vector(
  *     elem(
- *       qname = QName("Title"),
+ *       qname = QName("dbclass:Title"),
  *       children = Vector(text("Newsweek"))))).build()
  * }}}
  *
  * The latter expression could also be written as follows:
  * {{{
  * elem(
- *   qname = QName("Magazine"),
+ *   qname = QName("dbclass:Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = Vector(
- *     textElem(QName("Title"), "Newsweek"))).build()
+ *     textElem(QName("dbclass:Title"), "Newsweek"))).build()
  * }}}
  *
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"

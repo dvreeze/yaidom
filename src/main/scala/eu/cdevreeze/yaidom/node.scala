@@ -601,12 +601,12 @@ object Elem {
  * val scope = Scope.from("dbclass" -> "http://www.db-class.org")
  *
  * mkElem(
- *   qname = QName("Magazine"),
+ *   qname = QName("dbclass:Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   scope = scope,
  *   children = Vector(
  *     mkElem(
- *       qname = QName("Title"),
+ *       qname = QName("dbclass:Title"),
  *       scope = scope,
  *       children = Vector(mkText("Newsweek"))))).build()
  * }}}
@@ -614,11 +614,11 @@ object Elem {
  * The latter expression could also be written as follows:
  * {{{
  * mkElem(
- *   qname = QName("Magazine"),
+ *   qname = QName("dbclass:Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   scope = scope,
  *   children = Vector(
- *     mkTextElem(QName("Title"), scope, "Newsweek"))).build()
+ *     mkTextElem(QName("dbclass:Title"), scope, "Newsweek"))).build()
  * }}}
  */
 object Node {
