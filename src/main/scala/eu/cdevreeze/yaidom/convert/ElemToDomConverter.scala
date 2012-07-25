@@ -60,7 +60,7 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     node match {
       case e: Elem => convertElem(e, doc, parent, parentScope)
       case t: Text if t.isCData => convertCData(t, doc, parent)
-      case t: Text => require(!t.isCData); convertText(t, doc, parent)
+      case t: Text => assert(!t.isCData); convertText(t, doc, parent)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc, parent)
       case er: EntityRef => convertEntityRef(er, doc, parent)
       case c: Comment => convertComment(c, doc, parent)

@@ -64,7 +64,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     node match {
       case e: Elem => convertElem(e, xmlEventFactory, parentScope)
       case t: Text if t.isCData => convertCData(t, xmlEventFactory)
-      case t: Text => require(!t.isCData); convertText(t, xmlEventFactory)
+      case t: Text => assert(!t.isCData); convertText(t, xmlEventFactory)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, xmlEventFactory)
       // Difficult to convert yaidom EntityRef to StAX EntityReference, because of missing declaration
       case er: EntityRef => immutable.IndexedSeq[XMLEvent]()

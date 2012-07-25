@@ -395,7 +395,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
 
     def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {
-      require(entryIndex >= 0 && entryIndex <= path.entries.size)
+      assert(entryIndex >= 0 && entryIndex <= path.entries.size)
 
       if (entryIndex == path.entries.size) Some(currentRoot) else {
         val newRootOption: Option[E] = currentRoot.findWithElemPathEntry(path.entries(entryIndex))

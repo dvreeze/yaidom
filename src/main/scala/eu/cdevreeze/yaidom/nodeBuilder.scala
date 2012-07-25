@@ -277,7 +277,7 @@ object NodeBuilder {
         processingInstructions = d.processingInstructions collect { case pi: ProcessingInstruction => fromNode(pi)(parentScope).asInstanceOf[ProcessingInstructionBuilder] },
         comments = d.comments collect { case c => fromNode(c)(parentScope).asInstanceOf[CommentBuilder] })
     case e: Elem =>
-      require(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
+      assert(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 
       // Recursive call, but not tail-recursive
       new ElemBuilder(

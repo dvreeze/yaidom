@@ -176,7 +176,7 @@ object DocumentPrinterUsingSax {
   /** Returns `newInstance(TransformerFactory.newInstance().asInstanceOf[SAXTransformerFactory])` */
   def newInstance(): DocumentPrinterUsingSax = {
     val tf = TransformerFactory.newInstance()
-    require(tf.getFeature(SAXTransformerFactory.FEATURE), "The TransformerFactory %s is not a SAXTransformerFactory".format(tf.getClass))
+    assert(tf.getFeature(SAXTransformerFactory.FEATURE), "The TransformerFactory %s is not a SAXTransformerFactory".format(tf.getClass))
     val stf = tf.asInstanceOf[SAXTransformerFactory]
 
     newInstance(stf)

@@ -131,7 +131,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
   private def toQName(v: org.w3c.dom.Element): QName = {
     val name: String = v.getTagName
     val arr = name.split(':')
-    require(arr.length >= 1 && arr.length <= 2)
+    assert(arr.length >= 1 && arr.length <= 2)
     if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
 
@@ -139,7 +139,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
   private def toQName(v: org.w3c.dom.Attr): QName = {
     val name: String = v.getName
     val arr = name.split(':')
-    require(arr.length >= 1 && arr.length <= 2)
+    assert(arr.length >= 1 && arr.length <= 2)
     if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
 
@@ -147,7 +147,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
   private def isNamespaceDeclaration(v: org.w3c.dom.Attr): Boolean = {
     val name: String = v.getName
     val arr = name.split(':')
-    require(arr.length >= 1 && arr.length <= 2)
+    assert(arr.length >= 1 && arr.length <= 2)
     val result = arr(0) == "xmlns"
     result
   }
@@ -156,7 +156,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
   private def extractNamespaceDeclaration(v: org.w3c.dom.Attr): (Option[String], String) = {
     val name: String = v.getName
     val arr = name.split(':')
-    require(arr.length >= 1 && arr.length <= 2)
+    assert(arr.length >= 1 && arr.length <= 2)
     require(arr(0) == "xmlns")
     val prefixOption: Option[String] = if (arr.length == 1) None else Some(arr(1))
     val attrValue: String = v.getValue

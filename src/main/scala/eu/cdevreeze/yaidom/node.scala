@@ -382,7 +382,7 @@ final class Elem(
 
       val childPaths = elm.allChildElemPathEntries map { entry => path.append(entry) }
       val childElms = elm.allChildElems
-      require(childPaths.size == childElms.size)
+      assert(childPaths.size == childElms.size)
 
       val childElmPathPairs = childElms.zip(childPaths)
 
