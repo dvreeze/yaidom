@@ -232,8 +232,8 @@ Conclusion
 ==========
 
 I wanted a Scala-esque DOM-like XML library, centered around immutable thread-safe nodes. I also wanted that library to be somewhat
-less ambitious and more "pessimistic" than existing alternatives, such as the standard Scala XML library or Anti-XML. Hence, I created
-yaidom.
+less ambitious and more "pessimistic" than existing alternatives, such as the standard Scala XML library or Anti-XML. Moreover, I
+wanted the library to be sufficiently ease to use for XML scripting tasks (powered by Scala Collections). Hence, I created yaidom.
 
 By the way, in one way yaidom is pretty optimistic, namely the availability of (heap) memory. Maybe in Scala 2.10, with the help of
 SIP-15 (value classes), yaidom can become more memory-efficient.
