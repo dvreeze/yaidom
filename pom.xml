@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
@@ -122,6 +123,9 @@
 					<!-- See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993 
 						for the increased max stack size -->
 					<!-- <argLine>-Xmx4G -Xss20M</argLine> -->
+
+					<!-- We now use settings that would work in a 32bit environment -->
+					<argLine>-Xmx1350M -Xss5M</argLine>
 				</configuration>
 			</plugin>
 		</plugins>

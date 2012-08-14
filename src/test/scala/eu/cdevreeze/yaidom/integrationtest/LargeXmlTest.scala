@@ -174,7 +174,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Test def testSerializeLargeNodeBuilder() {
+  @Ignore @Test def testSerializeLargeNodeBuilder() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -209,7 +209,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Test def testSerializeLargeNode() {
+  @Ignore @Test def testSerializeLargeNode() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()

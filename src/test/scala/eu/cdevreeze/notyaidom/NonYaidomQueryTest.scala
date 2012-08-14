@@ -50,7 +50,7 @@ class NonYaidomQueryTest extends Suite {
   /**
    * Naive element class, which for example is not namespace-aware.
    *
-   * This class shows how methods findAllElemsOrSelf and findAllElemsOrSelf, along with the Scala
+   * This class shows how methods findAllElemsOrSelf and findTopmostElemsOrSelf, along with the Scala
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final class Elem(

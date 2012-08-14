@@ -26,19 +26,21 @@ import scala.collection.{ immutable, mutable }
  * Based on an abstract method returning the child elements, this trait offers query methods to find descendant-or-self elements,
  * topmost descendant-or-self elements obeying a predicate, and so on.
  *
- * This trait implements those methods of the `Elem` class. It is also used for implementing parts of other "element-like" classes,
- * other than the "core" [[eu.cdevreeze.yaidom.Elem]] class, such as [[eu.cdevreeze.yaidom.resolved.Elem]] for "resolved" elements.
+ * This trait implements those methods of the `Elem` class, which mixes in this trait. It is also used for implementing parts of other
+ * "element-like" classes, other than the "core" [[eu.cdevreeze.yaidom.Elem]] class, such as [[eu.cdevreeze.yaidom.resolved.Elem]] for
+ * "resolved" elements.
  *
  * Subtrait [[eu.cdevreeze.yaidom.ElemLike]] implements many more methods on elements, based on more knowledge about elements, such
  * as element names and attributes. It is indeed the `ElemLike` trait that is mixed in by element classes. The distinction between
  * this trait and subtrait `ElemLike` is still useful, because this trait implements methods that only need knowledge about
- * elements as parent nodes of other elements.
+ * elements as parent nodes of other elements. In an abstract sense, this trait even has nothing to do with elements in particular,
+ * but it deals with trees (XML or not) in general (if we were to rename the trait, its methods and the type parameter).
  *
  * ==ElemNodeLike more formally==
  *
  * The only abstract method is `allChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
  *
- * As said above, this trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
+ * As said above, this trait only knows about elements, not about other node types. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
  *
  * Trait `ElemNodeLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemNodeLike`
@@ -131,6 +133,15 @@ import scala.collection.{ immutable, mutable }
  * e.findElemOrSelf(p) == e.filterElemsOrSelf(p).headOption
  * e.findElemOrSelf(p) == e.findTopmostElemsOrSelf(p).headOption
  * }}}
+ *
+ * ==Implementation notes==
+ *
+ * Methods `findAllElemsOrSelf`, `filterElemsOrSelf`, `findTopmostElemsOrSelf` and `findElemOrSelf` use recursion in their
+ * implementations, but not tail-recursion. The lack of tail-recursion should not be a problem in practice, due to limited
+ * XML tree depths in practice. It is comparable to an "idiomatic" Scala quicksort implementation in its lack of tail-recursion.
+ * Also in the case of quicksort, the lack of tail-recursion is acceptable due to limited recursion depths. If we want tail-recursive
+ * implementations of the above-mentioned methods (in particular the first 3 ones), we either lose the ordering of result elements
+ * in document order (depth-first), or we lose performance and/or clarity. That just is not worth it.
  *
  * @tparam E The captured element subtype
  *
