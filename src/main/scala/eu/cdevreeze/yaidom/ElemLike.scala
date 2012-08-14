@@ -20,8 +20,8 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * Implementation trait for elements as containers of elements. This trait implements the corresponding `Elem` methods.
- * It is also used for implementing parts of other "element-like" classes, other than [[eu.cdevreeze.yaidom.Elem]], such as
- * [[eu.cdevreeze.yaidom.resolved.Elem]].
+ * It is also used for implementing parts of other "element-like" classes, other than the "core" [[eu.cdevreeze.yaidom.Elem]] class, such as
+ * [[eu.cdevreeze.yaidom.resolved.Elem]] for "resolved" elements.
  *
  * Example usage (where the `text` method is not offered by the `ElemLike` API itself):
  * {{{
@@ -70,7 +70,7 @@ import scala.collection.{ immutable, mutable }
  * cheapBookElm filterElemsOrSelf { _.localName == "Author" }
  * }}}
  *
- * ==ElemLike more formally==
+ * ==ElemLike methods==
  *
  * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
@@ -78,108 +78,22 @@ import scala.collection.{ immutable, mutable }
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
  *
- * Trait `ElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemLike`
- * has 3 '''core''' element collection retrieval methods. These 3 methods (in order of subset relation) are:
+ * The element query methods that need no knowledge about element names and attributes are implemented by supertrait
+ * [[eu.cdevreeze.yaidom.ElemNodeLike]].
+ *
+ * This trait adds the following groups of methods to the methods offered by the supertrait `ElemNodeLike`:
  * <ul>
- * <li>Abstract method `allChildElems`, returning all '''child''' elements</li>
- * <li>Method `findAllElems`, finding all '''descendant''' elements</li>
- * <li>Method `findAllElemsOrSelf`, finding all '''descendant''' elements '''or self'''</li>
+ * <li>A method to get the local name of the element, without the namespace</li>
+ * <li>Attribute query methods</li>
+ * <li>Element query methods taking an `EName` or local name (which trivially correspond to method calls in the supertrait)</li>
+ * <li>Query methods around `ElemPath`s</li>
  * </ul>
- * The latter 2 methods are implemented in terms of method `allChildElems`. The following equalities define their semantics more formally:
- * {{{
- * elm.findAllElems == (elm.allChildElems flatMap (_.findAllElemsOrSelf))
- *
- * elm.findAllElemsOrSelf == {
- *   immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))
- * }
- * }}}
- * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should in theory
- * be enough for all element collection needs. For conciseness (and performance), there are more element (collection) retrieval methods.
- *
- * Below follows a summary of those groups of `ElemLike` element collection retrieval methods:
- * <ul>
- * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
- * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
- * <li>'''Finding topmost obeying some predicate''' (not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
- * </ul>
- *
- * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
- * Therefore there are also some `ElemLike` methods returning at most one element. These methods are as follows:
- * <ul>
- * <li>'''Finding first obeying some predicate''' (depth-first search): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
- * </ul>
- *
- * These element (collection) retrieval methods process and return elements in depth-first order
- * (see http://en.wikipedia.org/wiki/Depth-first_search).
- *
- * Assuming no side-effects, some equalities defining the semantics of the left-hand-side are:
- * {{{
- * e.filterChildElems(p) == e.allChildElems.filter(p)
- * e.filterElems(p) == e.findAllElems.filter(p)
- * e.filterElemsOrSelf(p) == e.findAllElemsOrSelf.filter(p)
- *
- * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
- * e.collectFromElems(pf) == e.findAllElems.collect(pf)
- * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
- *
- * elm.findTopmostElems(p) == {
- *   elm.filterElems(p) filter { e =>
- *     val hasNoMatchingAncestor = elm.filterElems(p) forall { _.findElem(_ == e).isEmpty }
- *     hasNoMatchingAncestor
- *   }
- * }
- *
- * elm.findTopmostElemsOrSelf(p) == {
- *   elm.filterElemsOrSelf(p) filter { e =>
- *     val hasNoMatchingAncestor = elm.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
- *     hasNoMatchingAncestor
- *   }
- * }
- * }}}
- * The latter put differently:
- * {{{
- * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
- * }}}
- *
- * The equalities above give semantics to the left-hand sides, but do not necessarily suggest how they are implemented.
- * Assuming no side-effects, the following (provable) equalities hint at possible implementations of the left-hand-sides, although
- * the real implementations may be (far) more efficient:
- * {{{
- * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- *
- * elm.filterElemsOrSelf(p) == {
- *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- * }
- *
- * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- *
- * elm.findTopmostElemsOrSelf(p) == {
- *   if (p(elm))
- *     immutable.IndexedSeq(elm)
- *   else
- *     (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- * }
- * }}}
- *
- * Each method taking an EName trivially corresponds to a call to a method taking a predicate. For example:
- * {{{
- * e.filterElemsOrSelf(ename) == (e filterElemsOrSelf (_.resolvedName == ename))
- * }}}
- * Finally, the methods returning at most one element trivially correspond to expressions containing calls to element collection
- * retrieval methods. For example (in the absence of side-effects) the following holds:
- * {{{
- * e.findElemOrSelf(p) == e.filterElemsOrSelf(p).headOption
- * e.findElemOrSelf(p) == e.findTopmostElemsOrSelf(p).headOption
- * }}}
- *
- * Besides element (collection) retrieval methods, there are also attribute retrieval methods, methods dealing with `ElemPath`s, etc.
  *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] { self: E =>
 
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName
@@ -188,7 +102,7 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   def resolvedAttributes: Map[EName, String]
 
   /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemLike` methods will be. */
-  def allChildElems: immutable.IndexedSeq[E]
+  override def allChildElems: immutable.IndexedSeq[E]
 
   /** The local name (or local part). Convenience method. */
   final def localName: String = resolvedName.localPart
@@ -199,12 +113,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
   final def attribute(expandedName: EName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
-  /** Returns the child elements obeying the given predicate */
-  final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
-
-  /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */
-  final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
-
   /** Returns the child elements with the given expanded name */
   final def filterChildElems(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
@@ -214,25 +122,9 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Shorthand for `filterChildElems { _.localName == localName }`. */
   final def \(localName: String): immutable.IndexedSeq[E] = filterChildElems { _.localName == localName }
 
-  /** Returns `allChildElems collect pf` */
-  final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
-
-  /** Returns the first found child element obeying the given predicate, if any, wrapped in an `Option` */
-  final def findChildElem(p: E => Boolean): Option[E] = {
-    val result = filterChildElems(p)
-    result.headOption
-  }
-
   /** Returns the first found child element with the given expanded name, if any, wrapped in an `Option` */
   final def findChildElem(expandedName: EName): Option[E] = {
     findChildElem { e => e.resolvedName == expandedName }
-  }
-
-  /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
-  final def getChildElem(p: E => Boolean): E = {
-    val result = filterChildElems(p)
-    require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
-    result.head
   }
 
   /** Returns the single child element with the given expanded name, and throws an exception otherwise */
@@ -241,40 +133,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
     require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.head
   }
-
-  /** Returns this element followed by all descendant elements (that is, the descendant-or-self elements) */
-  final def findAllElemsOrSelf: immutable.IndexedSeq[E] = {
-    val result = mutable.ArrayBuffer[E]()
-
-    // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E) {
-      result += elm
-      elm.allChildElems foreach { e => accumulate(e) }
-    }
-
-    accumulate(self)
-    result.toIndexedSeq
-  }
-
-  /**
-   * Returns the descendant-or-self elements that obey the given predicate.
-   * That is, the result is equivalent to `findAllElemsOrSelf filter p`.
-   */
-  final def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
-    val result = mutable.ArrayBuffer[E]()
-
-    // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E) {
-      if (p(elm)) result += elm
-      elm.allChildElems foreach { e => accumulate(e) }
-    }
-
-    accumulate(self)
-    result.toIndexedSeq
-  }
-
-  /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
-  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
   /** Returns the descendant-or-self elements that have the given expanded name */
   final def filterElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
@@ -285,42 +143,8 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Shorthand for `filterElemsOrSelf { _.localName == localName }`. */
   final def \\(localName: String): immutable.IndexedSeq[E] = filterElemsOrSelf { _.localName == localName }
 
-  /** Returns (the equivalent of) `findAllElemsOrSelf collect pf` */
-  final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
-    filterElemsOrSelf { e => pf.isDefinedAt(e) } collect pf
-
-  /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
-  final def findAllElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.findAllElemsOrSelf }
-
-  /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
-  final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
-
   /** Returns the descendant elements with the given expanded name */
   final def filterElems(expandedName: EName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
-
-  /** Returns (the equivalent of) `findAllElems collect pf` */
-  final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
-    filterElems { e => pf.isDefinedAt(e) } collect pf
-
-  /**
-   * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
-   */
-  final def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
-    val result = mutable.ArrayBuffer[E]()
-
-    // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E) {
-      if (p(elm)) result += elm else {
-        elm.allChildElems foreach { e => accumulate(e) }
-      }
-    }
-
-    accumulate(self)
-    result.toIndexedSeq
-  }
-
-  /** Shorthand for `findTopmostElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
-  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(p)
 
   /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] =
@@ -332,41 +156,9 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Shorthand for `findTopmostElemsOrSelf { _.localName == localName }`. */
   final def \\!(localName: String): immutable.IndexedSeq[E] = findTopmostElemsOrSelf { _.localName == localName }
 
-  /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
-
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElems(expandedName: EName): immutable.IndexedSeq[E] =
     findTopmostElems { e => e.resolvedName == expandedName }
-
-  /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
-  final def findElemOrSelf(p: E => Boolean): Option[E] = {
-    // Not tail-recursive, but the depth should typically be limited
-    def findMatch(elm: E): Option[E] = {
-      if (p(elm)) Some(elm) else {
-        val childElms = elm.allChildElems
-
-        var i = 0
-        var result: Option[E] = None
-
-        while ((result.isEmpty) && (i < childElms.size)) {
-          result = findMatch(childElms(i))
-          i += 1
-        }
-
-        result
-      }
-    }
-
-    findMatch(self)
-  }
-
-  /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
-  final def findElem(p: E => Boolean): Option[E] = {
-    val elms = self.allChildElems.view flatMap { ch => ch findElemOrSelf p }
-    elms.headOption
-  }
 
   /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */
   final def findElemOrSelf(expandedName: EName): Option[E] =
@@ -375,9 +167,6 @@ trait ElemLike[E <: ElemLike[E]] { self: E =>
   /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
   final def findElem(expandedName: EName): Option[E] =
     findElem { e => e.resolvedName == expandedName }
-
-  /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
-  final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
 
   /**
    * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.

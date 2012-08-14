@@ -76,7 +76,7 @@ class NonYaidomQueryTest extends Suite {
 
     /**
      * Finds all topmost descendant elements and self, obeying the given predicate.
-     * If an matching element has been found, its descendants are not searched for matches (hence "topmost").
+     * If a matching element has been found, its descendants are not searched for matches (hence "topmost").
      */
     def findTopmostElemsOrSelf(p: Elem => Boolean): immutable.IndexedSeq[Elem] = {
       // Recursive, but not tail-recursive
