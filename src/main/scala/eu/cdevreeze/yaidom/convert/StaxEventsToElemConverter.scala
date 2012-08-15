@@ -214,7 +214,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
   private def eventToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
 
   private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
-    val declarations: Scope.Declarations = {
+    val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
 
@@ -246,7 +246,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
         else
           undeclaredPrefixOptions
       }
-      new Scope.Declarations(declared = declaredScope, undeclaredOptionalPrefixes = undeclaredOptionalPrefixes)
+      new Declarations(declared = declaredScope, undeclaredOptionalPrefixes = undeclaredOptionalPrefixes)
     }
     val currScope = parentScope.resolve(declarations)
 

@@ -221,7 +221,7 @@ final class Document(
  * </ol>
  *
  * The [[eu.cdevreeze.yaidom.Scope]] is absolute, typically containing a lot more than
- * the (implicit) [[eu.cdevreeze.yaidom.Scope.Declarations]] of this element.
+ * the (implicit) [[eu.cdevreeze.yaidom.Declarations]] of this element.
  *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
  *
@@ -443,7 +443,7 @@ final class Elem(
         Some(LineSeq(line))
       }
 
-    val declarations: Scope.Declarations = parentScope.relativize(self.scope)
+    val declarations: Declarations = parentScope.relativize(self.scope)
 
     val namespacesLineSeqOption: Option[LineSeq] = {
       if (declarations.toMap.isEmpty) None else {
@@ -600,7 +600,6 @@ object Elem {
  * Example:
  * {{{
  * import Node._
- * import Scope._
  *
  * val scope = Scope.from("dbclass" -> "http://www.db-class.org")
  *

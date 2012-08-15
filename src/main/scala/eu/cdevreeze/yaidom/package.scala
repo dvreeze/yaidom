@@ -92,7 +92,7 @@ package eu.cdevreeze
  * whereas the `Node`s that they create all must have a fixed `Scope`, so node builders are indeed intended to be handy for creation
  * of node trees. At the same level are [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
  * </ol>
- * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
+ * Dependencies are almost all uni-directional (Scope and Declarations are an exception). All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
  * Parsing and printing of XML is not handled in this package. Even the `toString` methods for nodes

@@ -105,7 +105,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   }
 
   private def createStartElement(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): StartElement = {
-    val namespaceDeclarations: Scope.Declarations = parentScope.relativize(elm.scope)
+    val namespaceDeclarations: Declarations = parentScope.relativize(elm.scope)
 
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
@@ -144,7 +144,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   }
 
   private def createEndElement(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): EndElement = {
-    val namespaceDeclarations: Scope.Declarations = parentScope.relativize(elm.scope)
+    val namespaceDeclarations: Declarations = parentScope.relativize(elm.scope)
 
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 

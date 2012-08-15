@@ -75,7 +75,6 @@ class XLinkTest extends Suite {
 
   private val sampleXml: xlink.ExtendedLink = {
     import NodeBuilder._
-    import Scope._
 
     // Example from http://www.w3.org/TR/xlink/ (adapted)
     // In the original example, some xlink attributes are set in the DTD but not in the XML document. That's not supported here.

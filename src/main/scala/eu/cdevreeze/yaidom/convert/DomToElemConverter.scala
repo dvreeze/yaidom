@@ -54,7 +54,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     val qname: QName = toQName(v)
     val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
 
-    val namespaceDeclarations: Scope.Declarations = extractNamespaceDeclarations(v.getAttributes)
+    val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.getAttributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
 
     Elem(
@@ -105,8 +105,8 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     }).toMap
   }
 
-  /** Converts the namespace declarations in a `NamedNodeMap` to a `Scope.Declarations` */
-  private def extractNamespaceDeclarations(domAttributes: NamedNodeMap): Scope.Declarations = {
+  /** Converts the namespace declarations in a `NamedNodeMap` to a `Declarations` */
+  private def extractNamespaceDeclarations(domAttributes: NamedNodeMap): Declarations = {
     val nsMap = {
       val result = (0 until domAttributes.getLength) flatMap { i =>
         val attr = domAttributes.item(i).asInstanceOf[Attr]
@@ -118,7 +118,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
       }
       result.toMap
     }
-    Scope.Declarations.fromMap(nsMap)
+    Declarations.fromMap(nsMap)
   }
 
   /** Converts a `NodeList` to an `IndexedSeq[org.w3c.dom.Node]` */

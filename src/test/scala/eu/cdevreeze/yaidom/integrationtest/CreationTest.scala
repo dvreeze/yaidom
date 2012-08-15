@@ -88,16 +88,16 @@ class CreationTest extends Suite {
       elem(
         qname = QName("books:Book"),
         attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
-        namespaces = Scope.Declarations.from("books" -> "http://books", "names" -> "http://names"),
+        namespaces = Declarations.from("books" -> "http://books", "names" -> "http://names"),
         children = Vector(
           textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
           elem(
             qname = QName("Authors"),
-            namespaces = Scope.Declarations.from("books" -> "", "magazines" -> "http://magazines"),
+            namespaces = Declarations.from("books" -> "", "magazines" -> "http://magazines"),
             children = Vector(
               elem(
                 qname = QName("books:Author"),
-                namespaces = Scope.Declarations.from("books" -> "http://bookstore", "names" -> "http://ns"),
+                namespaces = Declarations.from("books" -> "http://bookstore", "names" -> "http://ns"),
                 children = Vector(
                   textElem(QName("names:First_Name"), "Jennifer"),
                   textElem(QName("names:Last_Name"), "Widom")))))))
@@ -117,11 +117,11 @@ class CreationTest extends Suite {
           textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
           elem(
             qname = QName("Authors"),
-            namespaces = Scope.Declarations.from("books" -> "", "magazines" -> "http://magazines"),
+            namespaces = Declarations.from("books" -> "", "magazines" -> "http://magazines"),
             children = Vector(
               elem(
                 qname = QName("books:Author"),
-                namespaces = Scope.Declarations.from("books" -> "http://bookstore", "names" -> "http://ns"),
+                namespaces = Declarations.from("books" -> "http://bookstore", "names" -> "http://ns"),
                 children = Vector(
                   textElem(QName("names:First_Name"), "Jennifer"),
                   textElem(QName("names:Last_Name"), "Widom")))))))

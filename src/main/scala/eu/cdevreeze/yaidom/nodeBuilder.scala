@@ -24,7 +24,6 @@ import scala.collection.immutable
  * Example:
  * {{{
  * import NodeBuilder._
- * import Scope._
  *
  * elem(
  *   qname = QName("dbclass:Magazine"),
@@ -53,7 +52,7 @@ import scala.collection.immutable
  * and [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.ElemBuilder]] in particular. `Elem`s have (fixed, resolved) `Scope`s,
  * but `ElemBuilder`s do not. Using `NodeBuilder`s, `Scope` determination is postponed. Only `ElemBuilder`s
  * can have unbound prefixes, but only `Elem`s have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.Scope]], an `ElemBuilder`
- * has a [[eu.cdevreeze.yaidom.Scope.Declarations]].
+ * has a [[eu.cdevreeze.yaidom.Declarations]].
  *
  * Another reason that the above-mentioned impedance mismatch is less of a problem in practice is that typically the XML
  * trees (as `NodeBuilder`s or directly as `Node`s) are built in a top-down manner. The [[eu.cdevreeze.yaidom.ConverterToDocument]]s
@@ -125,7 +124,7 @@ final class DocBuilder(
 final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
-  val namespaces: Scope.Declarations,
+  val namespaces: Declarations,
   override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder with ElemNodeLike[ElemBuilder] { self =>
 
   require(qname ne null)
@@ -221,7 +220,7 @@ object NodeBuilder {
   def elem(
     qname: QName,
     attributes: Map[QName, String] = Map(),
-    namespaces: Scope.Declarations = Scope.Declarations.Empty,
+    namespaces: Declarations = Declarations.Empty,
     children: immutable.IndexedSeq[NodeBuilder] = Vector()): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, children)
@@ -247,13 +246,13 @@ object NodeBuilder {
     attributes: Map[QName, String],
     txt: String): ElemBuilder = {
 
-    textElem(qname, attributes, Scope.Declarations.Empty, txt)
+    textElem(qname, attributes, Declarations.Empty, txt)
   }
 
   def textElem(
     qname: QName,
     attributes: Map[QName, String],
-    namespaces: Scope.Declarations,
+    namespaces: Declarations,
     txt: String): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, Vector(text(txt)))

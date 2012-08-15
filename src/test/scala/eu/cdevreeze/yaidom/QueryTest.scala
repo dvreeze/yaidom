@@ -995,7 +995,7 @@ class QueryTest extends Suite {
       bookstore updated {
         case path if path.containsName(EName("Author")) =>
           val elm = bookstore.findWithElemPath(path).get
-          val newScope = elm.scope.resolve(Scope.Declarations.from("abc" -> "http://def"))
+          val newScope = elm.scope.resolve(Declarations.from("abc" -> "http://def"))
           val newElmName = QName("abc", elm.localName)
           Elem(newElmName, elm.attributes, newScope, elm.children)
       }

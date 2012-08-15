@@ -57,8 +57,6 @@ class ScopeTest extends Suite {
   }
 
   @Test def testCreateDeclarations() {
-    import Scope._
-
     intercept[Exception] {
       Declarations.from("" -> null)
     }
@@ -90,8 +88,6 @@ class ScopeTest extends Suite {
   }
 
   @Test def testResolveDeclarations() {
-    import Scope._
-
     val scope1 = Scope.Empty
 
     expect(0) {

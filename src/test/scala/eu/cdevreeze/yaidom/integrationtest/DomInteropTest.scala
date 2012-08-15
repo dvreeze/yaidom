@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import NodeBuilder._
-import Scope._
 import parse.DocumentParserUsingDom
 import print.DocumentPrinterUsingDom
 import convert.DomConversions._

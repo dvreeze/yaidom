@@ -183,14 +183,14 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
       children = mutable.IndexedSeq())
   }
 
-  private def extractDeclarations(atts: Attributes): Scope.Declarations = {
+  private def extractDeclarations(atts: Attributes): Declarations = {
     val result = attributeOrDeclarationMap(atts) filterKeys { qname => isNamespaceDeclaration(qname) } map { kv =>
       val key = QName.parse(kv._1)
       val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
       val nsUri = kv._2
       (prefix -> nsUri)
     }
-    Scope.Declarations.fromMap(result)
+    Declarations.fromMap(result)
   }
 
   private def extractAttributeMap(atts: Attributes): Map[QName, String] = {

@@ -773,7 +773,6 @@ class ElemLikeTest extends Suite {
 
   private val bookstore: Elem = {
     import NodeBuilder._
-    import Scope._
 
     val result: Elem =
       elem(

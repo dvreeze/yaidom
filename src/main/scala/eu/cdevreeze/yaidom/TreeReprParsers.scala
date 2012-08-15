@@ -91,12 +91,12 @@ object TreeReprParsers extends JavaTokenParsers {
       { case (qname, attrs, namespaces, children) => new ElemBuilder(qname, attrs, namespaces, children) }
   }
 
-  def elemContent: Parser[(QName, Map[QName, String], Scope.Declarations, Vector[NodeBuilder])] = {
+  def elemContent: Parser[(QName, Map[QName, String], Declarations, Vector[NodeBuilder])] = {
     qnamePart ~ opt("," ~> attributesPart) ~ opt("," ~> namespacesPart) ~ opt("," ~> elemChildrenPart) ^^
       {
         case (qn ~ optAttrs ~ optNs ~ optChildren) =>
           val attrs = optAttrs.getOrElse(Map[QName, String]())
-          val ns = optNs.getOrElse(Scope.Declarations.Empty)
+          val ns = optNs.getOrElse(Declarations.Empty)
           val children = optChildren.getOrElse(Vector[NodeBuilder]())
           (qn, attrs, ns, children)
       }
@@ -116,8 +116,8 @@ object TreeReprParsers extends JavaTokenParsers {
   def attribute: Parser[(QName, String)] =
     qname ~ "->" ~ stringLiteral2 ^^ { case qn ~ "->" ~ v => (qn, unwrapStringLiteral(v)) }
 
-  def namespacesPart: Parser[Scope.Declarations] =
-    "namespaces" ~> "=" ~> namespaces ^^ { xs => Scope.Declarations.fromMap(xs) }
+  def namespacesPart: Parser[Declarations] =
+    "namespaces" ~> "=" ~> namespaces ^^ { xs => Declarations.fromMap(xs) }
 
   def namespaces: Parser[Map[String, String]] =
     "Declarations.from" ~> "(" ~> repsep(namespace, ",") <~ ")" ^^ { xs => xs.toMap }
