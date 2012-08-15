@@ -137,8 +137,8 @@ import scala.collection.{ immutable, mutable }
  * ==Implementation notes==
  *
  * Methods `findAllElemsOrSelf`, `filterElemsOrSelf`, `findTopmostElemsOrSelf` and `findElemOrSelf` use recursion in their
- * implementations, but not tail-recursion. The lack of tail-recursion should not be a problem in practice, due to limited
- * XML tree depths in practice. It is comparable to an "idiomatic" Scala quicksort implementation in its lack of tail-recursion.
+ * implementations, but not tail-recursion. The lack of tail-recursion should not be a problem, due to limited XML tree
+ * depths in practice. It is comparable to an "idiomatic" Scala quicksort implementation in its lack of tail-recursion.
  * Also in the case of quicksort, the lack of tail-recursion is acceptable due to limited recursion depths. If we want tail-recursive
  * implementations of the above-mentioned methods (in particular the first 3 ones), we either lose the ordering of result elements
  * in document order (depth-first), or we lose performance and/or clarity. That just is not worth it.

@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * Implementation trait for elements as containers of elements. This trait implements the corresponding `Elem` methods, which mixes in this trait.
+ * API and implementation trait for elements as containers of elements. This trait implements the corresponding `Elem` methods, which mixes in this trait.
  * It is also used for implementing parts of other "element-like" classes, other than the "core" [[eu.cdevreeze.yaidom.Elem]] class, such as
  * [[eu.cdevreeze.yaidom.resolved.Elem]] for "resolved" elements.
  *

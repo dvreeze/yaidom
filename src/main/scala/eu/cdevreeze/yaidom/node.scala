@@ -63,6 +63,7 @@ sealed trait Node extends Immutable with Serializable {
 
   /**
    * Returns the tree representation String, conforming to the tree representation DSL that creates `NodeBuilder`s.
+   * That is, it does not correspond to the tree representation DSL of `Node`s, but of `NodeBuilder`s!
    *
    * There are a couple of advantages of this method compared to some "toXmlString" method which returns the XML string:
    * <ul>
@@ -77,7 +78,7 @@ sealed trait Node extends Immutable with Serializable {
   /** Same as `toTreeRepr(emptyScope)` */
   final def toTreeRepr: String = toTreeRepr(Scope.Empty)
 
-  /** Returns the tree representation string corresponding to this element. Possibly expensive! */
+  /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
   final override def toString: String = toTreeRepr
 
   /** Returns the tree representation as LineSeq, shifted indent spaces to the right */
