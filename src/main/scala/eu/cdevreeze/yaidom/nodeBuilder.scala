@@ -126,7 +126,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
   val namespaces: Scope.Declarations,
-  override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder { self =>
+  override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder with ElemNodeLike[ElemBuilder] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -134,6 +134,9 @@ final class ElemBuilder(
   require(children ne null)
 
   type NodeType = Elem
+
+  /** Returns the element children as ElemBuilder instances */
+  override def allChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
 
   def build(parentScope: Scope): Elem = {
     val newScope = parentScope.resolve(namespaces)
