@@ -584,14 +584,17 @@ object Elem {
 
 /**
  * This singleton object contains a DSL to easily create deeply nested Elems.
- * It looks a lot like the DSL for NodeBuilders, but using prefix "mk" in the method names. For example: `mkElem`.
+ * It looks a lot like the DSL for NodeBuilders, using the same method names (so a local import for Node singleton object members may be needed).
  *
  * There is a catch, though. When using this DSL, scopes must be passed throughout the tree. These Scopes had better be
  * the same (or parent element scopes should be subscopes of child element scopes), because otherwise the corresponding XML
  * may contain a lot of namespace undeclarations.
  *
- * In other words, choose your poison. The NodeBuilder DSL does have the advantage over this DSL that scopes do not have to be
- * passed around.
+ * Another thing to watch out for is that the "tree representations" conform to the NodeBuilder DSL, not to this one.
+ *
+ * Hence, choose your poison. The NodeBuilder DSL does have the advantage over this DSL that scopes do not have to be
+ * passed around. On the other hand, this Node DSL has the advantage that exceptions due to missing scope data are thrown immediately instead of
+ * later (when calling the build method, in the case of the NodeBuilder DSL).
  *
  * Example:
  * {{{
@@ -600,30 +603,30 @@ object Elem {
  *
  * val scope = Scope.from("dbclass" -> "http://www.db-class.org")
  *
- * mkElem(
+ * elem(
  *   qname = QName("dbclass:Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   scope = scope,
  *   children = Vector(
- *     mkElem(
+ *     elem(
  *       qname = QName("dbclass:Title"),
  *       scope = scope,
- *       children = Vector(mkText("Newsweek"))))).build()
+ *       children = Vector(text("Newsweek")))))
  * }}}
  *
  * The latter expression could also be written as follows:
  * {{{
- * mkElem(
+ * elem(
  *   qname = QName("dbclass:Magazine"),
  *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
  *   scope = scope,
  *   children = Vector(
- *     mkTextElem(QName("dbclass:Title"), scope, "Newsweek"))).build()
+ *     textElem(QName("dbclass:Title"), scope, "Newsweek")))
  * }}}
  */
 object Node {
 
-  def mkDocument(
+  def document(
     baseUriOption: Option[String] = None,
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
@@ -636,7 +639,7 @@ object Node {
       comments)
   }
 
-  def mkElem(
+  def elem(
     qname: QName,
     attributes: Map[QName, String] = Map(),
     scope: Scope,
@@ -645,27 +648,27 @@ object Node {
     new Elem(qname, attributes, scope, children)
   }
 
-  def mkText(textValue: String): Text = Text(text = textValue, isCData = false)
+  def text(textValue: String): Text = Text(text = textValue, isCData = false)
 
-  def mkCData(textValue: String): Text = Text(text = textValue, isCData = true)
+  def cdata(textValue: String): Text = Text(text = textValue, isCData = true)
 
-  def mkProcessingInstruction(target: String, data: String): ProcessingInstruction =
+  def processingInstruction(target: String, data: String): ProcessingInstruction =
     ProcessingInstruction(target, data)
 
-  def mkEntityRef(entity: String): EntityRef = EntityRef(entity)
+  def entityRef(entity: String): EntityRef = EntityRef(entity)
 
-  def mkComment(textValue: String): Comment = Comment(textValue)
+  def comment(textValue: String): Comment = Comment(textValue)
 
-  def mkTextElem(qname: QName, scope: Scope, txt: String): Elem = {
-    mkTextElem(qname, Map[QName, String](), scope, txt)
+  def textElem(qname: QName, scope: Scope, txt: String): Elem = {
+    textElem(qname, Map[QName, String](), scope, txt)
   }
 
-  def mkTextElem(
+  def textElem(
     qname: QName,
     attributes: Map[QName, String],
     scope: Scope,
     txt: String): Elem = {
 
-    new Elem(qname, attributes, scope, Vector(mkText(txt)))
+    new Elem(qname, attributes, scope, Vector(text(txt)))
   }
 }

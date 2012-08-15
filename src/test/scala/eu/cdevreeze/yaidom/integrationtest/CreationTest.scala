@@ -26,7 +26,6 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingDom
 import NodeBuilder._
-import Node._
 
 /**
  * XML creation test case.
@@ -134,32 +133,35 @@ class CreationTest extends Suite {
       resolvedElm3
     }
 
-    val elm4: Elem =
-      mkElem(
+    val elm4: Elem = {
+      import Node._
+
+      elem(
         qname = QName("books:Book"),
         attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
         scope = Scope.from("books" -> "http://books", "names" -> "http://names"),
         children = Vector(
-          mkTextElem(
+          textElem(
             QName("books:Title"),
             Scope.from("books" -> "http://books", "names" -> "http://names"),
             "Jennifer's Economical Database Hints"),
-          mkElem(
+          elem(
             qname = QName("Authors"),
             scope = Scope.from("magazines" -> "http://magazines"),
             children = Vector(
-              mkElem(
+              elem(
                 qname = QName("books:Author"),
                 scope = Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
                 children = Vector(
-                  mkTextElem(
+                  textElem(
                     QName("names:First_Name"),
                     Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
                     "Jennifer"),
-                  mkTextElem(
+                  textElem(
                     QName("names:Last_Name"),
                     Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
                     "Widom")))))))
+    }
 
     val resolvedElm4 = resolved.Elem(elm4)
 
