@@ -44,13 +44,13 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
   /** Returns an adapted copy of this Declarations, but retaining only the undeclarations, if any */
   def retainingUndeclarations: Declarations = {
     val m = map filter { kv => kv._2 == "" }
-    Declarations(m)
+    if (m.isEmpty) Declarations.Empty else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but without any undeclarations, if any */
   def withoutUndeclarations: Declarations = {
     val m = map filter { kv => kv._2 != "" }
-    Declarations(m)
+    if (m.size == map.size) this else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but retaining only the default namespace, if any */
@@ -61,18 +61,15 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
 
   /** Returns an adapted copy of this Declarations, but without the default namespace, if any */
   def withoutDefaultNamespace: Declarations = {
-    if (!map.contains("")) this else {
-      val m = map - ""
-      Declarations(m)
-    }
+    if (!map.contains("")) this else Declarations(map - "")
   }
 
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml
-    val defaultNamespaceUndeclared = map.get("") == Some("")
+    val defaultNamespaceUndeclared: Boolean = map.get("") == Some("")
     val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
-    val undeclaredPrefixes: Set[String] = (map filter (kv => kv._2 == "")).keySet
+    val undeclaredPrefixes: Set[String] = ((map - "") filter (kv => kv._2 == "")).keySet
     val undeclaredPrefixesString = undeclaredPrefixes map { pref => """xmlns:%s=""""".format(pref) } mkString (" ")
 
     List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString) filterNot { _ == "" } mkString (" ")

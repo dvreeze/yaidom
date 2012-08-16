@@ -51,6 +51,9 @@ class ScopeTest extends Suite {
     expect(Some("http://a")) {
       Scope.from("" -> "http://a", "b" -> "http://b").defaultNamespaceOption
     }
+    expect(None) {
+      Scope.from("b" -> "http://b").defaultNamespaceOption
+    }
     expect(Map("b" -> "http://b")) {
       Scope.from("b" -> "http://b").withoutDefaultNamespace.map
     }
@@ -67,8 +70,14 @@ class ScopeTest extends Suite {
     expect(Map("" -> "http://a")) {
       Declarations.from("" -> "http://a").map
     }
+    expect(Map()) {
+      Declarations.from("" -> "http://a").withoutDefaultNamespace.map
+    }
     expect(Map("a" -> "")) {
       Declarations.from("a" -> "").map
+    }
+    expect(Map()) {
+      Declarations.from("a" -> "").withoutUndeclarations.map
     }
     expect(Map("" -> "http://a")) {
       Declarations.from("" -> "http://a").map
@@ -81,6 +90,15 @@ class ScopeTest extends Suite {
     }
     expect(Map("b" -> "http://b")) {
       Declarations.from("b" -> "http://b").map
+    }
+
+    val decls1 = Declarations.from("" -> "http://a", "b" -> "http://b", "c" -> "")
+
+    expect(Declarations.from("b" -> "http://b")) {
+      decls1.withoutUndeclarations.withoutDefaultNamespace
+    }
+    expect(decls1.withoutDefaultNamespace.withoutUndeclarations) {
+      decls1.withoutUndeclarations.withoutDefaultNamespace
     }
   }
 
@@ -102,6 +120,9 @@ class ScopeTest extends Suite {
     }
     expect(declarations2) {
       scope1.relativize(scope2)
+    }
+    expect(true) {
+      scope1.subScopeOf(scope1)
     }
     expect(true) {
       scope1.subScopeOf(scope2)

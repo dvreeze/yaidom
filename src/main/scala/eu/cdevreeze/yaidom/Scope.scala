@@ -48,12 +48,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   def defaultNamespaceOption: Option[String] = map.get("")
 
   /** Returns an adapted copy of this Scope, but without the default namespace, if any */
-  def withoutDefaultNamespace: Scope = {
-    if (!map.contains("")) this else {
-      val m = map - ""
-      Scope(m)
-    }
-  }
+  def withoutDefaultNamespace: Scope = if (defaultNamespaceOption.isEmpty) this else Scope(map - "")
 
   /**
    * Returns true if the inverse exists, that is, each namespace URI has a unique prefix
@@ -65,9 +60,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Only if there is such a one-to-one correspondence, the indexes in `ElemPath`s and `ElemPathBuilder`s are stable, when converting
    * between the two.
    */
-  def isInvertible: Boolean = {
-    map.keySet.size == map.values.toSet.size
-  }
+  def isInvertible: Boolean = map.keySet.size == map.values.toSet.size
 
   /** Returns true if this is a subscope of the given parameter `Scope`. A `Scope` is considered subscope of itself. */
   def subScopeOf(scope: Scope): Boolean = {
