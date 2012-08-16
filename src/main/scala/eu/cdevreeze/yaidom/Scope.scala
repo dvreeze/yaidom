@@ -24,7 +24,7 @@ package eu.cdevreeze.yaidom
  * A `Scope` must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
  *
  * The Scope is backed by a map from prefixes (or the empty string for the default namespace) to (non-empty) namespace URIs.
- * 
+ *
  * This class depends on Declarations, but not the other way around.
  *
  * @author Chris de Vreeze
@@ -38,15 +38,22 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     map.values forall { ns => (ns ne null) && (ns != "") && (ns != "http://www.w3.org/2000/xmlns/") }
   }
   require {
-    prefixScope.keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
+    (map - "").keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
 
+  /** Returns true if this Scope is empty. Faster than comparing this Scope against the empty Scope. */
+  def isEmpty: Boolean = map.isEmpty
+
+  /** Returns the default namespace, if any, wrapped in an Option */
   def defaultNamespaceOption: Option[String] = map.get("")
 
-  def prefixScope: Map[String, String] = (map - "")
-
-  /** The prefix scope, with the implicit "xml" namespace added */
-  def completePrefixScope: Map[String, String] = prefixScope + ("xml" -> "http://www.w3.org/XML/1998/namespace")
+  /** Returns an adapted copy of this Scope, but without the default namespace, if any */
+  def withoutDefaultNamespace: Scope = {
+    if (!map.contains("")) this else {
+      val m = map - ""
+      Scope(m)
+    }
+  }
 
   /**
    * Returns true if the inverse exists, that is, each namespace URI has a unique prefix
@@ -80,7 +87,9 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(EName(unprefixedName.localPart))
     case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
-      completePrefixScope.get(prefixedName.prefix) map { nsUri => EName(nsUri, prefixedName.localPart) }
+      // The prefix scope (as Map), with the implicit "xml" namespace added
+      val completePrefixScopeMap: Map[String, String] = (map - "") + ("xml" -> "http://www.w3.org/XML/1998/namespace")
+      completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => EName(nsUri, prefixedName.localPart) }
   }
 
   /**
@@ -89,8 +98,12 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Inspired by `java.net.URI`, which has a similar method for URIs.
    */
   def resolve(declarations: Declarations): Scope = {
-    if (declarations == Declarations.Empty) this else {
-      val m = (map ++ declarations.declared) -- declarations.undeclaredSet
+    if (declarations.isEmpty) this else {
+      val declared: Map[String, String] = declarations.map filter { kv => kv._2.length > 0 }
+
+      val undeclarations: Declarations = declarations.retainingUndeclarations
+      assert(declared.keySet.intersect(undeclarations.map.keySet).isEmpty)
+      val m = (map ++ declared) -- undeclarations.map.keySet
       Scope(m)
     }
   }
@@ -101,35 +114,28 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Inspired by `java.net.URI`, which has a similar method for URIs.
    */
   def relativize(scope: Scope): Declarations = {
-    val declared: Scope = {
-      val defaultNs: Option[String] = (Scope.this.defaultNamespaceOption, scope.defaultNamespaceOption) match {
-        case (None, _) => scope.defaultNamespaceOption
-        case (_, None) => None
-        case (someNs1, someNs2) if someNs1.get == someNs2.get => None
-        case (_, _) => scope.defaultNamespaceOption
-      }
-      val prefixScope: Map[String, String] = scope.prefixScope collect {
-        case (pref, nsUri) if (!Scope.this.prefixScope.contains(pref)) || (Scope.this.prefixScope(pref) != scope.prefixScope(pref)) => (pref -> nsUri)
+    if (Scope.this == scope) Declarations.Empty else {
+      val newlyDeclared: Map[String, String] = scope.map filter { kv =>
+        val pref = kv._1
+        val ns = kv._2
+        assert(ns.length > 0)
+        Scope.this.map.getOrElse(pref, "") != ns
       }
 
-      val defaultNsMap = if (defaultNs.isEmpty) Map() else Map("" -> defaultNs.get)
-      Scope(defaultNsMap ++ prefixScope)
+      val removed: Set[String] = Scope.this.map.keySet -- scope.map.keySet
+      val undeclarations: Map[String, String] = (removed map (pref => (pref -> ""))).toMap
+
+      assert(newlyDeclared.keySet.intersect(removed).isEmpty)
+      val m: Map[String, String] = newlyDeclared ++ undeclarations
+
+      Declarations(m)
     }
-    val defaultNamespaceUndeclared: Boolean = this.defaultNamespaceOption.isDefined && scope.defaultNamespaceOption.isEmpty
-    val undeclaredPrefixes: Set[String] = Scope.this.prefixScope.keySet.diff(scope.prefixScope.keySet)
-    val undeclaredOptionalPrefixes = {
-      undeclaredPrefixes map { pref => Some(pref) }
-    } ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
-
-    val undeclaredMap: Map[String, String] =
-      (undeclaredOptionalPrefixes map (prefOption => if (prefOption.isEmpty) "" -> "" else prefOption.get -> "")).toMap
-    Declarations(declared.map ++ undeclaredMap)
   }
 
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
-    val prefixScopeString = prefixScope map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    val prefixScopeString = (map - "") map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }

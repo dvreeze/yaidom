@@ -52,7 +52,7 @@ class ScopeTest extends Suite {
       Scope.from("" -> "http://a", "b" -> "http://b").defaultNamespaceOption
     }
     expect(Map("b" -> "http://b")) {
-      Scope.from("b" -> "http://b").prefixScope
+      Scope.from("b" -> "http://b").withoutDefaultNamespace.map
     }
   }
 
@@ -77,7 +77,7 @@ class ScopeTest extends Suite {
       Declarations.from("" -> "http://a", "b" -> "http://b").map
     }
     expect(Scope.from("" -> "http://a", "b" -> "http://b").map) {
-      Declarations.from("" -> "http://a", "b" -> "http://b").declared
+      Declarations.from("" -> "http://a", "b" -> "http://b").withoutUndeclarations.map
     }
     expect(Map("b" -> "http://b")) {
       Declarations.from("b" -> "http://b").map
@@ -98,7 +98,7 @@ class ScopeTest extends Suite {
       scope2.defaultNamespaceOption
     }
     expect(Map("a" -> "http://a")) {
-      scope2.prefixScope
+      scope2.withoutDefaultNamespace.map
     }
     expect(declarations2) {
       scope1.relativize(scope2)
@@ -139,7 +139,7 @@ class ScopeTest extends Suite {
       scope4.map
     }
     expect(Map("a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
-      scope4.prefixScope
+      scope4.withoutDefaultNamespace.map
     }
     expect(declarations4) {
       scope3.relativize(scope4)
