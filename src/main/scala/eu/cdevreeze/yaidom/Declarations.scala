@@ -18,22 +18,32 @@ package eu.cdevreeze.yaidom
 
 /**
  * Namespace declarations (and undeclarations), typically at the level of one element.
+ *
+ * The Declarations is backed by a map from prefixes (or the empty string for the default namespace) to namespace URIs (or the empty string).
+ * If the mapped value is the empty string, it is an undeclaration.
+ * 
+ * This class does not depend on Scopes.
+ *
+ * @author Chris de Vreeze
  */
-final case class Declarations(declared: Scope, undeclaredOptionalPrefixes: Set[Option[String]]) extends Immutable {
-  require(declared ne null)
-  require(undeclaredOptionalPrefixes ne null)
+final case class Declarations(map: Map[String, String]) extends Immutable {
+  require(map ne null)
   require {
-    undeclaredOptionalPrefixes forall { prefOption =>
-      (prefOption ne null) && {
-        prefOption forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
-      }
-    }
+    map.keySet forall { pref => pref ne null }
   }
-  require(declared.toMap.keySet.intersect(undeclaredSet).isEmpty)
-  require(!defaultNamespaceUndeclared || declared.defaultNamespaceOption.isEmpty)
+  require {
+    map.values forall { ns => (ns ne null) && (ns != "http://www.w3.org/2000/xmlns/") }
+  }
+  require {
+    (map - "").keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
+  }
 
-  /** Convenience constructor if there are no undeclarations */
-  def this(declared: Scope) = this(declared, Set())
+  def declared: Map[String, String] = map filter { kv => kv._2.length > 0 }
+
+  def undeclaredOptionalPrefixes: Set[Option[String]] = {
+    val result = map filter { kv => kv._2.length == 0 } map { kv => val pref = kv._1; if (pref.length == 0) None else Some(pref) }
+    result.toSet
+  }
 
   def defaultNamespaceUndeclared: Boolean = undeclaredOptionalPrefixes.contains(None)
 
@@ -45,57 +55,27 @@ final case class Declarations(declared: Scope, undeclaredOptionalPrefixes: Set[O
     case true => undeclaredPrefixes + ""
   }
 
-  /** Creates a `Map` from prefixes to (possibly "undeclared") namespaces URIs, giving the default namespace the empty `String` as prefix */
-  def toMap: Map[String, String] = {
-    val undeclaredMap: Map[String, String] = {
-      val result = undeclaredOptionalPrefixes map { prefixOption => if (prefixOption.isEmpty) ("" -> "") else (prefixOption.get -> "") }
-      result.toMap
-    }
-    val declaredMap: Map[String, String] = declared.toMap
-    undeclaredMap ++ declaredMap
-  }
-
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
-    val declaredString = declared.toStringInXml
+    val declaredString = properDeclarationsToStringInXml
     val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
     val undeclaredPrefixesString = undeclaredPrefixes map { pref => """xmlns:%s=""""".format(pref) } mkString (" ")
 
     List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString) filterNot { _ == "" } mkString (" ")
+  }
+
+  private def properDeclarationsToStringInXml: String = {
+    val declaredMap = declared
+    val defaultNsString = if (!declaredMap.contains("")) "" else """xmlns="%s"""".format(declaredMap(""))
+    val prefixScopeString = (declaredMap - "") map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }
 
 object Declarations {
 
   /** The "empty" `Declarations` */
-  val Empty = Declarations(declared = Scope.Empty, undeclaredOptionalPrefixes = Set())
+  val Empty = Declarations(Map())
 
-  def from(m: (String, String)*): Declarations = fromMap(Map[String, String](m: _*))
-
-  def fromMap(m: Map[String, String]): Declarations = {
-    require {
-      m.keySet forall { pref => pref ne null }
-    }
-    require {
-      m.values forall { ns => ns ne null }
-    }
-
-    val scope = {
-      val scopeMap = m filter { kv => !kv._2.isEmpty }
-      Scope.fromMap(scopeMap)
-    }
-    val defaultNamespaceUndeclared: Boolean = {
-      val defaultNs = m.get("")
-      defaultNs == Some("")
-    }
-    val undeclaredPrefixes = {
-      val result = m filterKeys { pref => pref != "" } filter { kv => kv._2 == "" }
-      result.keySet
-    }
-    val undeclaredOptionalPrefixes = {
-      undeclaredPrefixes map { pref => Some(pref) }
-    } ++ (if (defaultNamespaceUndeclared) Set(None) else Set())
-
-    Declarations(scope, undeclaredOptionalPrefixes)
-  }
+  def from(m: (String, String)*): Declarations = Declarations(Map[String, String](m: _*))
 }

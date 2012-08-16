@@ -190,7 +190,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
       val nsUri = kv._2
       (prefix -> nsUri)
     }
-    Declarations.fromMap(result)
+    Declarations(result)
   }
 
   private def extractAttributeMap(atts: Attributes): Map[QName, String] = {

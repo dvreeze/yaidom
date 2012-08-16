@@ -125,7 +125,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeIterable.toBuffer.asJava).iterator
 
     val namespaceIterable: Iterable[Namespace] = {
-      val result = namespaceDeclarations.toMap map { kv =>
+      val result = namespaceDeclarations.map map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
 
@@ -149,7 +149,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
     val namespaceOutOfScopeIterable: Iterable[Namespace] = {
-      val result = namespaceDeclarations.toMap map { kv =>
+      val result = namespaceDeclarations.map map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
 

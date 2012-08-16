@@ -126,7 +126,19 @@ class CreationTest extends Suite {
                   textElem(QName("names:First_Name"), "Jennifer"),
                   textElem(QName("names:Last_Name"), "Widom")))))))
 
-    val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books", "names" -> "http://names"))
+    val prefixesUsed: Set[String] = {
+      elm3Builder.findAllElemsOrSelf.foldLeft(Set[String]()) { (acc, elemBuilder) =>
+        val qnames: Set[QName] = (elemBuilder.attributes.keySet) + elemBuilder.qname
+        val prefixes: Set[String] = qnames flatMap { qname => qname.prefixOption }
+        acc ++ prefixes.toSet
+      }
+    }
+
+    expect(Set("books", "names")) {
+      prefixesUsed
+    }
+
+    val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
     val resolvedElm3 = resolved.Elem(elm3)
 
     expect(expectedResolvedBookElm) {

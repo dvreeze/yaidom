@@ -43,10 +43,10 @@ class ScopeTest extends Suite {
       Scope.from("a" -> "")
     }
     expect(Map("" -> "http://a")) {
-      Scope.from("" -> "http://a").toMap
+      Scope.from("" -> "http://a").map
     }
     expect(Map("" -> "http://a", "b" -> "http://b")) {
-      Scope.from("" -> "http://a", "b" -> "http://b").toMap
+      Scope.from("" -> "http://a", "b" -> "http://b").map
     }
     expect(Some("http://a")) {
       Scope.from("" -> "http://a", "b" -> "http://b").defaultNamespaceOption
@@ -64,26 +64,23 @@ class ScopeTest extends Suite {
       val prefix: String = null
       Declarations.from(prefix -> "a")
     }
-    intercept[Exception] {
-      Declarations(Scope.from("" -> "http://a"), Set(None))
-    }
-    intercept[Exception] {
-      Declarations(Scope.from("a" -> "http://a"), Set(Some("a")))
+    expect(Map("" -> "http://a")) {
+      Declarations.from("" -> "http://a").map
     }
     expect(Map("a" -> "")) {
-      Declarations.from("a" -> "").toMap
+      Declarations.from("a" -> "").map
     }
     expect(Map("" -> "http://a")) {
-      Declarations.from("" -> "http://a").toMap
+      Declarations.from("" -> "http://a").map
     }
     expect(Map("" -> "http://a", "b" -> "http://b")) {
-      Declarations.from("" -> "http://a", "b" -> "http://b").toMap
+      Declarations.from("" -> "http://a", "b" -> "http://b").map
     }
-    expect(Scope.from("" -> "http://a", "b" -> "http://b")) {
+    expect(Scope.from("" -> "http://a", "b" -> "http://b").map) {
       Declarations.from("" -> "http://a", "b" -> "http://b").declared
     }
     expect(Map("b" -> "http://b")) {
-      Declarations.from("b" -> "http://b").toMap
+      Declarations.from("b" -> "http://b").map
     }
   }
 
@@ -91,7 +88,7 @@ class ScopeTest extends Suite {
     val scope1 = Scope.Empty
 
     expect(0) {
-      scope1.toMap.size
+      scope1.map.size
     }
 
     val declarations2 = Declarations.from("" -> "http://a", "a" -> "http://a")
@@ -120,7 +117,7 @@ class ScopeTest extends Suite {
     val scope3 = scope2.resolve(declarations3)
 
     expect(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
-      scope3.toMap
+      scope3.map
     }
     expect(declarations3) {
       scope2.relativize(scope3)
@@ -139,7 +136,7 @@ class ScopeTest extends Suite {
     val scope4 = scope3.resolve(declarations4)
 
     expect(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
-      scope4.toMap
+      scope4.map
     }
     expect(Map("a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
       scope4.prefixScope

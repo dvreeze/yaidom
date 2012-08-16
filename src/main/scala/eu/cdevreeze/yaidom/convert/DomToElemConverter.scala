@@ -118,7 +118,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
       }
       result.toMap
     }
-    Declarations.fromMap(nsMap)
+    Declarations(nsMap)
   }
 
   /** Converts a `NodeList` to an `IndexedSeq[org.w3c.dom.Node]` */

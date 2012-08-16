@@ -227,7 +227,8 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
           val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 != "" }
           result.toMap
         }
-        new Scope(defaultNamespaceOption = defaultNs, prefixScope = prefScope)
+        val defaultNsMap: Map[String, String] = if (defaultNs.isEmpty) Map() else Map("" -> defaultNs.get)
+        Scope(defaultNsMap ++ prefScope)
       }
       val undeclaredOptionalPrefixes: Set[Option[String]] = {
         val defaultNs = {
@@ -246,7 +247,9 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
         else
           undeclaredPrefixOptions
       }
-      new Declarations(declared = declaredScope, undeclaredOptionalPrefixes = undeclaredOptionalPrefixes)
+      val undeclaredMap: Map[String, String] =
+        (undeclaredOptionalPrefixes map (prefOption => if (prefOption.isEmpty) "" -> "" else prefOption.get -> "")).toMap
+      Declarations(declaredScope.map ++ undeclaredMap)
     }
     val currScope = parentScope.resolve(declarations)
 

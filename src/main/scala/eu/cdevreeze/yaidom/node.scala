@@ -250,7 +250,7 @@ final class Elem(
   override val uid: UID = new UID
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
-  val attributeScope: Scope = scope.copy(defaultNamespaceOption = None)
+  val attributeScope: Scope = Scope(scope.map - "")
 
   /** The `Elem` name as `EName`, obtained by resolving the element `QName` against the `Scope` */
   override val resolvedName: EName =
@@ -446,13 +446,13 @@ final class Elem(
     val declarations: Declarations = parentScope.relativize(self.scope)
 
     val namespacesLineSeqOption: Option[LineSeq] = {
-      if (declarations.toMap.isEmpty) None else {
+      if (declarations.map.isEmpty) None else {
         def namespaceEntryString(prefix: String, nsUri: String): String = {
           toStringLiteral(prefix) + " -> " + toStringLiteral(nsUri)
         }
 
         val namespaceEntryStrings = {
-          val result = declarations.toMap map { kv => namespaceEntryString(kv._1, kv._2) }
+          val result = declarations.map map { kv => namespaceEntryString(kv._1, kv._2) }
           result.mkString(", ")
         }
 

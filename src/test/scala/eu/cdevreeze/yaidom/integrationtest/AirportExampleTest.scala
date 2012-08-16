@@ -229,7 +229,7 @@ class AirportExampleTest extends Suite {
 
     // 2. Transform the XML. We do it in relatively small steps, but still using a for-comprehension.
 
-    val scope = Scope.fromMap(Map("" -> "http://www.webserviceX.NET"))
+    val scope = Scope(Map("" -> "http://www.webserviceX.NET"))
 
     val airportRootElm =
       Elem(

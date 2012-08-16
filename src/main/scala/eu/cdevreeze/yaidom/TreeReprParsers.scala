@@ -117,7 +117,7 @@ object TreeReprParsers extends JavaTokenParsers {
     qname ~ "->" ~ stringLiteral2 ^^ { case qn ~ "->" ~ v => (qn, unwrapStringLiteral(v)) }
 
   def namespacesPart: Parser[Declarations] =
-    "namespaces" ~> "=" ~> namespaces ^^ { xs => Declarations.fromMap(xs) }
+    "namespaces" ~> "=" ~> namespaces ^^ { xs => Declarations(xs) }
 
   def namespaces: Parser[Map[String, String]] =
     "Declarations.from" ~> "(" ~> repsep(namespace, ",") <~ ")" ^^ { xs => xs.toMap }

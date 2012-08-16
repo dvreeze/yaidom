@@ -74,7 +74,7 @@ final class DocumentPrinterUsingSax(
 
   private def generateEventsForElem(elm: Elem, parentScope: Scope, handler: TransformerHandler) {
     val namespaces: Declarations = parentScope.relativize(elm.scope)
-    val namespacesMap = namespaces.toMap
+    val namespacesMap = namespaces.map
 
     for ((prefix, nsUri) <- namespacesMap) handler.startPrefixMapping(prefix, nsUri)
 
@@ -154,7 +154,7 @@ final class DocumentPrinterUsingSax(
     // 2. Namespace declarations and undeclarations
 
     val namespaces: Declarations = parentScope.relativize(elm.scope)
-    val namespacesMap = namespaces.toMap
+    val namespacesMap = namespaces.map
 
     val tpe = ""
 
