@@ -27,6 +27,8 @@ package eu.cdevreeze.yaidom
  * @author Chris de Vreeze
  */
 final case class Declarations(map: Map[String, String]) extends Immutable {
+  import Declarations._
+
   require(map ne null)
   require {
     map.keySet forall { pref => pref ne null }
@@ -35,7 +37,7 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
     map.values forall { ns => (ns ne null) && (ns != "http://www.w3.org/2000/xmlns/") }
   }
   require {
-    (map - "").keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
+    (map - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
 
   /** Returns true if this Declarations is empty. Faster than comparing this Declarations against the empty Declarations. */
@@ -55,21 +57,21 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
 
   /** Returns an adapted copy of this Declarations, but retaining only the default namespace, if any */
   def retainingDefaultNamespace: Declarations = {
-    val m = map filter { kv => kv._1 == "" }
+    val m = map filter { kv => kv._1 == DefaultNsPrefix }
     if (m.isEmpty) Declarations.Empty else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but without the default namespace, if any */
   def withoutDefaultNamespace: Declarations = {
-    if (!map.contains("")) this else Declarations(map - "")
+    if (!map.contains(DefaultNsPrefix)) this else Declarations(map - DefaultNsPrefix)
   }
 
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml
-    val defaultNamespaceUndeclared: Boolean = map.get("") == Some("")
+    val defaultNamespaceUndeclared: Boolean = map.get(DefaultNsPrefix) == Some("")
     val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
-    val undeclaredPrefixes: Set[String] = ((map - "") filter (kv => kv._2 == "")).keySet
+    val undeclaredPrefixes: Set[String] = ((map - DefaultNsPrefix) filter (kv => kv._2 == "")).keySet
     val undeclaredPrefixesString = undeclaredPrefixes map { pref => """xmlns:%s=""""".format(pref) } mkString (" ")
 
     List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString) filterNot { _ == "" } mkString (" ")
@@ -77,8 +79,8 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
 
   private def properDeclarationsToStringInXml: String = {
     val declaredMap = map filter { kv => kv._2.length > 0 }
-    val defaultNsString = if (!declaredMap.contains("")) "" else """xmlns="%s"""".format(declaredMap(""))
-    val prefixScopeString = (declaredMap - "") map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    val defaultNsString = if (!declaredMap.contains(DefaultNsPrefix)) "" else """xmlns="%s"""".format(declaredMap(DefaultNsPrefix))
+    val prefixScopeString = (declaredMap - DefaultNsPrefix) map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }
@@ -89,4 +91,6 @@ object Declarations {
   val Empty = Declarations(Map())
 
   def from(m: (String, String)*): Declarations = Declarations(Map[String, String](m: _*))
+
+  val DefaultNsPrefix = ""
 }

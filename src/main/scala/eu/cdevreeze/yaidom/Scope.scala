@@ -30,6 +30,8 @@ package eu.cdevreeze.yaidom
  * @author Chris de Vreeze
  */
 final case class Scope(map: Map[String, String]) extends Immutable {
+  import Scope._
+
   require(map ne null)
   require {
     map.keySet forall { pref => pref ne null }
@@ -38,17 +40,17 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     map.values forall { ns => (ns ne null) && (ns != "") && (ns != "http://www.w3.org/2000/xmlns/") }
   }
   require {
-    (map - "").keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
+    (map - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
 
   /** Returns true if this Scope is empty. Faster than comparing this Scope against the empty Scope. */
   def isEmpty: Boolean = map.isEmpty
 
   /** Returns the default namespace, if any, wrapped in an Option */
-  def defaultNamespaceOption: Option[String] = map.get("")
+  def defaultNamespaceOption: Option[String] = map.get(DefaultNsPrefix)
 
   /** Returns an adapted copy of this Scope, but without the default namespace, if any */
-  def withoutDefaultNamespace: Scope = if (defaultNamespaceOption.isEmpty) this else Scope(map - "")
+  def withoutDefaultNamespace: Scope = if (defaultNamespaceOption.isEmpty) this else Scope(map - DefaultNsPrefix)
 
   /**
    * Returns true if the inverse exists, that is, each namespace URI has a unique prefix
@@ -81,7 +83,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
       // The prefix scope (as Map), with the implicit "xml" namespace added
-      val completePrefixScopeMap: Map[String, String] = (map - "") + ("xml" -> "http://www.w3.org/XML/1998/namespace")
+      val completePrefixScopeMap: Map[String, String] = (map - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
       completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => EName(nsUri, prefixedName.localPart) }
   }
 
@@ -128,7 +130,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
-    val prefixScopeString = (map - "") map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    val prefixScopeString = (map - DefaultNsPrefix) map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }
@@ -139,4 +141,6 @@ object Scope {
   val Empty = Scope(Map())
 
   def from(m: (String, String)*): Scope = Scope(Map[String, String](m: _*))
+
+  val DefaultNsPrefix = ""
 }
