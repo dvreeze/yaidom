@@ -134,6 +134,73 @@ import scala.collection.{ immutable, mutable }
  * e.findElemOrSelf(p) == e.findTopmostElemsOrSelf(p).headOption
  * }}}
  *
+ * ==ElemNodeLike even more formally==
+ *
+ * Below follows an example proof by structural induction of one of the above-mentioned properties. We use Scala notation in the proof.
+ *
+ * Assuming no side-effects (!), we prove by induction that:
+ * {{{
+ * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
+ * }}}
+ * where `findAllElemsOrSelf` is defined recursively as follows:
+ * {{{
+ * elm.findAllElemsOrSelf == { elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf)) }
+ * }}}
+ * and `filterElemsOrSelf` is defined recursively as follows:
+ * {{{
+ * elm.filterElemsOrSelf(p) == { (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) }
+ * }}}
+ *
+ * __Base case__
+ *
+ * If `elm` has no child elements, then:
+ * {{{
+ * elm.filterElemsOrSelf(p) == (immutable.IndexedSeq(elm).filter(p))
+ * }}}
+ * so:
+ * {{{
+ * elm.filterElemsOrSelf(p) == { (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p }
+ * }}}
+ * or:
+ * {{{
+ * elm.filterElemsOrSelf(p) == { (elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p }
+ * }}}
+ * so indeed:
+ * {{{
+ * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
+ * }}}
+ *
+ * __Inductive step__
+ *
+ * Let:
+ * {{{
+ * elm.allChildElems forall { ch => ch.filterElemsOrSelf(p) == ch.findAllElemsOrSelf.filter(p) }
+ * }}}
+ * then:
+ * {{{
+ * { elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p)) } == { elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf.filter(p)) }
+ * }}}
+ * so, by prepending the same collection in LHS and RHS:
+ * {{{
+ * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p))) } ==
+ * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf.filter(p))) }
+ * }}}
+ * so, by virtue of:
+ * {{{
+ * { xs flatMap (x => f(x) filter p) } == { (xs flatMap (x => f(x))) filter p }
+ * }}}
+ * we get:
+ * {{{
+ * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p))) } ==
+ * { (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf))) filter p }
+ * }}}
+ * so:
+ * {{{
+ * elm.filterElemsOrSelf(p) == { elm.findAllElemsOrSelf.filter(p) }
+ * }}}
+ *
+ * This completes the proof. Other above-mentioned properties can be proved by induction in a similar way.
+ *
  * ==Implementation notes==
  *
  * Methods `findAllElemsOrSelf`, `filterElemsOrSelf`, `findTopmostElemsOrSelf` and `findElemOrSelf` use recursion in their
