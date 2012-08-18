@@ -50,14 +50,16 @@ import scala.collection.{ immutable, mutable }
  * <li>Method `findAllElems`, finding all '''descendant''' elements</li>
  * <li>Method `findAllElemsOrSelf`, finding all '''descendant''' elements '''or self'''</li>
  * </ul>
- * The latter 2 methods are implemented in terms of method `allChildElems`. The following equalities define their semantics more formally:
- * {{{
- * elm.findAllElems == (elm.allChildElems flatMap (_.findAllElemsOrSelf))
  *
- * elm.findAllElemsOrSelf == {
- *   elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf))
- * }
+ * We define method `findAllElems` and `findAllElemsOrSelf` (recursively) as follows (in terms of equality):
+ * {{{
+ * elm.findAllElems == { elm.allChildElems flatMap (_.findAllElemsOrSelf) }
+ *
+ * elm.findAllElemsOrSelf == { elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf)) }
  * }}}
+ *
+ * The actual implementations may be different and more efficient, but they are consistent with these definitions.
+ *
  * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should in theory
  * be enough for all element collection needs. For conciseness (and performance), there are more element (collection) retrieval methods.
  *
@@ -77,15 +79,37 @@ import scala.collection.{ immutable, mutable }
  * These element (collection) retrieval methods process and return elements in depth-first order
  * (see http://en.wikipedia.org/wiki/Depth-first_search).
  *
- * Assuming no side-effects, some equalities defining the semantics of the left-hand-side are:
+ * We define some of those methods as follows (in terms of equality):
  * {{{
- * e.filterChildElems(p) == e.allChildElems.filter(p)
- * e.filterElems(p) == e.findAllElems.filter(p)
- * e.filterElemsOrSelf(p) == e.findAllElemsOrSelf.filter(p)
+ * elm.filterChildElems(p) == (elm.allChildElems filter p)
  *
- * e.collectFromChildElems(pf) == e.allChildElems.collect(pf)
- * e.collectFromElems(pf) == e.findAllElems.collect(pf)
- * e.collectFromElemsOrSelf(pf) == e.findAllElemsOrSelf.collect(pf)
+ * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ *
+ * elm.filterElemsOrSelf(p) == {
+ *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * }
+ *
+ * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ *
+ * elm.findTopmostElemsOrSelf(p) == {
+ *   if (p(elm))
+ *     immutable.IndexedSeq(elm)
+ *   else
+ *     (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * }
+ *
+ * elm.collectFromChildElems(pf) == elm.allChildElems.collect(pf)
+ * elm.collectFromElems(pf) == elm.findAllElems.collect(pf)
+ * elm.collectFromElemsOrSelf(pf) == elm.findAllElemsOrSelf.collect(pf)
+ * }}}
+ *
+ * Again, the actual implementations may be more efficient, but are consistent with these definitions.
+ *
+ * Given the definitions above, there are some provable properties about these methods that are also intuitively true, and give
+ * semantics to these methods. Assuming no side-effects, some of these equalities are:
+ * {{{
+ * elm.filterElems(p) == elm.findAllElems.filter(p)
+ * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
  *
  * elm.findTopmostElems(p) == {
  *   elm.filterElems(p) filter { e =>
@@ -107,48 +131,22 @@ import scala.collection.{ immutable, mutable }
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  * }}}
  *
- * The equalities above give semantics to the left-hand sides, but do not necessarily suggest how they are implemented.
- * Assuming no side-effects, the following (provable) equalities hint at possible implementations of the left-hand-sides, although
- * the real implementations may be (far) more efficient:
- * {{{
- * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- *
- * elm.filterElemsOrSelf(p) == {
- *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- * }
- *
- * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- *
- * elm.findTopmostElemsOrSelf(p) == {
- *   if (p(elm))
- *     immutable.IndexedSeq(elm)
- *   else
- *     (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- * }
- * }}}
- *
  * The methods returning at most one element trivially correspond to expressions containing calls to element collection
  * retrieval methods. For example (in the absence of side-effects) the following holds:
  * {{{
- * e.findElemOrSelf(p) == e.filterElemsOrSelf(p).headOption
- * e.findElemOrSelf(p) == e.findTopmostElemsOrSelf(p).headOption
+ * elm.findElemOrSelf(p) == elm.filterElemsOrSelf(p).headOption
+ * elm.findElemOrSelf(p) == elm.findTopmostElemsOrSelf(p).headOption
  * }}}
  *
  * ==ElemNodeLike even more formally==
+ *
+ * ===1. Proving property about filterElemsOrSelf===
  *
  * Below follows an example proof by structural induction of one of the above-mentioned properties. We use Scala notation in the proof.
  *
  * Assuming no side-effects (!), we prove by induction that:
  * {{{
  * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
- * }}}
- * where `findAllElemsOrSelf` is defined recursively as follows:
- * {{{
- * elm.findAllElemsOrSelf == { elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf)) }
- * }}}
- * and `filterElemsOrSelf` is defined recursively as follows:
- * {{{
- * elm.filterElemsOrSelf(p) == { (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) }
  * }}}
  *
  * __Base case__
@@ -189,6 +187,10 @@ import scala.collection.{ immutable, mutable }
  * {{{
  * { xs flatMap (x => f(x) filter p) } == { (xs flatMap (x => f(x))) filter p }
  * }}}
+ * and
+ * {{{
+ * (xs.filter(p) ++ ys.filter(p)) == { (xs ++ ys) filter p }
+ * }}}
  * we get:
  * {{{
  * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p))) } ==
@@ -200,6 +202,33 @@ import scala.collection.{ immutable, mutable }
  * }}}
  *
  * This completes the proof. Other above-mentioned properties can be proved by induction in a similar way.
+ *
+ * ===2. Proving property about filterElems===
+ *
+ * From the preceding proven property it easily follows (without using a proof by induction) that:
+ * {{{
+ * elm.filterElems(p) == elm.findAllElems.filter(p)
+ * }}}
+ * After all:
+ * {{{
+ * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * }}}
+ * so:
+ * {{{
+ * elm.filterElems(p) == { elm.allChildElems flatMap (e => e.findAllElemsOrSelf.filter(p)) }
+ * }}}
+ * so, by virtue of:
+ * {{{
+ * { xs flatMap (x => f(x) filter p) } == { (xs flatMap (x => f(x))) filter p }
+ * }}}
+ * we get:
+ * {{{
+ * elm.filterElems(p) == { (elm.allChildElems flatMap (e => e.findAllElemsOrSelf)) filter p }
+ * }}}
+ * so:
+ * {{{
+ * elm.filterElems(p) == elm.findAllElems.filter(p)
+ * }}}
  *
  * ==Implementation notes==
  *
