@@ -230,6 +230,77 @@ import scala.collection.{ immutable, mutable }
  * elm.filterElems(p) == elm.findAllElems.filter(p)
  * }}}
  *
+ * ===3. Proving property about findTopmostElemsOrSelf===
+ *
+ * Assuming no side-effects (!), we prove by induction that:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
+ * }}}
+ *
+ * __Base case__
+ *
+ * If `elm` has no child elements, and `p(elm)` holds, then LHS and RHS evaluate to `immutable.IndexedSeq(elm)`.
+ *
+ * If `elm` has no child elements, and `p(elm)` does not hold, then LHS and RHS evaluate to `immutable.IndexedSeq()`.
+ *
+ * __Inductive step__
+ *
+ * Let:
+ * {{{
+ * elm.allChildElems forall { ch => (ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (ch.filterElemsOrSelf(p)) }
+ * }}}
+ *
+ * If `p(elm)` holds, then:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (immutable.IndexedSeq(elm) flatMap (_.filterElemsOrSelf(p)))
+ * }}}
+ * so:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
+ * }}}
+ *
+ * If `p(elm)` does not hold, then:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == {
+ *   elm.allChildElems flatMap { _.findTopmostElemsOrSelf(p) } flatMap { _.filterElemsOrSelf(p) }
+ * }
+ * }}}
+ * so:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == { elm.allChildElems flatMap (_.filterElemsOrSelf(p)) }
+ * }}}
+ * so:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == {
+ *   immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * }
+ * }}}
+ * so:
+ * {{{
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == elm.filterElemsOrSelf(p)
+ * }}}
+ *
+ * ===4. Proving property about findTopmostElems===
+ *
+ * From the preceding proven property it easily follows (without using a proof by induction) that:
+ * {{{
+ * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
+ * }}}
+ *
+ * After all:
+ * {{{
+ * { elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)) } ==
+ * { elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)) flatMap (_.filterElemsOrSelf(p)) }
+ * }}}
+ * so:
+ * {{{
+ * { elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)) } == { elm.allChildElems flatMap (_.filterElemsOrSelf(p)) }
+ * }}}
+ * so:
+ * {{{
+ * { elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)) } == { elm.filterElems(p)) }
+ * }}}
+ *
  * ==Implementation notes==
  *
  * Methods `findAllElemsOrSelf`, `filterElemsOrSelf`, `findTopmostElemsOrSelf` and `findElemOrSelf` use recursion in their
