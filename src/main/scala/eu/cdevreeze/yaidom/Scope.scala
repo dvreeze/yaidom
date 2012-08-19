@@ -27,6 +27,60 @@ package eu.cdevreeze.yaidom
  *
  * This class depends on Declarations, but not the other way around.
  *
+ * ==Scope more formally==
+ *
+ * Method `resolve` resolves a `Declarations` against this Scope, returning a new Scope. It could be defined by the following equality:
+ * {{{
+ * scope.resolve(declarations) == {
+ *   val m = (scope.map ++ declarations.withoutUndeclarations.map) -- declarations.retainingUndeclarations.map.keySet
+ *   Scope(m)
+ * }
+ * }}}
+ * The actual implementation is a lot more efficient than that, but it is consistent with this definition.
+ *
+ * Method `relativize` relativizes a Scope against this Scope, returning a `Declarations`. It could be defined by the following equality:
+ * {{{
+ * scope1.relativize(scope2) == {
+ *   val declared = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
+ *   val undeclared = scope1.map.keySet -- scope2.map.keySet
+ *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
+ * }
+ * }}}
+ * Again, the actual implementation is more efficient than that, but it is consistent with this definition.
+ *
+ * Methods `relativize` and `resolve` obey the following equality:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)) == scope2
+ * }}}
+ *
+ * This property can be proven easily. After all, for arbitrary Declarations `decl`, we have:
+ * {{{
+ * scope1.resolve(decl).map == { (scope1.map ++ decl.withoutUndeclarations.map) -- decl.retainingUndeclarations.map.keySet }
+ * }}}
+ * Here, `decl` stands for `scope1.relativize(scope2)`, so:
+ * {{{
+ * scope1.resolve(decl).map == {
+ *   val properDeclarations = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
+ *   val undeclared = scope1.map.keySet -- scope2.map.keySet
+ *   (scope1.map ++ properDeclarations) -- undeclared
+ * }
+ * }}}
+ * so (visualising with Venn diagrams for prefix sets):
+ * {{{
+ * scope1.resolve(decl).map == {
+ *   val properDeclarations = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
+ *   (scope1.map ++ properDeclarations) filter { case (pref, ns) => scope2.map.contains(pref) }
+ * }
+ * }}}
+ * The RHS clearly has as keys the keys of `scope2.map` and the mapped values are also those in `scope2.map`. Hence,
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).map == scope2.map
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)) == scope2
+ * }}}
+ *
  * @author Chris de Vreeze
  */
 final case class Scope(map: Map[String, String]) extends Immutable {

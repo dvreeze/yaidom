@@ -109,7 +109,7 @@ class ScopeTest extends Suite {
       scope1.map.size
     }
 
-    val declarations2 = Declarations.from("" -> "http://a", "a" -> "http://a")
+    val declarations2 = Declarations.from("" -> "http://a", "a" -> "http://a", "x" -> "")
     val scope2 = scope1.resolve(declarations2)
 
     expect(Some("http://a")) {
@@ -118,7 +118,7 @@ class ScopeTest extends Suite {
     expect(Map("a" -> "http://a")) {
       scope2.withoutDefaultNamespace.map
     }
-    expect(declarations2) {
+    expect(Declarations.from("" -> "http://a", "a" -> "http://a")) {
       scope1.relativize(scope2)
     }
     expect(true) {
@@ -132,6 +132,12 @@ class ScopeTest extends Suite {
     }
     expect(Scope.Empty) {
       scope2.resolve(Declarations.from("" -> "")).resolve(Declarations.from("a" -> ""))
+    }
+    expect(scope2) {
+      Scope(declarations2.withoutUndeclarations.map)
+    }
+    expect(scope2) {
+      scope1.resolve(scope1.relativize(scope2))
     }
 
     val declarations3 = Declarations.from("b" -> "http://b", "c" -> "http://c")
@@ -151,6 +157,12 @@ class ScopeTest extends Suite {
     }
     expect(scope2) {
       scope3.resolve(Declarations.from("b" -> "", "c" -> ""))
+    }
+    expect(scope3) {
+      Scope((scope2.map ++ declarations3.withoutUndeclarations.map) -- declarations3.retainingUndeclarations.map.keySet)
+    }
+    expect(scope3) {
+      scope2.resolve(scope2.relativize(scope3))
     }
 
     val declarations4 = Declarations.from("c" -> "http://ccc", "d" -> "http://d")
@@ -182,6 +194,12 @@ class ScopeTest extends Suite {
     }
     expect(Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
       scope4
+    }
+    expect(scope4) {
+      Scope((scope3.map ++ declarations4.withoutUndeclarations.map) -- declarations4.retainingUndeclarations.map.keySet)
+    }
+    expect(scope4) {
+      scope3.resolve(scope3.relativize(scope4))
     }
   }
 

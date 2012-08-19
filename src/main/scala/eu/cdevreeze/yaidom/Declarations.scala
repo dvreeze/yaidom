@@ -66,6 +66,9 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
     if (!map.contains(DefaultNsPrefix)) this else Declarations(map - DefaultNsPrefix)
   }
 
+  /** Returns `Declarations(this.map ++ declarations.map)` */
+  def ++(declarations: Declarations): Declarations = Declarations(this.map ++ declarations.map)
+
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml
@@ -91,6 +94,12 @@ object Declarations {
   val Empty = Declarations(Map())
 
   def from(m: (String, String)*): Declarations = Declarations(Map[String, String](m: _*))
+
+  /** Returns a `Declarations` that contains (only) undeclarations for the given prefixes */
+  def undeclaring(prefixes: Set[String]): Declarations = {
+    val m = (prefixes map (pref => (pref -> ""))).toMap
+    Declarations(m)
+  }
 
   val DefaultNsPrefix = ""
 }
