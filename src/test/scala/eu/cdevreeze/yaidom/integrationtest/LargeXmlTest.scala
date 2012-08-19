@@ -331,11 +331,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    import ElemPathBuilder.comp
-
-    val path = ElemPathBuilder.from(
-      comp(QName("contact"), 2499),
-      comp(QName("phone"), 0)).build(Scope.Empty)
+    val path = ElemPathBuilder.from(QName("contact") -> 2499, QName("phone") -> 0).build(Scope.Empty)
 
     val newPhone = "012-34567890"
 
@@ -393,11 +389,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    import ElemPathBuilder.comp
-
-    val path = ElemPathBuilder.from(
-      comp(QName("contact"), 2499),
-      comp(QName("phone"), 0)).build(Scope.Empty)
+    val path = ElemPathBuilder.from(QName("contact") -> 2499, QName("phone") -> 0).build(Scope.Empty)
 
     val newPhone = "012-34567890"
 

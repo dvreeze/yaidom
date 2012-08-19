@@ -24,9 +24,7 @@ import scala.annotation.tailrec
  *
  * Example:
  * {{{
- * import ElemPathBuilder.comp
- *
- * val elemPath: ElemPath = ElemPathBuilder.from(comp(QName("parent"), 0), comp(QName("child"), 2)).build(Scope.Empty)
+ * val elemPath: ElemPath = ElemPathBuilder.from(QName("parent") -> 0, QName("child") -> 2).build(Scope.Empty)
  * }}}
  *
  * Note that the indexes are 0-based. Also note that the Scope passed to the `build` method must be invertible.
@@ -70,7 +68,10 @@ object ElemPathBuilder {
   def apply(entries: immutable.IndexedSeq[ElemPathBuilder.Entry]): ElemPathBuilder = new ElemPathBuilder(entries)
 
   /** Easy to use factory method for `ElemPathBuilder` instances */
-  def from(entries: ElemPathBuilder.Entry*): ElemPathBuilder = new ElemPathBuilder(Vector(entries: _*))
+  def from(entries: (QName, Int)*): ElemPathBuilder = {
+    val entrySeq: Seq[ElemPathBuilder.Entry] = entries map { p => Entry(p._1, p._2) }
+    new ElemPathBuilder(entrySeq.toIndexedSeq)
+  }
 
   /** An entry in an `ElemPathBuilder`, as an qname plus zero-based index of the elem as child (with that name) of the parent. */
   final case class Entry(qname: QName, index: Int) extends Immutable {
@@ -87,7 +88,4 @@ object ElemPathBuilder {
 
     def localName: String = qname.localPart
   }
-
-  /** Constructs an `ElemPathBuilder.Entry` component */
-  def comp(qname: QName, index: Int): Entry = Entry(qname, index)
 }
