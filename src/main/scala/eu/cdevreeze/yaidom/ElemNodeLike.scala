@@ -106,7 +106,7 @@ import scala.collection.{ immutable, mutable }
  * Again, the actual implementations may be more efficient, but are consistent with these definitions.
  *
  * Given the definitions above, there are some provable properties about these methods that are also intuitively true, and give
- * semantics to these methods. Assuming no side-effects, some of these equalities are:
+ * semantics to these methods. Assuming no side-effects etc. (see below for the precise assumptions made), some of these equalities are:
  * {{{
  * elm.filterElems(p) == elm.findAllElems.filter(p)
  * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
@@ -132,7 +132,7 @@ import scala.collection.{ immutable, mutable }
  * }}}
  *
  * The methods returning at most one element trivially correspond to expressions containing calls to element collection
- * retrieval methods. For example (in the absence of side-effects) the following holds:
+ * retrieval methods. For example, in the absence of side-effects etc. (see below for the precise assumptions made), the following holds:
  * {{{
  * elm.findElemOrSelf(p) == elm.filterElemsOrSelf(p).headOption
  * elm.findElemOrSelf(p) == elm.findTopmostElemsOrSelf(p).headOption
@@ -142,9 +142,18 @@ import scala.collection.{ immutable, mutable }
  *
  * ===1. Proving property about filterElemsOrSelf===
  *
- * Below follows an example proof by structural induction of one of the above-mentioned properties. We use Scala notation in the proof.
+ * Below follows a proof by structural induction of one of the above-mentioned properties. We use Scala notation in the proof.
  *
- * Assuming no side-effects (!), we prove by induction that:
+ * First we make a few assumptions, for this proof, and (implicitly) for the other proofs:
+ * <ul>
+ * <li>The function literals used in the properties ("element predicates" in this case) have no side-effects</li>
+ * <li>These function literals terminate normally, without throwing any exception</li>
+ * <li>These function literals have no free variables, bound in the context of the function (so they are "closed terms", and do not produce "true closures")</li>
+ * <li>These function literals use "fresh" variables, thus avoiding shadowing of variables defined in the context of the function literal</li>
+ * </ul>
+ * Equality on the type of the elements should be an equivalence relation, although that is not used here as assumption.
+ *
+ * Based on these assumptions, we prove by induction that:
  * {{{
  * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
  * }}}
@@ -232,7 +241,7 @@ import scala.collection.{ immutable, mutable }
  *
  * ===3. Proving property about findTopmostElemsOrSelf===
  *
- * Assuming no side-effects (!), we prove by induction that:
+ * Given the above-mentioned assumptions, we prove by induction that:
  * {{{
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  * }}}
