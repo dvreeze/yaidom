@@ -48,6 +48,8 @@ package eu.cdevreeze.yaidom
  * }}}
  * Again, the actual implementation is more efficient than that, but it is consistent with this definition.
  *
+ * ===1. Property about relativize and resolve, and its proof===
+ *
  * Methods `relativize` and `resolve` obey the following equality:
  * {{{
  * scope1.resolve(scope1.relativize(scope2)) == scope2
@@ -69,10 +71,10 @@ package eu.cdevreeze.yaidom
  * {{{
  * scope1.resolve(decl).map == {
  *   val properDeclarations = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
- *   (scope1.map ++ properDeclarations) filter { case (pref, ns) => scope2.map.contains(pref) }
+ *   (scope1.map ++ properDeclarations) filterKeys (scope2.map.keySet)
  * }
  * }}}
- * The RHS clearly has as keys the keys of `scope2.map` and the mapped values are also those in `scope2.map`. Hence,
+ * The RHS clearly has as keys the keys of `scope2.map` and the mapped values (per key) are also those found in `scope2.map`. Hence,
  * {{{
  * scope1.resolve(scope1.relativize(scope2)).map == scope2.map
  * }}}
@@ -80,6 +82,18 @@ package eu.cdevreeze.yaidom
  * {{{
  * scope1.resolve(scope1.relativize(scope2)) == scope2
  * }}}
+ *
+ * ===2. Another property about relativize and resolve===
+ *
+ * Methods `relativize` and `resolve` also obey the following equality:
+ * {{{
+ * scope.relativize(scope.resolve(declarations)) == declarations
+ * }}}
+ * but only if we cannot take a proper "subset" `decl` of `declarations` such that `scope.resolve(declarations) == scope.resolve(decl)`.
+ *
+ * Currently we offer no proof of this property.
+ *
+ * This and the preceding (proven) property are analogous to corresponding properties in the `URI` class.
  *
  * @author Chris de Vreeze
  */

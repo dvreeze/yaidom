@@ -148,10 +148,10 @@ import scala.collection.{ immutable, mutable }
  * <ul>
  * <li>The function literals used in the properties ("element predicates" in this case) have no side-effects</li>
  * <li>These function literals terminate normally, without throwing any exception</li>
- * <li>These function literals have no free variables, bound in the context of the function (so they are "closed terms", and do not produce "true closures")</li>
+ * <li>These function literals are "closed terms", so the function values that are instances of these function literals are not "true closures"</li>
  * <li>These function literals use "fresh" variables, thus avoiding shadowing of variables defined in the context of the function literal</li>
+ * <li>Equality on the element type is an equivalence relation (reflexive, symmetric, transitive)</li>
  * </ul>
- * Equality on the type of the elements should be an equivalence relation, although that is not used here as assumption.
  *
  * Based on these assumptions, we prove by induction that:
  * {{{
