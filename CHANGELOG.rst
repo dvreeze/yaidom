@@ -3,6 +3,38 @@ CHANGELOG
 =========
 
 
+0.6.2
+=====
+
+* Breaking API change: made class ``Declarations`` a top-level class
+* Breaking API changes to classes ``Scope`` and ``Declarations``:
+
+  * Simplified the implementations, with both classes now backed by maps from prefixes to namespace URIs
+  * Removed several methods (that are not often used outside the yaidom library itself)
+  * Added several methods (now both classes are more internally consistent than before)
+  * Added properties and their proofs to the documentation of both classes
+
+* Added trait ``ElemNodeLike``:
+
+  * Trait ``ElemLike`` extends this new trait
+  * Trait ``ElemNodeLike`` has only abstract method ``allChildElems``, and no further "knowledge" than that
+  * This trait is also mixed in by ``ElemBuilder``
+  * The documentation of trait ``ElemNodeLike`` contains several properties with their proofs
+  
+* Added class ``ElemPathBuilder``
+* Fixed class ``ElemPath``, using new method ``Scope.isInvertible``
+* Added trait ``TransformableElemLike``:
+
+  * Mixed in by different element classes
+  * Clarified and re-implemented ``Elem.updated`` for speed (in different ``Elem`` classes)
+
+* ``Node`` has a similar DSL for creating node trees as ``NodeBuilder``, using methods like ``elem``, ``text`` etc.
+* Added motivation document
+* Added some convenience methods to ``ElemBuilder``, like ``withChildren`` and ``plusChild``
+* Added convenience method ``NodeBuilder.textElem``
+* Added test case for some "mini-yaidom", which can be used in an article explaining yaidom
+
+
 0.6.1
 =====
 
