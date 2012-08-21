@@ -69,6 +69,22 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
   /** Returns `Declarations(this.map ++ declarations.map)` */
   def ++(declarations: Declarations): Declarations = Declarations(this.map ++ declarations.map)
 
+  /** Returns `Declarations(this.map -- prefixes)` */
+  def --(prefixes: Set[String]): Declarations = Declarations(this.map -- prefixes)
+
+  /** Returns true if this is a sub-declarations of the given parameter `Declarations`. A `Declarations` is considered sub-declarations of itself. */
+  def subDeclarationsOf(declarations: Declarations): Boolean = {
+    val thisMap = map
+    val otherMap = declarations.map
+
+    thisMap.keySet.subsetOf(otherMap.keySet) && {
+      thisMap.keySet forall { pref => thisMap(pref) == otherMap(pref) }
+    }
+  }
+
+  /** Returns true if this is a super-declarations of the given parameter `Declarations`. A `Declarations` is considered super-declarations of itself. */
+  def superDeclarationsOf(declarations: Declarations): Boolean = declarations.subDeclarationsOf(this)
+
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml

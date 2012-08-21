@@ -87,9 +87,8 @@ package eu.cdevreeze.yaidom
  *
  * Methods `relativize` and `resolve` also obey the following equality:
  * {{{
- * scope.relativize(scope.resolve(declarations)) == declarations
+ * scope.relativize(scope.resolve(declarations)) == scope.minimized(declarations)
  * }}}
- * but only if we cannot take a proper "subset" `decl` of `declarations` such that `scope.resolve(declarations) == scope.resolve(decl)`.
  *
  * Currently we offer no proof of this property.
  *
@@ -193,6 +192,23 @@ final case class Scope(map: Map[String, String]) extends Immutable {
 
       Declarations(m)
     }
+  }
+
+  /**
+   * Returns the smallest sub-declarations `decl` of `declarations` such that `this.resolve(decl) == this.resolve(declarations)`
+   */
+  def minimized(declarations: Declarations): Declarations = {
+    val declared = declarations.withoutUndeclarations.map filter { kv =>
+      val pref = kv._1
+      val ns = kv._2
+      this.map.getOrElse(pref, "") != ns
+    }
+    val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(this.map.keySet)
+
+    val result = Declarations(declared) ++ Declarations.undeclaring(undeclared)
+
+    assert(this.resolve(declarations) == this.resolve(result))
+    result
   }
 
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */

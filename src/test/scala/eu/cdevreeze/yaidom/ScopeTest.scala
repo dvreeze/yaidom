@@ -139,14 +139,20 @@ class ScopeTest extends Suite {
     expect(scope2) {
       scope1.resolve(scope1.relativize(scope2))
     }
+    expect(declarations2 -- Set("x")) {
+      scope1.minimized(declarations2)
+    }
+    expect(scope1.minimized(declarations2)) {
+      scope1.relativize(scope1.resolve(declarations2))
+    }
 
-    val declarations3 = Declarations.from("b" -> "http://b", "c" -> "http://c")
+    val declarations3 = Declarations.from("a" -> "http://a", "b" -> "http://b", "c" -> "http://c")
     val scope3 = scope2.resolve(declarations3)
 
     expect(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
       scope3.map
     }
-    expect(declarations3) {
+    expect(scope2.minimized(declarations3)) {
       scope2.relativize(scope3)
     }
     expect(true) {
@@ -163,6 +169,12 @@ class ScopeTest extends Suite {
     }
     expect(scope3) {
       scope2.resolve(scope2.relativize(scope3))
+    }
+    expect(declarations3 -- Set("a")) {
+      scope2.minimized(declarations3)
+    }
+    expect(scope2.minimized(declarations3)) {
+      scope2.relativize(scope2.resolve(declarations3))
     }
 
     val declarations4 = Declarations.from("c" -> "http://ccc", "d" -> "http://d")
@@ -200,6 +212,12 @@ class ScopeTest extends Suite {
     }
     expect(scope4) {
       scope3.resolve(scope3.relativize(scope4))
+    }
+    expect(declarations4) {
+      scope3.minimized(declarations4)
+    }
+    expect(scope3.minimized(declarations4)) {
+      scope3.relativize(scope3.resolve(declarations4))
     }
   }
 
