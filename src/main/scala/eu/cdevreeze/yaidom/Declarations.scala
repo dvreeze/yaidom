@@ -45,19 +45,19 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
 
   /** Returns an adapted copy of this Declarations, but retaining only the undeclarations, if any */
   def retainingUndeclarations: Declarations = {
-    val m = map filter { kv => kv._2 == "" }
+    val m = map filter { case (pref, ns) => ns == "" }
     if (m.isEmpty) Declarations.Empty else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but without any undeclarations, if any */
   def withoutUndeclarations: Declarations = {
-    val m = map filter { kv => kv._2 != "" }
+    val m = map filter { case (pref, ns) => ns != "" }
     if (m.size == map.size) this else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but retaining only the default namespace, if any */
   def retainingDefaultNamespace: Declarations = {
-    val m = map filter { kv => kv._1 == DefaultNsPrefix }
+    val m = map filter { case (pref, ns) => pref == DefaultNsPrefix }
     if (m.isEmpty) Declarations.Empty else Declarations(m)
   }
 
@@ -97,9 +97,9 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
   }
 
   private def properDeclarationsToStringInXml: String = {
-    val declaredMap = map filter { kv => kv._2.length > 0 }
+    val declaredMap = map filter { case (pref, ns) => ns.length > 0 }
     val defaultNsString = if (!declaredMap.contains(DefaultNsPrefix)) "" else """xmlns="%s"""".format(declaredMap(DefaultNsPrefix))
-    val prefixScopeString = (declaredMap - DefaultNsPrefix) map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    val prefixScopeString = (declaredMap - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }

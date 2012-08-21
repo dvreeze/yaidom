@@ -36,7 +36,7 @@ package eu.cdevreeze.yaidom
  *   Scope(m)
  * }
  * }}}
- * The actual implementation is a lot more efficient than that, but it is consistent with this definition.
+ * The actual implementation may be more efficient than that, but it is consistent with this definition.
  *
  * Method `relativize` relativizes a Scope against this Scope, returning a `Declarations`. It could be defined by the following equality:
  * {{{
@@ -46,7 +46,7 @@ package eu.cdevreeze.yaidom
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
- * Again, the actual implementation is more efficient than that, but it is consistent with this definition.
+ * Again, the actual implementation may be more efficient than that, but it is consistent with this definition.
  *
  * ===1. Property about relativize and resolve, and its proof===
  *
@@ -62,8 +62,18 @@ package eu.cdevreeze.yaidom
  * Here, `decl` stands for `scope1.relativize(scope2)`, so:
  * {{{
  * scope1.resolve(decl).map == {
+ *   val properDeclarations = scope1.relativize(scope2).withoutUndeclarations.map
+ *   val undeclared = scope1.relativize(scope2).retainingUndeclarations.map.keySet
+ *   (scope1.map ++ properDeclarations) -- undeclared
+ * }
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(decl).map == {
  *   val properDeclarations = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
  *   val undeclared = scope1.map.keySet -- scope2.map.keySet
+ *
+ *   assert((scope1.map ++ properDeclarations).keySet == scope1.map.keySet.union(scope2.map.keySet))
  *   (scope1.map ++ properDeclarations) -- undeclared
  * }
  * }}}
@@ -83,14 +93,58 @@ package eu.cdevreeze.yaidom
  * scope1.resolve(scope1.relativize(scope2)) == scope2
  * }}}
  *
- * ===2. Another property about relativize and resolve===
+ * ===2. Another property about relativize and resolve, and its proof===
  *
  * Methods `relativize` and `resolve` also obey the following equality:
  * {{{
  * scope.relativize(scope.resolve(declarations)) == scope.minimized(declarations)
  * }}}
+ * where `scope.minimized(declarations)` is defined by the following equality:
+ * {{{
+ * scope.minimized(declarations) == {
+ *   val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
+ *   val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(scope.map.keySet)
+ *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
+ * }
+ * }}}
  *
- * Currently we offer no proof of this property.
+ * Below follows a proof of this property. For arbitrary Scope `sc`, we have:
+ * {{{
+ * scope.relativize(sc) == {
+ *   val declared = sc.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
+ *   val undeclared = scope.map.keySet -- sc.map.keySet
+ *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
+ * }
+ * }}}
+ * Here, `sc` stands for `scope.resolve(declarations)`, so:
+ * {{{
+ * scope.relativize(sc) == {
+ *   val declared = scope.resolve(declarations).map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
+ *   val undeclared = scope.map.keySet -- scope.resolve(declarations).map.keySet
+ *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
+ * }
+ * }}}
+ * so:
+ * {{{
+ * scope.relativize(sc) == {
+ *   val newScope = Scope((scope.map ++ declarations.withoutUndeclarations.map) -- declarations.retainingUndeclarations.map.keySet)
+ *   val declared = newScope.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
+ *   val undeclared = scope.map.keySet -- newScope.map.keySet
+ *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
+ * }
+ * }}}
+ * so:
+ * {{{
+ * scope.relativize(sc) == {
+ *   val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
+ *   val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(scope.map.keySet)
+ *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
+ * }
+ * }}}
+ * so, as a result:
+ * {{{
+ * scope.relativize(scope.resolve(declarations)) == scope.minimized(declarations)
+ * }}}
  *
  * This and the preceding (proven) property are analogous to corresponding properties in the `URI` class.
  *
@@ -161,7 +215,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    */
   def resolve(declarations: Declarations): Scope = {
     if (declarations.isEmpty) this else {
-      val declared: Map[String, String] = declarations.map filter { kv => kv._2.length > 0 }
+      val declared: Map[String, String] = declarations.map filter { case (pref, ns) => ns.length > 0 }
 
       val undeclarations: Declarations = declarations.retainingUndeclarations
       assert(declared.keySet.intersect(undeclarations.map.keySet).isEmpty)
@@ -177,11 +231,10 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    */
   def relativize(scope: Scope): Declarations = {
     if (Scope.this == scope) Declarations.Empty else {
-      val newlyDeclared: Map[String, String] = scope.map filter { kv =>
-        val pref = kv._1
-        val ns = kv._2
-        assert(ns.length > 0)
-        Scope.this.map.getOrElse(pref, "") != ns
+      val newlyDeclared: Map[String, String] = scope.map filter {
+        case (pref, ns) =>
+          assert(ns.length > 0)
+          Scope.this.map.getOrElse(pref, "") != ns
       }
 
       val removed: Set[String] = Scope.this.map.keySet -- scope.map.keySet
@@ -198,11 +251,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Returns the smallest sub-declarations `decl` of `declarations` such that `this.resolve(decl) == this.resolve(declarations)`
    */
   def minimized(declarations: Declarations): Declarations = {
-    val declared = declarations.withoutUndeclarations.map filter { kv =>
-      val pref = kv._1
-      val ns = kv._2
-      this.map.getOrElse(pref, "") != ns
-    }
+    val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => this.map.getOrElse(pref, "") != ns }
     val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(this.map.keySet)
 
     val result = Declarations(declared) ++ Declarations.undeclaring(undeclared)
@@ -214,7 +263,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
-    val prefixScopeString = (map - DefaultNsPrefix) map { kv => """xmlns:%s="%s"""".format(kv._1, kv._2) } mkString (" ")
+    val prefixScopeString = (map - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 }
