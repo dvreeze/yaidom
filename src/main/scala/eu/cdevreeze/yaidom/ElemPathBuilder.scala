@@ -29,6 +29,8 @@ import scala.annotation.tailrec
  *
  * Note that the indexes are 0-based. Also note that the Scope passed to the `build` method must be invertible.
  * Otherwise the resolution of QNames can break the indexes of the path builder components.
+ *
+ * @author Chris de Vreeze
  */
 final class ElemPathBuilder(val entries: immutable.IndexedSeq[ElemPathBuilder.Entry]) extends Immutable { self =>
   require(entries ne null)

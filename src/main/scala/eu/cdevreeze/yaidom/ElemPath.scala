@@ -34,6 +34,8 @@ import scala.annotation.tailrec
  * Strictly speaking, each element in a tree would be uniquely identified by path entries that only contained
  * a child index instead of an element name plus child index (of children with the given name). Yet that would
  * be far less easy to use. Hence `ElemPath.Entry` instances each contain an element name plus index.
+ *
+ * @author Chris de Vreeze
  */
 final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
 
