@@ -26,15 +26,38 @@ import scala.collection.{ immutable, mutable }
  * Based on an abstract method returning the child elements, this trait offers query methods to find descendant-or-self elements,
  * topmost descendant-or-self elements obeying a predicate, and so on.
  *
- * This trait implements those methods of the `Elem` class, which mixes in this trait. It is also used for implementing parts of other
- * "element-like" classes, other than the "core" [[eu.cdevreeze.yaidom.Elem]] class, such as [[eu.cdevreeze.yaidom.resolved.Elem]] for
- * "resolved" elements.
+ * This trait implements those query methods of the [[eu.cdevreeze.yaidom.Elem]] class, which mixes in this trait. It is also used for
+ * implementing the same methods of other "element-like" classes, other than the "core" `Elem` class, such as [[eu.cdevreeze.yaidom.resolved.Elem]]
+ * for "resolved" elements.
  *
  * Subtrait [[eu.cdevreeze.yaidom.ElemLike]] implements many more methods on elements, based on more knowledge about elements, such
  * as element names and attributes. It is indeed the `ElemLike` trait that is mixed in by element classes. The distinction between
  * this trait and subtrait `ElemLike` is still useful, because this trait implements methods that only need knowledge about
- * elements as parent nodes of other elements. In an abstract sense, this trait even has nothing to do with elements in particular,
- * but it deals with trees (XML or not) in general (if we were to rename the trait, its methods and the type parameter).
+ * elements as parent nodes of other elements. In an abstract sense, this trait could even be seen as an API that has nothing to do with
+ * elements in particular, but that deals with trees (XML or not) in general (if we were to rename the trait, its methods and the type
+ * parameter).
+ *
+ * The element classes that mix in this trait (or sub-trait `ElemLike`) have knowledge about all child nodes of an element, whether
+ * these child nodes are elements or not (such as text, comments etc.). Hence, this simple element-centric `ElemNodeLike` API can be seen
+ * as a good basis for querying arbitrary nodes and their values.
+ *
+ * For example, using class [[eu.cdevreeze.yaidom.Elem]], which also mixes in trait [[eu.cdevreeze.yaidom.HasText]],
+ * all normalized text in a tree with document element `root` can be found as follows:
+ * {{{
+ * root.findAllElemsOrSelf map { e => e.normalizedText }
+ * }}}
+ * or:
+ * {{{
+ * root collectFromElemsOrSelf { case e => e.normalizedText }
+ * }}}
+ * As another example (also using the `HasText` trait as mixin), all text containing the string "query" can be found as follows:
+ * {{{
+ * root filterElemsOrSelf { e => e.text.contains("query") } map { _.text }
+ * }}}
+ * or:
+ * {{{
+ * root collectFromElemsOrSelf { case e if e.text.contains("query") => e.text }
+ * }}}
  *
  * ==ElemNodeLike more formally==
  *
