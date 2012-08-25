@@ -268,7 +268,7 @@ class EqualityTest extends Suite {
             case n: Node => Some(n)
           }
         }
-        e.withChildren(newChildren)
+        Vector(e.withChildren(newChildren))
     }
 
     val resolvedRoot3 = resolved.Elem(root3)

@@ -1362,7 +1362,7 @@ class DomInteropTest extends Suite {
 
     val countryPath = ElemPathBuilder.from(QName("car") -> 0, QName("country") -> 0).build(Scope.Empty)
     val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
-    val updatedDoc = doc.updated(countryPath, updatedCountryElm)
+    val updatedDoc = doc.updated(countryPath, Vector(updatedCountryElm))
 
     expect("New Zealand") {
       updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).getChildElem(_.localName == "country").trimmedText

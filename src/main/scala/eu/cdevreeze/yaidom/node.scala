@@ -142,14 +142,11 @@ final class Document(
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
-  /** Returns `withDocumentElement(this.documentElement updated pf)` */
-  def updated(pf: PartialFunction[ElemPath, Elem]): Document = withDocumentElement(this.documentElement updated pf)
-
   /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
-  def updated(path: ElemPath)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
+  def updated(path: ElemPath)(f: Elem => immutable.IndexedSeq[Node]): Document = withDocumentElement(this.documentElement.updated(path)(f))
 
-  /** Returns `updated(path) { e => elm }` */
-  def updated(path: ElemPath, elm: Elem): Document = updated(path) { e => elm }
+  /** Returns `updated(path) { e => nodes }` */
+  def updated(path: ElemPath, nodes: immutable.IndexedSeq[Node]): Document = updated(path) { e => nodes }
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
@@ -240,7 +237,7 @@ final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with TransformableElemLike[Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -269,56 +266,8 @@ final class Elem(
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
-  override def updated(pf: PartialFunction[ElemPath, Elem]): Elem = {
-    def updated(currentPath: ElemPath, currentElm: Elem): Elem = {
-      val childNodes = currentElm.children
-
-      if (pf.isDefinedAt(currentPath)) {
-        pf(currentPath)
-      } else if (childNodes.isEmpty) {
-        currentElm
-      } else {
-        val childElemsWithPaths: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = currentElm.allChildElemsWithPathEntries
-        var idx = 0
-
-        // Recursive, but not tail-recursive
-        val updatedChildNodes: immutable.IndexedSeq[Node] = childNodes map { (n: Node) =>
-          n match {
-            case e: Elem =>
-              val pathEntry = childElemsWithPaths(idx)._2
-              assert(childElemsWithPaths(idx)._1 == e)
-              idx += 1
-              val newPath = currentPath.append(pathEntry)
-
-              updated(newPath, e)
-            case n => n
-          }
-        }
-        currentElm.withChildren(updatedChildNodes)
-      }
-    }
-
-    updated(ElemPath.Root, self)
-  }
-
-  override def updated(path: ElemPath)(f: Elem => Elem): Elem = {
-    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
-    // "functional updates" (among other efficient operations).
-
-    if (path.entries.isEmpty) f(self) else {
-      val firstEntry = path.firstEntry
-      val idx = childIndexOf(firstEntry)
-      require(idx >= 0, "The path %s does not exist".format(path))
-
-      val childNodes = children
-
-      assert(childNodes(idx).isInstanceOf[Elem])
-      val childElm = childNodes(idx).asInstanceOf[Elem]
-
-      // Recursive, but not tail-recursive
-      val updatedChildren: immutable.IndexedSeq[Node] = childNodes.updated(idx, childElm.updated(path.withoutFirstEntry)(f))
-      self.withChildren(updatedChildren)
-    }
+  override def ownChildIndex(parent: Elem): Int = {
+    parent.children.zipWithIndex find { case (elm, idx) => elm == self } map { case (elm, idx) => idx } getOrElse (-1)
   }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
