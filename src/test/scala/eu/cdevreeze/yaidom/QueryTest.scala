@@ -938,6 +938,14 @@ class QueryTest extends Suite {
     expect(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
+    expect(4) {
+      val paths = bookstore findPathsOfTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      paths.size
+    }
+    expect(0) {
+      val paths = bookstoreWithoutPrices findPathsOfTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      paths.size
+    }
   }
 
   @Test def testTransformCombiningFirstAndLastName() {
