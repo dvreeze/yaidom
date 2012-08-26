@@ -391,14 +391,15 @@ class QueryTest extends Suite {
         qname = e.qname,
         attributes = e.attributes + (QName("elemPath") -> path.toCanonicalXPath(scope)),
         scope = e.scope,
-        children = e.children map { ch =>
-          ch match {
-            case che: Elem =>
-              val childPath = path.append(che.ownElemPathEntry(e))
-              // Recursive call
-              addElemPaths(che, childPath, scope)
-            case _ => ch
-          }
+        children = e.children.zipWithIndex map {
+          case (ch, idx) =>
+            ch match {
+              case che: Elem =>
+                val childPath = path.append(e.findChildPathEntry(idx).get)
+                // Recursive call
+                addElemPaths(che, childPath, scope)
+              case _ => ch
+            }
         })
     }
 

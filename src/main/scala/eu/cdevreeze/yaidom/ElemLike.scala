@@ -218,16 +218,4 @@ trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] { self: E =>
 
     acc.toIndexedSeq
   }
-
-  /**
-   * Returns the `ElemPath` `Entry` of this element with respect to the given parent,
-   * throwing an exception if this element is not a child of that parent.
-   *
-   * The implementation uses the equals method on the self type.
-   */
-  final def ownElemPathEntry(parent: E): ElemPath.Entry = {
-    val idx = parent.filterChildElems(self.resolvedName) indexWhere { e => e == self }
-    require(idx >= 0, "Expected %s to have parent %s".format(self.toString, parent.toString))
-    ElemPath.Entry(self.resolvedName, idx)
-  }
 }

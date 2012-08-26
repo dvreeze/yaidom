@@ -360,7 +360,8 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
 
-    val resolvedElm2: resolved.Elem = resolved.Elem(doc.documentElement).updated(path) { e =>
+    val resolvedDocElm = resolved.Elem(doc.documentElement)
+    val resolvedElm2: resolved.Elem = resolvedDocElm.updated(path) { e =>
       Vector(e.withChildren(Vector(resolved.Text(newPhone))))
     }
 
@@ -373,17 +374,9 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       resolvedElm1 == resolvedElm3
     }
 
-    /*
-    println(resolvedElm2.findAllElemsOrSelf.size)
-    println(resolvedElm3.findAllElemsOrSelf.size)
-    println()
-    println(resolvedElm2 collectFromElemsOrSelf { case e if e.text == newPhone => e })
-    println()
-    println(resolvedElm3 collectFromElemsOrSelf { case e if e.text == newPhone => e })
     expect(true) {
       resolvedElm2 == resolvedElm3
     }
-    */
   }
 
   @Test def testUpdateAgain() {

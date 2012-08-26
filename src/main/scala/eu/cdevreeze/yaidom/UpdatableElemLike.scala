@@ -22,16 +22,15 @@ import scala.collection.{ immutable, mutable }
  * "Updatable" element. It defines a contract for "functional updates".
  *
  * This trait is a sub-trait of [[eu.cdevreeze.yaidom.ElemLike]]. It adds a type parameter for (arbitrary) nodes.
- * It also requires concrete implementations for abstract methods `children` and `withChildren`. Based on these 2 methods,
- * and super-trait `ElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
+ * It also requires concrete implementations for abstract methods `children`, `withChildren`, `childNodeIndex` and `findChildPathEntry`.
+ * Based on these 4 methods, and super-trait `ElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
  *
  * This trait adds the following groups of methods to the methods offered by the supertrait `ElemLike`:
  * <ul>
  * <li>Convenience methods for functional updates given a child node index (range)</li>
- * <li>Methods for functional updates given an ElemPath</li>
- * <li>A method for functional updates, given an "element predicate"</li>
- * <li>Query methods returning ElemPath collections</li>
- * <li>A method to turn a child ElemPath entry into a child node index</li>
+ * <li>Methods for functional updates given an `ElemPath`</li>
+ * <li>A method for functional updates, given a partial function from elements to node collections</li>
+ * <li>Query methods returning `ElemPath` collections</li>
  * </ul>
  *
  * @tparam N The node supertype of the element subtype
@@ -50,14 +49,18 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
   /**
-   * Returns the index `idx` such that `parent.children(idx) == self`, or -1 otherwise.
+   * Returns the child node index of the given `ElemPath.Entry` with respect to this element as parent element.
+   * If the path entry is not found, -1 is returned.
    *
    * Methods `updated` (taking `ElemPath`s) heavily use this method to turn `ElemPath`s into child node indexes.
    * This makes indexing using `ElemPath`s slow, because this method is O(n).
    */
-  final def ownChildIndex(parent: E): Int = {
-    parent.children.zipWithIndex find { case (elm, idx) => elm == self } map { case (elm, idx) => idx } getOrElse (-1)
-  }
+  def childNodeIndex(childPathEntry: ElemPath.Entry): Int
+
+  /**
+   * The inverse of `childNodeIndex`, wrapped in an Option. If the child node at the given index is not an element, None is returned.
+   */
+  def findChildPathEntry(idx: Int): Option[ElemPath.Entry]
 
   /** Shorthand for `withChildren(children.updated(index, newChild))` */
   final def withUpdatedChildren(index: Int, newChild: N): E =
@@ -82,7 +85,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
     require(!path.isRoot, "We cannot update the root element itself (except for its children) within the tree with that root element")
 
     val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
-    val foundChildElmNodeIdx = foundChildElm.ownChildIndex(self)
+    val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
     assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
 
     val updatedChildren: immutable.IndexedSeq[N] =

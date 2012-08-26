@@ -270,8 +270,32 @@ final class Elem(
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
-  def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(qname, attributes, scope, newChildren)
+  }
+
+  override def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
+    (0 to childPathEntry.index).foldLeft(-1) {
+      case (acc, nextPathEntryIndex) =>
+        children.indexWhere({
+          case e: Elem if e.resolvedName == childPathEntry.elementName => true
+          case n: Node => false
+        }, acc + 1)
+    }
+  }
+
+  override def findChildPathEntry(idx: Int): Option[ElemPath.Entry] = {
+    val node = children(idx)
+
+    node match {
+      case e: Elem =>
+        val cnt = children.take(idx) count {
+          case che: Elem if che.resolvedName == e.resolvedName => true
+          case chn: Node => false
+        }
+        Some(ElemPath.Entry(e.resolvedName, cnt))
+      case n: Node => None
+    }
   }
 
   /** Returns `withChildren(self.children :+ newChild)`. */
