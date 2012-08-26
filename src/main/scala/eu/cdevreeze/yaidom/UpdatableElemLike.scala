@@ -19,7 +19,20 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * Updatable element. It defines a contract for "functional updates".
+ * "Updatable" element. It defines a contract for "functional updates".
+ *
+ * This trait is a sub-trait of [[eu.cdevreeze.yaidom.ElemLike]]. It adds a type parameter for (arbitrary) nodes.
+ * It also requires concrete implementations for abstract methods `children` and `withChildren`. Based on these 2 methods,
+ * and super-trait `ElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
+ *
+ * This trait adds the following groups of methods to the methods offered by the supertrait `ElemLike`:
+ * <ul>
+ * <li>Convenience methods for functional updates given a child node index (range)</li>
+ * <li>Methods for functional updates given an ElemPath</li>
+ * <li>A method for functional updates, given an "element predicate"</li>
+ * <li>Query methods returning ElemPath collections</li>
+ * <li>A method to turn a child ElemPath entry into a child node index</li>
+ * </ul>
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
@@ -30,18 +43,36 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
 
   // See https://pario.zendesk.com/entries/20124208-lesson-6-complex-xslt-example for an example of what we must be able to express easily.
 
+  /** Returns the child nodes of this element, in the correct order */
   def children: immutable.IndexedSeq[N]
 
-  def ownChildIndex(parent: E): Int
-
+  /** Returns an element with the same name, attributes and scope as this element, but with the given child nodes */
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
+
+  /**
+   * Returns the index `idx` such that `parent.children(idx) == self`, or -1 otherwise.
+   *
+   * Methods `updated` (taking `ElemPath`s) heavily use this method to turn `ElemPath`s into child node indexes.
+   * This makes indexing using `ElemPath`s slow, because this method is O(n).
+   */
+  final def ownChildIndex(parent: E): Int = {
+    parent.children.zipWithIndex find { case (elm, idx) => elm == self } map { case (elm, idx) => idx } getOrElse (-1)
+  }
+
+  /** Shorthand for `withChildren(children.updated(index, newChild))` */
+  final def withUpdatedChildren(index: Int, newChild: N): E =
+    withChildren(children.updated(index, newChild))
+
+  /** Shorthand for `withChildren(children.patch(from, newChildren, replace))` */
+  final def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[N], replace: Int): E =
+    withChildren(children.patch(from, newChildren, replace))
 
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
    * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
-   * 
+   *
    * The root element must remain the same, except for (one of its) children. Hence the root path is not allowed as parameter.
-   * 
+   *
    * The method throws an exception if no element is found with the given path, or if the root path is passed.
    */
   final def updated(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
@@ -73,4 +104,54 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
 
   /** Returns `updated(path) { e => nodes }` */
   final def updated(path: ElemPath, nodes: immutable.IndexedSeq[N]): E = updated(path) { e => nodes }
+
+  /**
+   * Functionally updates topmost descendant elements (but not self!) for which the partial function is defined,
+   * within the tree of which this element is the root element.
+   */
+  final def updated(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
+    val p = { e: E => pf.isDefinedAt(e) }
+    val paths = findPathsOfTopmostElems(p).reverse
+
+    val result: E = paths.foldLeft(self) {
+      case (acc, path) =>
+        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
+        assert(pf.isDefinedAt(e))
+
+        acc.updated(path, pf(e))
+    }
+    result
+  }
+
+  /**
+   * Returns all paths, relative to this element as root element, of the elements in `filterChildElems(p)`
+   */
+  final def filterPathsOfChildElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
+    this.allChildElemsWithPathEntries filter { case (e, pathEntry) => p(e) } map { case (e, pathEntry) => ElemPath.from(pathEntry) }
+  }
+
+  /**
+   * Returns all paths, relative to this element as root element, of the elements in `findTopmostElemsOrSelf(p)`
+   */
+  final def findPathsOfTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
+    if (p(self)) immutable.IndexedSeq(ElemPath.Root) else {
+      this.allChildElemsWithPathEntries flatMap {
+        case (ch, pathEntry) =>
+          // Recursive call, but not tail-recursive
+          val pathsFromChild = ch.findPathsOfTopmostElemsOrSelf(p)
+          pathsFromChild map { _.prepend(pathEntry) }
+      }
+    }
+  }
+
+  /**
+   * Returns all paths, relative to this element as root element, of the elements in `findTopmostElems(p)`
+   */
+  final def findPathsOfTopmostElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
+    this.allChildElemsWithPathEntries flatMap {
+      case (ch, pathEntry) =>
+        val pathsFromChild = ch.findPathsOfTopmostElemsOrSelf(p)
+        pathsFromChild map { _.prepend(pathEntry) }
+    }
+  }
 }

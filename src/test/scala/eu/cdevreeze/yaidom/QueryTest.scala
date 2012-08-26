@@ -908,7 +908,7 @@ class QueryTest extends Suite {
     assert(ngCount == 2, "Expected 'National Geographic' twice")
   }
 
-  @Ignore @Test def testTransformLeavingOutPrices() {
+  @Test def testTransformLeavingOutPrices() {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -926,13 +926,9 @@ class QueryTest extends Suite {
         children = book.children)
     }
 
-    /*
     val bookstoreWithoutPrices: Elem =
       bookstore updated {
-        case path if path.endsWithName(EName("Book")) =>
-          val elem = bookstore.findWithElemPath(path).get
-          Some(Vector(removePrice(elem)))
-        case _ => None
+        case e if e.resolvedName == EName("Book") => Vector(removePrice(e))
       }
 
     expect(4) {
@@ -941,10 +937,9 @@ class QueryTest extends Suite {
     expect(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    */
   }
 
-  @Ignore @Test def testTransformCombiningFirstAndLastName() {
+  @Test def testTransformCombiningFirstAndLastName() {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -970,55 +965,44 @@ class QueryTest extends Suite {
         children = Vector(name)).build()
     }
 
-    /*
     val bookstoreWithCombinedNames: Elem =
       bookstore updated {
-        case path if path.endsWithName(EName("Author")) =>
-          val elem = bookstore.findWithElemPath(path).get
-          Some(Vector(combineName(elem)))
-        case _ => None
+        case e if e.resolvedName == EName("Author") => Vector(combineName(e))
       }
 
     expect(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
       val result = bookstoreWithCombinedNames.filterElems(EName("Name")) map { _.trimmedText }
       result.toSet
     }
-    */
   }
 
-  @Ignore @Test def testTransformAuthors() {
+  @Test def testTransformAuthors() {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
 
     // Transforms the XML tree, giving a namespace to Author elements
 
-    // require(bookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
-    // import NodeBuilder._
+    import NodeBuilder._
 
-    /*
     val updatedBookstoreElm: Elem =
       bookstore updated {
-        case path if path.containsName(EName("Author")) =>
-          val elm = bookstore.findWithElemPath(path).get
-          val newScope = elm.scope.resolve(Declarations.from("abc" -> "http://def"))
-          val newElmName = QName("abc", elm.localName)
-          Some(Vector(Elem(newElmName, elm.attributes, newScope, elm.children)))
-        case _ => None
+        case e if e.resolvedName == EName("Author") =>
+          val newScope = e.scope.resolve(Declarations.from("abc" -> "http://def"))
+          val newElmName = QName("abc", e.localName)
+          Vector(Elem(newElmName, e.attributes, newScope, e.children))
       }
-    */
 
     // Although the partial function is defined for any path containing an Author, only the Author elements are functionally updated!
 
-    /*
     expect(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
       EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {
 
       val result = updatedBookstoreElm.findAllElemsOrSelf map { _.resolvedName }
       result.toSet
     }
-    */
   }
 
   private val book1: ElemBuilder = {

@@ -386,7 +386,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     */
   }
 
-  @Ignore @Test def testUpdateAgain() {
+  @Test def testUpdateAgain() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -410,13 +410,9 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     // Update, using a partial function. Note that this is probably inefficient for very large XML documents.
 
-    /*
     val start2Ms = System.currentTimeMillis()
     val updatedDoc: Document = doc updated {
-      case p if p == path =>
-        val e = doc.documentElement.findWithElemPath(path).get
-        Some(Vector(e.withChildren(Vector(Text(newPhone, false)))))
-      case _ => None
+      case e if (e.localName == "phone") && (e == oldPhoneElm) => Vector(e.withChildren(Vector(Text(newPhone, false))))
     }
     val end2Ms = System.currentTimeMillis()
     logger.info("Updating an element in the document (using a partial function) took %d ms".format(end2Ms - start2Ms))
@@ -426,7 +422,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     expect(true) {
       newPhoneElm.text == newPhone
     }
-    */
   }
 
   private def doTest[E <: ElemLike[E] with HasText](elm: E) {

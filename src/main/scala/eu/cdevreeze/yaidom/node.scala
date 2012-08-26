@@ -148,6 +148,9 @@ final class Document(
   /** Returns `updated(path) { e => nodes }` */
   def updated(path: ElemPath, nodes: immutable.IndexedSeq[Node]): Document = updated(path) { e => nodes }
 
+  /** Returns `withDocumentElement(this.documentElement.updated(pf))` */
+  def updated(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document = withDocumentElement(this.documentElement.updated(pf))
+
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     require(parentScope == Scope.Empty, "A document has no parent scope")
 
@@ -265,10 +268,6 @@ final class Elem(
 
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
-
-  override def ownChildIndex(parent: Elem): Int = {
-    parent.children.zipWithIndex find { case (elm, idx) => elm == self } map { case (elm, idx) => idx } getOrElse (-1)
-  }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {

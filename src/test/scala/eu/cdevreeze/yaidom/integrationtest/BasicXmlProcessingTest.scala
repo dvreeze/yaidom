@@ -155,7 +155,7 @@ class BasicXmlProcessingTest extends Suite {
     }
   }
 
-  @Ignore @Test def testConversions() {
+  @Test def testConversions() {
     val docParser = DocumentParserUsingSax.newInstance
     val musicElm: Elem = docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
 
@@ -230,15 +230,12 @@ class BasicXmlProcessingTest extends Suite {
     val docPrinter = DocumentPrinterUsingSax.newInstance
     val musicXml = docPrinter.print(musicElm2)
 
-    /*
     val musicElm3 = docParser.parse(new jio.ByteArrayInputStream(musicXml.getBytes(Codec.UTF8.toString))).documentElement
 
     val musicElmWithoutLinks: Elem =
       musicElm updated {
-        case path: ElemPath if path.lastEntryOption.map(_.localName).getOrElse("") == "description" =>
-          val e = musicElm.findWithElemPath(path).get
-          Some(Vector(Elem(e.qname, e.attributes - QName("link"), e.scope, e.children)))
-        case _ => None
+        case e if e.localName == "description" =>
+          Vector(Elem(e.qname, e.attributes - QName("link"), e.scope, e.children))
       }
 
     expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {
@@ -247,7 +244,6 @@ class BasicXmlProcessingTest extends Suite {
     expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {
       resolved.Elem(musicElm3).removeAllInterElementWhitespace
     }
-    */
   }
 
   final case class Song(val title: String, val length: String) extends Immutable {

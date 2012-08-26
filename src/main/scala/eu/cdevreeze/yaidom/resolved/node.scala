@@ -78,10 +78,6 @@ final case class Elem(
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
-  override def ownChildIndex(parent: Elem): Int = {
-    parent.children.zipWithIndex find { case (elm, idx) => elm == self } map { case (elm, idx) => idx } getOrElse (-1)
-  }
-
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(resolvedName, resolvedAttributes, newChildren)
