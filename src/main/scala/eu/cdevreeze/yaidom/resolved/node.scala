@@ -69,7 +69,7 @@ trait ParentNode extends Node {
 final case class Elem(
   val resolvedName: EName,
   val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with ElemLike[Elem] with UpdatableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
