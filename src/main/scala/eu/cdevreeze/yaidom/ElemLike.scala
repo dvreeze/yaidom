@@ -72,7 +72,7 @@ import scala.collection.{ immutable, mutable }
  *
  * ==ElemLike methods==
  *
- * The only abstract methods are `resolvedName`, `resolvedAttributes` and `allChildElems`.
+ * The only abstract methods (introduced by this trait) are `resolvedName`, `resolvedAttributes` and `allChildElems`.
  * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
@@ -81,7 +81,7 @@ import scala.collection.{ immutable, mutable }
  * The element query methods that need no knowledge about element names and attributes are implemented by supertrait
  * [[eu.cdevreeze.yaidom.ElemNodeLike]].
  *
- * This trait adds the following groups of methods to the methods offered by the supertrait `ElemNodeLike`:
+ * This trait adds the following groups of methods to the methods offered by the supertraits `ElemNodeLike` and `IndexedElemNodeLike`:
  * <ul>
  * <li>A method to get the local name of the element, without the namespace</li>
  * <li>Attribute query methods</li>
@@ -93,7 +93,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] with IndexedElemNodeLike[E] { self: E =>
 
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName
@@ -180,7 +180,7 @@ trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] { self: E =>
   /**
    * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
    */
-  final def findWithElemPath(path: ElemPath): Option[E] = {
+  final override def findWithElemPath(path: ElemPath): Option[E] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
 
     def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {

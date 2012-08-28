@@ -59,6 +59,9 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   /** Appends a given `Entry` to this `ElemPath` */
   def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries :+ entry)
 
+  /** Appends a given relative `ElemPath` to this `ElemPath` */
+  def ++(other: ElemPath): ElemPath = ElemPath(this.entries ++ other.entries)
+
   /**
    * Gets the parent path (if any, because the root path has no parent) wrapped in an `Option`.
    *
@@ -78,7 +81,7 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   def ancestorOrSelfPaths: immutable.IndexedSeq[ElemPath] = {
     @tailrec
     def accumulate(path: ElemPath, acc: mutable.ArrayBuffer[ElemPath]): mutable.ArrayBuffer[ElemPath] = {
-      acc :+ path
+      acc += path
       if (path.isRoot) acc else accumulate(path.parentPath, acc)
     }
 
@@ -117,7 +120,7 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
 
   override def hashCode: Int = entries.hashCode
 
-  override def toString: String = entries.toString
+  override def toString: String = "ElemPath(%s)".format(entries.toString)
 
   /**
    * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).

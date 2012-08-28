@@ -86,6 +86,19 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val resolvedRoot = resolved.Elem(doc.documentElement)
     doTest(resolvedRoot)
+
+    val emailPaths = resolvedRoot findTopmostElemPaths { e => e.localName == "email" } take (10)
+    val emailElms = resolvedRoot findTopmostElems { e => e.localName == "email" } take (10)
+
+    expect(10) {
+      emailPaths.size
+    }
+    expect(10) {
+      emailElms.size
+    }
+    expect(emailElms) {
+      emailPaths map { path => resolvedRoot.getWithElemPath(path) }
+    }
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */

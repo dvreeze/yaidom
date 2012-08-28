@@ -30,7 +30,6 @@ import scala.collection.{ immutable, mutable }
  * <li>Convenience methods for functional updates given a child node index (range)</li>
  * <li>Methods for functional updates given an `ElemPath`</li>
  * <li>A method for functional updates, given a partial function from elements to node collections</li>
- * <li>Query methods returning `ElemPath` collections</li>
  * </ul>
  *
  * @tparam N The node supertype of the element subtype
@@ -114,7 +113,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
    */
   final def updated(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
-    val paths = findPathsOfTopmostElems(p).reverse
+    val paths = findTopmostElemPaths(p).reverse
 
     val result: E = paths.foldLeft(self) {
       case (acc, path) =>
@@ -124,37 +123,5 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike
         acc.updated(path, pf(e))
     }
     result
-  }
-
-  /**
-   * Returns all paths, relative to this element as root element, of the elements in `filterChildElems(p)`
-   */
-  final def filterPathsOfChildElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
-    this.allChildElemsWithPathEntries filter { case (e, pathEntry) => p(e) } map { case (e, pathEntry) => ElemPath.from(pathEntry) }
-  }
-
-  /**
-   * Returns all paths, relative to this element as root element, of the elements in `findTopmostElemsOrSelf(p)`
-   */
-  final def findPathsOfTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
-    if (p(self)) immutable.IndexedSeq(ElemPath.Root) else {
-      this.allChildElemsWithPathEntries flatMap {
-        case (ch, pathEntry) =>
-          // Recursive call, but not tail-recursive
-          val pathsFromChild = ch.findPathsOfTopmostElemsOrSelf(p)
-          pathsFromChild map { _.prepend(pathEntry) }
-      }
-    }
-  }
-
-  /**
-   * Returns all paths, relative to this element as root element, of the elements in `findTopmostElems(p)`
-   */
-  final def findPathsOfTopmostElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
-    this.allChildElemsWithPathEntries flatMap {
-      case (ch, pathEntry) =>
-        val pathsFromChild = ch.findPathsOfTopmostElemsOrSelf(p)
-        pathsFromChild map { _.prepend(pathEntry) }
-    }
   }
 }

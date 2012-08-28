@@ -52,6 +52,18 @@ class QueryTest extends Suite {
       val result = bookTitles map { _.trimmedText }
       result.toSet
     }
+
+    val bookTitlePaths =
+      bookstore findTopmostElemPaths { _.localName == "Title" } filter { path => path.containsName(EName("Book")) }
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = bookTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      result.toSet
+    }
   }
 
   @Test def testQueryBookOrMagazineTitles() {
@@ -74,6 +86,23 @@ class QueryTest extends Suite {
       val result = bookOrMagazineTitles map { _.trimmedText }
       result.toSet
     }
+
+    val bookOrMagazineTitlePaths =
+      for {
+        titlePath <- bookstore filterElemPaths { _.resolvedName == EName("Title") }
+        if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
+      } yield titlePath
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints",
+      "National Geographic",
+      "Newsweek")) {
+      val result = bookOrMagazineTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      result.toSet
+    }
   }
 
   @Test def testQueryTitles() {
@@ -92,6 +121,23 @@ class QueryTest extends Suite {
       "National Geographic",
       "Newsweek")) {
       val result = titles map { _.trimmedText }
+      result.toSet
+    }
+
+    val titlePaths =
+      for {
+        titlePath <- bookstore findTopmostElemPaths { _.resolvedName == EName("Title") }
+        if titlePath.entries.size == 2
+      } yield titlePath
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints",
+      "National Geographic",
+      "Newsweek")) {
+      val result = titlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
       result.toSet
     }
   }
@@ -114,6 +160,22 @@ class QueryTest extends Suite {
       val result = titles map { _.trimmedText }
       result.toSet
     }
+
+    val titlePaths =
+      for {
+        titlePath <- bookstore filterElemPaths { _.localName == "Title" }
+      } yield titlePath
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints",
+      "National Geographic",
+      "Newsweek")) {
+      val result = titlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      result.toSet
+    }
   }
 
   @Test def testQueryAllElements() {
@@ -131,6 +193,16 @@ class QueryTest extends Suite {
         e.allChildElems forall { ch => elements.contains(ch) }
       }
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
+
+    val paths = bookstore.findAllElemOrSelfPaths
+
+    expect(elements.size) {
+      paths.size
+    }
+
+    expect(elements map (e => resolved.Elem(e))) {
+      paths map { path => bookstore.getWithElemPath(path) } map { e => resolved.Elem(e) }
+    }
   }
 
   @Test def testQueryBookIsbns() {
@@ -147,6 +219,16 @@ class QueryTest extends Suite {
       "ISBN-0-11-222222-3",
       "ISBN-9-88-777777-6")) {
       isbns.toSet
+    }
+
+    expect(Set(
+      "ISBN-0-13-713526-2",
+      "ISBN-0-13-815504-6",
+      "ISBN-0-11-222222-3",
+      "ISBN-9-88-777777-6")) {
+      val result =
+        for (bookPath <- bookstore filterChildElemPaths (e => e.localName == "Book")) yield bookstore.getWithElemPath(bookPath).attribute(EName("ISBN"))
+      result.toSet
     }
   }
 
@@ -169,6 +251,17 @@ class QueryTest extends Suite {
       val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = books flatMap { book =>
+        book findElemPath (e => e.resolvedName == EName("Title")) map
+          { path => book.getWithElemPath(path).trimmedText }
+      }
+      result.toSet
+    }
   }
 
   @Test def testQueryCheapBookTitles() {
@@ -187,6 +280,21 @@ class QueryTest extends Suite {
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
       val result = titles map { _.trimmedText }
+      result.toSet
+    }
+
+    val titlePaths = bookstore.findAllElemPaths filter { path =>
+      path.endsWithName(EName("Title")) && {
+        val parentElm = bookstore.getWithElemPath(path.parentPath)
+        parentElm.localName == "Book" && parentElm.attribute(EName("Price")).toInt < 90
+      }
+    }
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = titlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
       result.toSet
     }
   }
@@ -265,6 +373,30 @@ class QueryTest extends Suite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
+      result.toSet
+    }
+
+    val bookTitlePaths =
+      bookstore findTopmostElemPaths { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } filter { path =>
+        require(path.endsWithName(EName("Last_Name")))
+        path.containsName(EName("Book")) && {
+          val bookPath = path.ancestorPaths.filter(_.endsWithName(EName("Book"))).head
+          val bookElm = bookstore.getWithElemPath(bookPath)
+          bookElm.attribute(EName("Price")).toInt < 90
+        }
+      } flatMap { path =>
+        require(path.endsWithName(EName("Last_Name")))
+        val bookPath = path.ancestorPaths.filter(_.endsWithName(EName("Book"))).head
+        val bookElm = bookstore.getWithElemPath(bookPath)
+        val titlePathOption = bookElm findElemPath { e => e.resolvedName == EName("Title") } map
+          { relativeTitlePath => bookPath ++ relativeTitlePath }
+        titlePathOption
+      }
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
       result.toSet
     }
   }
@@ -939,11 +1071,11 @@ class QueryTest extends Suite {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     expect(4) {
-      val paths = bookstore findPathsOfTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
     expect(0) {
-      val paths = bookstoreWithoutPrices findPathsOfTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
   }
