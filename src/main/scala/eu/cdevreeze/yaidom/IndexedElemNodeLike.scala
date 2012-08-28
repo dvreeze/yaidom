@@ -38,8 +38,7 @@ import scala.collection.{ immutable, mutable }
  *   for {
  *     authorPath <- bookstoreElm findTopmostElemPaths { _.localName == "Author" }
  *     if authorPath.containsName(EName("Book"))
- *   }
- *   yield bookstoreElm.getWithElemPath(authorPath)
+ *   } yield bookstoreElm.getWithElemPath(authorPath)
  * }}}
  *
  * The above example shows how we can use the results of queries for `ElemPath`s, if we are interested in the ancestors of the
@@ -52,19 +51,18 @@ import scala.collection.{ immutable, mutable }
  *   for {
  *     bookElm <- bookstoreElm \\ EName("Book")
  *     authorElm <- bookElm \\! "Author"
- *   }
- *   yield bookElm
+ *   } yield bookElm
  * }}}
  *
- * Indeed, the query methods of the `ElemNodeLike` API should be preferred to those of this `IndexedElemNodeLike` API, whenever possible.
+ * Indeed, the query methods of the `ElemNodeLike` API should often be preferred to those of this `IndexedElemNodeLike` API.
  * After all, `ElemPath`s are relative to one specific root element, they are "volatile" (in that "functional updates" may render them
- * useless), and they are rather slow indexes. Moreover, the `ElemNodeLike` query methods tend to be faster themselves.
+ * useless), and they are rather slow indexes. Moreover, the `ElemNodeLike` query methods tend to be faster than those of this trait.
  *
  * On the other hand, it is often the combination of `ElemNodeLike` API query methods and `IndexedElemNodeLike` API query methods
  * that offer interesting querying possibilities. After all, sometimes it is handy to formulate a query in such a way that ancestors
  * are retrieved in at least one of the intermediate steps.
  *
- * Another use of queries for `ElemPath`s is functional updates. See [[eu.cdevreeze.yaidom.UpdatableElemLike]] for the "update"
+ * Another use for `ElemPath` queries is functional updates. See [[eu.cdevreeze.yaidom.UpdatableElemLike]] for the "update"
  * methods. Some `updated` methods take an `ElemPath`, and another `updated` method is implemented using an `ElemPath` query offered
  * by this API.
  *
@@ -85,34 +83,23 @@ import scala.collection.{ immutable, mutable }
  * {{{
  * val titlePaths = elm.findAllElemOrSelfPaths filter { path => elm.getWithElemPath(path).resolvedName == EName("Title") }
  * }}}
+ * The second statement is far less efficient, due to repeated calls to method `getWithElemPath`. In this case, we could instead
+ * have written:
+ * {{{
+ * val titlePaths = elm.findAllElemOrSelfPaths filter { path => path.endsWithName(EName("Title")) }
+ * }}}
  *
- * Assuming correct implementations of the abstract methods, and using "resolved" (!) [[eu.cdevreeze.yaidom.resolved.Elem]] elements
+ * Assuming correct implementations of the abstract methods, and using "resolved" (!) [[eu.cdevreeze.yaidom.resolved.Elem]] instances
  * (which have structural equality defined), this trait obeys some obvious properties, expressed using equality:
  * {{{
  * (elm.findAllElemOrSelfPaths map (path => elm.getWithElemPath(path))) == elm.findAllElemsOrSelf
- * }}}
- * and
- * {{{
  * (elm.findAllElemPaths map (path => elm.getWithElemPath(path))) == elm.findAllElems
- * }}}
- * and
- * {{{
  * (elm.allChildElemPaths map (path => elm.getWithElemPath(path))) == elm.allChildElems
- * }}}
- * and
- * {{{
+ *
  * (elm.filterElemOrSelfPaths(p) map (path => elm.getWithElemPath(path))) == elm.filterElemsOrSelf(p)
- * }}}
- * and
- * {{{
  * (elm.filterElemPaths(p) map (path => elm.getWithElemPath(path))) == elm.filterElems(p)
- * }}}
- * and
- * {{{
+ *
  * (elm.findTopmostElemOrSelfPaths(p) map (path => elm.getWithElemPath(path))) == elm.findTopmostElemsOrSelf(p)
- * }}}
- * and
- * {{{
  * (elm.findTopmostElemPaths(p) map (path => elm.getWithElemPath(path))) == elm.findTopmostElems(p)
  * }}}
  * etc.
@@ -185,7 +172,7 @@ trait IndexedElemNodeLike[E <: IndexedElemNodeLike[E]] { self: E =>
     if (p(self)) (ElemPath.Root +: remainder) else remainder
   }
 
-  /** Returns the paths of all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
+  /** Returns the paths of all descendant elements (not including this element). Equivalent to `findAllElemOrSelfPaths.drop(1)` */
   final def findAllElemPaths: immutable.IndexedSeq[ElemPath] =
     allChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findAllElemOrSelfPaths map { path => path.prepend(pe) } }
 
