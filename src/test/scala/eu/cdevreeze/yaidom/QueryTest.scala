@@ -554,6 +554,23 @@ class QueryTest extends Suite {
     expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       qnames
     }
+
+    // We could do a lot better, using the IndexedElemNodeLike API...
+
+    val paths =
+      for {
+        path <- bookstore.findAllElemPaths
+        parentPath = path.parentPath
+        parent = bookstore.getWithElemPath(parentPath)
+        if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
+      } yield path
+
+    assert(paths.size > 10, "Expected more than 10 matching element paths")
+
+    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
+      val result = paths map { path => bookstore.getWithElemPath(path).qname }
+      result.toSet
+    }
   }
 
   @Test def testQueryElementsWithParentNotBookOrBookstoreUsingIndexedDocument() {
@@ -579,6 +596,23 @@ class QueryTest extends Suite {
     }
     expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       qnames
+    }
+
+    // Again, without an IndexedDocument, we could do a lot better, using the IndexedElemNodeLike API...
+
+    val paths =
+      for {
+        path <- bookstore.findAllElemPaths
+        parentPath = path.parentPath
+        parent = bookstore.getWithElemPath(parentPath)
+        if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
+      } yield path
+
+    assert(paths.size > 10, "Expected more than 10 matching element paths")
+
+    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
+      val result = paths map { path => bookstore.getWithElemPath(path).qname }
+      result.toSet
     }
   }
 
