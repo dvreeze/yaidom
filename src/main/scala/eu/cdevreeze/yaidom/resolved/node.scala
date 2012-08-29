@@ -67,8 +67,8 @@ trait ParentNode extends Node {
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
  */
 final case class Elem(
-  val resolvedName: EName,
-  val resolvedAttributes: Map[EName, String],
+  override val resolvedName: EName,
+  override val resolvedAttributes: Map[EName, String],
   override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(resolvedName ne null)

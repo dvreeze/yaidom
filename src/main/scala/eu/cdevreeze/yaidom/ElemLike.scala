@@ -202,7 +202,7 @@ trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] with IndexedElemNodeLik
   }
 
   /** Returns all child elements with their `ElemPath` entries, in the correct order */
-  final def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)] = {
+  final override def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)] = {
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
     val elementNameCounts = mutable.Map[EName, Int]()

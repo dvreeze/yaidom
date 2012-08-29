@@ -641,6 +641,32 @@ class QueryTest extends Suite {
       val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
+
+    // And now using ElemPaths ...
+
+    val bookAndMagazinePaths =
+      for {
+        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine = bookstore.getWithElemPath(bookOrMagazinePath)
+        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
+        nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
+        nextChildren = bookstore.children.drop(nodeIndex + 1)
+        prevChildren = bookstore.children.take(nodeIndex)
+        nextOption = nextChildren find {
+          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
+          case n: Node => false
+        } collect { case e: Elem => e }
+        prevOption = prevChildren find {
+          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
+          case n: Node => false
+        } collect { case e: Elem => e }
+        if (nextOption.isDefined || prevOption.isDefined)
+      } yield bookOrMagazinePath
+
+    expect(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
+      result.toSet
+    }
   }
 
   @Test def testQueryBooksOrMagazinesWithTitleAsOtherBook() {
@@ -663,6 +689,32 @@ class QueryTest extends Suite {
 
     expect(Set("Hector and Jeff's Database Hints")) {
       val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      result.toSet
+    }
+
+    // And now using ElemPaths ...
+
+    val bookAndMagazinePaths =
+      for {
+        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine = bookstore.getWithElemPath(bookOrMagazinePath)
+        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
+        nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
+        nextChildren = bookstore.children.drop(nodeIndex + 1)
+        prevChildren = bookstore.children.take(nodeIndex)
+        nextBookOption = nextChildren find {
+          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
+          case n: Node => false
+        } collect { case e: Elem => e }
+        prevBookOption = prevChildren find {
+          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
+          case n: Node => false
+        } collect { case e: Elem => e }
+        if (nextBookOption.isDefined || prevBookOption.isDefined)
+      } yield bookOrMagazinePath
+
+    expect(Set("Hector and Jeff's Database Hints")) {
+      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
