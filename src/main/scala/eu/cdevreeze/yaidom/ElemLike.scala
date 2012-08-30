@@ -79,9 +79,9 @@ import scala.collection.{ immutable, mutable }
  * general. Hence the single type parameter, for the captured element type itself.
  *
  * The element query methods that need no knowledge about element names and attributes are implemented by supertrait
- * [[eu.cdevreeze.yaidom.ElemNodeLike]].
+ * [[eu.cdevreeze.yaidom.ElemAwareElemLike]].
  *
- * This trait adds the following groups of methods to the methods offered by the supertraits `ElemNodeLike` and `IndexedElemNodeLike`:
+ * This trait adds the following groups of methods to the methods offered by the supertraits `ElemAwareElemLike` and `PathAwareElemLike`:
  * <ul>
  * <li>A method to get the local name of the element, without the namespace</li>
  * <li>Attribute query methods</li>
@@ -93,7 +93,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] extends ElemNodeLike[E] with IndexedElemNodeLike[E] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends ElemAwareElemLike[E] with PathAwareElemLike[E] { self: E =>
 
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName

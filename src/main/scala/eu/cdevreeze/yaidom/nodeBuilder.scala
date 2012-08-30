@@ -125,7 +125,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
   val namespaces: Declarations,
-  override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder with ElemNodeLike[ElemBuilder] { self =>
+  override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder with ElemAwareElemLike[ElemBuilder] { self =>
 
   require(qname ne null)
   require(attributes ne null)

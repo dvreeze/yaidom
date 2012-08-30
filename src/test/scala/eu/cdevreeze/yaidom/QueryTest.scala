@@ -555,7 +555,7 @@ class QueryTest extends Suite {
       qnames
     }
 
-    // We could do a lot better, using the IndexedElemNodeLike API...
+    // We could do a lot better, using the PathAwareElemLike API...
 
     val paths =
       for {
@@ -598,7 +598,7 @@ class QueryTest extends Suite {
       qnames
     }
 
-    // Again, without an IndexedDocument, we could do a lot better, using the IndexedElemNodeLike API...
+    // Again, without an IndexedDocument, we could do a lot better, using the PathAwareElemLike API...
 
     val paths =
       for {

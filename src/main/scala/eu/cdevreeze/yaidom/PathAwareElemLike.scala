@@ -22,7 +22,7 @@ import scala.collection.{ immutable, mutable }
  * API and implementation trait for elements as containers of elements, as indexed element nodes in a node tree. This trait
  * offers query methods for "indexes", as `ElemPath` instances.
  *
- * This trait to a large extent mirrors the `ElemNodeLike` trait. This trait knows more about elements, though. It knows about
+ * This trait to a large extent mirrors the `ElemAwareElemLike` trait. This trait knows more about elements, though. It knows about
  * `ElemPath` indexes, and therefore about elements having resolved names. Other node types than elements are not known to this API.
  *
  * Based on abstract methods `allChildElemsWithPathEntries` and `findWithElemPath`, this trait offers a rich `ElemPath` query API.
@@ -42,7 +42,7 @@ import scala.collection.{ immutable, mutable }
  * }}}
  *
  * The above example shows how we can use the results of queries for `ElemPath`s, if we are interested in the ancestors of the
- * elements at those paths. Of course, using the `ElemNodeLike` API, this example could have been written simply as:
+ * elements at those paths. Of course, using the `ElemAwareElemLike` API, this example could have been written simply as:
  * {{{
  * val bookstoreElm = doc.documentElement
  * require(bookstoreElm.localName == "Bookstore")
@@ -54,11 +54,11 @@ import scala.collection.{ immutable, mutable }
  *   } yield bookElm
  * }}}
  *
- * Indeed, the query methods of the `ElemNodeLike` API should often be preferred to those of this `IndexedElemNodeLike` API.
+ * Indeed, the query methods of the `ElemAwareElemLike` API should often be preferred to those of this `PathAwareElemLike` API.
  * After all, `ElemPath`s are relative to one specific root element, they are "volatile" (in that "functional updates" may render them
- * useless), and they are rather slow indexes. Moreover, the `ElemNodeLike` query methods tend to be faster than those of this trait.
+ * useless), and they are rather slow indexes. Moreover, the `ElemAwareElemLike` query methods tend to be faster than those of this trait.
  *
- * On the other hand, it is often the combination of `ElemNodeLike` API query methods and `IndexedElemNodeLike` API query methods
+ * On the other hand, it is often the combination of `ElemAwareElemLike` API query methods and `PathAwareElemLike` API query methods
  * that offer interesting querying possibilities. After all, sometimes it is handy to formulate a query in such a way that ancestors
  * are retrieved in at least one of the intermediate steps.
  *
@@ -66,9 +66,9 @@ import scala.collection.{ immutable, mutable }
  * methods. Some `updated` methods take an `ElemPath`, and another `updated` method is implemented using an `ElemPath` query offered
  * by this API.
  *
- * ==IndexedElemNodeLike more formally==
+ * ==PathAwareElemLike more formally==
  *
- * Analogously to the `ElemNodeLike` API, there are 3 '''core''' element path retrieval methods:
+ * Analogously to the `ElemAwareElemLike` API, there are 3 '''core''' element path retrieval methods:
  * <ul>
  * <li>Method `allChildElemPaths`, returning the paths (relative to this element) of all '''child''' elements</li>
  * <li>Method `findAllElemPaths`, finding the paths (relative to this element) of all '''descendant''' elements</li>
@@ -108,14 +108,14 @@ import scala.collection.{ immutable, mutable }
  *
  * ==Implementation notes==
  *
- * Like trait `ElemNodeLike`, some query methods use recursion in their implementations, but no tail recursion. See [[eu.cdevreeze.yaidom.ElemNodeLike]]
+ * Like trait `ElemAwareElemLike`, some query methods use recursion in their implementations, but no tail recursion. See [[eu.cdevreeze.yaidom.ElemAwareElemLike]]
  * for a motivation.
  *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait IndexedElemNodeLike[E <: IndexedElemNodeLike[E]] { self: E =>
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] { self: E =>
 
   /** Returns all child elements with their `ElemPath` entries, in the correct order */
   def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
