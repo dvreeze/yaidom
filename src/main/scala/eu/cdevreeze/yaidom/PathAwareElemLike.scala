@@ -115,9 +115,13 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemLike[E <: PathAwareElemLike[E]] { self: E =>
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemAwareElemLike[E] { self: E =>
 
-  /** Returns all child elements with their `ElemPath` entries, in the correct order */
+  /**
+   * Returns all child elements with their `ElemPath` entries, in the correct order.
+   *
+   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   */
   def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
 
   /**

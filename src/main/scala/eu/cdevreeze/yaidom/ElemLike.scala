@@ -93,7 +93,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] extends ElemAwareElemLike[E] with PathAwareElemLike[E] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends PathAwareElemLike[E] { self: E =>
 
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName
@@ -216,6 +216,8 @@ trait ElemLike[E <: ElemLike[E]] extends ElemAwareElemLike[E] with PathAwareElem
       acc += (elm -> entry)
     }
 
-    acc.toIndexedSeq
+    val result = acc.toIndexedSeq
+    assert((result map (_._1)) == allChildElems)
+    result
   }
 }
