@@ -17,6 +17,8 @@
 package eu.cdevreeze
 
 /**
+ * ==Introduction==
+ *
  * Yet another immutable DOM-like API. Hence the name <em>yaidom</em>. This is not an implementation of W3C DOM.
  * Instead, this is a Scala-ish DOM-like API. Foremost, that means that this API is centered around
  * Scala Collections of immutable nodes.
@@ -77,7 +79,10 @@ package eu.cdevreeze
  * robustness, ease of use and performance. Yaidom tries to achieve the same (in a different way), but yaidom is less ambitious,
  * foremost in not offering any XPath(-like) support.
  *
- * Example usage:
+ * ==Examples==
+ *
+ * Below follow some examples. The first example queries for all book elements having a price below 90. It can be written as follows,
+ * assuming a book store `Document` with the appropriate structure:
  * {{{
  * val bookstoreElm = doc.documentElement
  * require(bookstoreElm.localName == "Bookstore")
@@ -99,6 +104,37 @@ package eu.cdevreeze
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}
+ *
+ * All books having (at least) Jeffrey Ullman as author can be found as follows:
+ * {{{
+ * val ullmanBookElms =
+ *   for {
+ *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
+ *     if (bookElm \\ "Author") exists { e =>
+ *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+ *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+ *     }
+ *   } yield bookElm
+ * }}}
+ *
+ * An alternative way to write the same query, but using [[eu.cdevreeze.yaidom.ElemPath]] instances instead, is as follows:
+ * {{{
+ * val ullmanBookElms =
+ *   for {
+ *     authorPath <- bookstoreElm filterElemPaths { e =>
+ *       (e.localName == "Author") &&
+ *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+ *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+ *     }
+ *     bookPath = authorPath.parentPath.parentPath
+ *   } yield {
+ *     require(bookPath.lastEntry.elementName.localPart == "Book")
+ *     bookstoreElm.getWithElemPath(bookPath)
+ *   }
+ * }}}
+ * This is conceptually similar to navigating in XPath to the grandparent nodes of the matching Author elements.
+ *
+ * ==What's in the API, and what are the dependencies?==
  *
  * This package contains the following parts, in order of dependencies (starting with the class without any dependencies):
  * <ol>

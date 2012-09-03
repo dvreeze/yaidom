@@ -448,6 +448,52 @@ class QueryTest extends Suite {
     }
   }
 
+  @Test def testQueryBooksByJeffreyUllman() {
+    // Own example
+
+    require(bookstore.localName == "Bookstore")
+
+    val bookElms =
+      for {
+        bookElm <- bookstore filterChildElems { _.localName == "Book" }
+        if (bookElm \\ "Author") exists { e =>
+          ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+            ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+        }
+      } yield bookElm
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookElms map { e => e.getChildElem(_.localName == "Title").text }
+      result.toSet
+    }
+
+    // Using paths ...
+
+    val ullmanBookElms =
+      for {
+        authorPath <- bookstore filterElemPaths { e =>
+          (e.localName == "Author") &&
+            ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+            ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+        }
+        bookPath = authorPath.parentPath.parentPath
+      } yield {
+        require(bookPath.lastEntry.elementName.localPart == "Book")
+        bookstore.getWithElemPath(bookPath)
+      }
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints")) {
+      val result = ullmanBookElms map { e => e.getChildElem(_.localName == "Title").text }
+      result.toSet
+    }
+  }
+
   @Test def testQuerySecondAuthors() {
     // XPath: doc("bookstore.xml")//Authors/Author[2]
 
