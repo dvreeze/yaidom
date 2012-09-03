@@ -45,7 +45,7 @@ package eu.cdevreeze
  * See for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm.</li>
  * <li>This API has good interop with standard Java XML APIs, that is, <em>JAXP</em>. Printing and parsing XML (and details of "escaping")
  * are delegated to JAXP, without taking away any control over JAXP configuration. By configuring JAXP objects (for parsing or
- * printing XML), we keep some control over the exact XML string representations of serialized yaidom elements.</li>
+ * printing XML), we keep some control over the XML string representations of serialized yaidom elements.</li>
  * </ul>
  *
  * The yaidom API is most suitable for processing <em>"data-oriented"</em> XML, roughly having the following properties:
@@ -160,7 +160,7 @@ package eu.cdevreeze
  * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.convert]] subpackage.
  * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
  *
- * Yaidom also offers packages [[eu.cdevreeze.yaidom.resolved]] and [[eu.cdevreeze.yaidom.xlink]]. the `resolved` package offers
+ * Yaidom also offers packages [[eu.cdevreeze.yaidom.resolved]] and [[eu.cdevreeze.yaidom.xlink]]. The `resolved` package offers
  * "bare bones" elements, stripped down to "essentials" (replacing prefixes by namespace URIs, removing comments, etc.), such that
  * those elements can be compared for some notion of equality. The `xlink` package offers some basic XLink support.
  *
