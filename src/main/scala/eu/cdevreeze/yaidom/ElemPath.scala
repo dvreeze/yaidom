@@ -23,7 +23,7 @@ import scala.annotation.tailrec
  * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It represents a unique path to an element, given
  * a root element, independent of other types of nodes, as if the XML tree only consists of elements.
  *
- * `ElemPath` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemPath]]), and in "functional updates"
+ * `ElemPath` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemLike]]), and in "functional updates"
  * (see [[eu.cdevreeze.yaidom.UpdatableElemLike]]).
  *
  * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),
