@@ -51,7 +51,7 @@ import scala.collection.{ immutable, mutable }
  *   for {
  *     bookElm <- bookstoreElm \\ EName("Book")
  *     authorElm <- bookElm \\! "Author"
- *   } yield bookElm
+ *   } yield authorElm
  * }}}
  *
  * Indeed, the query methods of the `ElemAwareElemLike` API should often be preferred to those of this `PathAwareElemLike` API.
@@ -65,6 +65,9 @@ import scala.collection.{ immutable, mutable }
  * Another use for `ElemPath` queries is functional updates. See [[eu.cdevreeze.yaidom.UpdatableElemLike]] for the "update"
  * methods. Some `updated` methods take an `ElemPath`, and another `updated` method is implemented using an `ElemPath` query offered
  * by this API.
+ *
+ * Note that this API does not offer any query methods using a predicate on `ElemPath`s instead of on elements. Such queries
+ * can always be rewritten to queries in which the Scala Collections API `filter` method is used for filtering on `ElemPath`s.
  *
  * ==PathAwareElemLike more formally==
  *

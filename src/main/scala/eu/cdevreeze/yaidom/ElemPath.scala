@@ -20,8 +20,11 @@ import scala.collection.{ immutable, mutable }
 import scala.annotation.tailrec
 
 /**
- * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It is used for transformations
- * from one node tree to another collection of nodes.
+ * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It represents a unique path to an element, given
+ * a root element, independent of other types of nodes, as if the XML tree only consists of elements.
+ *
+ * `ElemPath` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemPath]]), and in "functional updates"
+ * (see [[eu.cdevreeze.yaidom.UpdatableElemLike]]).
  *
  * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),
  * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
@@ -31,7 +34,7 @@ import scala.annotation.tailrec
  * The `ElemPath` contains an `IndexedSeq` of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
  *
- * Strictly speaking, each element in a tree would be uniquely identified by path entries that only contained
+ * As an alternative to class `ElemPath`, each element in a tree would be uniquely identified by "path entries" that only contained
  * a child index instead of an element name plus child index (of children with the given name). Yet that would
  * be far less easy to use. Hence `ElemPath.Entry` instances each contain an element name plus index.
  *
