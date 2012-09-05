@@ -34,6 +34,12 @@ import scala.collection.{ immutable, mutable }
  * <li>A method for functional updates, given a partial function from elements to node collections</li>
  * </ul>
  *
+ * It is important that the abstract methods are mutually consistent in their implementations. For example, the following equality
+ * must hold (for some concrete class `E` that mixes in this trait):
+ * {{{
+ * e.allChildElems == (e.children collect { case e: E => e })
+ * }}}
+ *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
