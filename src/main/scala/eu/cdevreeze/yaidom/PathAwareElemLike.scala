@@ -22,12 +22,14 @@ import scala.collection.{ immutable, mutable }
  * API and implementation trait for elements as containers of elements, as indexed element nodes in a node tree. This trait
  * offers query methods for "indexes", as `ElemPath` instances.
  *
+ * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ *
  * This trait to a large extent mirrors the `ElemAwareElemLike` trait. This trait knows more about elements, though. It knows about
  * `ElemPath` indexes, and therefore about elements having resolved names. Other node types than elements are not known to this API.
  *
  * Based on abstract methods `allChildElemsWithPathEntries` and `findWithElemPath`, this trait offers a rich `ElemPath` query API.
  *
- * This trait is mixed in by trait `ElemLike`, and therefore by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
+ * This trait is extended by trait `ElemLike`, and therefore mixed in by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
  *
  * Example usage:
  * {{{

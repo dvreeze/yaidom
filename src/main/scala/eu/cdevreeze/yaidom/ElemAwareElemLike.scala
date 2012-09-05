@@ -23,6 +23,8 @@ import scala.collection.{ immutable, mutable }
  * about elements. It does not know about names, attributes, etc. All it knows about elements is that elements can have element children (other
  * node types are entirely out of scope in this trait).
  *
+ * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ *
  * Based on an abstract method returning the child elements, this trait offers query methods to find descendant-or-self elements,
  * topmost descendant-or-self elements obeying a predicate, and so on.
  *

@@ -21,6 +21,8 @@ import scala.collection.{ immutable, mutable }
 /**
  * "Updatable" element. It defines a contract for "functional updates".
  *
+ * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ *
  * This trait is a sub-trait of [[eu.cdevreeze.yaidom.ElemLike]]. It adds a type parameter for (arbitrary) nodes.
  * It also requires concrete implementations for abstract methods `children`, `withChildren`, `childNodeIndex` and `findChildPathEntry`.
  * Based on these 4 methods, and super-trait `ElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.

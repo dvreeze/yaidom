@@ -19,11 +19,12 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * API and implementation trait for elements as containers of elements. This trait implements the corresponding `Elem` methods, which mixes in this trait.
- * It is also used for implementing parts of other "element-like" classes, other than the "core" [[eu.cdevreeze.yaidom.Elem]] class, such as
- * [[eu.cdevreeze.yaidom.resolved.Elem]] for "resolved" elements.
+ * API and implementation trait for elements as containers of elements. This trait extends trait [[eu.cdevreeze.yaidom.PathAwareElemLike]],
+ * adding methods for querying attributes and elements with a given `EName`.
  *
- * Example usage (where the `text` method is not offered by the `ElemLike` API itself):
+ * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ *
+ * Example usage (where the `text` method is not offered by the `ElemLike` API itself, but by trait `HasText` instead):
  * {{{
  * val bookstoreElm = doc.documentElement
  * require(bookstoreElm.localName == "Bookstore")
@@ -72,8 +73,9 @@ import scala.collection.{ immutable, mutable }
  *
  * ==ElemLike methods==
  *
- * The only abstract methods (introduced by this trait) are `resolvedName`, `resolvedAttributes` and `allChildElems`.
- * Based on these methods alone, this trait offers a rich API for querying elements and attributes.
+ * This trait adds the following abstract methods to the abstract methods required by its supertraits: `resolvedName` and `resolvedAttributes`.
+ * Based on these abstract methods (and the supertraits), this trait offers a rich API for querying elements by expanded name, and for querying
+ * attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
@@ -81,12 +83,12 @@ import scala.collection.{ immutable, mutable }
  * The element query methods that need no knowledge about element names and attributes are implemented by supertrait
  * [[eu.cdevreeze.yaidom.ElemAwareElemLike]].
  *
- * This trait adds the following groups of methods to the methods offered by the supertraits `ElemAwareElemLike` and `PathAwareElemLike`:
+ * This trait adds the following groups of methods to the methods offered by the supertraits `PathAwareElemLike` and `ElemAwareElemLike`:
  * <ul>
- * <li>A method to get the local name of the element, without the namespace</li>
  * <li>Attribute query methods</li>
  * <li>Element query methods taking an `EName` or local name (which trivially correspond to method calls in the supertrait)</li>
- * <li>Query methods around `ElemPath`s</li>
+ * <li>A method to get the local name of the element, without the namespace</li>
+ * <li>Some query methods returning pairs of `ElemPath`s and elements</li>
  * </ul>
  *
  * @tparam E The captured element subtype
