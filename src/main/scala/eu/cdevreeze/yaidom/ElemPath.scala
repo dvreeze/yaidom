@@ -34,9 +34,13 @@ import scala.annotation.tailrec
  * The `ElemPath` contains an `IndexedSeq` of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
  *
- * As an alternative to class `ElemPath`, each element in a tree would be uniquely identified by "path entries" that only contained
- * a child index instead of an element name plus child index (of children with the given name). Yet that would
+ * As an alternative to class `ElemPath`, each element in a tree could be uniquely identified by "path entries" that only contained
+ * a child index instead of an element name plus element child index (of element children with the given name). Yet that would
  * be far less easy to use. Hence `ElemPath.Entry` instances each contain an element name plus index.
+ *
+ * '''Warning: indexing using ElemPaths can be slow, especially in large XML trees.''' Hence, it is advisable to use class `ElemPath`
+ * wisely in queries and "functional updates". Most queries for elements can be written without them (using the methods in trait
+ * `ElemAwareElemLike`, instead of those added by subtrait `PathAwareElemLike`).
  *
  * @author Chris de Vreeze
  */
