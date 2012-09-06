@@ -27,12 +27,13 @@ import ElemToStaxEventsConverter._
 
 /**
  * Converter from [[eu.cdevreeze.yaidom.Elem]] to `immutable.IndexedSeq[XMLEvent]`
+ * Contains conversions for other nodes (than elements and documents) as well.
  *
  * @author Chris de Vreeze
  */
 trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with DocumentConverter[XmlEventsProducer] {
 
-  def convertDocument(doc: Document): XmlEventsProducer = {
+  final def convertDocument(doc: Document): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
       // For the line separator, see for example http://xerces.apache.org/xerces-j/apiDocs/org/apache/xml/serialize/OutputFormat.html#setLineSeparator(java.lang.String).
@@ -48,7 +49,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     }
   }
 
-  def convertElem(elm: Elem): XmlEventsProducer = {
+  final def convertElem(elm: Elem): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
       // For the line separator, see for example http://xerces.apache.org/xerces-j/apiDocs/org/apache/xml/serialize/OutputFormat.html#setLineSeparator(java.lang.String).
@@ -60,7 +61,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     }
   }
 
-  private def convertNode(node: Node, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
+  final def convertNode(node: Node, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     node match {
       case e: Elem => convertElem(e, xmlEventFactory, parentScope)
       case t: Text if t.isCData => convertCData(t, xmlEventFactory)
@@ -72,7 +73,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     }
   }
 
-  private def convertElem(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
+  final def convertElem(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     // Not tail-recursive, but the recursion depth should be limited
 
     val startEvent: XMLEvent = createStartElement(elm, xmlEventFactory, parentScope)
@@ -82,24 +83,24 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     immutable.IndexedSeq(startEvent) ++ childEvents ++ immutable.IndexedSeq(endEvent)
   }
 
-  private def convertCData(cdata: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+  final def convertCData(cdata: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
     val event = xmlEventFactory.createCData(cdata.text)
     immutable.IndexedSeq(event)
   }
 
-  private def convertText(text: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+  final def convertText(text: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
     val event = xmlEventFactory.createCharacters(text.text)
     immutable.IndexedSeq(event)
   }
 
-  private def convertProcessingInstruction(
+  final def convertProcessingInstruction(
     processingInstruction: ProcessingInstruction, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
 
     val event = xmlEventFactory.createProcessingInstruction(processingInstruction.target, processingInstruction.data)
     immutable.IndexedSeq(event)
   }
 
-  private def convertComment(comment: Comment, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
+  final def convertComment(comment: Comment, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
     val event = xmlEventFactory.createComment(comment.text)
     immutable.IndexedSeq(event)
   }

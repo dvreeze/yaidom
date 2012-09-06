@@ -27,12 +27,13 @@ import ElemToDomConverter._
 
 /**
  * Converter from [[eu.cdevreeze.yaidom.Elem]] to a DOM element, and from [[eu.cdevreeze.yaidom.Document]] to a DOM Document.
+ * Contains conversions for other nodes (than elements and documents) as well.
  *
  * @author Chris de Vreeze
  */
 trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentConverter[DocumentProducer] {
 
-  def convertDocument(document: yaidom.Document): DocumentProducer = {
+  final def convertDocument(document: yaidom.Document): DocumentProducer = {
     { (doc: org.w3c.dom.Document) =>
       // This also sets the document element on the document
       val docRoot: Element = convertElem(document.documentElement, doc, doc, Scope.Empty)
@@ -49,14 +50,14 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     }
   }
 
-  def convertElem(elm: Elem): ElementProducer = {
+  final def convertElem(elm: Elem): ElementProducer = {
     { (doc: org.w3c.dom.Document) =>
       val element = convertElem(elm, doc, doc, Scope.Empty)
       element
     }
   }
 
-  private def convertNode(node: Node, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): org.w3c.dom.Node = {
+  final def convertNode(node: Node, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): org.w3c.dom.Node = {
     node match {
       case e: Elem => convertElem(e, doc, parent, parentScope)
       case t: Text if t.isCData => convertCData(t, doc, parent)
@@ -67,7 +68,7 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     }
   }
 
-  private def convertElem(elm: Elem, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): Element = {
+  final def convertElem(elm: Elem, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): Element = {
     // Not tail-recursive, but the recursion depth should be limited
 
     val element = createElementWithoutChildren(elm, doc, parentScope)
@@ -80,21 +81,21 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     element
   }
 
-  private def convertCData(cdata: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.CDATASection = {
+  final def convertCData(cdata: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.CDATASection = {
     val domCData = doc.createCDATASection(cdata.text)
 
     parent.appendChild(domCData)
     domCData
   }
 
-  private def convertText(text: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Text = {
+  final def convertText(text: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Text = {
     val domText = doc.createTextNode(text.text)
 
     parent.appendChild(domText)
     domText
   }
 
-  private def convertProcessingInstruction(
+  final def convertProcessingInstruction(
     processingInstruction: ProcessingInstruction, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.ProcessingInstruction = {
 
     val domPi = doc.createProcessingInstruction(processingInstruction.target, processingInstruction.data)
@@ -103,14 +104,14 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     domPi
   }
 
-  private def convertEntityRef(entityRef: EntityRef, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.EntityReference = {
+  final def convertEntityRef(entityRef: EntityRef, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.EntityReference = {
     val domEntityRef = doc.createEntityReference(entityRef.entity)
 
     parent.appendChild(domEntityRef)
     domEntityRef
   }
 
-  private def convertComment(comment: Comment, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Comment = {
+  final def convertComment(comment: Comment, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Comment = {
     val domComment = doc.createComment(comment.text)
 
     parent.appendChild(domComment)

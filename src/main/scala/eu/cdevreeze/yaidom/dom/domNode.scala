@@ -20,6 +20,7 @@ package dom
 import java.{ util => jutil }
 import org.w3c
 import scala.collection.{ immutable, mutable }
+import convert.DomConversions
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -52,12 +53,7 @@ trait DomParentNode extends DomNode {
   final def children: immutable.IndexedSeq[DomNode] = {
     val childrenNodeList = wrappedNode.getChildNodes
 
-    nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrap(node) }
-  }
-
-  private def nodeListToIndexedSeq(nodeList: w3c.dom.NodeList): immutable.IndexedSeq[w3c.dom.Node] = {
-    val result = (0 until nodeList.getLength) map { i => nodeList.item(i) }
-    result.toIndexedSeq
+    DomConversions.nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrapOption(node) }
   }
 }
 
@@ -89,12 +85,7 @@ final class DomElem(
   /** Returns the comment children */
   def commentChildren: immutable.IndexedSeq[DomComment] = children collect { case c: DomComment => c }
 
-  def qname: QName = {
-    val name: String = wrappedNode.getTagName
-    val arr = name.split(':')
-    assert(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
-  }
+  def qname: QName = DomConversions.toQName(wrappedNode)
 
   def localName: String = qname.localPart
 
@@ -142,7 +133,7 @@ final class DomComment(override val wrappedNode: w3c.dom.Comment) extends DomNod
 
 object DomNode {
 
-  def wrap(node: w3c.dom.Node): Option[DomNode] = {
+  def wrapOption(node: w3c.dom.Node): Option[DomNode] = {
     node match {
       case e: w3c.dom.Element => Some(new DomElem(e))
       case cdata: w3c.dom.CDATASection => Some(new DomText(cdata))

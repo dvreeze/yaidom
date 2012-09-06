@@ -28,12 +28,13 @@ import StaxEventsToElemConverter._
 
 /**
  * Converter from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.Elem]], or to [[eu.cdevreeze.yaidom.Document]].
+ * Contains conversions for other nodes (than elements and documents) as well.
  *
  * @author Chris de Vreeze
  */
 trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XMLEvent]] with ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
 
-  def convertToDocument(v: immutable.IndexedSeq[XMLEvent]): Document = {
+  final def convertToDocument(v: immutable.IndexedSeq[XMLEvent]): Document = {
     val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartDocument }
 
     val eventsWithDepths: immutable.IndexedSeq[EventWithDepth] = {
@@ -55,7 +56,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
     result.doc
   }
 
-  def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
+  final def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
     val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
 
     val eventsWithDepths: immutable.IndexedSeq[EventWithDepth] = {
@@ -202,18 +203,18 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
     new ElemResult(elemWithChildren, remainingEvents)
   }
 
-  private def eventToText(event: Characters): Text = Text(text = event.getData, isCData = false)
+  final def eventToText(event: Characters): Text = Text(text = event.getData, isCData = false)
 
-  private def eventToCData(event: Characters): Text = Text(text = event.getData, isCData = true)
+  final def eventToCData(event: Characters): Text = Text(text = event.getData, isCData = true)
 
-  private def eventToEntityRef(event: EntityReference): EntityRef = EntityRef(event.getName)
+  final def eventToEntityRef(event: EntityReference): EntityRef = EntityRef(event.getName)
 
-  private def eventToProcessingInstruction(event: javax.xml.stream.events.ProcessingInstruction): ProcessingInstruction =
+  final def eventToProcessingInstruction(event: javax.xml.stream.events.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(event.getTarget, event.getData)
 
-  private def eventToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
+  final def eventToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
 
-  private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
+  final def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
     val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
@@ -274,9 +275,9 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
 
 object StaxEventsToElemConverter {
 
-  private final class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
+  private class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
 
-  private final class ElemResult(val elem: Elem, val remainder: immutable.IndexedSeq[EventWithDepth]) extends Immutable
+  private class ElemResult(val elem: Elem, val remainder: immutable.IndexedSeq[EventWithDepth]) extends Immutable
 
-  private final class DocumentResult(val doc: Document, val remainder: immutable.IndexedSeq[EventWithDepth]) extends Immutable
+  private class DocumentResult(val doc: Document, val remainder: immutable.IndexedSeq[EventWithDepth]) extends Immutable
 }
