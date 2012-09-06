@@ -21,9 +21,7 @@ import scala.collection.{ immutable, mutable }
 /**
  * API and implementation trait for elements as containers of elements, as element nodes in a node tree. This trait knows very little
  * about elements. It does not know about names, attributes, etc. All it knows about elements is that elements can have element children (other
- * node types are entirely out of scope in this trait). The name of the trait suggests that the trait only knows about elements that they can
- * be parents of other nodes, and the single type parameter of the trait indeed suggests that this trait only knows about element nodes (as parent or
- * child).
+ * node types are entirely out of scope in this trait).
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *

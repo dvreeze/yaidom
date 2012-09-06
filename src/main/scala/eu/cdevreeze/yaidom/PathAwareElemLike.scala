@@ -47,7 +47,7 @@ import scala.collection.{ immutable, mutable }
  * }}}
  *
  * The above example shows how we can use the results of queries for `ElemPath`s, if we are interested in the ancestors of the
- * elements at those paths. Of course, using only the `ParentElemLike` API, this example could have been written simply as:
+ * elements at those paths. Of course, using only the `ElemLike` API, this example could have been written simply as:
  * {{{
  * val bookstoreElm = doc.documentElement
  * require(bookstoreElm.localName == "Bookstore")
@@ -59,9 +59,10 @@ import scala.collection.{ immutable, mutable }
  *   } yield authorElm
  * }}}
  *
- * Indeed, the query methods of the `ParentElemLike` API should often be preferred to those of this `PathAwareElemLike` API.
- * After all, `ElemPath`s are relative to one specific root element, they are "volatile" (in that "functional updates" may render them
- * useless), and they are rather slow indexes. Moreover, the `ParentElemLike` query methods tend to be faster than those of this trait.
+ * Indeed, the query methods of the `ParentElemLike` API (or `ElemLike` API) should often be preferred to those of this
+ * `PathAwareElemLike` API. After all, `ElemPath`s are relative to one specific root element, they are "volatile" (in that
+ * "functional updates" may render them useless), and they are rather slow indexes. Moreover, the `ParentElemLike` query methods
+ * tend to be faster than those of this trait.
  *
  * On the other hand, it is often the combination of `ParentElemLike` API query methods and `PathAwareElemLike` API query methods
  * that offer interesting querying possibilities. After all, sometimes it is handy to formulate a query in such a way that ancestors
