@@ -1,7 +1,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Wrapper around class `org.w3c.dom.Element`, adapting it to the [[eu.cdevreeze.yaidom.ParentElemLike]] API.
+ * Wrapper around class `org.w3c.dom.Element`, adapting it to the [[eu.cdevreeze.yaidom.ElemLike]] API.
  *
  * This wrapper is not thread-safe, and should only be used if the immutable element classes such as [[eu.cdevreeze.yaidom.Elem]]
  * are not the best fit.
@@ -29,12 +29,12 @@ package eu.cdevreeze.yaidom
  * "roundtripping" keeps the XML string the same. Whitespace handling is one such area in which different configurations can lead
  * to quite different "roundtripping" results.
  *
- * Note that in one way these wrappers are somewhat unnatural: the `ParentElemLike` API uses immutable Scala collections everywhere,
+ * Note that in one way these wrappers are somewhat unnatural: the `ElemLike` API uses immutable Scala collections everywhere,
  * whereas the elements of those collections are mutable (!) DOM node wrappers. The wrappers are idiomatic Scala in their use of
  * the Scala Collections API, whereas the wrapped DOM nodes come from a distant past, when imperative programming and "mutability
  * everywhere" ruled.
  *
- * In comparison to XPath against DOM trees, the `ParentElemLike` API may be more verbose, but it requires no setup and
+ * In comparison to XPath against DOM trees, the `ElemLike` API may be more verbose, but it requires no setup and
  * "result set handling" boilerplate.
  */
 package object dom

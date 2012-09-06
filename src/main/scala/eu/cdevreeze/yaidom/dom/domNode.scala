@@ -68,7 +68,7 @@ final class DomDocument(
 }
 
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ParentElemLike[DomElem] with HasText { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasText { self =>
 
   require(wrappedNode ne null)
 
@@ -77,17 +77,49 @@ final class DomElem(
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[DomElem] = children collect { case e: DomElem => e }
 
-  // TODO Attributes, (resolved) element name, scope (by navigating parentNodes until the root), etc.
+  override def resolvedName: EName = {
+    // This is of course a very inefficient implementation
+
+    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+  }
+
+  /** The attributes as a `Map` from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
+  override def resolvedAttributes: Map[EName, String] = {
+    val attrScope = attributeScope
+
+    attributes map { kv =>
+      val attName = kv._1
+      val attValue = kv._2
+      val expandedName = attrScope.resolveQName(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
+      (expandedName -> attValue)
+    }
+  }
+
+  def qname: QName = DomConversions.toQName(wrappedNode)
+
+  def attributes: Map[QName, String] = DomConversions.convertAttributes(wrappedNode.getAttributes)
+
+  def scope: Scope = {
+    val parent = wrappedNode.getParentNode
+    val parentElement: w3c.dom.Element =
+      if (parent.isInstanceOf[w3c.dom.Element]) parent.asInstanceOf[w3c.dom.Element] else null
+
+    // Recursive, but not tail-recursive
+    val parentScope = if (parentElement eq null) Scope.Empty else (new DomElem(parentElement)).scope
+
+    parentScope.resolve(declarations)
+  }
+
+  /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
+  def attributeScope: Scope = Scope(scope.map - "")
+
+  def declarations: Declarations = DomConversions.extractNamespaceDeclarations(wrappedNode.getAttributes)
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[DomText] = children collect { case t: DomText => t }
 
   /** Returns the comment children */
   def commentChildren: immutable.IndexedSeq[DomComment] = children collect { case c: DomComment => c }
-
-  def qname: QName = DomConversions.toQName(wrappedNode)
-
-  def localName: String = qname.localPart
 
   /**
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
