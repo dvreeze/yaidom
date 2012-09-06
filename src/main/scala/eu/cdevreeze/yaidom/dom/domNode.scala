@@ -161,6 +161,8 @@ final class DomComment(override val wrappedNode: w3c.dom.Comment) extends DomNod
   require(wrappedNode ne null)
 
   override type DomType = w3c.dom.Comment
+
+  def text: String = wrappedNode.getData
 }
 
 object DomNode {
