@@ -23,11 +23,11 @@ import scala.collection.{ immutable, mutable }
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
- * This trait is a sub-trait of [[eu.cdevreeze.yaidom.ElemLike]]. It adds a type parameter for (arbitrary) nodes.
+ * This trait is a sub-trait of [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds a type parameter for (arbitrary) nodes.
  * It also requires concrete implementations for abstract methods `children`, `withChildren`, `childNodeIndex` and `findChildPathEntry`.
- * Based on these 4 methods, and super-trait `ElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
+ * Based on these 4 methods, and super-trait `PathAwareElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
  *
- * This trait adds the following groups of methods to the methods offered by the supertrait `ElemLike`:
+ * This trait adds the following groups of methods to the methods offered by the supertrait `PathAwareElemLike`:
  * <ul>
  * <li>Convenience methods for functional updates given a child node index (range)</li>
  * <li>Methods for functional updates given an `ElemPath`</li>
@@ -45,7 +45,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ElemLike[E] { self: E =>
+trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwareElemLike[E] { self: E =>
 
   // See https://pario.zendesk.com/entries/20124208-lesson-6-complex-xslt-example for an example of what we must be able to express easily.
 

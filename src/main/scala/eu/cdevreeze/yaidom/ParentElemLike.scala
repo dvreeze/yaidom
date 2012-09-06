@@ -21,7 +21,9 @@ import scala.collection.{ immutable, mutable }
 /**
  * API and implementation trait for elements as containers of elements, as element nodes in a node tree. This trait knows very little
  * about elements. It does not know about names, attributes, etc. All it knows about elements is that elements can have element children (other
- * node types are entirely out of scope in this trait).
+ * node types are entirely out of scope in this trait). The name of the trait suggests that the trait only knows about elements that they can
+ * be parents of other nodes, and the single type parameter of the trait indeed suggests that this trait only knows about element nodes (as parent or
+ * child).
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
@@ -33,14 +35,14 @@ import scala.collection.{ immutable, mutable }
  *
  * Subtraits like [[eu.cdevreeze.yaidom.ElemLike]] implement many more methods on elements, based on more knowledge about elements, such
  * as element names and attributes. It is subtrait `UpdatableElemLike` that is typically mixed in by element classes. The distinction between
- * `ElemAwareElemLike` and its subtraits is still useful, because this trait implements methods that only need knowledge about elements
+ * `ParentElemLike` and its subtraits is still useful, because this trait implements methods that only need knowledge about elements
  * as parent nodes of other elements. In an abstract sense, this trait could even be seen as an API that has nothing to do with
  * elements in particular, but that deals with trees (XML or not) in general (if we were to rename the trait, its methods and the type
  * parameter).
  *
  * The concrete element classes that mix in this trait (or a sub-trait) have knowledge about all child nodes of an element, whether
- * these child nodes are elements or not (such as text, comments etc.). Hence, this simple element-centric `ElemAwareElemLike` API can be seen
- * as a good basis for querying arbitrary nodes and their values, even if it knows only about element nodes.
+ * these child nodes are elements or not (such as text, comments etc.). Hence, this simple element-centric `ParentElemLike` API can be seen
+ * as a good basis for querying arbitrary nodes and their values, even if this trait itself knows only about element nodes.
  *
  * For example, using class [[eu.cdevreeze.yaidom.Elem]], which also mixes in trait [[eu.cdevreeze.yaidom.HasText]],
  * all normalized text in a tree with document element `root` can be found as follows:
@@ -60,14 +62,14 @@ import scala.collection.{ immutable, mutable }
  * root collectFromElemsOrSelf { case e: Elem if e.text.contains("query") => e.text }
  * }}}
  *
- * ==ElemAwareElemLike more formally==
+ * ==ParentElemLike more formally==
  *
  * The only abstract method is `allChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
  *
  * As said above, this trait only knows about elements, not about other node types. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
  *
- * Trait `ElemAwareElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ElemAwareElemLike`
+ * Trait `ParentElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ParentElemLike`
  * has 3 '''core''' element collection retrieval methods. These 3 methods (in order of subset relation) are:
  * <ul>
  * <li>Abstract method `allChildElems`, returning all '''child''' elements</li>
@@ -87,7 +89,7 @@ import scala.collection.{ immutable, mutable }
  * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should in theory
  * be enough for all element collection needs. For conciseness (and performance), there are more element (collection) retrieval methods.
  *
- * Below follows a summary of those groups of `ElemAwareElemLike` element collection retrieval methods:
+ * Below follows a summary of those groups of `ParentElemLike` element collection retrieval methods:
  * <ul>
  * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
  * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
@@ -95,7 +97,7 @@ import scala.collection.{ immutable, mutable }
  * </ul>
  *
  * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
- * Therefore there are also some `ElemAwareElemLike` methods returning at most one element. These methods are as follows:
+ * Therefore there are also some `ParentElemLike` methods returning at most one element. These methods are as follows:
  * <ul>
  * <li>'''Finding first obeying some predicate''' (depth-first search): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
  * </ul>
@@ -162,7 +164,7 @@ import scala.collection.{ immutable, mutable }
  * elm.findElemOrSelf(p) == elm.findTopmostElemsOrSelf(p).headOption
  * }}}
  *
- * ==ElemAwareElemLike even more formally==
+ * ==ParentElemLike even more formally==
  *
  * ===1. Proving property about filterElemsOrSelf===
  *
@@ -347,9 +349,9 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ElemAwareElemLike[E <: ElemAwareElemLike[E]] { self: E =>
+trait ParentElemLike[E <: ParentElemLike[E]] { self: E =>
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemAwareElemLike` methods will be. */
+  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ParentElemLike` methods will be. */
   def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the child elements obeying the given predicate */

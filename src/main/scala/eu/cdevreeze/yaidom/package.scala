@@ -140,8 +140,8 @@ package eu.cdevreeze
  * <ol>
  * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.EName]], [[eu.cdevreeze.yaidom.Declarations]] and
  * [[eu.cdevreeze.yaidom.Scope]]. At the same level is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Trait [[eu.cdevreeze.yaidom.ElemAwareElemLike]], which offers the core yaidom querying API. It is extended by trait
- * [[eu.cdevreeze.yaidom.PathAwareElemLike]], which is extended by trait [[eu.cdevreeze.yaidom.ElemLike]], which in turn is extended
+ * <li>Trait [[eu.cdevreeze.yaidom.ParentElemLike]], which offers the core yaidom querying API. It is extended by trait
+ * [[eu.cdevreeze.yaidom.ElemLike]], which is extended by trait [[eu.cdevreeze.yaidom.PathAwareElemLike]], which in turn is extended
  * by trait [[eu.cdevreeze.yaidom.UpdatableElemLike]]. At the same level is trait [[eu.cdevreeze.yaidom.HasText]]. All these APIs
  * turn small abstract APIs into rich APIs with implementations, and are mixed in by "element" classes.</li>
  * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
@@ -163,6 +163,8 @@ package eu.cdevreeze
  * Yaidom also offers packages [[eu.cdevreeze.yaidom.resolved]] and [[eu.cdevreeze.yaidom.xlink]]. The `resolved` package offers
  * "bare bones" elements, stripped down to "essentials" (replacing prefixes by namespace URIs, removing comments, etc.), such that
  * those elements can be compared for some notion of equality. The `xlink` package offers some basic XLink support.
+ *
+ * There is also a package [[eu.cdevreeze.yaidom.dom]] for `ElemLike` wrappers around (mutable!) DOM elements.
  *
  * @author Chris de Vreeze
  */

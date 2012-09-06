@@ -23,7 +23,7 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
- * [[eu.cdevreeze.yaidom.ElemAwareElemLike]] API.
+ * [[eu.cdevreeze.yaidom.ParentElemLike]] API.
  *
  * Not all DOM node types are exposed via these wrappers. For example, attributes are not nodes according to the `ElemLike` API,
  * so there is no wrapper for attributes.
@@ -72,7 +72,7 @@ final class DomDocument(
 }
 
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemAwareElemLike[DomElem] with HasText { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ParentElemLike[DomElem] with HasText { self =>
 
   require(wrappedNode ne null)
 

@@ -1,7 +1,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Wrapper around class `org.w3c.dom.Element`, adapting it to the [[eu.cdevreeze.yaidom.ElemAwareElemLike]] API.
+ * Wrapper around class `org.w3c.dom.Element`, adapting it to the [[eu.cdevreeze.yaidom.ParentElemLike]] API.
  *
  * This wrapper is not thread-safe, and should only be used if the immutable element classes such as [[eu.cdevreeze.yaidom.Elem]]
  * are not the best fit.
@@ -14,7 +14,7 @@ package eu.cdevreeze.yaidom
  * </ul>
  *
  * Yet be aware that the advantages of immutability and thread-safety (offered by immutable `Elem` classes) are lost when using
- * this wrapper API. Mutable DOM trees are also very easy to break, even via the `ElemAwareElemLike` API, if element predicates with
+ * this wrapper API. Mutable DOM trees are also very easy to break, even via the `ParentElemLike` API, if element predicates with
  * side-effects are used.
  *
  * To explain the "roundtripping" item above, note that class [[eu.cdevreeze.yaidom.Elem]] considers attributes in an element unordered,
@@ -29,12 +29,12 @@ package eu.cdevreeze.yaidom
  * "roundtripping" keeps the XML string the same. Whitespace handling is one such area in which different configurations can lead
  * to quite different "roundtripping" results.
  *
- * Note that in one way these wrappers are somewhat unnatural: the `ElemAwareElemLike` API uses immutable Scala collections everywhere,
+ * Note that in one way these wrappers are somewhat unnatural: the `ParentElemLike` API uses immutable Scala collections everywhere,
  * whereas the elements of those collections are mutable (!) DOM node wrappers. The wrappers are idiomatic Scala in their use of
  * the Scala Collections API, whereas the wrapped DOM nodes come from a distant past, when imperative programming and "mutability
  * everywhere" ruled.
  *
- * In comparison to XPath against DOM trees, the `ElemAwareElemLike` API may be more verbose, but it requires no setup and
+ * In comparison to XPath against DOM trees, the `ParentElemLike` API may be more verbose, but it requires no setup and
  * "result set handling" boilerplate.
  */
 package object dom

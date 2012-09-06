@@ -19,17 +19,20 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * API and implementation trait for elements as containers of elements, as indexed element nodes in a node tree. This trait
- * offers query methods for "indexes", as `ElemPath` instances.
+ * API and implementation trait for elements as containers of elements, each having a name and possible attributes,
+ * as well as an "element path" from the root element. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding knowledge
+ * about "element paths" of elements with respect to a root element.
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
- * This trait to a large extent mirrors the `ElemAwareElemLike` trait. This trait knows more about elements, though. It knows about
- * `ElemPath` indexes, and therefore about elements having resolved names. Other node types than elements are not known to this API.
+ * This trait to a large extent mirrors the `ParentElemLike` trait, with queries returning "element paths" instead of "elements".
+ * As mentioned above, this trait knows more about elements than its supertraits, because it knows about "element paths". Still, it
+ * knows only about element nodes, so other node types than elements are not known to this API.
  *
- * Based on abstract methods `allChildElemsWithPathEntries` and `findWithElemPath`, this trait offers a rich `ElemPath` query API.
+ * Based on its supertraits `ElemLike` and `ParentElemLike`, this trait offers a rich `ElemPath` query API. No additional abstract methods
+ * other than those required by the supertraits need to be implemented.
  *
- * This trait is extended by trait `ElemLike`, and therefore mixed in by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
+ * This trait is extended by trait `UpdatableElemLike`, and therefore mixed in by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
  *
  * Example usage:
  * {{{
@@ -44,7 +47,7 @@ import scala.collection.{ immutable, mutable }
  * }}}
  *
  * The above example shows how we can use the results of queries for `ElemPath`s, if we are interested in the ancestors of the
- * elements at those paths. Of course, using the `ElemAwareElemLike` API, this example could have been written simply as:
+ * elements at those paths. Of course, using only the `ParentElemLike` API, this example could have been written simply as:
  * {{{
  * val bookstoreElm = doc.documentElement
  * require(bookstoreElm.localName == "Bookstore")
@@ -56,11 +59,11 @@ import scala.collection.{ immutable, mutable }
  *   } yield authorElm
  * }}}
  *
- * Indeed, the query methods of the `ElemAwareElemLike` API should often be preferred to those of this `PathAwareElemLike` API.
+ * Indeed, the query methods of the `ParentElemLike` API should often be preferred to those of this `PathAwareElemLike` API.
  * After all, `ElemPath`s are relative to one specific root element, they are "volatile" (in that "functional updates" may render them
- * useless), and they are rather slow indexes. Moreover, the `ElemAwareElemLike` query methods tend to be faster than those of this trait.
+ * useless), and they are rather slow indexes. Moreover, the `ParentElemLike` query methods tend to be faster than those of this trait.
  *
- * On the other hand, it is often the combination of `ElemAwareElemLike` API query methods and `PathAwareElemLike` API query methods
+ * On the other hand, it is often the combination of `ParentElemLike` API query methods and `PathAwareElemLike` API query methods
  * that offer interesting querying possibilities. After all, sometimes it is handy to formulate a query in such a way that ancestors
  * are retrieved in at least one of the intermediate steps.
  *
@@ -73,7 +76,7 @@ import scala.collection.{ immutable, mutable }
  *
  * ==PathAwareElemLike more formally==
  *
- * Analogously to the `ElemAwareElemLike` API, there are 3 '''core''' element path retrieval methods:
+ * Analogously to the `ParentElemLike` API, there are 3 '''core''' element path retrieval methods:
  * <ul>
  * <li>Method `allChildElemPaths`, returning the paths (relative to this element) of all '''child''' elements</li>
  * <li>Method `findAllElemPaths`, finding the paths (relative to this element) of all '''descendant''' elements</li>
@@ -113,30 +116,14 @@ import scala.collection.{ immutable, mutable }
  *
  * ==Implementation notes==
  *
- * Like trait `ElemAwareElemLike`, some query methods use recursion in their implementations, but no tail recursion. See [[eu.cdevreeze.yaidom.ElemAwareElemLike]]
+ * Like trait `ParentElemLike`, some query methods use recursion in their implementations, but no tail recursion. See [[eu.cdevreeze.yaidom.ParentElemLike]]
  * for a motivation.
  *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemAwareElemLike[E] { self: E =>
-
-  /**
-   * Returns all child elements with their `ElemPath` entries, in the correct order.
-   *
-   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
-   */
-  def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
-
-  /**
-   * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
-   */
-  def findWithElemPath(path: ElemPath): Option[E]
-
-  /** Returns (the equivalent of) `findWithElemPath(path).get` */
-  final def getWithElemPath(path: ElemPath): E =
-    findWithElemPath(path).getOrElse(sys.error("Expected existing path %s from root %s".format(path, self)))
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E =>
 
   /** Returns `allChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
   final def allChildElemPaths: immutable.IndexedSeq[ElemPath] =
@@ -216,5 +203,66 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemAwareElemLike[E] 
   final def findElemPath(p: E => Boolean): Option[ElemPath] = {
     val elms = self.allChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findElemOrSelfPath(p) map { path => path.prepend(pe) } }
     elms.headOption
+  }
+
+  /**
+   * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.
+   */
+  final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
+    val relevantChildElms = self.filterChildElems(entry.elementName)
+
+    if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
+  }
+
+  /**
+   * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
+   */
+  final def findWithElemPath(path: ElemPath): Option[E] = {
+    // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
+
+    def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {
+      assert(entryIndex >= 0 && entryIndex <= path.entries.size)
+
+      if (entryIndex == path.entries.size) Some(currentRoot) else {
+        val newRootOption: Option[E] = currentRoot.findWithElemPathEntry(path.entries(entryIndex))
+        // Recursive call. Not tail-recursive, but recursion depth should be limited.
+        newRootOption flatMap { newRoot => findWithElemPath(newRoot, entryIndex + 1) }
+      }
+    }
+
+    findWithElemPath(self, 0)
+  }
+
+  /** Returns (the equivalent of) `findWithElemPath(path).get` */
+  final def getWithElemPath(path: ElemPath): E =
+    findWithElemPath(path).getOrElse(sys.error("Expected existing path %s from root %s".format(path, self)))
+
+  /** Returns the `ElemPath` entries of all child elements, in the correct order */
+  final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
+    allChildElemsWithPathEntries map { elmPathPair => elmPathPair._2 }
+  }
+
+  /**
+   * Returns all child elements with their `ElemPath` entries, in the correct order.
+   *
+   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   */
+  final def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)] = {
+    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
+
+    val elementNameCounts = mutable.Map[EName, Int]()
+    val acc = mutable.ArrayBuffer[(E, ElemPath.Entry)]()
+
+    for (elm <- self.allChildElems) {
+      val ename = elm.resolvedName
+      val countForName = elementNameCounts.getOrElse(ename, 0)
+      val entry = ElemPath.Entry(ename, countForName)
+      elementNameCounts.update(ename, countForName + 1)
+      acc += (elm -> entry)
+    }
+
+    val result = acc.toIndexedSeq
+    assert((result map (_._1)) == allChildElems)
+    result
   }
 }

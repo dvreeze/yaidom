@@ -19,8 +19,8 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * API and implementation trait for elements as containers of elements. This trait extends trait [[eu.cdevreeze.yaidom.PathAwareElemLike]],
- * adding methods for querying attributes and elements with a given `EName`.
+ * API and implementation trait for elements as containers of elements, each having a name and possible attributes.
+ * This trait extends trait [[eu.cdevreeze.yaidom.ParentElemLike]], adding knowledge about names of elements and of attributes.
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
@@ -73,29 +73,28 @@ import scala.collection.{ immutable, mutable }
  *
  * ==ElemLike methods==
  *
- * This trait adds the following abstract methods to the abstract methods required by its supertraits: `resolvedName` and `resolvedAttributes`.
- * Based on these abstract methods (and the supertraits), this trait offers a rich API for querying elements by expanded name, and for querying
+ * This trait adds the following abstract methods to the abstract methods required by its supertrait: `resolvedName` and `resolvedAttributes`.
+ * Based on these abstract methods (and the supertrait), this trait offers a rich API for querying elements by (expanded) name, and for querying
  * attributes.
  *
  * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
  *
  * The element query methods that need no knowledge about element names and attributes are implemented by supertrait
- * [[eu.cdevreeze.yaidom.ElemAwareElemLike]].
+ * [[eu.cdevreeze.yaidom.ParentElemLike]].
  *
- * This trait adds the following groups of methods to the methods offered by the supertraits `PathAwareElemLike` and `ElemAwareElemLike`:
+ * This trait adds the following groups of methods to the methods offered by the supertrait `ParentElemLike`:
  * <ul>
  * <li>Attribute query methods</li>
  * <li>Element query methods taking an `EName` or local name (which trivially correspond to method calls in the supertrait)</li>
  * <li>A method to get the local name of the element, without the namespace</li>
- * <li>Some query methods returning pairs of `ElemPath`s and elements</li>
  * </ul>
  *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] extends PathAwareElemLike[E] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
 
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName
@@ -169,57 +168,4 @@ trait ElemLike[E <: ElemLike[E]] extends PathAwareElemLike[E] { self: E =>
   /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
   final def findElem(expandedName: EName): Option[E] =
     findElem { e => e.resolvedName == expandedName }
-
-  /**
-   * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.
-   */
-  final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
-    val relevantChildElms = self.filterChildElems(entry.elementName)
-
-    if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
-  }
-
-  /**
-   * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
-   */
-  final override def findWithElemPath(path: ElemPath): Option[E] = {
-    // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
-
-    def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {
-      assert(entryIndex >= 0 && entryIndex <= path.entries.size)
-
-      if (entryIndex == path.entries.size) Some(currentRoot) else {
-        val newRootOption: Option[E] = currentRoot.findWithElemPathEntry(path.entries(entryIndex))
-        // Recursive call. Not tail-recursive, but recursion depth should be limited.
-        newRootOption flatMap { newRoot => findWithElemPath(newRoot, entryIndex + 1) }
-      }
-    }
-
-    findWithElemPath(self, 0)
-  }
-
-  /** Returns the `ElemPath` entries of all child elements, in the correct order */
-  final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
-    allChildElemsWithPathEntries map { elmPathPair => elmPathPair._2 }
-  }
-
-  /** Returns all child elements with their `ElemPath` entries, in the correct order */
-  final override def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(E, ElemPath.Entry)]()
-
-    for (elm <- self.allChildElems) {
-      val ename = elm.resolvedName
-      val countForName = elementNameCounts.getOrElse(ename, 0)
-      val entry = ElemPath.Entry(ename, countForName)
-      elementNameCounts.update(ename, countForName + 1)
-      acc += (elm -> entry)
-    }
-
-    val result = acc.toIndexedSeq
-    assert((result map (_._1)) == allChildElems)
-    result
-  }
 }

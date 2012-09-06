@@ -40,7 +40,7 @@ import scala.annotation.tailrec
  *
  * '''Warning: indexing using ElemPaths can be slow, especially in large XML trees.''' Hence, it is advisable to use class `ElemPath`
  * wisely in queries and "functional updates". Most queries for elements can be written without them (using the methods in trait
- * `ElemAwareElemLike`, instead of those added by subtrait `PathAwareElemLike`).
+ * `ParentElemLike`, instead of those added by subtrait `PathAwareElemLike`).
  *
  * @author Chris de Vreeze
  */
