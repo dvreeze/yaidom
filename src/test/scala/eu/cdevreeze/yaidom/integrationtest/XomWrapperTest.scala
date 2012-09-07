@@ -28,10 +28,10 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import JDomWrapperTest._
+import XomWrapperTest._
 
 /**
- * JDOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around JDOM Elements.
+ * XOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around XOM Elements.
  *
  * Acknowledgments: The sample XML is part of the online course "Introduction to Databases", by professor Widom at
  * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
@@ -40,7 +40,7 @@ import JDomWrapperTest._
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class JDomWrapperTest extends Suite {
+class XomWrapperTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -53,12 +53,11 @@ class JDomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
-    val is = classOf[JDomWrapperTest].getResourceAsStream("books.xml")
-    val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
-    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+    val is = classOf[XomWrapperTest].getResourceAsStream("books.xml")
+    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
-    val root: JDomElem = domDoc.documentElement
+    val root: XomElem = domDoc.documentElement
 
     expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       val elms = root.findAllElems
@@ -80,12 +79,11 @@ class JDomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
-    val is = classOf[JDomWrapperTest].getResourceAsStream("strangeXml.xml")
-    val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
-    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+    val is = classOf[XomWrapperTest].getResourceAsStream("strangeXml.xml")
+    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
-    val root: JDomElem = domDoc.documentElement
+    val root: XomElem = domDoc.documentElement
 
     expect(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -97,12 +95,11 @@ class JDomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
-    val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXml.xml")
-    val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
-    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+    val is = classOf[XomWrapperTest].getResourceAsStream("trivialXml.xml")
+    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
-    val root: JDomElem = domDoc.documentElement
+    val root: XomElem = domDoc.documentElement
 
     expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -141,14 +138,13 @@ class JDomWrapperTest extends Suite {
       db
     }
 
-    val is = classOf[JDomWrapperTest].getResourceAsStream("XMLSchema.xsd")
+    val is = classOf[XomWrapperTest].getResourceAsStream("XMLSchema.xsd")
 
     val db = createDocumentBuilder(dbf)
-    val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
-    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
-    val root: JDomElem = domDoc.documentElement
+    val root: XomElem = domDoc.documentElement
 
     val ns = nsXmlSchema
 
@@ -174,8 +170,8 @@ class JDomWrapperTest extends Suite {
       result.toSet
     }
 
-    def checkForChoiceDocumentation(rootElm: JDomElem): Unit = {
-      val forChoiceDefOption: Option[JDomElem] = {
+    def checkForChoiceDocumentation(rootElm: XomElem): Unit = {
+      val forChoiceDefOption: Option[XomElem] = {
         val result = rootElm filterChildElems { e => e.resolvedName == EName(ns, "simpleType") && e.attribute(EName("name")) == "formChoice" }
         result.headOption
       }
@@ -194,7 +190,7 @@ class JDomWrapperTest extends Suite {
 
     checkForChoiceDocumentation(root)
 
-    def checkCommentWithEscapedChar(rootElm: JDomElem): Unit = {
+    def checkCommentWithEscapedChar(rootElm: XomElem): Unit = {
       val documentationElms =
         for {
           annotationElm <- rootElm \ EName(ns, "annotation")
@@ -211,7 +207,7 @@ class JDomWrapperTest extends Suite {
 
     checkCommentWithEscapedChar(root)
 
-    def checkIdentityConstraintElm(rootElm: JDomElem): Unit = {
+    def checkIdentityConstraintElm(rootElm: XomElem): Unit = {
       val identityConstraintElms =
         for {
           schemaElm <- rootElm filterElems { e =>
@@ -242,7 +238,7 @@ class JDomWrapperTest extends Suite {
 
     checkIdentityConstraintElm(root)
 
-    def checkComplexTypeElm(rootElm: JDomElem): Unit = {
+    def checkComplexTypeElm(rootElm: XomElem): Unit = {
       val complexTypeElms =
         rootElm filterElems { e =>
           e.resolvedName == EName(ns, "complexType") &&
@@ -304,7 +300,7 @@ class JDomWrapperTest extends Suite {
 
     checkComplexTypeElm(root)
 
-    def checkFieldPattern(rootElm: JDomElem): Unit = {
+    def checkFieldPattern(rootElm: XomElem): Unit = {
       val fieldElms = rootElm filterElems { e =>
         e.resolvedName == EName(ns, "element") &&
           e.attributeOption(EName("name")) == Some("field") &&
@@ -326,52 +322,59 @@ class JDomWrapperTest extends Suite {
   }
 }
 
-object JDomWrapperTest {
+object XomWrapperTest {
 
-  sealed trait JDomNode {
+  sealed trait XomNode {
 
-    type DomType <: org.jdom2.Content
+    type DomType <: nu.xom.Node
 
     def wrappedNode: DomType
 
     final override def toString: String = wrappedNode.toString
   }
 
-  final class JDomDocument(
-    val wrappedNode: org.jdom2.Document) {
+  trait XomParentNode extends XomNode {
 
-    require(wrappedNode ne null)
+    override type DomType <: nu.xom.ParentNode
 
-    def documentElement: JDomElem = JDomNode.wrapElement(wrappedNode.getRootElement)
+    final def children: immutable.IndexedSeq[XomNode] = {
+      (0 until wrappedNode.getChildCount).toIndexedSeq flatMap { (idx: Int) => XomNode.wrapOption(wrappedNode.getChild(idx)) }
+    }
   }
 
-  final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ElemLike[JDomElem] with HasText { self =>
+  final class XomDocument(
+    val wrappedNode: nu.xom.Document) extends XomParentNode {
 
     require(wrappedNode ne null)
 
-    override type DomType = org.jdom2.Element
+    override type DomType = nu.xom.Document
 
-    final def children: immutable.IndexedSeq[JDomNode] = {
-      val childList = wrappedNode.getContent.asScala.toIndexedSeq
-      childList flatMap { ch => JDomNode.wrapOption(ch) }
-    }
+    def documentElement: XomElem = XomNode.wrapElement(wrappedNode.getRootElement)
+  }
 
-    override def allChildElems: immutable.IndexedSeq[JDomElem] = children collect { case e: JDomElem => e }
+  final class XomElem(
+    override val wrappedNode: nu.xom.Element) extends XomParentNode with ElemLike[XomElem] with HasText { self =>
+
+    require(wrappedNode ne null)
+
+    override type DomType = nu.xom.Element
+
+    override def allChildElems: immutable.IndexedSeq[XomElem] = children collect { case e: XomElem => e }
 
     override def resolvedName: EName = {
-      val jdomNs = wrappedNode.getNamespace
-      val nsOption: Option[String] = if (jdomNs == org.jdom2.Namespace.NO_NAMESPACE) None else Some(jdomNs.getURI)
-      EName(nsOption, wrappedNode.getName)
+      val ns: String = wrappedNode.getNamespaceURI
+      val nsOption: Option[String] = if (ns == "") None else Some(ns)
+      EName(nsOption, wrappedNode.getLocalName)
     }
 
     override def resolvedAttributes: Map[EName, String] = {
-      val jdomAttrs: immutable.IndexedSeq[org.jdom2.Attribute] = wrappedNode.getAttributes.asScala.toIndexedSeq
+      val attrs: immutable.IndexedSeq[nu.xom.Attribute] =
+        (0 until wrappedNode.getAttributeCount).toIndexedSeq map { (idx: Int) => wrappedNode.getAttribute(idx) }
 
-      val result = jdomAttrs map { attr =>
-        val jdomNs = attr.getNamespace
-        val nsOption: Option[String] = if (jdomNs == org.jdom2.Namespace.NO_NAMESPACE) None else Some(jdomNs.getURI)
-        val ename = EName(nsOption, attr.getName)
+      val result = attrs map { attr =>
+        val ns: String = attr.getNamespaceURI
+        val nsOption: Option[String] = if (ns == "") None else Some(ns)
+        val ename = EName(nsOption, attr.getLocalName)
 
         (ename -> attr.getValue)
       }
@@ -381,38 +384,18 @@ object JDomWrapperTest {
     def qname: QName = QName(wrappedNode.getQualifiedName)
 
     def attributes: Map[QName, String] = {
-      val jdomAttrs: immutable.IndexedSeq[org.jdom2.Attribute] = wrappedNode.getAttributes.asScala.toIndexedSeq
+      val attrs: immutable.IndexedSeq[nu.xom.Attribute] =
+        (0 until wrappedNode.getAttributeCount).toIndexedSeq map { (idx: Int) => wrappedNode.getAttribute(idx) }
 
-      val result = jdomAttrs map { attr =>
-        (QName(attr.getQualifiedName) -> attr.getValue)
-      }
+      val result = attrs map { attr => (QName(attr.getQualifiedName) -> attr.getValue) }
       result.toMap
     }
 
-    def scope: Scope = {
-      val m: Map[String, String] = {
-        val result = wrappedNode.getNamespacesInScope.asScala.toIndexedSeq map { (ns: org.jdom2.Namespace) => (ns.getPrefix -> ns.getURI) }
-        result.toMap
-      }
-      Scope(m)
-    }
-
-    /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
-    def attributeScope: Scope = Scope(scope.map - "")
-
-    def declarations: Declarations = {
-      val m: Map[String, String] = {
-        val result = wrappedNode.getNamespacesIntroduced.asScala.toIndexedSeq map { (ns: org.jdom2.Namespace) => (ns.getPrefix -> ns.getURI) }
-        result.toMap
-      }
-      Declarations(m)
-    }
-
     /** Returns the text children */
-    def textChildren: immutable.IndexedSeq[JDomText] = children collect { case t: JDomText => t }
+    def textChildren: immutable.IndexedSeq[XomText] = children collect { case t: XomText => t }
 
     /** Returns the comment children */
-    def commentChildren: immutable.IndexedSeq[JDomComment] = children collect { case c: JDomComment => c }
+    def commentChildren: immutable.IndexedSeq[XomComment] = children collect { case c: XomComment => c }
 
     /**
      * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
@@ -424,54 +407,46 @@ object JDomWrapperTest {
     }
   }
 
-  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode {
+  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode {
     require(wrappedNode ne null)
 
-    override type DomType = org.jdom2.Text
+    override type DomType = nu.xom.Text
 
-    def text: String = wrappedNode.getText
+    def text: String = wrappedNode.getValue
 
-    def trimmedText: String = wrappedNode.getTextTrim
+    def trimmedText: String = text.trim
 
-    def normalizedText: String = wrappedNode.getTextNormalize
+    def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final class JDomProcessingInstruction(override val wrappedNode: org.jdom2.ProcessingInstruction) extends JDomNode {
+  final class XomProcessingInstruction(override val wrappedNode: nu.xom.ProcessingInstruction) extends XomNode {
     require(wrappedNode ne null)
 
-    override type DomType = org.jdom2.ProcessingInstruction
+    override type DomType = nu.xom.ProcessingInstruction
   }
 
-  final class JDomEntityRef(override val wrappedNode: org.jdom2.EntityRef) extends JDomNode {
+  final class XomComment(override val wrappedNode: nu.xom.Comment) extends XomNode {
     require(wrappedNode ne null)
 
-    override type DomType = org.jdom2.EntityRef
+    override type DomType = nu.xom.Comment
+
+    def text: String = wrappedNode.getValue
   }
 
-  final class JDomComment(override val wrappedNode: org.jdom2.Comment) extends JDomNode {
-    require(wrappedNode ne null)
+  object XomNode {
 
-    override type DomType = org.jdom2.Comment
-
-    def text: String = wrappedNode.getText
-  }
-
-  object JDomNode {
-
-    def wrapOption(node: org.jdom2.Content): Option[JDomNode] = {
+    def wrapOption(node: nu.xom.Node): Option[XomNode] = {
       node match {
-        case e: org.jdom2.Element => Some(new JDomElem(e))
-        case cdata: org.jdom2.CDATA => Some(new JDomText(cdata))
-        case t: org.jdom2.Text => Some(new JDomText(t))
-        case pi: org.jdom2.ProcessingInstruction => Some(new JDomProcessingInstruction(pi))
-        case er: org.jdom2.EntityRef => Some(new JDomEntityRef(er))
-        case c: org.jdom2.Comment => Some(new JDomComment(c))
+        case e: nu.xom.Element => Some(new XomElem(e))
+        case t: nu.xom.Text => Some(new XomText(t))
+        case pi: nu.xom.ProcessingInstruction => Some(new XomProcessingInstruction(pi))
+        case c: nu.xom.Comment => Some(new XomComment(c))
         case _ => None
       }
     }
 
-    def wrapDocument(doc: org.jdom2.Document): JDomDocument = new JDomDocument(doc)
+    def wrapDocument(doc: nu.xom.Document): XomDocument = new XomDocument(doc)
 
-    def wrapElement(elm: org.jdom2.Element): JDomElem = new JDomElem(elm)
+    def wrapElement(elm: nu.xom.Element): XomElem = new XomElem(elm)
   }
 }
