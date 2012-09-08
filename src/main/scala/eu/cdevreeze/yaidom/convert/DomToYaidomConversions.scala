@@ -49,7 +49,12 @@ trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDo
         nodeListToIndexedSeq(v.getChildNodes) collect { case c: org.w3c.dom.Comment => convertToComment(c) })
   }
 
-  /** Same as `convertToElem(v, Scope.Empty)` */
+  /**
+   * Same as `convertToElem(v, Scope.Empty)`.
+   *
+   * Be careful: the namespaces inherited by the passed DOM element, if any, are ignored! In other words, the ancestry of
+   * the passed DOM element is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces.
+   */
   final def convertToElem(v: Element): Elem = {
     convertToElem(v, Scope.Empty)
   }
@@ -58,6 +63,10 @@ trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDo
    * Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.Elem]].
    *
    * The result `Elem` gets Scope `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
+   *
+   * Be careful: the namespaces inherited by the passed DOM element, if any, are ignored! In other words, the ancestry of
+   * the passed DOM element is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces,
+   * unless they are a subset of the passed parent scope.
    */
   final def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
@@ -78,6 +87,10 @@ trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDo
    *
    * In case of an element, the result `Elem` (wrapped in an Option) gets Scope
    * `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
+   *
+   * Be careful: the namespaces inherited by the passed DOM node, if any, are ignored! In other words, the ancestry of
+   * the passed DOM node is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces,
+   * unless they are a subset of the passed parent scope.
    */
   final def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {

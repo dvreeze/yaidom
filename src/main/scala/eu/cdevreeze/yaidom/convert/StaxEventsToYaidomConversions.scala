@@ -66,6 +66,10 @@ trait StaxEventsToYaidomConversions extends ConverterToElem[immutable.IndexedSeq
    *
    * First drops events until a "start element" event is found. After conversion, no "start/end element" events may be left.
    * The given parent scope is used.
+   *
+   * Be careful: the namespaces inherited by the "start element event", if any, are ignored! In other words, the ancestry of
+   * the passed events is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces,
+   * unless they are a subset of the passed parent scope.
    */
   final def convertToElem(v: immutable.IndexedSeq[XMLEvent], parentScope: Scope): Elem = {
     val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
@@ -91,6 +95,9 @@ trait StaxEventsToYaidomConversions extends ConverterToElem[immutable.IndexedSeq
 
   /**
    * Same as `convertToElem(v, Scope.Empty)`
+   *
+   * Be careful: the namespaces inherited by the "start element event", if any, are ignored! In other words, the ancestry of
+   * the passed events is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces.
    */
   final def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
     convertToElem(v, Scope.Empty)
