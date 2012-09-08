@@ -82,7 +82,6 @@ trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDo
   final def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {
       case e: Element => Some(convertToElem(e, parentScope))
-      case cdata: org.w3c.dom.CDATASection => Some(convertToCData(cdata))
       case t: org.w3c.dom.Text => Some(convertToText(t))
       case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
       case er: org.w3c.dom.EntityReference => Some(convertToEntityRef(er))
@@ -92,14 +91,14 @@ trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDo
   }
 
   /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.Text]] */
-  final def convertToText(v: org.w3c.dom.Text): Text = Text(text = v.getData, isCData = false)
+  final def convertToText(v: org.w3c.dom.Text): Text = v match {
+    case cdata: org.w3c.dom.CDATASection => Text(text = v.getData, isCData = true)
+    case _ => Text(text = v.getData, isCData = false)
+  }
 
   /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.ProcessingInstruction]] */
   final def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
-
-  /** Converts an `org.w3c.dom.CDATASection` to a [[eu.cdevreeze.yaidom.Text]] */
-  final def convertToCData(v: org.w3c.dom.CDATASection): Text = Text(text = v.getData, isCData = true)
 
   /** Converts an `org.w3c.dom.EntityReference` to a [[eu.cdevreeze.yaidom.EntityRef]] */
   final def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)

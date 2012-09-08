@@ -43,7 +43,6 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
         document.processingInstructions map { pi => convertProcessingInstruction(pi, doc) }
       for (pi <- pis) doc.appendChild(pi)
 
-      // This also sets the comments on the document
       val comments: immutable.IndexedSeq[org.w3c.dom.Comment] =
         document.comments map { com => convertComment(com, doc) }
       for (c <- comments) doc.appendChild(c)
