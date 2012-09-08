@@ -28,8 +28,11 @@ import org.xml.sax.ext.LexicalHandler
  * Typical non-trivial creation is as follows, assuming a trait `MyEntityResolver`, which extends `EntityResolver`,
  * and a trait `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
+ * val spf = SAXParserFactory.newInstance
+ * spf.setNamespaceAware(true)
+ *
  * val parser = DocumentParserUsingSax.newInstance(
- *   SAXParserFactory.newInstance,
+ *   spf,
  *   () => new DefaultElemProducingSaxHandler with MyEntityResolver with MyErrorHandler
  * )
  * }}}
@@ -111,19 +114,24 @@ final class DocumentParserUsingSax(
 
 object DocumentParserUsingSax {
 
-  /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`. */
+  /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`, except that namespace awareness is set to true. */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
+    spf.setNamespaceAware(true)
     newInstance(spf)
   }
 
-  /** Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`. */
+  /**
+   * Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`.
+   * Do not forget to set namespace awareness to true on the `SAXParserFactory`!
+   */
   def newInstance(parserFactory: SAXParserFactory): DocumentParserUsingSax =
     newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {})
 
   /**
    * Invokes the 3-arg `newInstance` method on `parserFactory`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
    * `handlerCreator`. The "SAX parser creator" invokes `parserFactory.newSAXParser()`.
+   * Do not forget to set namespace awareness to true on the `SAXParserFactory`!
    */
   def newInstance(parserFactory: SAXParserFactory, handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
     newInstance(
@@ -135,7 +143,10 @@ object DocumentParserUsingSax {
       handlerCreator = handlerCreator)
   }
 
-  /** Returns a new instance, by invoking the primary constructor */
+  /**
+   * Returns a new instance, by invoking the primary constructor
+   * Do not forget to set namespace awareness to true on the `SAXParserFactory`!
+   */
   def newInstance(
     parserFactory: SAXParserFactory,
     parserCreator: SAXParserFactory => SAXParser,

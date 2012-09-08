@@ -94,6 +94,9 @@ object DocumentParserUsingStax {
     newInstance(xmlInputFactory)
   }
 
-  /** Returns a new instance, by invoking the primary constructor */
+  /**
+   * Returns a new instance, by invoking the primary constructor.
+   * Do not turn off namespace awareness on the `XMLInputFactory` (by default, it is on).
+   */
   def newInstance(inputFactory: XMLInputFactory): DocumentParserUsingStax = new DocumentParserUsingStax(inputFactory)
 }

@@ -29,6 +29,7 @@ import convert.DomConversions._
  * and class `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
  * val dbf = DocumentBuilderFactory.newInstance()
+ * dbf.setNamespaceAware(true)
  *
  * def createDocumentBuilder(dbf: DocumentBuilderFactory): DocumentBuilder = {
  *   val db = dbf.newDocumentBuilder()
@@ -96,19 +97,26 @@ final class DocumentParserUsingDom(
 
 object DocumentParserUsingDom {
 
-  /** Returns `newInstance(DocumentBuilderFactory.newInstance)` */
+  /** Returns `newInstance(DocumentBuilderFactory.newInstance)`, except that namespace awareness is set to true */
   def newInstance(): DocumentParserUsingDom = {
     val dbf = DocumentBuilderFactory.newInstance()
+    dbf.setNamespaceAware(true)
     newInstance(dbf)
   }
 
-  /** Returns a new instance, using the given `DocumentBuilderFactory`, without any further configuration */
+  /**
+   * Returns a new instance, using the given `DocumentBuilderFactory`, without any further configuration.
+   * Do not forget to set namespace awareness to true on the `DocumentBuilderFactory`!
+   */
   def newInstance(docBuilderFactory: DocumentBuilderFactory): DocumentParserUsingDom = {
     val dbc = (dbf: DocumentBuilderFactory) => dbf.newDocumentBuilder()
     newInstance(docBuilderFactory, dbc)
   }
 
-  /** Returns a new instance, by invoking the primary constructor */
+  /**
+   * Returns a new instance, by invoking the primary constructor
+   * Do not forget to set namespace awareness to true on the `DocumentBuilderFactory`!
+   */
   def newInstance(
     docBuilderFactory: DocumentBuilderFactory,
     docBuilderCreator: DocumentBuilderFactory => DocumentBuilder): DocumentParserUsingDom = {
