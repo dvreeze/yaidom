@@ -18,38 +18,22 @@ package eu.cdevreeze.yaidom
 package convert
 
 /**
- * Conversions between [[eu.cdevreeze.yaidom.Elem]]s of this API and DOM Elements.
+ * Conversions between yaidom nodes and DOM nodes.
  *
- * Example usage for parsing an XML file into an [[eu.cdevreeze.yaidom.Elem]] using DOM:
+ * These conversions are used in implementations of yaidom XML parsers and printers. They are also useful
+ * in application code. One scenario in which these conversions are useful is as follows:
  * {{{
- * import DomConversions._
- *
  * val dbf = DocumentBuilderFactory.newInstance
  * val db = dbf.newDocumentBuilder
- * val doc = db.parse(inputFile)
- * val root: Elem = convertToElem(doc.getDocumentElement)
+ * val domDoc = db.parse(inputFile)
+ *
+ * editDomTreeInPlace(domDoc)
+ *
+ * val doc = DomConversions.convertToDocument(domDoc)
+ *
+ * useImmutableDoc(doc)
  * }}}
- * Class [[eu.cdevreeze.yaidom.parse.DocumentParserUsingDom]] makes this a lot easier, though.
- *
- * A somewhat involved example for writing an [[eu.cdevreeze.yaidom.Elem]] to an XML file using DOM:
- * {{{
- * import DomConversions._
- *
- * val dbf = DocumentBuilderFactory.newInstance
- * val db = dbf.newDocumentBuilder
- * val doc = db.newDocument
- * val domElement = convertElem(root)(doc)
- *
- * val source = new DOMSource(domElement)
- * val result = new StreamResult(outputStream)
- * val tf = TransformerFactory.newInstance
- * val tr = tf.newTransformer
- * tr.transform(source, result)
- *
- * outputStream.close()
- * }}}
- * Class [[eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom]] makes this a lot easier, though.
  *
  * @author Chris de Vreeze
  */
-object DomConversions extends ElemToDomConverter with DomToElemConverter
+object DomConversions extends YaidomToDomConversions with DomToYaidomConversions

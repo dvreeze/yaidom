@@ -20,10 +20,10 @@ package eu.cdevreeze.yaidom
  * Support for conversions from/to yaidom. This package mostly contains conversions between yaidom objects and JAXP DOM or StAX objects,
  * in both directions.
  *
- * This conversion support is typically not used directly by consumers of the yaidom API, although it is easy to do so when needed.
- * This package is used by the Document parsers and printers in the `parse` and `print` packages, respectively.
+ * This conversion support is used by the Document parsers and printers in the `parse` and `print` packages, respectively.
+ * This package can also be used directly by consumers of the yaidom API.
  *
- * These different JAXP-object conversions show that yaidom is optimistic about the available (heap) memory.
+ * These JAXP-object conversions suggest that yaidom is optimistic about the available (heap) memory.
  *
  * This package depends on the [[eu.cdevreeze.yaidom]] package, and not the other way around.
  * The [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] packages depend on this package.

@@ -24,16 +24,21 @@ import javax.xml.stream._
 import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
-import StaxEventsToElemConverter._
+import StaxEventsToYaidomConversions._
 
 /**
- * Converter from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.Elem]], or to [[eu.cdevreeze.yaidom.Document]].
- * Contains conversions for other nodes (than elements and documents) as well.
+ * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.Elem]] and
+ * to [[eu.cdevreeze.yaidom.Document]].
  *
  * @author Chris de Vreeze
  */
-trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XMLEvent]] with ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
+trait StaxEventsToYaidomConversions extends ConverterToElem[immutable.IndexedSeq[XMLEvent]] with ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
 
+  /**
+   * Converts the given sequence of `XMLEvent` instances to a yaidom `Document`.
+   *
+   * First drops events until a "start document" event is found. After conversion, no "start/end document/element" events may be left.
+   */
   final def convertToDocument(v: immutable.IndexedSeq[XMLEvent]): Document = {
     val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartDocument }
 
@@ -56,7 +61,13 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
     result.doc
   }
 
-  final def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
+  /**
+   * Converts the given sequence of `XMLEvent` instances to a yaidom `Elem`
+   *
+   * First drops events until a "start element" event is found. After conversion, no "start/end element" events may be left.
+   * The given parent scope is used.
+   */
+  final def convertToElem(v: immutable.IndexedSeq[XMLEvent], parentScope: Scope): Elem = {
     val events: immutable.IndexedSeq[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
 
     val eventsWithDepths: immutable.IndexedSeq[EventWithDepth] = {
@@ -70,13 +81,36 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
 
     require(eventsWithDepths.size > 1)
 
-    val result = eventsToElem(eventsWithDepths, Scope.Empty)
+    val result = eventsToElem(eventsWithDepths, parentScope)
 
     require {
       result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
     }
     result.elem
   }
+
+  /**
+   * Same as `convertToElem(v, Scope.Empty)`
+   */
+  final def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
+    convertToElem(v, Scope.Empty)
+  }
+
+  /** Converts a StAX `Characters` event to a yaidom `Text` */
+  final def convertToText(event: Characters): Text = {
+    val cdata = event.isCData
+    Text(text = event.getData, isCData = cdata)
+  }
+
+  /** Converts a StAX `EntityReference` event to a yaidom `EntityRef` */
+  final def convertToEntityRef(event: EntityReference): EntityRef = EntityRef(event.getName)
+
+  /** Converts a StAX `ProcessingInstruction` event to a yaidom `ProcessingInstruction` */
+  final def convertToProcessingInstruction(event: javax.xml.stream.events.ProcessingInstruction): ProcessingInstruction =
+    ProcessingInstruction(event.getTarget, event.getData)
+
+  /** Converts a StAX `Comment` event to a yaidom `Comment` */
+  final def convertToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
 
   private def eventsToDocument(eventsWithDepths: immutable.IndexedSeq[EventWithDepth]): DocumentResult = {
     require(eventsWithDepths.size > 3)
@@ -107,13 +141,13 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
         }
         case ev if ev.event.isProcessingInstruction => {
           val piEv = ev.event.asInstanceOf[javax.xml.stream.events.ProcessingInstruction]
-          val pi = eventToProcessingInstruction(piEv)
+          val pi = convertToProcessingInstruction(piEv)
           pis += pi
           remainingEvents = remainingEvents.drop(1)
         }
         case ev if ev.event.isInstanceOf[javax.xml.stream.events.Comment] => {
           val comEv = ev.event.asInstanceOf[javax.xml.stream.events.Comment]
-          val com = eventToComment(comEv)
+          val com = convertToComment(comEv)
           comments += com
           remainingEvents = remainingEvents.drop(1)
         }
@@ -168,25 +202,25 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
         }
         case ev if ev.event.isCharacters => {
           val charEv = ev.event.asCharacters
-          val ch = if (charEv.isCData) eventToCData(charEv) else eventToText(charEv)
+          val ch = convertToText(charEv)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
         case ev if ev.event.isEntityReference => {
           val erEv = ev.event.asInstanceOf[EntityReference]
-          val ch = eventToEntityRef(erEv)
+          val ch = convertToEntityRef(erEv)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
         case ev if ev.event.isProcessingInstruction => {
           val piEv = ev.event.asInstanceOf[javax.xml.stream.events.ProcessingInstruction]
-          val ch = eventToProcessingInstruction(piEv)
+          val ch = convertToProcessingInstruction(piEv)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
         case ev if ev.event.isInstanceOf[javax.xml.stream.events.Comment] => {
           val comEv = ev.event.asInstanceOf[javax.xml.stream.events.Comment]
-          val ch = eventToComment(comEv)
+          val ch = convertToComment(comEv)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
@@ -203,18 +237,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
     new ElemResult(elemWithChildren, remainingEvents)
   }
 
-  final def eventToText(event: Characters): Text = Text(text = event.getData, isCData = false)
-
-  final def eventToCData(event: Characters): Text = Text(text = event.getData, isCData = true)
-
-  final def eventToEntityRef(event: EntityReference): EntityRef = EntityRef(event.getName)
-
-  final def eventToProcessingInstruction(event: javax.xml.stream.events.ProcessingInstruction): ProcessingInstruction =
-    ProcessingInstruction(event.getTarget, event.getData)
-
-  final def eventToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
-
-  final def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
+  private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
     val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
@@ -273,7 +296,7 @@ trait StaxEventsToElemConverter extends ConverterToElem[immutable.IndexedSeq[XML
   }
 }
 
-object StaxEventsToElemConverter {
+private object StaxEventsToYaidomConversions {
 
   private class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
 

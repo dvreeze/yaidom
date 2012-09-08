@@ -97,7 +97,7 @@ final class DomElem(
 
   def qname: QName = DomConversions.toQName(wrappedNode)
 
-  def attributes: Map[QName, String] = DomConversions.convertAttributes(wrappedNode.getAttributes)
+  def attributes: Map[QName, String] = DomConversions.extractAttributes(wrappedNode.getAttributes)
 
   def scope: Scope = {
     val parent = wrappedNode.getParentNode

@@ -23,16 +23,17 @@ import javax.xml.stream._
 import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
-import ElemToStaxEventsConverter._
+import YaidomToStaxEventsConversions._
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.Elem]] to `immutable.IndexedSeq[XMLEvent]`
- * Contains conversions for other nodes (than elements and documents) as well.
+ * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.Elem]] to `immutable.IndexedSeq[XMLEvent]`,
+ * and from  [[eu.cdevreeze.yaidom.Document]] to `immutable.IndexedSeq[XMLEvent]`.
  *
  * @author Chris de Vreeze
  */
-trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with DocumentConverter[XmlEventsProducer] {
+trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] with DocumentConverter[XmlEventsProducer] {
 
+  /** Converts a yaidom `Document` to a function from `XMLEventFactory`s to sequences of `XMLEvent` instances */
   final def convertDocument(doc: Document): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
@@ -49,6 +50,11 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     }
   }
 
+  /**
+   * Converts a yaidom `Elem` to a function from `XMLEventFactory`s to sequences of `XMLEvent` instances.
+   * The assumed parent scope is the empty scope, so the namespace declarations of the outer "start element event" follow from the
+   * scope of the passed `Elem`.
+   */
   final def convertElem(elm: Elem): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
       val startDocument = xmlEventFactory.createStartDocument
@@ -61,11 +67,14 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     }
   }
 
+  /**
+   * Converts a yaidom node to a sequence of `XMLEvent` instances, given an `XMLEventFactory`.
+   * The given parent scope is used, in case the node is an `Elem`.
+   */
   final def convertNode(node: Node, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     node match {
       case e: Elem => convertElem(e, xmlEventFactory, parentScope)
-      case t: Text if t.isCData => convertCData(t, xmlEventFactory)
-      case t: Text => assert(!t.isCData); convertText(t, xmlEventFactory)
+      case t: Text => convertText(t, xmlEventFactory)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, xmlEventFactory)
       // Difficult to convert yaidom EntityRef to StAX EntityReference, because of missing declaration
       case er: EntityRef => immutable.IndexedSeq[XMLEvent]()
@@ -73,6 +82,11 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     }
   }
 
+  /**
+   * Converts a yaidom `Elem` to a sequence of `XMLEvent` instances, given an `XMLEventFactory`.
+   * The given parent scope is used, that is, the namespace declarations of the outer "start element event" is
+   * `parentScope.relativize(elm.scope)`.
+   */
   final def convertElem(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     // Not tail-recursive, but the recursion depth should be limited
 
@@ -83,16 +97,24 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     immutable.IndexedSeq(startEvent) ++ childEvents ++ immutable.IndexedSeq(endEvent)
   }
 
-  final def convertCData(cdata: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
-    val event = xmlEventFactory.createCData(cdata.text)
-    immutable.IndexedSeq(event)
-  }
-
+  /**
+   * Converts a yaidom `Text` to a sequence of `XMLEvent` instances, given an `XMLEventFactory`.
+   */
   final def convertText(text: Text, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
-    val event = xmlEventFactory.createCharacters(text.text)
+    val cdata = text.isCData
+    val event =
+      if (cdata) {
+        xmlEventFactory.createCData(text.text)
+      } else {
+        xmlEventFactory.createCharacters(text.text)
+      }
+
     immutable.IndexedSeq(event)
   }
 
+  /**
+   * Converts a yaidom `ProcessingInstruction` to a sequence of `XMLEvent` instances, given an `XMLEventFactory`.
+   */
   final def convertProcessingInstruction(
     processingInstruction: ProcessingInstruction, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
 
@@ -100,6 +122,9 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
     immutable.IndexedSeq(event)
   }
 
+  /**
+   * Converts a yaidom `Comment` to a sequence of `XMLEvent` instances, given an `XMLEventFactory`.
+   */
   final def convertComment(comment: Comment, xmlEventFactory: XMLEventFactory): immutable.IndexedSeq[XMLEvent] = {
     val event = xmlEventFactory.createComment(comment.text)
     immutable.IndexedSeq(event)
@@ -170,7 +195,7 @@ trait ElemToStaxEventsConverter extends ElemConverter[XmlEventsProducer] with Do
   }
 }
 
-object ElemToStaxEventsConverter {
+object YaidomToStaxEventsConversions {
 
   /** Producer of an `IndexedSeq[XMLEvent]`, given a `XMLEventFactory` as factory of StAX events */
   type XmlEventsProducer = (XMLEventFactory => immutable.IndexedSeq[XMLEvent])

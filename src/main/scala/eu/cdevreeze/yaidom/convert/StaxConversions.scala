@@ -24,35 +24,11 @@ import scala.collection.immutable
 import scala.collection.JavaConverters._
 
 /**
- * Conversions between [[eu.cdevreeze.yaidom.Elem]]s and StAX events.
+ * Conversions between yaidom nodes and StAX events.
  *
- * Example usage for parsing an XML file into an [[eu.cdevreeze.yaidom.Elem]] using StAX:
- * {{{
- * import StaxConversions._
- *
- * val xmlInputFactory = XMLInputFactory.newFactory
- * val xmlEventReader = xmlInputFactory.createXMLEventReader(inputStream)
- * val root: Elem = convertToElem(toIndexedSeq(xmlEventReader)) // assuming a method toIndexedSeq
- *
- * xmlEventReader.close()
- * }}}
- * Class [[eu.cdevreeze.yaidom.parse.DocumentParserUsingStax]] makes this a lot easier, though.
- *
- * A somewhat involved example for writing an [[eu.cdevreeze.yaidom.Elem]] to an XML file using StAX:
- * {{{
- * import StaxConversions._
- *
- * val xmlEventFactory = XMLEventFactory.newFactory
- * val events = convertElem(root)(xmlEventFactory)
- *
- * val xmlOutputFactory = XMLOutputFactory.newFactory
- * val xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream)
- * events.foreach(ev => xmlEventWriter.add(ev))
- *
- * xmlEventWriter.close()
- * }}}
- * Class [[eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax]] makes this a lot easier, though.
+ * These conversions are used in implementations of yaidom XML parsers and printers. They are also useful
+ * in application code.
  *
  * @author Chris de Vreeze
  */
-object StaxConversions extends ElemToStaxEventsConverter with StaxEventsToElemConverter
+object StaxConversions extends YaidomToStaxEventsConversions with StaxEventsToYaidomConversions

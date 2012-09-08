@@ -80,6 +80,7 @@ class DomInteropTest extends Suite {
     val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val domDoc2: org.w3c.dom.Document = db2.newDocument
     val element = convertElem(root)(domDoc2)
+    domDoc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 
@@ -303,6 +304,7 @@ class DomInteropTest extends Suite {
     val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
+    doc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 
@@ -663,6 +665,7 @@ class DomInteropTest extends Suite {
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
+    doc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 
@@ -769,6 +772,7 @@ class DomInteropTest extends Suite {
     val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
+    doc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 
@@ -862,6 +866,7 @@ class DomInteropTest extends Suite {
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
+    doc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 
@@ -928,6 +933,7 @@ class DomInteropTest extends Suite {
     val db2 = domParser.docBuilderCreator(domParser.docBuilderFactory)
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
+    doc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 
@@ -1017,6 +1023,7 @@ class DomInteropTest extends Suite {
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
+    doc2.appendChild(element)
 
     // 3. Convert DOM element into Elem
 

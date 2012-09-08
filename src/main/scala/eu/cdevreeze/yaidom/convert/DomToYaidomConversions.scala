@@ -25,13 +25,16 @@ import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 
 /**
- * Converter from DOM Element to [[eu.cdevreeze.yaidom.Elem]], and from DOM Document to [[eu.cdevreeze.yaidom.Document]].
- * Contains conversions for other nodes (than elements and documents) as well.
+ * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.Elem]] and
+ * from `org.w3c.dom.Document` to [[eu.cdevreeze.yaidom.Document]].
  *
  * @author Chris de Vreeze
  */
-trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocument[org.w3c.dom.Document] {
+trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDocument[org.w3c.dom.Document] {
 
+  /**
+   * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.Document]].
+   */
   final def convertToDocument(v: org.w3c.dom.Document): Document = {
     // It seems that the DOM Document does not keep the URI from which it was loaded. Related (but not the same) is bug
     // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4916415.
@@ -46,14 +49,19 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
         nodeListToIndexedSeq(v.getChildNodes) collect { case c: org.w3c.dom.Comment => convertToComment(c) })
   }
 
+  /** Same as `convertToElem(v, Scope.Empty)` */
   final def convertToElem(v: Element): Elem = {
     convertToElem(v, Scope.Empty)
   }
 
-  /** Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.Elem]] */
+  /**
+   * Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.Elem]].
+   *
+   * The result `Elem` gets Scope `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
+   */
   final def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
-    val attributes: Map[QName, String] = convertAttributes(v.getAttributes)
+    val attributes: Map[QName, String] = extractAttributes(v.getAttributes)
 
     val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.getAttributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
@@ -65,7 +73,12 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
       children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) })
   }
 
-  /** Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.Node]] */
+  /**
+   * Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.Node]].
+   *
+   * In case of an element, the result `Elem` (wrapped in an Option) gets Scope
+   * `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
+   */
   final def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {
       case e: Element => Some(convertToElem(e, parentScope))
@@ -94,8 +107,8 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
   /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.Comment]] */
   final def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
-  /** Converts a `NamedNodeMap` to a `Map[QName, String]` */
-  final def convertAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {
+  /** Converts a `NamedNodeMap` to a `Map[QName, String]`. Namespace declarations are skipped. */
+  final def extractAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
 
@@ -153,7 +166,7 @@ trait DomToElemConverter extends ConverterToElem[Element] with ConverterToDocume
     result
   }
 
-  /** Extracts (optional) prefix and namespace. Call only if `isNamespaceDeclaration(v)`. */
+  /** Extracts (optional) prefix and namespace. Call only if `isNamespaceDeclaration(v)`, since otherwise an exception is thrown. */
   final def extractNamespaceDeclaration(v: org.w3c.dom.Attr): (Option[String], String) = {
     val name: String = v.getName
     val arr = name.split(':')

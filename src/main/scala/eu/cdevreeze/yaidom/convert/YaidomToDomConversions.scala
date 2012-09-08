@@ -23,26 +23,30 @@ import org.w3c.dom.{ Element }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 import eu.cdevreeze.yaidom
-import ElemToDomConverter._
+import YaidomToDomConversions._
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.Elem]] to a DOM element, and from [[eu.cdevreeze.yaidom.Document]] to a DOM Document.
- * Contains conversions for other nodes (than elements and documents) as well.
+ * Converter from yaidom nodes to DOM nodes, in particular from [[eu.cdevreeze.yaidom.Elem]] to a `org.w3c.dom.Element`,
+ * and from  [[eu.cdevreeze.yaidom.Document]] to a `org.w3c.dom.Document`.
  *
  * @author Chris de Vreeze
  */
-trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentConverter[DocumentProducer] {
+trait YaidomToDomConversions extends ElemConverter[ElementProducer] with DocumentConverter[DocumentProducer] {
 
+  /** Converts a yaidom `Document` to a function from DOM documents (as node factories) to (filled) DOM documents */
   final def convertDocument(document: yaidom.Document): DocumentProducer = {
     { (doc: org.w3c.dom.Document) =>
-      // This also sets the document element on the document
-      val docRoot: Element = convertElem(document.documentElement, doc, doc, Scope.Empty)
-      // This also sets the PIs on the document
+      val docRoot: Element = convertElem(document.documentElement, doc, Scope.Empty)
+      doc.appendChild(docRoot)
+
       val pis: immutable.IndexedSeq[org.w3c.dom.ProcessingInstruction] =
-        document.processingInstructions map { pi => convertProcessingInstruction(pi, doc, doc) }
+        document.processingInstructions map { pi => convertProcessingInstruction(pi, doc) }
+      for (pi <- pis) doc.appendChild(pi)
+
       // This also sets the comments on the document
       val comments: immutable.IndexedSeq[org.w3c.dom.Comment] =
-        document.comments map { com => convertComment(com, doc, doc) }
+        document.comments map { com => convertComment(com, doc) }
+      for (c <- comments) doc.appendChild(c)
 
       if (document.baseUriOption.isDefined) doc.setDocumentURI(document.baseUriOption.get.toString)
 
@@ -50,71 +54,82 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
     }
   }
 
+  /** Same as `{ doc => convertElem(elm, doc, Scope.Empty) }` */
   final def convertElem(elm: Elem): ElementProducer = {
     { (doc: org.w3c.dom.Document) =>
-      val element = convertElem(elm, doc, doc, Scope.Empty)
+      val element = convertElem(elm, doc, Scope.Empty)
       element
     }
   }
 
-  final def convertNode(node: Node, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): org.w3c.dom.Node = {
+  /**
+   * Converts a yaidom node to a DOM node. A DOM document is passed as node factory. If the node is an element,
+   * the passed parent scope is used as in `convertElem(e, doc, parentScope)`.
+   */
+  final def convertNode(node: Node, doc: org.w3c.dom.Document, parentScope: Scope): org.w3c.dom.Node = {
     node match {
-      case e: Elem => convertElem(e, doc, parent, parentScope)
-      case t: Text if t.isCData => convertCData(t, doc, parent)
-      case t: Text => assert(!t.isCData); convertText(t, doc, parent)
-      case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc, parent)
-      case er: EntityRef => convertEntityRef(er, doc, parent)
-      case c: Comment => convertComment(c, doc, parent)
+      case e: Elem => convertElem(e, doc, parentScope)
+      case t: Text => convertText(t, doc)
+      case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc)
+      case er: EntityRef => convertEntityRef(er, doc)
+      case c: Comment => convertComment(c, doc)
     }
   }
 
-  final def convertElem(elm: Elem, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node, parentScope: Scope): Element = {
+  /**
+   * Converts a yaidom `Elem` to a DOM element. A DOM document is passed as node factory.
+   * The passed parent scope is used as follows: the namespace declarations on the result DOM element are:
+   * `parentScope.relativize(elm.scope)`.
+   */
+  final def convertElem(elm: Elem, doc: org.w3c.dom.Document, parentScope: Scope): Element = {
     // Not tail-recursive, but the recursion depth should be limited
 
     val element = createElementWithoutChildren(elm, doc, parentScope)
     val childNodes: immutable.IndexedSeq[org.w3c.dom.Node] =
-      elm.children map { ch => convertNode(ch, doc, element, elm.scope) }
+      elm.children map { ch => convertNode(ch, doc, elm.scope) }
 
     for (ch <- childNodes) element.appendChild(ch)
 
-    parent.appendChild(element)
     element
   }
 
-  final def convertCData(cdata: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.CDATASection = {
-    val domCData = doc.createCDATASection(cdata.text)
+  /**
+   * Converts a yaidom `Text` to a DOM `Text`. A DOM document is passed as node factory.
+   */
+  final def convertText(text: Text, doc: org.w3c.dom.Document): org.w3c.dom.Text = {
+    val domText =
+      if (text.isCData) {
+        doc.createCDATASection(text.text)
+      } else {
+        doc.createTextNode(text.text)
+      }
 
-    parent.appendChild(domCData)
-    domCData
-  }
-
-  final def convertText(text: Text, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Text = {
-    val domText = doc.createTextNode(text.text)
-
-    parent.appendChild(domText)
     domText
   }
 
+  /**
+   * Converts a yaidom `ProcessingInstruction` to a DOM `ProcessingInstruction`. A DOM document is passed as node factory.
+   */
   final def convertProcessingInstruction(
-    processingInstruction: ProcessingInstruction, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.ProcessingInstruction = {
+    processingInstruction: ProcessingInstruction, doc: org.w3c.dom.Document): org.w3c.dom.ProcessingInstruction = {
 
     val domPi = doc.createProcessingInstruction(processingInstruction.target, processingInstruction.data)
-
-    parent.appendChild(domPi)
     domPi
   }
 
-  final def convertEntityRef(entityRef: EntityRef, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.EntityReference = {
+  /**
+   * Converts a yaidom `EntityRef` to a DOM `EntityReference`. A DOM document is passed as node factory.
+   */
+  final def convertEntityRef(entityRef: EntityRef, doc: org.w3c.dom.Document): org.w3c.dom.EntityReference = {
     val domEntityRef = doc.createEntityReference(entityRef.entity)
-
-    parent.appendChild(domEntityRef)
     domEntityRef
   }
 
-  final def convertComment(comment: Comment, doc: org.w3c.dom.Document, parent: org.w3c.dom.Node): org.w3c.dom.Comment = {
+  /**
+   * Converts a yaidom `Comment` to a DOM `Comment`. A DOM document is passed as node factory.
+   */
+  final def convertComment(comment: Comment, doc: org.w3c.dom.Document): org.w3c.dom.Comment = {
     val domComment = doc.createComment(comment.text)
-
-    parent.appendChild(domComment)
     domComment
   }
 
@@ -151,7 +166,7 @@ trait ElemToDomConverter extends ElemConverter[ElementProducer] with DocumentCon
   }
 }
 
-object ElemToDomConverter {
+object YaidomToDomConversions {
 
   /** Producer of a DOM `Element`, given a DOM `Document` as factory of DOM objects */
   type ElementProducer = (org.w3c.dom.Document => Element)
