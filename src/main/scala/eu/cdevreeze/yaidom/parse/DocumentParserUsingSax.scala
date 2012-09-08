@@ -29,7 +29,6 @@ import org.xml.sax.ext.LexicalHandler
  * and a trait `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
  * val spf = SAXParserFactory.newInstance
- * spf.setNamespaceAware(true)
  *
  * val parser = DocumentParserUsingSax.newInstance(
  *   spf,
@@ -114,16 +113,14 @@ final class DocumentParserUsingSax(
 
 object DocumentParserUsingSax {
 
-  /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`, except that namespace awareness is set to true. */
+  /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`. */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
-    spf.setNamespaceAware(true)
     newInstance(spf)
   }
 
   /**
    * Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`.
-   * Do not forget to set namespace awareness to true on the `SAXParserFactory`!
    */
   def newInstance(parserFactory: SAXParserFactory): DocumentParserUsingSax =
     newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {})
@@ -131,7 +128,6 @@ object DocumentParserUsingSax {
   /**
    * Invokes the 3-arg `newInstance` method on `parserFactory`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
    * `handlerCreator`. The "SAX parser creator" invokes `parserFactory.newSAXParser()`.
-   * Do not forget to set namespace awareness to true on the `SAXParserFactory`!
    */
   def newInstance(parserFactory: SAXParserFactory, handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
     newInstance(
@@ -145,7 +141,6 @@ object DocumentParserUsingSax {
 
   /**
    * Returns a new instance, by invoking the primary constructor
-   * Do not forget to set namespace awareness to true on the `SAXParserFactory`!
    */
   def newInstance(
     parserFactory: SAXParserFactory,
