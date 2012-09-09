@@ -29,6 +29,8 @@ import org.xml.sax.ext.LexicalHandler
  * and a trait `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
  * val spf = SAXParserFactory.newInstance
+ * spf.setFeature("http://xml.org/sax/features/namespaces", true)
+ * spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
  *
  * val parser = DocumentParserUsingSax.newInstance(
  *   spf,
@@ -44,7 +46,8 @@ import org.xml.sax.ext.LexicalHandler
  *
  * val spf = {
  *   val result = SAXParserFactory.newInstance()
- *   result.setNamespaceAware(true)
+ *   result.setFeature("http://xml.org/sax/features/namespaces", true)
+ *   result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
  *   result.setSchema(schema)
  *   result
  * }
@@ -113,14 +116,25 @@ final class DocumentParserUsingSax(
 
 object DocumentParserUsingSax {
 
-  /** Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`. */
+  /**
+   * Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`, except for the following configuration:
+   * {{{
+   * spf.setFeature("http://xml.org/sax/features/namespaces", true)
+   * spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+   * }}}
+   * Calling the `setNamespaceAware` method instead does not suffice, and is not needed.
+   * See http://www.cafeconleche.org/slides/xmlone/london2002/namespaces/36.html.
+   */
   def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
     newInstance(spf)
   }
 
   /**
    * Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`.
+   * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
    */
   def newInstance(parserFactory: SAXParserFactory): DocumentParserUsingSax =
     newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {})
@@ -128,6 +142,7 @@ object DocumentParserUsingSax {
   /**
    * Invokes the 3-arg `newInstance` method on `parserFactory`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
    * `handlerCreator`. The "SAX parser creator" invokes `parserFactory.newSAXParser()`.
+   * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
    */
   def newInstance(parserFactory: SAXParserFactory, handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
     newInstance(
@@ -141,6 +156,7 @@ object DocumentParserUsingSax {
 
   /**
    * Returns a new instance, by invoking the primary constructor
+   * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
    */
   def newInstance(
     parserFactory: SAXParserFactory,
