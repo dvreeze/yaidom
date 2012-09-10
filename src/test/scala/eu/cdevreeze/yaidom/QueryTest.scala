@@ -1278,6 +1278,95 @@ class QueryTest extends Suite {
     }
   }
 
+  @Test def testDepthFirst() {
+    require(bookstore.localName == "Bookstore")
+
+    // Returns descendant-or-self elements in depth-first order, that is, in document order
+    val elms = bookstore.findAllElemsOrSelf
+
+    val depthFirstElmNames = List(
+      EName("Bookstore"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Remark"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Remark"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Magazine"),
+      EName("Title"),
+      EName("Magazine"),
+      EName("Title"),
+      EName("Magazine"),
+      EName("Title"),
+      EName("Magazine"),
+      EName("Title"))
+
+    expect(depthFirstElmNames) {
+      elms map { _.resolvedName }
+    }
+  }
+
+  @Test def testQueryBookWithGivenIsbn() {
+    // See http://kousenit.wordpress.com/2008/03/12/nothing-makes-you-want-groovy-more-than-xml/,
+    // but taking "our" bookstore as input XML. Somewhat more verbose than the Groovy example, but also more
+    // explicit (about elements, expanded names, etc.).
+
+    require(bookstore.localName == "Bookstore")
+
+    val isbn = "ISBN-0-11-222222-3"
+
+    val bookElmOption = bookstore findElem { e => e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn) }
+    val bookElm = bookElmOption.getOrElse(sys.error("Expected Book with ISBN %s".format(isbn)))
+
+    val title = bookElm.getChildElem(_.localName == "Title").text
+
+    val authorLastNames =
+      for {
+        authorsElm <- bookElm \ "Authors"
+        lastNameElm <- authorsElm \\ "Last_Name"
+      } yield lastNameElm.text
+    val firstAuthorLastName = authorLastNames.head
+
+    expect("Hector and Jeff's Database Hints") {
+      title
+    }
+    expect("Ullman") {
+      firstAuthorLastName
+    }
+  }
+
   private val book1: ElemBuilder = {
     import NodeBuilder._
 

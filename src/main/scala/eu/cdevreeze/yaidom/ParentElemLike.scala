@@ -101,7 +101,9 @@ import scala.collection.{ immutable, mutable }
  * </ul>
  *
  * These element (collection) retrieval methods process and return elements in depth-first order
- * (see http://en.wikipedia.org/wiki/Depth-first_search).
+ * (see http://en.wikipedia.org/wiki/Depth-first_search). In other words, they process and return elements in document order,
+ * which is the order encountered when reading the XML string from top to bottom. (This happens to be consistent with XPath 2.0,
+ * where path expression results must be in document order.)
  *
  * We define some of those methods as follows (in terms of equality):
  * {{{
