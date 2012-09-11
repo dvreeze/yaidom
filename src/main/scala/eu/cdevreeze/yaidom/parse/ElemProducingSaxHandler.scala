@@ -25,6 +25,8 @@ import eu.cdevreeze.yaidom._
  * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.Elem]] using
  * method `resultingElem`, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
  * `resultingDocument`.
+ *
+ * @author Chris de Vreeze
  */
 trait ElemProducingSaxHandler extends DefaultHandler {
 

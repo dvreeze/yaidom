@@ -30,6 +30,8 @@ import convert.StaxConversions._
  *
  * A `DocumentPrinterUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLEventFactory` and `XMLOutputFactory` are thread-safe, it can even be re-used from multiple threads.
+ *
+ * @author Chris de Vreeze
  */
 sealed class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,

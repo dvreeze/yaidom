@@ -61,6 +61,8 @@ import convert.StaxConversions._
  *
  * A `DocumentParserUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLInputFactory` is thread-safe, it can even be re-used from multiple threads.
+ *
+ * @author Chris de Vreeze
  */
 final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends DocumentParser {
 

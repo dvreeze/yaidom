@@ -25,6 +25,8 @@ import eu.cdevreeze.yaidom._
 
 /**
  * Mixin extending `DefaultHandler` that contains a `Locator`. Typically this `Locator` is used by an `ErrorHandler` mixed in after this trait.
+ *
+ * @author Chris de Vreeze
  */
 @NotThreadSafe
 trait SaxHandlerWithLocator extends DefaultHandler {

@@ -30,6 +30,8 @@ package print
  *
  * Although `DocumentPrinter` instances should be re-usable multiple times, implementing classes are encouraged to indicate
  * to what extent re-use of a `DocumentPrinter` instance is indeed supported (single-threaded, or even multi-threaded).
+ *
+ * @author Chris de Vreeze
  */
 trait DocumentPrinter {
 

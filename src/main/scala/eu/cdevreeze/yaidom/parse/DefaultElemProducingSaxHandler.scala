@@ -30,6 +30,8 @@ import DefaultElemProducingSaxHandler._
  * Default [[eu.cdevreeze.yaidom.parse.ElemProducingSaxHandler]] implementation.
  *
  * This is a trait instead of a class, so it is easy to mix in `EntityResolver`s, `ErrorHandler`s, etc.
+ *
+ * @author Chris de Vreeze
  */
 @NotThreadSafe
 trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {

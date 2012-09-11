@@ -81,6 +81,8 @@ import org.xml.sax.ext.LexicalHandler
  *
  * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXParserFactory` is thread-safe, it can even be re-used from multiple threads.
+ *
+ * @author Chris de Vreeze
  */
 final class DocumentParserUsingSax(
   val parserFactory: SAXParserFactory,

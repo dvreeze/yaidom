@@ -34,6 +34,8 @@ import java.io.InputStream
  *
  * Although `DocumentParser` instances should be re-usable multiple times, implementing classes are encouraged to indicate
  * to what extent re-use of a parser instance is indeed supported (single-threaded, or even multi-threaded).
+ *
+ * @author Chris de Vreeze
  */
 trait DocumentParser {
 

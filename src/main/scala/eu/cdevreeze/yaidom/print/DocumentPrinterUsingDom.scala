@@ -42,6 +42,8 @@ import convert.DomConversions._
  *
  * A `DocumentPrinterUsingDom` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` and `TransformerFactory` are thread-safe, it can even be re-used from multiple threads.
+ *
+ * @author Chris de Vreeze
  */
 final class DocumentPrinterUsingDom(
   val docBuilderFactory: DocumentBuilderFactory,
