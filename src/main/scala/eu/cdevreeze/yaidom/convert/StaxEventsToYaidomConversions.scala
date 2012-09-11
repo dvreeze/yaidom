@@ -32,7 +32,7 @@ import StaxEventsToYaidomConversions._
  *
  * @author Chris de Vreeze
  */
-trait StaxEventsToYaidomConversions extends ConverterToElem[immutable.IndexedSeq[XMLEvent]] with ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
+trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
 
   /**
    * Converts the given sequence of `XMLEvent` instances to a yaidom `Document`.
@@ -91,16 +91,6 @@ trait StaxEventsToYaidomConversions extends ConverterToElem[immutable.IndexedSeq
       result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
     }
     result.elem
-  }
-
-  /**
-   * Same as `convertToElem(v, Scope.Empty)`
-   *
-   * Be careful: the namespaces inherited by the "start element event", if any, are ignored! In other words, the ancestry of
-   * the passed events is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces.
-   */
-  final def convertToElem(v: immutable.IndexedSeq[XMLEvent]): Elem = {
-    convertToElem(v, Scope.Empty)
   }
 
   /** Converts a StAX `Characters` event to a yaidom `Text` */

@@ -30,7 +30,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDocument[org.w3c.dom.Document] {
+trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
 
   /**
    * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.Document]].
@@ -47,16 +47,6 @@ trait DomToYaidomConversions extends ConverterToElem[Element] with ConverterToDo
         nodeListToIndexedSeq(v.getChildNodes) collect { case pi: org.w3c.dom.ProcessingInstruction => convertToProcessingInstruction(pi) },
       comments =
         nodeListToIndexedSeq(v.getChildNodes) collect { case c: org.w3c.dom.Comment => convertToComment(c) })
-  }
-
-  /**
-   * Same as `convertToElem(v, Scope.Empty)`.
-   *
-   * Be careful: the namespaces inherited by the passed DOM element, if any, are ignored! In other words, the ancestry of
-   * the passed DOM element is entirely ignored. This may cause an exception to be thrown, if there are indeed such namespaces.
-   */
-  final def convertToElem(v: Element): Elem = {
-    convertToElem(v, Scope.Empty)
   }
 
   /**

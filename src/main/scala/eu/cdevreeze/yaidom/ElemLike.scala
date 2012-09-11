@@ -90,6 +90,11 @@ import scala.collection.{ immutable, mutable }
  * <li>A method to get the local name of the element, without the namespace</li>
  * </ul>
  *
+ * Obviously, this API does not offer much to the parent trait API. After all, the element query methods taking a local name or
+ * expanded name are only syntactic sugar for specific calls to the corresponding `ParentElemLike` methods taking an element predicate.
+ * Had we defined implicit conversions from local/expanded names to element predicates, most of this API would have been superfluous.
+ * On the other hand, the current `ElemLike` API, which requires no implicits, is trivial to use.
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze

@@ -84,7 +84,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(domDoc2.getDocumentElement)
+    val root2: Elem = convertToDocument(domDoc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -308,7 +308,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToDocument(doc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -669,7 +669,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToDocument(doc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -776,7 +776,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToDocument(doc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -870,7 +870,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToDocument(doc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -937,7 +937,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToDocument(doc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
@@ -1027,7 +1027,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val root2: Elem = convertToElem(doc2.getDocumentElement)
+    val root2: Elem = convertToDocument(doc2).documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
