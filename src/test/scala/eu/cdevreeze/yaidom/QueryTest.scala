@@ -240,7 +240,7 @@ class QueryTest extends Suite {
     val books =
       for {
         book <- bookstore \ "Book"
-        price = book.attribute(EName("Price"))
+        price <- book \@ "Price"
         if price.toInt < 90
       } yield book
 
@@ -272,7 +272,8 @@ class QueryTest extends Suite {
     val titles =
       for {
         book <- bookstore \ "Book"
-        if book.attribute(EName("Price")).toInt < 90
+        price <- book \@ "Price"
+        if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
 
     expect(Set(
@@ -307,7 +308,7 @@ class QueryTest extends Suite {
     val cheapBookElms =
       for {
         bookElm <- bookstore \ "Book"
-        price = bookElm.attribute(EName("Price"))
+        price <- bookElm \@ "Price"
         if price.toInt < 90
       } yield bookElm
 
@@ -880,8 +881,8 @@ class QueryTest extends Suite {
     val prices: immutable.IndexedSeq[Double] =
       for {
         book <- bookstore \ "Book"
-        price = book.attribute(EName("Price")).toDouble
-      } yield price
+        price <- book \@ "Price"
+      } yield price.toDouble
     val averagePrice =
       textElem(QName("Average"), (prices.sum.toDouble / prices.size).toString).build()
 

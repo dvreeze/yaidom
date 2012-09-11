@@ -119,6 +119,21 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
   /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
   final def attribute(expandedName: EName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
+  /**
+   * Returns the first found attribute value of an attribute with the given local name, if any, wrapped in an `Option`.
+   * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
+   */
+  final def findAttribute(localName: String): Option[String] = {
+    val matchingAttrs = resolvedAttributes filterKeys { _.localPart == localName }
+    matchingAttrs.values.headOption
+  }
+
+  /** Shorthand for `attributeOption(expandedName)` */
+  final def \@(expandedName: EName): Option[String] = attributeOption(expandedName)
+
+  /** Shorthand for `findAttribute(localName)` */
+  final def \@(localName: String): Option[String] = findAttribute(localName)
+
   /** Returns the child elements with the given expanded name */
   final def filterChildElems(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
