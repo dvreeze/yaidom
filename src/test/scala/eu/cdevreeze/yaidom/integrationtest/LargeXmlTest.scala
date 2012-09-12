@@ -42,8 +42,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @volatile
-  private var xmlBytes: Array[Byte] = _
+  @volatile private var xmlBytes: Array[Byte] = _
 
   override def beforeAll(configMap: Map[String, Any]) {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
@@ -66,8 +65,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     this.xmlBytes = bos.toByteArray
   }
 
-  @Test
-  def testProcessLargeXmlUsingSax() {
+  @Test def testProcessLargeXmlUsingSax() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -78,8 +76,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  @Test
-  def testProcessLargeXmlIntoResolvedElemUsingSax() {
+  @Test def testProcessLargeXmlIntoResolvedElemUsingSax() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -105,9 +102,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
-  @Ignore
-  @Test
-  def testParseLargeXmlRepeatedly() {
+  @Ignore @Test def testParseLargeXmlRepeatedly() {
     for (i <- (0 until 200).par) {
       val parser = DocumentParserUsingSax.newInstance
 
@@ -139,8 +134,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test
-  def testProcessLargeXmlUsingStax() {
+  @Test def testProcessLargeXmlUsingStax() {
     val parser = DocumentParserUsingStax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -151,8 +145,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  @Test
-  def testProcessLargeXmlUsingDom() {
+  @Test def testProcessLargeXmlUsingDom() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -164,9 +157,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
-  @Ignore
-  @Test
-  def testProcessLargeTreeRepr() {
+  @Ignore @Test def testProcessLargeTreeRepr() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -196,9 +187,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Ignore
-  @Test
-  def testSerializeLargeNodeBuilder() {
+  @Ignore @Test def testSerializeLargeNodeBuilder() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -233,9 +222,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Ignore
-  @Test
-  def testSerializeLargeNode() {
+  @Ignore @Test def testSerializeLargeNode() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -268,8 +255,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Test
-  def testFind() {
+  @Test def testFind() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -346,8 +332,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
   }
 
-  @Test
-  def testUpdate() {
+  @Test def testUpdate() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -407,8 +392,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test
-  def testUpdateAgain() {
+  @Test def testUpdateAgain() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
