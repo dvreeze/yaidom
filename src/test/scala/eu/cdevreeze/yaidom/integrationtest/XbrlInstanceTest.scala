@@ -23,7 +23,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingSax
+import parse.{ DocumentParserUsingSax, DocumentParserUsingDom }
 import XbrlInstanceTest._
 
 /**
@@ -64,31 +64,28 @@ class XbrlInstanceTest extends Suite {
       xbrlInstance.units.size
     }
     expect(Set("U-Monetary", "U-Shares", "U-Pure")) {
-      val result = xbrlInstance.units.values map { _.id }
+      val result = xbrlInstance.units map { _.id }
       result.toSet
-    }
-    expect(Set("U-Monetary", "U-Shares", "U-Pure")) {
-      xbrlInstance.units.keySet
     }
 
     // Check contexts
 
-    val iContexts = xbrlInstance.contexts filterKeys { id => id.startsWith("I-") }
-    val dContexts = xbrlInstance.contexts filterKeys { id => id.startsWith("D-") }
+    val iContexts = xbrlInstance.contexts filter { _.id.startsWith("I-") }
+    val dContexts = xbrlInstance.contexts filter { _.id.startsWith("D-") }
 
     assert(iContexts.size >= 30, "Expected at least 30 'instant' contexts")
     assert(dContexts.size >= 30, "Expected at least 30 'start-end-date' contexts")
 
-    expect(xbrlInstance.contexts) {
-      iContexts ++ dContexts
+    expect((xbrlInstance.contexts).toSet) {
+      (iContexts ++ dContexts).toSet
     }
 
     expect(Set(EName(nsXbrli, "instant"))) {
-      val result = iContexts.values flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
+      val result = iContexts flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
       result.toSet
     }
     expect(Set(EName(nsXbrli, "startDate"), EName(nsXbrli, "endDate"))) {
-      val result = dContexts.values flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
+      val result = dContexts flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
       result.toSet
     }
 
@@ -110,17 +107,84 @@ class XbrlInstanceTest extends Suite {
     }
 
     assert(
-      xbrlInstance.topLevelItems forall { item => xbrlInstance.contexts.contains(item.contextRef) },
+      xbrlInstance.topLevelItems forall { item => xbrlInstance.contexts.map(_.id).contains(item.contextRef) },
       "All contextRefs must be resolved")
 
     assert(
-      xbrlInstance.topLevelItems forall { item => xbrlInstance.units.contains(item.unitRefOption.getOrElse("U-Monetary")) },
+      xbrlInstance.topLevelItems forall { item => xbrlInstance.units.map(_.id).contains(item.unitRefOption.getOrElse("U-Monetary")) },
       "All unitRefs must be resolved")
 
     val txt = "The following is an example/sample of the target use case for narratives."
     assert(
       xbrlInstance.topLevelItems exists { item => item.wrappedElem.trimmedText.startsWith(txt) },
       "Expected an item with a value starting with '%s'".format(txt))
+  }
+
+  @Test def testBasicRules() {
+    // See The Guide & Workbook for Understanding XBRL, 2nd Edition (by Clinton White, Jr.)
+
+    val parser = DocumentParserUsingDom.newInstance()
+    val doc: Document = parser.parse(classOf[XbrlInstanceTest].getResourceAsStream("sample-xbrl-instance.xml"))
+
+    val xbrlInstance = XbrlInstance.fromElem(doc.documentElement)
+
+    val xbrlElm: Elem = xbrlInstance.toElem
+
+    expect(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem(xbrlElm).removeAllInterElementWhitespace
+    }
+
+    // XBRL rule 1
+
+    expect(EName(nsXbrli, "xbrl")) {
+      xbrlElm.resolvedName
+    }
+
+    // XBRL rule 2
+
+    expect(EName(nsLink, "schemaRef")) {
+      xbrlElm.allChildElems.headOption.getOrElse(sys.error("First xbrl child must be schemaRef")).resolvedName
+    }
+
+    val schemaRefElms = xbrlElm.filterChildElems(EName(nsLink, "schemaRef"))
+
+    expect(true) {
+      schemaRefElms forall { e =>
+        e.resolvedAttributes.keySet == Set(EName(nsXLink, "type"), EName(nsXLink, "href"))
+      }
+    }
+    expect(true) {
+      schemaRefElms forall { e =>
+        e.attribute(EName(nsXLink, "type")) == "simple"
+      }
+    }
+
+    // XBRL rule 3
+
+    expect(true) {
+      val contextElms = xbrlElm filterChildElems { e => XbrlInstance.mustBeContext(e)(xbrlElm) }
+      !contextElms.isEmpty
+    }
+
+    // ... more checks ...
+
+    // XBRL rule 4
+
+    expect(true) {
+      val unitElms = xbrlElm filterChildElems { e => XbrlInstance.mustBeUnit(e)(xbrlElm) }
+      !unitElms.isEmpty
+    }
+
+    // ... more checks ...
+
+    // XBRL rule 5
+
+    expect(true) {
+      val topLevelFactElms = xbrlElm filterChildElems { e => XbrlInstance.mustBeTopLevelFact(e)(xbrlElm) }
+      !topLevelFactElms.isEmpty
+    }
+
+    // ... more checks ...
   }
 }
 
@@ -132,6 +196,7 @@ object XbrlInstanceTest {
 
   import XbrlInstance._
 
+  /** XBRL instance. The original XML can be reconstructed, modulo equality of the "resolved elements" */
   final class XbrlInstance(
     val rootQName: QName,
     val rootAttributes: Map[QName, String],
@@ -140,8 +205,8 @@ object XbrlInstanceTest {
     val linkbaseRefs: immutable.IndexedSeq[xlink.SimpleLink],
     val roleRefs: immutable.IndexedSeq[xlink.SimpleLink],
     val arcroleRefs: immutable.IndexedSeq[xlink.SimpleLink],
-    val contexts: Map[String, XbrlContext],
-    val units: Map[String, XbrlUnit],
+    val contexts: immutable.IndexedSeq[XbrlContext],
+    val units: immutable.IndexedSeq[XbrlUnit],
     val topLevelFacts: immutable.IndexedSeq[XbrlFact],
     val footnoteLinks: immutable.IndexedSeq[xlink.ExtendedLink]) extends Immutable { self =>
 
@@ -156,6 +221,9 @@ object XbrlInstanceTest {
     require(units ne null)
     require(topLevelFacts ne null)
     require(footnoteLinks ne null)
+
+    require(contexts.size == (contexts map (_.id)).size)
+    require(units.size == (units map (_.id)).size)
 
     require(rootScope.resolveQName(rootQName) == Some(EName(nsXbrli, "xbrl")))
 
@@ -173,8 +241,8 @@ object XbrlInstanceTest {
         val linkbaseRefElms = linkbaseRefs map { _.wrappedElem }
         val roleRefElms = roleRefs map { _.wrappedElem }
         val arcroleRefElms = arcroleRefs map { _.wrappedElem }
-        val contextElms = contexts.values map { _.wrappedElem }
-        val unitElms = units.values map { _.wrappedElem }
+        val contextElms = contexts map { _.wrappedElem }
+        val unitElms = units map { _.wrappedElem }
         val topLevelFactElms = topLevelFacts map { _.wrappedElem }
         val footnoteLinkElms = footnoteLinks map { _.wrappedElem }
 
@@ -311,15 +379,11 @@ object XbrlInstanceTest {
     def fromElem(root: Elem): XbrlInstance = {
       require(mustBeInstance(root))
 
-      val contexts: Map[String, XbrlContext] = {
-        val result = root collectFromChildElems { case e if mustBeContext(e)(root) => (e.attribute(EName("id")) -> new XbrlContext(e)) }
-        result.toMap
-      }
+      val contexts: immutable.IndexedSeq[XbrlContext] =
+        root collectFromChildElems { case e if mustBeContext(e)(root) => new XbrlContext(e) }
 
-      val units: Map[String, XbrlUnit] = {
-        val result = root collectFromChildElems { case e if mustBeUnit(e)(root) => (e.attribute(EName("id")) -> new XbrlUnit(e)) }
-        result.toMap
-      }
+      val units: immutable.IndexedSeq[XbrlUnit] =
+        root collectFromChildElems { case e if mustBeUnit(e)(root) => new XbrlUnit(e) }
 
       val topLevelFacts: immutable.IndexedSeq[XbrlFact] =
         root collectFromChildElems { case e if mustBeTopLevelFact(e)(root) => XbrlFact(e) }
