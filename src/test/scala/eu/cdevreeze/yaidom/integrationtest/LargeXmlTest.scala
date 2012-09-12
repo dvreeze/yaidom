@@ -42,7 +42,8 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @volatile private var xmlString: String = _
+  @volatile
+  private var xmlBytes: Array[Byte] = _
 
   override def beforeAll(configMap: Map[String, Any]) {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
@@ -53,34 +54,36 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val zipEntry: jutil.zip.ZipEntry = zipEntries.nextElement()
 
-    val reader = new jio.BufferedReader(new jio.InputStreamReader(zipFile.getInputStream(zipEntry), "utf-8"))
+    val is = new jio.BufferedInputStream(zipFile.getInputStream(zipEntry))
 
-    val stringWriter = new jio.StringWriter
-    var c: Int = -1
-    while ({ c = reader.read(); c >= 0 }) {
-      stringWriter.write(c)
+    val bos = new jio.ByteArrayOutputStream
+    var b: Int = -1
+    while ({ b = is.read(); b >= 0 }) {
+      bos.write(b)
     }
-    reader.close()
+    is.close()
 
-    this.xmlString = stringWriter.toString
+    this.xmlBytes = bos.toByteArray
   }
 
-  @Test def testProcessLargeXmlUsingSax() {
+  @Test
+  def testProcessLargeXmlUsingSax() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testProcessLargeXmlUsingSax] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlIntoResolvedElemUsingSax() {
+  @Test
+  def testProcessLargeXmlIntoResolvedElemUsingSax() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testProcessLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
@@ -102,11 +105,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testParseLargeXmlRepeatedly() {
+  @Ignore
+  @Test
+  def testParseLargeXmlRepeatedly() {
     for (i <- (0 until 200).par) {
       val parser = DocumentParserUsingSax.newInstance
 
-      val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+      val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
       logger.info("Parsed Document (%d) in thread %s".format(i + 1, Thread.currentThread.getName))
 
       (i % 5) match {
@@ -134,22 +139,24 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testProcessLargeXmlUsingStax() {
+  @Test
+  def testProcessLargeXmlUsingStax() {
     val parser = DocumentParserUsingStax.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testProcessLargeXmlUsingStax] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     doTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlUsingDom() {
+  @Test
+  def testProcessLargeXmlUsingDom() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testProcessLargeXmlUsingDom] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
@@ -157,11 +164,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testProcessLargeTreeRepr() {
+  @Ignore
+  @Test
+  def testProcessLargeTreeRepr() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs1 = System.currentTimeMillis()
     logger.info("[testProcessLargeTreeRepr] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
 
@@ -187,11 +196,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Ignore @Test def testSerializeLargeNodeBuilder() {
+  @Ignore
+  @Test
+  def testSerializeLargeNodeBuilder() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs1 = System.currentTimeMillis()
     logger.info("[testSerializeLargeNodeBuilder] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
 
@@ -222,11 +233,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Ignore @Test def testSerializeLargeNode() {
+  @Ignore
+  @Test
+  def testSerializeLargeNode() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs1 = System.currentTimeMillis()
     logger.info("[testSerializeLargeNode] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
 
@@ -255,11 +268,12 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Test def testFind() {
+  @Test
+  def testFind() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testFind] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
@@ -332,11 +346,12 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
   }
 
-  @Test def testUpdate() {
+  @Test
+  def testUpdate() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testUpdate] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
@@ -392,11 +407,12 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testUpdateAgain() {
+  @Test
+  def testUpdateAgain() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
     logger.info("[testUpdateAgain] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
