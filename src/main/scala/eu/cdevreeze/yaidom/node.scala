@@ -85,132 +85,6 @@ sealed trait Node extends Immutable with Serializable {
   private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq
 }
 
-/** `Document` or `Elem` node */
-trait ParentNode extends Node {
-
-  def children: immutable.IndexedSeq[Node]
-}
-
-/**
- * `Document` node. Although at first sight the document root element seems to be the root node, this is not entirely true.
- * For example, there may be comments at top level, outside the document root element.
- */
-@SerialVersionUID(1L)
-final class Document(
-  val baseUriOption: Option[URI],
-  val documentElement: Elem,
-  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  val comments: immutable.IndexedSeq[Comment]) extends ParentNode {
-
-  require(baseUriOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
-
-  override val uid: UID = new UID
-
-  override def children: immutable.IndexedSeq[Node] =
-    processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
-
-  /** Expensive method to obtain all processing instructions */
-  def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
-    val result: immutable.IndexedSeq[immutable.IndexedSeq[ProcessingInstruction]] =
-      documentElement.findAllElemsOrSelf collect { case e: Elem => e.children collect { case pi: ProcessingInstruction => pi } }
-    val elemPIs = result.flatten
-    processingInstructions ++ elemPIs
-  }
-
-  /** Expensive method to obtain all comments */
-  def allComments: immutable.IndexedSeq[Comment] = {
-    val result: immutable.IndexedSeq[immutable.IndexedSeq[Comment]] =
-      documentElement.findAllElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
-    val elemComments = result.flatten
-    comments ++ elemComments
-  }
-
-  /** Creates a copy, but with the new documentElement passed as parameter newRoot */
-  def withDocumentElement(newRoot: Elem): Document = new Document(
-    baseUriOption = this.baseUriOption,
-    documentElement = newRoot,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
-
-  /** Creates a copy, but with the new baseUriOption passed as parameter newBaseUriOption */
-  def withBaseUriOption(newBaseUriOption: Option[URI]): Document = new Document(
-    baseUriOption = newBaseUriOption,
-    documentElement = this.documentElement,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
-
-  /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
-  def updated(path: ElemPath)(f: Elem => immutable.IndexedSeq[Node]): Document = withDocumentElement(this.documentElement.updated(path)(f))
-
-  /** Returns `updated(path) { e => nodes }` */
-  def updated(path: ElemPath, nodes: immutable.IndexedSeq[Node]): Document = updated(path) { e => nodes }
-
-  /** Returns `withDocumentElement(this.documentElement.updated(pf))` */
-  def updated(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document = withDocumentElement(this.documentElement.updated(pf))
-
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
-    require(parentScope == Scope.Empty, "A document has no parent scope")
-
-    val baseUriOptionLineSeq: LineSeq =
-      if (this.baseUriOption.isEmpty) {
-        val line = "baseUriOption = None"
-        LineSeq(line)
-      } else {
-        val line = "baseUriOption = Some(%s)".format(toStringLiteral(this.baseUriOption.get.toString))
-        LineSeq(line)
-      }
-
-    val documentElementLineSeq: LineSeq = {
-      val firstLine = LineSeq("documentElement =")
-      val contentLines = this.documentElement.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
-      firstLine ++ contentLines
-    }
-
-    val piLineSeqOption: Option[LineSeq] =
-      if (this.processingInstructions.isEmpty) None else {
-        val firstLine = LineSeq("processingInstructions = Vector(")
-        val contentLines = {
-          val groups =
-            this.processingInstructions map { pi =>
-              pi.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
-            }
-          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
-          result
-        }
-        val lastLine = LineSeq(")")
-
-        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
-      }
-
-    val commentsLineSeqOption: Option[LineSeq] =
-      if (this.comments.isEmpty) None else {
-        val firstLine = LineSeq("comments = Vector(")
-        val contentLines = {
-          val groups =
-            this.comments map { comment =>
-              comment.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
-            }
-          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
-          result
-        }
-        val lastLine = LineSeq(")")
-
-        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
-      }
-
-    val contentParts: Vector[LineSeq] = Vector(Some(baseUriOptionLineSeq), Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
-    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
-
-    LineSeqSeq(
-      LineSeq("document("),
-      content,
-      LineSeq(")")).mkLineSeq.shift(indent)
-  }
-}
-
 /**
  * Element node. An [[eu.cdevreeze.yaidom.Elem]] contains:
  * <ol>
@@ -240,7 +114,7 @@ final class Elem(
   val qname: QName,
   val attributes: Map[QName, String],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
+  val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -526,20 +400,6 @@ final case class Comment(text: String) extends Node {
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     toConcatenatedStringLiterals(text).prepend("comment(").append(")").shift(indent)
   }
-}
-
-object Document {
-
-  def apply(
-    baseUriOption: Option[URI],
-    documentElement: Elem,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
-    comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
-
-    new Document(baseUriOption, documentElement, processingInstructions, comments)
-  }
-
-  def apply(documentElement: Elem): Document = apply(None, documentElement)
 }
 
 object Elem {

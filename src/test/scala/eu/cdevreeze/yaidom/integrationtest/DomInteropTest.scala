@@ -215,7 +215,7 @@ class DomInteropTest extends Suite {
 
     // 9. Serialize the corresponding NodeBuilder, deserialize it, and check again.
 
-    val rootDocBuilder = NodeBuilder.fromDocument(Document(root))(Scope.Empty)
+    val rootDocBuilder = DocBuilder.fromDocument(Document(root))
     val bos = new jio.ByteArrayOutputStream
     val oos = new jio.ObjectOutputStream(bos)
 
@@ -229,7 +229,7 @@ class DomInteropTest extends Suite {
     val ois = new jio.ObjectInputStream(bis2)
 
     val rootDocBuilder2 = ois.readObject().asInstanceOf[DocBuilder]
-    val doc7 = rootDocBuilder2.build(Scope.Empty)
+    val doc7 = rootDocBuilder2.build()
     val root7 = doc7.documentElement
 
     expect((root.findAllElems map (e => e.localName)).toSet) {
@@ -403,7 +403,7 @@ class DomInteropTest extends Suite {
 
     // 5. Convert to NodeBuilder and back, and check again
 
-    val document3: eu.cdevreeze.yaidom.Document = NodeBuilder.fromDocument(document2)(Scope.Empty).build()
+    val document3: eu.cdevreeze.yaidom.Document = DocBuilder.fromDocument(document2).build()
     val root3: Elem = document3.documentElement
 
     expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {

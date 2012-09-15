@@ -84,48 +84,12 @@ sealed trait NodeBuilder extends Immutable with Serializable {
   final override def toString: String = toTreeRepr(Scope.Empty)
 }
 
-trait ParentNodeBuilder extends NodeBuilder {
-
-  def children: immutable.IndexedSeq[NodeBuilder]
-}
-
-/**
- * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
- */
-@SerialVersionUID(1L)
-final class DocBuilder(
-  val baseUriOption: Option[URI],
-  val documentElement: ElemBuilder,
-  val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
-  val comments: immutable.IndexedSeq[CommentBuilder]) extends ParentNodeBuilder { self =>
-
-  require(baseUriOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
-
-  type NodeType = Document
-
-  override def children: immutable.IndexedSeq[NodeBuilder] =
-    (processingInstructions ++ comments) :+ documentElement
-
-  def build(parentScope: Scope): Document = {
-    require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
-
-    Document(
-      baseUriOption = self.baseUriOption,
-      documentElement = documentElement.build(parentScope),
-      processingInstructions = processingInstructions map { (pi: ProcessingInstructionBuilder) => pi.build(parentScope) },
-      comments = comments map { (c: CommentBuilder) => c.build(parentScope) })
-  }
-}
-
 @SerialVersionUID(1L)
 final class ElemBuilder(
   val qname: QName,
   val attributes: Map[QName, String],
   val namespaces: Declarations,
-  override val children: immutable.IndexedSeq[NodeBuilder]) extends ParentNodeBuilder with ParentElemLike[ElemBuilder] { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -269,15 +233,6 @@ object NodeBuilder {
     case ProcessingInstruction(target, data) => ProcessingInstructionBuilder(target, data)
     case EntityRef(entity) => EntityRefBuilder(entity)
     case Comment(s) => CommentBuilder(s)
-    case d: Document =>
-      require(parentScope == Scope.Empty, "Documents are top level nodes, so have no parent scope")
-
-      // Recursive calls, but not tail-recursive
-      new DocBuilder(
-        baseUriOption = d.baseUriOption,
-        documentElement = fromNode(d.documentElement)(parentScope).asInstanceOf[ElemBuilder],
-        processingInstructions = d.processingInstructions collect { case pi: ProcessingInstruction => fromNode(pi)(parentScope).asInstanceOf[ProcessingInstructionBuilder] },
-        comments = d.comments collect { case c => fromNode(c)(parentScope).asInstanceOf[CommentBuilder] })
     case e: Elem =>
       assert(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 
@@ -288,8 +243,6 @@ object NodeBuilder {
         namespaces = parentScope.relativize(e.scope),
         children = e.children map { ch => fromNode(ch)(e.scope) })
   }
-
-  def fromDocument(doc: Document)(parentScope: Scope): DocBuilder = fromNode(doc)(parentScope).asInstanceOf[DocBuilder]
 
   def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = fromNode(elm)(parentScope).asInstanceOf[ElemBuilder]
 }

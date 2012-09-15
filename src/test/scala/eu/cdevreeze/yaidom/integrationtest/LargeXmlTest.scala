@@ -197,7 +197,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val startMs2 = System.currentTimeMillis()
 
-    val docBuilder = NodeBuilder.fromDocument(doc)(Scope.Empty)
+    val docBuilder = DocBuilder.fromDocument(doc)
     val bos = new jio.ByteArrayOutputStream
     val oos = new jio.ObjectOutputStream(bos)
 
@@ -214,7 +214,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val ois = new jio.ObjectInputStream(bis)
 
     val doc2Builder = ois.readObject().asInstanceOf[DocBuilder]
-    val doc2 = doc2Builder.build(Scope.Empty)
+    val doc2 = doc2Builder.build()
 
     val endMs3 = System.currentTimeMillis()
     logger.info("[testSerializeLargeNodeBuilder] Deserializing took %d ms".format(endMs3 - startMs3))

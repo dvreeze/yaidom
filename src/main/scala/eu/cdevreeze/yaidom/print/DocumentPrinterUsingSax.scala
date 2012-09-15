@@ -100,7 +100,6 @@ final class DocumentPrinterUsingSax(
       case er: EntityRef => () // What can we do?
       case pi: ProcessingInstruction => generateEventsForProcessingInstruction(pi, handler)
       case comment: Comment => generateEventsForComment(comment, handler)
-      case parentNode: ParentNode => sys.error("Non-element parent node found")
     }
   }
 

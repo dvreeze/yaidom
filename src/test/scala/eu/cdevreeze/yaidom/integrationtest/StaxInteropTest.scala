@@ -284,7 +284,7 @@ class StaxInteropTest extends Suite {
 
     // 5. Convert to NodeBuilder and back, and check again
 
-    val document3: Document = NodeBuilder.fromDocument(document2)(Scope.Empty).build()
+    val document3: Document = DocBuilder.fromDocument(document2).build()
     val root3: Elem = document3.documentElement
 
     expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
