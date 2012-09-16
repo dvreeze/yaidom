@@ -55,11 +55,6 @@ import scala.collection.{ immutable, mutable }
  */
 sealed trait Node extends Immutable
 
-trait ParentNode extends Node {
-
-  def children: immutable.IndexedSeq[Node]
-}
-
 /**
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
  * for XML trees and expanded names, where qualified names are absent.
@@ -69,7 +64,7 @@ trait ParentNode extends Node {
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends ParentNode with UpdatableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -200,7 +195,6 @@ final case class Elem(
           case e: Elem =>
             newChildren += e
             accumulate(childNodes.tail)
-          case parentNode: ParentNode => sys.error("Non-element parent node found")
         }
       }
     }
@@ -265,7 +259,6 @@ final case class Elem(
           case e: Elem =>
             newChildren += e
             accumulate(childNodes.tail)
-          case parentNode: ParentNode => sys.error("Non-element parent node found")
         }
       }
     }
