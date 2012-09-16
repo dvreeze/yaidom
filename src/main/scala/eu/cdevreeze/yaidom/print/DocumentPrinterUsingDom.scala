@@ -43,6 +43,29 @@ import convert.DomConversions._
  * A `DocumentPrinterUsingDom` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` and `TransformerFactory` are thread-safe, it can even be re-used from multiple threads.
  *
+ * ==Notes on HTML==
+ *
+ * In order to serialize a yaidom Document as HTML (which could have been parsed using the TagSoup library),
+ * a "transformer creator" can be coded as follows:
+ * {{{
+ * val trCreator = { (tf: TransformerFactory) =>
+ *   val t = tf.newTransformer
+ *   t.setOutputProperty(OutputKeys.METHOD, "html")
+ *   t
+ * }
+ * }}}
+ * This "transformer creator" is then passed as one of the arguments during `DocumentPrinter` construction.
+ *
+ * Using such a `DocumentPrinter` configured for "HTML serialization", the serialized HTML is hopefully better understood
+ * by browsers than would have been the case with a `DocumentPrinter` configured for "XML serialization".
+ * For example, script tags (with empty content) are typically not written as self-closing tags in the first case,
+ * whereas they are in the second case.
+ *
+ * If a `DocumentPrinter` is not explicitly configured for either "HTML or XML serialization", it may still be the case
+ * that HTML is serialized as HTML, depending on the TrAX implementation. Yet it is likely that in that case other elements
+ * than the document element would be serialized as XML instead of HTML. After all, (immutable) yaidom elements do not know about
+ * their ancestry.
+ *
  * @author Chris de Vreeze
  */
 final class DocumentPrinterUsingDom(
