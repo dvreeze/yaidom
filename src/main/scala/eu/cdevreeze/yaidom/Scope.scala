@@ -22,6 +22,7 @@ package eu.cdevreeze.yaidom
  * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.EName]]s.
  *
  * A `Scope` must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
+ * Moreover, a `Scope` must not contain the XML namespace (prefix "xml", namespace URI "http://www.w3.org/XML/1998/namespace").
  *
  * The Scope is backed by a map from prefixes (or the empty string for the default namespace) to (non-empty) namespace URIs.
  *
@@ -163,12 +164,22 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   require {
     (map - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
+  require(!map.keySet.contains("xml"), "A Scope must not contain the prefix 'xml'")
+  require(
+    map.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
+    "A Scope must not contain namespace URI 'http://www.w3.org/XML/1998/namespace'")
 
   /** Returns true if this Scope is empty. Faster than comparing this Scope against the empty Scope. */
   def isEmpty: Boolean = map.isEmpty
 
   /** Returns the default namespace, if any, wrapped in an Option */
   def defaultNamespaceOption: Option[String] = map.get(DefaultNsPrefix)
+
+  /** Returns an adapted copy of this Scope, but retaining only the default namespace, if any */
+  def retainingDefaultNamespace: Scope = {
+    val m = map filter { case (pref, ns) => pref == DefaultNsPrefix }
+    if (m.isEmpty) Scope.Empty else Scope(m)
+  }
 
   /** Returns an adapted copy of this Scope, but without the default namespace, if any */
   def withoutDefaultNamespace: Scope = if (defaultNamespaceOption.isEmpty) this else Scope(map - DefaultNsPrefix)
@@ -198,7 +209,16 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /** Returns true if this is a superscope of the given parameter `Scope`. A `Scope` is considered superscope of itself. */
   def superScopeOf(scope: Scope): Boolean = scope.subScopeOf(this)
 
-  /** Tries to resolve the given `QName` against this `Scope`, returning `None` otherwise */
+  /**
+   * Tries to resolve the given `QName` against this `Scope`, returning `None` otherwise.
+   *
+   * Note that the `subScopeOf` relation keeps the `resolveQName` result the same, provided there is no default namespace.
+   * That is, if `scope1.withoutDefaultNamespace.subScopeOf(scope2.withoutDefaultNamespace)`, then for each QName `qname`
+   * such that `scope1.withoutDefaultNamespace.resolveQName(qname).isDefined`, we have:
+   * {{{
+   * scope1.withoutDefaultNamespace.resolveQName(qname) == scope2.withoutDefaultNamespace.resolveQName(qname)
+   * }}}
+   */
   def resolveQName(qname: QName): Option[EName] = qname match {
     case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(EName(unprefixedName.localPart))
     case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
@@ -260,11 +280,49 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     result
   }
 
+  /**
+   * Returns `scope.retainingDefaultNamespace ++ this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)`
+   *
+   * Note that for each QName `qname` for which `scope.resolveQName(qname).isDefined`, we have:
+   * {{{
+   * scope.resolveQName(qname) == this.notUndeclaringPrefixes(scope).resolveQName(qname)
+   * }}}
+   *
+   * This property is handy when adding child elements to a parent `Elem`. By invoking this method for the child
+   * element, against the parent `Scope`, we can create `Elem` trees without any unnecessary undeclarations
+   * (which are implicit, of course, because `Elem`s contain Scopes, not Declarations).
+   */
+  def notUndeclaringPrefixes(scope: Scope): Scope = {
+    val onlyDefault = scope.retainingDefaultNamespace
+    val withoutDefault = this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)
+    val result = onlyDefault ++ withoutDefault
+
+    assert(scope.subScopeOf(result))
+    result
+  }
+
+  /** Returns `Scope(this.map ++ scope.map)` */
+  def ++(scope: Scope): Scope = Scope(this.map ++ scope.map)
+
+  /** Returns `Scope(this.map -- prefixes)` */
+  def --(prefixes: Set[String]): Scope = Scope(this.map -- prefixes)
+
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
     val prefixScopeString = (map - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
+  }
+
+  /**
+   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`
+   */
+  def notUndeclaring(scope: Scope): Scope = {
+    val decls = this.relativize(scope)
+    val result = this.resolve(decls.withoutUndeclarations)
+
+    assert(scope.subScopeOf(result))
+    result
   }
 }
 
@@ -273,7 +331,20 @@ object Scope {
   /** The "empty" `Scope` */
   val Empty = Scope(Map())
 
-  def from(m: (String, String)*): Scope = Scope(Map[String, String](m: _*))
+  /**
+   * Same as the constructor, but removing the 'xml' prefix, if any.
+   * Therefore this call is easier to use than the constructor or default `apply` method.
+   */
+  def from(m: Map[String, String]): Scope = {
+    if (m.contains("xml")) {
+      require(m("xml") == "http://www.w3.org/XML/1998/namespace",
+        "The 'xml' prefix must map to 'http://www.w3.org/XML/1998/namespace'")
+    }
+    Scope(m - "xml")
+  }
+
+  /** Returns `from(Map[String, String](m: _*))` */
+  def from(m: (String, String)*): Scope = from(Map[String, String](m: _*))
 
   val DefaultNsPrefix = ""
 }

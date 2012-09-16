@@ -485,7 +485,7 @@ class ElemLikeTest extends Suite {
       bookstore.findWithElemPath(ElemPath.Root)
     }
 
-    val scope = Scope(Map("b" -> ns.toString))
+    val scope = Scope.from(Map("b" -> ns.toString))
 
     expect(Some(QName("Last_Name"))) {
       val path = ElemPath.fromXPaths(List("/b:Book[1]", "/b:Authors[1]", "/b:Author[1]", "/b:Last_Name[1]"))(scope)

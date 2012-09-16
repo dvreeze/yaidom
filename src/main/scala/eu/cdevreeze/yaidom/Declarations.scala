@@ -39,6 +39,10 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
   require {
     (map - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
+  require(!map.keySet.contains("xml"), "A Declarations must not contain the prefix 'xml'")
+  require(
+    map.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
+    "A Declarations must not contain namespace URI 'http://www.w3.org/XML/1998/namespace'")
 
   /** Returns true if this Declarations is empty. Faster than comparing this Declarations against the empty Declarations. */
   def isEmpty: Boolean = map.isEmpty
@@ -109,7 +113,20 @@ object Declarations {
   /** The "empty" `Declarations` */
   val Empty = Declarations(Map())
 
-  def from(m: (String, String)*): Declarations = Declarations(Map[String, String](m: _*))
+  /**
+   * Same as the constructor, but removing the 'xml' prefix, if any.
+   * Therefore this call is easier to use than the constructor or default `apply` method.
+   */
+  def from(m: Map[String, String]): Declarations = {
+    if (m.contains("xml")) {
+      require(m("xml") == "http://www.w3.org/XML/1998/namespace",
+        "The 'xml' prefix must map to 'http://www.w3.org/XML/1998/namespace'")
+    }
+    Declarations(m - "xml")
+  }
+
+  /** Returns `from(Map[String, String](m: _*))` */
+  def from(m: (String, String)*): Declarations = from(Map[String, String](m: _*))
 
   /** Returns a `Declarations` that contains (only) undeclarations for the given prefixes */
   def undeclaring(prefixes: Set[String]): Declarations = {

@@ -394,7 +394,7 @@ object JDomWrapperTest {
         val result = wrappedNode.getNamespacesInScope.asScala.toIndexedSeq map { (ns: org.jdom2.Namespace) => (ns.getPrefix -> ns.getURI) }
         result.toMap
       }
-      Scope(m)
+      Scope.from(m)
     }
 
     /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
@@ -405,7 +405,7 @@ object JDomWrapperTest {
         val result = wrappedNode.getNamespacesIntroduced.asScala.toIndexedSeq map { (ns: org.jdom2.Namespace) => (ns.getPrefix -> ns.getURI) }
         result.toMap
       }
-      Declarations(m)
+      Declarations.from(m)
     }
 
     /** Returns the text children */

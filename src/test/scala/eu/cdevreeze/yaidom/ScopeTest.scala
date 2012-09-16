@@ -134,7 +134,7 @@ class ScopeTest extends Suite {
       scope2.resolve(Declarations.from("" -> "")).resolve(Declarations.from("a" -> ""))
     }
     expect(scope2) {
-      Scope(declarations2.withoutUndeclarations.map)
+      Scope.from(declarations2.withoutUndeclarations.map)
     }
     expect(scope2) {
       scope1.resolve(scope1.relativize(scope2))
@@ -165,7 +165,7 @@ class ScopeTest extends Suite {
       scope3.resolve(Declarations.from("b" -> "", "c" -> ""))
     }
     expect(scope3) {
-      Scope((scope2.map ++ declarations3.withoutUndeclarations.map) -- declarations3.retainingUndeclarations.map.keySet)
+      Scope.from((scope2.map ++ declarations3.withoutUndeclarations.map) -- declarations3.retainingUndeclarations.map.keySet)
     }
     expect(scope3) {
       scope2.resolve(scope2.relativize(scope3))
@@ -208,7 +208,7 @@ class ScopeTest extends Suite {
       scope4
     }
     expect(scope4) {
-      Scope((scope3.map ++ declarations4.withoutUndeclarations.map) -- declarations4.retainingUndeclarations.map.keySet)
+      Scope.from((scope3.map ++ declarations4.withoutUndeclarations.map) -- declarations4.retainingUndeclarations.map.keySet)
     }
     expect(scope4) {
       scope3.resolve(scope3.relativize(scope4))
@@ -247,6 +247,31 @@ class ScopeTest extends Suite {
     }
     expect(Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))) {
       scope2.resolveQName(QName("xml:lang"))
+    }
+  }
+
+  @Test def testResolveQNameNotUndeclaringNamespaces() {
+    val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
+    val scope2 = Scope.from("" -> "http://e", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
+
+    expect(Declarations.from("" -> "http://e", "a" -> "", "c" -> "http://ccc")) {
+      scope1.relativize(scope2)
+    }
+
+    expect(scope2 ++ Scope.from("a" -> "http://a")) {
+      scope1.notUndeclaringPrefixes(scope2)
+    }
+
+    val qnames = List(QName("x"), QName("b", "y"), QName("c", "z"), QName("d", "z"))
+
+    val expectedENames = List(EName("http://e", "x"), EName("http://b", "y"), EName("http://ccc", "z"), EName("http://d", "z"))
+
+    expect(expectedENames) {
+      qnames map { qname => scope2.resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+    }
+
+    expect(expectedENames) {
+      qnames map { qname => scope1.notUndeclaringPrefixes(scope2).resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
   }
 }

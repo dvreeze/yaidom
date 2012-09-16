@@ -249,7 +249,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
           result.toMap
         }
         val defaultNsMap: Map[String, String] = if (defaultNs.isEmpty) Map() else Map("" -> defaultNs.get)
-        Scope(defaultNsMap ++ prefScope)
+        Scope.from(defaultNsMap ++ prefScope)
       }
       val undeclaredOptionalPrefixes: Set[Option[String]] = {
         val defaultNs = {
@@ -270,7 +270,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       }
       val undeclaredMap: Map[String, String] =
         (undeclaredOptionalPrefixes map (prefOption => if (prefOption.isEmpty) "" -> "" else prefOption.get -> "")).toMap
-      Declarations(declaredScope.map ++ undeclaredMap)
+      Declarations.from(declaredScope.map ++ undeclaredMap)
     }
     val currScope = parentScope.resolve(declarations)
 

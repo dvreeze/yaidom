@@ -254,7 +254,7 @@ class EqualityTest extends Suite {
       resolvedRoot1 == resolvedRoot2
     }
 
-    val scope = Scope(Map("foobar" -> "urn:foo:bar"))
+    val scope = Scope.from(Map("foobar" -> "urn:foo:bar"))
 
     val path = ElemPathBuilder.from(QName("foobar:child") -> 0).build(scope)
 
@@ -328,7 +328,7 @@ class EqualityTest extends Suite {
 
     import NodeBuilder._
 
-    val scope = Scope(Map("" -> "urn:foo:bar"))
+    val scope = Scope.from(Map("" -> "urn:foo:bar"))
     val root2 =
       elem(
         qname = QName("root"),
@@ -371,7 +371,7 @@ class EqualityTest extends Suite {
 
     import NodeBuilder._
 
-    val scope = Scope(Map("" -> "urn:foo:bar"))
+    val scope = Scope.from(Map("" -> "urn:foo:bar"))
     val txt = "\u20AC 200"
     val root2 =
       elem(

@@ -134,7 +134,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
       }
       result.toMap
     }
-    Declarations(nsMap)
+    Declarations.from(nsMap)
   }
 
   /** Helper method that converts a `NodeList` to an `IndexedSeq[org.w3c.dom.Node]` */
