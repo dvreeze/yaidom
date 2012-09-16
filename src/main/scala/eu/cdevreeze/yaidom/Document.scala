@@ -24,9 +24,13 @@ import PrettyPrinting._
  * `Document`. Although at first sight the document root element seems to be the root node, this is not entirely true.
  * For example, there may be comments at top level, outside the document root element.
  *
- * The document is itself not a `Node`. Hence documents can not be children of element nodes, which would indeed be
- * incorrect. Moreover, the API is cleaner, because (unlike "elements") document methods like `toTreeRepr` should
- * not be passed a parent scope.
+ * The document is itself not a `Node`. This choice has the following advantages:
+ * <ul>
+ * <li>Documents are indeed prevented (at compile-time) from occurring as "child nodes"</li>
+ * <li>The API is cleaner. For example, (unlike "elements") document methods like `toTreeRepr` should
+ * not be passed a parent scope. By not considering a Document a Node, it is more visible that parent scopes
+ * are irrelevant for Documents, unlike for "elements".</li>
+ * </ul>
  *
  * @author Chris de Vreeze
  */

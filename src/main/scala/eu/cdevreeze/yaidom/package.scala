@@ -146,10 +146,12 @@ package eu.cdevreeze
  * turn small abstract APIs into rich APIs with implementations, and are mixed in by "element" classes.</li>
  * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
  * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned traits `UpdatableElemLike` and `HasText`).</li>
+ * <li>Class [[eu.cdevreeze.yaidom.Document]] (a Document is not considered a Node itself by yaidom).</li>
  * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
  * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s
  * (whereas the `Node`s that they create all must have a fixed `Scope`), so node builders are indeed intended to be handy for creation
  * of node trees. At the same level are [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
+ * <li>Class [[eu.cdevreeze.yaidom.DocBuilder]] (a DocBuilder is not considered a NodeBuilder itself by yaidom).</li>
  * </ol>
  * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
  * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.

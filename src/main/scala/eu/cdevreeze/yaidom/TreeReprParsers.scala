@@ -21,7 +21,8 @@ import scala.util.parsing.combinator._
 import org.apache.commons.lang3.StringEscapeUtils
 
 /**
- * Generator for parsers of "tree representation" expressions. The results from successful parses are `NodeBuilder` instances.
+ * Generator for parsers of "tree representation" expressions. The results from successful parses are `NodeBuilder` and
+ * `DocBuilder` instances.
  *
  * The "tree representation" expressions are themselves valid Scala code!
  *

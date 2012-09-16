@@ -22,6 +22,9 @@ import PrettyPrinting._
 
 /**
  * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
+ * A `DocBuilder` is itself not a `NodeBuilder`.
+ *
+ * @author Chris de Vreeze
  */
 @SerialVersionUID(1L)
 final class DocBuilder(
