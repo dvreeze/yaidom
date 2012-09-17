@@ -761,7 +761,8 @@ class DomInteropTest extends Suite {
       }
       val text = "This text contains an entity reference, viz. hi"
       expect(text) {
-        childOption.get.trimmedText.take(text.length)
+        val txt = childOption.get.trimmedText
+        txt.take(text.length)
       }
     }
 

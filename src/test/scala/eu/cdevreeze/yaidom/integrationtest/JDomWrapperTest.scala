@@ -324,6 +324,357 @@ class JDomWrapperTest extends Suite {
 
     checkFieldPattern(root)
   }
+
+  @Test def testParseXmlWithExpandedEntityRef() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    val ns = "urn:foo:bar"
+
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildText(rootElm: JDomElem): Unit = {
+      val childOption = rootElm.findElem(EName(ns, "child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      expect(1) {
+        childOption.get.textChildren.size
+      }
+      val text = "This text contains an entity reference, viz. hi"
+      expect(text) {
+        val txt = childOption.get.trimmedText
+        txt.take(text.length)
+      }
+    }
+
+    checkChildText(root)
+  }
+
+  @Test def testParseXmlWithNonExpandedEntityRef() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    dbf.setExpandEntityReferences(false)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    val ns = "urn:foo:bar"
+
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def checkChildTextAndEntityRef(rootElm: JDomElem): Unit = {
+      val childOption = rootElm.findElem(EName(ns, "child"))
+      expect(true) {
+        childOption.isDefined
+      }
+      expect(2) {
+        childOption.get.textChildren.size
+      }
+      expect(1) {
+        val result = childOption.get.children collect { case er: JDomEntityRef => er }
+        result.size
+      }
+      expect("hello") {
+        val entityRefs = childOption.get.children collect { case er: JDomEntityRef => er }
+        val entityRef: JDomEntityRef = entityRefs.head
+        entityRef.wrappedNode.getName
+      }
+      val s = "This text contains an entity reference, viz."
+      expect(s) {
+        childOption.get.trimmedText.take(s.length)
+      }
+    }
+
+    checkChildTextAndEntityRef(root)
+  }
+
+  @Test def testParseXmlWithNamespaceUndeclarations() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    val ns = "urn:foo:bar"
+
+    expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+  }
+
+  @Test def testParseXmlWithEscapedChars() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    dbf.setCoalescing(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    val ns = "urn:foo:bar"
+
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def doChecks(rootElm: JDomElem): Unit = {
+      val childElms = rootElm.findTopmostElems(EName(ns, "child"))
+      expect(2) {
+        childElms.size
+      }
+
+      val text = "Jansen & co"
+
+      // Remember: we set the parser to coalescing!
+      expect(Set(text)) {
+        val result = childElms map { e => e.trimmedText }
+        result.toSet
+      }
+
+      expect(Set(text)) {
+        val result = childElms map { e => e.attributeOption(EName("about")).getOrElse("Missing text") }
+        result.toSet
+      }
+
+      expect(Set(text)) {
+        val result = rootElm.commentChildren map { c => c.text.trim }
+        result.toSet
+      }
+    }
+
+    doChecks(root)
+  }
+
+  @Test def testParseXmlWithSpecialChars() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    val ns = "urn:foo:bar"
+
+    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    def doChecks(rootElm: JDomElem): Unit = {
+      val childElms = rootElm.findTopmostElems(EName(ns, "child"))
+      expect(2) {
+        childElms.size
+      }
+
+      val text = "\u20AC 200"
+
+      expect(Set(text)) {
+        val result = childElms map { e => e.trimmedText }
+        result.toSet
+      }
+    }
+
+    doChecks(root)
+  }
+
+  @Test def testParseGeneratedHtml() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("books.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    require(root.localName == "Bookstore")
+
+    val htmlFormatString =
+      """|<html>
+         |  <body>
+         |    <h1>Bookstore</h1>
+         |    <table>
+         |      <tr>
+         |        <th>Title</th>
+         |        <th>ISBN</th>
+         |        <th>Edition</th>
+         |        <th>Authors</th>
+         |        <th>Price</th>
+         |      </tr>
+         |%s
+         |    </table>
+         |  </body>
+         |</html>""".stripMargin
+
+    val bookFormatString =
+      """|      <tr>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |        <td>%s</td>
+         |      </tr>""".stripMargin
+
+    def bookHtmlString(bookElm: JDomElem): String = {
+      val authorNames: immutable.IndexedSeq[String] =
+        bookElm.filterElems(EName("{http://bookstore}Author")) map { e =>
+          "%s %s".format(
+            e.getChildElem(EName("{http://bookstore}First_Name")).trimmedText,
+            e.getChildElem(EName("{http://bookstore}Last_Name")).trimmedText)
+        }
+
+      val authors = authorNames.mkString(", ")
+
+      val result = bookFormatString.format(
+        bookElm.getChildElem(EName("{http://bookstore}Title")).trimmedText,
+        bookElm.attributeOption(EName("ISBN")).getOrElse(""),
+        bookElm.attributeOption(EName("Edition")).getOrElse(""),
+        authors,
+        bookElm.attributeOption(EName("Price")).getOrElse(""))
+      result
+    }
+
+    val booksHtmlString = root.filterElems(EName("{http://bookstore}Book")) map { e => bookHtmlString(e) } mkString ("\n")
+    val htmlString = htmlFormatString.format(booksHtmlString)
+
+    val domBuilder2 = new org.jdom2.input.DOMBuilder
+    val doc2 = domBuilder2.build(
+      dbf.newDocumentBuilder.parse(
+        new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))))
+    val domDoc2: JDomDocument = JDomNode.wrapDocument(doc2)
+
+    val htmlRoot: JDomElem = domDoc2.documentElement
+
+    val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
+
+    expect(4) {
+      tableRowElms.size
+    }
+
+    val isbnElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(1).headOption }
+    val isbns = isbnElms map { e => e.trimmedText }
+
+    expect(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
+      isbns.toSet
+    }
+
+    val authorsElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(3).headOption }
+    val authors = authorsElms map { e => e.trimmedText }
+
+    expect(Set(
+      "Jeffrey Ullman, Jennifer Widom",
+      "Hector Garcia-Molina, Jeffrey Ullman, Jennifer Widom",
+      "Jeffrey Ullman, Hector Garcia-Molina",
+      "Jennifer Widom")) {
+      authors.toSet
+    }
+  }
+
+  /**
+   * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
+   * The Scala counterpart is more type-safe.
+   */
+  @Test def testParseGroovyXmlExample() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("cars.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    expect("records") {
+      domDoc.documentElement.localName
+    }
+
+    val recordsElm = domDoc.documentElement
+
+    expect(3) {
+      (recordsElm \ "car").size
+    }
+
+    expect(10) {
+      recordsElm.findAllElemsOrSelf.size
+    }
+
+    val firstRecordElm = (recordsElm \ "car")(0)
+
+    expect("car") {
+      firstRecordElm.localName
+    }
+
+    expect("Holden") {
+      firstRecordElm.attribute(EName("make"))
+    }
+
+    expect("Australia") {
+      firstRecordElm.getChildElem(_.localName == "country").trimmedText
+    }
+
+    expect(2) {
+      val carElms = recordsElm \ "car"
+      val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
+      result.size
+    }
+
+    expect(Set("Holden", "Peel")) {
+      val carElms = recordsElm \ "car"
+      val pattern = ".*s.*a.*".r.pattern
+
+      val resultElms = carElms filter { e =>
+        val s = e.getChildElem(_.localName == "country").trimmedText
+        pattern.matcher(s).matches
+      }
+
+      (resultElms map (e => e.attribute(EName("make")))).toSet
+    }
+
+    expect(Set("speed", "size", "price")) {
+      val result = recordsElm collectFromElemsOrSelf { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
+      result.toSet
+    }
+  }
+
+  class LoggingEntityResolver extends EntityResolver {
+    override def resolveEntity(publicId: String, systemId: String): InputSource = {
+      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      // Default behaviour
+      null
+    }
+  }
 }
 
 object JDomWrapperTest {
