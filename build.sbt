@@ -1,10 +1,13 @@
 
 // Keep in sync with the Maven pom.xml file!
-// Note that the sbt build is nice for day-to-day work, and the Maven build is nice for deployments.
+// (I am not yet this far: https://github.com/sbt/sbt.github.com/blob/gen-master/src/jekyll/using_sonatype.md)
+// Note that the sbt build is nice for day-to-day work, and the Maven build must currently be used for publishing artifacts.
 // The sbt build uses the target directory in a different way than the Maven build, so, when switching
 // between sbt and Maven, first do a clean (emptying the target directory).
 
 name := "yaidom"
+
+organization := "eu.cdevreeze.yaidom"
 
 version := "0.6.2-SNAPSHOT"
 
