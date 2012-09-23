@@ -29,7 +29,7 @@ libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
 libraryDependencies <+= scalaBinaryVersion { version =>
   if (version.contains("2.10"))
-    "org.scalatest" % "scalatest_2.10.0-M7" % "2.0.M4-2.10.0-M7-B1" % "test"
+    "org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test"
   else
     "org.scalatest" %% "scalatest" % "1.8" % "test"
 }
