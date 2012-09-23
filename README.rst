@@ -64,3 +64,22 @@ Yaidom quite intentionally leaves the hard parts of parsing and printing to Java
 "ignorable whitespace", or the many ways to configure a parser. Yaidom merely represents the parsed XML as immutable
 Scala-ish node trees.
 
+Usage
+=====
+
+Yaidom versions can be found in the Maven central repository. Assuming version 0.6.2, yaidom can be added as dependency
+as follows (in an SBT or Maven build):
+
+**SBT**::
+
+    val yaidom = "eu.cdevreeze.yaidom" %% "yaidom" % "0.6.2"
+
+**Maven2**::
+
+    <dependency>
+      <groupId>eu.cdevreeze.yaidom</groupId>
+      <artifactId>yaidom_2.9.1</artifactId>
+      <version>0.6.2</version>
+    </dependency>
+
+Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.
