@@ -49,7 +49,7 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
     QName(prefixOption, localPart)
   }
 
-  /** Given an optional prefix, creates a [[javax.xml.namespace.QName]] from this EName */
+  /** Given an optional prefix, creates a `javax.xml.namespace.QName` from this EName */
   def toJavaQName(prefixOption: Option[String]): JQName = {
     require(namespaceUriOption.isDefined || prefixOption.isEmpty)
     new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
@@ -67,14 +67,14 @@ object EName {
   /** Shorthand for `parse(s)` */
   def apply(s: String): EName = parse(s)
 
-  /** Creates an `EName` from a [[javax.xml.namespace.QName]] */
+  /** Creates an `EName` from a `javax.xml.namespace.QName` */
   def fromJavaQName(jqname: JQName): EName = jqname match {
     case jqname: JQName if (jqname.getNamespaceURI eq null) || (jqname.getNamespaceURI == XMLConstants.NULL_NS_URI) =>
       EName(None, jqname.getLocalPart)
     case _ => EName(Some(jqname.getNamespaceURI), jqname.getLocalPart)
   }
 
-  /** Gets an optional prefix from a [[javax.xml.namespace.QName]] */
+  /** Gets an optional prefix from a `javax.xml.namespace.QName` */
   def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
     val prefix: String = jqname.getPrefix
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)

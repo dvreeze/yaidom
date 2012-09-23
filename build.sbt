@@ -13,9 +13,13 @@ version := "0.6.2-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
-crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.9.0")
+crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.9.0", "2.10.0-M7")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
+
+scalacOptions <++= scalaBinaryVersion map { version =>
+  if (version.contains("2.10")) Seq("-feature") else Seq()
+}
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
@@ -23,10 +27,15 @@ libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.1"
 
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
+libraryDependencies <+= scalaBinaryVersion { version =>
+  if (version.contains("2.10"))
+    "org.scalatest" % "scalatest_2.10.0-M7" % "2.0.M4-2.10.0-M7-B1" % "test"
+  else
+    "org.scalatest" %% "scalatest" % "1.8" % "test"
+}
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
 libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
-libraryDependencies += "xom" % "xom" % "1.2.5" % "test" intransitive()
+libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()

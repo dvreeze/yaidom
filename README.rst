@@ -72,7 +72,7 @@ as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    val yaidom = "eu.cdevreeze.yaidom" %% "yaidom" % "0.6.2"
+    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "0.6.2"
 
 **Maven2**::
 
