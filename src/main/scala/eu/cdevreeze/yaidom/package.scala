@@ -81,44 +81,47 @@ package eu.cdevreeze
  *
  * ==Different element types in yaidom==
  *
- * Yaidom considers XML to be trees of nodes, rather than text strings obeying "XML rules". Think InfoSet, and DOM, rather than
- * the XML spec. By considering XML to be node trees, roundtripping (from XML string to DOM-like tree, and back) cannot be lossless.
- * Again, if lossless roundtripping is important (like is the case for XML editors), yaidom (like DOM) may not be a good fit.
+ * Yaidom considers XML to be trees of nodes, rather than text strings obeying "XML rules". Think InfoSet and DOM, rather than
+ * the XML spec. By considering XML to be node trees, round-tripping (from XML string to DOM-like tree, and back) cannot be lossless.
+ * Again, if lossless round-tripping is important (like is the case for XML editors), yaidom (like DOM) may not be a good fit.
  *
- * Yet yaidom has no single type of (DOM-like) element. First of all, yaidom distinguishes between:
+ * Yet yaidom has more than just one type of (DOM-like) element. First of all, yaidom distinguishes between:
  * <ul>
- * <li>A <em>uniform querying API</em>, as traits [[eu.cdevreeze.yaidom.ParentElemLike]] and sub-traits.
+ * <li>A <em>uniform querying API</em> for DOM-like elements, as traits [[eu.cdevreeze.yaidom.ParentElemLike]] and sub-traits.
  * These <em>partially abstract</em> traits are mixed in by concrete element classes, but can also be mixed in by
  * different element classes not offered by yaidom. In other words, these traits make yaidom <em>extensible</em>,
- * as well as <em>uniform</em> (as querying API).</li>
- * <li><em>Concrete</em> element classes, like [[eu.cdevreeze.yaidom.Elem]], mixing in these traits.</li>
+ * as well as <em>uniform</em> (as querying API). These traits implement a <em>rich</em> querying API in terms of only a few
+ * abstract methods.</li>
+ * <li><em>Concrete</em> element classes, like [[eu.cdevreeze.yaidom.Elem]], mixing in these traits. By implementing only
+ * a few abstract methods required by the mixed-in traits, these concrete element classes get a rich element querying API
+ * almost for free.</li>
  * </ul>
  *
  * Concrete element classes in yaidom that mix in trait [[eu.cdevreeze.yaidom.ParentElemLike]] (or sub-traits) are:
  * <ul>
  * <li>The "default" yaidom element type: [[eu.cdevreeze.yaidom.Elem]]. These elements are immutable and thread-safe.
  * They do not know about their parents, and do not keep namespace declarations, but they do know about in-scope namespaces.</li>
- * <li>Element builder [[eu.cdevreeze.yaidom.ElemBuilder]]. They are also immutable and thread-safe, but are builders of the above-mentioned
+ * <li>The element builder type: [[eu.cdevreeze.yaidom.ElemBuilder]]. These objects are also immutable and thread-safe, but are builders of the above-mentioned
  * elements. Whereas `Elem`s know about in-scope namespaces but not about (own) namespace declarations, `ElemBuilder`s know
  * about (own) namespace declarations but not about in-scope namespaces.</li>
- * <li>"Stripped" elements: [[eu.cdevreeze.yaidom.resolved.Elem]]. These elements do not know about namespace prefixes,
+ * <li>The "stripped" element type: [[eu.cdevreeze.yaidom.resolved.Elem]]. These elements do not know about namespace prefixes,
  * but hold ("resolved") namespace URIs instead, and are therefore easy to compare for some (sensible) notion of equality.</li>
- * <li>Wrappers around DOM nodes: [[eu.cdevreeze.yaidom.dom.DomElem]]. They are `ParentElemLike` "views" backed by
+ * <li>The wrapper type around DOM nodes: [[eu.cdevreeze.yaidom.dom.DomElem]]. They are `ParentElemLike` "views" backed by
  * `org.w3c.dom.Element` elements. These views are mutable and "volatile", so far less safe to use than the immutable
  * elements mentioned above.</li>
  * </ul>
  *
  * Often these different element types can be used well together. For example:
  * <ul>
- * <li>The "default" element type is useful for querying XML trees (without having to worry about thread-safety)</li>
+ * <li>The "default" element type is useful for querying XML trees (without having to worry about mutable state and thread-safety)</li>
  * <li>The "element builders" are useful for constructing (parts of) such element trees</li>
  * <li>The "DOM wrappers" may be handy for in-place updates</li>
  * <li>The "resolved" elements may be handy for equality comparisons and pattern matching on (parts of) XML trees</li>
  * </ul>
  *
- * Other element types mixing in trait [[eu.cdevreeze.yaidom.ParentElemLike]] (or subtraits) could be the equivalent
- * of the "DOM node wrappers" for JDOM, XOM, etc. Yaidom does not offer these wrappers, but some test cases show that
- * such wrappers are easy to develop.
+ * In the spirit of the "DOM node wrappers", one could easily come up with similar wrappers around JDOM, XOM, etc.,
+ * mixing in trait [[eu.cdevreeze.yaidom.ParentElemLike]] (or subtraits). Yaidom does not offer these wrappers, but some
+ * test cases show that such wrappers are easy to develop.
  *
  * ==Examples==
  *

@@ -33,7 +33,7 @@ package eu.cdevreeze.yaidom
  * this wrapper API. Mutable DOM trees are also very easy to break, even via the `ParentElemLike` API, if element predicates with
  * side-effects are used.
  *
- * To explain the "roundtripping" item above, note that class [[eu.cdevreeze.yaidom.Elem]] considers attributes in an element unordered,
+ * To explain the "round-tripping" item above, note that class [[eu.cdevreeze.yaidom.Elem]] considers attributes in an element unordered,
  * let alone namespace declarations. That is consistent with the XML InfoSet specification, but can sometimes be impractical.
  * Using `org.w3c.dom.Element` instances, parsed from XML input sources, chances are that this order is retained.
  *
@@ -42,8 +42,8 @@ package eu.cdevreeze.yaidom
  * used the long or short form for an empty element.
  *
  * It should also be noted that the configuration of XML parsers and serializers can be of substantial influence on the extent that
- * "roundtripping" keeps the XML string the same. Whitespace handling is one such area in which different configurations can lead
- * to quite different "roundtripping" results.
+ * "round-tripping" keeps the XML string the same. Whitespace handling is one such area in which different configurations can lead
+ * to quite different "round-tripping" results.
  *
  * Note that in one way these wrappers are somewhat unnatural: the `ElemLike` API uses immutable Scala collections everywhere,
  * whereas the elements of those collections are mutable (!) DOM node wrappers. The wrappers are idiomatic Scala in their use of
