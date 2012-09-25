@@ -17,7 +17,8 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace.
+ * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace. In other words, <em>in-scope
+ * namespaces</em>.
  *
  * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.EName]]s.
  *

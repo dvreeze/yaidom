@@ -113,20 +113,31 @@ Yaidom clearly distinguishes between the 2 kinds of names. It is always clear in
 Just like qualified names, expanded names are first-class citizens in yaidom, so one could do very precise namespace-aware
 querying in yaidom, without caring about the prefixes used in the XML document.
 
-Another important distinction, at least in my opinion, is that between namespace (un)declarations and scopes. The latter
-map prefixes (or the empty string, for the default namespace) to namespace URIs.
+Another important distinction, at least in my opinion, is that between namespace (un)declarations and scopes (or: in-scope namespaces).
+The latter map prefixes (or the empty string, for the default namespace) to namespace URIs.
 
-This distinction comes in handy when building a node tree from scratch, as explained below. To construct a node tree, a scope must
-be given to each element. Typically it is one and the same scope that is passed to each element in the tree, which corresponds to an
-XML tree where only the root element introduces namespaces. Yet it is somewhat clumsy and error-prone to have to give each element
-in the tree a scope. See also the following `Anti-XML issue`_.
+This distinction is needed, because in yaidom immutable ("functional") Elems hold the scope (in-scope namespaces), but not
+any namespace declarations, whereas ElemBuilders hold namespace declarations but no scopes. Again, immutable Elems must
+on the one hand contain enough data in order to resolve qualified names, and on the other hand be useful building blocks
+for larger Elem trees. Hence they know about in-scope namespaces (which they need to resolve qualified names), but not about
+(own) namespace declarations. Being "functional", they also do not know about parent elements. This is all very different from
+the mutable elements found in other XML libraries.
 
-Yaidom insists that each element node is valid in that its scope binds all qualified names (of the element, and of the attributes),
-if applicable. Fortunately, the distinction between namespace (un)declarations and scopes comes in handy. If we do not want to pass scopes
-around when creating a node tree, yaidom offers an alternative. Yaidom not only has nodes, but also `NodeBuilders`. The latter
-have no scope, but do have namespace (un)declarations. When using NodeBuilders one should still remember which prefixes are used
-(and need to be resolved later), but at least "scope passing" can be postponed until the moment the root Node is built from the
-NodeBuilder tree.
+For Elem construction, it is not handy to pass the same Scope again and again while building the Elem tree. That is where
+ElemBuilders come in: they keep namespace declarations but do not know any Scopes, so cannot resolve any qualified names.
+That's just fine, because ElemBuilders are only builders of Elems. In other words, ElemBuilders postpone "scope passing"
+until the last moment. Note that very often ElemBuilders are not even needed, if Elems are produced by parsing XML (using
+one of yaidom's DocumentParsers).
+
+In a complete Elem tree, we do know where the namespace declarations are, because we can "relativize" each Elem Scope against
+the Scope of its parent, which produces namespace declarations. It turns out that Scopes and Declarations obey some interesting
+properties, and that we can "calculate" with them. The latter helped a lot in keeping many classes in yaidom smaller and
+simpler than otherwise would have been the case.
+
+In the context of Anti-XML, see the following `Anti-XML issue`_. Yaidom's handling of namespaces and prefixes may not be
+ideal (we still must keep "namespace context" around somehow), but yaidom clearly models the distinction between qualified names
+and expanded names, and between namespace declarations and in-scope namespaces (and between ElemBuilders and Elems). The
+model cannot get rid of all namespace clumsiness, but at least the model is clear and practical.
 
 .. _`XML Namespaces`: http://www.w3.org/TR/REC-xml-names/
 .. _`Anti-XML issue`: https://github.com/djspiewak/anti-xml/issues/78
@@ -178,8 +189,7 @@ and to a lesser extent for performance, the trait is a lot richer than that.
 Personally I like this element-centric approach in the core yaidom querying API a lot. The power-to-weight ratio is excellent.
 Of course querying for specific text nodes is somewhat more involved, but not that much more involved. (Trait ``ElemLike`` does not
 know about text nodes, but class ``Elem`` into which the trait is mixed in does know about them.) Using immutable element trees and
-eager evaluation, parent elements can not be queried for, but there are other means in yaidom to obtain element ancestors (after
-"indexing" the tree).
+eager evaluation, parent elements can not be queried for, but there are other means in yaidom to obtain element ancestors.
 
 Leveraging Scala's Collections API, a trait like ``ElemLike`` as general element query API (used as mixin in multiple element classes)
 was really a low hanging fruit.
@@ -202,7 +212,9 @@ No correctness at all costs
 ===========================
 
 Yaidom does not try to achieve "correctness" at all costs. What is correctness anyway, if some parts of XML technology do not go
-well with other ones? Case in point: DTDs and namespaces.
+well with other ones? Case in point: DTDs and namespaces. Other case in point: different XML specs with different angles on what
+is XML. The XML spec takes more of an "XML-as-text-obeying-XML-rules" approach, whereas the InfoSet spec takes more of an
+"XML-as-node-tree" approach (like DOM).
 
 Hence yaidom makes some pragmatics choices, such as:
 
