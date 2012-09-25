@@ -213,7 +213,7 @@ No correctness at all costs
 
 Yaidom does not try to achieve "correctness" at all costs. What is correctness anyway, if some parts of XML technology do not go
 well with other ones? Case in point: DTDs and namespaces. Other case in point: different XML specs with different angles on what
-is XML. The XML spec takes more of an "XML-as-text-obeying-XML-rules" approach, whereas the InfoSet spec takes more of an
+XML "is". The XML spec takes more of an "XML-as-text-obeying-XML-rules" approach, whereas the InfoSet spec takes more of an
 "XML-as-node-tree" approach (like DOM).
 
 Hence yaidom makes some pragmatics choices, such as:
