@@ -146,7 +146,7 @@ These properties indeed help in keeping a lot of yaidom implementation code simp
 
 Summarized, yaidom cannot take away the clumsiness of passing the same scope repeatedly when creating deeply nested immutable elements,
 but at least it can offer well-defined concepts (such as qualified names, expanded names, declarations, scopes, immutable
-elements, immutable element builders) that can be used together in a practical way, thus taking away a lot of .
+elements, immutable element builders) that can be used together in a practical way.
 
 .. _`XML Namespaces`: http://www.w3.org/TR/REC-xml-names/
 .. _`Anti-XML issue`: https://github.com/djspiewak/anti-xml/issues/78
