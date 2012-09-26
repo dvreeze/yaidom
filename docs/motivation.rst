@@ -114,9 +114,12 @@ Just like qualified names, expanded names are first-class citizens in yaidom, so
 querying in yaidom, without caring about the prefixes used in the XML document.
 
 Another important distinction, at least in my opinion, is that between namespace (un)declarations and scopes (or: in-scope namespaces).
-The latter map prefixes (or the empty string, for the default namespace) to namespace URIs.
+The latter map prefixes (or the empty string, for the default namespace) to namespace URIs. In-scope namespaces of an element are the
+"accumulation" of the namespace declarations in the ancestry of that element. The distinction between namespace (un)declarations
+and in-scope namespaces is needed, because the former actually exists in XML documents, whereas the latter is needed for the
+resolution of qualified names as expanded names.
 
-This distinction is needed, because in yaidom immutable ("functional") Elems hold the scope (in-scope namespaces), but not
+This distinction is prominent in yaidom, because immutable ("functional") Elems hold the scope (in-scope namespaces), but not
 any namespace declarations, whereas ElemBuilders hold namespace declarations but no scopes. Again, immutable Elems must
 on the one hand contain enough data in order to resolve qualified names, and on the other hand be useful building blocks
 for larger Elem trees. Hence they know about in-scope namespaces (which they need to resolve qualified names), but not about
