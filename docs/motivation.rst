@@ -130,20 +130,20 @@ of a scope compared with a (parent element) scope is a "declarations", which ind
 (of the element within an element tree, once the element tree is ready). These properties indeed help in keeping a lot of yaidom
 implementation code simpler than otherwise would have been the case.
 
-Yaidom makes yet another distinction, between immutable ("functional") elements and immutable element builders:
+Yaidom makes yet another distinction, between immutable elements and immutable element builders:
 
-* Being "functional", elements do not know about parents, ancestors, and namespace (un)declarations on ancestors
+* Being immutable, elements do not know about parents, ancestors, and namespace (un)declarations on ancestors
 * Elements must contain enough context for resolving own (un)qualified names, and they must also be building blocks for larger elements, so they contain scopes but not any (un)declarations
 * Element builders must be easy to use when constructing (nested) element from scratch, without passing scopes around, thus postponing "scope determination"
-* Hence the "functional" elements know about scopes, but not about (un)declarations, and for element builders it is the other way around
+* Hence the immutable elements know about scopes, but not about (un)declarations, and for element builders it is the other way around
 * Once an element tree is complete, we can calculate the (un)declarations on each element within the tree, by taking the "delta" of the element scope against the parent element scope
 
-Again, there is a place for both concepts: functional elements and element builders. Yaidom clearly makes this distinction.
-The reason that this distinction is more prominent in yaidom than in many other XML libraries is that yaidom offers "functional"
+Again, there is a place for both concepts: immutable elements and element builders. Yaidom clearly makes this distinction.
+The reason that this distinction is made in yaidom (unlike in many other XML libraries) is that yaidom offers immutable
 element trees, whereas most other XML DOM(-like) APIs offer mutable elements that know about ancestor nodes (and their namespace
 (un)declarations).
 
-See also the following `Anti-XML issue`_, about the impedance mismatch between XML's scoping semantics (top-down) and functional
+See also the following `Anti-XML issue`_, about the impedance mismatch between XML's scoping semantics (top-down) and immutable
 trees (bottom-up). Yaidom tries to tackle this mismatch with clearly defined concepts.
 
 Summarized, yaidom cannot take away this impedance mismatch when creating deeply nested immutable elements, but at least it can
