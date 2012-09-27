@@ -103,7 +103,8 @@ distinction:
 * Qualified names are easy to use, but have no meaning without any context that binds the prefixes (if any)
 * Expanded names have meaning on their own, but are not as easy to use as qualified names
 
-Qualified names are resolved as expanded names by binding prefixes to namespace URIs.
+Qualified names are resolved as expanded names by binding prefixes to namespace URIs. (For that, we need a namespace scope. See
+below.)
 
 Unfortunately, the distinction between qualified and expanded names is not clear in most XML APIs. Very often, only
 qualified names are defined, and often (like in JAXP) a qualified name in the API is really an expanded name, but also to some
@@ -115,38 +116,38 @@ querying in yaidom, without caring about the prefixes used in the XML document.
 
 Another important distinction is that between namespace (un)declarations and scopes (or: in-scope namespaces):
 
-* Both map prefixes (or the empty string for the default namespace) to namespace URIs
+* Both map prefixes (or the empty string for the default namespace) to namespace URIs (or, in the case of undeclarations, to the empty string)
 * Namespace (un)declarations occur on elements, whereas in-scope namespaces are the "accumulated effect" of the namespace (un)declarations of the element's ancestry (or self) 
-* Namespace (un)declarations are visible in the XML document, whereas namespace scopes are not
+* Namespace (un)declarations are explicitly visible in the XML document, whereas namespace scopes are implicit
 * Namespace scopes are enough context for resolving a (un)qualified name as a resolved name, whereas (un)declarations are not
 * Both namespace (un)declarations and in-scope namespaces are part of XML terminology (and the JDOM2 API, for that matter)
 
 In short, both concepts are needed: (un)declarations because they are visible in XML documents, and in-scope namespaces because
 they are needed for resolving qualified names as resolved names. Yaidom indeed makes this distinction clear.
 
-Yaidom makes yet another distinction, between immutable ("functional") "elements" and immutable "element builders":
+In yaidom there are some interesting properties concerning namespace (un)declarations and scopes. For example, the "delta"
+of a scope compared with a (parent element) scope is a "declarations", which indeed are the (un)declarations of the element itself
+(of the element within an element tree, once the element tree is ready). These properties indeed help in keeping a lot of yaidom
+implementation code simpler than otherwise would have been the case.
+
+Yaidom makes yet another distinction, between immutable ("functional") elements and immutable element builders:
 
 * Being "functional", elements do not know about parents, ancestors, and namespace (un)declarations on ancestors
-* Yet the "net namespace scope" does make sense for such elements, instead of namespace (un)declarations
-* So the functional elements know about scopes, but not about (un)declarations, and for element builders it is the other way around
-* Element builders then are easier to use when creating an element tree from scratch, whereas only elements have the needed context to resolve QNames as ENames
-* Yet the elements are indeed fully "functional" and building blocks for larger element trees
-* Element builders postpone "scope determination"
+* Elements must contain enough context for resolving own (un)qualified names, and they must also be building blocks for larger elements, so they contain scopes but not any (un)declarations
+* Element builders must be easy to use when constructing (nested) element from scratch, without passing scopes around, thus postponing "scope determination"
+* Hence the "functional" elements know about scopes, but not about (un)declarations, and for element builders it is the other way around
+* Once an element tree is complete, we can calculate the (un)declarations on each element within the tree, by taking the "delta" of the element scope against the parent element scope
 
-Again, there is a place for both concepts: functional elements and element builders. Yaidom does clearly make this distinction.
+Again, there is a place for both concepts: functional elements and element builders. Yaidom clearly makes this distinction.
 The reason that this distinction is more prominent in yaidom than in many other XML libraries is that yaidom offers "functional"
-element trees, whereas most other XML DOM(-like) APIs offer mutable elements that do know about ancestor nodes.
+element trees, whereas most other XML DOM(-like) APIs offer mutable elements that know about ancestor nodes (and their namespace
+(un)declarations).
 
-See also the following `Anti-XML issue`_, about the impedance mismatch between XML's coping semantics (top-down) and functional
+See also the following `Anti-XML issue`_, about the impedance mismatch between XML's scoping semantics (top-down) and functional
 trees (bottom-up). Yaidom tries to tackle this mismatch with clearly defined concepts.
 
-In yaidom, there are some interesting properties about namespace (un)declarations and scopes. For example, the "difference"
-between a scope and a (parent element) scope is a "declarations", which indeed are the (un)declarations of the element itself.
-These properties indeed help in keeping a lot of yaidom implementation code simpler than otherwise would have been the case.
-
-Summarized, yaidom cannot take away the clumsiness of passing the same scope repeatedly when creating deeply nested immutable elements,
-but at least it can offer well-defined concepts (such as qualified names, expanded names, declarations, scopes, immutable
-elements, immutable element builders) that can be used together in a practical way.
+Summarized, yaidom cannot take away this impedance mismatch when creating deeply nested immutable elements, but at least it can
+offer elements and element builders that can be used together in a practical way, thus alleviating the "namespace scoping pain".
 
 .. _`XML Namespaces`: http://www.w3.org/TR/REC-xml-names/
 .. _`Anti-XML issue`: https://github.com/djspiewak/anti-xml/issues/78
