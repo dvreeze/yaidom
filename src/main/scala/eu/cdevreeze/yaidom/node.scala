@@ -111,9 +111,11 @@ sealed trait Node extends Immutable with Serializable {
  * No notion of (value) equality has been defined. When thinking about it, it is very hard to come up with any useful
  * notion of equality for representations of XML elements. Think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
  *
- * Use the constructor with care, because it is easy to use incorrectly (regarding passed Scopes).
- * To construct `Elem`s by hand, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
- * Typically, however, `Elem`s are constructed by parsing an XML source.
+ * Use the constructor with care, because it is easy to use incorrectly (regarding passed Scopes, causing implicit namespace
+ * undeclarations). To construct `Elem`s by hand, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
+ * If `Elem`s are still constructed manually (without using `ElemBuilder`s), consider calling method `notUndeclaringPrefixes`
+ * afterwards, thus getting rid of unnecessary (implicit) namespace undeclarations. Typically, however, `Elem`s are constructed
+ * by parsing an XML source.
  */
 @SerialVersionUID(1L)
 final class Elem(

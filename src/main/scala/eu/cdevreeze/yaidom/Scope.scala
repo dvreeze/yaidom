@@ -295,7 +295,8 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    *
    * This property is handy when adding child elements to a parent `Elem`. By invoking this method (recursively) for the descendant
    * elements, against the parent `Scope`, we can create `Elem` trees without any unnecessary undeclarations
-   * (which are implicit, of course, because `Elem`s contain Scopes, not Declarations).
+   * (which are implicit, of course, because `Elem`s contain Scopes, not Declarations). There is indeed a corresponding method
+   * in class `Elem`, which does just that.
    */
   def notUndeclaringPrefixes(scope: Scope): Scope = {
     val onlyDefault = scope.retainingDefaultNamespace
