@@ -248,7 +248,7 @@ final class Elem(
 
   /**
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
-   * (non-default) namespace undeclarations, starting with the given parent scope.
+   * prefixed namespace undeclarations, given the passed parent scope.
    */
   def notUndeclaringPrefixes(parentScope: Scope): Elem = {
     val newScope = parentScope.notUndeclaringPrefixes(this.scope)

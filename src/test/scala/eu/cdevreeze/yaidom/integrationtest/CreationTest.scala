@@ -181,4 +181,63 @@ class CreationTest extends Suite {
       resolvedElm4
     }
   }
+
+  @Test def testNotUndeclaringPrefixes() {
+    val docParser = DocumentParserUsingDom.newInstance()
+
+    val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
+
+    val doc1: Document = docParser.parse(is)
+    val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
+
+    val isbn = "ISBN-9-88-777777-6"
+    val bookElm1 = doc1.documentElement.findElem(e =>
+      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error("No book with ISBN %s".format(isbn)))
+    val authorsElm1 = bookElm1.getChildElem(_.localName == "Authors")
+
+    val doc2: Document = Document(doc1.documentElement.notUndeclaringPrefixes(Scope.Empty))
+    val bookElm2 = doc2.documentElement.findElem(e =>
+      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error("No book with ISBN %s".format(isbn)))
+    val authorsElm2 = bookElm2.getChildElem(_.localName == "Authors")
+
+    val doc3: Document = Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore")))
+    val bookElm3 = doc3.documentElement.findElem(e =>
+      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error("No book with ISBN %s".format(isbn)))
+    val authorsElm3 = bookElm3.getChildElem(_.localName == "Authors")
+
+    val doc4: Document = Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://abc")))
+    val bookElm4 = doc4.documentElement.findElem(e =>
+      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error("No book with ISBN %s".format(isbn)))
+    val authorsElm4 = bookElm4.getChildElem(_.localName == "Authors")
+
+    expect((bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) -- Set("books")) {
+      authorsElm1.scope
+    }
+
+    expect(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
+      authorsElm2.scope
+    }
+
+    expect(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
+      authorsElm3.scope
+    }
+
+    expect(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
+      authorsElm4.scope
+    }
+
+    val resolvedRoot = resolved.Elem(doc1.documentElement)
+
+    expect(resolvedRoot) {
+      resolved.Elem(doc2.documentElement)
+    }
+
+    expect(resolvedRoot) {
+      resolved.Elem(doc3.documentElement)
+    }
+
+    expect(resolvedRoot) {
+      resolved.Elem(doc4.documentElement)
+    }
+  }
 }
