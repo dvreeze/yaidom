@@ -288,6 +288,10 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * {{{
    * scope.resolveQName(qname) == this.notUndeclaringPrefixes(scope).resolveQName(qname)
    * }}}
+   * and that:
+   * {{{
+   * scope.subScopeOf(this.notUndeclaringPrefixes(scope))
+   * }}}
    *
    * This property is handy when adding child elements to a parent `Elem`. By invoking this method for the child
    * element, against the parent `Scope`, we can create `Elem` trees without any unnecessary undeclarations
@@ -316,7 +320,15 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   }
 
   /**
-   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`
+   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`.
+   *
+   * Note that:
+   * {{{
+   * scope.subScopeOf(this.notUndeclaring(scope))
+   * }}}
+   * This does not necessarily mean that `scope.resolveQName(qname) == this.notUndeclaring(scope).resolveQName(qname)`.
+   * After all, for any unqualified name `qname`, if this scope has a default namespace but the passed scope does not, the LHS
+   * uses the default namespace to resolve `qname`, whereas the RHS does not.
    */
   def notUndeclaring(scope: Scope): Scope = {
     val decls = this.relativize(scope)

@@ -97,6 +97,12 @@ sealed trait Node extends Immutable with Serializable {
  * The [[eu.cdevreeze.yaidom.Scope]] is absolute, typically containing a lot more than
  * the (implicit) [[eu.cdevreeze.yaidom.Declarations]] of this element.
  *
+ * Note that `Elem` instances are immutable, so they do not know about parent nodes. Moreover, `Elem`s must be building blocks
+ * for larger (ancestor) `Elem`s, and at the same time they must contain enough context for resolving element and attribute
+ * (un)qualified names. Therefore an `Elem` contains a `Scope`, and not a `Declarations` (whereas for `ElemBuilder` it is the
+ * other way around). Once an `Elem` tree is complete, the (implicit) `Declarations` of the element are
+ * `parentElm.scope.relativize(this.scope)`.
+ *
  * Namespace declarations (and undeclarations) are not considered attributes in this API.
  *
  * The API is geared towards data-oriented XML that uses namespaces, and that typically is described in schemas (so that the
@@ -238,6 +244,23 @@ final class Elem(
 
     accumulate(self, ElemPath.Root)
     result.toMap
+  }
+
+  /**
+   * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
+   * (non-default) namespace undeclarations, starting with the given parent scope.
+   */
+  def notUndeclaringPrefixes(parentScope: Scope): Elem = {
+    val newScope = parentScope.notUndeclaringPrefixes(this.scope)
+    assert(this.scope.subScopeOf(newScope))
+
+    // Recursive (non-tail-recursive) call
+    val newChildren = children map {
+      case e: Elem => e.notUndeclaringPrefixes(newScope)
+      case n => n
+    }
+
+    Elem(this.qname, this.attributes, newScope, newChildren)
   }
 
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */

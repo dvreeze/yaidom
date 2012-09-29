@@ -250,7 +250,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQNameNotUndeclaringNamespaces() {
+  @Test def testResolveQNameNotUndeclaringPrefixes() {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
     val scope2 = Scope.from("" -> "http://e", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
@@ -272,6 +272,39 @@ class ScopeTest extends Suite {
 
     expect(expectedENames) {
       qnames map { qname => scope1.notUndeclaringPrefixes(scope2).resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+    }
+  }
+
+  @Test def testResolveQNameNotUndeclaringNamespaces() {
+    val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
+    val scope2 = Scope.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
+
+    expect(Declarations.from("" -> "", "a" -> "", "c" -> "http://ccc")) {
+      scope1.relativize(scope2)
+    }
+
+    expect(scope2 ++ Scope.from("a" -> "http://a") ++ scope1.retainingDefaultNamespace) {
+      scope1.notUndeclaring(scope2)
+    }
+
+    expect(Some(EName("x"))) {
+      scope2.resolveQName(QName("x"))
+    }
+
+    expect(Some(EName("http://a", "x"))) {
+      scope1.notUndeclaring(scope2).resolveQName(QName("x"))
+    }
+
+    val qnames = List(QName("b", "y"), QName("c", "z"), QName("d", "z"))
+
+    val expectedENames = List(EName("http://b", "y"), EName("http://ccc", "z"), EName("http://d", "z"))
+
+    expect(expectedENames) {
+      qnames map { qname => scope2.resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+    }
+
+    expect(expectedENames) {
+      qnames map { qname => scope1.notUndeclaring(scope2).resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
   }
 }
