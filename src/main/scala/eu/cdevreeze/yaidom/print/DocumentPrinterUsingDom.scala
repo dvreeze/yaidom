@@ -24,6 +24,7 @@ import javax.xml.transform.stream.StreamResult
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
 import convert.DomConversions._
+import DocumentPrinterUsingDom._
 
 /**
  * DOM-based `Document` printer.
@@ -105,6 +106,24 @@ final class DocumentPrinterUsingDom(
       transformerFactory,
       newTransformerCreator)
   }
+
+  def withDocumentBuilderCreator(newDocBuilderCreator: DocumentBuilderFactory => DocumentBuilder): DocumentPrinterUsingDom = {
+    new DocumentPrinterUsingDom(
+      docBuilderFactory,
+      newDocBuilderCreator,
+      transformerFactory,
+      transformerCreator)
+  }
+
+  def withTransformerCreator(newTransformerCreator: TransformerFactory => Transformer): DocumentPrinterUsingDom = {
+    new DocumentPrinterUsingDom(
+      docBuilderFactory,
+      docBuilderCreator,
+      transformerFactory,
+      newTransformerCreator)
+  }
+
+  def withTransformerCreatorForHtml: DocumentPrinterUsingDom = withTransformerCreator(transformerCreatorForHtml)
 }
 
 object DocumentPrinterUsingDom {
@@ -140,5 +159,11 @@ object DocumentPrinterUsingDom {
     transformerCreator: TransformerFactory => Transformer): DocumentPrinterUsingDom = {
 
     new DocumentPrinterUsingDom(docBuilderFactory, docBuilderCreator, transformerFactory, transformerCreator)
+  }
+
+  val transformerCreatorForHtml: (TransformerFactory => Transformer) = { (tf: TransformerFactory) =>
+    val t = tf.newTransformer
+    t.setOutputProperty(OutputKeys.METHOD, "html")
+    t
   }
 }

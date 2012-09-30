@@ -183,6 +183,11 @@ final class Elem(
   /** Returns `withChildren(self.children :+ newChild)`. */
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
+  /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
+  def withAttributes(newAttributes: Map[QName, String]): Elem = {
+    new Elem(qname, newAttributes, scope, children)
+  }
+
   /**
    * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
    * Must be fast.
