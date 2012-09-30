@@ -6,33 +6,53 @@ CHANGELOG
 0.6.2
 =====
 
-* Breaking API change: made class ``Declarations`` a top-level class
+* Breaking API change: made class ``Declarations`` a top-level class, because "namespace declarations" are an independent concept
 * Breaking API changes to classes ``Scope`` and ``Declarations``:
 
   * Simplified the implementations, with both classes now backed by maps from prefixes to namespace URIs
   * Removed several methods (that are not often used outside the yaidom library itself)
-  * Added several methods (now both classes are more internally consistent than before)
+  * Added several methods, thus making both classes more internally consistent than before
   * Added properties and their proofs to the documentation of both classes
 
-* Added trait ``ElemNodeLike``:
+* Added trait ``ParentElemLike``, as an independent abstraction, offering a rich "base" element querying API:
 
   * Trait ``ElemLike`` extends this new trait
-  * Trait ``ElemNodeLike`` has only abstract method ``allChildElems``, and no further "knowledge" than that
+  * Trait ``ParentElemLike`` has only abstract method ``allChildElems``, and no further "knowledge" than that
   * This trait is also mixed in by ``ElemBuilder``
-  * The documentation of trait ``ElemNodeLike`` contains several properties with their proofs
-  
+  * The documentation of trait ``ParentElemLike`` contains several properties with their proofs
+  * The subtrait ``ElemLike`` got some new attribute querying methods
+
 * Added class ``ElemPathBuilder``
 * Fixed class ``ElemPath``, using new method ``Scope.isInvertible``
-* Added trait ``TransformableElemLike``:
+* Added trait ``UpdatableElemLike``:
 
   * Mixed in by different element classes
-  * Clarified and re-implemented ``Elem.updated`` for speed (in different ``Elem`` classes)
+  * Breaking API change: ``Elem.updated`` methods now returning node collections instead of single elements
+  * Also clarified and re-implemented ``Elem.updated`` for speed (in different ``Elem`` classes)
+  * Added methods like ``withUpdatedChildren`` and ``withPatchedChildren``
 
+* Added trait ``PathAwareElemLike``, which mirrors trait ``ParentElemLike``, but returns element paths instead of elements
+* Added ``dom`` package:
+
+  * ``ElemLike`` wrappers around W3C DOM nodes
+
+* Adapted ``convert`` package:
+
+  * Breaking API changes: renamed several singleton objects
+  * Many conversion methods are now public
+  * "Conversion" API became more consistent
+  * Removed 2 ``convertToElem`` methods that were easy to use incorrectly
+
+* Breaking API change: ``Document`` is no longer a ``Node``, and ``DocBuilder`` no longer a ``NodeBuilder``
 * ``Node`` has a similar DSL for creating node trees as ``NodeBuilder``, using methods like ``elem``, ``text`` etc.
-* Added motivation document
 * Added some convenience methods to ``ElemBuilder``, like ``withChildren`` and ``plusChild``
 * Added convenience method ``NodeBuilder.textElem``
+* Added ``Elem`` methods ``prettify`` and ``notUndeclaringPrefixes``
+* Documented namespace-awareness for Document parsers
+* Added motivation document
 * Added test case for some "mini-yaidom", which can be used in an article explaining yaidom
+* Added many other tests
+* Added sbt build file
 
 
 0.6.1
