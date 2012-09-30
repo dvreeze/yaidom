@@ -6,6 +6,10 @@ CHANGELOG
 0.6.2
 =====
 
+In this version, yaidom clearly became 2 things: an element querying API (trait ``ParentElemLike`` and sub-traits), and concrete
+(immutable and mutable) element classes into which those traits are mixed in. The element querying API can also be mixed in into
+element classes that are not part of yaidom, such as ``ParentElemLike`` wrappers around JDOM or XOM.
+
 * Breaking API change: made class ``Declarations`` a top-level class, because "namespace declarations" are an independent concept
 * Breaking API changes to classes ``Scope`` and ``Declarations``:
 

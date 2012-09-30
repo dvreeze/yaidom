@@ -305,8 +305,8 @@ final class Elem(
       case _ => false
     }
 
-    def isElem(n: Node): Boolean = n match {
-      case e: Elem => true
+    def isText(n: Node): Boolean = n match {
+      case t: Text => true
       case _ => false
     }
 
@@ -318,20 +318,20 @@ final class Elem(
         case e: Elem => true
         case n: Node => false
       }).isDefined
-      val doPrettify = (childNodes forall (n => isElem(n))) && (hasElemChild)
+      val doPrettify = (childNodes forall (n => !isText(n))) && (hasElemChild)
 
       if (doPrettify) {
         val newIndent = currentIndent + indent
-        val indentString = Text("\n" + (" " * newIndent), false)
-        val endIndentString = Text("\n" + (" " * currentIndent), false)
+        val indentText = Text("\n" + (" " * newIndent), false)
+        val endIndentText = Text("\n" + (" " * currentIndent), false)
 
         val prettifiedChildNodes = childNodes map {
           case e: Elem => prettify(e, newIndent)
           case n => n
         }
 
-        val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(indentString, n) }
-        val newChildNodes = prefixedPrettifiedChildNodes :+ endIndentString
+        val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(indentText, n) }
+        val newChildNodes = prefixedPrettifiedChildNodes :+ endIndentText
 
         elm.withChildren(newChildNodes)
       } else {
