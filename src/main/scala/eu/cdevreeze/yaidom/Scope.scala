@@ -211,7 +211,8 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   def superScopeOf(scope: Scope): Boolean = scope.subScopeOf(this)
 
   /**
-   * Tries to resolve the given `QName` against this `Scope`, returning `None` otherwise.
+   * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
+   * to this `Scope`.
    *
    * Note that the `subScopeOf` relation keeps the `resolveQName` result the same, provided there is no default namespace.
    * That is, if `scope1.withoutDefaultNamespace.subScopeOf(scope2.withoutDefaultNamespace)`, then for each QName `qname`

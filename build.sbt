@@ -9,7 +9,7 @@ name := "yaidom"
 
 organization := "eu.cdevreeze.yaidom"
 
-version := "0.6.2-SNAPSHOT"
+version := "0.6.3-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
@@ -19,6 +19,11 @@ scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 scalacOptions <++= scalaBinaryVersion map { version =>
   if (version.contains("2.10")) Seq("-feature") else Seq()
+}
+
+sources in Test <++= scalaBinaryVersion map { version =>
+  val newSources = new java.io.File("src/test-reflect/scala/eu/cdevreeze/yaidom/reflect").listFiles.toSeq
+  if (version.contains("2.10")) newSources else Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
