@@ -46,10 +46,8 @@ class DependencyTest extends Suite {
   // Importing the members of the api.JavaUniverse cake
   import scala.reflect.runtime.universe._
 
-  // TODO Check if it is wrong to work a lot with (mutable?) Symbols instead of (immutable?) Type instances.
-
   private val yaidomPackageSymbol: Symbol = typeOf[Elem].typeSymbol.owner
-  private val yaidomConvertPackageSymbol: Symbol = typeOf[convert.DomConversions$].typeSymbol.owner
+  private val yaidomConvertPackageSymbol: Symbol = typeOf[convert.DomConversions.type].typeSymbol.owner
   private val yaidomDomPackageSymbol: Symbol = typeOf[dom.DomElem].typeSymbol.owner
   private val yaidoParsePackageSymbol: Symbol = typeOf[parse.DocumentParser].typeSymbol.owner
   private val yaidomPrintPackageSymbol: Symbol = typeOf[print.DocumentPrinter].typeSymbol.owner
@@ -144,7 +142,7 @@ class DependencyTest extends Suite {
   private val expectedDependenciesOfElem: Set[Type] =
     expectedDependenciesOfUpdatableElemLike ++
       (yaidomTypes filter (tpe => tpe <:< typeOf[eu.cdevreeze.yaidom.Node])) ++
-      Set(typeOf[eu.cdevreeze.yaidom.Node.type], typeOf[eu.cdevreeze.yaidom.Elem.type], typeOf[eu.cdevreeze.yaidom.Document], typeOf[eu.cdevreeze.yaidom.Document.type])
+      Set(typeOf[HasText], typeOf[eu.cdevreeze.yaidom.Node.type], typeOf[eu.cdevreeze.yaidom.Elem.type], typeOf[eu.cdevreeze.yaidom.Document], typeOf[eu.cdevreeze.yaidom.Document.type])
 
   @Test def testDependenciesOfQName() {
     // Depends on XmlStringUtils too, hidden inside statements, so not found in a Java reflection universe
@@ -272,7 +270,7 @@ class DependencyTest extends Suite {
     testDependenciesWithinYaidomTopLevel(
       typeOf[eu.cdevreeze.yaidom.ParentElemLike[_]],
       "findAllElemsOrSelf",
-      Set())
+      Set(typeOf[ParentElemLike[_]]))
   }
 
   @Test def testDependenciesOfElemLike() {
@@ -300,7 +298,7 @@ class DependencyTest extends Suite {
     testDependenciesWithinYaidomTopLevel(
       typeOf[eu.cdevreeze.yaidom.HasText],
       "trimmedText",
-      Set())
+      Set(typeOf[HasText]))
   }
 
   @Test def testDependenciesOfElem() {
@@ -375,13 +373,16 @@ class DependencyTest extends Suite {
 
   private def testDependenciesWithinYaidomTopLevel(tpe: Type, sampleMethodName: String, allowedTypes: Set[Type]) {
     val terms: Iterable[Symbol] = tpe.members filter { _.isTerm }
+    val baseClasses: Seq[Symbol] = tpe.baseClasses
     val termTypeSignatures = terms map { _.typeSignatureIn(tpe) }
 
     assert(terms exists (term => term.isMethod && term.asMethod.name == stringToTermName(sampleMethodName)),
       "Expected method %s to exist in type %s".format(sampleMethodName, tpe))
 
     val packages: Set[Symbol] = {
-      val result = termTypeSignatures flatMap { tpeSig => findPackageSymbol(tpeSig.typeSymbol) }
+      val baseClassResult = baseClasses flatMap { baseClass => findPackageSymbol(baseClass) }
+      val termResult = termTypeSignatures flatMap { tpeSig => findPackageSymbol(tpeSig.typeSymbol) }
+      val result = baseClassResult ++ termResult
       assert(result forall (_.isPackage))
       result.toSet
     }
@@ -396,6 +397,9 @@ class DependencyTest extends Suite {
     for (tpeSym <- disallowedYaidomTypeSymbols) {
       assert(termTypeSignatures forall (tpeSignature => !tpeSignature.contains(tpeSym)),
         "Dependency on type %s not expected in type %s".format(tpeSym, tpe))
+
+      assert(baseClasses forall (baseClass => !(baseClass.asType.toType <:< tpeSym.asType.toType)),
+        "Dependency on type %s not expected in any base class of %s".format(tpeSym, tpe))
     }
   }
 
