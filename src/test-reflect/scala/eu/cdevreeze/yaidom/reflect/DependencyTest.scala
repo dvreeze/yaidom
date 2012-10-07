@@ -214,11 +214,9 @@ class DependencyTest extends Suite {
     assert(packages forall (pkgSym => isScalaOrJavaPackage(pkgSym) || isYaidomTopLevelPackage(pkgSym)),
       "Expected the packages to be standard Java or Scala package, or the top level yaidom package, and nothing else")
 
-    val disallowedYaidomTypeSymbols: Seq[Symbol] = yaidomTypeSymbols filter { sym =>
-      val allowedTypeSymbols = allowedTypes map { _.typeSymbol }
+    val allowedTypeSymbols = allowedTypes map { _.typeSymbol }
 
-      !allowedTypeSymbols.contains(sym)
-    }
+    val disallowedYaidomTypeSymbols: Seq[Symbol] = yaidomTypeSymbols filter { sym => !allowedTypeSymbols.contains(sym) }
 
     for (tpeSym <- disallowedYaidomTypeSymbols) {
       assert(termTypeSignatures forall (tpeSignature => !tpeSignature.contains(tpeSym)),
