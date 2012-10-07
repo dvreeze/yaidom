@@ -33,8 +33,8 @@ import org.scalatest.junit.JUnitRunner
  * Note that we are in "Java reflection territory" here, so we cannot expect to find all possible dependencies of
  * the analyzed yaidom classes, such as those hidden inside method implementations.
  *
- * Also note that we can use the Scala Reflection API as alternative to Java reflection, for example to do dependency
- * analysis normally delegated to tools such as for example Macker (with the limitations that Java reflection impose upon us).
+ * Also note that it is quite conceivable that we can use the Scala Reflection API as alternative to Java reflection,
+ * although I have not tried yet.
  *
  * @author Chris de Vreeze
  */
@@ -46,6 +46,8 @@ class DependencyTest extends Suite {
   // Importing the members of the api.JavaUniverse cake
   import scala.reflect.runtime.universe._
 
+  // TODO Check if it is wrong to work a lot with (mutable?) Symbols instead of (immutable?) Type instances.
+
   private val yaidomPackageSymbol: Symbol = typeOf[Elem].typeSymbol.owner
   private val yaidomConvertPackageSymbol: Symbol = typeOf[convert.DomConversions$].typeSymbol.owner
   private val yaidomDomPackageSymbol: Symbol = typeOf[dom.DomElem].typeSymbol.owner
@@ -54,8 +56,8 @@ class DependencyTest extends Suite {
   private val yaidomResolvedPackageSymbol: Symbol = typeOf[resolved.Elem].typeSymbol.owner
   private val yaidomXlinkPackageSymbol: Symbol = typeOf[xlink.XLink].typeSymbol.owner
 
-  private val yaidomTypeSymbols: Seq[Symbol] = {
-    val types = List(
+  private val yaidomTypes: Seq[Type] = {
+    List(
       typeOf[Comment],
       typeOf[CommentBuilder],
       typeOf[ConverterToDocument[AnyRef]],
@@ -103,107 +105,280 @@ class DependencyTest extends Suite {
       typeOf[UnprefixedName],
       typeOf[UpdatableElemLike[Node, Elem]],
       typeOf[XmlStringUtils.type])
+  }
 
-    val result = types map { _.typeSymbol }
+  private val yaidomTypeSymbols: Seq[Symbol] = {
+    val result = yaidomTypes map { _.typeSymbol }
     assert(result forall (sym => isYaidomTopLevelPackage(findPackageSymbol(sym).get)))
     result
   }
 
+  private val expectedDependenciesOfQName: Set[Type] = Set(
+    typeOf[QName], typeOf[QName.type], typeOf[PrefixedName], typeOf[UnprefixedName])
+
+  private val expectedDependenciesOfEName: Set[Type] =
+    expectedDependenciesOfQName ++ Set(typeOf[EName], typeOf[EName.type])
+
+  private val expectedDependenciesOfDeclarations: Set[Type] =
+    Set(typeOf[Declarations], typeOf[Declarations.type])
+
+  private val expectedDependenciesOfScope: Set[Type] =
+    expectedDependenciesOfEName ++
+      expectedDependenciesOfDeclarations ++
+      Set(typeOf[eu.cdevreeze.yaidom.Scope], typeOf[eu.cdevreeze.yaidom.Scope.type])
+
+  private val expectedDependenciesOfElemPath: Set[Type] =
+    expectedDependenciesOfScope ++
+      Set(typeOf[ElemPath], typeOf[ElemPath.type], typeOf[ElemPathBuilder], typeOf[ElemPathBuilder.type],
+        typeOf[ElemPath.Entry], typeOf[ElemPath.Entry.type], typeOf[ElemPathBuilder.Entry])
+
+  private val expectedDependenciesOfElemLike: Set[Type] =
+    expectedDependenciesOfEName ++ Set(typeOf[ParentElemLike[_]], typeOf[ElemLike[_]])
+
+  private val expectedDependenciesOfPathAwareElemLike: Set[Type] =
+    expectedDependenciesOfElemLike ++ expectedDependenciesOfElemPath ++ Set(typeOf[PathAwareElemLike[_]])
+
+  private val expectedDependenciesOfUpdatableElemLike: Set[Type] =
+    expectedDependenciesOfPathAwareElemLike ++ Set(typeOf[UpdatableElemLike[_, _]])
+
+  private val expectedDependenciesOfElem: Set[Type] =
+    expectedDependenciesOfUpdatableElemLike ++
+      (yaidomTypes filter (tpe => tpe <:< typeOf[eu.cdevreeze.yaidom.Node])) ++
+      Set(typeOf[eu.cdevreeze.yaidom.Node.type], typeOf[eu.cdevreeze.yaidom.Elem.type], typeOf[eu.cdevreeze.yaidom.Document], typeOf[eu.cdevreeze.yaidom.Document.type])
+
   @Test def testDependenciesOfQName() {
     // Depends on XmlStringUtils too, hidden inside statements, so not found in a Java reflection universe
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[QName],
       "localPart",
-      List(typeOf[QName], typeOf[QName.type], typeOf[PrefixedName], typeOf[UnprefixedName]))
+      expectedDependenciesOfQName)
   }
 
   @Test def testDependenciesOfQNameObject() {
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[QName.type],
       "apply",
-      List(typeOf[QName], typeOf[QName.type], typeOf[PrefixedName], typeOf[UnprefixedName]))
+      expectedDependenciesOfQName)
   }
 
   @Test def testDependenciesOfPrefixedName() {
     // Depends on XmlStringUtils too, hidden inside statements, so not found in a Java reflection universe
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[PrefixedName],
       "localPart",
-      List(typeOf[QName], typeOf[QName.type], typeOf[PrefixedName], typeOf[UnprefixedName]))
+      expectedDependenciesOfQName)
   }
 
   @Test def testDependenciesOfUnprefixedName() {
     // Depends on XmlStringUtils too, hidden inside statements, so not found in a Java reflection universe
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[UnprefixedName],
       "localPart",
-      List(typeOf[QName], typeOf[QName.type], typeOf[PrefixedName], typeOf[UnprefixedName]))
+      expectedDependenciesOfQName)
   }
 
   @Test def testDependenciesOfEName() {
-    val allowedTypes = List(
-      typeOf[QName], typeOf[QName.type],
-      typeOf[PrefixedName], typeOf[UnprefixedName],
-      typeOf[EName], typeOf[EName.type])
-
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[EName],
       "namespaceUriOption",
-      allowedTypes)
+      expectedDependenciesOfEName)
   }
 
   @Test def testDependenciesOfENameObject() {
-    val allowedTypes = List(
-      typeOf[QName], typeOf[QName.type],
-      typeOf[PrefixedName], typeOf[UnprefixedName],
-      typeOf[EName], typeOf[EName.type])
-
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[EName.type],
       "apply",
-      allowedTypes)
+      expectedDependenciesOfEName)
   }
 
   @Test def testDependenciesOfDeclarations() {
-    testDependencies(typeOf[Declarations], "subDeclarationsOf", List(typeOf[Declarations], typeOf[Declarations.type]))
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[Declarations],
+      "subDeclarationsOf",
+      expectedDependenciesOfDeclarations)
   }
 
   @Test def testDependenciesOfDeclarationsObject() {
-    testDependencies(typeOf[Declarations.type], "from", List(typeOf[Declarations], typeOf[Declarations.type]))
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[Declarations.type],
+      "from",
+      expectedDependenciesOfDeclarations)
   }
 
   @Test def testDependenciesOfScope() {
-    val allowedTypes = List(
-      typeOf[Declarations], typeOf[Declarations.type],
-      typeOf[eu.cdevreeze.yaidom.Scope], typeOf[eu.cdevreeze.yaidom.Scope.type],
-      typeOf[QName], typeOf[QName.type],
-      typeOf[EName], typeOf[EName.type])
-
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[eu.cdevreeze.yaidom.Scope],
       "subScopeOf",
-      allowedTypes)
+      expectedDependenciesOfScope)
   }
 
   @Test def testDependenciesOfScopeObject() {
-    val allowedTypes = List(
-      typeOf[Declarations], typeOf[Declarations.type],
-      typeOf[eu.cdevreeze.yaidom.Scope], typeOf[eu.cdevreeze.yaidom.Scope.type],
-      typeOf[QName], typeOf[QName.type],
-      typeOf[EName], typeOf[EName.type])
-
-    testDependencies(
+    testDependenciesWithinYaidomTopLevel(
       typeOf[eu.cdevreeze.yaidom.Scope.type],
       "from",
-      allowedTypes)
+      expectedDependenciesOfScope)
   }
 
-  private def testDependencies(tpe: Type, sampleMethodName: String, allowedTypes: Seq[Type]) {
+  @Test def testDependenciesOfElemPath() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPath],
+      "parentPathOption",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfElemPathObject() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPath.type],
+      "from",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfElemPathBuilder() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPathBuilder],
+      "prepend",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfElemPathBuilderObject() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPathBuilder.type],
+      "from",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfElemPathEntry() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPath.Entry],
+      "localName",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfElemPathEntryObject() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPath.Entry.type],
+      "apply",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfElemPathBuilderEntry() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemPathBuilder.Entry],
+      "localName",
+      expectedDependenciesOfElemPath)
+  }
+
+  @Test def testDependenciesOfParentElemLike() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ParentElemLike[_]],
+      "findAllElemsOrSelf",
+      Set())
+  }
+
+  @Test def testDependenciesOfElemLike() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ElemLike[_]],
+      "attributeOption",
+      expectedDependenciesOfElemLike)
+  }
+
+  @Test def testDependenciesOfPathAwareElemLike() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.PathAwareElemLike[_]],
+      "allChildElemPaths",
+      expectedDependenciesOfPathAwareElemLike)
+  }
+
+  @Test def testDependenciesOfUpdatableElemLike() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.UpdatableElemLike[_, _]],
+      "updated",
+      expectedDependenciesOfUpdatableElemLike)
+  }
+
+  @Test def testDependenciesOfHasText() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.HasText],
+      "trimmedText",
+      Set())
+  }
+
+  @Test def testDependenciesOfElem() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Elem],
+      "findAllElemsOrSelf",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfElemObject() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Elem.type],
+      "apply",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfNode() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Node],
+      "toTreeRepr",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfNodeObject() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Node.type],
+      "elem",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfComment() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Comment],
+      "toTreeRepr",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfEntityRef() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.EntityRef],
+      "toTreeRepr",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfProcessingInstruction() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.ProcessingInstruction],
+      "toTreeRepr",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfText() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Text],
+      "normalizedText",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfDocument() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Document],
+      "updated",
+      expectedDependenciesOfElem)
+  }
+
+  @Test def testDependenciesOfDocumentObject() {
+    testDependenciesWithinYaidomTopLevel(
+      typeOf[eu.cdevreeze.yaidom.Document.type],
+      "apply",
+      expectedDependenciesOfElem)
+  }
+
+  private def testDependenciesWithinYaidomTopLevel(tpe: Type, sampleMethodName: String, allowedTypes: Set[Type]) {
     val terms: Iterable[Symbol] = tpe.members filter { _.isTerm }
     val termTypeSignatures = terms map { _.typeSignatureIn(tpe) }
 
     assert(terms exists (term => term.isMethod && term.asMethod.name == stringToTermName(sampleMethodName)),
-      "Expected method %s to exist".format(sampleMethodName))
+      "Expected method %s to exist in type %s".format(sampleMethodName, tpe))
 
     val packages: Set[Symbol] = {
       val result = termTypeSignatures flatMap { tpeSig => findPackageSymbol(tpeSig.typeSymbol) }
@@ -212,7 +387,7 @@ class DependencyTest extends Suite {
     }
 
     assert(packages forall (pkgSym => isScalaOrJavaPackage(pkgSym) || isYaidomTopLevelPackage(pkgSym)),
-      "Expected the packages to be standard Java or Scala package, or the top level yaidom package, and nothing else")
+      "Expected the packages to be standard Java or Scala package, or the top level yaidom package, and nothing else (for dependencies of %s)".format(tpe))
 
     val allowedTypeSymbols = allowedTypes map { _.typeSymbol }
 
@@ -220,7 +395,7 @@ class DependencyTest extends Suite {
 
     for (tpeSym <- disallowedYaidomTypeSymbols) {
       assert(termTypeSignatures forall (tpeSignature => !tpeSignature.contains(tpeSym)),
-        "Dependency on type %s not expected".format(tpeSym))
+        "Dependency on type %s not expected in type %s".format(tpeSym, tpe))
     }
   }
 
