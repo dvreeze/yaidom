@@ -168,7 +168,7 @@ import scala.collection.{ immutable, mutable }
  *
  * ===1. Proving property about filterElemsOrSelf===
  *
- * Below follows a proof by structural induction of one of the above-mentioned properties. We use Scala notation in the proof.
+ * Below follows a proof by structural induction of one of the above-mentioned properties.
  *
  * First we make a few assumptions, for this proof, and (implicitly) for the other proofs:
  * <ul>
@@ -186,57 +186,42 @@ import scala.collection.{ immutable, mutable }
  *
  * __Base case__
  *
- * If `elm` has no child elements, then:
+ * If `elm` has no child elements, then the LHS can be rewritten as follows:
  * {{{
- * elm.filterElemsOrSelf(p) == (immutable.IndexedSeq(elm).filter(p))
+ * elm.filterElemsOrSelf(p)
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElemsOrSelf
+ * immutable.IndexedSeq(elm).filter(p) ++ (Seq() flatMap (_.filterElemsOrSelf(p))) // there are no child elements
+ * immutable.IndexedSeq(elm).filter(p) ++ Seq() // flatMap on empty sequence returns empty sequence
+ * immutable.IndexedSeq(elm).filter(p) // property of concatenation: xs ++ Seq() == xs
+ * (immutable.IndexedSeq(elm) ++ Seq()).filter(p) // property of concatenation: xs ++ Seq() == xs
+ * (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p // flatMap on empty sequence (of child elements) returns empty sequence
+ * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
- * so:
- * {{{
- * elm.filterElemsOrSelf(p) == { (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p }
- * }}}
- * or:
- * {{{
- * elm.filterElemsOrSelf(p) == { (elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p }
- * }}}
- * so indeed:
- * {{{
- * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
- * }}}
+ * which is the RHS.
  *
  * __Inductive step__
  *
- * Let:
+ * For the inductive step, we use the following (general) properties:
  * {{{
- * elm.allChildElems forall { ch => ch.filterElemsOrSelf(p) == ch.findAllElemsOrSelf.filter(p) }
+ * (xs.filter(p) ++ ys.filter(p)) == ((xs ++ ys) filter p) // referred to below as property (a)
  * }}}
- * then:
+ * and:
  * {{{
- * { elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p)) } == { elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf.filter(p)) }
- * }}}
- * so, by prepending the same collection in LHS and RHS:
- * {{{
- * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p))) } ==
- * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf.filter(p))) }
- * }}}
- * so, by virtue of:
- * {{{
- * { xs flatMap (x => f(x) filter p) } == { (xs flatMap (x => f(x))) filter p }
- * }}}
- * and
- * {{{
- * (xs.filter(p) ++ ys.filter(p)) == { (xs ++ ys) filter p }
- * }}}
- * we get:
- * {{{
- * { immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.filterElemsOrSelf(p))) } ==
- * { (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf))) filter p }
- * }}}
- * so:
- * {{{
- * elm.filterElemsOrSelf(p) == { elm.findAllElemsOrSelf.filter(p) }
+ * (xs flatMap (x => f(x) filter p)) == ((xs flatMap f) filter p) // referred to below as property (b)
  * }}}
  *
- * This completes the proof. Other above-mentioned properties can be proved by induction in a similar way.
+ * If `elm` does have child elements, the LHS can be rewritten as:
+ * {{{
+ * elm.filterElemsOrSelf(p)
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElemsOrSelf
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf filter p)) // induction hypothesis
+ * immutable.IndexedSeq(elm).filter(p) ++ ((elm.allChildElems.flatMap(ch => ch.findAllElemsOrSelf)) filter p) // property (b)
+ * (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p // property (a)
+ * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
+ * }}}
+ * which is the RHS.
+ *
+ * This completes the proof. Other above-mentioned properties can be proven by induction in a similar way.
  *
  * ===2. Proving property about filterElems===
  *
@@ -244,30 +229,19 @@ import scala.collection.{ immutable, mutable }
  * {{{
  * elm.filterElems(p) == elm.findAllElems.filter(p)
  * }}}
- * After all:
+ * After all, the LHS can be rewritten as follows:
  * {{{
- * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * elm.filterElems(p)
+ * (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElems
+ * (elm.allChildElems flatMap (e => e.findAllElemsOrSelf.filter(p))) // using the property proven above
+ * (elm.allChildElems flatMap (_.findAllElemsOrSelf)) filter p // using property (b) above
+ * elm.findAllElems filter p // definition of findAllElems
  * }}}
- * so:
- * {{{
- * elm.filterElems(p) == { elm.allChildElems flatMap (e => e.findAllElemsOrSelf.filter(p)) }
- * }}}
- * so, by virtue of:
- * {{{
- * { xs flatMap (x => f(x) filter p) } == { (xs flatMap (x => f(x))) filter p }
- * }}}
- * we get:
- * {{{
- * elm.filterElems(p) == { (elm.allChildElems flatMap (e => e.findAllElemsOrSelf)) filter p }
- * }}}
- * so:
- * {{{
- * elm.filterElems(p) == elm.findAllElems.filter(p)
- * }}}
+ * which is the RHS.
  *
  * ===3. Proving property about findTopmostElemsOrSelf===
  *
- * Given the above-mentioned assumptions, we prove by induction that:
+ * Given the above-mentioned assumptions, we prove by structural induction that:
  * {{{
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
  * }}}
@@ -280,40 +254,30 @@ import scala.collection.{ immutable, mutable }
  *
  * __Inductive step__
  *
- * Let:
+ * For the inductive step, we introduce the following additional (general) property, if `f` and `g` have the same types:
  * {{{
- * elm.allChildElems forall { ch => (ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (ch.filterElemsOrSelf(p)) }
+ * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // referred to below as property (c)
  * }}}
  *
- * If `p(elm)` holds, then:
+ * If `elm` does have child elements, and `p(elm)` holds, the LHS can be rewritten as:
  * {{{
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (immutable.IndexedSeq(elm) flatMap (_.filterElemsOrSelf(p)))
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p)))
+ * immutable.IndexedSeq(elm) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElemsOrSelf, knowing that p(elm) holds
+ * elm.filterElemsOrSelf(p) // definition of flatMap, applied to singleton sequence
  * }}}
- * so:
- * {{{
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
- * }}}
+ * which is the RHS. In this case, we did not even need the induction hypothesis.
  *
- * If `p(elm)` does not hold, then:
+ * If `elm` does have child elements, and `p(elm)` does not hold, the LHS can be rewritten as:
  * {{{
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == {
- *   elm.allChildElems flatMap { _.findTopmostElemsOrSelf(p) } flatMap { _.filterElemsOrSelf(p) }
- * }
+ * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p)))
+ * (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElemsOrSelf, knowing that p(elm) does not hold
+ * elm.allChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
+ * elm.allChildElems flatMap (_.filterElemsOrSelf(p)) // induction hypothesis
+ * immutable.IndexedSeq() ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of concatenation
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filter, knowing that p(elm) does not hold
+ * elm.filterElemsOrSelf(p) // definition of filterElems
  * }}}
- * so:
- * {{{
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == { elm.allChildElems flatMap (_.filterElemsOrSelf(p)) }
- * }}}
- * so:
- * {{{
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == {
- *   immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
- * }
- * }}}
- * so:
- * {{{
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == elm.filterElemsOrSelf(p)
- * }}}
+ * which is the RHS.
  *
  * ===4. Proving property about findTopmostElems===
  *
@@ -322,19 +286,46 @@ import scala.collection.{ immutable, mutable }
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
  * }}}
  *
- * After all:
+ * After all, the LHS can be rewritten to:
  * {{{
- * { elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)) } ==
- * { elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)) flatMap (_.filterElemsOrSelf(p)) }
+ * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)))
+ * (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElems
+ * elm.allChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
+ * elm.allChildElems flatMap (_.filterElemsOrSelf(p)) // using the property proven above
+ * elm.filterElems(p) // definition of filterElems
  * }}}
- * so:
+ * which is the RHS.
+ *
+ * ===5. Properties used in the proofs above===
+ *
+ * There are several (unproven) properties that were used in the proofs above:
  * {{{
- * { elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)) } == { elm.allChildElems flatMap (_.filterElemsOrSelf(p)) }
+ * (xs.filter(p) ++ ys.filter(p)) == ((xs ++ ys) filter p) // property (a); filter distributes over concatenation
+ *
+ * (xs flatMap (x => f(x) filter p)) == ((xs flatMap f) filter p) // property (b)
+ *
+ * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // if f and g have the same types; property (c)
  * }}}
- * so:
+ *
+ * No proofs are offered here, but we could prove them ourselves. It would help to regard `xs` and `ys` above as `List` instances,
+ * and use structural induction for Lists (!) as proof method. First we would need some defining clauses for `filter`, `++` and `flatMap`:
  * {{{
- * { elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)) } == { elm.filterElems(p)) }
+ * Nil.filter(p) == Nil
+ * (x :: xs).filter(p) == if (p(x)) x :: xs.filter(p) else xs.filter(p)
+ *
+ * Nil ++ ys == ys
+ * (x :: xs) ++ ys == x :: (xs ++ ys)
+ *
+ * Nil.flatMap(f) == Nil
+ * (x :: xs).flatMap(f) == (f(x) ++ xs.flatMap(f))
  * }}}
+ *
+ * Property (a) could then be proven by structural induction (for lists), by using only defining clauses and no other proven properties.
+ * Property (b) could then be proven by structural induction as well, but (possibly) requiring property (a) in its proof.
+ * Property (c) could be proven by structural induction, if we would first prove the distribution law for `flatMap` over concatenation.
+ * The proof by structural induction of the latter property would (possibly) depend on the property that concatenation is associative.
+ * These proofs are all left as exercises for the reader, as they say. Yaidom considers these properties as theorems based on which "yaidom properties"
+ * were proven above.
  *
  * ==Implementation notes==
  *
