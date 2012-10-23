@@ -59,13 +59,28 @@ final class SimpleLink(override val wrappedElem: Elem) extends Link(wrappedElem)
 final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedElem) {
   require(xlinkType == "extended")
 
+  /** Stored XLink children, preventing recreations of XLink children, possibly at the expense of somewhat more memory usage */
+  val xlinkChildren: immutable.IndexedSeq[XLink] = wrappedElem.allChildElems collect { case e if mustBeXLink(e) => XLink(e) }
+
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)
   def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleEName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
-  def locatorXLinks: immutable.IndexedSeq[Locator] = wrappedElem.allChildElems collect { case e if XLink.mustBeLocator(e) => Locator(e) }
-  def arcXLinks: immutable.IndexedSeq[Arc] = wrappedElem.allChildElems collect { case e if XLink.mustBeArc(e) => Arc(e) }
-  def resourceXLinks: immutable.IndexedSeq[Resource] = wrappedElem.allChildElems collect { case e if XLink.mustBeResource(e) => Resource(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = xlinkChildren collect { case xlink: Title => xlink }
+  def locatorXLinks: immutable.IndexedSeq[Locator] = xlinkChildren collect { case xlink: Locator => xlink }
+  def arcXLinks: immutable.IndexedSeq[Arc] = xlinkChildren collect { case xlink: Arc => xlink }
+  def resourceXLinks: immutable.IndexedSeq[Resource] = xlinkChildren collect { case xlink: Resource => xlink }
+
+  def labeledResources: Map[String, Resource] = {
+    val result = resourceXLinks flatMap { res => res.labelOption map (label => (label -> res)) }
+    result.toMap
+  }
+
+  def labeledLocators: Map[String, Locator] = {
+    val result = locatorXLinks flatMap { loc => loc.labelOption map (label => (label -> loc)) }
+    result.toMap
+  }
+
+  def labeledXLinks: Map[String, XLink] = labeledResources ++ labeledLocators
 }
 
 final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
