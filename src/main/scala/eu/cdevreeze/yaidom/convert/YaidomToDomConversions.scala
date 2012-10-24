@@ -36,9 +36,6 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
   /** Converts a yaidom `Document` to a function from DOM documents (as node factories) to (filled) DOM documents */
   final def convertDocument(document: yaidom.Document): DocumentProducer = {
     { (doc: org.w3c.dom.Document) =>
-      val docRoot: Element = convertElem(document.documentElement, doc, Scope.Empty)
-      doc.appendChild(docRoot)
-
       val pis: immutable.IndexedSeq[org.w3c.dom.ProcessingInstruction] =
         document.processingInstructions map { pi => convertProcessingInstruction(pi, doc) }
       for (pi <- pis) doc.appendChild(pi)
@@ -46,6 +43,9 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
       val comments: immutable.IndexedSeq[org.w3c.dom.Comment] =
         document.comments map { com => convertComment(com, doc) }
       for (c <- comments) doc.appendChild(c)
+
+      val docRoot: Element = convertElem(document.documentElement, doc, Scope.Empty)
+      doc.appendChild(docRoot)
 
       if (document.baseUriOption.isDefined) doc.setDocumentURI(document.baseUriOption.get.toString)
 
