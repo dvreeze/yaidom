@@ -59,6 +59,10 @@ import convert.StaxConversions._
  * }
  * }}}
  *
+ * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
+ * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingStax`, but adapts the `parse` method.
+ * This would make it possible to adapt the conversion from StAX events to yaidom `Document`, for example.
+ *
  * A `DocumentParserUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLInputFactory` is thread-safe, it can even be re-used from multiple threads.
  *

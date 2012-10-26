@@ -29,6 +29,10 @@ import javax.xml.transform.stream.StreamResult
  *
  * See http://blogger.ziesemer.com/2007/06/xml-generation-in-java.html#SAXMethod.
  *
+ * If more flexibility is needed in configuring the `DocumentPrinter` than offered by this class, consider
+ * writing a wrapper `DocumentPrinter` which wraps a `DocumentPrinterUsingSax`, but adapts the `print` method.
+ * This would make it possible to adapt the generation of SAX events, for example.
+ *
  * A `DocumentPrinterUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXTransformerFactory` is thread-safe, it can even be re-used from multiple threads.
  *

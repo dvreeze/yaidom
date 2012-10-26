@@ -28,6 +28,10 @@ import convert.StaxConversions._
  *
  * Note: this XML printer does not pretty-print!
  *
+ * If more flexibility is needed in configuring the `DocumentPrinter` than offered by this class, consider
+ * writing a wrapper `DocumentPrinter` which wraps a `DocumentPrinterUsingStax`, but adapts the `print` method.
+ * This would make it possible to adapt the conversion from a yaidom `Document` to StAX events, for example.
+ *
  * A `DocumentPrinterUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLEventFactory` and `XMLOutputFactory` are thread-safe, it can even be re-used from multiple threads.
  *

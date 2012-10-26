@@ -41,6 +41,10 @@ import DocumentPrinterUsingDom._
  * val documentPrinter = DocumentPrinterUsingDom.newInstance(documentBuilderFactory, transformerFactory)
  * }}}
  *
+ * If more flexibility is needed in configuring the `DocumentPrinter` than offered by this class, consider
+ * writing a wrapper `DocumentPrinter` which wraps a `DocumentPrinterUsingDom`, but adapts the `print` method.
+ * This would make it possible to adapt the conversion from a yaidom `Document` to DOM `Document`, for example.
+ *
  * A `DocumentPrinterUsingDom` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` and `TransformerFactory` are thread-safe, it can even be re-used from multiple threads.
  *

@@ -79,6 +79,10 @@ import org.xml.sax.ext.LexicalHandler
  * val parser = DocumentParserUsingSax.newInstance(new org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl)
  * }}}
  *
+ * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
+ * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingSax`, but adapts the `parse` method.
+ * This would make it possible to set additional properties on the XML Reader, for example.
+ *
  * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXParserFactory` is thread-safe, it can even be re-used from multiple threads.
  *

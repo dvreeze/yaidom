@@ -75,6 +75,10 @@ import convert.DomConversions._
  * }
  * }}}
  *
+ * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
+ * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingDom`, but adapts the `parse` method.
+ * This would make it possible to adapt the conversion from a DOM `Document` to yaidom `Document`, for example.
+ *
  * A `DocumentParserUsingDom` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` is thread-safe, it can even be re-used from multiple threads.
  *
