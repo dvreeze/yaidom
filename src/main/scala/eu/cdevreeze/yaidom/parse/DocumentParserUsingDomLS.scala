@@ -39,15 +39,15 @@ import convert.DomConversions._
  * @author Chris de Vreeze
  */
 final class DocumentParserUsingDomLS(
-  val domImplLS: DOMImplementationLS,
+  val domImplementation: DOMImplementationLS,
   val parserCreator: DOMImplementationLS => LSParser) extends DocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
     try {
-      val parser: LSParser = parserCreator(domImplLS)
+      val parser: LSParser = parserCreator(domImplementation)
 
-      val input: LSInput = domImplLS.createLSInput
+      val input: LSInput = domImplementation.createLSInput
       input.setByteStream(inputStream)
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
@@ -59,9 +59,7 @@ final class DocumentParserUsingDomLS(
   }
 
   def withParserCreator(newParserCreator: DOMImplementationLS => LSParser): DocumentParserUsingDomLS = {
-    new DocumentParserUsingDomLS(
-      domImplLS,
-      newParserCreator)
+    new DocumentParserUsingDomLS(domImplementation, newParserCreator)
   }
 }
 
@@ -82,18 +80,18 @@ object DocumentParserUsingDomLS {
   /**
    * Returns a new instance, using the given `DOMImplementationLS`, without any further configuration.
    */
-  def newInstance(domImplLS: DOMImplementationLS): DocumentParserUsingDomLS = {
+  def newInstance(domImplementation: DOMImplementationLS): DocumentParserUsingDomLS = {
     val parserCreator = (domImpl: DOMImplementationLS) => domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
-    newInstance(domImplLS, parserCreator)
+    newInstance(domImplementation, parserCreator)
   }
 
   /**
    * Returns a new instance, by invoking the primary constructor.
    */
   def newInstance(
-    domImplLS: DOMImplementationLS,
+    domImplementation: DOMImplementationLS,
     parserCreator: DOMImplementationLS => LSParser): DocumentParserUsingDomLS = {
 
-    new DocumentParserUsingDomLS(domImplLS, parserCreator)
+    new DocumentParserUsingDomLS(domImplementation, parserCreator)
   }
 }

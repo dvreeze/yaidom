@@ -42,16 +42,16 @@ import DocumentPrinterUsingDomLS._
 final class DocumentPrinterUsingDomLS(
   val docBuilderFactory: DocumentBuilderFactory,
   val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
-  val domImplLS: DOMImplementationLS,
+  val domImplementation: DOMImplementationLS,
   val serializerCreator: DOMImplementationLS => LSSerializer) extends DocumentPrinter { self =>
 
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
 
-    val serializer: LSSerializer = serializerCreator(domImplLS)
+    val serializer: LSSerializer = serializerCreator(domImplementation)
 
-    val output: LSOutput = domImplLS.createLSOutput
+    val output: LSOutput = domImplementation.createLSOutput
     val bos = new jio.ByteArrayOutputStream
     output.setEncoding("utf-8")
     output.setByteStream(bos)
@@ -78,7 +78,7 @@ final class DocumentPrinterUsingDomLS(
     new DocumentPrinterUsingDomLS(
       docBuilderFactory,
       docBuilderCreator,
-      domImplLS,
+      domImplementation,
       newSerializerCreator)
   }
 }
@@ -101,12 +101,12 @@ object DocumentPrinterUsingDomLS {
   /** Invokes the 4-arg `newInstance` method, with trivial "docBuilderCreator" and "serializerCreator" */
   def newInstance(
     docBuilderFactory: DocumentBuilderFactory,
-    domImplLS: DOMImplementationLS): DocumentPrinterUsingDomLS = {
+    domImplementation: DOMImplementationLS): DocumentPrinterUsingDomLS = {
 
     newInstance(
       docBuilderFactory,
       { dbf => dbf.newDocumentBuilder() },
-      domImplLS,
+      domImplementation,
       { domImpl => domImpl.createLSSerializer() })
   }
 
@@ -114,9 +114,9 @@ object DocumentPrinterUsingDomLS {
   def newInstance(
     docBuilderFactory: DocumentBuilderFactory,
     docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
-    domImplLS: DOMImplementationLS,
+    domImplementation: DOMImplementationLS,
     serializerCreator: DOMImplementationLS => LSSerializer): DocumentPrinterUsingDomLS = {
 
-    new DocumentPrinterUsingDomLS(docBuilderFactory, docBuilderCreator, domImplLS, serializerCreator)
+    new DocumentPrinterUsingDomLS(docBuilderFactory, docBuilderCreator, domImplementation, serializerCreator)
   }
 }
