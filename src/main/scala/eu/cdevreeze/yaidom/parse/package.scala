@@ -29,6 +29,10 @@ package eu.cdevreeze.yaidom
  * One `DocumentParser` implementation does not use any `convert` conversion. That is `DocumentParserUsingSax`. It is likely the
  * fastest of the `DocumentParser` implementations.
  *
+ * The preferred `DocumentParser` for XML (not HTML) parsing is `DocumentParserUsingDomLS`, if memory usage is not an
+ * issue. This `DocumentParser` implementation is best integrated with DOM, and is highly configurable, although
+ * DOM LS configuration is somewhat involved.
+ *
  * This package depends on the [[eu.cdevreeze.yaidom]] and [[eu.cdevreeze.yaidom.convert]] packages, and not the other way around.
  *
  * @author Chris de Vreeze

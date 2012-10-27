@@ -1261,4 +1261,310 @@ class DomLSInteropTest extends Suite {
       resultElms map { e => e.attribute(EName("name")) }
     }
   }
+
+  @Test def testNoAdjacentTextNodes() {
+    val parser = DocumentParserUsingDomLS.newInstance
+
+    val xmlString = """<root><a> a <![CDATA[b]]> c </a></root>"""
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    val aElm = doc.documentElement.getChildElem(_.localName == "a")
+
+    expect(1) {
+      aElm.children.size
+    }
+    expect(1) {
+      aElm.textChildren.size
+    }
+    expect(" a b c ") {
+      aElm.textChildren(0).text
+    }
+    expect(" a b c ") {
+      aElm.text
+    }
+  }
+
+  @Test def testNoEmptyTextNodes() {
+    val parser = DocumentParserUsingDomLS.newInstance
+
+    val xmlString = """<root><a></a><b><![CDATA[]]></b><c/></root>"""
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    val aElm = doc.documentElement.getChildElem(_.localName == "a")
+    val bElm = doc.documentElement.getChildElem(_.localName == "b")
+    val cElm = doc.documentElement.getChildElem(_.localName == "c")
+
+    expect(0) {
+      aElm.children.size
+    }
+    expect(0) {
+      bElm.children.size
+    }
+    expect(0) {
+      cElm.children.size
+    }
+  }
+
+  @Test def testKeepCData() {
+    val parser1 = DocumentParserUsingDomLS.newInstance()
+
+    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      parser.getDomConfig.setParameter("cdata-sections", java.lang.Boolean.TRUE)
+      parser
+    }
+
+    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      parser.getDomConfig.setParameter("cdata-sections", java.lang.Boolean.FALSE)
+      parser
+    }
+
+    val xmlString = """<root><a><![CDATA[abc def]]></a></root>"""
+
+    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc2 = parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    val aElm1 = doc1.documentElement.getChildElem(_.localName == "a")
+    val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
+    val aElm3 = doc3.documentElement.getChildElem(_.localName == "a")
+
+    expect(1) {
+      aElm1.textChildren.size
+    }
+    expect(1) {
+      aElm2.textChildren.size
+    }
+    expect(1) {
+      aElm3.textChildren.size
+    }
+
+    expect("abc def") {
+      aElm1.text
+    }
+    expect("abc def") {
+      aElm2.text
+    }
+    expect("abc def") {
+      aElm3.text
+    }
+
+    expect(true) {
+      aElm2.textChildren(0).isCData
+    }
+    expect(false) {
+      aElm3.textChildren(0).isCData
+    }
+  }
+
+  @Test def testKeepComments() {
+    val parser1 = DocumentParserUsingDomLS.newInstance()
+
+    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      parser.getDomConfig.setParameter("comments", java.lang.Boolean.TRUE)
+      parser
+    }
+
+    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      parser.getDomConfig.setParameter("comments", java.lang.Boolean.FALSE)
+      parser
+    }
+
+    val xmlString = """<root><a>abc <!-- abc def --> def</a></root>"""
+
+    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc2 = parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    val aElm1 = doc1.documentElement.getChildElem(_.localName == "a")
+    val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
+    val aElm3 = doc3.documentElement.getChildElem(_.localName == "a")
+
+    expect(1) {
+      doc1.allComments.size
+    }
+    expect(1) {
+      doc2.allComments.size
+    }
+    expect(0) {
+      doc3.allComments.size
+    }
+
+    expect("abc  def") {
+      aElm1.text
+    }
+    expect("abc  def") {
+      aElm2.text
+    }
+    expect("abc  def") {
+      aElm3.text
+    }
+
+    expect(" abc def ") {
+      aElm1.commentChildren.headOption.map(_.text).getOrElse("")
+    }
+    expect(" abc def ") {
+      aElm2.commentChildren.headOption.map(_.text).getOrElse("")
+    }
+    expect("XXX") {
+      aElm3.commentChildren.headOption.map(_.text).getOrElse("XXX")
+    }
+  }
+
+  @Test def testElementContentWhitespace() {
+    val parser1 = DocumentParserUsingDomLS.newInstance()
+
+    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      parser.getDomConfig.setParameter("element-content-whitespace", java.lang.Boolean.TRUE)
+      parser
+    }
+
+    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      parser.getDomConfig.setParameter("element-content-whitespace", java.lang.Boolean.FALSE)
+      parser
+    }
+
+    val xmlString =
+      """|<?xml version="1.0"?>
+         |<!DOCTYPE root [
+         |  <!ELEMENT root (a)>
+         |  <!ELEMENT a (b)>
+         |]>
+         |<root><a><b></b>   </a></root>
+         |""".stripMargin
+
+    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc2 = parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    val aElm1 = doc1.documentElement.getChildElem(_.localName == "a")
+    val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
+    val aElm3 = doc3.documentElement.getChildElem(_.localName == "a")
+
+    expect(1) {
+      aElm1.textChildren.size
+    }
+    expect(1) {
+      aElm2.textChildren.size
+    }
+    expect(0) {
+      aElm3.textChildren.size
+    }
+
+    expect("   ") {
+      aElm1.text
+    }
+    expect("   ") {
+      aElm2.text
+    }
+    expect("") {
+      aElm3.text
+    }
+  }
+
+  @Test def testValidate() {
+    class MyErrorHandler extends DOMErrorHandler {
+
+      override def handleError(exc: DOMError): Boolean = {
+        sys.error(exc.toString)
+      }
+    }
+
+    val parser1 = DocumentParserUsingDomLS.newInstance()
+
+    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, "http://www.w3.org/TR/REC-xml")
+      parser.getDomConfig.setParameter("validate", java.lang.Boolean.TRUE)
+      parser.getDomConfig.setParameter("error-handler", new MyErrorHandler)
+      parser
+    }
+
+    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+      val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, "http://www.w3.org/TR/REC-xml")
+      parser.getDomConfig.setParameter("validate", java.lang.Boolean.FALSE)
+      parser.getDomConfig.setParameter("error-handler", new MyErrorHandler)
+      parser
+    }
+
+    val xmlString =
+      """|<?xml version="1.0"?>
+         |<!DOCTYPE root [
+         |  <!ELEMENT root (a)>
+         |  <!ELEMENT a (c)>
+         |]>
+         |<root><a><b></b></a></root>
+         |""".stripMargin
+
+    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    intercept[Exception] {
+      parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    }
+
+    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    expect(3) {
+      doc1.documentElement.findAllElemsOrSelf.size
+    }
+    expect(3) {
+      doc3.documentElement.findAllElemsOrSelf.size
+    }
+  }
+
+  @Test def testPrettyPrint() {
+    val parser = DocumentParserUsingDomLS.newInstance()
+
+    val xmlString =
+      """|<?xml version="1.0"?>
+         |<!DOCTYPE root [
+         |  <!ELEMENT root (a)>
+         |  <!ELEMENT a (b)>
+         |]>
+         |<root><a><b></b></a></root>
+         |""".stripMargin
+
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    expect("") {
+      doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
+    }
+
+    val printer1 = DocumentPrinterUsingDomLS.newInstance withSerializerCreator { domImpl =>
+      val writer = domImpl.createLSSerializer()
+      writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
+      writer
+    }
+
+    val printer2 = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+      val writer = domImpl.createLSSerializer()
+      writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
+      writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
+      writer
+    }
+
+    val xmlString1 = printer1.print(doc)
+    val xmlString2 = printer2.print(doc)
+
+    logger.info("Non-prettified xmlString1:%n%s".format(xmlString1))
+    logger.info("Prettified xmlString2:%n%s".format(xmlString2))
+
+    assert(xmlString1.size < xmlString2.size)
+    assert(xmlString1.trim.size < xmlString2.trim.size)
+
+    val doc1 = parser.parse(new jio.ByteArrayInputStream(xmlString1.getBytes("utf-8")))
+    val doc2 = parser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+
+    logger.info("Non-prettified xmlString1 after roundtripping:%n%s".format(printer1.print(doc1)))
+    logger.info("Prettified xmlString2 after roundtripping:%n%s".format(printer1.print(doc2)))
+
+    val text1 = doc1.documentElement.findAllElemsOrSelf.map(_.text).mkString
+    val text2 = doc2.documentElement.findAllElemsOrSelf.map(_.text).mkString
+
+    assert(text1.size < text2.size)
+  }
 }

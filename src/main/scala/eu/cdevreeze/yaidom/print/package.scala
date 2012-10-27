@@ -29,6 +29,10 @@ package eu.cdevreeze.yaidom
  * One `DocumentPrinter` implementation does not use any `convert` conversion. That is `DocumentPrinterUsingSax`. It is likely the
  * fastest of the `DocumentPrinter` implementations, as well as the one using the least memory.
  *
+ * The preferred `DocumentPrinter` for XML (not HTML) parsing is `DocumentPrinterUsingDomLS`, if memory usage is not an
+ * issue. This `DocumentPrinter` implementation is best integrated with DOM, and is highly configurable, although
+ * DOM LS configuration is somewhat involved.
+ *
  * This package depends on the [[eu.cdevreeze.yaidom]] and [[eu.cdevreeze.yaidom.convert]] packages, and not the other way around.
  *
  * @author Chris de Vreeze
