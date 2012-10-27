@@ -28,7 +28,14 @@ import DocumentPrinterUsingDomLS._
 /**
  * DOM-LS-based `Document` printer.
  *
- * TODO Examples.
+ * To pretty-print a `Document`, create a `DocumentPrinterUsingDomLS` instance as follows:
+ * {{{
+ * val printer = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+ *   val writer = domImpl.createLSSerializer()
+ *   writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
+ *   writer
+ * }
+ * }}}
  *
  * If more flexibility is needed in configuring the `DocumentPrinter` than offered by this class, consider
  * writing a wrapper `DocumentPrinter` which wraps a `DocumentPrinterUsingDomLS`, but adapts the `print` method.

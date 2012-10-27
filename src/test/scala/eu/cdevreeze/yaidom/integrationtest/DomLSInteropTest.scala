@@ -463,12 +463,10 @@ class DomLSInteropTest extends Suite {
   @Test def testParseSchemaXsd() {
     // 1. Parse XML file into Elem
 
-    val domImplLS = DocumentParserUsingDomLS.newInstance().domImplementation
-
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       val resourceResolver = new LSResourceResolver {
-        override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baesURI: String): LSInput = {
+        override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
           logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
 
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
@@ -491,7 +489,7 @@ class DomLSInteropTest extends Suite {
       parser
     }
 
-    val domParser = DocumentParserUsingDomLS.newInstance(domImplLS, createParser _)
+    val domParser = DocumentParserUsingDomLS.newInstance() withParserCreator (createParser _)
 
     val is = classOf[DomLSInteropTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -1550,8 +1548,8 @@ class DomLSInteropTest extends Suite {
     val xmlString1 = printer1.print(doc)
     val xmlString2 = printer2.print(doc)
 
-    logger.info("Non-prettified xmlString1:%n%s".format(xmlString1))
-    logger.info("Prettified xmlString2:%n%s".format(xmlString2))
+    logger.info("Non-prettified xmlString1 (method testPrettyPrint):%n%s".format(xmlString1))
+    logger.info("Prettified xmlString2 (method testPrettyPrint):%n%s".format(xmlString2))
 
     assert(xmlString1.size < xmlString2.size)
     assert(xmlString1.trim.size < xmlString2.trim.size)
@@ -1559,12 +1557,85 @@ class DomLSInteropTest extends Suite {
     val doc1 = parser.parse(new jio.ByteArrayInputStream(xmlString1.getBytes("utf-8")))
     val doc2 = parser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
 
-    logger.info("Non-prettified xmlString1 after roundtripping:%n%s".format(printer1.print(doc1)))
-    logger.info("Prettified xmlString2 after roundtripping:%n%s".format(printer1.print(doc2)))
+    logger.info("Non-prettified xmlString1 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc1)))
+    logger.info("Prettified xmlString2 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc2)))
 
     val text1 = doc1.documentElement.findAllElemsOrSelf.map(_.text).mkString
     val text2 = doc2.documentElement.findAllElemsOrSelf.map(_.text).mkString
 
     assert(text1.size < text2.size)
+  }
+
+  @Test def testPrettyPrintAgain() {
+    val parser = DocumentParserUsingDomLS.newInstance()
+
+    val xmlString =
+      """|<?xml version="1.0"?>
+         |<root><a><b></b></a></root>
+         |""".stripMargin
+
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+
+    expect("") {
+      doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
+    }
+
+    val printer1 = DocumentPrinterUsingDomLS.newInstance withSerializerCreator { domImpl =>
+      val writer = domImpl.createLSSerializer()
+      writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
+      writer
+    }
+
+    val printer2 = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+      val writer = domImpl.createLSSerializer()
+      writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
+      writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
+      writer
+    }
+
+    val xmlString1 = printer1.print(doc)
+    val xmlString2 = printer2.print(doc)
+
+    logger.info("Non-prettified xmlString1 (method testPrettyPrintAgain):%n%s".format(xmlString1))
+    logger.info("Prettified xmlString2 (method testPrettyPrintAgain):%n%s".format(xmlString2))
+
+    assert(xmlString1.size < xmlString2.size)
+    assert(xmlString1.trim.size < xmlString2.trim.size)
+
+    val doc1 = parser.parse(new jio.ByteArrayInputStream(xmlString1.getBytes("utf-8")))
+    val doc2 = parser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+
+    logger.info("Non-prettified xmlString1 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc1)))
+    logger.info("Prettified xmlString2 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc2)))
+
+    val text1 = doc1.documentElement.findAllElemsOrSelf.map(_.text).mkString
+    val text2 = doc2.documentElement.findAllElemsOrSelf.map(_.text).mkString
+
+    assert(text1.size < text2.size)
+  }
+
+  @Test def testSuppressDtdResolution() {
+    def createParser(domImplLS: DOMImplementationLS): LSParser = {
+      val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+      val resourceResolver = new LSResourceResolver {
+        override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
+          logger.info("Suppressing DTD resolution! Public ID: %s. System ID: %s".format(publicId, systemId))
+
+          val input = domImplLS.createLSInput()
+          input.setCharacterStream(new jio.StringReader(""))
+          input
+        }
+      }
+      parser.getDomConfig.setParameter("resource-resolver", resourceResolver)
+      parser
+    }
+
+    val domParser = DocumentParserUsingDomLS.newInstance() withParserCreator (createParser _)
+
+    val is = classOf[DomLSInteropTest].getResourceAsStream("XMLSchema.xsd")
+
+    val root: Elem = domParser.parse(is).documentElement
+
+    assert(root.findAllElemsOrSelf.size >= 100)
   }
 }

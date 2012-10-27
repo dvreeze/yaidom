@@ -26,7 +26,40 @@ import convert.DomConversions._
 /**
  * DOM-LS-based `Document` parser.
  *
- * TODO Examples, with entity resolution (e.g. suppressing DTD resolution), error handling, validation and namespace-awareness.
+ * Typical non-trivial creation is as follows, assuming class `MyEntityResolver`, which extends `LSResourceResolver`,
+ * and class `MyErrorHandler`, which extends `DOMErrorHandler`:
+ * {{{
+ * def createParser(domImplLS: DOMImplementationLS): LSParser = {
+ *   val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+ *   parser.getDomConfig.setParameter("resource-resolver", new MyEntityResolver)
+ *   parser.getDomConfig.setParameter("error-handler", new MyErrorHandler)
+ *   parser
+ * }
+ *
+ * val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser _)
+ * }}}
+ *
+ * A custom `LSResourceResolver` could be used to retrieve DTDs locally, or even to suppress DTD resolution.
+ * The latter can be coded as follows (see http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds),
+ * risking some loss of information:
+ * {{{
+ * class MyEntityResolver extends LSResourceResolver {
+ *   override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
+ *     val input = domImplLS.createLSInput()
+ *     input.setCharacterStream(new jio.StringReader(""))
+ *     input
+ *   }
+ * }
+ * }}}
+ *
+ * For completeness, a custom `DOMErrorHandler` class that simply throws an exception:
+ * {{{
+ * class MyErrorHandler extends DOMErrorHandler {
+ *   override def handleError(exc: DOMError): Boolean = {
+ *     sys.error(exc.toString)
+ *   }
+ * }
+ * }}}
  *
  * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
  * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingDomLS`, but adapts the `parse` method.
