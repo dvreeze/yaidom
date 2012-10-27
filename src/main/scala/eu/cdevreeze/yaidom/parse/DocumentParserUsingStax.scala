@@ -65,6 +65,8 @@ import convert.StaxConversions._
  *
  * A `DocumentParserUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLInputFactory` is thread-safe, it can even be re-used from multiple threads.
+ * Typically a `XMLInputFactory` cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `XMLInputFactory` instance per request.
  *
  * @author Chris de Vreeze
  */

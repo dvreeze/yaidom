@@ -34,6 +34,8 @@ import convert.StaxConversions._
  *
  * A `DocumentPrinterUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLEventFactory` and `XMLOutputFactory` are thread-safe, it can even be re-used from multiple threads.
+ * Typically these objects cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `XMLEventFactory` and `XMLOutputFactory` instance per request.
  *
  * @author Chris de Vreeze
  */

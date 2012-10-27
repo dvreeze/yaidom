@@ -36,6 +36,8 @@ import DocumentPrinterUsingDomLS._
  *
  * A `DocumentPrinterUsingDomLS` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` and `DOMImplementationLS` are thread-safe, it can even be re-used from multiple threads.
+ * Typically a `DocumentBuilderFactory` or `DOMImplementationLS` cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `DocumentBuilderFactory` and `DOMImplementationLS` instance per request.
  *
  * @author Chris de Vreeze
  */

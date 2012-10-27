@@ -85,6 +85,8 @@ import org.xml.sax.ext.LexicalHandler
  *
  * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXParserFactory` is thread-safe, it can even be re-used from multiple threads.
+ * Typically a `SAXParserFactory` cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `SAXParserFactory` instance per request.
  *
  * @author Chris de Vreeze
  */

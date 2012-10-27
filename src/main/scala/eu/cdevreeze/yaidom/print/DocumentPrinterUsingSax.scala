@@ -35,6 +35,8 @@ import javax.xml.transform.stream.StreamResult
  *
  * A `DocumentPrinterUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXTransformerFactory` is thread-safe, it can even be re-used from multiple threads.
+ * Typically a `SAXTransformerFactory` cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `SAXTransformerFactory` instance per request.
  *
  * @author Chris de Vreeze
  */

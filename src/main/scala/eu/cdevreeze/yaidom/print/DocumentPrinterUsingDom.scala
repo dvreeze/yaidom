@@ -47,6 +47,8 @@ import DocumentPrinterUsingDom._
  *
  * A `DocumentPrinterUsingDom` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` and `TransformerFactory` are thread-safe, it can even be re-used from multiple threads.
+ * Typically a `DocumentBuilderFactory` or `TransformerFactory` cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `DocumentBuilderFactory` and `TransformerFactory` instance per request.
  *
  * ==Notes on HTML==
  *

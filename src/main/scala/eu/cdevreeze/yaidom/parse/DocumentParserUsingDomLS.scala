@@ -35,6 +35,8 @@ import convert.DomConversions._
  *
  * A `DocumentParserUsingDomLS` instance can be re-used multiple times, from the same thread.
  * If the `DOMImplementationLS` is thread-safe, it can even be re-used from multiple threads.
+ * Typically a `DocumentBuilderFactory` cannot be trusted to be thread-safe, however. In a web application,
+ * one (safe) way to deal with that is to use one `DocumentBuilderFactory` instance per request.
  *
  * @author Chris de Vreeze
  */
