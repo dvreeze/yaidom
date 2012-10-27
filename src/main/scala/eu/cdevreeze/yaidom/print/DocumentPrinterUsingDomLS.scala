@@ -61,14 +61,14 @@ final class DocumentPrinterUsingDomLS(
     val serializer: LSSerializer = serializerCreator(domImplementation)
 
     val output: LSOutput = domImplementation.createLSOutput
-    val bos = new jio.ByteArrayOutputStream
+    val sw = new jio.StringWriter
     output.setEncoding("utf-8")
-    output.setByteStream(bos)
+    output.setCharacterStream(sw)
 
     val ok = serializer.write(domDocument, output)
     require(ok, "Expected successful serialization of Document %s".format(doc.documentElement.toString))
 
-    val result = new String(bos.toByteArray, "utf-8")
+    val result = sw.toString
     result
   }
 
