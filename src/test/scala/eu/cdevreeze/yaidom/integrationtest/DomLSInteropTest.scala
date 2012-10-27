@@ -463,7 +463,7 @@ class DomLSInteropTest extends Suite {
   @Test def testParseSchemaXsd() {
     // 1. Parse XML file into Elem
 
-    val domImplLS = DocumentParserUsingDomLS.newInstance().domImplLS
+    val domImplLS = DocumentParserUsingDomLS.newInstance().domImplementation
 
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
