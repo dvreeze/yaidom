@@ -33,10 +33,13 @@ import YaidomToStaxEventsConversions._
  */
 trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] with DocumentConverter[XmlEventsProducer] {
 
+  /** Returns encoding used in the createStartDocument call. Can be overridden. */
+  def encoding: String = "UTF-8"
+
   /** Converts a yaidom `Document` to a function from `XMLEventFactory`s to sequences of `XMLEvent` instances */
   final def convertDocument(doc: Document): XmlEventsProducer = {
     { (xmlEventFactory: XMLEventFactory) =>
-      val startDocument = xmlEventFactory.createStartDocument
+      val startDocument = xmlEventFactory.createStartDocument(encoding)
       // For the line separator, see for example http://xerces.apache.org/xerces-j/apiDocs/org/apache/xml/serialize/OutputFormat.html#setLineSeparator(java.lang.String).
       val newline = xmlEventFactory.createCharacters("\n")
       val piEvents: immutable.IndexedSeq[XMLEvent] =

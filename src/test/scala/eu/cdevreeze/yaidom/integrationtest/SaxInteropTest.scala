@@ -795,6 +795,28 @@ class SaxInteropTest extends Suite {
     }
 
     doChecks(root2)
+
+    // 3. Show the output with different output encodings
+
+    val printer = DocumentPrinterUsingSax.newInstance()
+
+    val utf8Encoding = "utf-8"
+    val iso8859_1Encoding = "ISO-8859-1"
+
+    val utf8Output = printer.print(Document(root), utf8Encoding)
+    val iso8859_1Output = printer.print(Document(root), iso8859_1Encoding)
+
+    logger.info("UTF-8 output (with euro) converted to String:%n%s".format(new String(utf8Output, utf8Encoding)))
+    logger.info("ISO 8859-1 output (with euro) converted to String:%n%s".format(new String(iso8859_1Output, iso8859_1Encoding)))
+
+    val doc1 = saxParser.parse(new jio.ByteArrayInputStream(utf8Output))
+    val doc2 = saxParser.parse(new jio.ByteArrayInputStream(iso8859_1Output))
+
+    doChecks(doc1.documentElement)
+    doChecks(doc2.documentElement)
+
+    logger.info(
+      "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
   }
 
   @Test def testParseGeneratedHtml() {

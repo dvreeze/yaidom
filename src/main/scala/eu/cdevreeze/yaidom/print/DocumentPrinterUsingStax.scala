@@ -21,7 +21,7 @@ import java.{ util => jutil, io => jio }
 import javax.xml.stream._
 import javax.xml.stream.events.XMLEvent
 import scala.collection.immutable
-import convert.StaxConversions._
+import convert.YaidomToStaxEventsConversions
 
 /**
  * StAX-based `Document` printer.
@@ -46,7 +46,16 @@ sealed class DocumentPrinterUsingStax(
   val omitXmlDeclaration: Boolean = false
 
   def print(doc: Document, encoding: String): Array[Byte] = {
-    val events: immutable.IndexedSeq[XMLEvent] = convertDocument(doc)(eventFactory)
+    // The following conversion (causing a CreateStartDocument event with encoding) is need to hopefully prevent the following exception:
+    // javax.xml.stream.XMLStreamException: Underlying stream encoding 'ISO8859_1' and input parameter for writeStartDocument() method 'UTF-8' do not match.
+    // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6452107.
+    // Alas, it still does not work, leading to an empty byte array below.
+
+    val enc = encoding
+    val converterToStax = new YaidomToStaxEventsConversions {
+      override def encoding: String = enc
+    }
+    val events: immutable.IndexedSeq[XMLEvent] = converterToStax.convertDocument(doc)(eventFactory)
 
     val bos = new jio.ByteArrayOutputStream
     var xmlEventWriter: XMLEventWriter = null
@@ -54,7 +63,9 @@ sealed class DocumentPrinterUsingStax(
     val bytes =
       try {
         xmlEventWriter = outputFactory.createXMLEventWriter(bos, encoding)
-        for (ev <- events) xmlEventWriter.add(ev)
+        for (ev <- events) {
+          xmlEventWriter.add(ev)
+        }
         val result = bos.toByteArray
         result
       } finally {
@@ -68,7 +79,8 @@ sealed class DocumentPrinterUsingStax(
   }
 
   def print(doc: Document): String = {
-    val events: immutable.IndexedSeq[XMLEvent] = convertDocument(doc)(eventFactory)
+    val converterToStax = new YaidomToStaxEventsConversions {}
+    val events: immutable.IndexedSeq[XMLEvent] = converterToStax.convertDocument(doc)(eventFactory)
 
     val sw = new jio.StringWriter
     var xmlEventWriter: XMLEventWriter = null
@@ -98,8 +110,8 @@ sealed class DocumentPrinterUsingStax(
     require(linesIterator.hasNext, "Expected at least one line")
     val firstLine = linesIterator.next()
 
-    if (firstLine.trim.startsWith("<?xml")) {
-      xmlString.drop(firstLine.size).trim
+    if (firstLine.trim.startsWith("<?xml") && firstLine.trim.contains("?>")) {
+      xmlString.dropWhile(c => c != '>').drop(1).trim
     } else xmlString
   }
 }

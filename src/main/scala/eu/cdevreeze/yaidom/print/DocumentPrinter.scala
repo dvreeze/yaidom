@@ -18,9 +18,9 @@ package eu.cdevreeze.yaidom
 package print
 
 /**
- * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a `String`).
+ * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a `String` or byte array).
  *
- * Implementing classes deal with the details of printing yaidom documents as XML strings.
+ * Implementing classes deal with the details of printing yaidom documents as XML strings or byte arrays.
  * The [[eu.cdevreeze.yaidom]] package itself is agnostic of those details.
  *
  * Typical implementations use DOM or StAX, but make them easier to use in the tradition of the "template" classes
@@ -46,6 +46,12 @@ trait DocumentPrinter {
 
   /** Returns a copy of this `DocumentPrinter` that omits XML declarations */
   def omittingXmlDeclaration: DocumentPrinter
+
+  /** Converts the `Elem` to a byte array, omitting the XML declaration */
+  final def print(elm: Elem, encoding: String): Array[Byte] = {
+    val printer = omittingXmlDeclaration
+    printer.print(Document(elm), encoding)
+  }
 
   /** Converts the `Elem` to a `String`, omitting the XML declaration */
   final def print(elm: Elem): String = {

@@ -1153,18 +1153,20 @@ class DomLSInteropTest extends Suite {
 
     // 4. Show the output with different output encodings
 
-    val printer = DocumentPrinterUsingDomLS.newInstance()
+    val printer = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+      val serializer = domImpl.createLSSerializer()
+      // This configuration fixes the following exception:
+      // org.w3c.dom.ls.LSException: Attribute "xmlns" was already specified for element "root"
+      serializer.getDomConfig.setParameter("namespaces", java.lang.Boolean.FALSE)
+      serializer
+    }
 
     val utf8Encoding = "utf-8"
     val iso8859_1Encoding = "ISO-8859-1"
 
-    logger.info("Root:%n%s".format(Document(root).toString))
-
     val utf8Output = printer.print(Document(root), utf8Encoding)
     val iso8859_1Output = printer.print(Document(root), iso8859_1Encoding)
 
-    // TODO Fix: org.w3c.dom.ls.LSException: Attribute "xmlns" was already specified for element "root"
-    /*
     logger.info("UTF-8 output (with euro) converted to String:%n%s".format(new String(utf8Output, utf8Encoding)))
     logger.info("ISO 8859-1 output (with euro) converted to String:%n%s".format(new String(iso8859_1Output, iso8859_1Encoding)))
 
@@ -1176,7 +1178,6 @@ class DomLSInteropTest extends Suite {
 
     logger.info(
       "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
-    */
   }
 
   @Test def testParseBrokenXml() {
