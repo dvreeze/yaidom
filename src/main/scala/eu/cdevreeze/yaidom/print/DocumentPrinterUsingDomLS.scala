@@ -137,7 +137,7 @@ object DocumentPrinterUsingDomLS {
       { domImpl => domImpl.createLSSerializer() })
   }
 
-  /** Returns a new instance, by invoking the primary constructor, with output encoding UTF-8 */
+  /** Returns a new instance, by invoking the primary constructor */
   def newInstance(
     docBuilderFactory: DocumentBuilderFactory,
     docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
