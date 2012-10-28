@@ -54,6 +54,24 @@ final class DocumentPrinterUsingDomLS(
   val domImplementation: DOMImplementationLS,
   val serializerCreator: DOMImplementationLS => LSSerializer) extends DocumentPrinter { self =>
 
+  def print(doc: Document, encoding: String): Array[Byte] = {
+    val docBuilder = docBuilderCreator(docBuilderFactory)
+    val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
+
+    val serializer: LSSerializer = serializerCreator(domImplementation)
+
+    val output: LSOutput = domImplementation.createLSOutput
+    val bos = new jio.ByteArrayOutputStream
+    output.setEncoding(encoding)
+    output.setByteStream(bos)
+
+    val ok = serializer.write(domDocument, output)
+    require(ok, "Expected successful serialization of Document %s".format(doc.documentElement.toString))
+
+    val result = bos.toByteArray
+    result
+  }
+
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
@@ -119,7 +137,7 @@ object DocumentPrinterUsingDomLS {
       { domImpl => domImpl.createLSSerializer() })
   }
 
-  /** Returns a new instance, by invoking the primary constructor */
+  /** Returns a new instance, by invoking the primary constructor, with output encoding UTF-8 */
   def newInstance(
     docBuilderFactory: DocumentBuilderFactory,
     docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,

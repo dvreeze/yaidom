@@ -35,7 +35,13 @@ package print
  */
 trait DocumentPrinter {
 
-  /** Converts the `Document` to a `String`. May use a lot of memory for large XML documents. */
+  /** Converts the `Document` to a byte array, using the given encoding. May use a lot of memory for large XML documents. */
+  def print(doc: Document, encoding: String): Array[Byte]
+
+  /**
+   * Converts the `Document` to a `String`. May use a lot of memory for large XML documents.
+   * The output encoding is UTF-8.
+   */
   def print(doc: Document): String
 
   /** Returns a copy of this `DocumentPrinter` that omits XML declarations */

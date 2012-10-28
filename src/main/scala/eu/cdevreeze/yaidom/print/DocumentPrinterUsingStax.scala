@@ -45,6 +45,28 @@ sealed class DocumentPrinterUsingStax(
 
   val omitXmlDeclaration: Boolean = false
 
+  def print(doc: Document, encoding: String): Array[Byte] = {
+    val events: immutable.IndexedSeq[XMLEvent] = convertDocument(doc)(eventFactory)
+
+    val bos = new jio.ByteArrayOutputStream
+    var xmlEventWriter: XMLEventWriter = null
+
+    val bytes =
+      try {
+        xmlEventWriter = outputFactory.createXMLEventWriter(bos, encoding)
+        for (ev <- events) xmlEventWriter.add(ev)
+        val result = bos.toByteArray
+        result
+      } finally {
+        if (xmlEventWriter ne null) xmlEventWriter.close()
+      }
+
+    // Inefficient, of course
+    val xmlString = new String(bytes, encoding)
+    val editedString = if (omitXmlDeclaration) removeXmlDeclaration(xmlString) else xmlString
+    editedString.getBytes(encoding)
+  }
+
   def print(doc: Document): String = {
     val events: immutable.IndexedSeq[XMLEvent] = convertDocument(doc)(eventFactory)
 

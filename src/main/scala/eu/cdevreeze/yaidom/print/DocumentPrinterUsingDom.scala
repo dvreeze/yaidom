@@ -81,6 +81,25 @@ final class DocumentPrinterUsingDom(
   val transformerFactory: TransformerFactory,
   val transformerCreator: TransformerFactory => Transformer) extends DocumentPrinter {
 
+  def print(doc: Document, encoding: String): Array[Byte] = {
+    val docBuilder = docBuilderCreator(docBuilderFactory)
+    val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
+
+    val transformer = transformerCreator(transformerFactory)
+    transformer.setOutputProperty(OutputKeys.ENCODING, encoding)
+
+    val domSource = new DOMSource(domDocument)
+
+    // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
+    val bos = new jio.ByteArrayOutputStream
+    val streamResult = new StreamResult(bos)
+
+    transformer.transform(domSource, streamResult)
+
+    val result = bos.toByteArray
+    result
+  }
+
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
