@@ -228,21 +228,30 @@ object NodeBuilder {
    * The following must always hold: `fromNode(node)(parentScope).build(parentScope)` "is structurally equal to" `node`
    */
   def fromNode(node: Node)(parentScope: Scope): NodeBuilder = node match {
-    case Text(s, false) => TextBuilder(s, false)
-    case Text(s, true) => TextBuilder(s, true)
-    case ProcessingInstruction(target, data) => ProcessingInstructionBuilder(target, data)
-    case EntityRef(entity) => EntityRefBuilder(entity)
-    case Comment(s) => CommentBuilder(s)
+    case t: Text => fromText(t)
+    case pi: ProcessingInstruction => fromProcessingInstruction(pi)
+    case er: EntityRef => fromEntityRef(er)
+    case c: Comment => fromComment(c)
     case e: Elem =>
       assert(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 
-      // Recursive call, but not tail-recursive
-      new ElemBuilder(
-        qname = e.qname,
-        attributes = e.attributes,
-        namespaces = parentScope.relativize(e.scope),
-        children = e.children map { ch => fromNode(ch)(e.scope) })
+      fromElem(e)(parentScope)
   }
 
-  def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = fromNode(elm)(parentScope).asInstanceOf[ElemBuilder]
+  def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = {
+    // Recursive call into fromNode, but not tail-recursive
+    new ElemBuilder(
+      qname = elm.qname,
+      attributes = elm.attributes,
+      namespaces = parentScope.relativize(elm.scope),
+      children = elm.children map { ch => fromNode(ch)(elm.scope) })
+  }
+
+  def fromText(txt: Text): TextBuilder = TextBuilder(txt.text, txt.isCData)
+
+  def fromProcessingInstruction(pi: ProcessingInstruction): ProcessingInstructionBuilder = ProcessingInstructionBuilder(pi.target, pi.data)
+
+  def fromEntityRef(er: EntityRef): EntityRefBuilder = EntityRefBuilder(er.entity)
+
+  def fromComment(comment: Comment): CommentBuilder = CommentBuilder(comment.text)
 }

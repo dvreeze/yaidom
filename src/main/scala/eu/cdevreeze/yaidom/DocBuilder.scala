@@ -67,8 +67,8 @@ object DocBuilder {
 
     new DocBuilder(
       baseUriOption = doc.baseUriOption,
-      documentElement = fromNode(doc.documentElement)(parentScope).asInstanceOf[ElemBuilder],
-      processingInstructions = doc.processingInstructions collect { case pi: ProcessingInstruction => fromNode(pi)(parentScope).asInstanceOf[ProcessingInstructionBuilder] },
-      comments = doc.comments collect { case c => fromNode(c)(parentScope).asInstanceOf[CommentBuilder] })
+      documentElement = fromElem(doc.documentElement)(parentScope),
+      processingInstructions = doc.processingInstructions collect { case pi: ProcessingInstruction => fromProcessingInstruction(pi) },
+      comments = doc.comments collect { case c => fromComment(c) })
   }
 }

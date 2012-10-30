@@ -154,14 +154,14 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     require(currentRoot ne null, "When parsing is ready, the current root must not be null")
     require(currentElem eq null, "When parsing is ready, the current path must be at the root")
 
-    val root = currentRoot.toNode.asInstanceOf[Elem]
+    val root = currentRoot.toNode
     root
   }
 
   final def resultingDocument: Document = {
     val docElem = resultingElem
-    val pis = topLevelProcessingInstructions map { pi => pi.toNode.asInstanceOf[ProcessingInstruction] }
-    val comments = topLevelComments map { comment => comment.toNode.asInstanceOf[Comment] }
+    val pis = topLevelProcessingInstructions map { pi => pi.toNode }
+    val comments = topLevelComments map { comment => comment.toNode }
     new Document(None, docElem, pis, comments)
   }
 
@@ -221,7 +221,9 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 object DefaultElemProducingSaxHandler {
 
   private[parse] trait InternalNode {
-    def toNode: Node
+    type NodeType <: Node
+
+    def toNode: NodeType
   }
 
   private[parse] trait InternalParentNode extends InternalNode {
@@ -236,6 +238,8 @@ object DefaultElemProducingSaxHandler {
     val scope: Scope,
     var children: mutable.IndexedSeq[InternalNode]) extends InternalParentNode {
 
+    type NodeType = Elem
+
     def toNode: Elem = {
       // Recursive (not tail-recursive)
       Elem(
@@ -247,21 +251,25 @@ object DefaultElemProducingSaxHandler {
   }
 
   private[parse] final class InternalTextNode(text: String, isCData: Boolean) extends InternalNode {
+    type NodeType = Text
 
     def toNode: Text = Text(text, isCData)
   }
 
   private[parse] final class InternalProcessingInstructionNode(target: String, data: String) extends InternalNode {
+    type NodeType = ProcessingInstruction
 
     def toNode: ProcessingInstruction = ProcessingInstruction(target, data)
   }
 
   private[parse] final class InternalEntityRefNode(entity: String) extends InternalNode {
+    type NodeType = EntityRef
 
     def toNode: EntityRef = EntityRef(entity)
   }
 
   private[parse] final class InternalCommentNode(text: String) extends InternalNode {
+    type NodeType = Comment
 
     def toNode: Comment = Comment(text)
   }
