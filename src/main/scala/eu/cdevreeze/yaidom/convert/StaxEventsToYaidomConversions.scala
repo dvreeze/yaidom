@@ -118,7 +118,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     def startsWithEndDocument(events: immutable.IndexedSeq[EventWithDepth]): Boolean = {
       if (events.isEmpty) false else {
         val head: EventWithDepth = events.head
-        head.event.isInstanceOf[EndDocument]
+        head.event.isEndDocument
       }
     }
 
@@ -129,22 +129,20 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
     // Imperative code
     while (!remainingEvents.isEmpty && !startsWithEndDocument(remainingEvents)) {
-      remainingEvents.head match {
-        case ev if ev.event.isStartElement => {
+      remainingEvents.head.event match {
+        case ev: StartElement => {
           require(docElement eq null, "Only 1 document element allowed and required")
           val result = eventsToElem(remainingEvents, Scope.Empty)
           docElement = result.elem
           remainingEvents = result.remainder
         }
-        case ev if ev.event.isProcessingInstruction => {
-          val piEv = ev.event.asInstanceOf[javax.xml.stream.events.ProcessingInstruction]
-          val pi = convertToProcessingInstruction(piEv)
+        case ev: javax.xml.stream.events.ProcessingInstruction => {
+          val pi = convertToProcessingInstruction(ev)
           pis += pi
           remainingEvents = remainingEvents.drop(1)
         }
-        case ev if ev.event.isInstanceOf[javax.xml.stream.events.Comment] => {
-          val comEv = ev.event.asInstanceOf[javax.xml.stream.events.Comment]
-          val com = convertToComment(comEv)
+        case ev: javax.xml.stream.events.Comment => {
+          val com = convertToComment(ev)
           comments += com
           remainingEvents = remainingEvents.drop(1)
         }
@@ -189,35 +187,31 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
     // Imperative code
     while (!remainingEvents.isEmpty && !startsWithMatchingEndElement(remainingEvents)) {
-      remainingEvents.head match {
-        case ev if ev.event.isStartElement => {
+      remainingEvents.head.event match {
+        case ev: StartElement => {
           // Recursive call (not tail-recursive, but recursion depth is rather limited)
           val result = eventsToElem(remainingEvents, elem.scope)
           val ch = result.elem
           children += ch
           remainingEvents = result.remainder
         }
-        case ev if ev.event.isCharacters => {
-          val charEv = ev.event.asCharacters
-          val ch = convertToText(charEv)
+        case ev: Characters => {
+          val ch = convertToText(ev)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
-        case ev if ev.event.isEntityReference => {
-          val erEv = ev.event.asInstanceOf[EntityReference]
-          val ch = convertToEntityRef(erEv)
+        case ev: EntityReference => {
+          val ch = convertToEntityRef(ev)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
-        case ev if ev.event.isProcessingInstruction => {
-          val piEv = ev.event.asInstanceOf[javax.xml.stream.events.ProcessingInstruction]
-          val ch = convertToProcessingInstruction(piEv)
+        case ev: javax.xml.stream.events.ProcessingInstruction => {
+          val ch = convertToProcessingInstruction(ev)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }
-        case ev if ev.event.isInstanceOf[javax.xml.stream.events.Comment] => {
-          val comEv = ev.event.asInstanceOf[javax.xml.stream.events.Comment]
-          val ch = convertToComment(comEv)
+        case ev: javax.xml.stream.events.Comment => {
+          val ch = convertToComment(ev)
           children += ch
           remainingEvents = remainingEvents.drop(1)
         }

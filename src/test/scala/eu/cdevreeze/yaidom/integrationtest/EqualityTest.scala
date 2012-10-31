@@ -238,7 +238,7 @@ class EqualityTest extends Suite {
     }
 
     val entityRefs = {
-      val result = root2.findAllElemsOrSelf flatMap { e => e.children.filter(_.isInstanceOf[EntityRef]) }
+      val result = root2.findAllElemsOrSelf flatMap { e => e.children collect { case er: EntityRef => er } }
       result
     }
     expect(1) {

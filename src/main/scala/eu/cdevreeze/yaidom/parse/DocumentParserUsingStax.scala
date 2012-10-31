@@ -89,7 +89,8 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends D
   }
 
   private def toIndexedSeq(xmlEventReader: XMLEventReader): immutable.IndexedSeq[XMLEvent] = {
-    xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]].asScala.toIndexedSeq
+    val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
+    it.asScala.toIndexedSeq
   }
 }
 

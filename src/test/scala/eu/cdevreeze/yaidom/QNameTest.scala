@@ -131,7 +131,7 @@ class QNameTest extends Suite {
       qname.prefix
     }
 
-    val qname2: PrefixedName = QName("books", "Bookstore").asInstanceOf[PrefixedName]
+    val qname2: PrefixedName = PrefixedName("books", "Bookstore")
 
     expect("Bookstore") {
       qname2.localPart

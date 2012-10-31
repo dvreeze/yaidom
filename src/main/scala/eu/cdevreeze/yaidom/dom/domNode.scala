@@ -101,8 +101,10 @@ final class DomElem(
 
   def scope: Scope = {
     val parent = wrappedNode.getParentNode
-    val parentElement: w3c.dom.Element =
-      if (parent.isInstanceOf[w3c.dom.Element]) parent.asInstanceOf[w3c.dom.Element] else null
+    val parentElement: w3c.dom.Element = parent match {
+      case e: w3c.dom.Element => e
+      case _ => null
+    }
 
     // Recursive, but not tail-recursive
     val parentScope = if (parentElement eq null) Scope.Empty else (new DomElem(parentElement)).scope
