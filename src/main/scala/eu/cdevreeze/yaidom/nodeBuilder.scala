@@ -228,10 +228,10 @@ object NodeBuilder {
    * The following must always hold: `fromNode(node)(parentScope).build(parentScope)` "is structurally equal to" `node`
    */
   def fromNode(node: Node)(parentScope: Scope): NodeBuilder = node match {
-    case t: Text => fromText(t)
-    case pi: ProcessingInstruction => fromProcessingInstruction(pi)
-    case er: EntityRef => fromEntityRef(er)
-    case c: Comment => fromComment(c)
+    case t @ Text(_, _) => fromText(t)
+    case pi @ ProcessingInstruction(_, _) => fromProcessingInstruction(pi)
+    case er @ EntityRef(_) => fromEntityRef(er)
+    case c @ Comment(_) => fromComment(c)
     case e: Elem =>
       assert(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 

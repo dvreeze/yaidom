@@ -130,7 +130,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     // Imperative code
     while (!remainingEvents.isEmpty && !startsWithEndDocument(remainingEvents)) {
       remainingEvents.head.event match {
-        case ev: StartElement => {
+        case ev if ev.isStartElement => {
           require(docElement eq null, "Only 1 document element allowed and required")
           val result = eventsToElem(remainingEvents, Scope.Empty)
           docElement = result.elem
