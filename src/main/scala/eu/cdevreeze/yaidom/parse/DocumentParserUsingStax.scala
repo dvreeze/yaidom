@@ -98,7 +98,11 @@ object DocumentParserUsingStax {
 
   /** Returns a new instance, configured to coalesce whitespace */
   def newInstance(): DocumentParserUsingStax = {
-    val xmlInputFactory = XMLInputFactory.newFactory
+    // Although the factory method newFactory should be used instead of newInstance,
+    // to stay out of "XML JAR-hell" (especially with Java 5, which does not ship with StAX), the newInstance method
+    // was used.
+
+    val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
     newInstance(xmlInputFactory)
   }

@@ -238,11 +238,18 @@ class BasicXmlProcessingTest extends Suite {
           Vector(Elem(e.qname, e.attributes - QName("link"), e.scope, e.children))
       }
 
-    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {
-      resolved.Elem(musicElm2).removeAllInterElementWhitespace
+    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
+      resolved.Elem(musicElm2).removeAllInterElementWhitespace.findAllElemsOrSelf.size
     }
-    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace) {
-      resolved.Elem(musicElm3).removeAllInterElementWhitespace
+    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem(musicElm2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    }
+
+    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
+      resolved.Elem(musicElm3).removeAllInterElementWhitespace.findAllElemsOrSelf.size
+    }
+    expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem(musicElm3).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
 
