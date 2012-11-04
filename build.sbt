@@ -44,3 +44,41 @@ libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
 libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
+
+publishMavenStyle := true
+
+publishTo <<= version { (v: String) =>
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishArtifact in Test := false
+
+pomIncludeRepository := { repo => false }
+
+pomExtra := {
+  <url>https://github.com/dvreeze/yaidom</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
+    <url>https://github.com/dvreeze/yaidom.git</url>
+    <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <id>dvreeze</id>
+      <name>Chris de Vreeze</name>
+      <email>chris.de.vreeze@caiway.net</email>
+    </developer>
+  </developers>
+}
