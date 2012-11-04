@@ -331,7 +331,14 @@ class AirportExampleTest extends Suite {
     val domPrinter = {
       val dbf = DocumentBuilderFactory.newInstance
       val tf = TransformerFactory.newInstance
-      tf.setAttribute("indent-number", java.lang.Integer.valueOf(2))
+
+      try {
+        tf.getAttribute("indent-number") // Throws an exception if "indent-number" is not supported
+        tf.setAttribute("indent-number", java.lang.Integer.valueOf(2))
+      } catch {
+        case e: Exception => () // Ignore
+      }
+
       DocumentPrinterUsingDom.newInstance(dbf, tf)
     }
 

@@ -144,7 +144,13 @@ class FriendFeedTest extends Suite {
       val dbf: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
 
       val tf: TransformerFactory = TransformerFactory.newInstance
-      tf.setAttribute("indent-number", int2Integer(2))
+
+      try {
+        tf.getAttribute("indent-number") // Throws an exception if "indent-number" is not supported
+        tf.setAttribute("indent-number", java.lang.Integer.valueOf(2))
+      } catch {
+        case e: Exception => () // Ignore
+      }
 
       DocumentPrinterUsingDom.newInstance(dbf, tf)
     }
