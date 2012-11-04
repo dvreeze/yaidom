@@ -44,8 +44,8 @@ import convert.StaxConversions._
  * risking some loss of information:
  * {{{
  * class MyXmlResolver extends XMLResolver {
- *   override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): InputSource = {
- *     new InputSource(new java.io.StringReader(""))
+ *   override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): Any = {
+ *     new java.io.StringReader("")
  *   }
  * }
  * }}}

@@ -1066,17 +1066,18 @@ class StaxInteropTest extends Suite {
   }
 
   class LoggingResolver extends XMLResolver {
-    override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): InputSource = {
+    override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
       // Default behaviour
-      null
+      val is: jio.InputStream = null
+      is
     }
   }
 
   class DtdSuppressionResolver extends XMLResolver {
-    override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): InputSource = {
+    override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
-      new InputSource(new java.io.StringReader(""))
+      new java.io.StringReader("")
     }
   }
 }
