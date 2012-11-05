@@ -3,6 +3,18 @@ CHANGELOG
 =========
 
 
+0.6.3
+=====
+
+* Enabled cross-building and publishing (to Sonatype repository) for different Scala versions, using sbt
+* Added DOM Load/Save based document parser and printer
+* Document printers can now print to byte arrays, given some character encoding
+* Extended XLinks know their resources and locators by label
+* Bug fix in `YaidomToDomConversions`: top-level comments occur before the document element, not after
+* Tests now also run on Java 5, including an IBM JRE 5
+* Small fixes, code cleanup and documentation additions
+
+
 0.6.2
 =====
 
