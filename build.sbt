@@ -1,9 +1,7 @@
 
 // Keep in sync with the Maven pom.xml file!
-// (I am not yet this far: https://github.com/sbt/sbt.github.com/blob/gen-master/src/jekyll/using_sonatype.md)
-// Note that the sbt build is nice for day-to-day work, and the Maven build must currently be used for publishing artifacts.
-// The sbt build uses the target directory in a different way than the Maven build, so, when switching
-// between sbt and Maven, first do a clean (emptying the target directory).
+// See http://www.scala-sbt.org/release/docs/Community/Using-Sonatype.html for how to publish to
+// Sonatype, using sbt only.
 
 name := "yaidom"
 
