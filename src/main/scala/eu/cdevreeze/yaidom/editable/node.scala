@@ -83,7 +83,7 @@ final class Elem(
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
-  // TODO Is the next operation safe and sufficiently easy to use w.r.t. namespaces? Should it repair namespaces?
+  // TODO Is the next operation safe and sufficiently easy to use w.r.t. namespaces? Should it fix namespace scopes?
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
