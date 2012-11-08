@@ -51,17 +51,15 @@ final class Document(
 
   /** Expensive method to obtain all processing instructions */
   def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
-    val result: immutable.IndexedSeq[immutable.IndexedSeq[ProcessingInstruction]] =
-      documentElement.findAllElemsOrSelf collect { case e: Elem => e.children collect { case pi: ProcessingInstruction => pi } }
-    val elemPIs = result.flatten
+    val elemPIs: immutable.IndexedSeq[ProcessingInstruction] =
+      documentElement.findAllElemsOrSelf flatMap { e: Elem => e.processingInstructionChildren }
     processingInstructions ++ elemPIs
   }
 
   /** Expensive method to obtain all comments */
   def allComments: immutable.IndexedSeq[Comment] = {
-    val result: immutable.IndexedSeq[immutable.IndexedSeq[Comment]] =
-      documentElement.findAllElemsOrSelf collect { case e: Elem => e.children collect { case c: Comment => c } }
-    val elemComments = result.flatten
+    val elemComments: immutable.IndexedSeq[Comment] =
+      documentElement.findAllElemsOrSelf flatMap { e: Elem => e.commentChildren }
     comments ++ elemComments
   }
 

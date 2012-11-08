@@ -220,6 +220,10 @@ final class Elem(
   /** Returns the comment children */
   def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
 
+  /** Returns the processing instruction children */
+  def processingInstructionChildren: immutable.IndexedSeq[ProcessingInstruction] =
+    children collect { case pi: ProcessingInstruction => pi }
+
   /**
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
    * If there are no text children, the empty string is returned.
