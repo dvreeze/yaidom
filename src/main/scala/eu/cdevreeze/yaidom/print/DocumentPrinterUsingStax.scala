@@ -45,7 +45,7 @@ sealed class DocumentPrinterUsingStax(
 
   val omitXmlDeclaration: Boolean = false
 
-  def print(doc: Document, encoding: String): Array[Byte] = {
+  def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     // The following conversion (causing a CreateStartDocument event with encoding) is need to hopefully prevent the following exception:
     // javax.xml.stream.XMLStreamException: Underlying stream encoding 'ISO8859_1' and input parameter for writeStartDocument() method 'UTF-8' do not match.
     // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6452107.
@@ -60,6 +60,8 @@ sealed class DocumentPrinterUsingStax(
     val bos = new jio.ByteArrayOutputStream
     var xmlEventWriter: XMLEventWriter = null
 
+    // TODO Fix. This uses far too much memory!!!
+
     val bytes =
       try {
         xmlEventWriter = outputFactory.createXMLEventWriter(bos, encoding)
@@ -72,10 +74,15 @@ sealed class DocumentPrinterUsingStax(
         if (xmlEventWriter ne null) xmlEventWriter.close()
       }
 
-    // Inefficient, of course
+    // Very inefficient, of course
     val xmlString = new String(bytes, encoding)
     val editedString = if (omitXmlDeclaration) removeXmlDeclaration(xmlString) else xmlString
-    editedString.getBytes(encoding)
+
+    try {
+      outputStream.write(editedString.getBytes(encoding))
+    } finally {
+      outputStream.close()
+    }
   }
 
   def print(doc: Document): String = {

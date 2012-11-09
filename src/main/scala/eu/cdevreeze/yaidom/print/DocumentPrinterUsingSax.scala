@@ -44,19 +44,19 @@ final class DocumentPrinterUsingSax(
   val saxTransformerFactory: SAXTransformerFactory,
   val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler) extends DocumentPrinter {
 
-  def print(doc: Document, encoding: String): Array[Byte] = {
+  def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val handler = transformerHandlerCreator(saxTransformerFactory)
 
     // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
-    val bos = new jio.ByteArrayOutputStream
-    val streamResult = new StreamResult(bos)
+    val streamResult = new StreamResult(outputStream)
 
-    handler.getTransformer.setOutputProperty(OutputKeys.ENCODING, encoding)
-    handler.setResult(streamResult)
-    generateEventsForDocument(doc, handler)
-
-    val result = bos.toByteArray
-    result
+    try {
+      handler.getTransformer.setOutputProperty(OutputKeys.ENCODING, encoding)
+      handler.setResult(streamResult)
+      generateEventsForDocument(doc, handler)
+    } finally {
+      outputStream.close()
+    }
   }
 
   def print(doc: Document): String = {

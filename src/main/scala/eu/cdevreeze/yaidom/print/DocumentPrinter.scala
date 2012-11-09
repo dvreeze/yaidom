@@ -17,6 +17,8 @@
 package eu.cdevreeze.yaidom
 package print
 
+import java.io.{ OutputStream, ByteArrayOutputStream }
+
 /**
  * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a `String` or byte array).
  *
@@ -35,8 +37,20 @@ package print
  */
 trait DocumentPrinter {
 
+  /**
+   * Serializes the `Document` to an output stream, using the given encoding.
+   * This method should close the output stream afterwards.
+   *
+   * May use a lot of memory for large XML documents, although not as much as the `print` method that returns a byte array.
+   */
+  def print(doc: Document, encoding: String, outputStream: OutputStream): Unit
+
   /** Converts the `Document` to a byte array, using the given encoding. May use a lot of memory for large XML documents. */
-  def print(doc: Document, encoding: String): Array[Byte]
+  final def print(doc: Document, encoding: String): Array[Byte] = {
+    val bos = new ByteArrayOutputStream
+    print(doc, encoding, bos)
+    bos.toByteArray
+  }
 
   /**
    * Converts the `Document` to a `String`. May use a lot of memory for large XML documents.
@@ -51,6 +65,15 @@ trait DocumentPrinter {
   final def print(elm: Elem, encoding: String): Array[Byte] = {
     val printer = omittingXmlDeclaration
     printer.print(Document(elm), encoding)
+  }
+
+  /**
+   * Serializes the `Elem` to an output stream, omitting the XML declaration.
+   * This method should close the output stream afterwards.
+   */
+  final def print(elm: Elem, encoding: String, outputStream: OutputStream): Unit = {
+    val printer = omittingXmlDeclaration
+    printer.print(Document(elm), encoding, outputStream)
   }
 
   /** Converts the `Elem` to a `String`, omitting the XML declaration */

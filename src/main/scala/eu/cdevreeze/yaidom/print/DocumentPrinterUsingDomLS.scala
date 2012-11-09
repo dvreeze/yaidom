@@ -54,22 +54,23 @@ final class DocumentPrinterUsingDomLS(
   val domImplementation: DOMImplementationLS,
   val serializerCreator: DOMImplementationLS => LSSerializer) extends DocumentPrinter { self =>
 
-  def print(doc: Document, encoding: String): Array[Byte] = {
+  def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
     val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
 
     val serializer: LSSerializer = serializerCreator(domImplementation)
 
-    val output: LSOutput = domImplementation.createLSOutput
-    val bos = new jio.ByteArrayOutputStream
-    output.setEncoding(encoding)
-    output.setByteStream(bos)
+    try {
+      val output: LSOutput = domImplementation.createLSOutput()
+      output.setEncoding(encoding)
+      output.setByteStream(outputStream)
 
-    val ok = serializer.write(domDocument, output)
-    require(ok, "Expected successful serialization of Document %s".format(doc.documentElement.toString))
-
-    val result = bos.toByteArray
-    result
+      val ok = serializer.write(domDocument, output)
+      require(ok, "Expected successful serialization of Document %s".format(
+        doc.documentElement.withChildren(Vector(Text(" ... ", false))).toString))
+    } finally {
+      outputStream.close()
+    }
   }
 
   def print(doc: Document): String = {
@@ -78,13 +79,14 @@ final class DocumentPrinterUsingDomLS(
 
     val serializer: LSSerializer = serializerCreator(domImplementation)
 
-    val output: LSOutput = domImplementation.createLSOutput
+    val output: LSOutput = domImplementation.createLSOutput()
     val sw = new jio.StringWriter
     output.setEncoding("utf-8")
     output.setCharacterStream(sw)
 
     val ok = serializer.write(domDocument, output)
-    require(ok, "Expected successful serialization of Document %s".format(doc.documentElement.toString))
+    require(ok, "Expected successful serialization of Document %s".format(
+      doc.documentElement.withChildren(Vector(Text(" ... ", false))).toString))
 
     val result = sw.toString
     result
