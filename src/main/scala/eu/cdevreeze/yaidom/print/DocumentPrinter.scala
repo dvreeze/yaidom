@@ -54,7 +54,10 @@ trait DocumentPrinter {
 
   /**
    * Converts the `Document` to a `String`. May use a lot of memory for large XML documents.
-   * The output encoding is UTF-8.
+   *
+   * To have more control over the character encoding of the output, when converting the String to bytes
+   * (and of the encoding mentioned in the XML declaration, if any), consider using one of the other overloaded
+   * `print` methods taking a `Document`.
    */
   def print(doc: Document): String
 
@@ -76,7 +79,13 @@ trait DocumentPrinter {
     printer.print(Document(elm), encoding, outputStream)
   }
 
-  /** Converts the `Elem` to a `String`, omitting the XML declaration */
+  /**
+   * Converts the `Elem` to a `String`, omitting the XML declaration. May use a lot of memory for large XML documents.
+   *
+   * To have more control over the character encoding of the output, when converting the String to bytes
+   * (and of the encoding mentioned in the XML declaration, if any), consider using one of the other overloaded
+   * `print` methods taking an `Elem`.
+   */
   final def print(elm: Elem): String = {
     val printer = omittingXmlDeclaration
     printer.print(Document(elm))
