@@ -44,7 +44,8 @@ class DependencyTest extends Suite {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.reflect")
 
   // Importing the members of the api.JavaUniverse cake
-  import scala.reflect.runtime.universe._
+  val ru = scala.reflect.runtime.universe
+  import ru._
 
   private val yaidomPackageSymbol: Symbol = typeOf[Elem].typeSymbol.owner
   private val yaidomConvertPackageSymbol: Symbol = typeOf[convert.DomConversions.type].typeSymbol.owner
