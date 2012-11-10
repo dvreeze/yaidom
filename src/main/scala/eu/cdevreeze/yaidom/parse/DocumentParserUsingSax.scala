@@ -19,6 +19,7 @@ package parse
 
 import java.{ io => jio }
 import javax.xml.parsers.{ SAXParserFactory, SAXParser }
+import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
 
@@ -112,7 +113,9 @@ final class DocumentParserUsingSax(
         sp.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
       }
 
-      sp.parse(inputStream, handler)
+      // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/best.html
+      val inputSource = new InputSource(inputStream)
+      sp.parse(inputSource, handler)
 
       val doc: Document = handler.resultingDocument
       doc

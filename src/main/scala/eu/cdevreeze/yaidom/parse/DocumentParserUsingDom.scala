@@ -20,6 +20,7 @@ package parse
 import java.{ io => jio }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import org.w3c.dom.Element
+import org.xml.sax.InputSource
 import convert.DomConversions._
 
 /**
@@ -94,7 +95,10 @@ final class DocumentParserUsingDom(
   def parse(inputStream: jio.InputStream): Document = {
     try {
       val db: DocumentBuilder = docBuilderCreator(docBuilderFactory)
-      val domDoc: org.w3c.dom.Document = db.parse(inputStream)
+
+      // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/best.html
+      val inputSource = new InputSource(inputStream)
+      val domDoc: org.w3c.dom.Document = db.parse(inputSource)
 
       convertToDocument(domDoc)
     } finally {

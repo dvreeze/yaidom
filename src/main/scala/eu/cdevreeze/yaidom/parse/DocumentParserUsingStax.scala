@@ -20,6 +20,7 @@ package parse
 import java.{ io => jio, util => jutil }
 import javax.xml.stream.{ XMLInputFactory, XMLEventReader }
 import javax.xml.stream.events.XMLEvent
+import javax.xml.transform.stream.StreamSource
 import scala.collection.immutable
 import scala.collection.JavaConverters._
 import scala.util.control.Exception._
@@ -76,7 +77,8 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends D
   def parse(inputStream: jio.InputStream): Document = {
     var xmlEventReader: XMLEventReader = null
     try {
-      xmlEventReader = inputFactory.createXMLEventReader(inputStream)
+      val streamSource = new StreamSource(inputStream)
+      xmlEventReader = inputFactory.createXMLEventReader(streamSource)
       convertToDocument(toIndexedSeq(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
