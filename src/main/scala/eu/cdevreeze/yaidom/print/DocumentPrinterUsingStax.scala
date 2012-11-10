@@ -46,48 +46,45 @@ sealed class DocumentPrinterUsingStax(
   val omitXmlDeclaration: Boolean = false
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
-    // The following conversion (causing a CreateStartDocument event with encoding) is need to hopefully prevent the following exception:
+    // The following conversion (causing a CreateStartDocument event with encoding) is needed to hopefully prevent the following exception:
     // javax.xml.stream.XMLStreamException: Underlying stream encoding 'ISO8859_1' and input parameter for writeStartDocument() method 'UTF-8' do not match.
     // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6452107.
     // Alas, it still does not work, leading to an empty byte array below.
+
+    // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/stax.html#1105345 for a nice StAX tutorial.
 
     val enc = encoding
     val converterToStax = new YaidomToStaxEventsConversions {
       override def encoding: String = enc
     }
-    val events: immutable.IndexedSeq[XMLEvent] = converterToStax.convertDocument(doc)(eventFactory)
+    val events: immutable.IndexedSeq[XMLEvent] = {
+      val result = converterToStax.convertDocument(doc)(eventFactory)
 
-    val bos = new jio.ByteArrayOutputStream
+      if (omitXmlDeclaration) result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
+      else result
+    }
+
     var xmlEventWriter: XMLEventWriter = null
 
-    // TODO Fix. This uses far too much memory!!!
-
-    val bytes =
-      try {
-        xmlEventWriter = outputFactory.createXMLEventWriter(bos, encoding)
-        for (ev <- events) {
-          xmlEventWriter.add(ev)
-        }
-        val result = bos.toByteArray
-        result
-      } finally {
-        if (xmlEventWriter ne null) xmlEventWriter.close()
-      }
-
-    // Very inefficient, of course
-    val xmlString = new String(bytes, encoding)
-    val editedString = if (omitXmlDeclaration) removeXmlDeclaration(xmlString) else xmlString
-
     try {
-      outputStream.write(editedString.getBytes(encoding))
+      xmlEventWriter = outputFactory.createXMLEventWriter(outputStream, encoding)
+      for (ev <- events) {
+        xmlEventWriter.add(ev)
+      }
     } finally {
+      if (xmlEventWriter ne null) xmlEventWriter.close()
       outputStream.close()
     }
   }
 
   def print(doc: Document): String = {
     val converterToStax = new YaidomToStaxEventsConversions {}
-    val events: immutable.IndexedSeq[XMLEvent] = converterToStax.convertDocument(doc)(eventFactory)
+    val events: immutable.IndexedSeq[XMLEvent] = {
+      val result = converterToStax.convertDocument(doc)(eventFactory)
+
+      if (omitXmlDeclaration) result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
+      else result
+    }
 
     val sw = new jio.StringWriter
     var xmlEventWriter: XMLEventWriter = null
@@ -102,24 +99,13 @@ sealed class DocumentPrinterUsingStax(
         if (xmlEventWriter ne null) xmlEventWriter.close()
       }
 
-    if (omitXmlDeclaration) removeXmlDeclaration(xmlString) else xmlString
+    xmlString
   }
 
   def omittingXmlDeclaration: DocumentPrinterUsingStax = {
     new DocumentPrinterUsingStax(eventFactory, outputFactory) {
       override val omitXmlDeclaration: Boolean = true
     }
-  }
-
-  /** Low tech solution for removing the XML declaration, if any */
-  private def removeXmlDeclaration(xmlString: String): String = {
-    val linesIterator = xmlString.linesWithSeparators
-    require(linesIterator.hasNext, "Expected at least one line")
-    val firstLine = linesIterator.next()
-
-    if (firstLine.trim.startsWith("<?xml") && firstLine.trim.contains("?>")) {
-      xmlString.dropWhile(c => c != '>').drop(1).trim
-    } else xmlString
   }
 }
 
