@@ -21,7 +21,8 @@ scalacOptions <++= scalaBinaryVersion map { version =>
 
 sources in Test <++= scalaBinaryVersion map { version =>
   val newSources = new java.io.File("src/test-reflect/scala/eu/cdevreeze/yaidom/reflect").listFiles.toSeq
-  if (version.contains("2.10")) newSources else Seq()
+  // if (version.contains("2.10")) newSources else Seq()
+  Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
