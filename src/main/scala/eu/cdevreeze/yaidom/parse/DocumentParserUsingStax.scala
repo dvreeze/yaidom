@@ -21,7 +21,7 @@ import java.{ io => jio, util => jutil }
 import javax.xml.stream.{ XMLInputFactory, XMLEventReader }
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
-import scala.collection.immutable
+import scala.collection.{ immutable, Iterator }
 import scala.collection.JavaConverters._
 import scala.util.control.Exception._
 import convert.StaxConversions._
@@ -79,7 +79,8 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends D
     try {
       val streamSource = new StreamSource(inputStream)
       xmlEventReader = inputFactory.createXMLEventReader(streamSource)
-      convertToDocument(toIndexedSeq(xmlEventReader))
+
+      convertToDocument(asIterator(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
         if (xmlEventReader ne null) xmlEventReader.close()
@@ -90,9 +91,9 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends D
     }
   }
 
-  private def toIndexedSeq(xmlEventReader: XMLEventReader): immutable.IndexedSeq[XMLEvent] = {
+  private def asIterator(xmlEventReader: XMLEventReader): Iterator[XMLEvent] = {
     val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
-    it.asScala.toIndexedSeq
+    it.asScala
   }
 }
 
