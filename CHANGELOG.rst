@@ -10,7 +10,7 @@ CHANGELOG
 * Fixed method ``DocumentPrinterUsingStax.omittingXmlDeclaration``
 * Improved ``DocumentParser`` classes with respect to character encoding detection
 * ``StaxEventsToYaidomConversions`` can now produce an Iterator of XMLEvents, thus enabling less memory-hungry StAX-based parsing
-* Indeed, ``DocumentParserUsingStax`` uses this Iterator-producing conversions, thus leading to far less memory usage
+* Indeed, ``DocumentParserUsingStax`` uses these Iterator-producing conversions, thus leading to far less memory usage
 
 
 0.6.3
