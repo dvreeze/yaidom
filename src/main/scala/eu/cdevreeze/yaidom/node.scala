@@ -78,7 +78,12 @@ sealed trait Node extends Immutable with Serializable {
   /** Same as `toTreeRepr(emptyScope)` */
   final def toTreeRepr: String = toTreeRepr(Scope.Empty)
 
-  /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
+  /**
+   * Returns the tree representation string corresponding to this element, that is, `toTreeRepr`.
+   *
+   * Possibly expensive, especially for large XML trees! Note that the `toString` method is often called implicitly,
+   * for example in logging statements. So, if the `toString` method is not used carefully, OutOfMemoryErrors may occur.
+   */
   final override def toString: String = toTreeRepr
 
   /** Returns the tree representation as LineSeq, shifted indent spaces to the right */

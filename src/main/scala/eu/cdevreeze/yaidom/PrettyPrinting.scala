@@ -116,7 +116,7 @@ private[yaidom] object PrettyPrinting {
      * The parameter String must not contain any newlines.
      */
     def append(s: String): LineSeq = {
-      require(s.lines.size <= 1, "The string to append must not have any newlines")
+      require(s.indexOf('\n') < 0, "The string to append must not have any newlines")
 
       if (lines.isEmpty) this else {
         val result = lines.dropRight(1) :+ (lines.last + s)
@@ -129,7 +129,7 @@ private[yaidom] object PrettyPrinting {
      * The parameter String must not contain any newlines.
      */
     def prepend(s: String): LineSeq = {
-      require(s.lines.size <= 1, "The string to prepend must not have any newlines")
+      require(s.indexOf('\n') < 0, "The string to prepend must not have any newlines")
 
       if (lines.isEmpty) this else {
         val indent = s.size
