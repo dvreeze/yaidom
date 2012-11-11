@@ -30,7 +30,7 @@ import StaxEventsToYaidomConversions._
  * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.Elem]] and
  * to [[eu.cdevreeze.yaidom.Document]].
  *
- * There are also analogous conversions that take an `BufferedIterator[XMLEvent]` instead. These can be used to reduce memory usage.
+ * There are also analogous conversions that take an `Iterator[XMLEvent]` instead. These can be used to reduce memory usage.
  *
  * @author Chris de Vreeze
  */
@@ -95,11 +95,11 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
    * unless they are a subset of the passed parent scope.
    */
   final def convertToElem(v: Iterator[XMLEvent], parentScope: Scope): Elem = {
-    val events: Iterator[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
+    val eventIterator: Iterator[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
 
     val eventWithDepthIterator: BufferedIterator[EventWithDepth] = {
       var depth = 0
-      val result = events map { ev =>
+      val result = eventIterator map { ev =>
         ev match {
           case start: StartElement => depth += 1; new EventWithDepth(start, depth)
           case end: EndElement => val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
@@ -208,9 +208,9 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
     val elem: Elem = eventToElem(startElement, parentScope)
 
-    def startsWithMatchingEndElement(events: BufferedIterator[EventWithDepth]): Boolean = {
-      if (!events.hasNext) false else {
-        val hd: EventWithDepth = events.head
+    def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithDepth]): Boolean = {
+      if (!eventIterator.hasNext) false else {
+        val hd: EventWithDepth = eventIterator.head
         (hd.depth == head.depth) && (hd.event.isEndElement)
       }
     }
