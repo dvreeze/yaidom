@@ -81,8 +81,8 @@ class XmlToFlatFileTest extends Suite {
     val separator = System.getProperty("line.separator")
 
     val rows = (rootElem \ "book") map { e =>
-      val columns = (0 until 3).map(idx => columnMapping(idx)(e)).mkString
-      columns + separator
+      val columns = columnMapping map { f => f(e) }
+      columns.mkString + separator
     }
 
     val expected =
