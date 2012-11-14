@@ -46,7 +46,7 @@ private[yaidom] object PrettyPrinting {
 
     /** Functionally adds a trailing string (which must contain no newline) to this line */
     def +(s: String): Line = {
-      if (s.isEmpty) this else new Line(indent, (line + s))
+      if (s.length == 0) this else new Line(indent, (line + s))
     }
 
     /** Returns the resulting line as complete materialized line String with indentation */
