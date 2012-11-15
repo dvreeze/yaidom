@@ -73,7 +73,7 @@ object XmlStringUtils {
     require(s ne null)
 
     val separators = Array(' ', '\t', '\r', '\n')
-    val words: Seq[String] = s.split(separators).toSeq filterNot { s => s.length == 0 }
+    val words: Seq[String] = s.split(separators).toSeq filterNot { s => s.isEmpty }
 
     words.mkString(" ") // Returns empty string if words.isEmpty
   }

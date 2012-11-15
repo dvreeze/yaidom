@@ -146,7 +146,7 @@ final case class Elem(
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
-      case t: Text if t.trimmedText.length == 0 => true
+      case t: Text if t.trimmedText.isEmpty => true
       case _ => false
     }
 

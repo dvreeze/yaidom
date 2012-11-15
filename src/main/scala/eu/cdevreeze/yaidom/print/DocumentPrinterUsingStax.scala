@@ -114,8 +114,7 @@ object DocumentPrinterUsingStax {
   /** Returns `newInstance(XMLEventFactory.newFactory, XMLOutputFactory.newFactory)` */
   def newInstance(): DocumentPrinterUsingStax = {
     // Although the factory methods newFactory should be used instead of newInstance,
-    // to stay out of "XML JAR-hell" (especially with Java 5, which does not ship with StAX), the newInstance methods
-    // were used.
+    // to stay out of "XML JAR-hell", the newInstance methods were used.
 
     val eventFactory: XMLEventFactory = XMLEventFactory.newInstance
     val outputFactory: XMLOutputFactory = XMLOutputFactory.newInstance

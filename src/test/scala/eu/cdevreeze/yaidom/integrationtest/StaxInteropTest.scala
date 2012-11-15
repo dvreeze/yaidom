@@ -308,7 +308,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseSchemaXsd() {
     // 1. Parse XML file into Elem
 
-    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell" with Java 5 (which does not contain StAX).
+    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
     xmlInputFactory.setXMLResolver(new DtdSuppressionResolver)
@@ -547,7 +547,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseXmlWithExpandedEntityRef() {
     // 1. Parse XML file into Elem
 
-    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell" with Java 5 (which does not contain StAX).
+    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
     val staxParser = new DocumentParserUsingStax(xmlInputFactory)
@@ -615,7 +615,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseXmlWithNonExpandedEntityRef() {
     // 1. Parse XML file into Elem
 
-    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell" with Java 5 (which does not contain StAX).
+    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, java.lang.Boolean.FALSE)
     val staxParser = new DocumentParserUsingStax(xmlInputFactory)
@@ -691,7 +691,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseXmlWithNamespaceUndeclarations() {
     // 1. Parse XML file into Elem
 
-    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell" with Java 5 (which does not contain StAX).
+    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
     val staxParser = new DocumentParserUsingStax(xmlInputFactory)
@@ -738,7 +738,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseXmlWithEscapedChars() {
     // 1. Parse XML file into Elem
 
-    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell" with Java 5 (which does not contain StAX).
+    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
     val staxParser = new DocumentParserUsingStax(xmlInputFactory)
@@ -973,7 +973,7 @@ class StaxInteropTest extends Suite {
   }
 
   @Test def testParseBrokenXml() {
-    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell" with Java 5 (which does not contain StAX).
+    // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setXMLResolver(new LoggingResolver)
 

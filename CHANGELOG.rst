@@ -11,6 +11,7 @@ CHANGELOG
 * Improved ``DocumentParser`` classes with respect to character encoding detection
 * ``StaxEventsToYaidomConversions`` can now produce an Iterator of XMLEvents, thus enabling less memory-hungry StAX-based parsing
 * Indeed, ``DocumentParserUsingStax`` uses these Iterator-producing conversions, thus leading to far less memory usage
+* Removed half-baked support for Java 5 (requiring at least Java 6 from now on)
 
 
 0.6.3
