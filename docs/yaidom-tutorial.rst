@@ -375,10 +375,10 @@ The scope contains only one mapping from prefix ``f`` to namespace name ``http:/
 
 The concepts mentioned above are modelled in yaidom by the following classes:
 
-* ``eu.devreeze.yaidom.QName``
-* ``eu.devreeze.yaidom.EName``
-* ``eu.devreeze.yaidom.Declarations``
-* ``eu.devreeze.yaidom.Scope``
+* ``eu.cdevreeze.yaidom.QName``
+* ``eu.cdevreeze.yaidom.EName``
+* ``eu.cdevreeze.yaidom.Declarations``
+* ``eu.cdevreeze.yaidom.Scope``
 
 Scopes and declarations are backed by a ``Map`` from prefixes to namespace names. If the prefix is the empty string,
 the default namespace is meant. In namespace declarations, if the namespace name is empty, a namespace undeclaration
