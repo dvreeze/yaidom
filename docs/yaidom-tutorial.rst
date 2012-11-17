@@ -24,9 +24,9 @@ The tutorial is organized as follows:
 
 * Yaidom uniform querying API
 
-  * ParentElemLike querying API
-  * ElemLike querying API
-  * PathAwareElemLike querying API
+  * ParentElemLike trait
+  * ElemLike trait
+  * PathAwareElemLike trait
 
 * Working with default yaidom Elems
 
@@ -255,10 +255,8 @@ on its own. In the queries, most work is done by Scala's Collections API. Some q
   val bookOrMagazineTitles =
     for {
       bookOrMagazine <- bookstore.allChildElems filter { e => Set("Book", "Magazine").contains(e.name) }
-    } yield {
-      val result = bookOrMagazine.allChildElems find { _.name == "Title" }
-      result.get
-    }
+      title <- bookOrMagazine.allChildElems find { _.name == "Title" }
+    } yield title
 
 
   // XPath: doc("bookstore.xml")//Title
@@ -279,25 +277,26 @@ on its own. In the queries, most work is done by Scala's Collections API. Some q
     for {
       book <- bookstore.allChildElems filter { _.name == "Book" }
       if book.attributes("Price").toInt < 90
-    } yield {
-      val result = book.allChildElems find { _.name == "Title" }
-      result.get
-    }
+      title <- book.allChildElems find { _.name == "Title" }
+    } yield title
 
 
   // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
+  def authorLastAndFirstNames(bookElem: Elem): immutable.IndexedSeq[(String, String)] = {
+    for {
+      author <- bookElem.findAllElemsOrSelf filter { e => e.name == "Author" }
+    } yield {
+      val lastNames = author.allChildElems filter { _.name == "Last_Name" } map { _.text.trim }
+      val firstNames = author.allChildElems filter { _.name == "First_Name" } map { _.text.trim }
+      (lastNames.mkString, firstNames.mkString)
+    }
+  }
+
   val cheapUllmanBookTitles =
     for {
       book <- bookstore.allChildElems filter { _.name == "Book" }
-      if book.attributes("Price").toInt < 90
-      authors = book.allChildElems.filter(_.name == "Authors").head
-      authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap
-        { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
-      if authorLastName == "Ullman"
-      authorFirstName <- authors.allChildElems filter { _.name == "Author" } flatMap
-        { e => e.allChildElems filter (_.name == "First_Name") } map { _.text.trim }
-      if authorFirstName == "Jeffrey"
+      if book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains("Ullman", "Jeffrey")
     } yield book.allChildElems.find(_.name == "Title").get
 
 
@@ -423,8 +422,8 @@ and in-scope namespaces.**
 Yaidom uniform querying API
 =============================
 
-ParentElemLike querying API
----------------------------
+ParentElemLike trait
+--------------------
 
 Element-centric yaidom querying API versus implementations. See earlier take-away point about Scala Collections API.
 
@@ -438,14 +437,14 @@ Take-away point: these different node class hierarchies can still share the same
 Take-away point: there is no magic at all in the yaidom querying API, even if the resulting queries are somewhat more
 verbose than XPath expressions (but XPath is a different thing altogether).
 
-ElemLike querying API
----------------------
+ElemLike trait
+--------------
 
 Show convenience methods offered by the ElemLike API as well (using EName arguments instead of element predicates).
 Show shorthand notations as well.
 
-PathAwareElemLike querying API
-------------------------------
+PathAwareElemLike trait
+-----------------------
 
 Sometimes we want to query for "paths" to elements rather than for elements themselves. Knowing the path (relative to a
 root) we know the element, but the reverse does not hold, of course.

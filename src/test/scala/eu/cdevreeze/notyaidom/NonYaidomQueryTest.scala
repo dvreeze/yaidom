@@ -124,10 +124,8 @@ class NonYaidomQueryTest extends Suite {
     val bookOrMagazineTitles =
       for {
         bookOrMagazine <- bookstore.allChildElems filter { e => Set("Book", "Magazine").contains(e.name) }
-      } yield {
-        val result = bookOrMagazine.allChildElems find { _.name == "Title" }
-        result.get
-      }
+        title <- bookOrMagazine.allChildElems find { _.name == "Title" }
+      } yield title
 
     expect(Set(
       "A First Course in Database Systems",
@@ -248,10 +246,8 @@ class NonYaidomQueryTest extends Suite {
       for {
         book <- bookstore.allChildElems filter { _.name == "Book" }
         if book.attributes("Price").toInt < 90
-      } yield {
-        val result = book.allChildElems find { _.name == "Title" }
-        result.get
-      }
+        title <- book.allChildElems find { _.name == "Title" }
+      } yield title
 
     expect(Set(
       "A First Course in Database Systems",
@@ -346,17 +342,20 @@ class NonYaidomQueryTest extends Suite {
 
     require(bookstore.name == "Bookstore")
 
+    def authorLastAndFirstNames(bookElem: Elem): immutable.IndexedSeq[(String, String)] = {
+      for {
+        author <- bookElem.findAllElemsOrSelf filter { e => e.name == "Author" }
+      } yield {
+        val lastNames = author.allChildElems filter { _.name == "Last_Name" } map { _.text.trim }
+        val firstNames = author.allChildElems filter { _.name == "First_Name" } map { _.text.trim }
+        (lastNames.mkString, firstNames.mkString)
+      }
+    }
+
     val bookTitles =
       for {
         book <- bookstore.allChildElems filter { _.name == "Book" }
-        if book.attributes("Price").toInt < 90
-        authors = book.allChildElems.filter(_.name == "Authors").head
-        authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap
-          { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
-        if authorLastName == "Ullman"
-        authorFirstName <- authors.allChildElems filter { _.name == "Author" } flatMap
-          { e => e.allChildElems filter (_.name == "First_Name") } map { _.text.trim }
-        if authorFirstName == "Jeffrey"
+        if book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains("Ullman", "Jeffrey")
       } yield book.allChildElems.find(_.name == "Title").get
 
     expect(Set(
@@ -375,7 +374,7 @@ class NonYaidomQueryTest extends Suite {
     val bookTitles =
       for {
         book <- bookstore.allChildElems filter { _.name == "Book" }
-        authors = book.allChildElems.find(_.name == "Authors").get
+        authors <- book.allChildElems.find(_.name == "Authors")
         lastNameStrings = for {
           author <- authors.allChildElems filter { _.name == "Author" }
           lastNameString = author.allChildElems.find(_.name == "Last_Name").get.text.trim
