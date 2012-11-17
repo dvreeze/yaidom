@@ -56,7 +56,7 @@ class NonYaidomQueryTest extends Suite {
   final class Elem(
     val name: String,
     val attributes: Map[String, String],
-    val children: immutable.IndexedSeq[Node]) extends Node {
+    val children: immutable.IndexedSeq[Node]) extends Node { self =>
 
     def this(name: String, children: immutable.IndexedSeq[Node]) =
       this(name, Map(), children)
@@ -69,22 +69,19 @@ class NonYaidomQueryTest extends Suite {
      */
     def findAllElemsOrSelf: immutable.IndexedSeq[Elem] = {
       // Recursive, but not tail-recursive
-      val self = Elem.this
       val elms = allChildElems flatMap { _.findAllElemsOrSelf }
       self +: elms
     }
 
     /**
-     * Finds all topmost descendant elements and self, obeying the given predicate.
-     * If a matching element has been found, its descendants are not searched for matches (hence "topmost").
+     * Finds all topmost descendant elements and self obeying the given predicate.
+     * If a matching element has been found, its descendants are not searched for matches
+     * (hence "topmost").
      */
     def findTopmostElemsOrSelf(p: Elem => Boolean): immutable.IndexedSeq[Elem] = {
       // Recursive, but not tail-recursive
-      if (p(Elem.this)) {
-        Vector(Elem.this)
-      } else {
-        allChildElems flatMap { _.findTopmostElemsOrSelf(p) }
-      }
+      if (p(Elem.this)) Vector(Elem.this)
+      else allChildElems flatMap { _.findTopmostElemsOrSelf(p) }
     }
 
     def text: String = {
