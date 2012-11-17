@@ -5,7 +5,7 @@ Yaidom tutorial
 Introduction
 ============
 
-Yaidom is yet-another-immutable DOM-like XML API, written in the `Scala`_ programming language. It is an XML API that:
+Yaidom is *yet another immutable DOM-like* XML API, written in the `Scala`_ programming language. It is an XML API that:
 
 * leverages the highly expressive Scala Collections API, on the inside and from the outside
 * offers immutable thread-safe DOM-like element trees
@@ -56,6 +56,8 @@ The most important foundation of yaidom is Scala's Collections API. This can be 
 of yaidom.
 
 Assume a simple immutable DOM-like node class hierarchy defined as follows::
+
+  // This is NOT yaidom! This is some "mini-yaidom" looking a lot like yaidom, if we ignore namespaces
 
   import scala.collection.immutable
 
@@ -109,6 +111,8 @@ Having Scala's Collections API, along with the DOM-like trees defined above, we 
 Before doing so, let's first define some XML data as a "mini-yaidom" DOM-like tree. This example XML comes from the
 online course "Introduction to Databases", by professor Widom at Stanford University, and is used here with permission.
 The sample XML data represents a bookstore, and is created in "mini-yaidom" as follows::
+
+  // This is NOT yaidom! This is some "mini-yaidom" looking a lot like yaidom, if we ignore namespaces
 
   def textElem(elmName: String, txt: String): Elem =
     new Elem(
@@ -244,6 +248,8 @@ The sample XML data represents a bookstore, and is created in "mini-yaidom" as f
 Having this bookstore DOM-like tree, we can write queries against it. Note that class ``Elem`` has very few query methods
 on its own. In the queries, most work is done by Scala's Collections API. Some queries are::
 
+  // This is NOT yaidom! This is some "mini-yaidom" looking a lot like yaidom, if we ignore namespaces
+
   // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
   val bookOrMagazineTitles =
@@ -286,9 +292,11 @@ on its own. In the queries, most work is done by Scala's Collections API. Some q
       book <- bookstore.allChildElems filter { _.name == "Book" }
       if book.attributes("Price").toInt < 90
       authors = book.allChildElems.filter(_.name == "Authors").head
-      authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
+      authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap
+        { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
       if authorLastName == "Ullman"
-      authorFirstName <- authors.allChildElems filter { _.name == "Author" } flatMap { e => e.allChildElems filter (_.name == "First_Name") } map { _.text.trim }
+      authorFirstName <- authors.allChildElems filter { _.name == "Author" } flatMap
+        { e => e.allChildElems filter (_.name == "First_Name") } map { _.text.trim }
       if authorFirstName == "Jeffrey"
     } yield book.allChildElems.find(_.name == "Title").get
 
@@ -299,25 +307,118 @@ on its own. In the queries, most work is done by Scala's Collections API. Some q
     for {
       book <- bookstore.allChildElems filter { _.name == "Book" }
       authorNames = {
-        val result = book.findAllElemsOrSelf filter { _.name == "Author" } map { _.allChildElems.find(_.name == "Last_Name").get.text.trim }
+        val result = book.findAllElemsOrSelf filter { _.name == "Author" } map
+          { _.allChildElems.find(_.name == "Last_Name").get.text.trim }
         result.toSet
       }
       if authorNames.contains("Ullman") && !authorNames.contains("Widom")
     } yield book.allChildElems.find(_.name == "Title").get
 
 The queries above are more verbose than the equivalent XPath expressions, but they are also easy to understand semantically.
-Besides ``Elem`` methods ``findAllElemsOrSelf``, ``allChildElems`` and possibly ``findTopmostElemsOrSelf``, Scala's Collections
-API does the rest.
+Using the Scala Collections API, along with only a few ``Elem`` methods such as ``findAllElemsOrSelf``, ``allChildElems``
+and possibly ``findTopmostElemsOrSelf``, much (namespace-agnostic) XML querying is already possible. This says a lot about
+the expressive power of Scala's Collections API, as a *universal query API*.
 
-**In summary, using the Scala Collections API and a minimal "mini-yaidom" API, the contours
-of a powerful XML querying API already become visible.**
+The "mini-yaidom" above also shows immutable element trees, just like the real yaidom API offers. These immutable element
+trees are thread-safe.
+
+**In summary, using the Scala Collections API and only a minimal "mini-yaidom" API, the contours
+of a powerful XML querying API already become visible. Indeed, the Scala Collections API lays the foundation
+of yaidom.**
 
 Yaidom and namespaces
 ---------------------
 
-TODO Mini-yaidom is not enough, of course. Namespaces are first-class citizens in yaidom.
-Qualified names, expanded names. Namespace declarations and in-scope namespaces ("scopes").
-Reasoning about namespaces.
+The "mini-yaidom" above offers no support for namespaces, unlike the real yaidom API. Good namespace support is another
+foundation of yaidom.
+
+One important distinction is that between *qualified names* and *expanded names*. Alas, many XML APIs do not clearly
+distinguish between the two. For a formal description of these 2 types of names, see `Namespaces in XML 1.0`_.
+
+For example, consider the following simple XML document (from W3Schools_)::
+
+  <f:table xmlns:f="http://www.w3schools.com/furniture">
+    <f:name>African Coffee Table</f:name>
+    <f:width>80</f:width>
+    <f:length>120</f:length>
+  </f:table>
+
+The qualified names in this example are:
+
+* ``f:table``
+* ``f:name``
+* ``f:width``
+* ``f:length``
+
+These qualified names all use the same prefix ``f``. This prefix is introduced in the XML by the *namespace declaration*
+``xmlns:f="http://www.w3schools.com/furniture"``, occurring in the root element. This namespace declaration binds the
+prefix ``f`` to the namespace URI ``http://www.w3schools.com/furniture``. Although it looks like an URL, it is just
+a namespace name, and there is no promise of any document behind the name interpreted as URL. (This confuses XML beginners
+a lot.)
+
+Using this namespace declaration, the qualified names above are resolved as expanded names. These expanded names, written
+in `James Clark`_ notation, are as follows:
+
+* ``{http://www.w3schools.com/furniture}table``
+* ``{http://www.w3schools.com/furniture}name``
+* ``{http://www.w3schools.com/furniture}width``
+* ``{http://www.w3schools.com/furniture}length``
+
+These expanded names do not occur in XML documents. Expanded names are too long to be practical. On the other hand,
+prefixed names have no meaning outside their context (namely in-scope namespaces), whereas expanded names have an
+existence on their own. Moreover, prefixes themselves are just placeholders, and can easily be replaced by other prefixes
+without changing the meaning of the XML document. For example, in the XML above, we could replace prefix ``f`` by prefix
+``g`` everywhere (also in the namespace declaration, of course), without changing the meaning of the document.
+
+The namespace declaration in the root element above leads to *in-scope namespaces*, or *scope*, from the root all the way down.
+The scope at each element is the accumulated effect of the namespace declarations in the element and its ancestry.
+The scope contains only one mapping from prefix ``f`` to namespace name ``http://www.w3schools.com/furniture``.
+
+The concepts mentioned above are modelled in yaidom by the following classes:
+
+* ``eu.devreeze.yaidom.QName``
+* ``eu.devreeze.yaidom.EName``
+* ``eu.devreeze.yaidom.Declarations``
+* ``eu.devreeze.yaidom.Scope``
+
+Scopes and declarations are backed by a ``Map`` from prefixes to namespace names. If the prefix is the empty string,
+the default namespace is meant. In namespace declarations, if the namespace name is empty, a namespace undeclaration
+is meant.
+
+The following code snippet shows resolution of qualified names as expanded names, given a scope::
+
+  val scope1 = Scope.from() // empty scope
+
+  scope1.resolveQName(QName("book")) // Some(EName("book"))
+  scope1.resolveQName(QName("book:book")) // None
+
+  val scope2 =
+    Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
+
+  scope2.resolveQName(QName("book")) // Some(EName("{http://a}book"))
+  scope2.resolveQName(QName("book:book")) // None
+  scope2.resolveQName(QName("a:book")) // Some(EName("{http://a}book"))
+  scope2.resolveQName(QName("c:bookstore")) // Some(EName("{http://ccc}bookstore"))
+  scope2.resolveQName(QName("xml:lang")) // Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))
+
+Scopes and declarations can be calculated with. That is, given a scope, and using a declarations as "delta" against it,
+we get another scope. In other words, ``scope1.resolve(declarations1)`` results in another ``Scope``. Likewise, the
+"difference" between 2 scopes is a declarations. In other words, ``scope1.relativize(scope2)`` results in a ``Declarations``.
+
+Scopes and declarations obey some interesting properties. For example::
+
+  scope1.resolve(scope1.relativize(scope2)) == scope2
+
+These properties, as well as the definitions of ``Scope`` methods ``resolve`` and ``relativize`` contribute significantly
+to the "internal consistency" of yaidom. They also helped a lot in making yaidom easier to implement, especially in conversions
+between yaidom and DOM nodes.
+
+**In summary, yaidom clearly distinguishes between qualified names and expanded names, and between namespace declarations
+and in-scope namespaces.**
+
+.. _`Namespaces in XML 1.0`: http://www.w3.org/TR/REC-xml-names/
+.. _W3Schools: http://www.w3schools.com/xml/xml_namespaces.asp
+.. _`James Clark`: http://www.jclark.com/xml/xmlns.htm
 
 Yaidom uniform querying API
 =============================

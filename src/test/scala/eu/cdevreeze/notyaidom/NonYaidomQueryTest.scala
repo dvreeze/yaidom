@@ -328,7 +328,8 @@ class NonYaidomQueryTest extends Suite {
         book <- bookstore.allChildElems filter { _.name == "Book" }
         if book.attributes("Price").toInt < 90
         authors = book.allChildElems.filter(_.name == "Authors").head
-        authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
+        authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap
+          { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
         if authorLastName == "Ullman"
       } yield book.allChildElems.find(_.name == "Title").get
 
@@ -350,9 +351,11 @@ class NonYaidomQueryTest extends Suite {
         book <- bookstore.allChildElems filter { _.name == "Book" }
         if book.attributes("Price").toInt < 90
         authors = book.allChildElems.filter(_.name == "Authors").head
-        authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
+        authorLastName <- authors.allChildElems filter { _.name == "Author" } flatMap
+          { e => e.allChildElems filter (_.name == "Last_Name") } map { _.text.trim }
         if authorLastName == "Ullman"
-        authorFirstName <- authors.allChildElems filter { _.name == "Author" } flatMap { e => e.allChildElems filter (_.name == "First_Name") } map { _.text.trim }
+        authorFirstName <- authors.allChildElems filter { _.name == "Author" } flatMap
+          { e => e.allChildElems filter (_.name == "First_Name") } map { _.text.trim }
         if authorFirstName == "Jeffrey"
       } yield book.allChildElems.find(_.name == "Title").get
 
@@ -546,7 +549,8 @@ class NonYaidomQueryTest extends Suite {
       for {
         book <- bookstore.allChildElems filter { _.name == "Book" }
         authorNames = {
-          val result = book.findAllElemsOrSelf filter { _.name == "Author" } map { _.allChildElems.find(_.name == "Last_Name").get.text.trim }
+          val result = book.findAllElemsOrSelf filter { _.name == "Author" } map
+            { _.allChildElems.find(_.name == "Last_Name").get.text.trim }
           result.toSet
         }
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
