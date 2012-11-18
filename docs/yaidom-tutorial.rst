@@ -441,7 +441,7 @@ fundamental method ``findAllElemsOrSelf``, just like in the "mini-yaidom" above.
 
 Below we use the ``ParentElemLike`` API to rewrite the queries given earlier, where we used "mini-yaidom". First the same
 DOM-like tree is created, this time in yaidom. We create elements of the default ``Elem`` element class. To do so, we
-use so-called ``ElemBuilder``s. The distinction between ``Elem`` and ``ElemBuilder`` is explained later in this tutorial.
+use so-called ``ElemBuilders``. The distinction between ``Elem`` and ``ElemBuilder`` is explained later in this tutorial.
 The sample XML data is created in yaidom as follows::
 
   import eu.cdevreeze.yaidom._
