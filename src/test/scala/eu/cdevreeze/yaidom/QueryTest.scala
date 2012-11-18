@@ -71,10 +71,13 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
+    // Using only the ParentElemLike API (except for method localName)...
+
     val bookOrMagazineTitles =
       for {
-        bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-      } yield bookOrMagazine.getChildElem(EName("Title"))
+        bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+        title <- bookOrMagazine findChildElem { _.localName == "Title" }
+      } yield title
 
     expect(Set(
       "A First Course in Database Systems",
@@ -210,8 +213,10 @@ class QueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
+    // Using only the ParentElemLike API (except for method localName)...
+
     val isbns =
-      for (book <- bookstore \ "Book") yield book.attribute(EName("ISBN"))
+      for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
 
     expect(Set(
       "ISBN-0-13-713526-2",
@@ -281,6 +286,23 @@ class QueryTest extends Suite {
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
       val result = titles map { _.trimmedText }
+      result.toSet
+    }
+
+    // Now the verbose way, using the ParentElemLike API and no operator notation...
+
+    val titles2 =
+      for {
+        book <- bookstore filterChildElems { _.localName == "Book" }
+        price <- book.attributeOption(EName("Price"))
+        if price.toInt < 90
+      } yield book.getChildElem(EName("Title"))
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = titles2 map { _.trimmedText }
       result.toSet
     }
 

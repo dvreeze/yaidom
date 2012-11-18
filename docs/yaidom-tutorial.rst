@@ -426,17 +426,200 @@ Yaidom uniform query API
 ParentElemLike trait
 --------------------
 
-Element-centric yaidom query API versus implementations. See earlier take-away point about Scala Collections API.
+Yaidom takes the position that one size does not fit all, when it comes to XML processing. For example, the default ``Elem``
+class represents immutable (thread-safe) element nodes (that do not know about their parent elements). As another example,
+yaidom offers immutable elements that can be compared for some notion of equality, but carry less data than the default
+elements. As yet another example, yaidom offers wrappers around DOM elements.
 
-Show queries using ParentElemLike (using namespaces), and show how these queries work for "normal" yaidom Elems,
-as well as for DOM wrapper elements and "resolved" elements. The ParentElemLike API is the most important API in yaidom.
+All these different element classes have one thing in common, viz. the *same yaidom query API*. The yaidom query API consists
+of a Scala *trait* inheritance tree. The root trait is the ``ParentElemLike`` trait.
 
-Take-away point: one size does not fit all for element trees (different characteristics).
+Each trait in the query API inheritance tree turns a small API into a *rich API*. In particular, the ``ParentElemLike``
+trait turns a small API that implements only method ``allChildElems`` into a rich query API. The rich API contains the
+fundamental method ``findAllElemsOrSelf``, just like in the "mini-yaidom" above. It also offers syntactic sugar, such as method
+``filterElemsOrSelf`` (which takes an element predicate).
 
-Take-away point: these different node class hierarchies can still share the same query API(s).
+Below we use the ``ParentElemLike`` API to rewrite the queries given earlier, where we used "mini-yaidom". First the same
+DOM-like tree is created, this time in yaidom. We create elements of the default ``Elem`` element class. To do so, we
+use so-called ``ElemBuilder``s. The distinction between ``Elem`` and ``ElemBuilder`` is explained later in this tutorial.
+The sample XML data is created in yaidom as follows::
 
-Take-away point: there is no magic at all in the yaidom query API, even if the resulting queries are somewhat more
-verbose than XPath expressions (but XPath is a different thing altogether).
+  import eu.cdevreeze.yaidom._
+  import NodeBuilder._
+
+  val book1: ElemBuilder = {
+    elem(
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      children = Vector(
+        textElem(QName("Title"), "A First Course in Database Systems"),
+        elem(
+          qname = QName("Authors"),
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Jeffrey"),
+                textElem(QName("Last_Name"), "Ullman"))),
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Jennifer"),
+                textElem(QName("Last_Name"), "Widom")))))))
+  }
+
+  val book2: ElemBuilder = {
+    elem(
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      children = Vector(
+        textElem(QName("Title"), "Database Systems: The Complete Book"),
+        elem(
+          qname = QName("Authors"),
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Hector"),
+                textElem(QName("Last_Name"), "Garcia-Molina"))),
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Jeffrey"),
+                textElem(QName("Last_Name"), "Ullman"))),
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Jennifer"),
+                textElem(QName("Last_Name"), "Widom"))))),
+        textElem(QName("Remark"), "Buy this book bundled with \"A First Course\" - a great deal!")))
+  }
+
+  val book3: ElemBuilder = {
+    elem(
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      children = Vector(
+        textElem(QName("Title"), "Hector and Jeff's Database Hints"),
+        elem(
+          qname = QName("Authors"),
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Jeffrey"),
+                textElem(QName("Last_Name"), "Ullman"))),
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Hector"),
+                textElem(QName("Last_Name"), "Garcia-Molina"))))),
+        textElem(QName("Remark"), "An indispensable companion to your textbook")))
+  }
+
+  val book4: ElemBuilder = {
+    elem(
+      qname = QName("Book"),
+      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      children = Vector(
+        textElem(QName("Title"), "Jennifer's Economical Database Hints"),
+        elem(
+          qname = QName("Authors"),
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), "Jennifer"),
+                textElem(QName("Last_Name"), "Widom")))))))
+  }
+
+  val magazine1: ElemBuilder = {
+    elem(
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
+      children = Vector(
+        textElem(QName("Title"), "National Geographic")))
+  }
+
+  val magazine2: ElemBuilder = {
+    elem(
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      children = Vector(
+        textElem(QName("Title"), "National Geographic")))
+  }
+
+  val magazine3: ElemBuilder = {
+    elem(
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      children = Vector(
+        textElem(QName("Title"), "Newsweek")))
+  }
+
+  val magazine4: ElemBuilder = {
+    elem(
+      qname = QName("Magazine"),
+      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
+      children = Vector(
+        textElem(QName("Title"), "Hector and Jeff's Database Hints")))
+  }
+
+  val bookstore: Elem = {
+    elem(
+      qname = QName("Bookstore"),
+      children = Vector(
+        book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
+  }
+
+Using (almost) only ``ParentElemLike`` query methods on the bookstore element, we get the following rewritten queries (the
+first 4 of them)::
+
+  // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
+
+  val bookOrMagazineTitles =
+    for {
+      bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+      title <- bookOrMagazine findChildElem { _.localName == "Title" }
+    } yield title
+
+
+  // XPath: doc("bookstore.xml")//Title
+  // Note the use of method filterElems instead of filterElemsOrSelf
+
+  val titles =
+    for (title <- bookstore filterElems (_.localName == "Title")) yield title
+
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
+
+  val isbns =
+    for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
+
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
+
+  val titlesOfCheapBooks =
+    for {
+      book <- bookstore filterChildElems { _.localName == "Book" }
+      price <- book.attributeOption(EName("Price"))
+      if price.toInt < 90
+    } yield book.getChildElem(EName("Title"))
+
+Note the obvious equivalence to the "mini-yaidom" queries given earlier. Besides *core query method* ``findAllElemsOrSelf``,
+trait ``ParentElemLike`` offers a lot of syntactic sugar that made the rewritten queries less verbose than the "mini-yaidom"
+versions.
+
+To summarize:
+
+* Yaidom offers an *element-centric query API*
+* This query API is based on the *Scala Collections API*, from the inside and on the outside
+* The base trait of this query API, ``ParentElemLike``, turns a small API (method ``allChildElems``) into a *rich API*
+* This rich API contains the fundamental query method ``findAllElemsOrSelf``, just like in the "mini-yaidom" example
+* This rich API also offers many convenience query methods for child elements, descendant elements and descendant-or-self elements
+* This API is *uniform*, in that this trait is mixed in by different element classes in yaidom, even by yaidom wrappers for DOM
+* The ``ParentElemLike`` API is trivial to understand semantically, due to Scala's Collections API as its foundation
+* The API may be more verbose than XPath, but due to its simplicity (w.r.t. its semantics), it can still be attractive for XML querying
 
 ElemLike trait
 --------------
