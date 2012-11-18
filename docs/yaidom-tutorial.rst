@@ -286,7 +286,7 @@ query methods on its own. In the queries, most work is done by Scala's Collectio
   val cheapUllmanBookTitles =
     for {
       book <- bookstore.allChildElems filter { _.name == "Book" }
-      if book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains("Ullman", "Jeffrey")
+      if book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey"))
     } yield book.allChildElems.find(_.name == "Title").get
 
 
