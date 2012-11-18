@@ -615,11 +615,11 @@ To summarize:
 * Yaidom offers an *element-centric query API*
 * This query API is based on the *Scala Collections API*, from the inside and on the outside
 * The base trait of this query API, ``ParentElemLike``, turns a small API (method ``allChildElems``) into a *rich API*
-* This rich API contains the fundamental query method ``findAllElemsOrSelf``, just like in the "mini-yaidom" example
+* This rich API contains the *fundamental query method* ``findAllElemsOrSelf``, just like in the "mini-yaidom" example
 * This rich API also offers many convenience query methods for child elements, descendant elements and descendant-or-self elements
 * This API is *uniform*, in that this trait is mixed in by different element classes in yaidom, even by yaidom wrappers for DOM
 * The ``ParentElemLike`` API is trivial to understand semantically, due to Scala's Collections API as its foundation
-* The API may be more verbose than XPath, but due to its simplicity (w.r.t. its semantics), it can still be attractive for XML querying
+* Although the API is more verbose than XPath, due to its simplicity and the use of Scala, it can be very useful for XML querying
 
 ElemLike trait
 --------------
