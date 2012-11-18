@@ -50,7 +50,7 @@ class NonYaidomQueryTest extends Suite {
   /**
    * Naive element class, which for example is not namespace-aware.
    *
-   * This class shows how methods findAllElemsOrSelf and findTopmostElemsOrSelf, along with the Scala
+   * This class shows how methods allChildElems and findAllElemsOrSelf, along with the Scala
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final class Elem(
@@ -71,17 +71,6 @@ class NonYaidomQueryTest extends Suite {
       // Recursive, but not tail-recursive
       val elms = allChildElems flatMap { _.findAllElemsOrSelf }
       self +: elms
-    }
-
-    /**
-     * Finds all topmost descendant elements and self obeying the given predicate.
-     * If a matching element has been found, its descendants are not searched for matches
-     * (hence "topmost").
-     */
-    def findTopmostElemsOrSelf(p: Elem => Boolean): immutable.IndexedSeq[Elem] = {
-      // Recursive, but not tail-recursive
-      if (p(Elem.this)) Vector(Elem.this)
-      else allChildElems flatMap { _.findTopmostElemsOrSelf(p) }
     }
 
     def text: String = {
@@ -544,14 +533,17 @@ class NonYaidomQueryTest extends Suite {
 
     require(bookstore.name == "Bookstore")
 
+    def findAuthorNames(bookElem: Elem): immutable.IndexedSeq[String] = {
+      for {
+        author <- bookElem.findAllElemsOrSelf filter { _.name == "Author" }
+        lastName <- author.allChildElems filter { _.name == "Last_Name" }
+      } yield lastName.text.trim
+    }
+
     val titles =
       for {
         book <- bookstore.allChildElems filter { _.name == "Book" }
-        authorNames = {
-          val result = book.findAllElemsOrSelf filter { _.name == "Author" } map
-            { _.allChildElems.find(_.name == "Last_Name").get.text.trim }
-          result.toSet
-        }
+        authorNames = findAuthorNames(book)
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
       } yield book.allChildElems.find(_.name == "Title").get
 

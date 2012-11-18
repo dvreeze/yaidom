@@ -22,7 +22,7 @@ The tutorial is organized as follows:
   * Leveraging Scala Collections
   * Yaidom and namespaces
 
-* Yaidom uniform querying API
+* Yaidom uniform query API
 
   * ParentElemLike trait
   * ElemLike trait
@@ -86,16 +86,6 @@ Assume a simple immutable DOM-like node class hierarchy defined as follows::
     def findAllElemsOrSelf: immutable.IndexedSeq[Elem] = {
       val elms = allChildElems flatMap { _.findAllElemsOrSelf }
       self +: elms
-    }
-
-    /**
-     * Finds all topmost descendant elements and self obeying the given predicate.
-     * If a matching element has been found, its descendants are not searched for matches
-     * (hence "topmost").
-     */
-    def findTopmostElemsOrSelf(p: Elem => Boolean): immutable.IndexedSeq[Elem] = {
-      if (p(Elem.this)) Vector(Elem.this)
-      else allChildElems flatMap { _.findTopmostElemsOrSelf(p) }
     }
 
     def text: String = {
@@ -245,8 +235,8 @@ The sample XML data represents a bookstore, and is created in "mini-yaidom" as f
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
   }
 
-Having this bookstore DOM-like tree, we can write queries against it. Note that class ``Elem`` has very few query methods
-on its own. In the queries, most work is done by Scala's Collections API. Some queries are::
+Having this bookstore DOM-like tree, we can write queries against it. Note that "mini-yaidom" class ``Elem`` has very few
+query methods on its own. In the queries, most work is done by Scala's Collections API. Some queries are::
 
   // This is NOT yaidom! This is some "mini-yaidom" looking a lot like yaidom, if we ignore namespaces
 
@@ -302,27 +292,35 @@ on its own. In the queries, most work is done by Scala's Collections API. Some q
 
   // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
 
+  def findAuthorNames(bookElem: Elem): immutable.IndexedSeq[String] = {
+    for {
+      author <- bookElem.findAllElemsOrSelf filter { _.name == "Author" }
+      lastName <- author.allChildElems filter { _.name == "Last_Name" }
+    } yield lastName.text.trim
+  }
+
   val ullmanButNotWidomBookTitles =
     for {
       book <- bookstore.allChildElems filter { _.name == "Book" }
-      authorNames = {
-        val result = book.findAllElemsOrSelf filter { _.name == "Author" } map
-          { _.allChildElems.find(_.name == "Last_Name").get.text.trim }
-        result.toSet
-      }
+      authorNames = findAuthorNames(book)
       if authorNames.contains("Ullman") && !authorNames.contains("Widom")
     } yield book.allChildElems.find(_.name == "Title").get
 
 The queries above are more verbose than the equivalent XPath expressions, but they are also easy to understand semantically.
-Using the Scala Collections API, along with only a few ``Elem`` methods such as ``findAllElemsOrSelf``, ``allChildElems``
-and possibly ``findTopmostElemsOrSelf``, much (namespace-agnostic) XML querying is already possible. This says a lot about
-the expressive power of Scala's Collections API, as a *universal query API*.
+Using the Scala Collections API, along with only a few ``Elem`` methods such as ``findAllElemsOrSelf`` and ``allChildElems``,
+much (namespace-agnostic) XML querying is already possible. This says a lot about the expressive power of Scala's Collections
+API, as a *universal query API*.
+
+Yaidom queries are less verbose than the queries above, but a lot of what the yaidom query API offers is just syntactic sugar.
+The foundation is still the same: core ``Elem`` methods ``allChildElems`` and ``findAllElemsOrSelf``, and the rest is offered
+by the Scala Collections API itself, and/or by some syntactic sugar. As an example of the latter, yaidom offers method
+``elem.filterElemsOrSelf(p)``, which is equivalent to ``elem.findAllElemsOrSelf.filter(p)``.
 
 The "mini-yaidom" above also shows immutable element trees, just like the real yaidom API offers. These immutable element
 trees are thread-safe.
 
 **In summary, using the Scala Collections API and only a minimal "mini-yaidom" API, the contours
-of a powerful XML querying API already become visible. Indeed, the Scala Collections API lays the foundation
+of a powerful XML query API already become visible. Indeed, the Scala Collections API lays the foundation
 of yaidom.**
 
 Yaidom and namespaces
@@ -369,20 +367,22 @@ existence on their own. Moreover, prefixes themselves are just placeholders, and
 without changing the meaning of the XML document. For example, in the XML above, we could replace prefix ``f`` by prefix
 ``g`` everywhere (also in the namespace declaration, of course), without changing the meaning of the document.
 
-The namespace declaration in the root element above leads to *in-scope namespaces*, or *scope*, from the root all the way down.
-The scope at each element is the accumulated effect of the namespace declarations in the element and its ancestry.
-The scope contains only one mapping from prefix ``f`` to namespace name ``http://www.w3schools.com/furniture``.
+The namespace declaration in the root element above leads to *in-scope namespaces*, or *scope*, from the root all the way down
+to all descendants of the root (that is, the entire document). The namespace scope at each element is the accumulated effect of
+the namespace declarations in the element and its ancestry. In this example, each element has the same scope, because only the
+root element has namespace declarations. The namespace scope contains only one mapping from prefix ``f`` to namespace name
+``http://www.w3schools.com/furniture``.
 
 The concepts mentioned above are modelled in yaidom by the following classes:
 
-* ``eu.cdevreeze.yaidom.QName``
-* ``eu.cdevreeze.yaidom.EName``
+* ``eu.cdevreeze.yaidom.QName``, for example unprefixed name ``QName("book")`` and prefixed name ``QName("b:book")``
+* ``eu.cdevreeze.yaidom.EName``, for example ``EName("book")`` (without namespace) and ``EName("{http://bookstore}book")``
 * ``eu.cdevreeze.yaidom.Declarations``
 * ``eu.cdevreeze.yaidom.Scope``
 
 Scopes and declarations are backed by a ``Map`` from prefixes to namespace names. If the prefix is the empty string,
 the default namespace is meant. In namespace declarations, if the namespace name is empty, a namespace undeclaration
-is meant.
+is meant. (Note that unlike XML 1.1, XML 1.0 does not allow namespace undeclarations, except for default namespaces.)
 
 The following code snippet shows resolution of qualified names as expanded names, given a scope::
 
@@ -410,31 +410,32 @@ Scopes and declarations obey some interesting properties. For example::
 
 These properties, as well as the definitions of ``Scope`` methods ``resolve`` and ``relativize`` contribute significantly
 to the "internal consistency" of yaidom. They also helped a lot in making yaidom easier to implement, especially in conversions
-between yaidom and DOM nodes.
+between yaidom and DOM nodes. Along with the Scala Collections API and the "mini-yaidom" of the preceding section, they are
+the foundation of yaidom.
 
 **In summary, yaidom clearly distinguishes between qualified names and expanded names, and between namespace declarations
-and in-scope namespaces.**
+and in-scope namespaces. This is the second foundation of yaidom.**
 
 .. _`Namespaces in XML 1.0`: http://www.w3.org/TR/REC-xml-names/
 .. _W3Schools: http://www.w3schools.com/xml/xml_namespaces.asp
 .. _`James Clark`: http://www.jclark.com/xml/xmlns.htm
 
-Yaidom uniform querying API
-=============================
+Yaidom uniform query API
+========================
 
 ParentElemLike trait
 --------------------
 
-Element-centric yaidom querying API versus implementations. See earlier take-away point about Scala Collections API.
+Element-centric yaidom query API versus implementations. See earlier take-away point about Scala Collections API.
 
 Show queries using ParentElemLike (using namespaces), and show how these queries work for "normal" yaidom Elems,
 as well as for DOM wrapper elements and "resolved" elements. The ParentElemLike API is the most important API in yaidom.
 
 Take-away point: one size does not fit all for element trees (different characteristics).
 
-Take-away point: these different node class hierarchies can still share the same querying API(s).
+Take-away point: these different node class hierarchies can still share the same query API(s).
 
-Take-away point: there is no magic at all in the yaidom querying API, even if the resulting queries are somewhat more
+Take-away point: there is no magic at all in the yaidom query API, even if the resulting queries are somewhat more
 verbose than XPath expressions (but XPath is a different thing altogether).
 
 ElemLike trait
