@@ -244,7 +244,8 @@ query methods on its own. In the queries, most work is done by Scala's Collectio
 
   val bookOrMagazineTitles =
     for {
-      bookOrMagazine <- bookstore.allChildElems filter { e => Set("Book", "Magazine").contains(e.name) }
+      bookOrMagazine <- bookstore.allChildElems
+      if Set("Book", "Magazine").contains(bookOrMagazine.name)
       title <- bookOrMagazine.allChildElems find { _.name == "Title" }
     } yield title
 
@@ -252,21 +253,21 @@ query methods on its own. In the queries, most work is done by Scala's Collectio
   // XPath: doc("bookstore.xml")//Title
 
   val titles =
-    for (title <- bookstore.findAllElemsOrSelf filter (_.name == "Title")) yield title
+    for (title <- bookstore.findAllElemsOrSelf if title.name == "Title") yield title
 
 
   // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
   val isbns =
-    for (book <- bookstore.allChildElems filter (_.name == "Book")) yield book.attributes("ISBN")
+    for (book <- bookstore.allChildElems if book.name == "Book") yield book.attributes("ISBN")
 
 
   // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
   val titlesOfCheapBooks =
     for {
-      book <- bookstore.allChildElems filter { _.name == "Book" }
-      if book.attributes("Price").toInt < 90
+      book <- bookstore.allChildElems
+      if (book.name == "Book") && (book.attributes("Price").toInt < 90)
       title <- book.allChildElems find { _.name == "Title" }
     } yield title
 
@@ -275,7 +276,8 @@ query methods on its own. In the queries, most work is done by Scala's Collectio
 
   def authorLastAndFirstNames(bookElem: Elem): immutable.IndexedSeq[(String, String)] = {
     for {
-      author <- bookElem.findAllElemsOrSelf filter { e => e.name == "Author" }
+      author <- bookElem.findAllElemsOrSelf
+      if author.name == "Author"
     } yield {
       val lastNames = author.allChildElems filter { _.name == "Last_Name" } map { _.text.trim }
       val firstNames = author.allChildElems filter { _.name == "First_Name" } map { _.text.trim }
@@ -285,8 +287,9 @@ query methods on its own. In the queries, most work is done by Scala's Collectio
 
   val cheapUllmanBookTitles =
     for {
-      book <- bookstore.allChildElems filter { _.name == "Book" }
-      if book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey"))
+      book <- bookstore.allChildElems
+      if (book.name == "Book") &&
+        (book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey")))
     } yield book.allChildElems.find(_.name == "Title").get
 
 
@@ -294,14 +297,17 @@ query methods on its own. In the queries, most work is done by Scala's Collectio
 
   def findAuthorNames(bookElem: Elem): immutable.IndexedSeq[String] = {
     for {
-      author <- bookElem.findAllElemsOrSelf filter { _.name == "Author" }
-      lastName <- author.allChildElems filter { _.name == "Last_Name" }
+      author <- bookElem.findAllElemsOrSelf
+      if author.name == "Author"
+      lastName <- author.allChildElems
+      if lastName.name == "Last_Name"
     } yield lastName.text.trim
   }
 
   val ullmanButNotWidomBookTitles =
     for {
-      book <- bookstore.allChildElems filter { _.name == "Book" }
+      book <- bookstore.allChildElems
+      if book.name == "Book"
       authorNames = findAuthorNames(book)
       if authorNames.contains("Ullman") && !authorNames.contains("Widom")
     } yield book.allChildElems.find(_.name == "Title").get
@@ -311,17 +317,18 @@ Using the Scala Collections API, along with only a few ``Elem`` methods such as 
 much (namespace-agnostic) XML querying is already possible. This says a lot about the expressive power of Scala's Collections
 API, as a *universal query API*.
 
-Yaidom queries are less verbose than the queries above, but a lot of what the yaidom query API offers is just syntactic sugar.
-The foundation is still the same: core ``Elem`` methods ``allChildElems`` and ``findAllElemsOrSelf``, and the rest is offered
-by the Scala Collections API itself, and/or by some syntactic sugar. As an example of the latter, yaidom offers method
-``elem.filterElemsOrSelf(p)``, which is equivalent to ``elem.findAllElemsOrSelf.filter(p)``.
+Yaidom queries are less verbose than the "mini-yaidom" queries above, but a lot of what the yaidom query API offers are just
+convenience methods. The foundation is still the same: core ``Elem`` methods ``allChildElems`` and ``findAllElemsOrSelf``,
+and the rest is offered by the Scala Collections API itself, and/or by some convenience methods or syntactic sugar. As an
+example of such a convenience method, yaidom offers method ``elem.filterElemsOrSelf(p)``, which is equivalent to
+``elem.findAllElemsOrSelf.filter(p)``.
 
 The "mini-yaidom" above also shows immutable element trees, just like the real yaidom API offers. These immutable element
 trees are thread-safe.
 
-**In summary, using the Scala Collections API and only a minimal "mini-yaidom" API, the contours
-of a powerful XML query API already become visible. Indeed, the Scala Collections API lays the foundation
-of yaidom.**
+**In summary, using the Scala Collections API and only a minimal "mini-yaidom" API, it already becomes obvious
+that the Scala Collections API plus only a few core element query methods make for a powerful XML query language.
+Indeed, the Scala Collections API lays most of the foundation of yaidom.**
 
 Yaidom and namespaces
 ---------------------
@@ -365,13 +372,13 @@ These expanded names do not occur in XML documents. Expanded names are too long 
 prefixed names have no meaning outside their context (namely in-scope namespaces), whereas expanded names have an
 existence on their own. Moreover, prefixes themselves are just placeholders, and can easily be replaced by other prefixes
 without changing the meaning of the XML document. For example, in the XML above, we could replace prefix ``f`` by prefix
-``g`` everywhere (also in the namespace declaration, of course), without changing the meaning of the document.
+``g`` everywhere (also in the namespace declaration, of course), without changing the "meaning" of the document.
 
 The namespace declaration in the root element above leads to *in-scope namespaces*, or *scope*, from the root all the way down
 to all descendants of the root (that is, the entire document). The namespace scope at each element is the accumulated effect of
 the namespace declarations in the element and its ancestry. In this example, each element has the same scope, because only the
-root element has namespace declarations. The namespace scope contains only one mapping from prefix ``f`` to namespace name
-``http://www.w3schools.com/furniture``.
+root element has declarations of namespaces, which are in scope throughout the document. The namespace scope contains only one
+mapping from prefix ``f`` to namespace name ``http://www.w3schools.com/furniture``.
 
 The concepts mentioned above are modelled in yaidom by the following classes:
 
@@ -409,9 +416,9 @@ Scopes and declarations obey some interesting properties. For example::
   scope1.resolve(scope1.relativize(scope2)) == scope2
 
 These properties, as well as the definitions of ``Scope`` methods ``resolve`` and ``relativize`` contribute significantly
-to the "internal consistency" of yaidom. They also helped a lot in making yaidom easier to implement, especially in conversions
-between yaidom and DOM nodes. Along with the Scala Collections API and the "mini-yaidom" of the preceding section, they are
-the foundation of yaidom.
+to the "internal consistency" of yaidom. They also help a lot in keeping the implementation of yaidom fairly simple, especially
+in conversions between yaidom and DOM nodes. Along with the Scala Collections API and the "mini-yaidom" of the preceding section,
+they are the foundation of yaidom.
 
 **In summary, yaidom clearly distinguishes between qualified names and expanded names, and between namespace declarations
 and in-scope namespaces. This is the second foundation of yaidom.**
@@ -426,18 +433,19 @@ Yaidom uniform query API
 ParentElemLike trait
 --------------------
 
-Yaidom takes the position that one size does not fit all, when it comes to XML processing. For example, the default ``Elem``
+Yaidom takes the position that one size does not fit all, when it comes to XML processing. (On the other hand, yaidom is a DOM-like
+API, and does not care much about the exact XML strings from which DOM-like trees are parsed). For example, the default ``Elem``
 class represents immutable (thread-safe) element nodes (that do not know about their parent elements). As another example,
 yaidom offers immutable elements that can be compared for some notion of equality, but carry less data than the default
-elements. As yet another example, yaidom offers wrappers around DOM elements.
+element class. As yet another example, yaidom offers wrappers around DOM elements.
 
 All these different element classes have one thing in common, viz. the *same yaidom query API*. The yaidom query API consists
 of a Scala *trait* inheritance tree. The root trait is the ``ParentElemLike`` trait.
 
 Each trait in the query API inheritance tree turns a small API into a *rich API*. In particular, the ``ParentElemLike``
 trait turns a small API that implements only method ``allChildElems`` into a rich query API. The rich API contains the
-fundamental method ``findAllElemsOrSelf``, just like in the "mini-yaidom" above. It also offers syntactic sugar, such as method
-``filterElemsOrSelf`` (which takes an element predicate).
+fundamental method ``findAllElemsOrSelf``, just like in the "mini-yaidom" above. It also offers convenience methods, such as
+method ``filterElemsOrSelf`` (which takes an element predicate).
 
 Below we use the ``ParentElemLike`` API to rewrite the queries given earlier, where we used "mini-yaidom". First the same
 DOM-like tree is created, this time in yaidom. We create elements of the default ``Elem`` element class. To do so, we
@@ -572,6 +580,17 @@ The sample XML data is created in yaidom as follows::
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
   }
 
+We can now use convenience methods offered by trait ``ParentElemLike``. For example, instead of writing::
+
+  elem.findAllElemsOrSelf filter { e => e.localName == "Book" }
+
+we can now write::
+
+  elem filterElemsOrSelf { e => e.localName == "Book" }
+
+Method ``localName`` is offered by subtrait ``ElemLike``, and returns the local part of the element name. After all, the
+element name may have a namespace.
+
 Using (almost) only ``ParentElemLike`` query methods on the bookstore element, we get the following rewritten queries (the
 first 4 of them)::
 
@@ -607,25 +626,122 @@ first 4 of them)::
     } yield book.getChildElem(EName("Title"))
 
 Note the obvious equivalence to the "mini-yaidom" queries given earlier. Besides *core query method* ``findAllElemsOrSelf``,
-trait ``ParentElemLike`` offers a lot of syntactic sugar that made the rewritten queries less verbose than the "mini-yaidom"
+trait ``ParentElemLike`` offers many convenience methods that make the rewritten queries less verbose than the "mini-yaidom"
 versions.
+
+The queries above can become more concise by using operator notation ``\`` for ``filterChildElems`` and ``\\`` for
+``filterElemsOrSelf``. Below we will see more convenience methods, leading to more conciseness without loss of clarity.
+
+If we had used different element classes than the default yaidom ``Elem`` class, such as ``eu.cdevreeze.yaidom.resolved.Elem`` or
+``eu.cdevreeze.yaidom.dom.DomElem``, the query code above would stay the same! Indeed, the ``ParentElemLike`` trait is a
+uniform XML query API in yaidom (or in future yaidom extensions).
 
 To summarize:
 
 * Yaidom offers an *element-centric query API*
 * This query API is based on the *Scala Collections API*, from the inside and on the outside
-* The base trait of this query API, ``ParentElemLike``, turns a small API (method ``allChildElems``) into a *rich API*
+* In other words, the underlying *core query API* is the Scala Collections API plus core methods ``allChildElems`` and ``findAllElemsOrSelf``
+* The base trait of the query API, ``ParentElemLike``, turns a small API (method ``allChildElems``) into a *rich API*
 * This rich API contains the *fundamental query method* ``findAllElemsOrSelf``, just like in the "mini-yaidom" example
 * This rich API also offers many convenience query methods for child elements, descendant elements and descendant-or-self elements
-* This API is *uniform*, in that this trait is mixed in by different element classes in yaidom, even by yaidom wrappers for DOM
-* The ``ParentElemLike`` API is trivial to understand semantically, due to Scala's Collections API as its foundation
-* Although the API is more verbose than XPath, due to its simplicity and the use of Scala, it can be very useful for XML querying
+* This API is *uniform*, in that this trait is mixed in (as query API) by different element classes in yaidom, even by yaidom wrappers for DOM
+* Indeed this API knows almost nothing about XML elements (just that it has method ``allChildElems``), which makes it easy to mix in
+* The ``ParentElemLike`` API is trivial to understand semantically, due to Scala's Collections API as its clearly visible foundation
+* Although the API is more verbose than XPath, due to its simplicity and the expressive power of Scala, it can be very useful for XML querying
 
 ElemLike trait
 --------------
 
-Show convenience methods offered by the ElemLike API as well (using EName arguments instead of element predicates).
-Show shorthand notations as well.
+The ``ParentElemLike`` trait knows almost nothing about the elements. It only knows that elements can have child elements.
+Yet typical element classes contain methods for element name (EName and/or QName), attributes, etc. This is where the
+``ElemLike`` trait comes in. It extends trait ``ParentElemLike``, and turns a small API with methods ``allChildElems``,
+``resolvedName`` and ``resolvedAttributes`` into a *rich API* in which queries for elements or attributes can be passed
+names instead of predicates.
+
+In other words, trait ``ElemLike`` adds only convenience methods to super-trait ``ParentElemLike`` (which itself consists mostly
+of convenience methods, as discussed above).
+
+Most element classes in yaidom not only mix in trait ``ParentElemLike``, but sub-trait ``ElemLike`` as well. Hence the queries
+we write using the ``ElemLike`` API can often be used unchanged for different element types in yaidom.
+
+Using the ``ElemLike`` trait, we can make the queries above more concise, without losing any clarity. This time we do not use
+local parts of names in the queries, but the full expanded names (which happen to have no namespace). These more concise versions
+are::
+
+  // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
+
+  val bookOrMagazineTitles =
+    for {
+      bookOrMagazine <- bookstore filterChildElems { e => Set(EName("Book"), EName("Magazine")).contains(e.resolvedName) }
+      title <- bookOrMagazine.findChildElem(EName("Title"))
+    } yield title
+
+
+  // XPath: doc("bookstore.xml")//Title
+  // Note the use of method filterElems instead of filterElemsOrSelf
+
+  val titles =
+    for (title <- bookstore.filterElems(EName("Title"))) yield title
+
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
+
+  val isbns =
+    for (book <- bookstore.filterChildElems(EName("Book"))) yield book.attribute(EName("ISBN"))
+
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
+
+  val titlesOfCheapBooks =
+    for {
+      book <- bookstore.filterChildElems(EName("Book"))
+      price <- book.attributeOption(EName("Price"))
+      if price.toInt < 90
+    } yield book.getChildElem(EName("Title"))
+
+Using operator notation ``\`` for ``filterChildElems`` and ``\\`` for ``filterElemsOrSelf``, we could write::
+
+  // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
+
+  val bookOrMagazineTitles =
+    for {
+      bookOrMagazine <- bookstore \ { e => Set(EName("Book"), EName("Magazine")).contains(e.resolvedName) }
+      title <- bookOrMagazine.findChildElem(EName("Title"))
+    } yield title
+
+
+  // XPath: doc("bookstore.xml")//Title
+  // Note the use of method filterElems instead of filterElemsOrSelf
+
+  val titles =
+    for (title <- bookstore \\ EName("Title")) yield title
+
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
+
+  val isbns =
+    for (book <- bookstore \ EName("Book")) yield book.attribute(EName("ISBN"))
+
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
+  // Note the use of operator notation for method attributeOption
+
+  val titlesOfCheapBooks =
+    for {
+      book <- bookstore \ EName("Book")
+      price <- book \@ EName("Price")
+      if price.toInt < 90
+    } yield book.getChildElem(EName("Title"))
+
+Of course, in these versions of the queries, the search criteria are ENames instead of local names, so we have to get
+the namespaces in those ENames right, if any.
+
+To summarize:
+
+* Trait ``ElemLike`` extends trait ``ParentElemLike``, adding knowledge about ENames of elements and attributes
+* Trait ``ElemLike`` turns a small API (methods ``allChildElems``, ``resolvedName`` and ``resolvedAttributes``) into a rich API
+* This trait only adds convenience methods for EName-based querying to the super-trait, so adds no core query methods
+* Most element classes in yaidom mix in trait ``ElemLike`` (not just its super-trait)
 
 PathAwareElemLike trait
 -----------------------
