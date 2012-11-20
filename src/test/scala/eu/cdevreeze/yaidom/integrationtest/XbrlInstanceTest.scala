@@ -150,7 +150,7 @@ class XbrlInstanceTest extends Suite {
 
     expect(true) {
       schemaRefElms forall { e =>
-        e.resolvedAttributes.keySet == Set(EName(nsXLink, "type"), EName(nsXLink, "href"))
+        e.resolvedAttributes.toMap.keySet == Set(EName(nsXLink, "type"), EName(nsXLink, "href"))
       }
     }
     expect(true) {
@@ -199,7 +199,7 @@ object XbrlInstanceTest {
   /** XBRL instance. The original XML can be reconstructed, modulo equality of the "resolved elements" */
   final class XbrlInstance(
     val rootQName: QName,
-    val rootAttributes: Map[QName, String],
+    val rootAttributes: immutable.IndexedSeq[(QName, String)],
     val rootScope: Scope,
     val schemaRefs: immutable.IndexedSeq[xlink.SimpleLink],
     val linkbaseRefs: immutable.IndexedSeq[xlink.SimpleLink],

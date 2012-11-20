@@ -27,7 +27,7 @@ import scala.collection.immutable
  *
  * elem(
  *   qname = QName("dbclass:Magazine"),
- *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = Vector(
  *     elem(
@@ -39,7 +39,7 @@ import scala.collection.immutable
  * {{{
  * elem(
  *   qname = QName("dbclass:Magazine"),
- *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
  *   namespaces = Declarations.from("dbclass" -> "http://www.db-class.org"),
  *   children = Vector(
  *     textElem(QName("dbclass:Title"), "Newsweek"))).build()
@@ -87,7 +87,7 @@ sealed trait NodeBuilder extends Immutable with Serializable {
 @SerialVersionUID(1L)
 final class ElemBuilder(
   val qname: QName,
-  val attributes: Map[QName, String],
+  val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
   val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] { self =>
 
@@ -95,6 +95,8 @@ final class ElemBuilder(
   require(attributes ne null)
   require(namespaces ne null)
   require(children ne null)
+
+  require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
 
   type NodeType = Elem
 
@@ -183,7 +185,7 @@ object NodeBuilder {
 
   def elem(
     qname: QName,
-    attributes: Map[QName, String] = Map(),
+    attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     namespaces: Declarations = Declarations.Empty,
     children: immutable.IndexedSeq[NodeBuilder] = Vector()): ElemBuilder = {
 
@@ -202,12 +204,12 @@ object NodeBuilder {
   def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
 
   def textElem(qname: QName, txt: String): ElemBuilder = {
-    textElem(qname, Map[QName, String](), txt)
+    textElem(qname, Vector(), txt)
   }
 
   def textElem(
     qname: QName,
-    attributes: Map[QName, String],
+    attributes: immutable.IndexedSeq[(QName, String)],
     txt: String): ElemBuilder = {
 
     textElem(qname, attributes, Declarations.Empty, txt)
@@ -215,7 +217,7 @@ object NodeBuilder {
 
   def textElem(
     qname: QName,
-    attributes: Map[QName, String],
+    attributes: immutable.IndexedSeq[(QName, String)],
     namespaces: Declarations,
     txt: String): ElemBuilder = {
 

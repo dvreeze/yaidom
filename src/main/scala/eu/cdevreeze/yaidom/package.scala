@@ -55,9 +55,9 @@ package eu.cdevreeze
  * <li>The structure of the XML is known, and typically described in an XSD.</li>
  * <li>Namespaces are heavily used.</li>
  * <li>DTDs are not used.</li>
- * <li>The exact string representation is not important (such as short or long form of empty elements, the order of attributes,
- * including namespace declarations, even the exact namespace prefixes used, etc.). A "DOM-centric" view of XML may well
- * suffice for processing such XML.</li>
+ * <li>The exact string representation is not important, such as short or long form of empty elements, the order of attributes,
+ * including namespace declarations, even the exact namespace prefixes used, etc. (Yaidom elements do keep the order of
+ * non-namespace-declaration attributes.) A "DOM-centric" view of XML may well suffice for processing such XML.</li>
  * </ul>
  * That is not to say that yaidom can only be used for processing such "data-oriented" XML.
  *

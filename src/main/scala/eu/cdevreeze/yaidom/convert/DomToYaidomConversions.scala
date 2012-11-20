@@ -60,7 +60,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
    */
   final def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
-    val attributes: Map[QName, String] = extractAttributes(v.getAttributes)
+    val attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(v.getAttributes)
 
     val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.getAttributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
@@ -109,8 +109,8 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.Comment]] */
   final def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
-  /** Converts a `NamedNodeMap` to a `Map[QName, String]`. Namespace declarations are skipped. */
-  final def extractAttributes(domAttributes: NamedNodeMap): Map[QName, String] = {
+  /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */
+  final def extractAttributes(domAttributes: NamedNodeMap): immutable.IndexedSeq[(QName, String)] = {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
 
@@ -118,7 +118,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
         val qname: QName = toQName(attr)
         Some(qname -> attr.getValue)
       }
-    }).toMap
+    }).toIndexedSeq
   }
 
   /** Converts the namespace declarations in a `NamedNodeMap` to a `Declarations` */

@@ -458,7 +458,7 @@ The sample XML data is created in yaidom as follows::
   val book1: ElemBuilder = {
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
         textElem(QName("Title"), "A First Course in Database Systems"),
         elem(
@@ -479,7 +479,7 @@ The sample XML data is created in yaidom as follows::
   val book2: ElemBuilder = {
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
         textElem(QName("Title"), "Database Systems: The Complete Book"),
         elem(
@@ -506,7 +506,7 @@ The sample XML data is created in yaidom as follows::
   val book3: ElemBuilder = {
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
         textElem(QName("Title"), "Hector and Jeff's Database Hints"),
         elem(
@@ -528,7 +528,7 @@ The sample XML data is created in yaidom as follows::
   val book4: ElemBuilder = {
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
         textElem(QName("Title"), "Jennifer's Economical Database Hints"),
         elem(
@@ -544,7 +544,7 @@ The sample XML data is created in yaidom as follows::
   val magazine1: ElemBuilder = {
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "National Geographic")))
   }
@@ -552,7 +552,7 @@ The sample XML data is created in yaidom as follows::
   val magazine2: ElemBuilder = {
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "National Geographic")))
   }
@@ -560,7 +560,7 @@ The sample XML data is created in yaidom as follows::
   val magazine3: ElemBuilder = {
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "Newsweek")))
   }
@@ -568,7 +568,7 @@ The sample XML data is created in yaidom as follows::
   val magazine4: ElemBuilder = {
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "Hector and Jeff's Database Hints")))
   }

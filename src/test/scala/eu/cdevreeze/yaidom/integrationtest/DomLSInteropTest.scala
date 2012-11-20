@@ -608,41 +608,41 @@ class DomLSInteropTest extends Suite {
       val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
       expect(Set(EName("base"))) {
-        val result = extensionElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
       expect(Set("xs:annotated")) {
-        val result = extensionElms flatMap { e => e.resolvedAttributes.values }
+        val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.values }
         result.toSet
       }
 
       expect(Set()) {
-        val result = sequenceElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = sequenceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("minOccurs"))) {
-        val result = choiceElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = choiceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("name"), EName("type"))) {
-        val result = elementElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = elementElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
-        val result = groupElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = groupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
-        val result = attributeElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = attributeElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("ref"))) {
-        val result = attributeGroupElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = attributeGroupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
     }

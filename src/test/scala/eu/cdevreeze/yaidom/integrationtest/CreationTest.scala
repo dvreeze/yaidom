@@ -54,27 +54,27 @@ class CreationTest extends Suite {
 
       Elem(
         EName("{http://books}Book"),
-        Map(EName("ISBN") -> "ISBN-9-88-777777-6", EName("Price") -> "25"),
+        Vector(EName("ISBN") -> "ISBN-9-88-777777-6", EName("Price") -> "25"),
         Vector(
           Elem(
             EName("{http://books}Title"),
-            Map(),
+            Vector(),
             Vector(Text("Jennifer's Economical Database Hints"))),
           Elem(
             EName("Authors"),
-            Map(),
+            Vector(),
             Vector(
               Elem(
                 EName("{http://bookstore}Author"),
-                Map(),
+                Vector(),
                 Vector(
                   Elem(
                     EName("{http://ns}First_Name"),
-                    Map(),
+                    Vector(),
                     Vector(Text("Jennifer"))),
                   Elem(
                     EName("{http://ns}Last_Name"),
-                    Map(),
+                    Vector(),
                     Vector(Text("Widom")))))))))
     }
 
@@ -87,7 +87,7 @@ class CreationTest extends Suite {
     val elm2Builder: ElemBuilder =
       elem(
         qname = QName("books:Book"),
-        attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+        attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
         namespaces = Declarations.from("books" -> "http://books", "names" -> "http://names"),
         children = Vector(
           textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
@@ -112,7 +112,7 @@ class CreationTest extends Suite {
     val elm3Builder: ElemBuilder =
       elem(
         qname = QName("books:Book"),
-        attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+        attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
         children = Vector(
           textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
           elem(
@@ -128,7 +128,7 @@ class CreationTest extends Suite {
 
     val prefixesUsed: Set[String] = {
       elm3Builder.findAllElemsOrSelf.foldLeft(Set[String]()) { (acc, elemBuilder) =>
-        val qnames: Set[QName] = (elemBuilder.attributes.keySet) + elemBuilder.qname
+        val qnames: Set[QName] = (elemBuilder.attributes.toMap.keySet) + elemBuilder.qname
         val prefixes: Set[String] = qnames flatMap { qname => qname.prefixOption }
         acc ++ prefixes.toSet
       }
@@ -150,7 +150,7 @@ class CreationTest extends Suite {
 
       elem(
         qname = QName("books:Book"),
-        attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+        attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
         scope = Scope.from("books" -> "http://books", "names" -> "http://names"),
         children = Vector(
           textElem(

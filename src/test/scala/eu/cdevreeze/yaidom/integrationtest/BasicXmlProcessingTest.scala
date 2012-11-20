@@ -56,15 +56,15 @@ class BasicXmlProcessingTest extends Suite {
         children = Vector(
           textElem(
             qname = QName("bar"),
-            attributes = Map(QName("type") -> "greet"),
+            attributes = Vector(QName("type") -> "greet"),
             txt = "hi"),
           textElem(
             qname = QName("bar"),
-            attributes = Map(QName("type") -> "count"),
+            attributes = Vector(QName("type") -> "count"),
             txt = "1"),
           textElem(
             qname = QName("bar"),
-            attributes = Map(QName("type") -> "color"),
+            attributes = Vector(QName("type") -> "color"),
             txt = "yellow"))).build()
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
@@ -108,22 +108,22 @@ class BasicXmlProcessingTest extends Suite {
         children = Vector(
           elem(
             qname = QName("z"),
-            attributes = Map(QName("x") -> "1")),
+            attributes = Vector(QName("x") -> "1")),
           elem(
             qname = QName("b"),
             children = Vector(
               elem(
                 qname = QName("z"),
-                attributes = Map(QName("x") -> "2")),
+                attributes = Vector(QName("x") -> "2")),
               elem(
                 qname = QName("c"),
                 children = Vector(
                   elem(
                     qname = QName("z"),
-                    attributes = Map(QName("x") -> "3")))),
+                    attributes = Vector(QName("x") -> "3")))),
               elem(
                 qname = QName("z"),
-                attributes = Map(QName("x") -> "4")))))).build()
+                attributes = Vector(QName("x") -> "4")))))).build()
 
     val zs = baz \\ "z"
 
@@ -208,16 +208,16 @@ class BasicXmlProcessingTest extends Suite {
         children = artists map { artist =>
           elem(
             qname = QName("artist"),
-            attributes = Map(QName("name") -> artist.name),
+            attributes = Vector(QName("name") -> artist.name),
             children = artist.albums map { album =>
               elem(
                 qname = QName("album"),
-                attributes = Map(QName("title") -> album.title),
+                attributes = Vector(QName("title") -> album.title),
                 children = {
                   val songChildren: immutable.IndexedSeq[NodeBuilder] = album.songs map { song =>
                     elem(
                       qname = QName("song"),
-                      attributes = Map(QName("title") -> song.title, QName("length") -> song.length))
+                      attributes = Vector(QName("title") -> song.title, QName("length") -> song.length))
                   }
 
                   val descriptionElm = textElem(QName("description"), album.description)
@@ -235,7 +235,8 @@ class BasicXmlProcessingTest extends Suite {
     val musicElmWithoutLinks: Elem =
       musicElm updated {
         case e if e.localName == "description" =>
-          Vector(Elem(e.qname, e.attributes - QName("link"), e.scope, e.children))
+          val updatedAttrs = e.attributes filterNot { case (qn, v) => qn == QName("link") }
+          Vector(Elem(e.qname, updatedAttrs, e.scope, e.children))
       }
 
     expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {

@@ -82,16 +82,16 @@ class XLinkTest extends Suite {
     val rootBuilder: ElemBuilder =
       elem(
         qname = QName("courseload"),
-        attributes = Map(QName("xlink:type") -> "extended"),
+        attributes = Vector(QName("xlink:type") -> "extended"),
         namespaces = Declarations.from("xlink" -> "http://www.w3.org/1999/xlink"),
         children = Vector(
           textElem(
             qname = QName("tooltip"),
-            attributes = Map(QName("xlink:type") -> "title"),
+            attributes = Vector(QName("xlink:type") -> "title"),
             txt = "Course Load for Pat Jones"),
           elem(
             qname = QName("person"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "locator",
               QName("xlink:href") -> "students/patjones62.xml",
               QName("xlink:label") -> "student62",
@@ -99,7 +99,7 @@ class XLinkTest extends Suite {
               QName("xlink:title") -> "Pat Jones")),
           elem(
             qname = QName("person"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "locator",
               QName("xlink:href") -> "profs/jaysmith7.xml",
               QName("xlink:label") -> "prof7",
@@ -108,7 +108,7 @@ class XLinkTest extends Suite {
           comment(" more remote resources for professors, teaching assistants, etc. "),
           elem(
             qname = QName("course"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "locator",
               QName("xlink:href") -> "courses/cs101.xml",
               QName("xlink:label") -> "CS-101",
@@ -116,14 +116,14 @@ class XLinkTest extends Suite {
           comment(" more remote resources for courses, seminars, etc. "),
           textElem(
             qname = QName("gpa"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "resource",
               QName("xlink:label") -> "PatJonesGPA",
               QName("xlink:role") -> "http://www.example.com/linkprops/gpa"),
             txt = "3.5"),
           elem(
             qname = QName("go"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "arc",
               QName("xlink:from") -> "student62",
               QName("xlink:arcrole") -> "", // Required??
@@ -133,7 +133,7 @@ class XLinkTest extends Suite {
               QName("xlink:title") -> "Pat Jones's GPA")),
           elem(
             qname = QName("go"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "arc",
               QName("xlink:from") -> "CS-101",
               QName("xlink:arcrole") -> "http://www.example.com/linkprops/auditor",
@@ -143,7 +143,7 @@ class XLinkTest extends Suite {
               QName("xlink:title") -> "Pat Jones, auditing the course")),
           elem(
             qname = QName("go"),
-            attributes = Map(
+            attributes = Vector(
               QName("xlink:type") -> "arc",
               QName("xlink:from") -> "student62",
               QName("xlink:arcrole") -> "http://www.example.com/linkprops/advisor",

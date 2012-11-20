@@ -66,7 +66,7 @@ class UpdateTest extends Suite {
     println(docPrinter.print(doc1))
 
     def attrNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
-      val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.keySet }
+      val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
       result.toSet
     }
 
@@ -136,7 +136,7 @@ class UpdateTest extends Suite {
 
     elem(
       qname = bookElm.qname,
-      attributes = bookElm.attributes - QName(attrName),
+      attributes = bookElm.attributes filterNot { case (qn, v) => qn == QName(attrName) },
       scope = bookElm.scope,
       children = bookElm.children :+ textElem(
         qname = QName(attrName),
@@ -152,10 +152,10 @@ class UpdateTest extends Suite {
 
     resolved.Elem(
       resolvedName = bookElm.resolvedName,
-      resolvedAttributes = bookElm.resolvedAttributes - EName(attrName),
+      resolvedAttributes = bookElm.resolvedAttributes filterNot { case (en, v) => en == EName(attrName) },
       children = bookElm.children :+ resolved.Elem(
         resolvedName = EName("http://bookstore", attrName),
-        resolvedAttributes = Map(),
+        resolvedAttributes = Vector(),
         children = Vector(resolved.Text(attrValue))))
   }
 }

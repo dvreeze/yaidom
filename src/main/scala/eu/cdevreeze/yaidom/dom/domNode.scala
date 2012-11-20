@@ -83,8 +83,8 @@ final class DomElem(
     scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
   }
 
-  /** The attributes as a `Map` from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
-  override def resolvedAttributes: Map[EName, String] = {
+  /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
+  override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = attributeScope
 
     attributes map { kv =>
@@ -97,7 +97,7 @@ final class DomElem(
 
   def qname: QName = DomConversions.toQName(wrappedNode)
 
-  def attributes: Map[QName, String] = DomConversions.extractAttributes(wrappedNode.getAttributes)
+  def attributes: immutable.IndexedSeq[(QName, String)] = DomConversions.extractAttributes(wrappedNode.getAttributes)
 
   def scope: Scope = {
     val parent = wrappedNode.getParentNode

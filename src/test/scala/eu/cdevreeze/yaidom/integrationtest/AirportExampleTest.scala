@@ -292,7 +292,7 @@ class AirportExampleTest extends Suite {
               children = Vector(
                 textElem(
                   qname = QName("Airport"),
-                  attributes = Map(QName("code") -> airportCode),
+                  attributes = Vector(QName("code") -> airportCode),
                   txt = dist.toString)))
         })
     }

@@ -263,41 +263,41 @@ class JDomWrapperTest extends Suite {
       val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
       expect(Set(EName("base"))) {
-        val result = extensionElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
       expect(Set("xs:annotated")) {
-        val result = extensionElms flatMap { e => e.resolvedAttributes.values }
+        val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.values }
         result.toSet
       }
 
       expect(Set()) {
-        val result = sequenceElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = sequenceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("minOccurs"))) {
-        val result = choiceElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = choiceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("name"), EName("type"))) {
-        val result = elementElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = elementElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
-        val result = groupElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = groupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
-        val result = attributeElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = attributeElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
       expect(Set(EName("ref"))) {
-        val result = attributeGroupElms flatMap { e => e.resolvedAttributes.keySet }
+        val result = attributeGroupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
     }
@@ -716,7 +716,7 @@ object JDomWrapperTest {
       EName(nsOption, wrappedNode.getName)
     }
 
-    override def resolvedAttributes: Map[EName, String] = {
+    override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
       val jdomAttrs: immutable.IndexedSeq[org.jdom2.Attribute] = wrappedNode.getAttributes.asScala.toIndexedSeq
 
       val result = jdomAttrs map { attr =>
@@ -726,18 +726,18 @@ object JDomWrapperTest {
 
         (ename -> attr.getValue)
       }
-      result.toMap
+      result.toIndexedSeq
     }
 
     def qname: QName = QName(wrappedNode.getQualifiedName)
 
-    def attributes: Map[QName, String] = {
+    def attributes: immutable.IndexedSeq[(QName, String)] = {
       val jdomAttrs: immutable.IndexedSeq[org.jdom2.Attribute] = wrappedNode.getAttributes.asScala.toIndexedSeq
 
       val result = jdomAttrs map { attr =>
         (QName(attr.getQualifiedName) -> attr.getValue)
       }
-      result.toMap
+      result.toIndexedSeq
     }
 
     def scope: Scope = {

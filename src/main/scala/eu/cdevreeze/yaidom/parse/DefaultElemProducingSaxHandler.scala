@@ -173,40 +173,42 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     val elmQName: QName = if (qName != "") QName.parse(qName) else QName.parse(localName)
 
     val nsDecls = extractDeclarations(atts)
-    val attrMap = extractAttributeMap(atts)
+    val attrSeq = extractAttributeMap(atts)
 
     val newScope = parentScope.resolve(nsDecls)
 
     new InternalElemNode(
       parentOption = None,
       qname = elmQName,
-      attributes = attrMap,
+      attributes = attrSeq,
       scope = newScope,
       children = mutable.IndexedSeq())
   }
 
   private def extractDeclarations(atts: Attributes): Declarations = {
-    val result = attributeOrDeclarationMap(atts) filterKeys { qname => isNamespaceDeclaration(qname) } map { kv =>
-      val key = QName.parse(kv._1)
-      val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
-      val nsUri = kv._2
-      (prefix -> nsUri)
+    val result = attributeOrDeclarationSeq(atts) collect {
+      case (qn, v) if isNamespaceDeclaration(qn) =>
+        val key = QName.parse(qn)
+        val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
+        val nsUri = v
+        (prefix -> nsUri)
     }
-    Declarations.from(result)
+    Declarations.from(result.toMap)
   }
 
-  private def extractAttributeMap(atts: Attributes): Map[QName, String] = {
-    val result = attributeOrDeclarationMap(atts) filterKeys { qname => !isNamespaceDeclaration(qname) } map { kv =>
-      val qname = QName.parse(kv._1)
-      val attValue = kv._2
-      (qname -> attValue)
+  private def extractAttributeMap(atts: Attributes): immutable.IndexedSeq[(QName, String)] = {
+    val result = attributeOrDeclarationSeq(atts) collect {
+      case (qn, v) if !isNamespaceDeclaration(qn) =>
+        val qname = QName.parse(qn)
+        val attValue = v
+        (qname -> attValue)
     }
     result
   }
 
-  private def attributeOrDeclarationMap(atts: Attributes): Map[String, String] = {
+  private def attributeOrDeclarationSeq(atts: Attributes): immutable.IndexedSeq[(String, String)] = {
     val result = (0 until atts.getLength).toIndexedSeq map { (idx: Int) => (atts.getQName(idx) -> atts.getValue(idx)) }
-    result.toMap
+    result
   }
 
   /** Returns true if the attribute qualified (prefixed) name is a namespace declaration */
@@ -234,7 +236,7 @@ object DefaultElemProducingSaxHandler {
   private[parse] final class InternalElemNode(
     var parentOption: Option[InternalElemNode],
     val qname: QName,
-    val attributes: Map[QName, String],
+    val attributes: immutable.IndexedSeq[(QName, String)],
     val scope: Scope,
     var children: mutable.IndexedSeq[InternalNode]) extends InternalParentNode {
 

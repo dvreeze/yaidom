@@ -642,7 +642,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
         textElem(QName("Title"), "A First Course in Database Systems"),
         elem(
@@ -665,7 +665,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
         textElem(QName("Title"), "Database Systems: The Complete Book"),
         elem(
@@ -694,7 +694,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
         textElem(QName("Title"), "Hector and Jeff's Database Hints"),
         elem(
@@ -718,7 +718,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
         textElem(QName("Title"), "Jennifer's Economical Database Hints"),
         elem(
@@ -736,7 +736,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "National Geographic")))
   }
@@ -746,7 +746,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "National Geographic")))
   }
@@ -756,7 +756,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "Newsweek")))
   }
@@ -766,7 +766,7 @@ class ElemLikeTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "Hector and Jeff's Database Hints")))
   }

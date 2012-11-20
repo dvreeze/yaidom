@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom
 
 import java.net.URI
+import scala.collection.immutable
 import scala.util.parsing.combinator._
 import org.apache.commons.lang3.StringEscapeUtils
 
@@ -92,11 +93,11 @@ object TreeReprParsers extends JavaTokenParsers {
       { case (qname, attrs, namespaces, children) => new ElemBuilder(qname, attrs, namespaces, children) }
   }
 
-  def elemContent: Parser[(QName, Map[QName, String], Declarations, Vector[NodeBuilder])] = {
+  def elemContent: Parser[(QName, immutable.IndexedSeq[(QName, String)], Declarations, Vector[NodeBuilder])] = {
     qnamePart ~ opt("," ~> attributesPart) ~ opt("," ~> namespacesPart) ~ opt("," ~> elemChildrenPart) ^^
       {
         case (qn ~ optAttrs ~ optNs ~ optChildren) =>
-          val attrs = optAttrs.getOrElse(Map[QName, String]())
+          val attrs = optAttrs.getOrElse(Vector[(QName, String)]())
           val ns = optNs.getOrElse(Declarations.Empty)
           val children = optChildren.getOrElse(Vector[NodeBuilder]())
           (qn, attrs, ns, children)
@@ -108,11 +109,11 @@ object TreeReprParsers extends JavaTokenParsers {
   def qname: Parser[QName] =
     "QName" ~> "(" ~> stringLiteral2 <~ ")" ^^ { x => QName.parse(unwrapStringLiteral(x)) }
 
-  def attributesPart: Parser[Map[QName, String]] =
+  def attributesPart: Parser[immutable.IndexedSeq[(QName, String)]] =
     "attributes" ~> "=" ~> attributes
 
-  def attributes: Parser[Map[QName, String]] =
-    "Map" ~> "(" ~> repsep(attribute, ",") <~ ")" ^^ { xs => xs.toMap }
+  def attributes: Parser[immutable.IndexedSeq[(QName, String)]] =
+    "Vector" ~> "(" ~> repsep(attribute, ",") <~ ")" ^^ { xs => xs.toIndexedSeq }
 
   def attribute: Parser[(QName, String)] =
     qname ~ "->" ~ stringLiteral2 ^^ { case qn ~ "->" ~ v => (qn, unwrapStringLiteral(v)) }

@@ -303,14 +303,14 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val elemEName = EName.fromJavaQName(startElement.getName)
     val elemPrefixOption: Option[String] = EName.prefixOptionFromJavaQName(startElement.getName)
 
-    val currAttrs: Map[QName, String] = {
+    val currAttrs: immutable.IndexedSeq[(QName, String)] = {
       val attributes: List[Attribute] = startElement.getAttributes.asScala.toList collect { case a: Attribute => a }
       val result = attributes map { a =>
         val prefixOption: Option[String] = EName.prefixOptionFromJavaQName(a.getName)
         val name = EName.fromJavaQName(a.getName).toQName(prefixOption)
         (name -> a.getValue)
       }
-      result.toMap
+      result.toIndexedSeq
     }
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here

@@ -590,7 +590,7 @@ class QueryTest extends Suite {
     def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
       Elem(
         qname = e.qname,
-        attributes = e.attributes + (QName("elemPath") -> path.toCanonicalXPath(scope)),
+        attributes = e.attributes :+ (QName("elemPath") -> path.toCanonicalXPath(scope)),
         scope = e.scope,
         children = e.children.zipWithIndex map {
           case (ch, idx) =>
@@ -1130,7 +1130,7 @@ class QueryTest extends Suite {
         author <- book.filterElems(EName("Author"))
         if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
-        val attrs = book.attributes filterKeys { a => Set(QName("ISBN"), QName("Price")).contains(a) }
+        val attrs = book.attributes filter { case (qn, v) => Set(QName("ISBN"), QName("Price")).contains(qn) }
         elem(
           qname = QName("Book"),
           attributes = attrs).
@@ -1209,7 +1209,7 @@ class QueryTest extends Suite {
       require(book.resolvedName == EName("Book"))
       Elem(
         qname = book.qname,
-        attributes = book.attributes filterKeys { a => a != QName("Price") },
+        attributes = book.attributes filter { case (qn, v) => qn != QName("Price") },
         scope = book.scope,
         children = book.children)
     }
@@ -1395,7 +1395,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
       children = Vector(
         textElem(QName("Title"), "A First Course in Database Systems"),
         elem(
@@ -1418,7 +1418,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
       children = Vector(
         textElem(QName("Title"), "Database Systems: The Complete Book"),
         elem(
@@ -1447,7 +1447,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
       children = Vector(
         textElem(QName("Title"), "Hector and Jeff's Database Hints"),
         elem(
@@ -1471,7 +1471,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Book"),
-      attributes = Map(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
       children = Vector(
         textElem(QName("Title"), "Jennifer's Economical Database Hints"),
         elem(
@@ -1489,7 +1489,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "January", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "National Geographic")))
   }
@@ -1499,7 +1499,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "National Geographic")))
   }
@@ -1509,7 +1509,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "Newsweek")))
   }
@@ -1519,7 +1519,7 @@ class QueryTest extends Suite {
 
     elem(
       qname = QName("Magazine"),
-      attributes = Map(QName("Month") -> "March", QName("Year") -> "2009"),
+      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
       children = Vector(
         textElem(QName("Title"), "Hector and Jeff's Database Hints")))
   }

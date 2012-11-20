@@ -125,7 +125,7 @@ sealed trait Node extends Immutable with Serializable {
 @SerialVersionUID(1L)
 final class Elem(
   val qname: QName,
-  val attributes: Map[QName, String],
+  val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
   override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
@@ -133,6 +133,8 @@ final class Elem(
   require(attributes ne null)
   require(scope ne null)
   require(children ne null)
+
+  require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
 
   override val uid: UID = new UID
 
@@ -143,8 +145,8 @@ final class Elem(
   override val resolvedName: EName =
     scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
 
-  /** The attributes as a `Map` from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
-  override val resolvedAttributes: Map[EName, String] = {
+  /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
+  override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
@@ -189,7 +191,7 @@ final class Elem(
   def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
 
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
-  def withAttributes(newAttributes: Map[QName, String]): Elem = {
+  def withAttributes(newAttributes: immutable.IndexedSeq[(QName, String)]): Elem = {
     new Elem(qname, newAttributes, scope, children)
   }
 
@@ -373,7 +375,7 @@ final class Elem(
           result.mkString(", ")
         }
 
-        val line = "attributes = Map(%s)".format(attributeEntryStrings)
+        val line = "attributes = Vector(%s)".format(attributeEntryStrings)
         Some(LineSeq(line))
       }
 
@@ -498,7 +500,7 @@ object Elem {
    */
   def apply(
     qname: QName,
-    attributes: Map[QName, String] = Map(),
+    attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 }
@@ -525,7 +527,7 @@ object Elem {
  *
  * elem(
  *   qname = QName("dbclass:Magazine"),
- *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
  *   scope = scope,
  *   children = Vector(
  *     elem(
@@ -538,7 +540,7 @@ object Elem {
  * {{{
  * elem(
  *   qname = QName("dbclass:Magazine"),
- *   attributes = Map(QName("Month") -> "February", QName("Year") -> "2009"),
+ *   attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
  *   scope = scope,
  *   children = Vector(
  *     textElem(QName("dbclass:Title"), scope, "Newsweek")))
@@ -561,7 +563,7 @@ object Node {
 
   def elem(
     qname: QName,
-    attributes: Map[QName, String] = Map(),
+    attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope,
     children: immutable.IndexedSeq[Node] = Vector()): Elem = {
 
@@ -580,12 +582,12 @@ object Node {
   def comment(textValue: String): Comment = Comment(textValue)
 
   def textElem(qname: QName, scope: Scope, txt: String): Elem = {
-    textElem(qname, Map[QName, String](), scope, txt)
+    textElem(qname, Vector(), scope, txt)
   }
 
   def textElem(
     qname: QName,
-    attributes: Map[QName, String],
+    attributes: immutable.IndexedSeq[(QName, String)],
     scope: Scope,
     txt: String): Elem = {
 

@@ -104,8 +104,12 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName
 
-  /** The attributes as a `Map` from `EName`s (instead of `QName`s) to values */
-  def resolvedAttributes: Map[EName, String]
+  /**
+   * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values.
+   *
+   * The implementation must ensure that `resolvedAttributes.toMap.size == resolvedAttributes.size`.
+   */
+  def resolvedAttributes: immutable.IndexedSeq[(EName, String)]
 
   /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemLike` methods will be. */
   override def allChildElems: immutable.IndexedSeq[E]
@@ -114,7 +118,7 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
   final def localName: String = resolvedName.localPart
 
   /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */
-  final def attributeOption(expandedName: EName): Option[String] = resolvedAttributes.get(expandedName)
+  final def attributeOption(expandedName: EName): Option[String] = resolvedAttributes.toMap.get(expandedName)
 
   /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
   final def attribute(expandedName: EName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
@@ -124,8 +128,8 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
    * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
    */
   final def findAttribute(localName: String): Option[String] = {
-    val matchingAttrs = resolvedAttributes filterKeys { _.localPart == localName }
-    matchingAttrs.values.headOption
+    val matchingAttrs = resolvedAttributes filter { case (en, v) => en.localPart == localName }
+    matchingAttrs.map(_._2).headOption
   }
 
   /** Shorthand for `attributeOption(expandedName)` */

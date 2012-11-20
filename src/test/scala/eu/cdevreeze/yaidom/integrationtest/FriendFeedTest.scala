@@ -101,15 +101,15 @@ class FriendFeedTest extends Suite {
 
       Elem(
         EName("Service"),
-        Map(EName("id") -> "twitter"),
+        Vector(EName("id") -> "twitter"),
         Vector(
           Elem(
             EName("UserList"),
-            Map(),
+            Vector(),
             Vector(
-              Elem(EName("nickname"), Map(), Vector(Text("karlerikson"))),
-              Elem(EName("nickname"), Map(), Vector(Text("asfaq"))),
-              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
+              Elem(EName("nickname"), Vector(), Vector(Text("karlerikson"))),
+              Elem(EName("nickname"), Vector(), Vector(Text("asfaq"))),
+              Elem(EName("nickname"), Vector(), Vector(Text("chrisjlee")))))))
     }
 
     expect(expectedTwitterSummaryElm) {
@@ -124,13 +124,13 @@ class FriendFeedTest extends Suite {
 
       Elem(
         EName("Service"),
-        Map(EName("id") -> "googlereader"),
+        Vector(EName("id") -> "googlereader"),
         Vector(
           Elem(
             EName("UserList"),
-            Map(),
+            Vector(),
             Vector(
-              Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
+              Elem(EName("nickname"), Vector(), Vector(resolved.Text("misterjt")))))))
     }
 
     expect(expectedGoogleReaderSummaryElm) {
@@ -176,15 +176,15 @@ class FriendFeedTest extends Suite {
 
       Elem(
         EName(NsFriendFeedStats, "Stats"),
-        Map(),
+        Vector(),
         Vector(
           Elem(
             EName(NsFriendFeedStats, "Service"),
-            Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
+            Vector(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
             Vector()),
           Elem(
             EName(NsFriendFeedStats, "Service"),
-            Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
+            Vector(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
             Vector())))
     }
 
@@ -222,7 +222,7 @@ class FriendFeedTest extends Suite {
 
         elem(
           qname = QName("Service"),
-          attributes = Map(QName("id") -> serviceId, QName("cnt") -> serviceCount.toString)).build(StatsScope)
+          attributes = Vector(QName("cnt") -> serviceCount.toString, QName("id") -> serviceId)).build(StatsScope)
       }
 
       Elem(
@@ -289,7 +289,7 @@ class FriendFeedTest extends Suite {
     // Creating an Elem directly
     Elem(
       qname = QName("Service"),
-      attributes = Map(QName("id") -> serviceName),
+      attributes = Vector(QName("id") -> serviceName),
       children = Vector(userListElm))
   }
 
@@ -301,7 +301,7 @@ class FriendFeedTest extends Suite {
     val serviceElm: ElemBuilder =
       elem(
         qname = QName("Service"),
-        attributes = Map(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName))
+        attributes = Vector(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName))
 
     serviceElm.build(StatsScope)
   }

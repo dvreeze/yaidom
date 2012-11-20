@@ -146,9 +146,9 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
           "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, elm.attributeScope)))
         val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
 
-        (attrQName -> xmlEventFactory.createAttribute(attrJavaQName, value))
+        xmlEventFactory.createAttribute(attrJavaQName, value)
       }
-      result.values
+      result
     }
 
     val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeIterable.toBuffer.asJava).iterator
