@@ -6,6 +6,7 @@ CHANGELOG
 0.6.4
 =====
 
+* Breaking API changes: Throughout the yaidom library, attributes in elements are now ordered (for "better roundtripping")!
 * Added ``DocumentPrinter.print`` methods that print to an OutputStream, and therefore typically save memory
 * Fixed method ``DocumentPrinterUsingStax.omittingXmlDeclaration``
 * Improved ``DocumentParser`` classes with respect to character encoding detection
