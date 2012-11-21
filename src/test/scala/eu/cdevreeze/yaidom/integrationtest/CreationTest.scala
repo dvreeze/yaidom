@@ -54,27 +54,27 @@ class CreationTest extends Suite {
 
       Elem(
         EName("{http://books}Book"),
-        Vector(EName("ISBN") -> "ISBN-9-88-777777-6", EName("Price") -> "25"),
+        Map(EName("ISBN") -> "ISBN-9-88-777777-6", EName("Price") -> "25"),
         Vector(
           Elem(
             EName("{http://books}Title"),
-            Vector(),
+            Map(),
             Vector(Text("Jennifer's Economical Database Hints"))),
           Elem(
             EName("Authors"),
-            Vector(),
+            Map(),
             Vector(
               Elem(
                 EName("{http://bookstore}Author"),
-                Vector(),
+                Map(),
                 Vector(
                   Elem(
                     EName("{http://ns}First_Name"),
-                    Vector(),
+                    Map(),
                     Vector(Text("Jennifer"))),
                   Elem(
                     EName("{http://ns}Last_Name"),
-                    Vector(),
+                    Map(),
                     Vector(Text("Widom")))))))))
     }
 

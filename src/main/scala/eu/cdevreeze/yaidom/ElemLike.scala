@@ -105,11 +105,11 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
   def resolvedName: EName
 
   /**
-   * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values.
+   * The attributes as a mapping from `EName`s (instead of `QName`s) to values.
    *
    * The implementation must ensure that `resolvedAttributes.toMap.size == resolvedAttributes.size`.
    */
-  def resolvedAttributes: immutable.IndexedSeq[(EName, String)]
+  def resolvedAttributes: immutable.Iterable[(EName, String)]
 
   /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemLike` methods will be. */
   override def allChildElems: immutable.IndexedSeq[E]

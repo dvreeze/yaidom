@@ -63,16 +63,12 @@ sealed trait Node extends Immutable
  */
 final case class Elem(
   override val resolvedName: EName,
-  override val resolvedAttributes: immutable.IndexedSeq[(EName, String)],
+  override val resolvedAttributes: Map[EName, String],
   override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
   require(children ne null)
-
-  require(
-    resolvedAttributes.toMap.size == resolvedAttributes.size,
-    "There are duplicate attribute names: %s".format(resolvedAttributes))
 
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
@@ -318,7 +314,7 @@ object Elem {
     }
     val resolvedChildren = children map { node => Node(node) }
 
-    Elem(e.resolvedName, e.resolvedAttributes, resolvedChildren)
+    Elem(e.resolvedName, e.resolvedAttributes.toMap, resolvedChildren)
   }
 }
 

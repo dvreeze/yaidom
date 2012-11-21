@@ -155,7 +155,7 @@ class UpdateTest extends Suite {
       resolvedAttributes = bookElm.resolvedAttributes filterNot { case (en, v) => en == EName(attrName) },
       children = bookElm.children :+ resolved.Elem(
         resolvedName = EName("http://bookstore", attrName),
-        resolvedAttributes = Vector(),
+        resolvedAttributes = Map(),
         children = Vector(resolved.Text(attrValue))))
   }
 }

@@ -101,15 +101,15 @@ class FriendFeedTest extends Suite {
 
       Elem(
         EName("Service"),
-        Vector(EName("id") -> "twitter"),
+        Map(EName("id") -> "twitter"),
         Vector(
           Elem(
             EName("UserList"),
-            Vector(),
+            Map(),
             Vector(
-              Elem(EName("nickname"), Vector(), Vector(Text("karlerikson"))),
-              Elem(EName("nickname"), Vector(), Vector(Text("asfaq"))),
-              Elem(EName("nickname"), Vector(), Vector(Text("chrisjlee")))))))
+              Elem(EName("nickname"), Map(), Vector(Text("karlerikson"))),
+              Elem(EName("nickname"), Map(), Vector(Text("asfaq"))),
+              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
     }
 
     expect(expectedTwitterSummaryElm) {
@@ -124,13 +124,13 @@ class FriendFeedTest extends Suite {
 
       Elem(
         EName("Service"),
-        Vector(EName("id") -> "googlereader"),
+        Map(EName("id") -> "googlereader"),
         Vector(
           Elem(
             EName("UserList"),
-            Vector(),
+            Map(),
             Vector(
-              Elem(EName("nickname"), Vector(), Vector(resolved.Text("misterjt")))))))
+              Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
     }
 
     expect(expectedGoogleReaderSummaryElm) {
@@ -176,15 +176,15 @@ class FriendFeedTest extends Suite {
 
       Elem(
         EName(NsFriendFeedStats, "Stats"),
-        Vector(),
+        Map(),
         Vector(
           Elem(
             EName(NsFriendFeedStats, "Service"),
-            Vector(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
+            Map(EName("cnt") -> 3.toString, EName("id") -> "twitter"),
             Vector()),
           Elem(
             EName(NsFriendFeedStats, "Service"),
-            Vector(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
+            Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
             Vector())))
     }
 
