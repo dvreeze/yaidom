@@ -7,10 +7,10 @@ Introduction
 
 Yaidom is *yet another immutable DOM-like* XML API, written in the `Scala`_ programming language. It is an XML API that:
 
-* leverages the highly expressive Scala Collections API, on the inside and from the outside
+* leverages the highly expressive Scala Collections API
 * offers immutable thread-safe DOM-like element trees
 * offers first-class support for namespaces
-* interoperates very well with JAXP
+* interoperates very well with `JAXP`_
 
 This tutorial introduces the yaidom API. Some basic Scala knowledge is assumed, especially about the Scala
 `Collections API`_.
@@ -21,6 +21,7 @@ The tutorial is organized as follows:
 
   * Leveraging Scala Collections
   * Yaidom and namespaces
+  * JAXP
 
 * Yaidom uniform query API
 
@@ -45,6 +46,7 @@ The tutorial is organized as follows:
 
 .. _`Scala`: http://www.scala-lang.org
 .. _`Collections API`: http://www.scala-lang.org/docu/files/collections-api/collections.html
+.. _`JAXP`: http://en.wikipedia.org/wiki/Java_API_for_XML_Processing
 
 Yaidom foundations
 ==================
@@ -83,10 +85,8 @@ Assume a simple immutable DOM-like node class hierarchy defined as follows::
     /**
      * Finds all descendant elements and self.
      */
-    def findAllElemsOrSelf: immutable.IndexedSeq[Elem] = {
-      val elms = allChildElems flatMap { _.findAllElemsOrSelf }
-      self +: elms
-    }
+    def findAllElemsOrSelf: immutable.IndexedSeq[Elem] =
+      self +: (allChildElems flatMap (_.findAllElemsOrSelf))
 
     def text: String = {
       val textStrings = children collect { case t: Text => t.text }
@@ -317,18 +317,32 @@ Using the Scala Collections API, along with only a few ``Elem`` methods such as 
 much (namespace-agnostic) XML querying is already possible. This says a lot about the expressive power of Scala's Collections
 API, as a *universal query API*.
 
-Yaidom queries are less verbose than the "mini-yaidom" queries above, but a lot of what the yaidom query API offers are just
+Yaidom queries are less verbose than the "mini-yaidom" queries above, but a lot of what the yaidom query API offers is just
 convenience methods. The foundation is still the same: core ``Elem`` methods ``allChildElems`` and ``findAllElemsOrSelf``,
-and the rest is offered by the Scala Collections API itself, and/or by some convenience methods or syntactic sugar. As an
-example of such a convenience method, yaidom offers method ``elem.filterElemsOrSelf(p)``, which is equivalent to
+and the rest is offered by the Scala Collections API itself (and by some ``Elem`` convenience methods or syntactic sugar).
+As an example of such a convenience method, yaidom offers method ``elem.filterElemsOrSelf(p)``, which is equivalent to
 ``elem.findAllElemsOrSelf.filter(p)``.
 
 The "mini-yaidom" above also shows immutable element trees, just like the real yaidom API offers. These immutable element
 trees are thread-safe.
 
+Still the question remains: why not use a standard query language like `XQuery`_? Some possible reasons are:
+
+* XQuery is a complex language. The different specifications of XQuery or related to it illustrate its complexity well.
+* XQuery has a type system based on `XML Schema`_, which is very complex in itself.
+* There are too few mature open source XQuery libraries.
+* The standard API for XQuery is `XQJ`_, which is to XML databases what JDBC is to relational databases. What if we only want to process XML in-memory?
+
+So, having Scala (and a Java runtime) at our disposal, we can use Scala's Collections API as XML query language, without having to
+resort to more complex XML querying libraries and setups.
+
 **In summary, using the Scala Collections API and only a minimal "mini-yaidom" API, it already becomes obvious
 that the Scala Collections API plus only a few core element query methods make for a powerful XML query language.
 Indeed, the Scala Collections API lays most of the foundation of yaidom.**
+
+.. _`XQuery`: http://www.w3.org/TR/xquery/
+.. _`XML Schema`: http://www.w3.org/TR/xmlschema-2/
+.. _`XQJ`: http://www.jcp.org/aboutJava/communityprocess/edr/jsr225/
 
 Yaidom and namespaces
 ---------------------
@@ -418,7 +432,7 @@ Scopes and declarations obey some interesting properties. For example::
 These properties, as well as the definitions of ``Scope`` methods ``resolve`` and ``relativize`` contribute significantly
 to the "internal consistency" of yaidom. They also help a lot in keeping the implementation of yaidom fairly simple, especially
 in conversions between yaidom and DOM nodes. Along with the Scala Collections API and the "mini-yaidom" of the preceding section,
-they are the foundation of yaidom.
+as well as JAXP, they are the foundation of yaidom.
 
 **In summary, yaidom clearly distinguishes between qualified names and expanded names, and between namespace declarations
 and in-scope namespaces. This is the second foundation of yaidom.**
@@ -427,6 +441,28 @@ and in-scope namespaces. This is the second foundation of yaidom.**
 .. _W3Schools: http://www.w3schools.com/xml/xml_namespaces.asp
 .. _`James Clark`: http://www.jclark.com/xml/xmlns.htm
 
+JAXP
+----
+
+When creating an XML processing library, it is very tempting to make parsing and serialization of XML look easy.
+That is especially the case in Scala, because of its expressiveness. Unfortunately, the expressiveness and orthogonality
+of Scala do not extend to the domain of XML processing. For many XML documents in the wild, the specific XML parser configuration
+affects the resulting DOM tree or SAX events. Details of whitespace handling, entity resolution, namespace handling etc. may
+depend heavily on the XML parser or serializer configuration, and are often obscure. To make things worse, different XML-related
+specifications often contradict each other or are incompatible. For example, DTDs do not understand namespaces.
+
+Yaidom takes the position that details of XML parsing and serialization are hard, and are best left to JAXP. Yaidom also does not
+try to make parsing and serialization look easy, but instead encourages the user to take control over configuration of XML
+parsers and serializers, instead of hiding parsers and serializers behind a clean but naive API.
+
+Yaidom offers several JAXP-based ``DocumentParser`` and ``DocumentPrinter`` implementations. There are implementations
+based on SAX, DOM, StAX and DOM Load/Save. As said above, the user has full control over JAXP configuration. For example,
+using a ``DocumentParserUsingDom``, the yaidom user can suppress entity resolution (for performance and/or security reasons)
+by configuring an ``EntityResolver``, as if DOM were used directly.
+
+**In summary, JAXP is the third foundation of yaidom. The gory details of XML parsing and serialization are left to JAXP,
+and yaidom makes no effort hiding JAXP, thus giving the user full control over JAXP parser/serializer configuration.**
+
 Yaidom uniform query API
 ========================
 
@@ -434,7 +470,7 @@ ParentElemLike trait
 --------------------
 
 Yaidom takes the position that one size does not fit all, when it comes to XML processing. (On the other hand, yaidom is a DOM-like
-API, and does not care much about the exact XML strings from which DOM-like trees are parsed). For example, the default ``Elem``
+API, and does not know the exact XML strings from which DOM-like trees are parsed). For example, the default ``Elem``
 class represents immutable (thread-safe) element nodes (that do not know about their parent elements). As another example,
 yaidom offers immutable elements that can be compared for some notion of equality, but carry less data than the default
 element class. As yet another example, yaidom offers wrappers around DOM elements.
@@ -634,15 +670,15 @@ The queries above can become more concise by using operator notation ``\`` for `
 
 If we had used different element classes than the default yaidom ``Elem`` class, such as ``eu.cdevreeze.yaidom.resolved.Elem`` or
 ``eu.cdevreeze.yaidom.dom.DomElem``, the query code above would stay the same! Indeed, the ``ParentElemLike`` trait is a
-uniform XML query API in yaidom (or in future yaidom extensions).
+*uniform* XML query API in yaidom (or in future yaidom extensions).
 
 To summarize:
 
 * Yaidom offers an *element-centric query API*
-* This query API is based on the *Scala Collections API*, from the inside and on the outside
-* In other words, the underlying *core query API* is the Scala Collections API plus core methods ``allChildElems`` and ``findAllElemsOrSelf``
+* This query API is based on the *Scala Collections API*
+* More precisely, the underlying *core query API* is the Scala Collections API plus core methods ``allChildElems`` and ``findAllElemsOrSelf``
 * The base trait of the query API, ``ParentElemLike``, turns a small API (method ``allChildElems``) into a *rich API*
-* This rich API contains the *fundamental query method* ``findAllElemsOrSelf``, just like in the "mini-yaidom" example
+* The *fundamental query method* ``findAllElemsOrSelf`` is defined in terms of ``allChildElems``, just like in the "mini-yaidom" example
 * This rich API also offers many convenience query methods for child elements, descendant elements and descendant-or-self elements
 * This API is *uniform*, in that this trait is mixed in (as query API) by different element classes in yaidom, even by yaidom wrappers for DOM
 * Indeed this API knows almost nothing about XML elements (just that it has method ``allChildElems``), which makes it easy to mix in
@@ -711,7 +747,6 @@ Using operator notation ``\`` for ``filterChildElems`` and ``\\`` for ``filterEl
 
 
   // XPath: doc("bookstore.xml")//Title
-  // Note the use of method filterElems instead of filterElemsOrSelf
 
   val titles =
     for (title <- bookstore \\ EName("Title")) yield title
@@ -746,10 +781,99 @@ To summarize:
 PathAwareElemLike trait
 -----------------------
 
-Sometimes we want to query for "paths" to elements rather than for elements themselves. Knowing the path (relative to a
-root) we know the element, but the reverse does not hold, of course.
+Sometimes we want to query for "paths" to elements rather than for elements themselves. Recall the following example, given earlier,
+but this time in yaidom instead of "mini-yaidom"::
 
-PathAwareElemLike examples.
+  // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
+
+  def authorLastAndFirstNames(bookElem: Elem): immutable.IndexedSeq[(String, String)] = {
+    for {
+      author <- bookElem.filterElemsOrSelf(EName("Author"))
+    } yield {
+      val lastNames = author.filterChildElems(EName("Last_Name")) map { _.text.trim }
+      val firstNames = author.filterChildElems(EName("First_Name")) map { _.text.trim }
+      (lastNames.mkString, firstNames.mkString)
+    }
+  }
+
+  val cheapUllmanBookTitles =
+    for {
+      book <- bookstore.filterChildElems(EName("Book"))
+      if (book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey")))
+    } yield book.getChildElem(EName("Title"))
+
+In the query above a top-down approach was used. Per "cheap" book, its author descendants were analyzed and filtered. What if
+we want to folllow a bottom-up approach, and start from matching authors and look up the matching books in the ancestry of the
+author? For the immutable ``Elem`` classes in yaidom that is a problem, because these immutable elements do not know their
+parents.
+
+There is a way to get the ancestry of an element, if we know the "path" from the document element to that element.
+As we will see shortly, we can query for "paths" just like we can query for elements, and having such "paths", it is relatively
+cheap to get the parent element, grandparent element etc.
+
+The above-mentioned "paths" are represented by class ``eu.cdevreeze.yaidom.ElemPath``. Class ``eu.cdevreeze.yaidom.ElemPathBuilder``
+can be used to create ``ElemPath`` instances. Let's give an example, in the context of the bookstore above::
+
+  val book4Path = ElemPathBuilder.from(QName("Book") -> 3).build(Scope.Empty)
+  
+  val foundBook4: Elem = bookstore.getWithElemPath(book4Path) // Jennifer's Economical Database Hints
+  
+  val lastNamePath = ElemPathBuilder.from(
+    QName("Book") -> 3,
+    QName("Authors") -> 0,
+    QName("Author") -> 0,
+    QName("Last_Name") -> 0).build(Scope.Empty)
+
+  val foundLastName: Elem = bookstore.getWithElemPath(lastNamePath) // Widom
+
+So, first we build a "path" for the child element named "Book" with (0-based) index 3, that is, the 4th child element named "Book".
+Then we look up the element with that path, taking the bookstore element as root. This indeed returns the 4th book in the bookstore.
+Note that the root itself is not mentioned in the "path". That's one big difference with XPath.
+
+Next we look up the last name of the first author of that book. That is, the 4th child element named "Book", from that the
+first child element named "Authors", from that the first child element named "Author", and finally from that the first child
+element named "Last_Name". When applying that "path" to the bookstore element, this indeed results in the first author's last name.
+
+Now that we know the basics of ``ElemPath``, we can turn to the part of the yaidom query API that deals with "paths".
+Trait ``PathAwareElemLike`` is that API. It contains query methods for obtaining ElemPaths instead of elements, as well as
+methods to get an element given an ElemPath (for example, method ``getWithElemPath`` above).
+
+Trait ``PathAwareElemLike`` extends trait ``ElemLike``, because it knows about element paths and therefore about (resolved)
+element names.
+
+Trait ``PathAwareElemLike`` mirrors trait ``ParentElemLike``, in that each query in ``ParentElemLike`` that returns elements
+has a counterpart in ``PathAwareElemLike`` that returns ElemPaths instead of elements.
+
+Let's now rewrite the query at the beginning of this section, this time in a bottom-up manner, using trait ``PathAwareElemLike``::
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
+
+  def authorLastAndFirstName(authorElem: Elem): (String, String) = {
+    val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
+    val firstNames = authorElem.filterChildElems(EName("First_Name")) map { _.text.trim }
+    (lastNames.mkString, firstNames.mkString)
+  }
+
+  val cheapUllmanBookTitles =
+    for {
+      authorPath <- bookstore filterElemOrSelfPaths { _.resolvedName == EName("Author") }
+      authorElem = bookstore.getWithElemPath(authorPath)
+      if authorLastAndFirstName(authorElem) == ("Ullman", "Jeffrey")
+      bookPath = authorPath.parentPath.parentPath
+      if bookPath.lastEntry.elementName == EName("Book")
+      bookElem = bookstore.getWithElemPath(bookPath)
+      if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
+    } yield bookElem.getChildElem(EName("Title"))
+
+It is wise not to overuse ElemPaths. After all, they depend on an implicit root element, so it is best to use them rather locally.
+Moreover, indexing using ElemPaths is not very efficient. So querying for large collections of paths and then using them to
+find elements is rarely useful.
+
+To summarize:
+
+* Trait ``PathAwareElemLike`` extends trait ``ElemLike``, adding queries for finding element paths instead of elements
+* Trait ``PathAwareElemLike`` turns a small API (methods ``allChildElems``, ``resolvedName`` and ``resolvedAttributes``) into a rich API
+* The query methods in this trait are handy for a bottom-up style of querying, but it is wise not to overuse element paths
 
 Working with default yaidom Elems
 =================================
