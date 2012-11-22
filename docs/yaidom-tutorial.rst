@@ -800,7 +800,7 @@ but this time in yaidom instead of "mini-yaidom"::
   val cheapUllmanBookTitles =
     for {
       book <- bookstore.filterChildElems(EName("Book"))
-      if (book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey")))
+      if (book.attribute(EName("Price")).toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey")))
     } yield book.getChildElem(EName("Title"))
 
 In the query above a top-down approach was used. Per "cheap" book, its author descendants were analyzed and filtered. What if
@@ -1051,7 +1051,7 @@ Let's now create the same book element as above, this time using an ``ElemBuilde
                 children = Vector(
                   textElem(QName("First_Name"), "Jennifer"),
                   textElem(QName("Last_Name"), "Widom")))))))
-	}
+    }
 
     // Only now a parent scope is passed, which is empty, because the root element already declared the used namespaces
     val scope = Scope.Empty
