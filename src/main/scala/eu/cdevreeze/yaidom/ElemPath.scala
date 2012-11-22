@@ -98,6 +98,16 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   /** Returns the ancestor paths, starting with the parent path (if any), and ending with the root path */
   def ancestorPaths: immutable.IndexedSeq[ElemPath] = ancestorOrSelfPaths.drop(1)
 
+  /** Returns `ancestorOrSelfPaths find { path => p(path) }` */
+  def findAncestorOrSelfPath(p: ElemPath => Boolean): Option[ElemPath] = {
+    ancestorOrSelfPaths find { path => p(path) }
+  }
+
+  /** Returns `ancestorPaths find { path => p(path) }` */
+  def findAncestorPath(p: ElemPath => Boolean): Option[ElemPath] = {
+    ancestorPaths find { path => p(path) }
+  }
+
   /** Returns the first entry, if any, wrapped in an `Option` */
   def firstEntryOption: Option[ElemPath.Entry] = entries.headOption
 
