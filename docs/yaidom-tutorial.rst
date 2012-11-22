@@ -329,7 +329,8 @@ trees are thread-safe.
 Still the question remains: why not use a standard query language like `XQuery`_? Some possible reasons are:
 
 * XQuery is a complex language. The different specifications of XQuery or related to it illustrate its complexity well.
-* XQuery has a type system based on `XML Schema`_, which is very complex in itself.
+* XQuery has a type system based on `XML Schema`_, which is known to be very complex in itself.
+* Non-trivial computations are better and more directly expressed in a programming language like Scala than in XPath/XQuery or XQuery extension functions.
 * There are too few mature open source XQuery libraries.
 * The standard API for XQuery is `XQJ`_, which is to XML databases what JDBC is to relational databases. What if we only want to process XML in-memory?
 
@@ -859,11 +860,12 @@ Let's now rewrite the query at the beginning of this section, this time in a bot
       authorPath <- bookstore filterElemOrSelfPaths { _.resolvedName == EName("Author") }
       authorElem = bookstore.getWithElemPath(authorPath)
       if authorLastAndFirstName(authorElem) == ("Ullman", "Jeffrey")
-      bookPath = authorPath.parentPath.parentPath
-      if bookPath.lastEntry.elementName == EName("Book")
+      bookPath <- authorPath findAncestorPath { _.endsWithName(EName("Book")) }
       bookElem = bookstore.getWithElemPath(bookPath)
       if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
     } yield bookElem.getChildElem(EName("Title"))
+
+Note the use of method ``ElemPath.findAncestorPath`` to find a path to an ancestor element.
 
 It is wise not to overuse ElemPaths. After all, they depend on an implicit root element, so it is best to use them rather locally.
 Moreover, indexing using ElemPaths is not very efficient. So querying for large collections of paths and then using them to
@@ -874,6 +876,8 @@ To summarize:
 * Trait ``PathAwareElemLike`` extends trait ``ElemLike``, adding queries for finding element paths instead of elements
 * Trait ``PathAwareElemLike`` turns a small API (methods ``allChildElems``, ``resolvedName`` and ``resolvedAttributes``) into a rich API
 * The query methods in this trait are handy for a bottom-up style of querying, but it is wise not to overuse element paths
+* Some element classes in yaidom mix in trait ``PathAwareElemLike`` (since they know about resolved element names etc.), and therefore offer all of this query API
+* Yet class ``ElemBuilder`` only mixes in trait ``ParentElemLike`` (since it does not know about resolved element names etc.)
 
 Working with default yaidom Elems
 =================================
@@ -881,12 +885,186 @@ Working with default yaidom Elems
 Default Elems
 -------------
 
-Explain the default yaidom Elems. They are immutable.
+As mentioned earlier, yaidom does not think that one size fits all, when it comes to DOM-like class hierarchies.
+After all, there are many subtle abstraction levels at which an XML document can be looked at, ranging from the exact XML strings
+to DOM-like representations keeping only parts of the XML InfoSet. These different implicit abstraction levels also come into
+play when considering the notion(s) of equality for XML. For example, at a high level of abstraction the exact (namespace)
+prefixes are often considered irrelevant, when comparing XML documents for equality.
+
+Yaidom's default element class tries to find some "middle ground". It does not define any semantic notion of equality.
+
+The default element class in yaidom is ``eu.cdevreeze.yaidom.Elem``. It is part of a ``Node`` hierarchy that includes
+classes like ``Text``, ``Comment`` and others. Class ``Elem`` has the following characteristics:
+
+* It mixes in trait ``PathAwareElemLike``, and therefore offers all of that *query API*
+* It is *immutable* and thread-safe
+* Therefore, Elems do not know about their parent elements, but using element paths from a root element this should mostly not be a problem
+* Elems are reasonably easy to construct from scratch, using ``ElemBuilders``
+* There is excellent support for parsing and serializing these Elems, using ``DocumentParser`` and ``DocumentPrinter`` implementations, resp.
+* Elems are reasonably good at "lossless roundtripping", keeping differences in the XML text limited after parsing and serializing
+* These Elems offer support for "functional updates" (see below)
+* The Elem class keeps the following state: element QName, attributes (mapping QNames to string values), in-scope namespaces, and a list of child nodes
+* Although this Elem class keeps in-scope namespaces, it does not keep namespace declarations, thus enabling Elem creation from other Elem child nodes
+* When serializing an Elem, namespace declarations are inserted by relativizing the scope of the element against the parent scope.
+
+Hence, the default Elem class is immutable, and otherwise tries to find a balance between competing design forces for DOM-like trees.
+The extent to which "lossless roundtripping" is supported shows the compromise made. For example:
+
+* Attribute order is maintained, although the XML InfoSet specification does not consider attribute order relevant
+* Yet namespace declaration order is not preserved while "roundtripping"
+* Whitespace outside the document element is lost (a yaidom ``Document`` has a document element and can have comments and processing instructions, and that's it)
+* The difference between the 2 forms of an empty element is not preserved
+* DTDs have no explicit support in yaidom, let alone default attributes
+
+Creating Elems directly is somewhat cumbersome, because the in-scope namespaces must be passed for each element in the tree.
+For example, using default namespace "http://bookstore", we could write::
+
+  val book1: Elem = {
+    import Node._ // This import is used for direct Elem creation (not via ElemBuilders)
+
+    val scope = Scope.from("" -> "http://bookstore")
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      scope = scope,
+      children = Vector(
+        textElem(QName("Title"), scope, "A First Course in Database Systems"),
+        elem(
+          qname = QName("Authors"),
+          scope = scope,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = scope,
+              children = Vector(
+                textElem(QName("First_Name"), scope, "Jeffrey"),
+                textElem(QName("Last_Name"), scope, "Ullman"))),
+            elem(
+              qname = QName("Author"),
+              scope = scope,
+              children = Vector(
+                textElem(QName("First_Name"), scope, "Jennifer"),
+                textElem(QName("Last_Name"), scope, "Widom")))))))
+  }
+
+If we print the result of ``book1.toString``, we get::
+
+  elem(
+    qname = QName("Book"),
+    attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+    namespaces = Declarations.from("" -> "http://bookstore"),
+    children = Vector(
+      elem(
+        qname = QName("Title"),
+        children = Vector(
+          text("A First Course in Database Systems")
+        )
+      ),
+      elem(
+        qname = QName("Authors"),
+        children = Vector(
+          elem(
+            qname = QName("Author"),
+            children = Vector(
+              elem(
+                qname = QName("First_Name"),
+                children = Vector(
+                  text("Jeffrey")
+                )
+              ),
+              elem(
+                qname = QName("Last_Name"),
+                children = Vector(
+                  text("Ullman")
+                )
+              )
+            )
+          ),
+          elem(
+            qname = QName("Author"),
+            children = Vector(
+              elem(
+                qname = QName("First_Name"),
+                children = Vector(
+                  text("Jennifer")
+                )
+              ),
+              elem(
+                qname = QName("Last_Name"),
+                children = Vector(
+                  text("Widom")
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+
+In this String representation it is visible that the root element has a default namespace declaration, and the other
+elements have no namespace declarations. Indeed, the root element has a scope that must be created by a namespace declaration,
+whereas the other elements all have the same scope, so need no namespace declarations themselves. In the next section a
+better way is shown to create elements from scratch.
+
+Ideally all namespace declarations are in the root element. In any case, be careful not to undeclare namespaces. This is not
+allowed in XML 1.0 (except for default namespaces). Yet it is very easy to accidently undeclare namespaces. For example, above
+we could have passed the empty scope to descendant elements of the root element, which would lead to namespace undeclarations.
+Again, it is much safer to create elements from scratch using ``ElemBuilders``, as shown in the next section. When parsing
+XML into ``Elems``, namespace scopes are created by the ``DocumentParser``.
+
+If a created ``Elem`` has any namespace undeclarations, invoke method ``notUndeclaringPrefixes``, and use the resulting Elem instead.
+Otherwise serialization may lead to a corrupt XML document.
 
 ElemBuilders
 ------------
 
-Explain ElemBuilders, and how to construct Elems from scratch. Explain namespace handling.
+Class ``ElemBuilder`` is what the name suggests: a builder of ``Elems``. ElemBuilders do not carry any scopes, and that makes
+them easier to use than Elems when creating Elems from scratch. Since ElemBuilders have no scopes, they have no way to resolve
+own QNames (of the element itself and its attributes). That's ok, because of the purpose of ElemBuilders.
+
+So, Elems carry scopes but no namespace declarations, whereas ElemBuilders carry namespace declarations but no scopes.
+
+Let's now create the same book element as above, this time using an ``ElemBuilder``. Here is how::
+
+  val book1: Elem = {
+    import NodeBuilder._ // This import is used for ElemBuilder creation
+
+    val elemBuilder = {
+      elem(
+        qname = QName("Book"),
+        attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+        namespaces = Declarations.from("" -> "http://bookstore"),
+        children = Vector(
+          textElem(QName("Title"), "A First Course in Database Systems"),
+          elem(
+            qname = QName("Authors"),
+            children = Vector(
+              elem(
+                qname = QName("Author"),
+                children = Vector(
+                  textElem(QName("First_Name"), "Jeffrey"),
+                  textElem(QName("Last_Name"), "Ullman"))),
+              elem(
+                qname = QName("Author"),
+                children = Vector(
+                  textElem(QName("First_Name"), "Jennifer"),
+                  textElem(QName("Last_Name"), "Widom")))))))
+	}
+
+    // Only now a parent scope is passed, which is empty, because the root element already declared the used namespaces
+    val scope = Scope.Empty
+
+    elemBuilder.build(scope)
+  }
+
+Here we also knew the namespaces used in the element tree, but we declared this (default) namespace only once. The call
+``elemBuilder.build(scope)`` then recursively invokes ``parentScope.resolve(namespaceDeclarations)``, thus giving each created
+Elem its namespace scope. Using ElemBuilders, the danger of accidently creating namespace undeclarations is minimal, because
+one would have to explicitly do so instead of implicitly.
+
+Normally, elements are created by parsing an XML document, however. That is the topic of the next section.
 
 Parsing XML
 -----------
