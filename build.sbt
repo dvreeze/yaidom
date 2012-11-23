@@ -11,7 +11,7 @@ version := "0.6.4-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
-crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.9.0", "2.10.0-RC2")
+crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.9.0", "2.10.0-RC3")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
@@ -33,7 +33,7 @@ libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
 libraryDependencies <+= scalaBinaryVersion { version =>
   if (version.contains("2.10"))
-    "org.scalatest" % "scalatest_2.10.0-RC2" % "1.8" % "test"
+    "org.scalatest" % "scalatest_2.10.0-RC3" % "1.8-B1" % "test"
   else
     "org.scalatest" %% "scalatest" % "1.8" % "test"
 }
