@@ -1315,8 +1315,8 @@ supertype of the element type, but can also represent comment nodes, processing 
 indeed mixes in this trait.
 
 In this section we use methods of the ``UpdatableElemLike`` trait to "functionally update" ``Elems``. The examples use the
-XML string of the section on parsing XML. In the examples we are going to replace the first and last name elements by text
-of the parent Author element. Here is the first attempt, using a query for element paths::
+XML string of the section on parsing XML. In the examples we are going to replace the first and last name elements of the
+parent Author element by text (for the name). Here is the first attempt, using a query for element paths::
 
   val xmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
