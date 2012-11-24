@@ -1308,7 +1308,135 @@ with good reason.
 Functional updates
 ------------------
 
-Show the (also general) UpdatableElemLike API. Explain correct namespace handling.
+An ``Elem`` is *immutable*, and therefore cannot be updated in place. Yet "functional updates" (transformations) are supported.
+There is even a trait ``UpdatableElemLike``, which extends trait ``PathAwareElemLike``. Unlike its super-type, trait
+``UpdatableElemLike`` has 2 type parameters: the 2nd one for the element type, and the 1st one for the node type (which is a
+supertype of the element type, but can also represent comment nodes, processing instructions, etc.). Class ``eu.cdevreeze.yaidom.Elem``
+indeed mixes in this trait.
+
+In this section we use methods of the ``UpdatableElemLike`` trait to "functionally update" ``Elems``. The examples use the
+XML string of the section on parsing XML. In the examples we are going to replace the first and last name elements by text
+of the parent Author element. Here is the first attempt, using a query for element paths::
+
+  val xmlString =
+    """<?xml version="1.0" encoding="UTF-8"?>
+  <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
+      <Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
+          <Title>A First Course in Database Systems</Title>
+          <Authors>
+              <Author>
+                  <First_Name>Jeffrey</First_Name>
+                  <Last_Name>Ullman</Last_Name>
+              </Author>
+              <Author>
+                  <First_Name>Jennifer</First_Name>
+                  <Last_Name>Widom</Last_Name>
+              </Author>
+          </Authors>
+      </Book>
+      <Book ISBN="ISBN-0-13-815504-6" Price="100">
+          <Title>Database Systems: The Complete Book</Title>
+          <Authors>
+              <Author>
+                  <First_Name>Hector</First_Name>
+                  <Last_Name>Garcia-Molina</Last_Name>
+              </Author>
+              <Author>
+                  <First_Name>Jeffrey</First_Name>
+                  <Last_Name>Ullman</Last_Name>
+              </Author>
+              <Author>
+                  <First_Name>Jennifer</First_Name>
+                  <Last_Name>Widom</Last_Name>
+              </Author>
+          </Authors>
+          <Remark>Buy this book bundled with "A First Course" - a great deal!
+          </Remark>
+      </Book>
+  </books:Bookstore>"""
+
+  val xmlBytes = xmlString.getBytes("UTF-8") // Indeed this XML should be parsed as UTF-8
+
+  val docParser = parse.DocumentParserUsingSax.newInstance // SAX-based parsing seems to retain attribute order
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  assert(doc.documentElement.resolvedName == EName("{http://bookstore}Bookstore"))
+  
+  val firstBookElem = doc.documentElement.filterChildElems(EName("{http://bookstore}Book")).head
+  assert(firstBookElem.resolvedAttributes.map(_._1) == Seq(EName("ISBN"), EName("Price"), EName("Edition")))
+
+  // Find the elements to "update"
+  val authorPaths = doc.documentElement filterElemPaths { e => e.localName == "Author" }
+
+  def updateAuthor(authorElem: Elem): Elem = {
+    require(authorElem.resolvedName == EName("{http://bookstore}Author"))
+
+    val firstName = authorElem.getChildElem(_.localName == "First_Name").text
+    val lastName = authorElem.getChildElem(_.localName == "Last_Name").text
+    val name = List(firstName, lastName).mkString(" ")
+
+    authorElem.withChildren(Vector(Text(name, false)))
+  }
+
+  // Do the "functional update", creating lots of immutable intermediary results
+  val newDoc: Document = authorPaths.foldLeft(doc) { (acc, path) =>
+    // Using a method in trait UpdatableElemLike
+    acc.updated(path) { e => 
+      val newE = updateAuthor(e)
+      Vector(newE)
+    }
+  }
+
+  val docPrinter = print.DocumentPrinterUsingSax.newInstance // SAX-based serialization seems to retain attribute order 
+
+  val bos = new ByteArrayOutputStream
+  docPrinter.omittingXmlDeclaration.print(newDoc, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val newXmlString = new String(newXmlBytes, "UTF-8")
+
+We see successfully "updated" result XML, where the Author elements only have text as child nodes, namely the author names.
+
+Now we are going to do almost the same transformation, but this time using a bulk ``UpdatableElemLike.updated`` method, and
+inserting new Name elements::
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  assert(doc.documentElement.resolvedName == EName("{http://bookstore}Bookstore"))
+  
+  val firstBookElem = doc.documentElement.filterChildElems(EName("{http://bookstore}Book")).head
+  assert(firstBookElem.resolvedAttributes.map(_._1) == Seq(EName("ISBN"), EName("Price"), EName("Edition")))
+
+  import NodeBuilder._
+
+  def updateAuthor(authorElem: Elem): Elem = {
+    require(authorElem.resolvedName == EName("{http://bookstore}Author"))
+
+    val firstName = authorElem.getChildElem(_.localName == "First_Name").text
+    val lastName = authorElem.getChildElem(_.localName == "Last_Name").text
+    val name = List(firstName, lastName).mkString(" ")
+
+    // Defensive programming: not assuming anything about the scope of the Author element!!
+    val scope = authorElem.scope ++ Scope.from("books" -> "http://bookstore")
+    val nameElem = textElem(qname = QName("books:Name"), txt = name).build(scope)
+
+    authorElem.withChildren(Vector(nameElem))
+  }
+
+  // Do the "functional update"
+  val newDoc: Document = doc updated {
+    case e if e.resolvedName == EName("{http://bookstore}Author") =>
+      val newE = updateAuthor(e)
+      Vector(newE)
+  }
+
+  val bos = new ByteArrayOutputStream
+  docPrinter.omittingXmlDeclaration.print(newDoc, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val newXmlString = new String(newXmlBytes, "UTF-8")
+
+Again we see successfully "updated" result XML, where the First_Name and Last_Name elements have been replaced by Name elements.
+Check the ``UpdatableElemLike`` API documentation for more details on "functional updates" in yaidom.
 
 Other element implementations
 =============================
