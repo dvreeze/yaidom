@@ -44,8 +44,9 @@ The tutorial is organized as follows:
 
 * Conclusion
 
-This tutorial is not a replacement of the yaidom API documentation. The core features of the yaidom API are introduced in
-this tutorial, but for a more complete picture the API documentation should be consulted.
+This tutorial is not a replacement for the yaidom API documentation. Most core features of the yaidom API are introduced in
+this tutorial, but for a more complete picture the API documentation should be consulted. The API documentation also has more
+depth than this tutorial (for example, w.r.t. generic "query API" types, or formal properties).
 
 .. _`Scala`: http://www.scala-lang.org
 .. _`Collections API`: http://www.scala-lang.org/docu/files/collections-api/collections.html
@@ -1176,6 +1177,13 @@ the parser can be created (and used) as follows::
 Both examples use the created document parser in the same way. This is only logical, because the ``DocumentParser`` trait
 is the contract that determines how a document parser can be used.
 
+The document parser can parse any XML ``InputStream``. For example::
+
+  val doc: Document = docParser.parse(new FileInputStream(new File("file:///home/user/bookstore.xml")))
+
+  val url = new URL("http://bookstore/bookstore.xml")
+  val doc: Document = docParser.parse(url.openStream())
+
 The state of the created ``DocumentParserUsingDom`` is a JAXP ``DocumentBuilderFactory``. Indeed, the created document parser
 instance can be used as long as the ``DocumentBuilderFactory`` instance can be used. Alas, these instances are typically not
 thread-safe, so in a web application they should not be shared among threads (typically by scoping them to HTTP requests, or
@@ -1188,21 +1196,114 @@ the document parser each time a Document is parsed. Recall that the only state o
 Of course the provided function could be written in any way the user sees fit. It could also configure an ErrorHandler, for
 example.
 
-All ``DocumentParser`` implementations follow the same pattern:
+All ``DocumentParser`` implementations follow the same pattern w.r.t. creation:
 
 * They have one JAXP factory object as state, such as a DocumentBuilderFactory, or a SAXParserFactory
 * They have a factory method that gives maximal control over configuration of the document parser
 * This factory method has one parameter for the "JAXP factory object", and function parameters otherwise (such as a function from DocumentBuilderFactory instances to DocumentBuilders)
-* Other factory methods are defined in terms of each other, and ultimately in terms of the above-mentioned factory method
-* These other factory methods provide defaults for parameters passed to the other invoked factory method
+* Each factory method is defined in terms of another one
+* Each of these other factory methods provides defaults for parameters passed to the factory method that it calls itself
+
+All in all, there is plenty of choice how to parse XML input into a ``Document``:
+
+* There are several JAXP-based ``DocumentParser`` implementations to choose from, as shown above
+* Each of these document parsers can be configured, using normal JAXP parser configuration
+* Typically parser configuration is used for entity resolution (such as suppression of entity resolution), error handling, whitespace handling, namespace-awareness and validation
+
+If memory-usage is an issue, consider using the ``DocumentParserUsingStax``. If more flexibility is needed than already provided,
+consider using a ``DocumentParserUsingSax`` with custom ``ElemProducingSaxHandler`` producers. If even more flexibility is needed,
+consider using a custom ``DocumentParser`` implementation that may or may not wrap another document parser. After all, the only
+thing that the ``DocumentParser`` trait promises is that it can take an XML ``InputStream`` and parse that into a yaidom
+``Document``. How that is done is completely left open to implementing classes.
+
+As seen in this section, the one thing that yaidom does not do is suggest that there is only 1 way to get from the XML input source
+to a yaidom DOM-like Document.
 
 Serializing XML
 ---------------
 
-Explain serializing in yaidom.
+Having seen XML parsing in yaidom, XML serialization using ``DocumentPrinter`` implementations will look quite familiar:
 
-Take-away point: XML serialization is quite complex in its details. Yaidom leaves XML serializer configuration completely open instead
-of hiding it.
+* The philosophy is the same; that is, one size does not fit all, w.r.t. implementation and configuration choices
+* Document printers are JAXP-based
+* Document printers roughly follow the same creation patterns as document parsers
+
+The document printer examples in this section take the bookstore element shown in the section on trait ``ParentElemLike``,
+taking only the first 2 books. That is::
+
+  // We take only the first 2 books, and would lose "ignorable" whitespace in the process, if there happened to be any whitespace
+  val updatedBookstore = Elem(
+    qname = bookstore.qname,
+    attributes = bookstore.attributes,
+    scope = bookstore.scope,
+    children = bookstore.allChildElems.take(2))
+
+  val updatedDoc = Document(updatedBookstore)
+
+We now try to serialize this Document into the XML string of the preceding section, except for the namespaces.
+
+Our first attempt is as follows::
+
+  val docPrinter = print.DocumentPrinterUsingDom.newInstance
+  
+  val bos = new ByteArrayOutputStream
+  docPrinter.print(updatedBookstore, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val newXmlString = new String(newXmlBytes, "UTF-8")
+
+The original Document contained no "ignorable whitespace" for readability. The serialized XML string contains elements on separate
+lines, but no indentation. Let's try to fix indentation. Note that the following code is JAXP implementation-specific::
+
+  import javax.xml.parsers._
+  import javax.xml.transform._
+
+  val dbf = DocumentBuilderFactory.newInstance
+
+  val tf = TransformerFactory.newInstance
+
+  val trCreator = { tf: TransformerFactory =>
+    val tr = tf.newTransformer
+    tr.setOutputProperty(OutputKeys.INDENT, "yes")
+    tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+    tr
+  }
+
+  val docPrinter = print.DocumentPrinterUsingDom.newInstance(dbf, tf).withTransformerCreator(trCreator)
+  
+  val bos = new ByteArrayOutputStream
+  docPrinter.print(updatedDoc, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val newXmlString = new String(newXmlBytes, "UTF-8")
+
+This is very sensitive implementation-specific code, but on my configuration the indentation turns out to work. Yet attribute order
+is different than in the original XML, on my machine. Let's try to fix that, using a SAX-based document printer::
+
+  val formattedBookstore = updatedBookstore.prettify(4)
+  val formattedDoc = Document(formattedBookstore)
+
+  val docPrinter = print.DocumentPrinterUsingSax.newInstance
+
+  val bos = new ByteArrayOutputStream
+  docPrinter.print(formattedDoc, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val newXmlString = new String(newXmlBytes, "UTF-8")
+
+This time, on my machine the attribute order is the same as in the original. Yet now there is no newline after the XML declaration
+in my case. A hack to fix that could be as follows::
+
+  val formattedBookstore = updatedBookstore.prettify(4)
+  val formattedDoc = Document(formattedBookstore)
+
+  val docPrinter = print.DocumentPrinterUsingSax.newInstance
+
+  val bos = new ByteArrayOutputStream
+  docPrinter.omittingXmlDeclaration.print(formattedDoc, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val xmlDeclaration = """<?xml version="1.0" encoding="UTF-8"?>"""
+  val newXmlString = xmlDeclaration + "\n" + new String(newXmlBytes, "UTF-8")
+
+These examples show just how sensitive XML parsing and serialization are. Yaidom exposes JAXP objects for configuration
+with good reason.
 
 Functional updates
 ------------------
