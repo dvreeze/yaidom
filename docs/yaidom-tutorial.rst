@@ -1438,13 +1438,91 @@ inserting new Name elements::
 Again we see successfully "updated" result XML, where the First_Name and Last_Name elements have been replaced by Name elements.
 Check the ``UpdatableElemLike`` API documentation for more details on "functional updates" in yaidom.
 
+Functional updates using the appropriate methods in trait ``UpdatableElemLike`` trait benefit from the safety resulting from
+a functional style of programming (easy to reason about, thread-safety). Yet they do come with a cost, especially if many
+functional updates are done on large documents. An alternative may be to convert immutable Documents to DOM trees, update them
+in-place, and then convert back to immutable Documents. If these updates are local to a function that is functional on the
+outside, a functional style of programming is not compromised too much. In a later section such local in-place updates are
+shown.
+
 Other element implementations
 =============================
 
 "Resolved" elements
 -------------------
 
-Explain "resolved" elements and their purpose.
+It should be obvious by now that equality for XML is very hard to define. It is common to regard 2 XML documents as equal if
+all they differ in are the namespace prefixes used. Yaidom indeed offers another type of elements that supports "equality
+comparisons", and that know about expanded names (and namespace URIs) but not about qualified names (and namespace prefixes).
+That type of element is ``eu.cdevreeze.yaidom.resolved.Elem``.
+
+These "resolved" Elems mix in trait ``UpdatableElemLike``, just like the default Elems. Hence, the query API of the default
+yaidom Elems is also the query API of "resolved" Elems, and both classes offer the same "functional update" API (except for
+the specific differences between the 2 Elem classes). After all, the query API and "functional update" API are *uniform* APIs
+in yaidom, across different element types.
+
+To illustrate XML equality comparisons in yaidom, one query will be written twice: once in a now familiar way, and once using
+equality comparisons.
+
+The XML is again the same as in the preceding section. The query returns books written by Jeffrey Ullman. The first version is::
+
+  val docParser = parse.DocumentParserUsingSax.newInstance
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  assert(doc.documentElement.resolvedName == EName("{http://bookstore}Bookstore"))
+
+  def authorLastAndFirstNames(bookElem: Elem): immutable.IndexedSeq[(String, String)] = {
+    for {
+      author <- bookElem filterElemsOrSelf { _.localName == "Author" }
+    } yield {
+      val lastNames = author filterChildElems { _.localName == "Last_Name" } map { _.text.trim }
+      val firstNames = author filterChildElems { _.localName == "First_Name" } map { _.text.trim }
+      (lastNames.mkString, firstNames.mkString)
+    }
+  }
+
+  val ullmanBookElems = doc.documentElement filterElems { e =>
+    e.localName == "Book" && authorLastAndFirstNames(e).contains(("Ullman", "Jeffrey"))
+  }
+
+The second version of this query compares book authors against the author Jeffrey Ullman as element tree. To make the
+comparison without getting any differences caused by "ignorable" whitespace etc., such whitespace is stripped before making
+the comparison. The second version of the query is as follows::
+
+  val docParser = parse.DocumentParserUsingSax.newInstance
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  assert(doc.documentElement.resolvedName == EName("{http://bookstore}Bookstore"))
+
+  import NodeBuilder._
+  val authorElem =
+    elem(
+      qname = QName("books:Author"),
+      children = Vector(
+        textElem(
+          qname = QName("books:First_Name"),
+          txt = "Jeffrey"),
+        textElem(
+          qname = QName("books:Last_Name"),
+          txt = "Ullman"))).build(Scope.from("books" -> "http://bookstore"))
+
+  val resolvedAuthorElem = resolved.Elem(authorElem).removeAllInterElementWhitespace
+
+  val ullmanBookElems = doc.documentElement filterElems { e =>
+    e.localName == "Book" && {
+      val resolvedBookElem = resolved.Elem(e).removeAllInterElementWhitespace
+      val resolvedAuthorElems = resolvedBookElem filterElems { ch => ch.localName == "Author" }
+      
+      // Do the comparison. Note that method "contains" calls "==" on the "resolved" elements
+      resolvedAuthorElems.contains(resolvedAuthorElem)
+    }
+  }
+
+There is a lot more to "resolved" Elems and equality comparisons than shown here. The API documentation contains more information.
+In any case, when comparing XML for equality, be prepared to do some work while taking charge of the exact comparison. There are
+many reasons why XML that should be considered "equal" still fails the equality test, as the API documentation shows.
 
 Yaidom DOM wrappers
 -------------------
