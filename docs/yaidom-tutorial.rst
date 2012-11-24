@@ -44,6 +44,9 @@ The tutorial is organized as follows:
 
 * Conclusion
 
+This tutorial is not a replacement of the yaidom API documentation. The core features of the yaidom API are introduced in
+this tutorial, but for a more complete picture the API documentation should be consulted.
+
 .. _`Scala`: http://www.scala-lang.org
 .. _`Collections API`: http://www.scala-lang.org/docu/files/collections-api/collections.html
 .. _`JAXP`: http://en.wikipedia.org/wiki/Java_API_for_XML_Processing
@@ -901,8 +904,8 @@ classes like ``Text``, ``Comment`` and others. Class ``Elem`` has the following 
 * Therefore, Elems do not know about their parent elements, but using element paths from a root element this should mostly not be a problem
 * Elems are reasonably easy to construct from scratch, using ``ElemBuilders``
 * There is excellent support for parsing and serializing these Elems, using ``DocumentParser`` and ``DocumentPrinter`` implementations, resp.
-* Elems are reasonably good at "lossless roundtripping", keeping differences in the XML text limited after parsing and serializing
-* These Elems offer support for "functional updates" (see below)
+* Elems do a reasonable job at "lossless roundtripping", keeping differences in the XML text limited after parsing and serializing
+* These Elems offer support for "functional updates" (see a later section)
 * The Elem class keeps the following state: element QName, attributes (mapping QNames to string values), in-scope namespaces, and a list of child nodes
 * Although this Elem class keeps in-scope namespaces, it does not keep namespace declarations, thus enabling Elem creation from other Elem child nodes
 * When serializing an Elem, namespace declarations are inserted by relativizing the scope of the element against the parent scope.
@@ -912,6 +915,7 @@ The extent to which "lossless roundtripping" is supported shows the compromise m
 
 * Attribute order is maintained, although the XML InfoSet specification does not consider attribute order relevant
 * Yet namespace declaration order is not preserved while "roundtripping"
+* Redundant namespace declarations get lost
 * Whitespace outside the document element is lost (a yaidom ``Document`` has a document element and can have comments and processing instructions, and that's it)
 * The difference between the 2 forms of an empty element is not preserved
 * DTDs have no explicit support in yaidom, let alone default attributes
@@ -1069,10 +1073,128 @@ Normally, elements are created by parsing an XML document, however. That is the 
 Parsing XML
 -----------
 
-Explain parsing in yaidom.
+Earlier in this tutorial it was explained that JAXP is one of the foundations of yaidom. It was also explained why yaidom
+gives the user full control over XML parser and serializer configuration.
 
-Take-away point: XML parsing is quite complex in its details. Yaidom leaves XML parser configuration completely open instead
-of hiding it.
+The parsers in yaidom are implementations of trait ``eu.cdevreeze.yaidom.parse.DocumentParser``, and the serializers are
+implementations of trait ``eu.cdevreeze.yaidom.print.DocumentPrinter``. In this section, ``DocumentParsers`` are treated.
+
+Above the default ``eu.cdevreeze.yaidom.Elem`` class was discussed. A parsed XML document is not an element, however.
+``DocumentParsers`` return parsing results as ``eu.cdevreeze.yaidom.Document`` instances. Each such ``Document`` must always
+have a document element, but it can also contain top level comments and processing instructions.
+
+Below some examples of creation and use of ``DocumentParsers`` are given. These examples use the following input XML, which is
+a stripped version of the XML above::
+
+  val xmlString =
+    """<?xml version="1.0" encoding="UTF-8"?>
+  <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
+      <Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
+          <Title>A First Course in Database Systems</Title>
+          <Authors>
+              <Author>
+                  <First_Name>Jeffrey</First_Name>
+                  <Last_Name>Ullman</Last_Name>
+              </Author>
+              <Author>
+                  <First_Name>Jennifer</First_Name>
+                  <Last_Name>Widom</Last_Name>
+              </Author>
+          </Authors>
+      </Book>
+      <Book ISBN="ISBN-0-13-815504-6" Price="100">
+          <Title>Database Systems: The Complete Book</Title>
+          <Authors>
+              <Author>
+                  <First_Name>Hector</First_Name>
+                  <Last_Name>Garcia-Molina</Last_Name>
+              </Author>
+              <Author>
+                  <First_Name>Jeffrey</First_Name>
+                  <Last_Name>Ullman</Last_Name>
+              </Author>
+              <Author>
+                  <First_Name>Jennifer</First_Name>
+                  <Last_Name>Widom</Last_Name>
+              </Author>
+          </Authors>
+          <Remark>Buy this book bundled with "A First Course" - a great deal!
+          </Remark>
+      </Book>
+  </books:Bookstore>"""
+
+  val xmlBytes = xmlString.getBytes("UTF-8") // Indeed this XML should be parsed as UTF-8
+
+A very simple example of creating and using a ``DocumentParser`` is as follows::
+
+  import java.io._
+  import eu.cdevreeze.yaidom._
+
+  val docParser = parse.DocumentParserUsingDom.newInstance
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  doc.documentElement.filterElems(EName("{http://bookstore}Book")).size // returns 2
+
+In this example a ``DocumentParser`` was created in one line of code. This document parser uses a DOM parser, and
+then converts the DOM tree to a yaidom ``Document``.
+
+Analogously, we could have created a ``DocumentParserUsingSax``, ``DocumentParserUsingStax``, or ``DocumentParserUsingDomLS``.
+A ``DocumentParserUsingSax`` parses XML into a Document using an ``ElemProducingSaxHandler``, which is a SAX ``DefaultHandler``
+that can be asked for the ``resultingDocument``. A ``DocumentParserUsingStax`` parses XML into a Document using StAX, and
+converting the StAX events to a Document. A ``DocumentParserUsingDomLS`` parser uses DOM Load/Save, and converts the DOM tree
+to a Document.
+
+The converters between DOM and yaidom Documents, and between StAX events and yaidom Documents, reside in package
+``eu.cdevreeze.yaidom.convert``. Although they are used implicitly by document parsers, they can also be used by
+application code.
+
+The following example creates a DOM-based document parser that suppresses entity resolution. Ignoring import statements,
+the parser can be created (and used) as follows::
+
+  class MyEntityResolver extends EntityResolver {
+    override def resolveEntity(publicId: String, systemId: String): InputSource = {
+      new InputSource(new java.io.StringReader(""))
+    }
+  }
+
+  val dbf = DocumentBuilderFactory.newInstance()
+  dbf.setNamespaceAware(true)
+
+  def createDocumentBuilder(dbf: DocumentBuilderFactory): DocumentBuilder = {
+    val db = dbf.newDocumentBuilder()
+    db.setEntityResolver(new MyEntityResolver)
+    db
+  }
+
+  val docParser = DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder _)
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  doc.documentElement.filterElems(EName("{http://bookstore}Book")).size // returns 2
+
+Both examples use the created document parser in the same way. This is only logical, because the ``DocumentParser`` trait
+is the contract that determines how a document parser can be used.
+
+The state of the created ``DocumentParserUsingDom`` is a JAXP ``DocumentBuilderFactory``. Indeed, the created document parser
+instance can be used as long as the ``DocumentBuilderFactory`` instance can be used. Alas, these instances are typically not
+thread-safe, so in a web application they should not be shared among threads (typically by scoping them to HTTP requests, or
+otherwise by making them thread-local).
+
+Further configuration of the document parser above is done using a function from JAXP DocumentBuilderFactory instances to
+DocumentBuilders. This function creates and configures a DocumentBuilder from the DocumentBuilderFactory. It is called by
+the document parser each time a Document is parsed. Recall that the only state of the document parser is the DocumentBuilderFactory.
+
+Of course the provided function could be written in any way the user sees fit. It could also configure an ErrorHandler, for
+example.
+
+All ``DocumentParser`` implementations follow the same pattern:
+
+* They have one JAXP factory object as state, such as a DocumentBuilderFactory, or a SAXParserFactory
+* They have a factory method that gives maximal control over configuration of the document parser
+* This factory method has one parameter for the "JAXP factory object", and function parameters otherwise (such as a function from DocumentBuilderFactory instances to DocumentBuilders)
+* Other factory methods are defined in terms of each other, and ultimately in terms of the above-mentioned factory method
+* These other factory methods provide defaults for parameters passed to the other invoked factory method
 
 Serializing XML
 ---------------
