@@ -1527,10 +1527,39 @@ many possible reasons why XML that should be considered "equal" still fails the 
 Yaidom DOM wrappers
 -------------------
 
-Explain yaidom DOM wrappers, and how to use them.
+Besides the immutable ``eu.cdevreeze.yaidom.Elem`` and ``eu.cdevreeze.yaidom.resolved.Elem`` element types, there are also
+yaidom wrappers around DOM elements. The latter ones are *mutable*, of course. DOM wrapper element class
+``eu.cdevreeze.yaidom.dom.DomElem`` mixes in query API ``ElemLike``, but not its subtraits. That's only natural, because
+DOM elements are simply updated in-place, so the "element path" and "functional update" machinery is not applicable.
+
+DOM wrapper elements should not be the default choice in an application using yaidom, but they do have their uses. One use is
+to locally update elements by converting immutable ``Elems`` to DOM wrapper, update the wrapper DOM elements in-place, and then
+convert back to immutable ``Elems``.
+
+In this section we use DOM wrappers to do the updates that we did functionally in an earlier section. The XML is again the same.
+The example is as follows::
+
+  ...
+
+For other XML libraries, such as JDOM and XOM, similar wrappers are conceivable, yet yaidom does not offer those out of the box.
+Still, ``ElemLike`` wrappers around mutable elements are a bit unnatural, since immutable collections with mutable elements
+are unnatural. Again, if needed or appropriate use them, but do not make them the default choice.
 
 Conclusion
 ==========
 
-What yaidom does, what it does not, how we can deal with some limitations.
+In summary, yaidom was really a *low hanging fruit*:
 
+* On the one hand, there is the highly expressive *Scala Collections API*, which can easily be used for *querying XML*
+* On the other hand, there is *JAXP* for the *dirty groundwork* in dealing with XML (parsing and serialization)
+* Third, there are benefits in clearly *modelling namespace-related concepts* (qualified and expanded names, etc.)
+
+On these foundations it was relatively easy to develop the *yaidom* DOM-like XML library, using the Scala programming language.
+
+Yaidom is unique in offering multiple types of elements, with different strengths and weaknesses. Although these element types
+are different, they pretty much share the *same query API*. In this tutorial it was shown (too some extent) how this can benefit
+XML processing applications.
+
+Yaidom does not try to fool the user that XML processing is easy. Configuring XML parsers and serializers (typically a one-time
+job per application) is still hard, among other things. Yet the *uniform query API* and Scala with its Collections API can make
+yaidom a viable alternative to XPath, XQuery and XSLT in many applications.
