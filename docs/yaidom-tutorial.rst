@@ -474,16 +474,15 @@ Yaidom uniform query API
 ParentElemLike trait
 --------------------
 
-Yaidom takes the position that one size does not fit all, when it comes to XML processing. (On the other hand, yaidom is a DOM-like
-API, and does not know the exact XML strings from which DOM-like trees are parsed). For example, the default ``Elem``
-class represents immutable (thread-safe) element nodes (that do not know about their parent elements). As another example,
-yaidom offers immutable elements that can be compared for some notion of equality, but carry less data than the default
-element class. As yet another example, yaidom offers wrappers around DOM elements.
+Yaidom takes the position that one size (of DOM-like trees) does not fit all, when it comes to (DOM-like) XML processing.
+For example, the default ``Elem`` class represents immutable (thread-safe) element nodes (that do not know about their parent
+elements). As another example, yaidom offers immutable elements that can be compared for some notion of equality, but carry less
+data than the default element class. As yet another example, yaidom offers wrappers around DOM elements.
 
 All these different element classes have one thing in common, viz. the *same yaidom query API*. The yaidom query API consists
 of a Scala *trait* inheritance tree. The root trait is the ``ParentElemLike`` trait.
 
-Each trait in the query API inheritance tree turns a small API into a *rich API*. In particular, the ``ParentElemLike``
+Each trait in the "query API inheritance tree" turns a small API into a *rich API*. In particular, the ``ParentElemLike``
 trait turns a small API that implements only method ``allChildElems`` into a rich query API. The rich API contains the
 fundamental method ``findAllElemsOrSelf``, just like in the "mini-yaidom" above. It also offers convenience methods, such as
 method ``filterElemsOrSelf`` (which takes an element predicate).
@@ -908,16 +907,16 @@ classes like ``Text``, ``Comment`` and others. Class ``Elem`` has the following 
 * Elems do a reasonable job at "lossless roundtripping", keeping differences in the XML text limited after parsing and serializing
 * These Elems offer support for "functional updates" (see a later section)
 * The Elem class keeps the following state: element QName, attributes (mapping QNames to string values), in-scope namespaces, and a list of child nodes
-* Although this Elem class keeps in-scope namespaces, it does not keep namespace declarations, thus enabling Elem creation from other Elem child nodes
+* Although this Elem class keeps in-scope namespaces, it does not keep namespace declarations, thus making it easier to create Elems from other Elem children
 * When serializing an Elem, namespace declarations are inserted by relativizing the scope of the element against the parent scope.
 
 Hence, the default Elem class is immutable, and otherwise tries to find a balance between competing design forces for DOM-like trees.
-The extent to which "lossless roundtripping" is supported shows the compromise made. For example:
+The extent to which "lossless roundtripping" is supported shows the compromises made. For example:
 
 * Attribute order is maintained, although the XML InfoSet specification does not consider attribute order relevant
 * Yet namespace declaration order is not preserved while "roundtripping"
 * Redundant namespace declarations get lost
-* Whitespace outside the document element is lost (a yaidom ``Document`` has a document element and can have comments and processing instructions, and that's it)
+* Whitespace outside the document element is lost (a yaidom ``Document`` has a document element and can have comments and processing instructions, but no more than that)
 * The difference between the 2 forms of an empty element is not preserved
 * DTDs have no explicit support in yaidom, let alone default attributes
 
@@ -1016,8 +1015,8 @@ better way is shown to create elements from scratch.
 Ideally all namespace declarations are in the root element. In any case, be careful not to undeclare namespaces. This is not
 allowed in XML 1.0 (except for default namespaces). Yet it is very easy to accidently undeclare namespaces. For example, above
 we could have passed the empty scope to descendant elements of the root element, which would lead to namespace undeclarations.
-Again, it is much safer to create elements from scratch using ``ElemBuilders``, as shown in the next section. When parsing
-XML into ``Elems``, namespace scopes are created by the ``DocumentParser``.
+Again, it is much safer to create elements from scratch using ``ElemBuilders``, as shown in the next section. Alternatively, when
+parsing XML into ``Elems`` (instead of creating Elems from scratch), namespace scopes are created by the ``DocumentParser``.
 
 If a created ``Elem`` has any namespace undeclarations, invoke method ``notUndeclaringPrefixes``, and use the resulting Elem instead.
 Otherwise serialization may lead to a corrupt XML document.
@@ -1027,7 +1026,7 @@ ElemBuilders
 
 Class ``ElemBuilder`` is what the name suggests: a builder of ``Elems``. ElemBuilders do not carry any scopes, and that makes
 them easier to use than Elems when creating Elems from scratch. Since ElemBuilders have no scopes, they have no way to resolve
-own QNames (of the element itself and its attributes). That's ok, because of the purpose of ElemBuilders.
+own QNames (of the element itself and its attributes). That's ok, because the purpose of ElemBuilders is to create Elems.
 
 So, Elems carry scopes but no namespace declarations, whereas ElemBuilders carry namespace declarations but no scopes.
 
@@ -1064,7 +1063,7 @@ Let's now create the same book element as above, this time using an ``ElemBuilde
     elemBuilder.build(scope)
   }
 
-Here we also knew the namespaces used in the element tree, but we declared this (default) namespace only once. The call
+Here we also knew the namespace(s) used in the element tree, but we declared this (default) namespace only once. The call
 ``elemBuilder.build(scope)`` then recursively invokes ``parentScope.resolve(namespaceDeclarations)``, thus giving each created
 Elem its namespace scope. Using ElemBuilders, the danger of accidently creating namespace undeclarations is minimal, because
 one would have to explicitly do so instead of implicitly.
@@ -1080,12 +1079,12 @@ gives the user full control over XML parser and serializer configuration.
 The parsers in yaidom are implementations of trait ``eu.cdevreeze.yaidom.parse.DocumentParser``, and the serializers are
 implementations of trait ``eu.cdevreeze.yaidom.print.DocumentPrinter``. In this section, ``DocumentParsers`` are treated.
 
-Above the default ``eu.cdevreeze.yaidom.Elem`` class was discussed. A parsed XML document is not an element, however.
+Above, the default ``eu.cdevreeze.yaidom.Elem`` class was discussed. A parsed XML document is not an element, however.
 ``DocumentParsers`` return parsing results as ``eu.cdevreeze.yaidom.Document`` instances. Each such ``Document`` must always
 have a document element, but it can also contain top level comments and processing instructions.
 
 Below some examples of creation and use of ``DocumentParsers`` are given. These examples use the following input XML, which is
-a stripped version of the XML above::
+a stripped version of the XML above (if we ignore namespaces)::
 
   val xmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
@@ -1143,7 +1142,7 @@ then converts the DOM tree to a yaidom ``Document``.
 Analogously, we could have created a ``DocumentParserUsingSax``, ``DocumentParserUsingStax``, or ``DocumentParserUsingDomLS``.
 A ``DocumentParserUsingSax`` parses XML into a Document using an ``ElemProducingSaxHandler``, which is a SAX ``DefaultHandler``
 that can be asked for the ``resultingDocument``. A ``DocumentParserUsingStax`` parses XML into a Document using StAX, and
-converting the StAX events to a Document. A ``DocumentParserUsingDomLS`` parser uses DOM Load/Save, and converts the DOM tree
+converts the StAX events to a Document. A ``DocumentParserUsingDomLS`` parser uses DOM Load/Save, and converts the DOM tree
 to a Document.
 
 The converters between DOM and yaidom Documents, and between StAX events and yaidom Documents, reside in package
@@ -1179,10 +1178,10 @@ is the contract that determines how a document parser can be used.
 
 The document parser can parse any XML ``InputStream``. For example::
 
-  val doc: Document = docParser.parse(new FileInputStream(new File("file:///home/user/bookstore.xml")))
+  val doc1: Document = docParser.parse(new FileInputStream(new File("file:///home/user/bookstore.xml")))
 
   val url = new URL("http://bookstore/bookstore.xml")
-  val doc: Document = docParser.parse(url.openStream())
+  val doc2: Document = docParser.parse(url.openStream())
 
 The state of the created ``DocumentParserUsingDom`` is a JAXP ``DocumentBuilderFactory``. Indeed, the created document parser
 instance can be used as long as the ``DocumentBuilderFactory`` instance can be used. Alas, these instances are typically not
@@ -1190,7 +1189,7 @@ thread-safe, so in a web application they should not be shared among threads (ty
 otherwise by making them thread-local).
 
 Further configuration of the document parser above is done using a function from JAXP DocumentBuilderFactory instances to
-DocumentBuilders. This function creates and configures a DocumentBuilder from the DocumentBuilderFactory. It is called by
+DocumentBuilders. This function creates a DocumentBuilder from the DocumentBuilderFactory, and configures it. It is called by
 the document parser each time a Document is parsed. Recall that the only state of the document parser is the DocumentBuilderFactory.
 
 Of course the provided function could be written in any way the user sees fit. It could also configure an ErrorHandler, for
@@ -1201,7 +1200,8 @@ All ``DocumentParser`` implementations follow the same pattern w.r.t. creation:
 * They have one JAXP factory object as state, such as a DocumentBuilderFactory, or a SAXParserFactory
 * They have a factory method that gives maximal control over configuration of the document parser
 * This factory method has one parameter for the "JAXP factory object", and function parameters otherwise (such as a function from DocumentBuilderFactory instances to DocumentBuilders)
-* Each factory method is defined in terms of another one
+* There are other factory methods as well
+* Each "other" factory method is defined in terms of another factory method
 * Each of these other factory methods provides defaults for parameters passed to the factory method that it calls itself
 
 All in all, there is plenty of choice how to parse XML input into a ``Document``:
@@ -1214,7 +1214,7 @@ If memory-usage is an issue, consider using the ``DocumentParserUsingStax``. If 
 consider using a ``DocumentParserUsingSax`` with custom ``ElemProducingSaxHandler`` producers. If even more flexibility is needed,
 consider using a custom ``DocumentParser`` implementation that may or may not wrap another document parser. After all, the only
 thing that the ``DocumentParser`` trait promises is that it can take an XML ``InputStream`` and parse that into a yaidom
-``Document``. How that is done is completely left open to implementing classes.
+``Document``. How that is done is completely left to implementing classes.
 
 As seen in this section, the one thing that yaidom does not do is suggest that there is only 1 way to get from the XML input source
 to a yaidom DOM-like Document.
@@ -1452,8 +1452,8 @@ Other element implementations
 -------------------
 
 It should be obvious by now that equality for XML is very hard to define. It is common to regard 2 XML documents to be equal if
-all they differ in are the namespace prefixes used. Yaidom indeed offers another type of elements that supports "equality
-comparisons", and that know about expanded names (and namespace URIs) but not about qualified names (and namespace prefixes).
+all they differ in are the namespace prefixes used. Yaidom indeed offers another element type that supports "equality
+comparisons", and that knows about expanded names (and namespace URIs) but not about qualified names (and namespace prefixes).
 That type of element is ``eu.cdevreeze.yaidom.resolved.Elem``.
 
 These "resolved" Elems mix in trait ``UpdatableElemLike``, just like the default Elems. Hence, the query API of the default
@@ -1521,7 +1521,7 @@ the comparison. The second version of the query is as follows::
   }
 
 There is a lot more to "resolved" Elems and equality comparisons than shown here. The API documentation contains more information.
-In any case, when comparing XML for equality, be prepared to do some work while taking charge of the exact comparison. There are
+In any case, when comparing XML for equality, be prepared to do some work to take charge of the exact comparison. There are
 many possible reasons why XML that should be considered "equal" still fails the equality test, as the API documentation shows.
 
 Yaidom DOM wrappers
