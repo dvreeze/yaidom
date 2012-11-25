@@ -45,8 +45,8 @@ The tutorial is organized as follows:
 * Conclusion
 
 This tutorial is not a replacement for the yaidom API documentation. Most core features of the yaidom API are introduced in
-this tutorial, but for a more complete picture the API documentation should be consulted. The API documentation also has more
-depth than this tutorial (for example, w.r.t. generic "query API" types, or formal properties).
+this tutorial, but for a more complete overview the API documentation should be consulted. The API documentation also has more
+depth than this tutorial (for example, w.r.t. the use of generics in the "query API", and w.r.t. formally proven properties).
 
 .. _`Scala`: http://www.scala-lang.org
 .. _`Collections API`: http://www.scala-lang.org/docu/files/collections-api/collections.html
@@ -239,8 +239,8 @@ The sample XML data represents a bookstore, and is created in "mini-yaidom" as f
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
   }
 
-Having this bookstore DOM-like tree, we can write queries against it. Note that "mini-yaidom" class ``Elem`` has very few
-query methods on its own. In the queries, most work is done by Scala's Collections API. Some queries are::
+Having this bookstore as DOM-like tree, we can write queries against it. Note that "mini-yaidom" class ``Elem`` has very few
+query methods on its own. In the queries most work is done by Scala's Collections API. Some queries are::
 
   // This is NOT yaidom! This is some "mini-yaidom" looking a lot like yaidom, if we ignore namespaces
 
@@ -321,8 +321,8 @@ Using the Scala Collections API, along with only a few ``Elem`` methods such as 
 much (namespace-agnostic) XML querying is already possible. This says a lot about the expressive power of Scala's Collections
 API, as a *universal query API*.
 
-Yaidom queries are less verbose than the "mini-yaidom" queries above, but a lot of what the yaidom query API offers is just
-convenience methods. The foundation is still the same: core ``Elem`` methods ``allChildElems`` and ``findAllElemsOrSelf``,
+Yaidom queries are typically less verbose than the "mini-yaidom" queries above, but a lot of what the yaidom query API offers is
+just convenience methods. The foundation is still the same: core ``Elem`` methods ``allChildElems`` and ``findAllElemsOrSelf``,
 and the rest is offered by the Scala Collections API itself (and by some ``Elem`` convenience methods or syntactic sugar).
 As an example of such a convenience method, yaidom offers method ``elem.filterElemsOrSelf(p)``, which is equivalent to
 ``elem.findAllElemsOrSelf.filter(p)``.
@@ -332,7 +332,7 @@ trees are thread-safe.
 
 Still the question remains: why not use a standard query language like `XQuery`_? Some possible reasons are:
 
-* XQuery is a complex language. The different specifications of XQuery or related to it illustrate its complexity well.
+* XQuery is a complex language. The different specifications of or related to XQuery illustrate its complexity well.
 * XQuery has a type system based on `XML Schema`_, which is known to be very complex in itself.
 * Non-trivial computations are better and more directly expressed in a programming language like Scala than in XPath/XQuery or XQuery extension functions.
 * There are too few mature open source XQuery libraries.
@@ -390,13 +390,13 @@ in `James Clark`_ notation, are as follows:
 These expanded names do not occur in XML documents. Expanded names are too long to be practical. On the other hand,
 prefixed names have no meaning outside their context (namely in-scope namespaces), whereas expanded names have an
 existence on their own. Moreover, prefixes themselves are just placeholders, and can easily be replaced by other prefixes
-without changing the meaning of the XML document. For example, in the XML above, we could replace prefix ``f`` by prefix
+without changing the "meaning" of the XML document. For example, in the XML above, we could replace prefix ``f`` by prefix
 ``g`` everywhere (also in the namespace declaration, of course), without changing the "meaning" of the document.
 
 The namespace declaration in the root element above leads to *in-scope namespaces*, or *scope*, from the root all the way down
 to all descendants of the root (that is, the entire document). The namespace scope at each element is the accumulated effect of
 the namespace declarations in the element and its ancestry. In this example, each element has the same scope, because only the
-root element has declarations of namespaces, which are in scope throughout the document. The namespace scope contains only one
+root element has a declaration of a namespace, which is in scope throughout the document. The namespace scope contains only one
 mapping from prefix ``f`` to namespace name ``http://www.w3schools.com/furniture``.
 
 The concepts mentioned above are modelled in yaidom by the following classes:
@@ -450,7 +450,7 @@ JAXP
 ----
 
 When creating an XML processing library, it is very tempting to make parsing and serialization of XML look easy.
-That is especially the case in Scala, because of its expressiveness. Unfortunately, the expressiveness and orthogonality
+That is especially the case when using Scala, because of its expressiveness. Unfortunately, the expressiveness and orthogonality
 of Scala do not extend to the domain of XML processing. For many XML documents in the wild, the specific XML parser configuration
 affects the resulting DOM tree or SAX events. Details of whitespace handling, entity resolution, namespace handling etc. may
 depend heavily on the XML parser or serializer configuration, and are often obscure. To make things worse, different XML-related
@@ -1541,19 +1541,25 @@ The example is as follows::
 
   import org.w3c.{ dom => w3cdom }
   import javax.xml.parsers.DocumentBuilderFactory
+  import javax.xml.transform._
+  import eu.cdevreeze.yaidom.dom
 
+  // Parse the Document
   val docParser = parse.DocumentParserUsingDom.newInstance
 
   val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
 
   assert(doc.documentElement.resolvedName == EName("{http://bookstore}Bookstore"))
 
+  // Convert the Document
   val domDoc = convert.DomConversions.convertDocument(doc) {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     db.newDocument
   }
   val rootWrapper = new dom.DomElem(domDoc.getDocumentElement)
+
+  // Query for Author elements, and update them
 
   def updateAuthor(authorElem: dom.DomElem): dom.DomElem = {
     require(authorElem.resolvedName == EName("{http://bookstore}Author"))
@@ -1568,10 +1574,9 @@ The example is as follows::
     val nameDomElem = domDoc.createElementNS("http://bookstore", "books:Name")
     nameDomElem.setTextContent(name)
 
-    val childElems = authorElem.allChildElems map { ch => ch.wrappedNode }
-    childElems.drop(1) foreach { ch => authorElem.wrappedNode.removeChild(ch) }
+    authorElem.children foreach { ch => authorElem.wrappedNode.removeChild(ch.wrappedNode) }
 
-    authorElem.wrappedNode.replaceChild(nameDomElem, childElems.head)
+    authorElem.wrappedNode.appendChild(nameDomElem)
 
     // Return the authorElem, whose wrapped node has been updated in place
     authorElem
@@ -1581,12 +1586,26 @@ The example is as follows::
 
   authorWrappers foreach { e => updateAuthor(e) }
 
+  // Convert back to a Document
   val newDoc = convert.DomConversions.convertToDocument(domDoc)
+  val formattedNewDoc = newDoc.withDocumentElement(newDoc.documentElement.removeAllInterElementWhitespace)
 
-  val docPrinter = print.DocumentPrinterUsingDom.newInstance
+  // Print the Document
+  val dbf = DocumentBuilderFactory.newInstance
+
+  val tf = TransformerFactory.newInstance
+
+  val trCreator = { tf: TransformerFactory =>
+    val tr = tf.newTransformer
+    tr.setOutputProperty(OutputKeys.INDENT, "yes")
+    tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+    tr
+  }
+
+  val docPrinter = print.DocumentPrinterUsingDom.newInstance(dbf, tf).withTransformerCreator(trCreator)
 
   val bos = new ByteArrayOutputStream
-  docPrinter.omittingXmlDeclaration.print(newDoc, "UTF-8", bos)
+  docPrinter.omittingXmlDeclaration.print(formattedNewDoc, "UTF-8", bos)
   val newXmlBytes = bos.toByteArray
   val newXmlString = new String(newXmlBytes, "UTF-8")
 
@@ -1598,7 +1617,7 @@ local as possible.
 Conclusion
 ==========
 
-In summary, yaidom was really a *low hanging fruit*:
+In summary, having Scala and JAXP at our disposal, yaidom was really *low-hanging fruit*:
 
 * On the one hand, there is the highly *expressive Scala Collections API*, which can easily be used for *querying XML*
 * On the other hand, there is *JAXP* for dealing with the *gory details of XML* (parsing and serialization)
