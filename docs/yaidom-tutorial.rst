@@ -1533,33 +1533,83 @@ yaidom wrappers around DOM elements. The latter ones are *mutable*, of course. D
 DOM elements are simply updated in-place, so the "element path" and "functional update" machinery is not applicable.
 
 DOM wrapper elements should not be the default choice in an application using yaidom, but they do have their uses. One use is
-to locally update elements by converting immutable ``Elems`` to DOM wrapper, update the wrapper DOM elements in-place, and then
+to locally update elements by converting immutable ``Elems`` to DOM wrappers, update the wrapper DOM elements in-place, and then
 convert back to immutable ``Elems``.
 
 In this section we use DOM wrappers to do the updates that we did functionally in an earlier section. The XML is again the same.
 The example is as follows::
 
-  ...
+  import org.w3c.{ dom => w3cdom }
+  import javax.xml.parsers.DocumentBuilderFactory
+
+  val docParser = parse.DocumentParserUsingDom.newInstance
+
+  val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
+
+  assert(doc.documentElement.resolvedName == EName("{http://bookstore}Bookstore"))
+
+  val domDoc = convert.DomConversions.convertDocument(doc) {
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    db.newDocument
+  }
+  val rootWrapper = new dom.DomElem(domDoc.getDocumentElement)
+
+  def updateAuthor(authorElem: dom.DomElem): dom.DomElem = {
+    require(authorElem.resolvedName == EName("{http://bookstore}Author"))
+
+    val domDoc = authorElem.wrappedNode.getOwnerDocument
+    require(domDoc ne null)
+
+    val firstName = authorElem.getChildElem(_.localName == "First_Name").text
+    val lastName = authorElem.getChildElem(_.localName == "Last_Name").text
+    val name = List(firstName, lastName).mkString(" ")
+
+    val nameDomElem = domDoc.createElementNS("http://bookstore", "books:Name")
+    nameDomElem.setTextContent(name)
+
+    val childElems = authorElem.allChildElems map { ch => ch.wrappedNode }
+    childElems.drop(1) foreach { ch => authorElem.wrappedNode.removeChild(ch) }
+
+    authorElem.wrappedNode.replaceChild(nameDomElem, childElems.head)
+
+    // Return the authorElem, whose wrapped node has been updated in place
+    authorElem
+  }
+
+  val authorWrappers = rootWrapper.filterElems(EName("{http://bookstore}Author"))
+
+  authorWrappers foreach { e => updateAuthor(e) }
+
+  val newDoc = convert.DomConversions.convertToDocument(domDoc)
+
+  val docPrinter = print.DocumentPrinterUsingDom.newInstance
+
+  val bos = new ByteArrayOutputStream
+  docPrinter.omittingXmlDeclaration.print(newDoc, "UTF-8", bos)
+  val newXmlBytes = bos.toByteArray
+  val newXmlString = new String(newXmlBytes, "UTF-8")
 
 For other XML libraries, such as JDOM and XOM, similar wrappers are conceivable, yet yaidom does not offer those out of the box.
 Still, ``ElemLike`` wrappers around mutable elements are a bit unnatural, since immutable collections with mutable elements
-are unnatural. Again, if needed or appropriate use them, but do not make them the default choice.
+are unnatural. Again, if needed or appropriate use them, but do not make them the default choice, and try to keep their use as
+local as possible.
 
 Conclusion
 ==========
 
 In summary, yaidom was really a *low hanging fruit*:
 
-* On the one hand, there is the highly expressive *Scala Collections API*, which can easily be used for *querying XML*
-* On the other hand, there is *JAXP* for the *dirty groundwork* in dealing with XML (parsing and serialization)
+* On the one hand, there is the highly *expressive Scala Collections API*, which can easily be used for *querying XML*
+* On the other hand, there is *JAXP* for dealing with the *gory details of XML* (parsing and serialization)
 * Third, there are benefits in clearly *modelling namespace-related concepts* (qualified and expanded names, etc.)
 
 On these foundations it was relatively easy to develop the *yaidom* DOM-like XML library, using the Scala programming language.
 
 Yaidom is unique in offering multiple types of elements, with different strengths and weaknesses. Although these element types
-are different, they pretty much share the *same query API*. In this tutorial it was shown (too some extent) how this can benefit
-XML processing applications.
+are different, they pretty much share the *same query API*. In this tutorial it was shown (too some extent) how these different
+element types that share the same query API can benefit XML processing applications.
 
-Yaidom does not try to fool the user that XML processing is easy. Configuring XML parsers and serializers (typically a one-time
-job per application) is still hard, among other things. Yet the *uniform query API* and Scala with its Collections API can make
-yaidom a viable alternative to XPath, XQuery and XSLT in many applications.
+Yaidom does not try to fool the user into believing that XML processing is easy. Configuring XML parsers and serializers
+(typically a one-time job per application) is still hard, among other things. Yet the *uniform query API* and Scala with its
+Collections API can make yaidom a viable alternative to XPath, XQuery and XSLT in many applications.
