@@ -1438,10 +1438,10 @@ inserting new Name elements::
 Again we see successfully "updated" result XML, where the First_Name and Last_Name elements have been replaced by Name elements.
 Check the ``UpdatableElemLike`` API documentation for more details on "functional updates" in yaidom.
 
-Functional updates using the appropriate methods in trait ``UpdatableElemLike`` trait benefit from the safety resulting from
+Functional updates using the appropriate methods in trait ``UpdatableElemLike`` benefit from the safety resulting from
 a functional style of programming (easy to reason about, thread-safety). Yet they do come with a cost, especially if many
 functional updates are done on large documents. An alternative may be to convert immutable Documents to DOM trees, update them
-in-place, and then convert back to immutable Documents. If these updates are local to a function that is functional on the
+in-place, and then convert back to immutable Documents. If these updates are local to a function that is functional from the
 outside, a functional style of programming is not compromised too much. In a later section such local in-place updates are
 shown.
 
@@ -1451,7 +1451,7 @@ Other element implementations
 "Resolved" elements
 -------------------
 
-It should be obvious by now that equality for XML is very hard to define. It is common to regard 2 XML documents as equal if
+It should be obvious by now that equality for XML is very hard to define. It is common to regard 2 XML documents to be equal if
 all they differ in are the namespace prefixes used. Yaidom indeed offers another type of elements that supports "equality
 comparisons", and that know about expanded names (and namespace URIs) but not about qualified names (and namespace prefixes).
 That type of element is ``eu.cdevreeze.yaidom.resolved.Elem``.
@@ -1522,7 +1522,7 @@ the comparison. The second version of the query is as follows::
 
 There is a lot more to "resolved" Elems and equality comparisons than shown here. The API documentation contains more information.
 In any case, when comparing XML for equality, be prepared to do some work while taking charge of the exact comparison. There are
-many reasons why XML that should be considered "equal" still fails the equality test, as the API documentation shows.
+many possible reasons why XML that should be considered "equal" still fails the equality test, as the API documentation shows.
 
 Yaidom DOM wrappers
 -------------------
