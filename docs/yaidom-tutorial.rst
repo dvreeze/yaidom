@@ -1626,7 +1626,7 @@ In summary, having Scala and JAXP at our disposal, yaidom was really *low-hangin
 On these foundations it was relatively easy to develop the *yaidom* DOM-like XML library, using the Scala programming language.
 
 Yaidom is unique in offering multiple types of elements, with different strengths and weaknesses. Although these element types
-are different, they pretty much share the *same query API*. In this tutorial it was shown (too some extent) how these different
+are different, they pretty much share the *same query API*. In this tutorial it was shown (to some extent) how these different
 element types that share the same query API can benefit XML processing applications.
 
 Yaidom does not try to fool the user into believing that XML processing is easy. Configuring XML parsers and serializers
