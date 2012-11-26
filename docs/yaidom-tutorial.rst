@@ -1278,29 +1278,51 @@ lines, but no indentation. Let's try to fix indentation. Note that the following
 This is very sensitive implementation-specific code, but on my configuration the indentation turns out to work. Yet attribute order
 is different than in the original XML, on my machine. Let's try to fix that, using a SAX-based document printer::
 
-  val formattedBookstore = updatedBookstore.prettify(4)
-  val formattedDoc = Document(formattedBookstore)
+  import javax.xml.parsers._
+  import javax.xml.transform._
+  import javax.xml.transform.sax.SAXTransformerFactory
 
-  val docPrinter = print.DocumentPrinterUsingSax.newInstance
+  val stf = TransformerFactory.newInstance().asInstanceOf[SAXTransformerFactory]
+
+  val trHandler = { stf: SAXTransformerFactory =>
+    val trh = stf.newTransformerHandler
+    val tr = trh.getTransformer
+    tr.setOutputProperty(OutputKeys.INDENT, "yes")
+    tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+    trh
+  }
+
+  val docPrinter = print.DocumentPrinterUsingSax.newInstance(stf, trHandler)
 
   val bos = new ByteArrayOutputStream
-  docPrinter.print(formattedDoc, "UTF-8", bos)
+  docPrinter.print(updatedDoc, "UTF-8", bos)
   val newXmlBytes = bos.toByteArray
   val newXmlString = new String(newXmlBytes, "UTF-8")
 
 This time, on my machine the attribute order is the same as in the original. Yet now there is no newline after the XML declaration
 in my case. A hack to fix that could be as follows::
 
-  val formattedBookstore = updatedBookstore.prettify(4)
-  val formattedDoc = Document(formattedBookstore)
+  import javax.xml.parsers._
+  import javax.xml.transform._
+  import javax.xml.transform.sax.SAXTransformerFactory
 
-  val docPrinter = print.DocumentPrinterUsingSax.newInstance
+  val stf = TransformerFactory.newInstance().asInstanceOf[SAXTransformerFactory]
+
+  val trHandler = { stf: SAXTransformerFactory =>
+    val trh = stf.newTransformerHandler
+    val tr = trh.getTransformer
+    tr.setOutputProperty(OutputKeys.INDENT, "yes")
+    tr.setOutputProperty(OutputKeys.STANDALONE, "yes") // Causing a newline after the XML declaration
+    tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+    trh
+  }
+
+  val docPrinter = print.DocumentPrinterUsingSax.newInstance(stf, trHandler)
 
   val bos = new ByteArrayOutputStream
-  docPrinter.omittingXmlDeclaration.print(formattedDoc, "UTF-8", bos)
+  docPrinter.print(updatedDoc, "UTF-8", bos)
   val newXmlBytes = bos.toByteArray
-  val xmlDeclaration = """<?xml version="1.0" encoding="UTF-8"?>"""
-  val newXmlString = xmlDeclaration + "\n" + new String(newXmlBytes, "UTF-8")
+  val newXmlString = new String(newXmlBytes, "UTF-8")
 
 These examples show just how sensitive XML parsing and serialization are. Yaidom exposes JAXP objects for configuration
 with good reason.
