@@ -6,12 +6,15 @@ CHANGELOG
 0.6.4
 =====
 
-* Breaking API changes: Throughout the yaidom library, attributes in elements are now ordered (for "better roundtripping")!
+* Breaking API changes: Throughout the yaidom library (except for "resolved elements"), attributes in elements are now ordered (for "better roundtripping")!
 * Added ``DocumentPrinter.print`` methods that print to an OutputStream, and therefore typically save memory
 * Fixed method ``DocumentPrinterUsingStax.omittingXmlDeclaration``
 * Improved ``DocumentParser`` classes with respect to character encoding detection
 * ``StaxEventsToYaidomConversions`` can now produce an Iterator of XMLEvents, thus enabling less memory-hungry StAX-based parsing
 * Indeed, ``DocumentParserUsingStax`` uses these Iterator-producing conversions, thus leading to far less memory usage
+* Added ``ElemPath`` convenience methods ``findAncestorOrSelfPath`` and ``findAncestorPath``
+* Breaking API change: removed superfluous ``childIndexOf`` method (twice)
+* Added yaidom tutorial
 * Removed half-baked support for Java 5 (requiring at least Java 6 from now on)
 
 

@@ -195,32 +195,6 @@ final class Elem(
     new Elem(qname, newAttributes, scope, children)
   }
 
-  /**
-   * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
-   * Must be fast.
-   */
-  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
-    val childNodes = children
-
-    var cnt = 0
-    var idx = -1
-    while (cnt <= pathEntry.index) {
-      val newIdx = childNodes indexWhere ({
-        case e: Elem =>
-          e.resolvedName == pathEntry.elementName
-        case _ => false
-      }, idx + 1)
-
-      idx = newIdx
-      if (idx < 0) {
-        assert(idx == -1)
-        return idx
-      }
-      cnt += 1
-    }
-    idx
-  }
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 

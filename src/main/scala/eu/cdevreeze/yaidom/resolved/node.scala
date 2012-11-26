@@ -117,32 +117,6 @@ final case class Elem(
     textStrings.mkString
   }
 
-  /**
-   * Returns the index of the child with the given `ElemPath` `Entry` (taking this element as parent), or -1 if not found.
-   * Must be fast.
-   */
-  def childIndexOf(pathEntry: ElemPath.Entry): Int = {
-    val childNodes = children
-
-    var cnt = 0
-    var idx = -1
-    while (cnt <= pathEntry.index) {
-      val newIdx = childNodes indexWhere ({
-        case e: Elem =>
-          e.resolvedName == pathEntry.elementName
-        case _ => false
-      }, idx + 1)
-
-      idx = newIdx
-      if (idx < 0) {
-        assert(idx == -1)
-        return idx
-      }
-      cnt += 1
-    }
-    idx
-  }
-
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
