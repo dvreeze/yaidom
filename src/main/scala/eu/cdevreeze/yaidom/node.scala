@@ -195,6 +195,20 @@ final class Elem(
     new Elem(qname, newAttributes, scope, children)
   }
 
+  /**
+   * Functionally adds or updates the given attribute.
+   *
+   * More precisely, if an attribute with the same name exists at position `idx` (0-based),
+   * `withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))` is returned.
+   * Otherwise, `withAttributes(attributes :+ (attributeName -> attributeValue))` is returned.
+   */
+  def plusAttribute(attributeName: QName, attributeValue: String): Elem = {
+    val idx = attributes indexWhere { case (attr, value) => attr == attributeName }
+
+    if (idx < 0) withAttributes(attributes :+ (attributeName -> attributeValue))
+    else withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))
+  }
+
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
