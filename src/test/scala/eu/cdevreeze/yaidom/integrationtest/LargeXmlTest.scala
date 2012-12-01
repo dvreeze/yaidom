@@ -358,7 +358,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val start2Ms = System.currentTimeMillis()
     val updatedDoc: Document = doc.updated(path) { e =>
-      Vector(e.withChildren(Vector(Text(newPhone, false))))
+      e.withChildren(Vector(Text(newPhone, false)))
     }
     val end2Ms = System.currentTimeMillis()
     logger.info("Updating an element in the document took %d ms".format(end2Ms - start2Ms))
@@ -375,7 +375,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val resolvedDocElm = resolved.Elem(doc.documentElement)
     val resolvedElm2: resolved.Elem = resolvedDocElm.updated(path) { e =>
-      Vector(e.withChildren(Vector(resolved.Text(newPhone))))
+      e.withChildren(Vector(resolved.Text(newPhone)))
     }
 
     val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
@@ -418,7 +418,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val start2Ms = System.currentTimeMillis()
     val updatedDoc: Document = doc updated {
-      case e if (e.localName == "phone") && (e == oldPhoneElm) => Vector(e.withChildren(Vector(Text(newPhone, false))))
+      case e if (e.localName == "phone") && (e == oldPhoneElm) => e.withChildren(Vector(Text(newPhone, false)))
     }
     val end2Ms = System.currentTimeMillis()
     logger.info("Updating an element in the document (using a partial function) took %d ms".format(end2Ms - start2Ms))

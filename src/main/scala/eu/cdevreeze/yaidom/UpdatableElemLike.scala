@@ -81,47 +81,38 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
    * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
    *
-   * The root element must remain the same, except for (one of its) children. Hence the root path is not allowed as parameter.
-   *
-   * The method throws an exception if no element is found with the given path, or if the root path is passed.
+   * The method throws an exception if no element is found with the given path.
    */
-  final def updated(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
+  final def updated(path: ElemPath)(f: E => E): E = {
     // This implementation has been inspired by Scala's immutable Vector, which offers efficient
     // "functional updates" (among other efficient operations).
 
-    require(!path.isRoot, "We cannot update the root element itself (except for its children) within the tree with that root element")
+    if (path == ElemPath.Root) f(self)
+    else {
+      val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
+      val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
+      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
 
-    val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
-    val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
-    assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
+      // Recursive, but not tail-recursive
+      val updatedChildTree: E = foundChildElm.updated(path.withoutFirstEntry)(f)
 
-    val updatedChildren: immutable.IndexedSeq[N] =
-      if (path.entries.length == 1) {
-        val newNodes: immutable.IndexedSeq[N] = f(foundChildElm)
+      val updatedChildren: immutable.IndexedSeq[N] =
+        self.children.updated(foundChildElmNodeIdx, updatedChildTree)
 
-        self.children.patch(foundChildElmNodeIdx, newNodes, 1)
-      } else {
-        assert(path.entries.length >= 2)
-
-        // Recursive, but not tail-recursive
-        val updatedTree: E = foundChildElm.updated(path.withoutFirstEntry)(f)
-
-        self.children.updated(foundChildElmNodeIdx, updatedTree)
-      }
-
-    self.withChildren(updatedChildren)
+      self.withChildren(updatedChildren)
+    }
   }
 
-  /** Returns `updated(path) { e => nodes }` */
-  final def updated(path: ElemPath, nodes: immutable.IndexedSeq[N]): E = updated(path) { e => nodes }
+  /** Returns `updated(path) { e => newElem }` */
+  final def updated(path: ElemPath, newElem: E): E = updated(path) { e => newElem }
 
   /**
-   * Functionally updates topmost descendant elements (but not self!) for which the partial function is defined,
+   * Functionally updates topmost descendant-or-self elements for which the partial function is defined,
    * within the tree of which this element is the root element.
    */
-  final def updated(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
+  final def updated(pf: PartialFunction[E, E]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
-    val paths = findTopmostElemPaths(p).reverse
+    val paths = findTopmostElemOrSelfPaths(p)
 
     val result: E = paths.foldLeft(self) {
       case (acc, path) =>

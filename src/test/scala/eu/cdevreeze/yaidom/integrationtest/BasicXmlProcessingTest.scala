@@ -236,7 +236,7 @@ class BasicXmlProcessingTest extends Suite {
       musicElm updated {
         case e if e.localName == "description" =>
           val updatedAttrs = e.attributes filterNot { case (qn, v) => qn == QName("link") }
-          Vector(Elem(e.qname, updatedAttrs, e.scope, e.children))
+          Elem(e.qname, updatedAttrs, e.scope, e.children)
       }
 
     expect(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {

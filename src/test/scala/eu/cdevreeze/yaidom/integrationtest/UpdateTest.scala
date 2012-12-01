@@ -114,7 +114,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def turnBookAttributeIntoElem[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => N): E = {
+  private def turnBookAttributeIntoElem[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
     val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
@@ -122,7 +122,7 @@ class UpdateTest extends Suite {
     matchingPaths.foldLeft(rootElm) { (acc, path) =>
       require(rootElm.findWithElemPath(path).isDefined)
 
-      acc.updated(path) { case e => Vector(upd(e, attrName)) }
+      acc.updated(path) { case e => upd(e, attrName) }
     }
   }
 

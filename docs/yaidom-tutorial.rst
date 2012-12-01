@@ -1404,10 +1404,7 @@ parent Author element by text (for the name). Here is the first attempt, using a
   // Do the "functional update", creating lots of immutable intermediary results
   val newDoc: Document = authorPaths.foldLeft(doc) { (acc, path) =>
     // Using a method in trait UpdatableElemLike
-    acc.updated(path) { e => 
-      val newE = updateAuthor(e)
-      Vector(newE)
-    }
+    acc.updated(path) { e => updateAuthor(e) }
   }
 
   val docPrinter = print.DocumentPrinterUsingSax.newInstance // SAX-based serialization seems to retain attribute order 
@@ -1447,9 +1444,7 @@ inserting new Name elements::
 
   // Do the "functional update"
   val newDoc: Document = doc updated {
-    case e if e.resolvedName == EName("{http://bookstore}Author") =>
-      val newE = updateAuthor(e)
-      Vector(newE)
+    case e if e.resolvedName == EName("{http://bookstore}Author") => updateAuthor(e)
   }
 
   val bos = new ByteArrayOutputStream

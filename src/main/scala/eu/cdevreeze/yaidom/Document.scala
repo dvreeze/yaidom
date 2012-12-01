@@ -78,13 +78,13 @@ final class Document(
     comments = this.comments)
 
   /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
-  def updated(path: ElemPath)(f: Elem => immutable.IndexedSeq[Node]): Document = withDocumentElement(this.documentElement.updated(path)(f))
+  def updated(path: ElemPath)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
 
-  /** Returns `updated(path) { e => nodes }` */
-  def updated(path: ElemPath, nodes: immutable.IndexedSeq[Node]): Document = updated(path) { e => nodes }
+  /** Returns `updated(path) { e => newElem }` */
+  def updated(path: ElemPath, newElem: Elem): Document = updated(path) { e => newElem }
 
   /** Returns `withDocumentElement(this.documentElement.updated(pf))` */
-  def updated(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document = withDocumentElement(this.documentElement.updated(pf))
+  def updated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.updated(pf))
 
   final def toTreeRepr(): String = toTreeReprAsLineSeq(0)(2).mkString
 
