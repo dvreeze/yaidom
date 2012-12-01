@@ -112,7 +112,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
    */
   final def updated(pf: PartialFunction[E, E]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
-    val paths = findTopmostElemOrSelfPaths(p).reverse // Very important to process paths in reverse order!!
+    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
+    val paths = findTopmostElemOrSelfPaths(p).reverse
 
     val result: E = paths.foldLeft(self) {
       case (acc, path) =>

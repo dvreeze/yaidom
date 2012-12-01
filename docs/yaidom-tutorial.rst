@@ -1401,9 +1401,9 @@ parent Author element by text (for the name). Here is the first attempt, using a
     authorElem.withChildren(Vector(Text(name, false)))
   }
 
-  // Do the "functional update", creating lots of immutable intermediary results
-  val newDoc: Document = authorPaths.foldLeft(doc) { (acc, path) =>
-    // Using a method in trait UpdatableElemLike
+  // Do the "functional update", creating lots of immutable intermediary results.
+  // It is very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
+  val newDoc: Document = authorPaths.reverse.foldLeft(doc) { (acc, path) =>
     acc.updated(path) { e => updateAuthor(e) }
   }
 
