@@ -19,10 +19,14 @@ scalacOptions <++= scalaBinaryVersion map { version =>
   if (version.contains("2.10")) Seq("-feature") else Seq()
 }
 
-sources in Test <++= scalaBinaryVersion map { version =>
-  val newSources = new java.io.File("src/test-reflect/scala/eu/cdevreeze/yaidom/reflect").listFiles.toSeq
-  // if (version.contains("2.10")) newSources else Seq()
-  Seq()
+(unmanagedSourceDirectories in Compile) <++= scalaBinaryVersion apply { version =>
+  val newSourceDirs = Seq(new java.io.File("src/main-2.10/scala"))
+  if (version.contains("2.10")) newSourceDirs else Seq()
+}
+
+(unmanagedSourceDirectories in Test) <++= scalaBinaryVersion apply { version =>
+  val newSourceDirs = Seq(new java.io.File("src/test-reflect/scala"))
+  if (version.contains("2.10")) newSourceDirs else Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
