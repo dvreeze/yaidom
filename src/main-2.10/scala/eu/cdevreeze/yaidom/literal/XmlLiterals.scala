@@ -81,7 +81,7 @@ object XmlLiterals {
 
           if (e.text.trim == placeholderString) {
             val nodes = extractNodes(args(idx))
-            require(!nodes.isEmpty, "Expected Node or Node sequence for parameter %d (0-based)".format(idx))
+            require(!nodes.isEmpty, "Expected Node, Node sequence or String for parameter %d (0-based)".format(idx))
 
             tmpDoc.updated(path) { e =>
               val newE = e.withChildren(nodes.toIndexedSeq)
@@ -118,14 +118,13 @@ object XmlLiterals {
     }
 
     private def extractNodes(arg: Any): Seq[Node] = arg match {
+      case s: String => Seq(Text(s, false))
       case n: Node => Seq(n)
       case xs: Seq[_] if xs.forall(x => x.isInstanceOf[Node]) => xs.asInstanceOf[Seq[Node]]
       case _ => Seq()
     }
 
     private def findArgumentParentElemPaths(doc: Document, args: Seq[Any]): Map[Int, ElemPath] = {
-      val allElems = doc.documentElement.findAllElemsOrSelf
-
       val result: Seq[(Int, ElemPath)] = (0 until args.length) flatMap { idx =>
         val placeholderString = quotedPlaceholder(idx)
 
