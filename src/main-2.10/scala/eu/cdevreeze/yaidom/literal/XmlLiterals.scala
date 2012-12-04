@@ -74,7 +74,7 @@ object XmlLiterals {
 
       val docParser = getParser
 
-      // The Document with quoted placeholders
+      // The Document with (possibly quoted) placeholders
       // TODO UTF-8?
       val doc: Document = docParser.parse(new ByteArrayInputStream(xmlWithPlaceholders.getBytes("UTF-8")))
 
@@ -97,7 +97,11 @@ object XmlLiterals {
             require(!nodes.isEmpty, "Expected Node, Node sequence or String for parameter %d (0-based)".format(idx))
 
             tmpDoc.updated(path) { e =>
-              val newE = e.withChildren(nodes.toIndexedSeq)
+              val newChildren = nodes.toIndexedSeq map {
+                case ch: Elem => NodeBuilder.fromElem(ch)(Scope.Empty).build(e.scope)
+                case ch => ch
+              }
+              val newE = e.withChildren(newChildren)
               newE
             }
           } else if (canBeAttributeValue(idx) && e.attributes.map(_._2).contains(placeholder)) {
@@ -170,6 +174,7 @@ object XmlLiterals {
 
     private def getParser: parse.DocumentParser = {
       val result = parse.DocumentParserUsingSax.newInstance
+      // TODO Configure
       result
     }
   }

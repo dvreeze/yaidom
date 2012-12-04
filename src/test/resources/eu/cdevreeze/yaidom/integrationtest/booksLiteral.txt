@@ -12,7 +12,7 @@
 			        textElem(QName("Last_Name"), lastName)
 			      ))
 			  }
-			val scope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
+			val scope = Scope.from("" -> "http://bookstore")
 			elemBuilders map { elemBuilder => elemBuilder.build(scope) }
 		}</Authors>
 	</Book>
