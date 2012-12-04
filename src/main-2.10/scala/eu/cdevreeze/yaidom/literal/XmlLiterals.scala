@@ -43,7 +43,16 @@ object XmlLiterals {
         "All arguments must be of an allowed argument type (String, Node or Seq[Node])")
 
       val strings: Seq[String] = sc.parts
-      val placeholderStrings: Seq[String] = (0 until args.length) map { idx => quotedPlaceholder(idx) }
+
+      def canBeAttributeValue(i: Int): Boolean = argCanBeAttributeValue(args(i), sc.parts(i), sc.parts(i + 1))
+
+      def canBeChildNodes(i: Int): Boolean = argCanBeChildNodes(args(i), sc.parts(i), sc.parts(i + 1))
+
+      require(
+        (0 until args.size) forall { i => println(args(i)); canBeAttributeValue(i) || canBeChildNodes(i) },
+        "All arguments must be potential attribute values or child node sequences")
+      assert(
+        (0 until args.size) forall { i => !(canBeAttributeValue(i) && canBeChildNodes(i)) })
 
       val xmlWithPlaceholders: String = {
         val sb = new StringBuilder
@@ -51,7 +60,12 @@ object XmlLiterals {
 
         val tail = strings.drop(1)
         for (i <- 0 until tail.size) {
-          sb ++= placeholderStrings(i)
+          if (canBeAttributeValue(i)) {
+            sb ++= quotedPlaceholder(i)
+          } else {
+            assert(canBeChildNodes(i))
+            sb ++= placeholderName(i)
+          }
           sb ++= tail(i)
         }
 
@@ -74,12 +88,11 @@ object XmlLiterals {
       val resultDoc: Document =
         (0 until args.length).reverse.foldLeft(doc) { (tmpDoc, idx) =>
           val placeholder = placeholderName(idx)
-          val placeholderString = quotedPlaceholder(idx)
 
           val path = parentPaths(idx)
           val e = doc.documentElement.getWithElemPath(path)
 
-          if (e.text.trim == placeholderString) {
+          if (canBeChildNodes(idx) && (e.text.trim == placeholder)) {
             val nodes = extractNodes(args(idx))
             require(!nodes.isEmpty, "Expected Node, Node sequence or String for parameter %d (0-based)".format(idx))
 
@@ -87,7 +100,7 @@ object XmlLiterals {
               val newE = e.withChildren(nodes.toIndexedSeq)
               newE
             }
-          } else if (e.attributes.map(_._2).contains(placeholder)) {
+          } else if (canBeAttributeValue(idx) && e.attributes.map(_._2).contains(placeholder)) {
             val attrOption = e.attributes find { case (attr, value) => value == placeholder }
             require(attrOption.isDefined, "Expected attribute for parameter %d (0-based)".format(idx))
             val (attrName, attrValue) = attrOption.get
@@ -104,6 +117,18 @@ object XmlLiterals {
     private def placeholderName(idx: Int): String = placeholderPrefix + idx
 
     private def quotedPlaceholder(idx: Int): String = """"%s"""".format(placeholderName(idx))
+
+    private def argCanBeAttributeValue(arg: Any, partBefore: String, partAfter: String): Boolean = arg match {
+      case s: String if partBefore.endsWith("=") => true
+      case _ => false
+    }
+
+    private def argCanBeChildNodes(arg: Any, partBefore: String, partAfter: String): Boolean = arg match {
+      case s: String if partBefore.trim.endsWith(">") && partAfter.trim.startsWith("</") => true
+      case n: Node if partBefore.trim.endsWith(">") && partAfter.trim.startsWith("</") => true
+      case xs if isNodeSeq(xs) && partBefore.trim.endsWith(">") && partAfter.trim.startsWith("</") => true
+      case _ => false
+    }
 
     private def hasAllowedArgumentType(arg: Any): Boolean = arg match {
       case s: String => true
@@ -125,12 +150,17 @@ object XmlLiterals {
     }
 
     private def findArgumentParentElemPaths(doc: Document, args: Seq[Any]): Map[Int, ElemPath] = {
-      val result: Seq[(Int, ElemPath)] = (0 until args.length) flatMap { idx =>
-        val placeholderString = quotedPlaceholder(idx)
+      def canBeAttributeValue(i: Int): Boolean = argCanBeAttributeValue(args(i), sc.parts(i), sc.parts(i + 1))
 
+      def canBeChildNodes(i: Int): Boolean = argCanBeChildNodes(args(i), sc.parts(i), sc.parts(i + 1))
+
+      val result: Seq[(Int, ElemPath)] = (0 until args.length) flatMap { idx =>
         val elemOption = doc.documentElement findElemOrSelf { e =>
-          e.text.trim == quotedPlaceholder(idx) ||
-            e.attributes.map(_._2).contains(placeholderName(idx))
+          val matchesAttributeValue =
+            canBeAttributeValue(idx) && (e.attributes.map(_._2).contains(placeholderName(idx)))
+          val matchesChildNodes =
+            canBeChildNodes(idx) && (e.text.trim == placeholderName(idx))
+          matchesAttributeValue || matchesChildNodes
         }
         val elemPathOption = elemOption flatMap { e => doc.documentElement findElemOrSelfPath (_ == e) }
         elemPathOption map { path => (idx -> path) }

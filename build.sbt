@@ -25,7 +25,7 @@ scalacOptions <++= scalaBinaryVersion map { version =>
 }
 
 (unmanagedSourceDirectories in Test) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq(new java.io.File("src/test-reflect/scala"))
+  val newSourceDirs = Seq(new java.io.File("src/test-2.10/scala"))
   if (version.contains("2.10")) newSourceDirs else Seq()
 }
 
