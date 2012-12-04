@@ -49,7 +49,7 @@ object XmlLiterals {
       def canBeChildNodes(i: Int): Boolean = argCanBeChildNodes(args(i), sc.parts(i), sc.parts(i + 1))
 
       require(
-        (0 until args.size) forall { i => println(args(i)); canBeAttributeValue(i) || canBeChildNodes(i) },
+        (0 until args.size) forall { i => canBeAttributeValue(i) || canBeChildNodes(i) },
         "All arguments must be potential attribute values or child node sequences")
       assert(
         (0 until args.size) forall { i => !(canBeAttributeValue(i) && canBeChildNodes(i)) })
