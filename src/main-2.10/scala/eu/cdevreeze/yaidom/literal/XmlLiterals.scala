@@ -18,6 +18,8 @@ package eu.cdevreeze.yaidom
 package literal
 
 import java.io._
+import javax.xml.parsers.SAXParserFactory
+import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
 
 /**
  * Helper object for creating yaidom XML literals.
@@ -173,8 +175,26 @@ object XmlLiterals {
     }
 
     private def getParser: parse.DocumentParser = {
-      val result = parse.DocumentParserUsingSax.newInstance
-      // TODO Configure
+      val spf = SAXParserFactory.newInstance
+      spf.setFeature("http://xml.org/sax/features/namespaces", true)
+      spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
+      trait MyEntityResolver extends EntityResolver {
+        override def resolveEntity(publicId: String, systemId: String): InputSource = {
+          new InputSource(new StringReader(""))
+        }
+      }
+
+      trait MyErrorHandler extends ErrorHandler {
+        override def warning(exc: SAXParseException) { throw exc }
+        override def error(exc: SAXParseException) { throw exc }
+        override def fatalError(exc: SAXParseException) { throw exc }
+      }
+
+      val result = parse.DocumentParserUsingSax.newInstance(
+        spf,
+        () => new parse.DefaultElemProducingSaxHandler with MyEntityResolver with MyErrorHandler)
+
       result
     }
   }
