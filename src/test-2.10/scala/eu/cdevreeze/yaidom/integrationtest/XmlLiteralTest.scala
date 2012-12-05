@@ -101,6 +101,37 @@ class XmlLiteralTest extends Suite {
   @Test def testXmlLiteral3() {
     val doc: Document = getDocument3
     
+    val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
+    val expectedBookTitles = List(
+        "A First Course in Database Systems",
+        "Database Systems: The Complete Book",
+        "Hector and Jeff's Database Hints",
+        "Jennifer's Economical Database Hints")
+        
+    expect(expectedBookTitles) {
+      bookTitles
+    }
+    
+    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
+    
+    expect(Some("85")) {
+      firstBookElemOption flatMap { e => (e \@ "Price") }
+    }
+    
+    val expectedScope = Scope.from("books" -> "http://bookstore")
+    
+    expect(expectedScope) {
+      doc.documentElement.scope
+    }
+    expect(Set(expectedScope)) {
+      val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
+      result.toSet
+    }
+  }
+
+  @Test def testXmlLiteral4() {
+    val doc: Document = getDocument4
+    
     expect(1) {
       doc.documentElement.findAllElemsOrSelf.size
     }
@@ -271,6 +302,86 @@ class XmlLiteralTest extends Suite {
   }
 
   private def getDocument3: Document = {
+    val doc =
+      xml"""
+<books:Bookstore xmlns:books="http://bookstore">
+	<books:Book ISBN="ISBN-0-13-713526-2" Price=${ 85.toString } Edition="3rd">
+		<books:Title>${ "A First Course in Database Systems" }</books:Title>
+		<books:Authors>${
+			val elemBuilders =
+			  List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map { case (firstName, lastName) =>
+			    elem(
+			      qname = QName("books:Author"),
+			      children = Vector(
+			        textElem(QName("books:First_Name"), firstName),
+			        textElem(QName("books:Last_Name"), lastName)
+			      ))
+			  }
+			val scope = Scope.from("books" -> "http://bookstore")
+			elemBuilders map { elemBuilder => elemBuilder.build(scope) }
+		}</books:Authors>
+	</books:Book>
+	<books:Book ISBN="ISBN-0-13-815504-6" Price="100">
+		<books:Title>${ "Database Systems: The Complete Book" }</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Hector</books:First_Name>
+				<books:Last_Name>Garcia-Molina</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Jeffrey</books:First_Name>
+				<books:Last_Name>Ullman</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Jennifer</books:First_Name>
+				<books:Last_Name>Widom</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+		<books:Remark>Buy this book bundled with "A First Course" - a great deal!
+		</books:Remark>
+	</books:Book>
+	<books:Book ISBN="ISBN-0-11-222222-3" Price="50">
+		<books:Title>Hector and Jeff's Database Hints</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Jeffrey</books:First_Name>
+				<books:Last_Name>Ullman</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Hector</books:First_Name>
+				<books:Last_Name>Garcia-Molina</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+		<books:Remark>An indispensable companion to your textbook</books:Remark>
+	</books:Book>
+	<books:Book ISBN="ISBN-9-88-777777-6" Price="25">
+		<books:Title>Jennifer's Economical Database Hints</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Jennifer</books:First_Name>
+				<books:Last_Name>Widom</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+	</books:Book>
+	<books:Magazine Month="January" Year="2009">
+		<books:Title>National Geographic</books:Title>
+	</books:Magazine>
+	<books:Magazine Month="February" Year="2009">
+		<books:Title>National Geographic</books:Title>
+	</books:Magazine>
+	<books:Magazine Month="February" Year="2009">
+		<books:Title>Newsweek</books:Title>
+	</books:Magazine>
+	<books:Magazine Month="March" Year="2009">
+		<books:Title>Hector and Jeff's Database Hints</books:Title>
+	</books:Magazine>
+</books:Bookstore>
+"""
+      
+    doc
+  }
+
+  private def getDocument4: Document = {
     val doc =
       xml"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />""" 
 
