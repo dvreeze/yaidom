@@ -23,6 +23,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.SAXParseException
 import NodeBuilder._
 import literal.XmlLiterals._
 
@@ -134,6 +135,38 @@ class XmlLiteralTest extends Suite {
     
     expect(1) {
       doc.documentElement.findAllElemsOrSelf.size
+    }
+  }
+
+  @Test def testWrongXmlLiterals() {
+    val doc = xml"""<a>${ "b" }</a>"""
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a>=${ "b" }</a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a>ab${ "b" }cd</a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<${ "a" }>wrong</${ "a" }>"""
+    }
+
+    intercept[SAXParseException] {
+      xml"""<a><b></a></b>"""
+    }
+
+    intercept[SAXParseException] {
+      xml"""<a><b>${ "x" }</a></b>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a x=">${ "wrong" }<">abc</a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a x="ab${ "wrong" }cd">abc</a>"""
     }
   }
 
@@ -383,7 +416,7 @@ class XmlLiteralTest extends Suite {
 
   private def getDocument4: Document = {
     val doc =
-      xml"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />""" 
+      xml"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />"""
 
     doc
   }
