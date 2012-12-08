@@ -50,10 +50,14 @@ class DependencyTest extends Suite {
   private val yaidomPackageSymbol: Symbol = typeOf[Elem].typeSymbol.owner
   private val yaidomConvertPackageSymbol: Symbol = typeOf[convert.DomConversions.type].typeSymbol.owner
   private val yaidomDomPackageSymbol: Symbol = typeOf[dom.DomElem].typeSymbol.owner
-  private val yaidoParsePackageSymbol: Symbol = typeOf[parse.DocumentParser].typeSymbol.owner
+  private val yaidomParsePackageSymbol: Symbol = typeOf[parse.DocumentParser].typeSymbol.owner
   private val yaidomPrintPackageSymbol: Symbol = typeOf[print.DocumentPrinter].typeSymbol.owner
   private val yaidomResolvedPackageSymbol: Symbol = typeOf[resolved.Elem].typeSymbol.owner
-  private val yaidomXlinkPackageSymbol: Symbol = typeOf[xlink.XLink].typeSymbol.owner
+  private val yaidomXLinkPackageSymbol: Symbol = typeOf[xlink.XLink].typeSymbol.owner
+
+  private val thisPackage = typeOf[DependencyTest].typeSymbol.owner
+
+  // Of course, I could scan the classpath instead...
 
   private val yaidomTypes: Seq[Type] = {
     List(
@@ -72,7 +76,7 @@ class DependencyTest extends Suite {
       typeOf[Elem.type],
       typeOf[ElemBuilder],
       typeOf[ElemConverter[AnyRef]],
-      typeOf[ElemLike[Elem]],
+      typeOf[ElemLike[_]],
       typeOf[ElemPath],
       typeOf[ElemPath.type],
       typeOf[ElemPath.Entry],
@@ -89,8 +93,8 @@ class DependencyTest extends Suite {
       typeOf[Node.type],
       typeOf[NodeBuilder],
       typeOf[NodeBuilder.type],
-      typeOf[ParentElemLike[Elem]],
-      typeOf[PathAwareElemLike[Elem]],
+      typeOf[ParentElemLike[_]],
+      typeOf[PathAwareElemLike[_]],
       typeOf[PrefixedName],
       typeOf[ProcessingInstruction],
       typeOf[ProcessingInstructionBuilder],
@@ -102,8 +106,93 @@ class DependencyTest extends Suite {
       typeOf[eu.cdevreeze.yaidom.TextBuilder],
       typeOf[TreeReprParsers.type],
       typeOf[UnprefixedName],
-      typeOf[UpdatableElemLike[Node, Elem]],
+      typeOf[UpdatableElemLike[_, _]],
       typeOf[XmlStringUtils.type])
+  }
+
+  private val yaidomConvertTypes: Seq[Type] = {
+    List(
+      typeOf[convert.DomConversions.type],
+      typeOf[convert.DomToYaidomConversions],
+      typeOf[convert.StaxConversions.type],
+      typeOf[convert.StaxEventsToYaidomConversions],
+      typeOf[convert.YaidomToDomConversions],
+      typeOf[convert.YaidomToDomConversions.type],
+      typeOf[convert.YaidomToStaxEventsConversions],
+      typeOf[convert.YaidomToStaxEventsConversions.type])
+  }
+
+  private val yaidomDomTypes: Seq[Type] = {
+    List(
+      typeOf[dom.DomComment],
+      typeOf[dom.DomDocument],
+      typeOf[dom.DomElem],
+      typeOf[dom.DomEntityRef],
+      typeOf[dom.DomNode],
+      typeOf[dom.DomNode.type],
+      typeOf[dom.DomParentNode],
+      typeOf[dom.DomProcessingInstruction],
+      typeOf[dom.DomText])
+  }
+
+  private val yaidomParseTypes: Seq[Type] = {
+    List(
+      typeOf[parse.DefaultElemProducingSaxHandler],
+      typeOf[parse.DefaultElemProducingSaxHandler.type],
+      typeOf[parse.DocumentParser],
+      typeOf[parse.DocumentParserUsingDom],
+      typeOf[parse.DocumentParserUsingDom.type],
+      typeOf[parse.DocumentParserUsingDomLS],
+      typeOf[parse.DocumentParserUsingDomLS.type],
+      typeOf[parse.DocumentParserUsingSax],
+      typeOf[parse.DocumentParserUsingSax.type],
+      typeOf[parse.DocumentParserUsingStax],
+      typeOf[parse.DocumentParserUsingStax.type],
+      typeOf[parse.ElemProducingSaxHandler],
+      typeOf[parse.SaxHandlerWithLocator])
+  }
+
+  private val yaidomPrintTypes: Seq[Type] = {
+    List(
+      typeOf[print.DocumentPrinter],
+      typeOf[print.DocumentPrinterUsingDom],
+      typeOf[print.DocumentPrinterUsingDom.type],
+      typeOf[print.DocumentPrinterUsingDomLS],
+      typeOf[print.DocumentPrinterUsingDomLS.type],
+      typeOf[print.DocumentPrinterUsingSax],
+      typeOf[print.DocumentPrinterUsingSax.type],
+      typeOf[print.DocumentPrinterUsingStax],
+      typeOf[print.DocumentPrinterUsingStax.type])
+  }
+
+  private val yaidomResolvedTypes: Seq[Type] = {
+    List(
+      typeOf[resolved.Node],
+      typeOf[resolved.Node.type],
+      typeOf[resolved.Elem],
+      typeOf[resolved.Elem.type],
+      typeOf[resolved.Text],
+      typeOf[resolved.Text.type])
+  }
+
+  private val yaidomXLinkTypes: Seq[Type] = {
+    List(
+      typeOf[xlink.XLink],
+      typeOf[xlink.XLink.type],
+      typeOf[xlink.Link],
+      typeOf[xlink.Link.type],
+      typeOf[xlink.SimpleLink],
+      typeOf[xlink.SimpleLink.type],
+      typeOf[xlink.ExtendedLink],
+      typeOf[xlink.ExtendedLink.type],
+      typeOf[xlink.Arc],
+      typeOf[xlink.Arc.type],
+      typeOf[xlink.Locator],
+      typeOf[xlink.Locator.type],
+      typeOf[xlink.Resource],
+      typeOf[xlink.Resource.type],
+      typeOf[xlink.Title],
+      typeOf[xlink.Title.type])
   }
 
   private val yaidomTypeSymbols: Seq[Symbol] = {
@@ -372,6 +461,76 @@ class DependencyTest extends Suite {
       expectedDependenciesOfElem)
   }
 
+  @Test def testDependenciesOfYaidomPackage() {
+    val tpes = yaidomTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
+  @Test def testDependenciesOfYaidomConvertPackage() {
+    val tpes = yaidomConvertTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol, yaidomConvertPackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
+  @Test def testDependenciesOfYaidomParsePackage() {
+    val tpes = yaidomParseTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol, yaidomParsePackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
+  @Test def testDependenciesOfYaidomPrintPackage() {
+    val tpes = yaidomPrintTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol, yaidomPrintPackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
+  @Test def testDependenciesOfYaidomDomPackage() {
+    val tpes = yaidomDomTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol, yaidomDomPackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
+  @Test def testDependenciesOfYaidomResolvedPackage() {
+    val tpes = yaidomResolvedTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol, yaidomResolvedPackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
+  @Test def testDependenciesOfYaidomXLinkPackage() {
+    val tpes = yaidomXLinkTypes
+
+    val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
+
+    expect(Set(yaidomPackageSymbol, yaidomXLinkPackageSymbol)) {
+      packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
+    }
+  }
+
   private def testDependenciesWithinYaidomTopLevel(tpe: Type, sampleMethodName: String, allowedTypes: Set[Type]) {
     val terms: Iterable[Symbol] = tpe.members filter { _.isTerm }
     val baseClasses: Seq[Symbol] = tpe.baseClasses
@@ -380,16 +539,14 @@ class DependencyTest extends Suite {
     assert(terms exists (term => term.isMethod && term.asMethod.name == stringToTermName(sampleMethodName)),
       "Expected method %s to exist in type %s".format(sampleMethodName, tpe))
 
-    val packages: Set[Symbol] = {
-      val baseClassResult = baseClasses flatMap { baseClass => findPackageSymbol(baseClass) }
-      val termResult = termTypeSignatures flatMap { tpeSig => findPackageSymbol(tpeSig.typeSymbol) }
-      val result = baseClassResult ++ termResult
-      assert(result forall (_.isPackage))
-      result.toSet
-    }
+    val packages: Set[Symbol] = getPackageDependencies(tpe)
 
-    assert(packages forall (pkgSym => isScalaOrJavaPackage(pkgSym) || isYaidomTopLevelPackage(pkgSym)),
-      "Expected the packages to be standard Java or Scala package, or the top level yaidom package, and nothing else (for dependencies of %s)".format(tpe))
+    val unexpectedPackages: Set[Symbol] =
+      packages filterNot { pkgSym => isScalaOrJavaPackage(pkgSym) || isYaidomTopLevelPackage(pkgSym) || (pkgSym == thisPackage) }
+
+    expect(Set()) {
+      unexpectedPackages
+    }
 
     val allowedTypeSymbols = allowedTypes map { _.typeSymbol }
 
@@ -404,12 +561,53 @@ class DependencyTest extends Suite {
     }
   }
 
+  private def getPackageDependencies(tpe: Type): Set[Symbol] = {
+    val terms: Iterable[Symbol] = tpe.members filter { _.isTerm }
+    val baseClasses: Seq[Symbol] = tpe.baseClasses
+
+    val termTypeSignatures = terms map { _.typeSignatureIn(tpe) }
+
+    val termTypes: Set[Type] = termTypeSignatures.toSet flatMap { (tpe: Type) =>
+      tpe match {
+        case methodType: MethodType => methodSignatureTypes(methodType)
+        case tpe: Type => Set(tpe)
+      }
+    }
+
+    val packages: Set[Symbol] = {
+      val baseClassResult = baseClasses flatMap { baseClass => findPackageSymbol(baseClass) }
+      val termResult = termTypes flatMap { tpeSig => findPackageSymbol(tpeSig.typeSymbol) }
+      val result = baseClassResult ++ termResult
+      assert(result forall (_.isPackage))
+      result.toSet
+    }
+    packages
+  }
+
+  private def methodSignatureTypes(methodType: MethodType): Set[Type] = {
+    val resultType = methodType.resultType
+    val paramTypes = methodType.params map { par => par.typeSignature }
+    paramTypes.toSet + resultType
+  }
+
+  private def getPackageDependencies(tpes: Iterable[Type]): Set[Symbol] = {
+    tpes.toSet flatMap { (tpe: Type) => getPackageDependencies(tpe) }
+  }
+
   private def isJavaPackage(sym: Symbol): Boolean = {
-    (sym.isPackage) && ((sym.fullName.startsWith("java.")) || (sym.fullName.startsWith("javax.")))
+    sym.isPackage && {
+      sym.fullName.startsWith("java.") ||
+        sym.fullName.startsWith("javax.") ||
+        sym.fullName.startsWith("org.w3c") ||
+        sym.fullName.startsWith("org.xml")
+    }
   }
 
   private def isScalaPackage(sym: Symbol): Boolean = {
-    (sym.isPackage) && ((sym.fullName == "scala") || (sym.fullName.startsWith("scala.")))
+    sym.isPackage && {
+      sym.fullName == "scala" ||
+        sym.fullName.startsWith("scala.")
+    }
   }
 
   private def isScalaOrJavaPackage(sym: Symbol): Boolean = isScalaPackage(sym) || isJavaPackage(sym)

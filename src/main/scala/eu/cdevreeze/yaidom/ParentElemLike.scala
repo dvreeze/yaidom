@@ -342,7 +342,12 @@ import scala.collection.{ immutable, mutable }
  */
 trait ParentElemLike[E <: ParentElemLike[E]] { self: E =>
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ParentElemLike` methods will be. */
+  /**
+   * Returns all child elements, in the correct order. The faster this method is, the faster the other `ParentElemLike` methods will be.
+   *
+   * Note that this method is named "allChildElems" instead of "findAllChildElems". The latter name would be more consistent
+   * with the rest of this API, but the chosen name illustrates that `allChildElems` is seen more as "data" than a "computation".
+   */
   def allChildElems: immutable.IndexedSeq[E]
 
   /** Returns the child elements obeying the given predicate */
