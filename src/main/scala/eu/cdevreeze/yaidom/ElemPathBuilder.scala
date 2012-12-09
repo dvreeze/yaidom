@@ -84,7 +84,7 @@ object ElemPathBuilder {
     def build(scope: Scope): ElemPath.Entry = {
       require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
-      val ename: EName = scope.resolveQName(qname).getOrElse(sys.error("Could not resolve qname '%s' in scope %s".format(qname, scope)))
+      val ename: EName = scope.resolveQNameOption(qname).getOrElse(sys.error("Could not resolve qname '%s' in scope %s".format(qname, scope)))
       ElemPath.Entry(ename, index)
     }
 

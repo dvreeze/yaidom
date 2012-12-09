@@ -263,7 +263,7 @@ object ElemPath {
       require(positionString.endsWith("]"), "The canonical XPath for the 'entry' must have a position ending with ']', such as [1]")
 
       val qname = QName.parse(qnameString)
-      val elementName = scope.resolveQName(qname).getOrElse(sys.error("Could not resolve QName '%s'".format(qname)))
+      val elementName = scope.resolveQNameOption(qname).getOrElse(sys.error("Could not resolve QName '%s'".format(qname)))
       val position = positionString.drop(1).dropRight(1).toInt
 
       Entry(elementName, position - 1)

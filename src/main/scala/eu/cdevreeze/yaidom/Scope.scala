@@ -214,14 +214,14 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
    * to this `Scope`.
    *
-   * Note that the `subScopeOf` relation keeps the `resolveQName` result the same, provided there is no default namespace.
+   * Note that the `subScopeOf` relation keeps the `resolveQNameOption` result the same, provided there is no default namespace.
    * That is, if `scope1.withoutDefaultNamespace.subScopeOf(scope2.withoutDefaultNamespace)`, then for each QName `qname`
-   * such that `scope1.withoutDefaultNamespace.resolveQName(qname).isDefined`, we have:
+   * such that `scope1.withoutDefaultNamespace.resolveQNameOption(qname).isDefined`, we have:
    * {{{
-   * scope1.withoutDefaultNamespace.resolveQName(qname) == scope2.withoutDefaultNamespace.resolveQName(qname)
+   * scope1.withoutDefaultNamespace.resolveQNameOption(qname) == scope2.withoutDefaultNamespace.resolveQNameOption(qname)
    * }}}
    */
-  def resolveQName(qname: QName): Option[EName] = qname match {
+  def resolveQNameOption(qname: QName): Option[EName] = qname match {
     case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(EName(unprefixedName.localPart))
     case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
@@ -285,9 +285,9 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /**
    * Returns `scope.retainingDefaultNamespace ++ this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)`
    *
-   * Note that for each QName `qname` for which `scope.resolveQName(qname).isDefined`, we have:
+   * Note that for each QName `qname` for which `scope.resolveQNameOption(qname).isDefined`, we have:
    * {{{
-   * scope.resolveQName(qname) == this.notUndeclaringPrefixes(scope).resolveQName(qname)
+   * scope.resolveQNameOption(qname) == this.notUndeclaringPrefixes(scope).resolveQNameOption(qname)
    * }}}
    * and that:
    * {{{
@@ -328,7 +328,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * {{{
    * scope.subScopeOf(this.notUndeclaring(scope))
    * }}}
-   * This does not necessarily mean that `scope.resolveQName(qname) == this.notUndeclaring(scope).resolveQName(qname)`.
+   * This does not necessarily mean that `scope.resolveQNameOption(qname) == this.notUndeclaring(scope).resolveQNameOption(qname)`.
    * After all, for any unqualified name `qname`, if this scope has a default namespace but the passed scope does not, the LHS
    * uses no namespace to resolve `qname`, whereas the RHS uses the default namespace.
    */

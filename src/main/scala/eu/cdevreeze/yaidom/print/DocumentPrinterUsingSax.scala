@@ -164,7 +164,7 @@ final class DocumentPrinterUsingSax(
     // 1. Normal attributes
 
     for ((attQName, attValue) <- elm.attributes) {
-      val attEName = elm.attributeScope.resolveQName(attQName).getOrElse(sys.error("Corrupt non-resolvable attribute: %s".format(attQName)))
+      val attEName = elm.attributeScope.resolveQNameOption(attQName).getOrElse(sys.error("Corrupt non-resolvable attribute: %s".format(attQName)))
       val uri = attEName.namespaceUriOption.getOrElse("")
       val localName = attQName.localPart // Correct?
       val qname = attQName.toString

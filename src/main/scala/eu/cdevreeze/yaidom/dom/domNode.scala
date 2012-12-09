@@ -80,7 +80,7 @@ final class DomElem(
   override def resolvedName: EName = {
     // This is of course a very inefficient implementation
 
-    scope.resolveQName(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+    scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
   }
 
   /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
@@ -90,7 +90,7 @@ final class DomElem(
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attrScope.resolveQName(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
+      val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
       (expandedName -> attValue)
     }
   }

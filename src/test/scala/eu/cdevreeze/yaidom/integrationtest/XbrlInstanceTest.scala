@@ -225,7 +225,7 @@ object XbrlInstanceTest {
     require(contexts.size == (contexts map (_.id)).size)
     require(units.size == (units map (_.id)).size)
 
-    require(rootScope.resolveQName(rootQName) == Some(EName(nsXbrli, "xbrl")))
+    require(rootScope.resolveQNameOption(rootQName) == Some(EName(nsXbrli, "xbrl")))
 
     require(schemaRefs forall { schemaRef => schemaRef.hrefOption.isDefined })
     require(linkbaseRefs forall { linkbaseRef => linkbaseRef.hrefOption.isDefined })

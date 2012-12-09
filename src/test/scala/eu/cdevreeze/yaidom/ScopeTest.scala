@@ -225,28 +225,28 @@ class ScopeTest extends Suite {
     val scope1 = Scope.from()
 
     expect(Some(EName("book"))) {
-      scope1.resolveQName(QName("book"))
+      scope1.resolveQNameOption(QName("book"))
     }
     expect(None) {
-      scope1.resolveQName(QName("book:book"))
+      scope1.resolveQNameOption(QName("book:book"))
     }
 
     val scope2 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
     expect(Some(EName("{http://a}book"))) {
-      scope2.resolveQName(QName("book"))
+      scope2.resolveQNameOption(QName("book"))
     }
     expect(None) {
-      scope2.resolveQName(QName("book:book"))
+      scope2.resolveQNameOption(QName("book:book"))
     }
     expect(Some(EName("{http://a}book"))) {
-      scope2.resolveQName(QName("a:book"))
+      scope2.resolveQNameOption(QName("a:book"))
     }
     expect(Some(EName("{http://ccc}bookstore"))) {
-      scope2.resolveQName(QName("c:bookstore"))
+      scope2.resolveQNameOption(QName("c:bookstore"))
     }
     expect(Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))) {
-      scope2.resolveQName(QName("xml:lang"))
+      scope2.resolveQNameOption(QName("xml:lang"))
     }
   }
 
@@ -267,11 +267,11 @@ class ScopeTest extends Suite {
     val expectedENames = List(EName("http://e", "x"), EName("http://b", "y"), EName("http://ccc", "z"), EName("http://d", "z"))
 
     expect(expectedENames) {
-      qnames map { qname => scope2.resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+      qnames map { qname => scope2.resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
 
     expect(expectedENames) {
-      qnames map { qname => scope1.notUndeclaringPrefixes(scope2).resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+      qnames map { qname => scope1.notUndeclaringPrefixes(scope2).resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
   }
 
@@ -288,11 +288,11 @@ class ScopeTest extends Suite {
     }
 
     expect(Some(EName("x"))) {
-      scope2.resolveQName(QName("x"))
+      scope2.resolveQNameOption(QName("x"))
     }
 
     expect(Some(EName("http://a", "x"))) {
-      scope1.notUndeclaring(scope2).resolveQName(QName("x"))
+      scope1.notUndeclaring(scope2).resolveQNameOption(QName("x"))
     }
 
     val qnames = List(QName("b", "y"), QName("c", "z"), QName("d", "z"))
@@ -300,11 +300,11 @@ class ScopeTest extends Suite {
     val expectedENames = List(EName("http://b", "y"), EName("http://ccc", "z"), EName("http://d", "z"))
 
     expect(expectedENames) {
-      qnames map { qname => scope2.resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+      qnames map { qname => scope2.resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
 
     expect(expectedENames) {
-      qnames map { qname => scope1.notUndeclaring(scope2).resolveQName(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+      qnames map { qname => scope1.notUndeclaring(scope2).resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
   }
 }

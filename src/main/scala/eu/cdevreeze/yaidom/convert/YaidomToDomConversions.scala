@@ -154,7 +154,7 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
       if (attrQName.prefixOption.isEmpty) {
         element.setAttribute(attrQName.localPart, attrValue)
       } else {
-        val attrEName = elm.attributeScope.resolveQName(attrQName).getOrElse(sys.error(
+        val attrEName = elm.attributeScope.resolveQNameOption(attrQName).getOrElse(sys.error(
           "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, elm.attributeScope)))
         val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
         element.setAttributeNS(attrJavaQName.getNamespaceURI, attrQName.toString, attrValue)
