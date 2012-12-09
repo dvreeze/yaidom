@@ -88,7 +88,6 @@ class DependencyTest extends Suite {
       typeOf[EntityRef],
       typeOf[EntityRefBuilder],
       typeOf[HasText],
-      typeOf[IndexedDocument],
       typeOf[Node],
       typeOf[Node.type],
       typeOf[NodeBuilder],

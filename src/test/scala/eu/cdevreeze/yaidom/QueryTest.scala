@@ -642,49 +642,6 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingIndexedDocument() {
-    // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
-
-    // This implementation is similar to the preceding one, except that the index on ElemPath is easily obtained, but not stored
-
-    require(bookstore.localName == "Bookstore")
-
-    val indexedDoc = new IndexedDocument(Document(bookstore))
-
-    val elms =
-      for {
-        elm <- indexedDoc.document.documentElement.findAllElems
-        parent <- indexedDoc.findParent(elm)
-        if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
-      } yield elm
-
-    assert(elms.size > 10, "Expected more than 10 matching elements")
-    val qnames: Set[QName] = {
-      val result = elms map { _.qname }
-      result.toSet
-    }
-    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
-      qnames
-    }
-
-    // Again, without an IndexedDocument, we could do a lot better, using the PathAwareElemLike API...
-
-    val paths =
-      for {
-        path <- bookstore.findAllElemPaths
-        parentPath = path.parentPath
-        parent = bookstore.getWithElemPath(parentPath)
-        if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
-      } yield path
-
-    assert(paths.size > 10, "Expected more than 10 matching element paths")
-
-    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
-      val result = paths map { path => bookstore.getWithElemPath(path).qname }
-      result.toSet
-    }
-  }
-
   @Test def testQueryBooksOrMagazinesWithNonUniqueTitles() {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 

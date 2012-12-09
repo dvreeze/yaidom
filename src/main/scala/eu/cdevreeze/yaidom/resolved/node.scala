@@ -45,8 +45,7 @@ import scala.collection.{ immutable, mutable }
  * </ul>
  * Note that a validating parser knows the content model, so knows precisely which whitespace is "ignorable", for example, but once the parsed
  * XML is turned into untyped yaidom nodes, this information is lost. (Of course in principle PSVI data could be added to `Elem`s,
- * just like `ElemPath`s are added to elements in class `IndexedDocument`, using the element UIDs as keys, but that is beyond the scope
- * of yaidom.)
+ * indexed by "element paths", but that is beyond the scope of yaidom.)
  *
  * Class [[eu.cdevreeze.yaidom.resolved.Elem]] has some methods to mitigate the above-mentioned small differences among elements (except
  * for the first difference, related to untyped data).

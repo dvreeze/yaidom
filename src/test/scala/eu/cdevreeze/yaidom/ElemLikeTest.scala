@@ -426,22 +426,26 @@ class ElemLikeTest extends Suite {
   }
 
   @Test def testFindParentInTree() {
+    // Actually a test of sub-trait PathAwareElemLike...
+
     require(bookstore.localName == "Bookstore")
 
     val bookElms = bookstore filterElems { _.localName == "Book" }
 
-    val indexedBookstoreDoc = new IndexedDocument(Document(bookstore))
-
     expect(Set(bookstore)) {
-      val result = bookElms map { e => indexedBookstoreDoc.findParent(e) }
-      result.flatten.toSet
+      val paths = bookstore.findAllElemOrSelfPaths filter { path => bookElms.contains(bookstore.getWithElemPath(path)) }
+      val parentPaths = paths flatMap { _.parentPathOption }
+      val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => bookstore.getWithElemPath(path) }
+      result
     }
 
     val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
     expect(Set(EName(ns, "Author"))) {
-      val result = lastNameElms map { e => indexedBookstoreDoc.findParent(e) } flatMap { eOption => eOption map { _.resolvedName } }
-      result.toSet
+      val paths = bookstore.findAllElemOrSelfPaths filter { path => lastNameElms.contains(bookstore.getWithElemPath(path)) }
+      val parentPaths = paths flatMap { _.parentPathOption }
+      val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => bookstore.getWithElemPath(path) }
+      result map { e => e.resolvedName }
     }
 
     val cheapBookElms =
@@ -450,10 +454,11 @@ class ElemLikeTest extends Suite {
     val cheapBookAuthorElms = cheapBookElm filterElems { _.localName == "Author" }
 
     expect(cheapBookAuthorElms.toSet) {
-      val indexedCheapBookDoc = new IndexedDocument(Document(cheapBookElm))
-
-      val result = lastNameElms flatMap { e => indexedCheapBookDoc.findParent(e) }
-      result.toSet
+      // Taking cheapBookElm as root! Finding parents of lastNameElms.
+      val paths = cheapBookElm.findAllElemOrSelfPaths filter { path => lastNameElms.contains(cheapBookElm.getWithElemPath(path)) }
+      val parentPaths = paths flatMap { _.parentPathOption }
+      val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => cheapBookElm.getWithElemPath(path) }
+      result
     }
   }
 
