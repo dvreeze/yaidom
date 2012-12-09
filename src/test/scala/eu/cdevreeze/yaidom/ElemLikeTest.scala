@@ -493,11 +493,11 @@ class ElemLikeTest extends Suite {
     val scope = Scope.from(Map("b" -> ns.toString))
 
     expect(Some(QName("Last_Name"))) {
-      val path = ElemPath.fromXPaths(List("/b:Book[1]", "/b:Authors[1]", "/b:Author[1]", "/b:Last_Name[1]"))(scope)
+      val path = ElemPathBuilder.from(QName("Book") -> 0, QName("Authors") -> 0, QName("Author") -> 0, QName("Last_Name") -> 0).build(scope)
       bookstore.findWithElemPath(path) map { _.qname }
     }
     expect(Some("Ullman")) {
-      val path = ElemPath.fromXPaths(List("/b:Book[1]", "/b:Authors[1]", "/b:Author[1]", "/b:Last_Name[1]"))(scope)
+      val path = ElemPathBuilder.from(QName("Book") -> 0, QName("Authors") -> 0, QName("Author") -> 0, QName("Last_Name") -> 0).build(scope)
       bookstore.findWithElemPath(path) map { _.trimmedText }
     }
 
@@ -521,7 +521,7 @@ class ElemLikeTest extends Suite {
       }
     }
     expect(None) {
-      val path = ElemPath.fromXPaths(List("/b:Book[3]", "/b:Title[3]"))(scope)
+      val path = ElemPathBuilder.from(QName("Book") -> 2, QName("Title") -> 2).build(scope)
       bookstore.findWithElemPath(path)
     }
   }

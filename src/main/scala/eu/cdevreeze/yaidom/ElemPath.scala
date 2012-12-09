@@ -169,14 +169,6 @@ object ElemPath {
   /** Easy to use factory method for `ElemPath` instances */
   def from(entries: ElemPath.Entry*): ElemPath = new ElemPath(Vector(entries: _*))
 
-  /** Creates an `ElemPath` from a sequence of entry XPath strings. The passed scope must be invertible. */
-  def fromXPaths(paths: immutable.Seq[String])(scope: Scope): ElemPath = {
-    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
-
-    val entries = paths map { path => ElemPath.Entry(path)(scope) }
-    apply(entries.toIndexedSeq)
-  }
-
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath`. The passed scope must be invertible. */
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
     require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
