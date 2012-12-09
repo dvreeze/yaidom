@@ -74,12 +74,6 @@ object EName {
     case _ => EName(Some(jqname.getNamespaceURI), jqname.getLocalPart)
   }
 
-  /** Gets an optional prefix from a `javax.xml.namespace.QName` */
-  def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
-    val prefix: String = jqname.getPrefix
-    if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
-  }
-
   /** Parses a `String` into an `EName`. The `String` must conform to the `toString` format of an `EName` */
   def parse(s: String): EName = s match {
     case s if s.startsWith("{") =>

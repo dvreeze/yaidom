@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom
 
+import javax.xml.XMLConstants
+import javax.xml.namespace.{ QName => JQName }
+
 /**
  * Qualified name. See http://www.w3.org/TR/xml-names11/.
  * Semantically like a `QName` in Anti-XML, and not like a `QName` in Java.
@@ -65,8 +68,8 @@ final case class PrefixedName(prefix: String, override val localPart: String) ex
 object QName {
 
   /** Creates a `QName` from an optional prefix and a localPart */
-  def apply(prefix: Option[String], localPart: String): QName =
-    prefix map { pref => PrefixedName(pref, localPart) } getOrElse (UnprefixedName(localPart))
+  def apply(prefixOption: Option[String], localPart: String): QName =
+    prefixOption map { pref => PrefixedName(pref, localPart) } getOrElse (UnprefixedName(localPart))
 
   /** Creates a `PrefixedName` from a prefix and a localPart */
   def apply(prefix: String, localPart: String): QName = PrefixedName(prefix, localPart)
@@ -84,5 +87,11 @@ object QName {
       case 2 => PrefixedName(arr(0), arr(1))
       case _ => sys.error("Did not expect more than 1 colon in QName '%s'".format(s))
     }
+  }
+
+  /** Gets an optional prefix from a `javax.xml.namespace.QName` */
+  def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
+    val prefix: String = jqname.getPrefix
+    if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
 }

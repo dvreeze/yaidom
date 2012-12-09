@@ -301,12 +301,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val currScope = parentScope.resolve(declarations)
 
     val elemEName = EName.fromJavaQName(startElement.getName)
-    val elemPrefixOption: Option[String] = EName.prefixOptionFromJavaQName(startElement.getName)
+    val elemPrefixOption: Option[String] = QName.prefixOptionFromJavaQName(startElement.getName)
 
     val currAttrs: immutable.IndexedSeq[(QName, String)] = {
       val attributes: List[Attribute] = startElement.getAttributes.asScala.toList collect { case a: Attribute => a }
       val result = attributes map { a =>
-        val prefixOption: Option[String] = EName.prefixOptionFromJavaQName(a.getName)
+        val prefixOption: Option[String] = QName.prefixOptionFromJavaQName(a.getName)
         val name = EName.fromJavaQName(a.getName).toQName(prefixOption)
         (name -> a.getValue)
       }
