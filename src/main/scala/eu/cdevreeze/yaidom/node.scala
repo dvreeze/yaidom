@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom
 
 import java.{ util => jutil }
 import java.net.URI
-import java.rmi.server.UID
 import scala.annotation.tailrec
 import scala.collection.{ immutable, mutable }
 import PrettyPrinting._
@@ -51,15 +50,6 @@ import PrettyPrinting._
  * @author Chris de Vreeze
  */
 sealed trait Node extends Immutable with Serializable {
-
-  /**
-   * Returns a unique ID of the node. It can be used to associate metadata such as `ElemPath`s with elements, for example.
-   * The UIDs would then be the Map keys, and the metadata the mapped values.
-   *
-   * Be careful: if a node is "functionally updated", effectively creating a new node, the old UID still only refers to the old
-   * node before the "update".
-   */
-  def uid: UID
 
   /**
    * Returns the tree representation String, conforming to the tree representation DSL that creates `NodeBuilder`s.
@@ -135,8 +125,6 @@ final class Elem(
   require(children ne null)
 
   require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
-
-  override val uid: UID = new UID
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = Scope(scope.map - "")
@@ -226,30 +214,6 @@ final class Elem(
   override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
-  }
-
-  /**
-   * Returns a `Map` from the element UIDs in the tree with this element as root to the `ElemPath`s relative to this root.
-   * This effectively enriches this element and its descendant elements with their `ElemPath`s relative to this element.
-   */
-  def getElemPaths: Map[UID, ElemPath] = {
-    val result = mutable.Map[UID, ElemPath]()
-
-    // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: Elem, path: ElemPath): Unit = {
-      result += (elm.uid -> path)
-
-      val childPaths = elm.allChildElemPathEntries map { entry => path.append(entry) }
-      val childElms = elm.allChildElems
-      assert(childPaths.size == childElms.size)
-
-      val childElmPathPairs = childElms.zip(childPaths)
-
-      childElmPathPairs foreach { pair => accumulate(pair._1, pair._2) }
-    }
-
-    accumulate(self, ElemPath.Root)
-    result.toMap
   }
 
   /**
@@ -416,8 +380,6 @@ final case class Text(text: String, isCData: Boolean) extends Node {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
 
-  override val uid: UID = new UID
-
   /** Returns `text.trim`. */
   def trimmedText: String = text.trim
 
@@ -437,8 +399,6 @@ final case class Text(text: String, isCData: Boolean) extends Node {
 final case class ProcessingInstruction(target: String, data: String) extends Node {
   require(target ne null)
   require(data ne null)
-
-  override val uid: UID = new UID
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val targetStringLiteral = toStringLiteral(target)
@@ -461,8 +421,6 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 final case class EntityRef(entity: String) extends Node {
   require(entity ne null)
 
-  override val uid: UID = new UID
-
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val entityStringLiteral = toStringLiteral(entity)
     LineSeq("entityRef(%s)".format(entityStringLiteral)).shift(indent)
@@ -472,8 +430,6 @@ final case class EntityRef(entity: String) extends Node {
 @SerialVersionUID(1L)
 final case class Comment(text: String) extends Node {
   require(text ne null)
-
-  override val uid: UID = new UID
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     toConcatenatedStringLiterals(text).prepend("comment(").append(")").shift(indent)
