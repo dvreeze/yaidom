@@ -23,7 +23,7 @@ import java.{ lang => jlang }
  *
  * @author Chris de Vreeze
  */
-object XmlStringUtils {
+private[yaidom] object XmlStringUtils {
 
   /** Returns true if the name is probably a valid XML name (even if reserved or containing a colon) */
   def isProbablyValidXmlName(s: String): Boolean = {
