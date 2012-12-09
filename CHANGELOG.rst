@@ -3,6 +3,26 @@ CHANGELOG
 =========
 
 
+0.6.5
+=====
+
+This version prepares the future upgrade to version 0.7.0, which will take stability of the API far more seriously (with proper
+deprecation of obsolete code). Much cleanup of the API has therefore be done in this release 0.6.5. Many (mostly small) breaking API changes
+have been performed in this release. The foundations of the API are clear, and the packages, types and their methods now all
+have a clear purpose. Moreover, consistency of the API has improved somewhat. As a result of this API cleanup, it is to be
+expected that future release 0.7.0 will be pretty much like this release, except for cleaned up documentation.
+
+* Breaking API changes: The ``updated`` methods now return single elements instead of node collections, so they can now be called on the "root element path"
+* Breaking API change: Renamed ``Scope.resolveQName`` to ``Scope.resolveQNameOption``
+* Breaking API change: Removed ``IndexedDocument``
+* Breaking API change: Removed ``Node.uid`` (and method ``getElemPaths``)
+* Breaking API change: Made ``XmlStringUtils`` internal to yaidom
+* Breaking API change: Moved method ``prefixOptionFromJavaQName`` from ``EName`` to ``QName``
+* Breaking API change: Removed ``ElemPath.fromXPaths``
+* Breaking API change: Renamed ``DomNode.wrapOption`` to ``DomNode.wrapNodeOption``
+* Added method ``Elem.plusAttribute`` (now that attributes can be ordered)
+* Experimental, and only for Scala 2.10: XML literals (a first naive version)
+
 0.6.4
 =====
 

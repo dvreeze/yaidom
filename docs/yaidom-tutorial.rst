@@ -414,17 +414,17 @@ The following code snippet shows resolution of qualified names as expanded names
 
   val scope1 = Scope.from() // empty scope
 
-  scope1.resolveQName(QName("book")) // Some(EName("book"))
-  scope1.resolveQName(QName("book:book")) // None
+  scope1.resolveQNameOption(QName("book")) // Some(EName("book"))
+  scope1.resolveQNameOption(QName("book:book")) // None
 
   val scope2 =
     Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
-  scope2.resolveQName(QName("book")) // Some(EName("{http://a}book"))
-  scope2.resolveQName(QName("book:book")) // None
-  scope2.resolveQName(QName("a:book")) // Some(EName("{http://a}book"))
-  scope2.resolveQName(QName("c:bookstore")) // Some(EName("{http://ccc}bookstore"))
-  scope2.resolveQName(QName("xml:lang")) // Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))
+  scope2.resolveQNameOption(QName("book")) // Some(EName("{http://a}book"))
+  scope2.resolveQNameOption(QName("book:book")) // None
+  scope2.resolveQNameOption(QName("a:book")) // Some(EName("{http://a}book"))
+  scope2.resolveQNameOption(QName("c:bookstore")) // Some(EName("{http://ccc}bookstore"))
+  scope2.resolveQNameOption(QName("xml:lang")) // Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))
 
 Scopes and declarations can be calculated with. That is, given a scope, and using a declarations as "delta" against it,
 we get another scope. In other words, ``scope1.resolve(declarations1)`` results in another ``Scope``. Likewise, the
@@ -1646,6 +1646,6 @@ Yaidom is unique in offering multiple types of elements, with different strength
 are different, they pretty much share the *same query API*. In this tutorial it was shown (to some extent) how these different
 element types that share the same query API can benefit XML processing applications.
 
-Yaidom does not try to fool the user into believing that XML processing is easy. Configuring XML parsers and serializers
-(typically a one-time job per application) is still hard, among other things. Yet the *uniform query API* and Scala with its
-Collections API can make yaidom a viable alternative to XPath, XQuery and XSLT in many applications.
+Yaidom does not try to make the user believe that XML processing is easy. For example, configuring XML parsers and serializers
+(typically a one-time job per application) is still hard. Yet the *uniform query API* and Scala with its Collections API can
+make yaidom a viable alternative to XPath, XQuery and XSLT in many applications.
