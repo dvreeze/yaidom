@@ -151,8 +151,9 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
   }
 
-  /** Extracts the `QName` of an `org.w3c.dom.Attr`. If the `Attr` is a namespace declaration, the prefix or unprefixed name is "xmlns" */
+  /** Extracts the `QName` of an `org.w3c.dom.Attr`. If the `Attr` is a namespace declaration, an exception is thrown. */
   final def toQName(v: org.w3c.dom.Attr): QName = {
+    require(!isNamespaceDeclaration(v), "Namespace declaration not allowed")
     val name: String = v.getName
     val arr = name.split(':')
     assert(arr.length >= 1 && arr.length <= 2)

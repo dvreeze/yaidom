@@ -705,7 +705,7 @@ object JDomWrapperTest {
 
     final def children: immutable.IndexedSeq[JDomNode] = {
       val childList = wrappedNode.getContent.asScala.toIndexedSeq
-      childList flatMap { ch => JDomNode.wrapOption(ch) }
+      childList flatMap { ch => JDomNode.wrapNodeOption(ch) }
     }
 
     override def allChildElems: immutable.IndexedSeq[JDomElem] = children collect { case e: JDomElem => e }
@@ -809,7 +809,7 @@ object JDomWrapperTest {
 
   object JDomNode {
 
-    def wrapOption(node: org.jdom2.Content): Option[JDomNode] = {
+    def wrapNodeOption(node: org.jdom2.Content): Option[JDomNode] = {
       node match {
         case e: org.jdom2.Element => Some(new JDomElem(e))
         case cdata: org.jdom2.CDATA => Some(new JDomText(cdata))

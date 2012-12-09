@@ -53,7 +53,7 @@ trait DomParentNode extends DomNode {
   final def children: immutable.IndexedSeq[DomNode] = {
     val childrenNodeList = wrappedNode.getChildNodes
 
-    DomConversions.nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrapOption(node) }
+    DomConversions.nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrapNodeOption(node) }
   }
 }
 
@@ -169,7 +169,7 @@ final class DomComment(override val wrappedNode: w3c.dom.Comment) extends DomNod
 
 object DomNode {
 
-  def wrapOption(node: w3c.dom.Node): Option[DomNode] = {
+  def wrapNodeOption(node: w3c.dom.Node): Option[DomNode] = {
     node match {
       case e: w3c.dom.Element => Some(new DomElem(e))
       case cdata: w3c.dom.CDATASection => Some(new DomText(cdata))

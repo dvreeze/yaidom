@@ -635,7 +635,7 @@ object XomWrapperTest {
     override type DomType <: nu.xom.ParentNode
 
     final def children: immutable.IndexedSeq[XomNode] = {
-      (0 until wrappedNode.getChildCount).toIndexedSeq flatMap { (idx: Int) => XomNode.wrapOption(wrappedNode.getChild(idx)) }
+      (0 until wrappedNode.getChildCount).toIndexedSeq flatMap { (idx: Int) => XomNode.wrapNodeOption(wrappedNode.getChild(idx)) }
     }
   }
 
@@ -732,7 +732,7 @@ object XomWrapperTest {
 
   object XomNode {
 
-    def wrapOption(node: nu.xom.Node): Option[XomNode] = {
+    def wrapNodeOption(node: nu.xom.Node): Option[XomNode] = {
       node match {
         case e: nu.xom.Element => Some(new XomElem(e))
         case t: nu.xom.Text => Some(new XomText(t))
