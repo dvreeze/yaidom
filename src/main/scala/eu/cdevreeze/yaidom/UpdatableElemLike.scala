@@ -77,6 +77,12 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
   final def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[N], replace: Int): E =
     withChildren(children.patch(from, newChildren, replace))
 
+  /** Returns a copy in which the given child has been inserted at the given position (0-based) */
+  final def plusChild(index: Int, child: N): E = withPatchedChildren(index, Vector(child, children(index)), 1)
+
+  /** Returns a copy in which the child at the given position (0-based) has been removed */
+  final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
+
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
    * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).

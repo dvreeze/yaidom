@@ -88,6 +88,7 @@ final class DocumentPrinterUsingDom(
     val transformer = transformerCreator(transformerFactory)
     transformer.setOutputProperty(OutputKeys.ENCODING, encoding)
 
+    // TODO TrAX, DOMSource and namespaces are a very troublesome combination. See for example http://java.net/jira/browse/JAXP-46.
     val domSource = new DOMSource(domDocument)
 
     // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
@@ -106,6 +107,7 @@ final class DocumentPrinterUsingDom(
 
     val transformer = transformerCreator(transformerFactory)
 
+    // TODO TrAX, DOMSource and namespaces are a very troublesome combination. See for example http://java.net/jira/browse/JAXP-46.
     val domSource = new DOMSource(domDocument)
 
     // See bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
