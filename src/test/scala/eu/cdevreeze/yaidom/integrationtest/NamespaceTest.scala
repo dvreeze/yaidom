@@ -87,6 +87,32 @@ class NamespaceTest extends Suite {
     }
   }
 
+  @Test def testFeed3() {
+    testFeed("feed3.xml")
+
+    val docParser = DocumentParserUsingSax.newInstance
+    val doc = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed3.xml"))
+    val rootElm = doc.documentElement
+
+    expect(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
+      rootElm.findAllElemsOrSelf map { _.qname }
+    }
+
+    val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
+
+    expect(Declarations.from("" -> nsAtom, "xhtml" -> nsXhtml, "my" -> nsExamples)) {
+      rootElmBuilder.namespaces
+    }
+    // Superfluous namespace declarations not restored
+    expect(Declarations.Empty) {
+      rootElmBuilder findElem { eb => eb.qname == QName("rights") } map { _.namespaces } getOrElse (Declarations.Empty)
+    }
+    // Superfluous namespace declarations not restored
+    expect(Declarations.Empty) {
+      rootElmBuilder findElem { eb => eb.qname == QName("div") } map { _.namespaces } getOrElse (Declarations.Empty)
+    }
+  }
+
   @Test def testFeedEquality() {
     val docParser = DocumentParserUsingSax.newInstance
 

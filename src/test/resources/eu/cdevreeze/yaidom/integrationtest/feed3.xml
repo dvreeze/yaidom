@@ -1,0 +1,23 @@
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:my="http://xmlportfolio.com/xmlguild-examples">
+
+  <title xmlns="http://www.w3.org/2005/Atom"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:my="http://xmlportfolio.com/xmlguild-examples">Example Feed</title>
+  <rights type="xhtml"
+          my:type="silly" xmlns="http://www.w3.org/2005/Atom"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:my="http://xmlportfolio.com/xmlguild-examples">
+    <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:my="http://xmlportfolio.com/xmlguild-examples">
+      You may not read, utter, interpret, or otherwise
+      <xhtml:strong>verbally process</xhtml:strong> the words
+      contained in this feed without <xhtml:em>express written
+      permission</xhtml:em> from the authors.
+    </xhtml:div>
+  </rights>
+
+  <!-- ... -->
+
+</feed>
