@@ -39,7 +39,7 @@ import scala.collection.{ immutable, mutable }
  * There are several reasons why equality would return false for 2 elements that should be considered equal, such as:
  * <ul>
  * <li>The text and attribute values are untyped, so equality of numbers 2 and 2.0 is not detected</li>
- * <li>The text and attribute values are untyped, so QNames in text or attribute values depend on in-scope namespaces for resolution</li>
+ * <li>QNames in text or attribute values depend on in-scope namespaces for resolution</li>
  * <li>Differences in "ignorable whitespace", meant only for pretty-printing</li>
  * <li>Text that is possibly divided over several adjacent text nodes (possibly including CDATA text nodes), but should be "coalesced"</li>
  * <li>Text that is only equal after normalizing</li>
