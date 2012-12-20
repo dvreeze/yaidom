@@ -39,6 +39,7 @@ import scala.collection.{ immutable, mutable }
  * There are several reasons why equality would return false for 2 elements that should be considered equal, such as:
  * <ul>
  * <li>The text and attribute values are untyped, so equality of numbers 2 and 2.0 is not detected</li>
+ * <li>The text and attribute values are untyped, so QNames in text or attribute values depend on in-scope namespaces for resolution</li>
  * <li>Differences in "ignorable whitespace", meant only for pretty-printing</li>
  * <li>Text that is possibly divided over several adjacent text nodes (possibly including CDATA text nodes), but should be "coalesced"</li>
  * <li>Text that is only equal after normalizing</li>
@@ -46,6 +47,11 @@ import scala.collection.{ immutable, mutable }
  * Note that a validating parser knows the content model, so knows precisely which whitespace is "ignorable", for example, but once the parsed
  * XML is turned into untyped yaidom nodes, this information is lost. (Of course in principle PSVI data could be added to `Elem`s,
  * indexed by "element paths", but that is beyond the scope of yaidom.)
+ *
+ * As mentioned above, QNames in text or attribute values depend on in-scope namespaces for resolution. Yet "resolved" nodes do
+ * not keep track of in-scope namespaces, because QNames do not exist for "resolved" nodes. So, be extra careful when comparing
+ * "resolved" elements containing QNames in text or attribute values. Either keep track of prefix bindings (scopes) outside the
+ * "resolved" element, or convert the QNames before turning a normal Elem into a "resolved" Elem.
  *
  * Class [[eu.cdevreeze.yaidom.resolved.Elem]] has some methods to mitigate the above-mentioned small differences among elements (except
  * for the first difference, related to untyped data).

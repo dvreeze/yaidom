@@ -127,6 +127,156 @@ class NamespaceTest extends Suite {
     }
   }
 
+  @Test def testUndeclareDefaultNamespace() {
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val doc1 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("simpleStylesheet1.xsl"))
+    val rootElm1 = doc1.documentElement
+
+    val doc2 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("simpleStylesheet2.xsl"))
+    val rootElm2 = doc2.documentElement
+
+    expect(resolved.Elem(rootElm1)) {
+      resolved.Elem(rootElm2)
+    }
+
+    val elm1Option = rootElm1 findElem { e => e.qname == QName("xsl:template") }
+
+    expect(Some(EName("{http://www.w3.org/1999/XSL/Transform}template"))) {
+      elm1Option.map(_.resolvedName)
+    }
+
+    val elm2Option = rootElm2 findElem { e => e.qname == QName("template") }
+
+    expect(Some(EName("{http://www.w3.org/1999/XSL/Transform}template"))) {
+      elm2Option.map(_.resolvedName)
+    }
+
+    val htmlElm1Option = rootElm1 findElem { e => e.qname == QName("html") }
+
+    expect(Some(EName("html"))) {
+      htmlElm1Option.map(_.resolvedName)
+    }
+
+    val htmlElm2Option = rootElm2 findElem { e => e.qname == QName("html") }
+
+    expect(Some(EName("html"))) {
+      htmlElm2Option.map(_.resolvedName)
+    }
+  }
+
+  @Test def testOverrideNamespace() {
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val s = """|<my:foo xmlns:my="http://example.com/uri1">
+               |  <my:bar xmlns:my="http://example.com/uri2"/>
+               |</my:foo>""".stripMargin
+
+    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val rootElm = doc.documentElement
+
+    expect(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
+      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+    }
+  }
+
+  @Test def testNamespaceIsNotUri() {
+    val docParser = DocumentParserUsingSax.newInstance
+
+    // Relative URIs should not be used! In any case, namespace URI comparison is string comparison.
+    val s = """|<my1:foo xmlns:my1="http://example.com/uri1">
+               |  <my2:bar xmlns:my2="http://EXAMPLE.COM/uri2/"><my3:baz xmlns:my3="../uri3"/></my2:bar>
+               |</my1:foo>""".stripMargin
+
+    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val rootElm = doc.documentElement
+
+    val enames =
+      List(
+        EName("{http://example.com/uri1}foo"),
+        EName("{http://EXAMPLE.COM/uri2/}bar"),
+        EName("{../uri3}baz"))
+
+    expect(enames) {
+      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+    }
+
+    expect(3) {
+      Set(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri/}foo"), EName("{http://EXAMPLE.COM/uri}foo")).size
+    }
+  }
+
+  @Test def testUndeclareNonDefaultNamespace() {
+    val docParser = DocumentParserUsingSax.newInstance
+
+    // Only XML version 1.1 allows the use of prefixed namespace undeclarations
+
+    val s = """|<?xml version="1.1"?>
+               |<my:foo xmlns:my="http://example.com/uri1">
+               |  <my2:bar xmlns:my="" xmlns:my2="http://example.com/uri2"/>
+               |</my:foo>""".stripMargin
+
+    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val rootElm = doc.documentElement
+
+    expect(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
+      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+    }
+  }
+
+  @Test def testXmlNamespace() {
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val s = """|<my:foo xmlns:my="http://example.com/uri">
+               |  <my:bar xml:lang="en"/>
+               |</my:foo>""".stripMargin
+
+    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val rootElm = doc.documentElement
+
+    expect(List(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri}bar"))) {
+      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+    }
+
+    expect(Some("en")) {
+      rootElm findElem { e => e.localName == "bar" } flatMap
+        { e => e.attributeOption(EName("{http://www.w3.org/XML/1998/namespace}lang")) }
+    }
+  }
+
+  @Test def testUndeclareAnotherNonDefaultNamespace() {
+    val docParser = DocumentParserUsingSax.newInstance
+
+    // Only XML version 1.1 allows the use of prefixed namespace undeclarations
+
+    val s = """|<?xml version="1.1"?>
+               |<my:doc xmlns:my="http://xmlportfolio.com/xmlguild-examples">
+               |  <simple xmlns:my="">
+               |    <remark>We don't use namespaces.</remark>
+               |  </simple>
+               |</my:doc>""".stripMargin
+
+    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val rootElm = doc.documentElement
+
+    expect(Scope.from("my" -> "http://xmlportfolio.com/xmlguild-examples")) {
+      rootElm.scope
+    }
+
+    val simpleElmOption = rootElm findElem { _.qname == QName("simple") }
+    val simpleElm = simpleElmOption.getOrElse(sys.error("Expected element 'simple'"))
+
+    expect(EName("simple")) {
+      simpleElm.resolvedName
+    }
+    expect(Scope.Empty) {
+      simpleElm.scope
+    }
+    expect(List(EName("simple"), EName("remark"))) {
+      simpleElm.findAllElemsOrSelf map { _.resolvedName }
+    }
+  }
+
   private def testFeed(fileName: String) {
     val docParser = DocumentParserUsingSax.newInstance
     val doc = docParser.parse(classOf[NamespaceTest].getResourceAsStream(fileName))
