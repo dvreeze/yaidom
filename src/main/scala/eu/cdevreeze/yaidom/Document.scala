@@ -86,6 +86,9 @@ final class Document(
   /** Returns `withDocumentElement(this.documentElement.updated(pf))` */
   def updated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.updated(pf))
 
+  /** Returns `withDocumentElement(this.documentElement.topmostUpdated(pf))` */
+  def topmostUpdated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.topmostUpdated(pf))
+
   final def toTreeRepr(): String = toTreeReprAsLineSeq(0)(2).mkString
 
   /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */

@@ -146,4 +146,37 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     }
     result
   }
+
+  /**
+   * Functionally updates the topmost descendant-or-self elements for which the partial function is defined,
+   * within the tree of which this element is the root element.
+   *
+   * This function is equivalent to:
+   * {{{
+   * val p = { e: E => pf.isDefinedAt(e) }
+   * val pathsReversed = findTopmostElemOrSelfPaths(p).reverse
+   *
+   * pathsReversed.foldLeft(self) { case (acc, path) =>
+   *   val e = acc.findWithElemPath(path).get
+   *   acc.updated(path, pf(e))
+   * }
+   * }}}
+   *
+   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
+   * and partly because many intermediate element objects may be created.
+   */
+  final def topmostUpdated(pf: PartialFunction[E, E]): E = {
+    val p = { e: E => pf.isDefinedAt(e) }
+    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
+    val pathsReversed = findTopmostElemOrSelfPaths(p).reverse
+
+    val result: E = pathsReversed.foldLeft(self) {
+      case (acc, path) =>
+        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
+        assert(pf.isDefinedAt(e))
+
+        acc.updated(path, pf(e))
+    }
+    result
+  }
 }

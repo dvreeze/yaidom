@@ -41,39 +41,26 @@ class UpdateTest extends Suite {
 
   private val scope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
-  @Test def testUpdate() {
-    val docParser = DocumentParserUsingDom.newInstance()
+  private val docParser = DocumentParserUsingDom.newInstance()
 
-    val docPrinter = {
-      val dbf = DocumentBuilderFactory.newInstance
-      val tf = TransformerFactory.newInstance
+  private val docPrinter = {
+    val dbf = DocumentBuilderFactory.newInstance
+    val tf = TransformerFactory.newInstance
 
-      try {
-        tf.getAttribute("indent-number") // Throws an exception if "indent-number" is not supported
-        tf.setAttribute("indent-number", java.lang.Integer.valueOf(4))
-      } catch {
-        case e: Exception => () // Ignore
-      }
-
-      DocumentPrinterUsingDom.newInstance(dbf, tf)
+    try {
+      tf.getAttribute("indent-number") // Throws an exception if "indent-number" is not supported
+      tf.setAttribute("indent-number", java.lang.Integer.valueOf(4))
+    } catch {
+      case e: Exception => () // Ignore
     }
 
+    DocumentPrinterUsingDom.newInstance(dbf, tf)
+  }
+
+  @Test def testUpdateUsingPaths() {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
-
-    println()
-    println(docPrinter.print(doc1))
-
-    def attrNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
-      val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
-      result.toSet
-    }
-
-    def elemNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
-      val result = rootElm.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
 
     expect(Set(EName("Price"), EName("Edition"))) {
       attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
@@ -86,9 +73,6 @@ class UpdateTest extends Suite {
     val doc2 = Document(
       turnBookAttributeIntoElem[Node, Elem](
         turnBookAttributeIntoElem[Node, Elem](doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
-
-    println()
-    println(docPrinter.print(doc2))
 
     expect(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
@@ -114,16 +98,140 @@ class UpdateTest extends Suite {
     }
   }
 
+  @Test def testUpdateUsingUpdatedFunction() {
+    val is = classOf[UpdateTest].getResourceAsStream("books.xml")
+
+    val doc1: Document = docParser.parse(is)
+
+    expect(Set(EName("Price"), EName("Edition"))) {
+      attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
+    }
+    expect(Set()) {
+      elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
+    }
+
+    val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
+    val doc2 = Document(
+      turnBookAttributeIntoElemUsingUpdatedFunction(
+        turnBookAttributeIntoElemUsingUpdatedFunction(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+
+    expect(Set()) {
+      attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
+    }
+    expect(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
+      elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
+    }
+
+    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
+    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
+
+    val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
+    val updatedResolvedElm =
+      turnBookAttributeIntoElemUsingUpdatedFunction(
+        turnBookAttributeIntoElemUsingUpdatedFunction(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
+
+    expect(false) {
+      resolvedOriginalElm == resolvedUpdatedElm
+    }
+
+    expect(true) {
+      resolvedUpdatedElm == updatedResolvedElm
+    }
+  }
+
+  @Test def testUpdateUsingTopmostUpdatedFunction() {
+    val is = classOf[UpdateTest].getResourceAsStream("books.xml")
+
+    val doc1: Document = docParser.parse(is)
+
+    expect(Set(EName("Price"), EName("Edition"))) {
+      attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
+    }
+    expect(Set()) {
+      elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
+    }
+
+    val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
+    val doc2 = Document(
+      turnBookAttributeIntoElemUsingTopmostUpdatedFunction(
+        turnBookAttributeIntoElemUsingTopmostUpdatedFunction(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+
+    expect(Set()) {
+      attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
+    }
+    expect(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
+      elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
+    }
+
+    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
+    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
+
+    val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
+    val updatedResolvedElm =
+      turnBookAttributeIntoElemUsingTopmostUpdatedFunction(
+        turnBookAttributeIntoElemUsingTopmostUpdatedFunction(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
+
+    expect(false) {
+      resolvedOriginalElm == resolvedUpdatedElm
+    }
+
+    expect(true) {
+      resolvedUpdatedElm == updatedResolvedElm
+    }
+  }
+
+  private def attrNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+    val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
+    result.toSet
+  }
+
+  private def elemNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+    val result = rootElm.findAllElemsOrSelf map { e => e.resolvedName }
+    result.toSet
+  }
+
   private def turnBookAttributeIntoElem[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
     val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
 
-    matchingPaths.foldLeft(rootElm) { (acc, path) =>
+    matchingPaths.reverse.foldLeft(rootElm) { (acc, path) =>
       require(rootElm.findWithElemPath(path).isDefined)
 
       acc.updated(path) { case e => upd(e, attrName) }
     }
+  }
+
+  private def turnBookAttributeIntoElemUsingUpdatedFunction(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    val pf: PartialFunction[Elem, Elem] = {
+      case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+    }
+
+    rootElm updated pf
+  }
+
+  private def turnBookAttributeIntoElemUsingUpdatedFunction(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
+    val pf: PartialFunction[resolved.Elem, resolved.Elem] = {
+      case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+    }
+
+    rootElm updated pf
+  }
+
+  private def turnBookAttributeIntoElemUsingTopmostUpdatedFunction(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    val pf: PartialFunction[Elem, Elem] = {
+      case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+    }
+
+    rootElm topmostUpdated pf
+  }
+
+  private def turnBookAttributeIntoElemUsingTopmostUpdatedFunction(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
+    val pf: PartialFunction[resolved.Elem, resolved.Elem] = {
+      case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+    }
+
+    rootElm topmostUpdated pf
   }
 
   def updateBook(bookElm: Elem, attrName: String): Elem = {
