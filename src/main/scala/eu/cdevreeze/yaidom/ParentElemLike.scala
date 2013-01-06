@@ -472,6 +472,8 @@ trait ParentElemLike[E <: ParentElemLike[E]] { self: E =>
     elms.headOption
   }
 
-  /** Computes an index on the given function taking an element, for example a function returning some unique element "identifier" */
+  /**
+   * Computes an index on the given function taking an element, that is, returns `findAllElemsOrSelf groupBy f`.
+   */
   final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
 }
