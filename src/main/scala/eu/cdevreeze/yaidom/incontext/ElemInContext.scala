@@ -38,4 +38,11 @@ final class ElemInContext(
   override def resolvedName: EName = elem.resolvedName
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: ElemInContext => (other.rootElem == this.rootElem) && (other.elemPath == this.elemPath)
+    case _ => false
+  }
+
+  override def hashCode: Int = (rootElem, elemPath).hashCode
 }
