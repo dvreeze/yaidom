@@ -68,4 +68,7 @@ object Document {
   }
 
   def apply(documentElement: Elem): Document = apply(None, documentElement)
+
+  def apply(d: eu.cdevreeze.yaidom.Document): Document =
+    new Document(d.baseUriOption, incontext.Elem(d.documentElement), d.processingInstructions, d.comments)
 }
