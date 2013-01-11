@@ -20,19 +20,21 @@ package incontext
 import scala.collection.immutable
 
 /**
- * An element with its context, starting with the root element.
+ * An element within its context. In other words, an element as a pair containing the root element (as standard yaidom Elem)
+ * and an element path (from that root element) to this element.
  *
  * @author Chris de Vreeze
  */
-final class ElemInContext(
-  val rootElem: Elem,
-  val elemPath: ElemPath) extends PathAwareElemLike[ElemInContext] with Immutable {
+final class Elem(
+  val rootElem: eu.cdevreeze.yaidom.Elem,
+  val elemPath: ElemPath) extends ElemLike[Elem] with Immutable {
 
-  val elem: Elem = rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
+  val elem: eu.cdevreeze.yaidom.Elem =
+    rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
-  override def allChildElems: immutable.IndexedSeq[ElemInContext] = {
+  override def allChildElems: immutable.IndexedSeq[Elem] = {
     val childElemPathEntries = elem.allChildElemPathEntries
-    childElemPathEntries map { entry => new ElemInContext(rootElem, elemPath.append(entry)) }
+    childElemPathEntries map { entry => new Elem(rootElem, elemPath.append(entry)) }
   }
 
   override def resolvedName: EName = elem.resolvedName
@@ -40,9 +42,20 @@ final class ElemInContext(
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
 
   override def equals(obj: Any): Boolean = obj match {
-    case other: ElemInContext => (other.rootElem == this.rootElem) && (other.elemPath == this.elemPath)
+    case other: Elem => (other.rootElem == this.rootElem) && (other.elemPath == this.elemPath)
     case _ => false
   }
 
   override def hashCode: Int = (rootElem, elemPath).hashCode
+}
+
+object Elem {
+
+  def apply(rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
+    new Elem(rootElem, elemPath)
+  }
+
+  def apply(rootElem: eu.cdevreeze.yaidom.Elem): Elem = {
+    apply(rootElem, ElemPath.Root)
+  }
 }

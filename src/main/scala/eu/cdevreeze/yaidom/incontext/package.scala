@@ -21,8 +21,20 @@ package eu.cdevreeze.yaidom
  * in this package are pairs of a root element and an element path (to the actual element itself).
  *
  * An example of where such a representation can be useful is XML Schema. After all, to interpret an element definition
- * in an XML schema, we need context of the element definition to determine the target namespace and whether the element
- * definition is top level, etc.
+ * in an XML schema, we need context of the element definition to determine the target namespace, or to determine whether the
+ * element definition is top level, etc.
+ *
+ * Do not do this:
+ * {{{
+ * import eu.cdevreeze.yaidom.incontext._
+ *
+ * }}}
+ * Better is the following:
+ * {{{
+ * import eu.cdevreeze.yaidom.incontext
+ *
+ * val rootElmInContext = incontext.Elem(rootElm)
+ * }}}
  *
  * @author Chris de Vreeze
  */

@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingSax
-import incontext.ElemInContext
+import eu.cdevreeze.yaidom.incontext
 import XbrlSchemaTest._
 
 /**
@@ -39,7 +39,7 @@ class XbrlSchemaTest extends Suite {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
 
-    val xbrlSchema: ElemInContext = new ElemInContext(doc.documentElement, ElemPath.Root)
+    val xbrlSchema: incontext.Elem = incontext.Elem(doc.documentElement)
 
     // Check concepts
 
