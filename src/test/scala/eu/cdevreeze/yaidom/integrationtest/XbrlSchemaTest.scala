@@ -39,7 +39,8 @@ class XbrlSchemaTest extends Suite {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
 
-    val xbrlSchema: incontext.Elem = incontext.Elem(doc.documentElement)
+    val xbrlSchemaDoc = incontext.Document(doc)
+    val xbrlSchema: incontext.Elem = xbrlSchemaDoc.documentElement
 
     // Check concepts
 
@@ -66,6 +67,25 @@ class XbrlSchemaTest extends Suite {
       }
       val matchingConceptENames = conceptENames filter { ename => Set("AMinusMinusMember", "APlusPlusPlusMember").contains(ename.localPart) }
       matchingConceptENames.toSet
+    }
+
+    // Check equivalence of different ways to get the same concepts
+
+    val elemPaths = xbrlSchema.elem.findAllElemOrSelfPaths
+
+    expect(elemPaths) {
+      xbrlSchema.findAllElemsOrSelf map { _.elemPath }
+    }
+
+    val elemsContainingPlus = xbrlSchema filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+    val pathsOfElemsContainingPlus = xbrlSchema.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+
+    expect(pathsOfElemsContainingPlus) {
+      elemsContainingPlus map (_.elemPath)
+    }
+
+    expect(true) {
+      elemsContainingPlus forall { e => xbrlSchema.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
     }
   }
 }

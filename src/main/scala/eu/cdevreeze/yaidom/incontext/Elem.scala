@@ -20,8 +20,28 @@ package incontext
 import scala.collection.immutable
 
 /**
- * An element within its context. In other words, an element as a pair containing the root element (as standard yaidom Elem)
+ * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.Elem]])
  * and an element path (from that root element) to this element.
+ *
+ * ==Elem more formally==
+ *
+ * The following (rather obvious) properties hold for "in context" elements:
+ * {{{
+ * val elems = rootElemInContext.findAllElemsOrSelf
+ * val elemPaths = rootElemInContext.elem.findAllElemOrSelfPaths
+ * (elems map (_.elemPath)) == elemPaths
+ *
+ * elems forall { e => rootElemInContext.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * }}}
+ *
+ * Analogous remarks apply to the other query methods. For example:
+ * {{{
+ * val elemsContainingPlus = rootElemInContext filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+ * val pathsOfElemsContainingPlus = rootElemInContext.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+ * (elemsContainingPlus map (_.elemPath)) == pathsOfElemsContainingPlus
+ *
+ * elemsContainingPlus forall { e => rootElemInContext.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * }}}
  *
  * @author Chris de Vreeze
  */
