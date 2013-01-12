@@ -15,7 +15,7 @@
  */
 
 package eu.cdevreeze.yaidom
-package incontext
+package indexed
 
 import scala.collection.immutable
 
@@ -25,22 +25,22 @@ import scala.collection.immutable
  *
  * ==Elem more formally==
  *
- * The following (rather obvious) properties hold for "in context" elements:
+ * The following (rather obvious) properties hold for indexed elements:
  * {{{
- * val elems = rootElemInContext.findAllElemsOrSelf
- * val elemPaths = rootElemInContext.elem.findAllElemOrSelfPaths
+ * val elems = indexedRootElem.findAllElemsOrSelf
+ * val elemPaths = indexedRooElem.elem.findAllElemOrSelfPaths
  * (elems map (_.elemPath)) == elemPaths
  *
- * elems forall { e => rootElemInContext.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * Analogous remarks apply to the other query methods. For example:
  * {{{
- * val elemsContainingPlus = rootElemInContext filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
- * val pathsOfElemsContainingPlus = rootElemInContext.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+ * val elemsContainingPlus = indexedRootElem filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+ * val pathsOfElemsContainingPlus = indexedRootElem.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
  * (elemsContainingPlus map (_.elemPath)) == pathsOfElemsContainingPlus
  *
- * elemsContainingPlus forall { e => rootElemInContext.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elemsContainingPlus forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * @author Chris de Vreeze

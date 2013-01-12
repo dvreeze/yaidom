@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * This package contains element representations that contain the context of the element. That is, the elements
+ * This package contains element representations that contain the "context" of the element. That is, the elements
  * in this package are pairs of a root element and an element path (to the actual element itself).
  *
  * An example of where such a representation can be useful is XML Schema. After all, to interpret an element definition
@@ -26,16 +26,16 @@ package eu.cdevreeze.yaidom
  *
  * Do not do this:
  * {{{
- * import eu.cdevreeze.yaidom.incontext._
+ * import eu.cdevreeze.yaidom.indexed._
  *
  * }}}
  * Better is the following:
  * {{{
- * import eu.cdevreeze.yaidom.incontext
+ * import eu.cdevreeze.yaidom.indexed
  *
- * val rootElmInContext = incontext.Elem(rootElm)
+ * val indexedRootElm = indexed.Elem(rootElm)
  * }}}
  *
  * @author Chris de Vreeze
  */
-package object incontext
+package object indexed

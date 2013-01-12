@@ -15,13 +15,13 @@
  */
 
 package eu.cdevreeze.yaidom
-package incontext
+package indexed
 
 import java.net.URI
 import scala.collection.immutable
 
 /**
- * `Document`, containing an "in context" document element.
+ * `Document`, containing an "indexed" document element.
  *
  * @author Chris de Vreeze
  */
@@ -70,5 +70,5 @@ object Document {
   def apply(documentElement: Elem): Document = apply(None, documentElement)
 
   def apply(d: eu.cdevreeze.yaidom.Document): Document =
-    new Document(d.baseUriOption, incontext.Elem(d.documentElement), d.processingInstructions, d.comments)
+    new Document(d.baseUriOption, indexed.Elem(d.documentElement), d.processingInstructions, d.comments)
 }
