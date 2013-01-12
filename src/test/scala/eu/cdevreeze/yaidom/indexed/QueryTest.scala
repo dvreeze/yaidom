@@ -386,7 +386,7 @@ class QueryTest extends Suite {
     expect(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.elem.trimmedText }
+      val result = bookTitles2 map { _.elem.trimmedText }
       result.toSet
     }
   }
