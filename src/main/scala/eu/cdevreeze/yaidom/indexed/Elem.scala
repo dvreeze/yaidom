@@ -67,6 +67,41 @@ final class Elem(
   }
 
   override def hashCode: Int = (rootElem, elemPath).hashCode
+
+  /**
+   * Returns `this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }`
+   */
+  def parentOption: Option[Elem] =
+    this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }
+
+  /**
+   * Returns `Elem(this.rootElem, this.elemPath.parentPath)`
+   */
+  def parent: Elem = Elem(this.rootElem, this.elemPath.parentPath)
+
+  /**
+   * Returns `this.elemPath.ancestorOrSelfPaths map { path => Elem(this.rootElem, path) }`
+   */
+  def ancestorsOrSelf: immutable.IndexedSeq[Elem] =
+    this.elemPath.ancestorOrSelfPaths map { path => Elem(this.rootElem, path) }
+
+  /**
+   * Returns `this.elemPath.ancestorPaths map { path => Elem(this.rootElem, path) }`
+   */
+  def ancestors: immutable.IndexedSeq[Elem] =
+    this.elemPath.ancestorPaths map { path => Elem(this.rootElem, path) }
+
+  /**
+   * Returns `ancestorsOrSelf find { e => p(e) }`
+   */
+  def findAncestorOrSelf(p: Elem => Boolean): Option[Elem] =
+    ancestorsOrSelf find { e => p(e) }
+
+  /**
+   * Returns `ancestors find { e => p(e) }`
+   */
+  def findAncestor(p: Elem => Boolean): Option[Elem] =
+    ancestors find { e => p(e) }
 }
 
 object Elem {
