@@ -156,6 +156,19 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
+  @Ignore @Test def testProcessLargeXmlIntoIndexedElem() {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
+    val endMs = System.currentTimeMillis()
+    logger.info("[testProcessLargeXmlIntoIndexedElem] Parsing (into a Document) took %d ms".format(endMs - startMs))
+
+    val indexedDoc = indexed.Document(doc)
+
+    doTest(indexedDoc.documentElement)
+  }
+
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
   @Ignore @Test def testProcessLargeTreeRepr() {
     val parser = DocumentParserUsingSax.newInstance

@@ -220,11 +220,13 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E
    */
   final def findWithElemPath(path: ElemPath): Option[E] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
+    
+    val entryCount = path.entries.size
 
     def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {
-      assert(entryIndex >= 0 && entryIndex <= path.entries.size)
+      assert(entryIndex >= 0 && entryIndex <= entryCount)
 
-      if (entryIndex == path.entries.size) Some(currentRoot) else {
+      if (entryIndex == entryCount) Some(currentRoot) else {
         val newRootOption: Option[E] = currentRoot.findWithElemPathEntry(path.entries(entryIndex))
         // Recursive call. Not tail-recursive, but recursion depth should be limited.
         newRootOption flatMap { newRoot => findWithElemPath(newRoot, entryIndex + 1) }

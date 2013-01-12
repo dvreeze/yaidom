@@ -47,7 +47,7 @@ import scala.collection.immutable
  */
 final class Elem(
   val rootElem: eu.cdevreeze.yaidom.Elem,
-  val elemPath: ElemPath) extends ElemLike[Elem] with Immutable {
+  val elemPath: ElemPath) extends ElemLike[Elem] with HasText with Immutable {
 
   val elem: eu.cdevreeze.yaidom.Elem =
     rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
@@ -67,6 +67,15 @@ final class Elem(
   }
 
   override def hashCode: Int = (rootElem, elemPath).hashCode
+
+  /**
+   * Returns the concatenation of the texts of text children, including whitespace. Non-text children are ignored.
+   * If there are no text children, the empty string is returned.
+   */
+  override def text: String = {
+    val textStrings = elem.textChildren map { t => t.text }
+    textStrings.mkString
+  }
 
   /**
    * Returns `this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }`
