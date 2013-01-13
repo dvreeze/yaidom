@@ -29,8 +29,8 @@ import scala.collection.{ immutable, mutable }
  * As mentioned above, this trait knows more about elements than its supertraits, because it knows about "element paths". Still, it
  * knows only about element nodes, so other node types than elements are not known to this API.
  *
- * Based on its supertraits `ElemLike` and `ParentElemLike`, this trait offers a rich `ElemPath` query API. No additional abstract methods
- * other than those required by the supertraits need to be implemented.
+ * Based on its supertraits `ElemLike` and `ParentElemLike`, this trait offers a rich `ElemPath` query API. Two additional abstract methods
+ * other than those required by the supertraits need to be implemented, viz. `findWithElemPathEntry` and `allChildElemsWithPathEntries`.
  *
  * This trait is extended by trait `UpdatableElemLike`, and therefore mixed in by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
  *
@@ -126,6 +126,18 @@ import scala.collection.{ immutable, mutable }
  */
 trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E =>
 
+  /**
+   * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be very efficient.
+   */
+  def findWithElemPathEntry(entry: ElemPath.Entry): Option[E]
+
+  /**
+   * Returns all child elements with their `ElemPath` entries, in the correct order. This method should be very efficient.
+   *
+   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   */
+  def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
+
   /** Returns `allChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
   final def allChildElemPaths: immutable.IndexedSeq[ElemPath] =
     allChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }
@@ -207,20 +219,12 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E
   }
 
   /**
-   * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be more efficient.
-   */
-  final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = {
-    val relevantChildElms = self.filterChildElems(entry.elementName)
-
-    if (entry.index >= relevantChildElms.size) None else Some(relevantChildElms(entry.index))
-  }
-
-  /**
    * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
+   * This method must be very efficient, which depends on the efficiency of method `findWithElemPathEntry`.
    */
   final def findWithElemPath(path: ElemPath): Option[E] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
-    
+
     val entryCount = path.entries.size
 
     def findWithElemPath(currentRoot: E, entryIndex: Int): Option[E] = {
@@ -240,32 +244,11 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E
   final def getWithElemPath(path: ElemPath): E =
     findWithElemPath(path).getOrElse(sys.error("Expected existing path %s from root %s".format(path, self)))
 
-  /** Returns the `ElemPath` entries of all child elements, in the correct order */
-  final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
-    allChildElemsWithPathEntries map { elmPathPair => elmPathPair._2 }
-  }
-
   /**
-   * Returns all child elements with their `ElemPath` entries, in the correct order.
-   *
-   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   * Returns the `ElemPath` entries of all child elements, in the correct order.
+   * Equivalent to `allChildElemsWithPathEntries map { _._2 }`.
    */
-  final def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(E, ElemPath.Entry)]()
-
-    for (elm <- self.allChildElems) {
-      val ename = elm.resolvedName
-      val countForName = elementNameCounts.getOrElse(ename, 0)
-      val entry = ElemPath.Entry(ename, countForName)
-      elementNameCounts.update(ename, countForName + 1)
-      acc += (elm -> entry)
-    }
-
-    val result = acc.toIndexedSeq
-    assert((result map (_._1)) == allChildElems)
-    result
+  final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
+    allChildElemsWithPathEntries map { _._2 }
   }
 }

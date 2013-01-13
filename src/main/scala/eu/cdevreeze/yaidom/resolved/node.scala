@@ -75,8 +75,52 @@ final case class Elem(
   require(resolvedAttributes ne null)
   require(children ne null)
 
+  @throws(classOf[java.io.ObjectStreamException])
+  def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
+
+  /** Cache for speeding up child element lookups by element path */
+  private val childIndexesByPathEntries: Map[ElemPath.Entry, Int] = {
+    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
+
+    val elementNameCounts = mutable.Map[EName, Int]()
+    val acc = mutable.ArrayBuffer[(ElemPath.Entry, Int)]()
+
+    for ((node, idx) <- self.children.zipWithIndex) {
+      node match {
+        case elm: Elem =>
+          val ename = elm.resolvedName
+          val countForName = elementNameCounts.getOrElse(ename, 0)
+          val entry = ElemPath.Entry(ename, countForName)
+          elementNameCounts.update(ename, countForName + 1)
+          acc += ((entry, idx))
+        case _ => ()
+      }
+    }
+
+    val result = acc.toMap
+    result
+  }
+
+  /** The inverse of `childIndexesByPathEntries` */
+  private val childPathEntriesByIndexes: Map[Int, ElemPath.Entry] = {
+    val result = childIndexesByPathEntries map { case (entry, idx) => (idx, entry) }
+    result.toMap
+  }
+
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
+
+  /**
+   * Returns all child elements with their `ElemPath` entries, in the correct order.
+   *
+   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   */
+  override def allChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = {
+    val childElms = allChildElems
+    val entries = childPathEntriesByIndexes.toSeq.sortBy(_._1).map(_._2)
+    assert(childElms.size == entries.size)
+    childElms.zip(entries)
+  }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
@@ -84,27 +128,16 @@ final case class Elem(
   }
 
   override def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
-    (0 to childPathEntry.index).foldLeft(-1) {
-      case (acc, nextPathEntryIndex) =>
-        children.indexWhere({
-          case e: Elem if e.resolvedName == childPathEntry.elementName => true
-          case n: Node => false
-        }, acc + 1)
-    }
+    childIndexesByPathEntries.getOrElse(childPathEntry, -1)
   }
 
   override def findChildPathEntry(idx: Int): Option[ElemPath.Entry] = {
-    val node = children(idx)
+    childPathEntriesByIndexes.get(idx)
+  }
 
-    node match {
-      case e: Elem =>
-        val cnt = children.take(idx) count {
-          case che: Elem if che.resolvedName == e.resolvedName => true
-          case chn: Node => false
-        }
-        Some(ElemPath.Entry(e.resolvedName, cnt))
-      case n: Node => None
-    }
+  override def findWithElemPathEntry(entry: ElemPath.Entry): Option[Elem] = {
+    val idx = childNodeIndex(entry)
+    if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }
 
   /** Returns `withChildren(self.children :+ newChild)`. */
@@ -285,6 +318,15 @@ object Node {
 }
 
 object Elem {
+
+  private[yaidom] final class ElemSerializationProxy(
+    val resolvedName: EName,
+    val resolvedAttributes: Map[EName, String],
+    val children: immutable.IndexedSeq[Node]) extends Serializable {
+
+    @throws(classOf[java.io.ObjectStreamException])
+    def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
+  }
 
   def apply(e: eu.cdevreeze.yaidom.Elem): Elem = {
     val children = e.children collect {

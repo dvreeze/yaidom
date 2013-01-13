@@ -49,10 +49,11 @@ final class Elem(
   val rootElem: eu.cdevreeze.yaidom.Elem,
   val elemPath: ElemPath) extends ElemLike[Elem] with HasText with Immutable {
 
-  val elem: eu.cdevreeze.yaidom.Elem =
+  def elem: eu.cdevreeze.yaidom.Elem =
     rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
   override def allChildElems: immutable.IndexedSeq[Elem] = {
+    // Remember: this function must be as fast as possible!
     val childElemPathEntries = elem.allChildElemPathEntries
     childElemPathEntries map { entry => new Elem(rootElem, elemPath.append(entry)) }
   }

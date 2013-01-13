@@ -156,7 +156,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  @Ignore @Test def testProcessLargeXmlIntoIndexedElem() {
+  @Test def testProcessLargeXmlIntoIndexedElem() {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
