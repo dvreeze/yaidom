@@ -60,7 +60,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
    * If the path entry is not found, -1 is returned.
    *
    * Methods `updated` (taking `ElemPath`s) heavily use this method to turn `ElemPath`s into child node indexes.
-   * This makes indexing using `ElemPath`s slow, because this method is O(n).
+   * This method should therefore be very fast (preferably using a cache from ElemPath.Entry instances to indexes).
    */
   def childNodeIndex(childPathEntry: ElemPath.Entry): Int
 

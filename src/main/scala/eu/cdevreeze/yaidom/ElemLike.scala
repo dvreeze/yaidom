@@ -111,9 +111,6 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
    */
   def resolvedAttributes: immutable.Iterable[(EName, String)]
 
-  /** Returns all child elements, in the correct order. The faster this method is, the faster the other `ElemLike` methods will be. */
-  override def allChildElems: immutable.IndexedSeq[E]
-
   /** The local name (or local part). Convenience method. */
   final def localName: String = resolvedName.localPart
 
