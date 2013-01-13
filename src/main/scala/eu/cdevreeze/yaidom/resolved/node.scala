@@ -101,12 +101,6 @@ final case class Elem(
     result
   }
 
-  /** The inverse of `childIndexesByPathEntries` */
-  private val childPathEntriesByIndexes: Map[Int, ElemPath.Entry] = {
-    val result = childIndexesByPathEntries map { case (entry, idx) => (idx, entry) }
-    result.toMap
-  }
-
   /** Returns the element children */
   override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
@@ -117,7 +111,7 @@ final case class Elem(
    */
   override def allChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = {
     val childElms = allChildElems
-    val entries = childPathEntriesByIndexes.toSeq.sortBy(_._1).map(_._2)
+    val entries = childIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
     assert(childElms.size == entries.size)
     childElms.zip(entries)
   }
@@ -129,10 +123,6 @@ final case class Elem(
 
   override def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
     childIndexesByPathEntries.getOrElse(childPathEntry, -1)
-  }
-
-  override def findChildPathEntry(idx: Int): Option[ElemPath.Entry] = {
-    childPathEntriesByIndexes.get(idx)
   }
 
   override def findWithElemPathEntry(entry: ElemPath.Entry): Option[Elem] = {

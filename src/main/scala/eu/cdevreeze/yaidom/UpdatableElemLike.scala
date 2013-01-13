@@ -24,7 +24,7 @@ import scala.collection.{ immutable, mutable }
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
  * This trait is a sub-trait of [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds a type parameter for (arbitrary) nodes.
- * It also requires concrete implementations for abstract methods `children`, `withChildren`, `childNodeIndex` and `findChildPathEntry`.
+ * It also requires concrete implementations for abstract methods `children`, `withChildren` and `childNodeIndex`.
  * Based on these 4 methods, and super-trait `PathAwareElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
  *
  * This trait adds the following groups of methods to the methods offered by the supertrait `PathAwareElemLike`:
@@ -63,11 +63,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
    * This makes indexing using `ElemPath`s slow, because this method is O(n).
    */
   def childNodeIndex(childPathEntry: ElemPath.Entry): Int
-
-  /**
-   * The inverse of `childNodeIndex`, wrapped in an Option. If the child node at the given index is not an element, None is returned.
-   */
-  def findChildPathEntry(idx: Int): Option[ElemPath.Entry]
 
   /** Shorthand for `withChildren(children.updated(index, newChild))` */
   final def withUpdatedChildren(index: Int, newChild: N): E =

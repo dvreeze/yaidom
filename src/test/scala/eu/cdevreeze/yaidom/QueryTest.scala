@@ -588,6 +588,13 @@ class QueryTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
+      def getChildPathEntry(e: Elem, nodeIdx: Int): ElemPath.Entry = {
+        val includedChildren = e.children.take(nodeIdx + 1)
+        val ename = includedChildren.last.asInstanceOf[Elem].resolvedName
+        val childElmsWithSameName = includedChildren collect { case che: Elem if che.resolvedName == ename => che }
+        ElemPath.Entry(ename, childElmsWithSameName.size - 1)
+      }
+
       Elem(
         qname = e.qname,
         attributes = e.attributes :+ (QName("elemPath") -> path.toCanonicalXPath(scope)),
@@ -596,7 +603,7 @@ class QueryTest extends Suite {
           case (ch, idx) =>
             ch match {
               case che: Elem =>
-                val childPath = path.append(e.findChildPathEntry(idx).get)
+                val childPath = path.append(getChildPathEntry(e, idx))
                 // Recursive call
                 addElemPaths(che, childPath, scope)
               case _ => ch
