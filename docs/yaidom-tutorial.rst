@@ -1653,12 +1653,13 @@ standard yaidom elements are a "bottom-up notion" of elements, the "indexed" ele
 It is easy to convert standard yaidom elements to "indexed" elements, and vice versa. An indexed element can be created as follows::
 
   val indexedBookstore = indexed.Elem(bookstore)
-  
-Each indexed element in indexedBookstore has the same (standard yaidom) root element, as is to be expected.
 
 The uniform yaidom query API, mixed in by different element-like classes, is also mixed in by "indexed" elements. That is,
 class ``indexed.Elem`` mixes in query API trait ``ElemLike``. The subtraits of ElemLike are not applicable or useful for
 indexed elements. After all, indexed elements know their paths, relative to the root element.
+
+When querying for elements in an "indexed" element tree, for example with method ``findAllElemsOrSelf``, all returned
+"indexed" elements are relative to the same root element, as is to be expected.
 
 As an example of "indexed" elements in action, let's rewrite the query example in `PathAwareElemLike trait`_. There we used a
 conbination of standard yaidom elements and element paths. Here we use (only) indexed elements, leading to a much more concise
