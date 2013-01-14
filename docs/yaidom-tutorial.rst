@@ -41,6 +41,7 @@ The tutorial is organized as follows:
 
   * `"Resolved" elements`_
   * `Yaidom DOM wrappers`_
+  * `"Indexed" elements`_
 
 * `Conclusion`_
 
@@ -1631,6 +1632,66 @@ Still, ``ElemLike`` wrappers around mutable elements are a bit unnatural, since 
 are unnatural. Again, if needed or appropriate use them, but do not make them the default choice, and try to keep their use as
 local as possible.
 
+"Indexed" elements
+------------------
+
+Standard (immutable) yaidom elements are easy to compose, if we ignore the fact that namespace scopes must be passed for each
+element. To avoid the latter during element construction from scratch (as opposed to parsing XML input), we introduced element builders.
+The immutability and composability of standard yaidom elements are a strength, but also a weakness, in that these elements have no
+knowledge about their context. For example, a standard yaidom element can not be asked for its parent element, if any.
+
+Sometimes it is very handy to know the ancestry of an element. For example, in an XML schema document, an element declaration
+defines an element, whose expanded name can only be determined by querying the element and its ancestry (in this case the
+root element). After all, the local name of the expanded name follows from the name attribute of the element declaration itself,
+but the namespace URI of that expanded name follows from the target namespace of the schema document, as specified in the root
+element.
+
+Yaidom does offer elements that know their ancestry. They are called "indexed" elements. Each such element is a pair,
+containing the root element of the tree (as standard yaidom element), and an element path to the element itself. Hence, whereas
+standard yaidom elements are a "bottom-up notion" of elements, the "indexed" elements are a "top-down notion" of elements.
+
+It is easy to convert standard yaidom elements to "indexed" elements, and vice versa. An indexed element can be created as follows::
+
+  val indexedBookstore = indexed.Elem(bookstore)
+  
+Each indexed element in indexedBookstore has the same (standard yaidom) root element, as is to be expected.
+
+The uniform yaidom query API, mixed in by different element-like classes, is also mixed in by "indexed" elements. That is,
+class ``indexed.Elem`` mixes in query API trait ``ElemLike``. The subtraits of ElemLike are not applicable or useful for
+indexed elements. After all, indexed elements know their paths, relative to the root element.
+
+As an example of "indexed" elements in action, let's rewrite the query example in `PathAwareElemLike trait`_. There we used a
+conbination of standard yaidom elements and element paths. Here we use (only) indexed elements, leading to a much more concise
+query. The query is rewritten as follows::
+
+  // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
+
+  def authorLastAndFirstName(authorElem: Elem): (String, String) = {
+    val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
+    val firstNames = authorElem.filterChildElems(EName("First_Name")) map { _.text.trim }
+    (lastNames.mkString, firstNames.mkString)
+  }
+
+  val bookTitles =
+    for {
+      authorElem <- indexedBookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
+      if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+      bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
+      if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
+    } yield bookElem.getChildElem(EName("Title"))
+
+Using operator notation we could write more concisely::
+
+  val bookTitles =
+    for {
+      authorElem <- indexedBookstore \\ EName("Author")
+      if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+      bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
+      if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
+    } yield (bookElem \ EName("Title")).head
+
+"Indexed" elements are great for querying, but they do have their performance costs. In other words, use them wisely.
+
 Conclusion
 ==========
 
@@ -1644,7 +1705,7 @@ On these foundations it was relatively easy to develop the *yaidom* DOM-like XML
 
 Yaidom is unique in offering multiple types of elements, with different strengths and weaknesses. Although these element types
 are different, they pretty much share the *same query API*. In this tutorial it was shown (to some extent) how these different
-element types that share the same query API can benefit XML processing applications.
+element types that share (more or less of) the same query API can benefit XML processing applications.
 
 Yaidom does not try to make the user believe that XML processing is easy. For example, configuring XML parsers and serializers
 (typically a one-time job per application) is still hard. Yet the *uniform query API* and Scala with its Collections API can

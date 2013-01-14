@@ -413,6 +413,42 @@ class QueryTest extends Suite {
       val result = bookTitles map { _.trimmedText }
       result.toSet
     }
+
+    def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.Elem): (String, String) = {
+      val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
+      val firstNames = authorElem.filterChildElems(EName("First_Name")) map { _.text.trim }
+      (lastNames.mkString, firstNames.mkString)
+    }
+
+    val bookTitles2 =
+      for {
+        authorElem <- indexedBookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
+        if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+        bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
+        if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
+      } yield bookElem.getChildElem(EName("Title"))
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookTitles2 map { _.trimmedText }
+      result.toSet
+    }
+
+    val bookTitles3 =
+      for {
+        authorElem <- indexedBookstore \\ EName("Author")
+        if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+        bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
+        if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
+      } yield (bookElem \ EName("Title")).head
+
+    expect(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookTitles3 map { _.elem.trimmedText }
+      result.toSet
+    }
   }
 
   @Test def testQueryTitlesOfBooksByJeffreyUllmanButNotWidom() {
