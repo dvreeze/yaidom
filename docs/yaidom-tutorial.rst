@@ -10,7 +10,7 @@ Yaidom is *yet another immutable DOM-like* XML API, written in the `Scala`_ prog
 * leverages the highly expressive Scala Collections API
 * offers immutable thread-safe DOM-like element trees
 * offers first-class support for namespaces
-* interoperates very well with `JAXP`_
+* interoperates very well with `the Java API for XML processing (JAXP)`_
 
 This tutorial introduces the yaidom API. Some basic Scala knowledge is assumed, especially about the Scala
 `Collections API`_.
@@ -50,7 +50,7 @@ depth than this tutorial (for example, w.r.t. the use of generics in the "query 
 
 .. _`Scala`: http://www.scala-lang.org
 .. _`Collections API`: http://www.scala-lang.org/docu/files/collections-api/collections.html
-.. _`JAXP`: http://en.wikipedia.org/wiki/Java_API_for_XML_Processing
+.. _`the Java API for XML processing (JAXP)`: http://en.wikipedia.org/wiki/Java_API_for_XML_Processing
 
 Yaidom foundations
 ==================
