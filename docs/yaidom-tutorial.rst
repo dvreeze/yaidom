@@ -17,32 +17,32 @@ This tutorial introduces the yaidom API. Some basic Scala knowledge is assumed, 
 
 The tutorial is organized as follows:
 
-* Yaidom foundations
+* `Yaidom foundations`_
 
-  * Leveraging Scala Collections
-  * Yaidom and namespaces
-  * JAXP
+  * `Leveraging Scala Collections`_
+  * `Yaidom and namespaces`_
+  * `JAXP`_
 
-* Yaidom uniform query API
+* `Yaidom uniform query API`_
 
-  * ParentElemLike trait
-  * ElemLike trait
-  * PathAwareElemLike trait
+  * `ParentElemLike trait`_
+  * `ElemLike trait`_
+  * `PathAwareElemLike trait`_
 
-* Working with default yaidom Elems
+* `Working with default yaidom Elems`_
 
-  * Default Elems
-  * ElemBuilders
-  * Parsing XML
-  * Serializing XML
-  * Functional updates
+  * `Default Elems`_
+  * `ElemBuilders`_
+  * `Parsing XML`_
+  * `Serializing XML`_
+  * `Functional updates`_
 
-* Other element implementations
+* `Other element implementations`_
 
-  * "Resolved" elements
-  * Yaidom DOM wrappers
+  * `"Resolved" elements`_
+  * `Yaidom DOM wrappers`_
 
-* Conclusion
+* `Conclusion`_
 
 This tutorial is not a replacement for the yaidom API documentation. Most core features of the yaidom API are introduced in
 this tutorial, but for a more complete overview the API documentation should be consulted. The API documentation also has more
