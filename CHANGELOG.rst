@@ -12,7 +12,7 @@ query API and the "conceptual surface area".
 * Small breaking API change: removed obsolete method ``UpdatableElemLike.findChildPathEntry``
 * Added "indexed" elements, which mix in trait ElemLike:
 
-  * "Indexed" elements are a "bottom-up notion" of elements, knowing about their ancestry
+  * "Indexed" elements are a "top-down notion" of elements, knowing about their ancestry
 
 * Added some "functional update" methods, such as ``plusChild``, ``minusChild``, ``topmostUpdated``, and changed meaning of ``updated``
 * Reworked some internals for better performance (at the cost of more memory usage):
