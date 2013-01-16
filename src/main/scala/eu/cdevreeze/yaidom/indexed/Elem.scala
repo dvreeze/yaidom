@@ -23,6 +23,22 @@ import scala.collection.immutable
  * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.Elem]])
  * and an element path (from that root element) to this element.
  *
+ * ==Example==
+ *
+ * Below follows an example. This example queries for all book elements having at least Jeffrey Ullman as author. It can be written as follows,
+ * assuming a book store `Document` with the appropriate structure:
+ * {{{
+ * val ullmanBookElms =
+ *   for {
+ *     authorElm <- indexed.Elem(bookstoreElm) filterElems { e =>
+ *       (e.localName == "Author") &&
+ *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+ *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+ *     }
+ *     bookElm <- authorElm findAncestor { _.resolvedName == EName("Book") }
+ *   } yield bookElm
+ * }}}
+ *
  * ==Elem more formally==
  *
  * The following (rather obvious) properties hold for indexed elements:

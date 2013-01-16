@@ -106,6 +106,9 @@ package eu.cdevreeze
  * about (own) namespace declarations but not about in-scope namespaces.</li>
  * <li>The "stripped" element type: [[eu.cdevreeze.yaidom.resolved.Elem]]. These elements do not know about namespace prefixes,
  * but hold ("resolved") namespace URIs instead, and are therefore easy to compare for some (sensible) notion of equality.</li>
+ * <li>The "indexed" element type: [[eu.cdevreeze.yaidom.indexed.Elem]]. Unlike "standard" yaidom elements, these elements
+ * are a "top-down notion" of elements, that know about their ancestry. Still, these elements are immutable. (They are "views"
+ * on "standard" yaidom elements, each as a pair of a root element and an element path.)</li>
  * <li>The wrapper type around DOM nodes: [[eu.cdevreeze.yaidom.dom.DomElem]]. They are `ParentElemLike` "views" backed by
  * `org.w3c.dom.Element` elements. These views are mutable and "volatile", so far less safe to use than the immutable
  * elements mentioned above.</li>
@@ -115,8 +118,9 @@ package eu.cdevreeze
  * <ul>
  * <li>The "default" element type is useful for querying XML trees (without having to worry about mutable state and thread-safety)</li>
  * <li>The "element builders" are useful for constructing (parts of) such element trees</li>
- * <li>The "DOM wrappers" may be handy for in-place updates</li>
  * <li>The "resolved" elements may be handy for equality comparisons and pattern matching on (parts of) XML trees</li>
+ * <li>The "indexed" elements are useful for processing XML where context is important, such as XML schemas</li>
+ * <li>The "DOM wrappers" may be handy for in-place updates</li>
  * </ul>
  *
  * In the spirit of the "DOM node wrappers", one could easily come up with similar wrappers around JDOM, XOM, etc.,
@@ -134,7 +138,7 @@ package eu.cdevreeze
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm \ "Book"
- *     price = bookElm.attribute(EName("Price"))
+ *     price = bookElm \@ EName("Price")
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}
@@ -144,7 +148,7 @@ package eu.cdevreeze
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
- *     price = bookElm.attribute(EName("Price"))
+ *     price <- bookElm.attributeOption(EName("Price"))
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}
@@ -170,13 +174,23 @@ package eu.cdevreeze
  *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
  *     }
- *     bookPath = authorPath.parentPath.parentPath
- *   } yield {
- *     require(bookPath.lastEntry.elementName.localPart == "Book")
- *     bookstoreElm.getWithElemPath(bookPath)
- *   }
+ *     bookPath <- authorPath findAncestorPath { _.endsWithName(EName("Book")) }
+ *   } yield bookstoreElm.getWithElemPath(bookPath)
  * }}}
  * This is conceptually similar to navigating in XPath to the grandparent nodes of the matching Author elements.
+ *
+ * Alternatively, using [[eu.cdevreeze.yaidom.indexed.Elem]] instances, we could write:
+ * {{{
+ * val ullmanBookElms =
+ *   for {
+ *     authorElm <- indexed.Elem(bookstoreElm) filterElems { e =>
+ *       (e.localName == "Author") &&
+ *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+ *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+ *     }
+ *     bookElm <- authorElm findAncestor { _.resolvedName == EName("Book") }
+ *   } yield bookElm
+ * }}}
  *
  * ==What's in the API, and what are the dependencies?==
  *
@@ -206,9 +220,10 @@ package eu.cdevreeze
  * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.convert]] subpackage.
  * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
  *
- * Yaidom also offers packages [[eu.cdevreeze.yaidom.resolved]] and [[eu.cdevreeze.yaidom.xlink]]. The `resolved` package offers
- * "bare bones" elements, stripped down to "essentials" (replacing prefixes by namespace URIs, removing comments, etc.), such that
- * those elements can be compared for some notion of equality. The `xlink` package offers some basic XLink support.
+ * Yaidom also offers packages [[eu.cdevreeze.yaidom.resolved]], [[eu.cdevreeze.yaidom.indexed]] and [[eu.cdevreeze.yaidom.xlink]].
+ * The `resolved` package offers "bare bones" elements, stripped down to "essentials" (replacing prefixes by namespace URIs,
+ * removing comments, etc.), such that those elements can be compared for some notion of equality. The `indexed` package offers
+ * immutable elements knowing their ancestry. The `xlink` package offers some basic XLink support.
  *
  * There is also a package [[eu.cdevreeze.yaidom.dom]] for `ElemLike` wrappers around (mutable!) DOM elements.
  *

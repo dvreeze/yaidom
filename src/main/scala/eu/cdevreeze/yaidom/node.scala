@@ -111,6 +111,24 @@ sealed trait Node extends Immutable with Serializable {
  * If `Elem`s are still constructed manually (without using `ElemBuilder`s), consider calling method `notUndeclaringPrefixes`
  * afterwards, thus getting rid of unnecessary (implicit) namespace undeclarations. Typically, however, `Elem`s are constructed
  * by parsing an XML source.
+ *
+ * ==Example==
+ *
+ * Below follows an example. This example queries for all book elements having a price below 90. It can be written as follows,
+ * assuming a book store `Document` with the appropriate structure:
+ * {{{
+ * val bookstoreElm = doc.documentElement
+ * require(bookstoreElm.localName == "Bookstore")
+ *
+ * val bookElms =
+ *   for {
+ *     bookElm <- bookstoreElm \ "Book"
+ *     price = bookElm \@ EName("Price")
+ *     if price.toInt < 90
+ *   } yield bookElm
+ * }}}
+ *
+ * For more examples, see the [[eu.cdevreeze.yaidom]] package documentation.
  */
 @SerialVersionUID(1L)
 final class Elem(

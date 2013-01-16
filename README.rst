@@ -67,19 +67,19 @@ Scala-ish node trees.
 Usage
 =====
 
-Yaidom versions can be found in the Maven central repository. Assuming version 0.6.5, yaidom can be added as dependency
+Yaidom versions can be found in the Maven central repository. Assuming version 0.6.6, yaidom can be added as dependency
 as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "0.6.5"
+    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "0.6.6"
 
 **Maven2**::
 
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
       <artifactId>yaidom_2.9.1</artifactId>
-      <version>0.6.5</version>
+      <version>0.6.6</version>
     </dependency>
 
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.

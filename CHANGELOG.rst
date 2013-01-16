@@ -14,7 +14,7 @@ query API and the "conceptual surface area".
 
   * "Indexed" elements are a "top-down notion" of elements, knowing about their ancestry
 
-* Added some "functional update" methods, such as ``plusChild``, ``minusChild``, ``topmostUpdated``, and changed meaning of ``updated``
+* Added some "functional update" methods, such as ``plusChild``, ``minusChild``, ``topmostUpdated``, and changed the meaning of ``updated``
 * Reworked some internals for better performance (at the cost of more memory usage):
 
   * Made ``PathAwareElemLike`` methods ``findWithElemPathEntry`` and ``allChildElemsWithPathEntries`` abstract
