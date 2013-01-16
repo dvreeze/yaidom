@@ -123,7 +123,7 @@ sealed trait Node extends Immutable with Serializable {
  * val bookElms =
  *   for {
  *     bookElm <- bookstoreElm \ "Book"
- *     price = bookElm \@ EName("Price")
+ *     price <- bookElm \@ EName("Price")
  *     if price.toInt < 90
  *   } yield bookElm
  * }}}

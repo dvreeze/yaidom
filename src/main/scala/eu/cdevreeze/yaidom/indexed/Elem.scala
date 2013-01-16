@@ -28,9 +28,12 @@ import scala.collection.immutable
  * Below follows an example. This example queries for all book elements having at least Jeffrey Ullman as author. It can be written as follows,
  * assuming a book store `Document` with the appropriate structure:
  * {{{
+ * val bookstoreElm = indexed.Document(doc).documentElement
+ * require(bookstoreElm.localName == "Bookstore")
+ *
  * val ullmanBookElms =
  *   for {
- *     authorElm <- indexed.Elem(bookstoreElm) filterElems { e =>
+ *     authorElm <- bookstoreElm filterElems { e =>
  *       (e.localName == "Author") &&
  *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
