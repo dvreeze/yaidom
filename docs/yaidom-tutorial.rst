@@ -1641,8 +1641,8 @@ The immutability and composability of standard yaidom elements are a strength, b
 knowledge about their context. For example, a standard yaidom element can not be asked for its parent element, if any.
 
 Sometimes it is very handy to know the ancestry of an element. For example, in an XML schema document, an element declaration
-defines an element, whose expanded name can only be determined by querying the element and its ancestry (in this case the
-root element). After all, the local name of the expanded name follows from the name attribute of the element declaration itself,
+declares an element, whose expanded name can only be determined by querying the element and its ancestry (in this case the
+root element). After all, the local name of that expanded name follows from the name attribute of the element declaration itself,
 but the namespace URI of that expanded name follows from the target namespace of the schema document, as specified in the root
 element.
 
@@ -1658,11 +1658,14 @@ The uniform yaidom query API, mixed in by different element-like classes, is als
 class ``indexed.Elem`` mixes in query API trait ``ElemLike``. The subtraits of ElemLike are not applicable or useful for
 indexed elements. After all, indexed elements know their paths, relative to the root element.
 
+Class ``indexed.Elem`` adds a few query methods to the query methods offered by the ``ElemLike`` API, to obtain ancestor
+elements, in particular the parent element.
+
 When querying for elements in an "indexed" element tree, for example with method ``findAllElemsOrSelf``, all returned
 "indexed" elements are relative to the same root element, as is to be expected.
 
 As an example of "indexed" elements in action, let's rewrite the query example in `PathAwareElemLike trait`_. There we used a
-conbination of standard yaidom elements and element paths. Here we use (only) indexed elements, leading to a much more concise
+combination of standard yaidom elements and element paths. Here we use (only) indexed elements, leading to a much more concise
 query. The query is rewritten as follows::
 
   // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title

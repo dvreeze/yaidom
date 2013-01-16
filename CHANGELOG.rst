@@ -3,6 +3,25 @@ CHANGELOG
 =========
 
 
+0.6.6
+=====
+
+This version is one step closer to version 0.7.0. It introduces so-called "indexed" elements, (almost) without changing the
+query API and the "conceptual surface area".
+
+* Small breaking API change: removed obsolete method ``UpdatableElemLike.findChildPathEntry``
+* Added "indexed" elements, which mix in trait ElemLike:
+
+  * "Indexed" elements are a "bottom-up notion" of elements, knowing about their ancestry
+
+* Added some "functional update" methods, such as ``plusChild``, ``minusChild``, ``topmostUpdated``, and changed meaning of ``updated``
+* Reworked some internals for better performance (at the cost of more memory usage):
+
+  * Made ``PathAwareElemLike`` methods ``findWithElemPathEntry`` and ``allChildElemsWithPathEntries`` abstract
+  * Element path based querying (and method ``findWithElemPathEntry`` in particular) is much faster now
+
+* More tests
+
 0.6.5
 =====
 
