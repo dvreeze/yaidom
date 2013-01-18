@@ -47,7 +47,7 @@ import scala.collection.immutable
  * The following (rather obvious) properties hold for indexed elements:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
- * val elemPaths = indexedRooElem.elem.findAllElemOrSelfPaths
+ * val elemPaths = indexedRootElem.elem.findAllElemOrSelfPaths
  * (elems map (_.elemPath)) == elemPaths
  *
  * elems forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
