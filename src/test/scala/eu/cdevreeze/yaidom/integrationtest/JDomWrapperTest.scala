@@ -668,6 +668,38 @@ class JDomWrapperTest extends Suite {
     }
   }
 
+  /**
+   * Example of finding elements and their ancestors.
+   */
+  @Test def testParseSchemaExample() {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("gaap.xsd")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val doc = domBuilder.build(db.parse(is))
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val elementDecls = domDoc.documentElement filterElems { e =>
+      e.resolvedName == EName(nsXmlSchema, "element")
+    }
+
+    val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")) == Some("AddressRecord") }
+
+    expect(Some("AddressRecord")) {
+      anElementDeclOption flatMap { e => (e \@ "name") }
+    }
+
+    val tnsOption = anElementDeclOption flatMap { e =>
+      val ancestorOption = e findAncestor (ancestorElm => ancestorElm.resolvedName == EName(nsXmlSchema, "schema"))
+      ancestorOption flatMap { e => (e \@ "targetNamespace") }
+    }
+
+    expect(Some("http://xasb.org/gaap")) {
+      tnsOption
+    }
+  }
+
   class LoggingEntityResolver extends EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
@@ -697,7 +729,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ElemLike[JDomElem] with HasText { self =>
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ElemLike[JDomElem] with HasParent[JDomElem] with HasText { self =>
 
     require(wrappedNode ne null)
 
@@ -773,6 +805,9 @@ object JDomWrapperTest {
       val textStrings = textChildren map { t => t.text }
       textStrings.mkString
     }
+
+    override def parentOption: Option[JDomElem] =
+      Option(wrappedNode.getParentElement) map { e => JDomNode.wrapElement(e) }
   }
 
   final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode {

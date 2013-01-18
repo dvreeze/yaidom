@@ -670,6 +670,35 @@ class DomWrapperTest extends Suite {
     }
   }
 
+  /**
+   * Example of finding elements and their ancestors.
+   */
+  @Test def testParseSchemaExample() {
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomWrapperTest].getResourceAsStream("gaap.xsd")
+    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+
+    val elementDecls = domDoc.documentElement filterElems { e =>
+      e.resolvedName == EName(nsXmlSchema, "element")
+    }
+
+    val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")) == Some("AddressRecord") }
+
+    expect(Some("AddressRecord")) {
+      anElementDeclOption flatMap { e => (e \@ "name") }
+    }
+
+    val tnsOption = anElementDeclOption flatMap { e =>
+      val ancestorOption = e findAncestor (ancestorElm => ancestorElm.resolvedName == EName(nsXmlSchema, "schema"))
+      ancestorOption flatMap { e => (e \@ "targetNamespace") }
+    }
+
+    expect(Some("http://xasb.org/gaap")) {
+      tnsOption
+    }
+  }
+
   class LoggingEntityResolver extends EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))

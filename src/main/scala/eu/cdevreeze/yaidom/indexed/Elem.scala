@@ -102,35 +102,6 @@ final class Elem(
    */
   override def parentOption: Option[Elem] =
     this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }
-
-  /**
-   * Returns `Elem(this.rootElem, this.elemPath.parentPath)`
-   */
-  override def parent: Elem = Elem(this.rootElem, this.elemPath.parentPath)
-
-  /**
-   * Returns `this.elemPath.ancestorOrSelfPaths map { path => Elem(this.rootElem, path) }`
-   */
-  override def ancestorsOrSelf: immutable.IndexedSeq[Elem] =
-    this.elemPath.ancestorOrSelfPaths map { path => Elem(this.rootElem, path) }
-
-  /**
-   * Returns `this.elemPath.ancestorPaths map { path => Elem(this.rootElem, path) }`
-   */
-  override def ancestors: immutable.IndexedSeq[Elem] =
-    this.elemPath.ancestorPaths map { path => Elem(this.rootElem, path) }
-
-  /**
-   * Returns `ancestorsOrSelf find { e => p(e) }`
-   */
-  override def findAncestorOrSelf(p: Elem => Boolean): Option[Elem] =
-    ancestorsOrSelf find { e => p(e) }
-
-  /**
-   * Returns `ancestors find { e => p(e) }`
-   */
-  override def findAncestor(p: Elem => Boolean): Option[Elem] =
-    ancestors find { e => p(e) }
 }
 
 object Elem {

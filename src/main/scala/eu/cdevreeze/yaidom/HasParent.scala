@@ -19,7 +19,13 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * API of elements that know their ancestry.
+ * API and implementation trait for elements that can be asked for the ancestor elements, if any.
+ *
+ * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ *
+ * This trait only knows about elements, not about documents as root element parents.
+ *
+ * Based on abstract method `parentOption` alone, this trait offers a rich API for querying the element ancestry of an element.
  *
  * @tparam E The captured element subtype
  *
@@ -35,25 +41,26 @@ trait HasParent[E <: HasParent[E]] { self: E =>
   /**
    * Returns the equivalent `parentOption.get`, throwing an exception if this is the root element
    */
-  def parent: E
+  final def parent: E = parentOption.getOrElse(sys.error("There is no parent element"))
 
   /**
    * Returns all ancestor elements or self
    */
-  def ancestorsOrSelf: immutable.IndexedSeq[E]
+  final def ancestorsOrSelf: immutable.IndexedSeq[E] =
+    self +: (parentOption.toIndexedSeq flatMap ((e: E) => e.ancestorsOrSelf))
 
   /**
    * Returns `ancestorsOrSelf.drop(1)`
    */
-  def ancestors: immutable.IndexedSeq[E]
+  final def ancestors: immutable.IndexedSeq[E] = ancestorsOrSelf.drop(1)
 
   /**
    * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option
    */
-  def findAncestorOrSelf(p: E => Boolean): Option[E]
+  final def findAncestorOrSelf(p: E => Boolean): Option[E] = ancestorsOrSelf find p
 
   /**
    * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option
    */
-  def findAncestor(p: E => Boolean): Option[E]
+  final def findAncestor(p: E => Boolean): Option[E] = ancestors find p
 }

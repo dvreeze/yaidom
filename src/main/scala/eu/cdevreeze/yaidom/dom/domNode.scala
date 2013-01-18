@@ -68,7 +68,7 @@ final class DomDocument(
 }
 
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasText { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasParent[DomElem] with HasText { self =>
 
   require(wrappedNode ne null)
 
@@ -130,6 +130,12 @@ final class DomElem(
   override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
+  }
+
+  override def parentOption: Option[DomElem] = {
+    val parentNodeOption = Option(wrappedNode.getParentNode)
+    val parentElemOption = parentNodeOption collect { case e: w3c.dom.Element => e }
+    parentElemOption map { e => DomNode.wrapElement(e) }
   }
 }
 
