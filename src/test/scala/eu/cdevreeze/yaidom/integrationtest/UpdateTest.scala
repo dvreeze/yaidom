@@ -186,6 +186,8 @@ class UpdateTest extends Suite {
 
     val doc: Document = docParser.parse(is)
 
+    import NodeBuilder._
+
     // Updates on Employee elements:
     // 1. Id attribute prefix with (one char) gender
     // 2. Name element made uppercase. This is coded as a separate case in the partial function below!
@@ -199,7 +201,7 @@ class UpdateTest extends Suite {
         val newId = genderPrefix + (e \@ "id").head
 
         val scope = e.scope ++ Scope.from("" -> "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser")
-        val salaryElem = Elem(QName("salary"), Vector(), scope, Vector(Text("10000", false)))
+        val salaryElem = textElem(QName("salary"), "10000").build(scope)
         val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
       case e: Elem if e.localName == "name" =>
@@ -244,6 +246,8 @@ class UpdateTest extends Suite {
 
     val doc: Document = docParser.parse(is)
 
+    import NodeBuilder._
+
     // Updates on Employee elements:
     // 1. Id attribute prefix with (one char) gender
     // 2. Tried but not picked up: name element made uppercase. This is coded as a separate case in the partial function below!
@@ -257,7 +261,7 @@ class UpdateTest extends Suite {
         val newId = genderPrefix + (e \@ "id").head
 
         val scope = e.scope ++ Scope.from("" -> "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser")
-        val salaryElem = Elem(QName("salary"), Vector(), scope, Vector(Text("10000", false)))
+        val salaryElem = textElem(QName("salary"), "10000").build(scope)
         val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
       case e: Elem if e.localName == "name" =>
