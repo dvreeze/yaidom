@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- See http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser 
+	(but updated with namespace), after the functional update -->
+<Employees
+	xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser">
+	<Employee id="M1">
+		<name>PANKAJ</name>
+		<age>29</age>
+		<role>Java Developer</role>
+		<salary>10000</salary>
+	</Employee>
+	<Employee id="F2">
+		<name>LISA</name>
+		<age>35</age>
+		<role>CSS Developer</role>
+		<salary>10000</salary>
+	</Employee>
+</Employees>

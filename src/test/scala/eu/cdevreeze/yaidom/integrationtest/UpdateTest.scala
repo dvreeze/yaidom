@@ -180,6 +180,124 @@ class UpdateTest extends Suite {
     }
   }
 
+  /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom functional updates */
+  @Test def testAnotherUpdateUsingUpdatedFunction() {
+    val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
+
+    val doc: Document = docParser.parse(is)
+
+    // Updates on Employee elements:
+    // 1. Id attribute prefix with (one char) gender
+    // 2. Name element made uppercase. This is coded as a separate case in the partial function below!
+    // 3. Element gender removed
+    // 4. Element salary added (with value 10000)
+
+    val pf: PartialFunction[Elem, Elem] = {
+      case e: Elem if e.localName == "Employee" =>
+        val gender = (e \ "gender") map (_.text) mkString ""
+        val genderPrefix = if (gender == "Male") "M" else "F"
+        val newId = genderPrefix + (e \@ "id").head
+
+        val scope = e.scope ++ Scope.from("" -> "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser")
+        val salaryElem = Elem(QName("salary"), Vector(), scope, Vector(Text("10000", false)))
+        val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
+        e.plusAttribute(QName("id"), newId).withChildren(newChildren)
+      case e: Elem if e.localName == "name" =>
+        e.withChildren(Vector(Text(e.text.toUpperCase, false)))
+    }
+
+    val updatedDoc = doc updated pf
+    val formattedUpdatedDoc = updatedDoc.withDocumentElement(updatedDoc.documentElement.prettify(4))
+
+    logger.info("Result of update (using function updated):%n%s".format(docPrinter.print(formattedUpdatedDoc.documentElement)))
+
+    // Parse and check the file with the expected updated result
+
+    val expectedNewDoc = docParser.parse(classOf[UpdateTest].getResourceAsStream("updatedEmployee.xml"))
+    val expectedResolvedNewRoot = resolved.Elem(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
+
+    // Is the parsed expected update result indeed as expected?
+
+    expect(Seq("M1", "F2")) {
+      (expectedResolvedNewRoot \\ "Employee") flatMap (_ \@ "id")
+    }
+    expect(Seq("PANKAJ", "LISA")) {
+      (expectedResolvedNewRoot \\ "name") map (_.text)
+    }
+    expect(Seq()) {
+      (expectedResolvedNewRoot \\ "gender")
+    }
+    expect(Seq("10000", "10000")) {
+      (expectedResolvedNewRoot \\ "salary") map (_.text)
+    }
+
+    // Finally we check the result of the functional update against this parsed expected update result
+
+    expect(expectedResolvedNewRoot) {
+      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
+    }
+  }
+
+  /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom function topmostUpdated */
+  @Test def testAnotherUpdateUsingTopmostUpdatedFunction() {
+    val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
+
+    val doc: Document = docParser.parse(is)
+
+    // Updates on Employee elements:
+    // 1. Id attribute prefix with (one char) gender
+    // 2. Tried but not picked up: name element made uppercase. This is coded as a separate case in the partial function below!
+    // 3. Element gender removed
+    // 4. Element salary added (with value 10000)
+
+    val pf: PartialFunction[Elem, Elem] = {
+      case e: Elem if e.localName == "Employee" =>
+        val gender = (e \ "gender") map (_.text) mkString ""
+        val genderPrefix = if (gender == "Male") "M" else "F"
+        val newId = genderPrefix + (e \@ "id").head
+
+        val scope = e.scope ++ Scope.from("" -> "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser")
+        val salaryElem = Elem(QName("salary"), Vector(), scope, Vector(Text("10000", false)))
+        val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
+        e.plusAttribute(QName("id"), newId).withChildren(newChildren)
+      case e: Elem if e.localName == "name" =>
+        e.withChildren(Vector(Text(e.text.toUpperCase, false)))
+    }
+
+    // Using the topmostUpdated method, the name update is not picked up!
+
+    val updatedDoc = doc topmostUpdated pf
+    val formattedUpdatedDoc = updatedDoc.withDocumentElement(updatedDoc.documentElement.prettify(4))
+
+    logger.info("Result of update (using function topmostUpdated):%n%s".format(docPrinter.print(formattedUpdatedDoc.documentElement)))
+
+    // Parse and check the file with the expected updated result
+
+    val expectedNewDoc = docParser.parse(classOf[UpdateTest].getResourceAsStream("anotherUpdatedEmployee.xml"))
+    val expectedResolvedNewRoot = resolved.Elem(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
+
+    // Is the parsed expected update result indeed as expected?
+
+    expect(Seq("M1", "F2")) {
+      (expectedResolvedNewRoot \\ "Employee") flatMap (_ \@ "id")
+    }
+    expect(Seq("Pankaj", "Lisa")) {
+      (expectedResolvedNewRoot \\ "name") map (_.text)
+    }
+    expect(Seq()) {
+      (expectedResolvedNewRoot \\ "gender")
+    }
+    expect(Seq("10000", "10000")) {
+      (expectedResolvedNewRoot \\ "salary") map (_.text)
+    }
+
+    // Finally we check the result of the functional update against this parsed expected update result
+
+    expect(expectedResolvedNewRoot) {
+      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
+    }
+  }
+
   private def attrNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
     result.toSet
