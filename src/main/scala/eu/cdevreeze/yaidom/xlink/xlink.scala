@@ -78,7 +78,7 @@ final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedEle
     locatorXLinks filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }
 
-  def labeledXLinks: Map[String, immutable.IndexedSeq[XLink]] = {
+  def labeledXLinks: Map[String, immutable.IndexedSeq[LabeledXLink]] = {
     (resourceXLinks ++ locatorXLinks) filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }
 }
