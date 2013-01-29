@@ -81,7 +81,7 @@ sealed trait NodeBuilder extends Immutable with Serializable {
   final def toTreeRepr(parentScope: Scope): String = build(parentScope).toTreeRepr(parentScope)
 
   /**
-   * Returns `toTreeRepr`. Dummy placeholders for namespace URIs may be inserted, in order to make the XML namespace-valid.
+   * Returns `toTreeRepr`.
    */
   final override def toString: String = {
     val prefixes: Set[String] = this match {
