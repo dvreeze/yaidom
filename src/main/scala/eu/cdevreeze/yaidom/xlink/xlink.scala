@@ -70,17 +70,17 @@ final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedEle
   def arcXLinks: immutable.IndexedSeq[Arc] = xlinkChildren collect { case xlink: Arc => xlink }
   def resourceXLinks: immutable.IndexedSeq[Resource] = xlinkChildren collect { case xlink: Resource => xlink }
 
-  def labeledResources: Map[String, Resource] = {
-    val result = resourceXLinks flatMap { res => res.labelOption map (label => (label -> res)) }
-    result.toMap
+  def labeledResources: Map[String, immutable.IndexedSeq[Resource]] = {
+    resourceXLinks filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }
 
-  def labeledLocators: Map[String, Locator] = {
-    val result = locatorXLinks flatMap { loc => loc.labelOption map (label => (label -> loc)) }
-    result.toMap
+  def labeledLocators: Map[String, immutable.IndexedSeq[Locator]] = {
+    locatorXLinks filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }
 
-  def labeledXLinks: Map[String, XLink] = labeledResources ++ labeledLocators
+  def labeledXLinks: Map[String, immutable.IndexedSeq[XLink]] = {
+    (resourceXLinks ++ locatorXLinks) filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
+  }
 }
 
 final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
@@ -96,7 +96,12 @@ final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
   def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
-final class Locator(override val wrappedElem: Elem) extends XLink(wrappedElem) {
+trait LabeledXLink extends XLink {
+
+  def labelOption: Option[String]
+}
+
+final class Locator(override val wrappedElem: Elem) extends XLink(wrappedElem) with LabeledXLink {
   require(xlinkType == "locator")
   require(wrappedElem.attributeOption(XLinkHrefEName).isDefined, "Missing %s".format(XLinkHrefEName))
 
@@ -108,7 +113,7 @@ final class Locator(override val wrappedElem: Elem) extends XLink(wrappedElem) {
   def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
-final class Resource(override val wrappedElem: Elem) extends XLink(wrappedElem) {
+final class Resource(override val wrappedElem: Elem) extends XLink(wrappedElem) with LabeledXLink {
   require(xlinkType == "resource")
 
   def labelOption: Option[String] = wrappedElem.attributeOption(XLinkLabelEName)
