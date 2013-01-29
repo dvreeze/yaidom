@@ -80,8 +80,17 @@ sealed trait NodeBuilder extends Immutable with Serializable {
   /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
   final def toTreeRepr(parentScope: Scope): String = build(parentScope).toTreeRepr(parentScope)
 
-  /** Returns `toTreeRepr` */
-  final override def toString: String = toTreeRepr(Scope.Empty)
+  /**
+   * Returns `toTreeRepr`. Dummy placeholders for namespace URIs may be inserted, in order to make the XML namespace-valid.
+   */
+  final override def toString: String = {
+    val prefixes: Set[String] = this match {
+      case e: ElemBuilder => e.nonDeclaredPrefixes(Scope.Empty)
+      case _ => Set()
+    }
+    val parentScope = Scope.from(prefixes.map(pref => (pref -> "placeholder-for-namespace-uri")).toMap)
+    toTreeRepr(parentScope)
+  }
 }
 
 @SerialVersionUID(1L)
@@ -127,6 +136,29 @@ final class ElemBuilder(
       attributes = self.attributes,
       namespaces = self.namespaces,
       children = childNodes map { ch => NodeBuilder.fromNode(ch)(parentScope) })
+  }
+
+  /**
+   * Returns the non-declared prefixes throughout the tree.
+   */
+  def nonDeclaredPrefixes(parentScope: Scope): Set[String] = {
+    val newScope = parentScope.resolve(namespaces)
+
+    val undeclaredPrefixesForThisElem = prefixesInElemNameAndAttributes diff (newScope.withoutDefaultNamespace.map.keySet)
+
+    // Recursive calls (not tail-recursive)
+    val result = children.foldLeft(undeclaredPrefixesForThisElem) { (acc, child) =>
+      child match {
+        case e: ElemBuilder => acc union (e.nonDeclaredPrefixes(newScope))
+        case _ => acc
+      }
+    }
+    result
+  }
+
+  private def prefixesInElemNameAndAttributes: Set[String] = {
+    val result = (qname +: attributes.map(_._1)) flatMap { qname => qname.prefixOption }
+    result.toSet
   }
 }
 

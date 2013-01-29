@@ -109,6 +109,10 @@ class CreationTest extends Suite {
       resolvedElm2
     }
 
+    expect(Set()) {
+      elm2Builder.nonDeclaredPrefixes(Scope.Empty)
+    }
+
     val elm3Builder: ElemBuilder =
       elem(
         qname = QName("books:Book"),
@@ -136,6 +140,13 @@ class CreationTest extends Suite {
 
     expect(Set("books", "names")) {
       prefixesUsed
+    }
+
+    expect(Set("books")) {
+      elm3Builder.nonDeclaredPrefixes(Scope.Empty)
+    }
+    expect(Set()) {
+      elm3Builder.nonDeclaredPrefixes(Scope.from("books" -> "http://bookstore"))
     }
 
     val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
