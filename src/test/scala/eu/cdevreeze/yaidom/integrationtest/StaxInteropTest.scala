@@ -1065,6 +1065,28 @@ class StaxInteropTest extends Suite {
     }
   }
 
+  @Test def testParseFileWithUtf8Bom() {
+    // 1. Parse XML file into Elem
+
+    val staxParser = DocumentParserUsingStax.newInstance
+
+    val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
+    val ba = Stream.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
+    val baWithBom = addUtf8Bom(ba)
+    assert(baWithBom.size == ba.size + 3)
+
+    val root: Elem = staxParser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
+
+    expect(4) {
+      (root \\! "Book").size
+    }
+    expect(4) {
+      (root \\! "Magazine").size
+    }
+  }
+
+  private def addUtf8Bom(ba: Array[Byte]): Array[Byte] = Array[Byte](0xEF.toByte, 0xBB.toByte, 0xBF.toByte) ++ ba
+
   class LoggingResolver extends XMLResolver {
     override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))

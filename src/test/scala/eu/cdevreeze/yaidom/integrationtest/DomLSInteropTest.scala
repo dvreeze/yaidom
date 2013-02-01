@@ -1666,4 +1666,26 @@ class DomLSInteropTest extends Suite {
 
     assert(root.findAllElemsOrSelf.size >= 100)
   }
+
+  @Test def testParseFileWithUtf8Bom() {
+    // 1. Parse XML file into Elem
+
+    val parser = DocumentParserUsingDomLS.newInstance
+
+    val is = classOf[DomLSInteropTest].getResourceAsStream("books.xml")
+    val ba = Stream.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
+    val baWithBom = addUtf8Bom(ba)
+    assert(baWithBom.size == ba.size + 3)
+
+    val root: Elem = parser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
+
+    expect(4) {
+      (root \\! "Book").size
+    }
+    expect(4) {
+      (root \\! "Magazine").size
+    }
+  }
+
+  private def addUtf8Bom(ba: Array[Byte]): Array[Byte] = Array[Byte](0xEF.toByte, 0xBB.toByte, 0xBF.toByte) ++ ba
 }
