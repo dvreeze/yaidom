@@ -1676,6 +1676,7 @@ class DomLSInteropTest extends Suite {
     val ba = Stream.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
     val baWithBom = addUtf8Bom(ba)
     assert(baWithBom.size == ba.size + 3)
+    assert(baWithBom.toSeq.drop(3) == ba.toSeq)
 
     val root: Elem = parser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
