@@ -123,12 +123,6 @@ final class ElemBuilder(
    *
    * The `Scope` of the created (root) element is the passed parent scope, altered by the namespace declarations
    * in this element builder, if any.
-   *
-   * If throughout this element builder tree there are no namespace undeclarations, the following holds for the resulting
-   * element "elem":
-   * {{{
-   * elem.findAllElemsOrSelf forall { e => parentScope.subScopeOf(e.scope) }
-   * }}}
    */
   def build(parentScope: Scope): Elem = {
     val newScope = parentScope.resolve(namespaces)
