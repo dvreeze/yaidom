@@ -24,6 +24,9 @@ import PrettyPrinting._
  * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
  * A `DocBuilder` is itself not a `NodeBuilder`.
  *
+ * A `DocBuilder` is constructed from an optional base URI, a document element (as `ElemBuilder`), top-level processing
+ * instruction builders, if any, and top-level comment builders, if any.
+ *
  * @author Chris de Vreeze
  */
 @SerialVersionUID(1L)
@@ -38,9 +41,16 @@ final class DocBuilder(
   require(processingInstructions ne null)
   require(comments ne null)
 
+  /**
+   * Returns the child node builders, that is, the "document element" and the top-level processing instructions and comments,
+   * if any.
+   */
   def children: immutable.IndexedSeq[NodeBuilder] =
     (processingInstructions ++ comments) :+ documentElement
 
+  /**
+   * Creates a [[eu.cdevreeze.yaidom.Document]] from this document builder.
+   */
   def build(): Document = {
     val parentScope = Scope.Empty
 
@@ -60,6 +70,9 @@ final class DocBuilder(
 
 object DocBuilder {
 
+  /**
+   * Creates a document builder from a document.
+   */
   def fromDocument(doc: Document): DocBuilder = {
     import NodeBuilder._
 

@@ -106,10 +106,16 @@ final class Elem(
 
 object Elem {
 
+  /**
+   * Calls `new Elem(rootElem, elemPath)`
+   */
   def apply(rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
     new Elem(rootElem, elemPath)
   }
 
+  /**
+   * Calls `apply(rootElem, ElemPath.Root)`
+   */
   def apply(rootElem: eu.cdevreeze.yaidom.Elem): Elem = {
     apply(rootElem, ElemPath.Root)
   }

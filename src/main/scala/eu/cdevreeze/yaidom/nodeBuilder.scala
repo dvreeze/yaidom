@@ -75,6 +75,9 @@ sealed trait NodeBuilder extends Immutable with Serializable {
 
   def build(parentScope: Scope): NodeType
 
+  /**
+   * Returns `build(Scope.Empty)`
+   */
   final def build(): NodeType = build(Scope.Empty)
 
   /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
@@ -93,6 +96,9 @@ sealed trait NodeBuilder extends Immutable with Serializable {
   }
 }
 
+/**
+ * Builder for elements. See [[eu.cdevreeze.yaidom.NodeBuilder]].
+ */
 @SerialVersionUID(1L)
 final class ElemBuilder(
   val qname: QName,
@@ -112,9 +118,22 @@ final class ElemBuilder(
   /** Returns the element children as ElemBuilder instances */
   override def allChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
 
+  /**
+   * Creates an `Elem` from this element builder, using the passed parent scope.
+   *
+   * The `Scope` of the created (root) element is the passed parent scope, altered by the namespace declarations
+   * in this element builder, if any.
+   *
+   * If throughout this element builder tree there are no namespace undeclarations, the following holds for the resulting
+   * element "elem":
+   * {{{
+   * elem.findAllElemsOrSelf forall { e => parentScope.subScopeOf(e.scope) }
+   * }}}
+   */
   def build(parentScope: Scope): Elem = {
     val newScope = parentScope.resolve(namespaces)
 
+    // Recursive, but not tail-recursive, calls to the same method
     Elem(
       qname,
       attributes,
@@ -129,14 +148,6 @@ final class ElemBuilder(
 
   /** Returns `withChildren(self.children :+ newChild)`. */
   def plusChild(newChild: NodeBuilder): ElemBuilder = withChildren(self.children :+ newChild)
-
-  def withChildNodes(childNodes: immutable.IndexedSeq[Node])(parentScope: Scope): ElemBuilder = {
-    new ElemBuilder(
-      qname = self.qname,
-      attributes = self.attributes,
-      namespaces = self.namespaces,
-      children = childNodes map { ch => NodeBuilder.fromNode(ch)(parentScope) })
-  }
 
   /**
    * Returns the non-declared prefixes throughout the tree.
@@ -272,6 +283,11 @@ object NodeBuilder {
       fromElem(e)(parentScope)
   }
 
+  /**
+   * Converts an `Elem` to an `ElemBuilder`, given a parent scope.
+   *
+   * The resulting (root) `ElemBuilder` gets the following namespace declarations: `parentScope.relativize(elm.scope)`.
+   */
   def fromElem(elm: Elem)(parentScope: Scope): ElemBuilder = {
     // Recursive call into fromNode, but not tail-recursive
     new ElemBuilder(

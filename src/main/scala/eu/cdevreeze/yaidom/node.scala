@@ -490,7 +490,9 @@ object Elem {
   }
 
   /**
-   * Use this constructor with care, because it is easy to use incorrectly (regarding passed Scopes).
+   * Factory method that mimics the primary constructor, but has defaults for all parameters except the qname.
+   *
+   * Use this factory method with care, because it is easy to use incorrectly (regarding passed Scopes).
    * To construct `Elem`s, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
    */
   def apply(

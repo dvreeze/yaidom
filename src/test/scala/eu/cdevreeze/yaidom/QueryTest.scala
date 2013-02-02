@@ -1095,10 +1095,13 @@ class QueryTest extends Suite {
         if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
         val attrs = book.attributes filter { case (qn, v) => Set(QName("ISBN"), QName("Price")).contains(qn) }
+
+        val children = book.filterChildElems(EName("Title")) map { e => NodeBuilder.fromElem(e)(book.scope) }
+
         elem(
           qname = QName("Book"),
-          attributes = attrs).
-          withChildNodes(book.filterChildElems(EName("Title")))(Scope.Empty).build()
+          attributes = attrs,
+          children = children).build()
       }
 
     val authorsWithBooks =

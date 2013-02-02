@@ -22,6 +22,9 @@ package eu.cdevreeze.yaidom
  * The Declarations is backed by a map from prefixes (or the empty string for the default namespace) to namespace URIs (or the empty string).
  * If the mapped value is the empty string, it is an undeclaration.
  *
+ * Prefix 'xml' is not allowed as key in this map. That prefix, mapping to namespace URI 'http://www.w3.org/XML/1998/namespace',
+ * is always available, without needing any declaration.
+ *
  * This class does not depend on Scopes.
  *
  * @author Chris de Vreeze

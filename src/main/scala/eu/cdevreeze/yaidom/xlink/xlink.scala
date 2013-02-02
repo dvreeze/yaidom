@@ -70,14 +70,23 @@ final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedEle
   def arcXLinks: immutable.IndexedSeq[Arc] = xlinkChildren collect { case xlink: Arc => xlink }
   def resourceXLinks: immutable.IndexedSeq[Resource] = xlinkChildren collect { case xlink: Resource => xlink }
 
+  /**
+   * Returns the XLink resources, grouped by xlink:label attribute
+   */
   def labeledResources: Map[String, immutable.IndexedSeq[Resource]] = {
     resourceXLinks filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }
 
+  /**
+   * Returns the XLink locators, grouped by xlink:label attribute
+   */
   def labeledLocators: Map[String, immutable.IndexedSeq[Locator]] = {
     locatorXLinks filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }
 
+  /**
+   * Returns the XLink resources and locators, grouped by xlink:label attribute
+   */
   def labeledXLinks: Map[String, immutable.IndexedSeq[LabeledXLink]] = {
     (resourceXLinks ++ locatorXLinks) filter { _.labelOption.isDefined } groupBy { _.labelOption.get }
   }

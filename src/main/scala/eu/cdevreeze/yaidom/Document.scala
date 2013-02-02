@@ -32,6 +32,9 @@ import PrettyPrinting._
  * are irrelevant for Documents, unlike for "elements".</li>
  * </ul>
  *
+ * A `Document` is constructed from an optional base URI, a document element (as `Elem`), top-level processing instructions,
+ * if any, and top-level comments, if any.
+ *
  * @author Chris de Vreeze
  */
 @SerialVersionUID(1L)
@@ -46,17 +49,21 @@ final class Document(
   require(processingInstructions ne null)
   require(comments ne null)
 
+  /**
+   * Returns the immediate child nodes of the document. That includes at least the document element, but top-level
+   * comments and processing instructions are also returned.
+   */
   def children: immutable.IndexedSeq[Node] =
     processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
 
-  /** Expensive method to obtain all processing instructions */
+  /** Expensive method to obtain all processing instructions, throughout the tree */
   def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
     val elemPIs: immutable.IndexedSeq[ProcessingInstruction] =
       documentElement.findAllElemsOrSelf flatMap { e: Elem => e.processingInstructionChildren }
     processingInstructions ++ elemPIs
   }
 
-  /** Expensive method to obtain all comments */
+  /** Expensive method to obtain all comments, throughout the tree */
   def allComments: immutable.IndexedSeq[Comment] = {
     val elemComments: immutable.IndexedSeq[Comment] =
       documentElement.findAllElemsOrSelf flatMap { e: Elem => e.commentChildren }
@@ -156,6 +163,11 @@ final class Document(
 
 object Document {
 
+  /**
+   * Creates a `Document` from an optional base URI, the document element, and the top-level comments and processing
+   * instructions, if any. Unlike the primary constructor, this factory method defaults the processing instructions and
+   * comments to empty collections. In other words, only the optional base URI and the document element are mandatory parameters.
+   */
   def apply(
     baseUriOption: Option[URI],
     documentElement: Elem,
@@ -165,5 +177,9 @@ object Document {
     new Document(baseUriOption, documentElement, processingInstructions, comments)
   }
 
+  /**
+   * Creates a `Document` from only the document element. The base URI is empty, and so are the collections of top-level
+   * comments and processing instructions.
+   */
   def apply(documentElement: Elem): Document = apply(None, documentElement)
 }
