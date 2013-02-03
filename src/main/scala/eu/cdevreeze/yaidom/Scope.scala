@@ -349,7 +349,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * the empty String if this Scope has a default namespace.
    */
   def inverse: Map[String, Set[String]] = {
-    val nsPrefixPairs = this.map.toIndexedSeq[(String, String)] map { case (prefix, ns) => (ns, prefix) }
+    val nsPrefixPairs = this.map.toSeq map { case (prefix, ns) => (ns, prefix) }
     val nsPrefixPairsGroupedByNs = nsPrefixPairs groupBy { case (ns, prefix) => ns }
 
     val result = nsPrefixPairsGroupedByNs mapValues { xs =>
