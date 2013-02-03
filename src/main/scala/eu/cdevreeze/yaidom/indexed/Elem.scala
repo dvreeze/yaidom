@@ -71,6 +71,9 @@ final class Elem(
   def elem: eu.cdevreeze.yaidom.Elem =
     rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
+  /**
+   * Returns all child elements. These child elements share the same rootElem with this element, but differ in element paths.
+   */
   override def allChildElems: immutable.IndexedSeq[Elem] = {
     // Remember: this function must be as fast as possible!
     val childElemPathEntries = elem.allChildElemPathEntries
