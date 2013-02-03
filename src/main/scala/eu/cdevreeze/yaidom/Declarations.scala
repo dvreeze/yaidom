@@ -25,7 +25,10 @@ package eu.cdevreeze.yaidom
  * Prefix 'xml' is not allowed as key in this map. That prefix, mapping to namespace URI 'http://www.w3.org/XML/1998/namespace',
  * is always available, without needing any declaration.
  *
- * This class does not depend on Scopes.
+ * This class does not depend on the `Scope` class.
+ *
+ * There are no methods such for subset relationships on namespace declarations (unlike for class `Scope`).
+ * After all, in the presence of namespace undeclarations such a subset relationship would become a bit unnatural.
  *
  * @author Chris de Vreeze
  */
@@ -78,19 +81,6 @@ final case class Declarations(map: Map[String, String]) extends Immutable {
 
   /** Returns `Declarations(this.map -- prefixes)` */
   def --(prefixes: Set[String]): Declarations = Declarations(this.map -- prefixes)
-
-  /** Returns true if this is a sub-declarations of the given parameter `Declarations`. A `Declarations` is considered sub-declarations of itself. */
-  def subDeclarationsOf(declarations: Declarations): Boolean = {
-    val thisMap = map
-    val otherMap = declarations.map
-
-    thisMap.keySet.subsetOf(otherMap.keySet) && {
-      thisMap.keySet forall { pref => thisMap(pref) == otherMap(pref) }
-    }
-  }
-
-  /** Returns true if this is a super-declarations of the given parameter `Declarations`. A `Declarations` is considered super-declarations of itself. */
-  def superDeclarationsOf(declarations: Declarations): Boolean = declarations.subDeclarationsOf(this)
 
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {

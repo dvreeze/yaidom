@@ -148,7 +148,7 @@ final class Elem(
   def writeReplace(): Any = new Elem.ElemSerializationProxy(qname, attributes, scope, children)
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
-  val attributeScope: Scope = Scope(scope.map - "")
+  val attributeScope: Scope = scope.withoutDefaultNamespace
 
   /** The `Elem` name as `EName`, obtained by resolving the element `QName` against the `Scope` */
   override val resolvedName: EName =

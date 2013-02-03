@@ -281,7 +281,7 @@ class DependencyTest extends Suite {
   @Test def testDependenciesOfDeclarations() {
     testDependenciesWithinYaidomTopLevel(
       typeOf[Declarations],
-      "subDeclarationsOf",
+      "withoutUndeclarations",
       expectedDependenciesOfDeclarations)
   }
 

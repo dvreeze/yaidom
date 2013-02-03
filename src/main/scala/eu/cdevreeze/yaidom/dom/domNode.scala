@@ -113,7 +113,7 @@ final class DomElem(
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
-  def attributeScope: Scope = Scope(scope.map - "")
+  def attributeScope: Scope = scope.withoutDefaultNamespace
 
   def declarations: Declarations = DomConversions.extractNamespaceDeclarations(wrappedNode.getAttributes)
 

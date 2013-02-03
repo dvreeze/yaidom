@@ -72,7 +72,10 @@ final class Elem(
     rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
   /**
-   * Returns all child elements. These child elements share the same rootElem with this element, but differ in element paths.
+   * Returns all child elements, in the correct order.
+   *
+   * These child elements share the same rootElem with this element, but differ in the element paths, which have one more
+   * "path entry".
    */
   override def allChildElems: immutable.IndexedSeq[Elem] = {
     // Remember: this function must be as fast as possible!

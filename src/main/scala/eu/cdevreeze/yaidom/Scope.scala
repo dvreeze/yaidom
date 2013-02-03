@@ -237,11 +237,11 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    */
   def resolve(declarations: Declarations): Scope = {
     if (declarations.isEmpty) this else {
-      val declared: Map[String, String] = declarations.map filter { case (pref, ns) => ns.length > 0 }
-
+      val declared: Declarations = declarations.withoutUndeclarations
       val undeclarations: Declarations = declarations.retainingUndeclarations
-      assert(declared.keySet.intersect(undeclarations.map.keySet).isEmpty)
-      val m = (map ++ declared) -- undeclarations.map.keySet
+
+      assert(declared.map.keySet.intersect(undeclarations.map.keySet).isEmpty)
+      val m = (map ++ declared.map) -- undeclarations.map.keySet
       Scope(m)
     }
   }
@@ -283,7 +283,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   }
 
   /**
-   * Returns `scope.retainingDefaultNamespace ++ this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)`
+   * Returns `scope.retainingDefaultNamespace ++ this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)`.
    *
    * Note that for each QName `qname` for which `scope.resolveQNameOption(qname).isDefined`, we have:
    * {{{
@@ -322,7 +322,8 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   }
 
   /**
-   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`.
+   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`. In other words, returns the minimal superscope `sc` of
+   * `scope` such that `this.relativize(sc)` contains no namespace undeclarations.
    *
    * Note that:
    * {{{
@@ -337,6 +338,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     val result = this.resolve(decls.withoutUndeclarations)
 
     assert(scope.subScopeOf(result))
+    assert(this.relativize(result).retainingUndeclarations.isEmpty)
     result
   }
 }

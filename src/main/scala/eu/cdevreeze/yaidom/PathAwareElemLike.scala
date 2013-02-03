@@ -128,6 +128,9 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E
 
   /**
    * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be very efficient.
+   *
+   * Indeed, it is function `findWithElemPath` that is defined in terms of this function, `findWithElemPathEntry`, and not
+   * the other way around.
    */
   def findWithElemPathEntry(entry: ElemPath.Entry): Option[E]
 
