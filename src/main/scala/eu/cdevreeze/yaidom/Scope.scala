@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom
 
+import scala.collection.immutable
+
 /**
  * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace. In other words, <em>in-scope
  * namespaces</em>.
@@ -339,6 +341,23 @@ final case class Scope(map: Map[String, String]) extends Immutable {
 
     assert(scope.subScopeOf(result))
     assert(this.relativize(result).retainingUndeclarations.isEmpty)
+    result
+  }
+
+  /**
+   * Returns the inverse of this Scope, as Map from namespace URIs to collections of prefixes. These prefixes also include
+   * the empty String if this Scope has a default namespace.
+   */
+  def inverse: Map[String, Set[String]] = {
+    val nsPrefixPairs = this.map.toIndexedSeq[(String, String)] map { case (prefix, ns) => (ns, prefix) }
+    val nsPrefixPairsGroupedByNs = nsPrefixPairs groupBy { case (ns, prefix) => ns }
+
+    val result = nsPrefixPairsGroupedByNs mapValues { xs =>
+      val result = xs map { case (ns, prefix) => prefix }
+      result.toSet
+    }
+
+    assert(result.values forall (prefixes => !prefixes.isEmpty))
     result
   }
 }

@@ -307,4 +307,21 @@ class ScopeTest extends Suite {
       qnames map { qname => scope1.notUndeclaring(scope2).resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
     }
   }
+
+  @Test def testInverse() {
+    val scope =
+      Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
+
+    val scopeInverse = scope.inverse
+
+    val expectedScopeInverse = Map(
+      "http://a" -> Set("", "a"),
+      "http://b" -> Set("b"),
+      "http://c" -> Set("c"),
+      "http://d" -> Set("d", "dd"))
+
+    expect(expectedScopeInverse) {
+      scopeInverse
+    }
+  }
 }
