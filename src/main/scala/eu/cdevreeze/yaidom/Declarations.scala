@@ -27,8 +27,8 @@ package eu.cdevreeze.yaidom
  *
  * This class does not depend on the `Scope` class.
  *
- * There are no methods such for subset relationships on namespace declarations (unlike for class `Scope`).
- * After all, in the presence of namespace undeclarations such a subset relationship would become a bit unnatural.
+ * There are no methods for subset relationships on namespace declarations (unlike for class `Scope`).
+ * After all, in the presence of namespace undeclarations, such a subset relationship would become a bit unnatural.
  *
  * @author Chris de Vreeze
  */
