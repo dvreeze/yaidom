@@ -144,7 +144,23 @@ final class ElemBuilder(
   def plusChild(newChild: NodeBuilder): ElemBuilder = withChildren(self.children :+ newChild)
 
   /**
-   * Returns the non-declared prefixes throughout the tree.
+   * Returns true if parentScope suffices to build an `Elem`, that is, if `build(parentScope)` returns an `Elem` instead of
+   * throwing an exception.
+   */
+  def canBuild(parentScope: Scope): Boolean = {
+    val newScope = parentScope.resolve(namespaces)
+
+    val undeclaredPrefixesForThisElem = prefixesInElemNameAndAttributes diff (newScope.withoutDefaultNamespace.map.keySet)
+
+    // Recursive calls (not tail-recursive)
+    undeclaredPrefixesForThisElem.isEmpty && {
+      allChildElems forall { e => e.canBuild(newScope) }
+    }
+  }
+
+  /**
+   * Returns the accumulated used but non-declared prefixes throughout the tree, given the passed parentScope.
+   * A prefix is considered used in an element if it is used in element name and/or attribute names.
    */
   def nonDeclaredPrefixes(parentScope: Scope): Set[String] = {
     val newScope = parentScope.resolve(namespaces)

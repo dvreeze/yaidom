@@ -112,6 +112,7 @@ class CreationTest extends Suite {
     expect(Set()) {
       elm2Builder.nonDeclaredPrefixes(Scope.Empty)
     }
+    assert(elm2Builder.canBuild(Scope.Empty))
 
     val elm3Builder: ElemBuilder =
       elem(
@@ -148,6 +149,8 @@ class CreationTest extends Suite {
     expect(Set()) {
       elm3Builder.nonDeclaredPrefixes(Scope.from("books" -> "http://bookstore"))
     }
+    assert(!elm3Builder.canBuild(Scope.Empty))
+    assert(elm3Builder.canBuild(Scope.from("books" -> "http://bookstore")))
 
     val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
     val resolvedElm3 = resolved.Elem(elm3)
