@@ -3,6 +3,21 @@ CHANGELOG
 =========
 
 
+0.6.7
+=====
+
+This version is again one step closer to version 0.7.0. It contains small improvements, and contains only "unimportant" breaking changes.
+
+* Added ``HasParent`` API, mixed in by ``indexed.Elem`` and ``DomElem``, without changing those classes from the outside
+* Added purely abstract ``ParentElemApi``, ``ElemApi`` etc., which are implemented by ``ParentElemLike``, ``ElemLike`` etc.
+* Added ``ElemBuilder`` methods ``canBuild``, ``nonDeclaredPrefixes`` and ``allDeclarationsAreAtTopLevel``
+* Breaking API change: removed ``ElemBuilder.withChildNodes``
+* Breaking API change: removed confusing methods ``Declarations.subDeclarationsOf`` and ``Declarations.superDeclarationsOf``
+* Breaking API change: XLink labels need not be unique within extended links. This affects the extended link methods like ``labeledXLinks`.
+* Added ``Scope`` methods ``inverse`` and ``prefixOption``
+* A few bug fixes
+* More tests, more documentation
+
 0.6.6
 =====
 
