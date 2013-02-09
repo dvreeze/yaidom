@@ -324,4 +324,20 @@ class ScopeTest extends Suite {
       scopeInverse
     }
   }
+
+  @Test def testPrefixOption() {
+    val scope =
+      Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
+
+    expect(Some("a")) {
+      scope.prefixOption("http://a")
+    }
+    expect(None) {
+      scope.prefixOption("http://abc")
+    }
+    expect(Some("c")) {
+      scope.prefixOption("http://c")
+    }
+    assert(Set[Option[String]](Some("d"), Some("dd")).contains(scope.prefixOption("http://d")))
+  }
 }

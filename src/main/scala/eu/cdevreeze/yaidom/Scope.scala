@@ -360,6 +360,17 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     assert(result.values forall (prefixes => !prefixes.isEmpty))
     result
   }
+
+  /**
+   * Returns a prefix mapping to the given namespace URI, if any, wrapped in an `Option`. If multiple prefixes map to
+   * the given namespace URI, it is undetermined which of the prefixes is returned.
+   *
+   * This method can be handy when "inserting" an "element" into a parent tree, if one wants to reuse prefixes of the
+   * parent tree.
+   */
+  def prefixOption(namespaceUri: String): Option[String] = {
+    this.map collectFirst { case (pref, ns) if (pref != DefaultNsPrefix) && (ns == namespaceUri) => pref }
+  }
 }
 
 object Scope {

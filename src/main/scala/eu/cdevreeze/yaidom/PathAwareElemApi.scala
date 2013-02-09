@@ -86,7 +86,6 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
 
   /**
    * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
-   * This method must be very efficient, which depends on the efficiency of method `findWithElemPathEntry`.
    */
   def findWithElemPath(path: ElemPath): Option[E]
 

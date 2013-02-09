@@ -259,7 +259,7 @@ final class Elem(
 
   /**
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
-   * prefixed namespace undeclarations, given the passed parent scope.
+   * prefixed namespace undeclarations, given the passed parent scope. Note that XML 1.0 does not allow prefix undeclarations.
    */
   def notUndeclaringPrefixes(parentScope: Scope): Elem = {
     val newScope = parentScope.notUndeclaringPrefixes(this.scope)

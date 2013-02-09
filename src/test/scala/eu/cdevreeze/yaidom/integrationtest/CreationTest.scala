@@ -114,6 +114,10 @@ class CreationTest extends Suite {
     }
     assert(elm2Builder.canBuild(Scope.Empty))
 
+    expect(false) {
+      elm2Builder.allDeclarationsAreAtTopLevel
+    }
+
     val elm3Builder: ElemBuilder =
       elem(
         qname = QName("books:Book"),
@@ -151,6 +155,10 @@ class CreationTest extends Suite {
     }
     assert(!elm3Builder.canBuild(Scope.Empty))
     assert(elm3Builder.canBuild(Scope.from("books" -> "http://bookstore")))
+
+    expect(false) {
+      elm3Builder.allDeclarationsAreAtTopLevel
+    }
 
     val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
     val resolvedElm3 = resolved.Elem(elm3)
@@ -252,6 +260,83 @@ class CreationTest extends Suite {
 
     expect(resolvedRoot) {
       resolved.Elem(doc4.documentElement)
+    }
+  }
+
+  @Test def testInsertionWhileReusingPrefixes() {
+    val booksElmBuilder: ElemBuilder =
+      elem(
+        qname = QName("books:Book"),
+        attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+        namespaces = Declarations.from("books" -> "http://bookstore"),
+        children = Vector(
+          textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
+          elem(
+            qname = QName("books:Authors"))))
+
+    expect(true) {
+      booksElmBuilder.canBuild(Scope.Empty)
+    }
+    expect(true) {
+      booksElmBuilder.findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined)
+    }
+    expect(true) {
+      booksElmBuilder.allDeclarationsAreAtTopLevel
+    }
+
+    val booksElm: Elem = booksElmBuilder.build(Scope.Empty)
+
+    val prefixBooks = booksElm.scope.prefixOption("http://bookstore").getOrElse("bks")
+
+    expect("books") {
+      prefixBooks
+    }
+
+    // Building an "independent" author ElemBuilder, which reuses the "books" prefix of the intended parent tree.
+    // "Independence" means: canBuild(Scope.Empty) && (findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined))
+    // In other words, it does not care about the specific parent scope.
+
+    val authorElmBuilder: ElemBuilder =
+      elem(
+        qname = QName(prefixBooks, "Author"),
+        namespaces = Declarations.from(prefixBooks -> "http://bookstore"),
+        children = Vector(
+          textElem(QName(prefixBooks, "First_Name"), "Jennifer"),
+          textElem(QName(prefixBooks, "Last_Name"), "Widom")))
+
+    expect(true) {
+      authorElmBuilder.canBuild(Scope.Empty)
+    }
+    expect(true) {
+      authorElmBuilder.findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined)
+    }
+    expect(true) {
+      authorElmBuilder.allDeclarationsAreAtTopLevel
+    }
+
+    val authorElm: Elem = authorElmBuilder.build(Scope.Empty)
+
+    // Let's functionally insert the author
+
+    val authorsPath = booksElm.findElemPath(_.resolvedName == EName("{http://bookstore}Authors")).
+      getOrElse(sys.error("No 'Authors' element found"))
+
+    val updatedBooksElm: Elem = booksElm.updated(authorsPath) {
+      e => e.plusChild(authorElm)
+    }
+
+    expect(Some(authorsPath)) {
+      updatedBooksElm findElemOrSelfPath { e => e.localName == "Author" } flatMap { path => path.parentPathOption }
+    }
+    expect(true) {
+      updatedBooksElm.findAllElemsOrSelf forall { e => e.scope == Scope.from("books" -> "http://bookstore") }
+    }
+
+    // Although the "inserted" tree had its own namespace declarations, they are superfluous within the parent tree,
+    // and are lost when converting the parent tree back to an ElemBuilder.
+
+    expect(true) {
+      NodeBuilder.fromElem(updatedBooksElm)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
   }
 }

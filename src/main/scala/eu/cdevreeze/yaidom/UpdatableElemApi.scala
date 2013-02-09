@@ -37,9 +37,6 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
   /**
    * Returns the child node index of the given `ElemPath.Entry` with respect to this element as parent element.
    * If the path entry is not found, -1 is returned.
-   *
-   * Methods `updated` (taking `ElemPath`s) heavily use this method to turn `ElemPath`s into child node indexes.
-   * This method should therefore be very fast (preferably using a cache from ElemPath.Entry instances to indexes).
    */
   def childNodeIndex(childPathEntry: ElemPath.Entry): Int
 
@@ -80,11 +77,6 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *   acc.updated(path, pf(e))
    * }
    * }}}
-   *
-   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
-   * and partly because many intermediate element objects may be created. Typically, when all elements must be "functionally
-   * updated" (so when the partial function is defined for all elements), it is better to do so by recursion, without using
-   * this function.
    */
   def updated(pf: PartialFunction[E, E]): E
 
@@ -102,9 +94,6 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *   acc.updated(path, pf(e))
    * }
    * }}}
-   *
-   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
-   * and partly because many intermediate element objects may be created.
    */
   def topmostUpdated(pf: PartialFunction[E, E]): E
 }

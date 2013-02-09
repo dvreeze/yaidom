@@ -146,6 +146,8 @@ final class ElemBuilder(
   /**
    * Returns true if parentScope suffices to build an `Elem`, that is, if `build(parentScope)` returns an `Elem` instead of
    * throwing an exception.
+   *
+   * A complete `ElemBuilder` tree should obey property `canBuild(Scope.Empty)`.
    */
   def canBuild(parentScope: Scope): Boolean = {
     val newScope = parentScope.resolve(namespaces)
@@ -175,6 +177,16 @@ final class ElemBuilder(
       }
     }
     result
+  }
+
+  /**
+   * Returns true if all namespace declarations, if any, are only at top level (so at the root of this tree).
+   *
+   * It is good practice for a complete `ElemBuilder` tree to have only top-level namespace declarations, if any.
+   */
+  def allDeclarationsAreAtTopLevel: Boolean = {
+    val rejected = this filterElems { e => e.namespaces != Declarations.Empty }
+    rejected.isEmpty
   }
 
   private def prefixesInElemNameAndAttributes: Set[String] = {
