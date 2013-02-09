@@ -99,7 +99,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] with ElemApi[E] { self: E =>
 
   /** Resolved name of the element, as `EName` */
   def resolvedName: EName

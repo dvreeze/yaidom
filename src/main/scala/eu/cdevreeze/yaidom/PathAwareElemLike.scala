@@ -124,7 +124,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] { self: E =>
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with PathAwareElemApi[E] { self: E =>
 
   /**
    * Returns the equivalent of `findWithElemPath(ElemPath(immutable.IndexedSeq(entry)))`, but it should be very efficient.

@@ -340,7 +340,7 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait ParentElemLike[E <: ParentElemLike[E]] { self: E =>
+trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E =>
 
   /**
    * Returns all child elements, in the correct order. The faster this method is, the faster the other `ParentElemLike` methods will be.
