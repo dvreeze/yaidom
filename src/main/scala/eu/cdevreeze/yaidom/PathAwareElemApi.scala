@@ -22,6 +22,9 @@ import scala.collection.immutable
  * API for elements as containers of elements, each having a name and possible attributes, as well as an "element path" from
  * the root element. See [[eu.cdevreeze.yaidom.PathAwareElemLike]].
  *
+ * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
+ * an XML database would not use the ``PathAwareElemLike`` implementation, for reasons of efficiency.
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze

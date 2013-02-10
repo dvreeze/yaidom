@@ -21,6 +21,9 @@ import scala.collection.immutable
 /**
  * API for elements as containers of elements, as element nodes in a node tree. See [[eu.cdevreeze.yaidom.ParentElemLike]].
  *
+ * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
+ * an XML database would not use the ``ParentElemLike`` implementation, for reasons of efficiency.
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze

@@ -15,7 +15,7 @@ This version is again one step closer to version 0.7.0. It contains small improv
 * Breaking API change: removed ``ElemBuilder.withChildNodes``
 * Breaking API change: removed confusing methods ``Declarations.subDeclarationsOf`` and ``Declarations.superDeclarationsOf``
 * Breaking API change: XLink labels need not be unique within extended links. This affects the extended link methods like ``labeledXLinks``.
-* Moved method ``plusChild`` (taking one parameter) up ``UpdatableElemLike``
+* Moved method ``plusChild`` (taking one parameter) up to ``UpdatableElemLike``
 * A few bug fixes
 * More tests, and more documentation
 

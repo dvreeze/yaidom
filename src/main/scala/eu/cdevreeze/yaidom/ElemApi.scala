@@ -22,6 +22,9 @@ import scala.collection.immutable
  * API for elements as containers of elements, each having a name and possible attributes.
  * See [[eu.cdevreeze.yaidom.ElemLike]].
  *
+ * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
+ * an XML database would not use the ``ElemLike`` implementation, for reasons of efficiency.
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
