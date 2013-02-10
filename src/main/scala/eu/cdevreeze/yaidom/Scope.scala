@@ -193,7 +193,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    *
    * In other words, returns true if the inverse of `toMap` is also a mathematical function, mapping namespace URIs to unique prefixes.
    *
-   * Invertible scopes offer a one-to-one correspondence between QNames and ENames. This is needed, for example, for `ElemPaths`s.
+   * Invertible scopes offer a one-to-one correspondence between QNames and ENames. This is needed, for example, for `ElemPath`s.
    * Only if there is such a one-to-one correspondence, the indexes in `ElemPath`s and `ElemPathBuilder`s are stable, when converting
    * between the two.
    */
