@@ -73,17 +73,17 @@ class XLinkTest extends Suite {
     }
 
     expect(List("courses/cs101.xml")) {
-      sampleXml.labeledLocators.getOrElse("CS-101", List()) map { link => link.href.toString }
+      sampleXml.labeledLocators.getOrElse("CS-101", Vector()) map { loc => loc.href.toString }
     }
     expect(List("courses/cs101.xml")) {
-      sampleXml.labeledXLinks.getOrElse("CS-101", List()) collect { case loc: Locator => loc.href.toString }
+      sampleXml.labeledXLinks.getOrElse("CS-101", Vector()) collect { case loc: Locator => loc.href.toString }
     }
 
     expect(List(QName("gpa"))) {
-      sampleXml.labeledResources.getOrElse("PatJonesGPA", List()) map { link => link.wrappedElem.qname }
+      sampleXml.labeledResources.getOrElse("PatJonesGPA", Vector()) map { res => res.wrappedElem.qname }
     }
     expect(List(QName("gpa"))) {
-      sampleXml.labeledXLinks.getOrElse("PatJonesGPA", List()) map { link => link.wrappedElem.qname }
+      sampleXml.labeledXLinks.getOrElse("PatJonesGPA", Vector()) map { link => link.wrappedElem.qname }
     }
   }
 
