@@ -1659,7 +1659,8 @@ class ``indexed.Elem`` mixes in query API trait ``ElemLike``. The subtraits of E
 indexed elements. After all, indexed elements know their paths, relative to the root element.
 
 Class ``indexed.Elem`` adds a few query methods to the query methods offered by the ``ElemLike`` API, to obtain ancestor
-elements, in particular the parent element.
+elements, in particular the parent element. These methods are defined in trait ``HasParent``, which is mixed in by class
+``indexed.Elem`` (but also by class ``dom.DomElem`` introduced earlier).
 
 When querying for elements in an "indexed" element tree, for example with method ``findAllElemsOrSelf``, all returned
 "indexed" elements are relative to the same root element, as is to be expected.

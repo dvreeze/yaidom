@@ -71,6 +71,20 @@ class XLinkTest extends Suite {
     expect(Some("students/patjones62.xml")) {
       fromToHrefPairs.headOption map { _._2 }
     }
+
+    expect(List("courses/cs101.xml")) {
+      sampleXml.labeledLocators.getOrElse("CS-101", List()) map { link => link.href.toString }
+    }
+    expect(List("courses/cs101.xml")) {
+      sampleXml.labeledXLinks.getOrElse("CS-101", List()) collect { case loc: Locator => loc.href.toString }
+    }
+
+    expect(List(QName("gpa"))) {
+      sampleXml.labeledResources.getOrElse("PatJonesGPA", List()) map { link => link.wrappedElem.qname }
+    }
+    expect(List(QName("gpa"))) {
+      sampleXml.labeledXLinks.getOrElse("PatJonesGPA", List()) map { link => link.wrappedElem.qname }
+    }
   }
 
   private val sampleXml: xlink.ExtendedLink = {
