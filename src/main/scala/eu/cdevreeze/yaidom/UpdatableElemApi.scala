@@ -49,6 +49,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
   /** Returns a copy in which the given child has been inserted at the given position (0-based) */
   def plusChild(index: Int, child: N): E
 
+  /** Returns a copy in which the given child has been inserted at the end */
+  def plusChild(child: N): E
+
   /** Returns a copy in which the child at the given position (0-based) has been removed */
   def minusChild(index: Int): E
 

@@ -75,6 +75,9 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
   /** Returns a copy in which the given child has been inserted at the given position (0-based) */
   final def plusChild(index: Int, child: N): E = withPatchedChildren(index, Vector(child, children(index)), 1)
 
+  /** Returns a copy in which the given child has been inserted at the end */
+  final def plusChild(child: N): E = withChildren(children :+ child)
+
   /** Returns a copy in which the child at the given position (0-based) has been removed */
   final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
 

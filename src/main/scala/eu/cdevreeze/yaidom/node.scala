@@ -216,9 +216,6 @@ final class Elem(
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }
 
-  /** Returns `withChildren(self.children :+ newChild)`. */
-  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
-
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
   def withAttributes(newAttributes: immutable.IndexedSeq[(QName, String)]): Elem = {
     new Elem(qname, newAttributes, scope, children)

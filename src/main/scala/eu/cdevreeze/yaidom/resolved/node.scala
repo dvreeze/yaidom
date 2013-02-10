@@ -130,9 +130,6 @@ final case class Elem(
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }
 
-  /** Returns `withChildren(self.children :+ newChild)`. */
-  def plusChild(newChild: Node): Elem = withChildren(self.children :+ newChild)
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
