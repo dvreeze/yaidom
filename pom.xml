@@ -3,12 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<scala.version>2.9.1</scala.version>
+		<scala.version>2.10.0</scala.version>
+		<scala.binary.version>2.10</scala.binary.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
-	<artifactId>yaidom_2.9.1</artifactId>
+	<artifactId>yaidom_${scala.binary.version}</artifactId>
 	<version>0.6.8-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -65,7 +66,7 @@
 					<args>
 						<arg>-unchecked</arg>
 						<arg>-deprecation</arg>
-						<!-- <arg>-explaintypes</arg> -->
+						<arg>-feature</arg>
 					</args>
 				</configuration>
 			</plugin>
