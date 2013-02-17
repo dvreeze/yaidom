@@ -44,6 +44,13 @@ import scala.collection.immutable
  *
  * ==Elem more formally==
  *
+ * Let `indexedRootElem` be a root element, so `indexedRootElem.elemPath == ElemPath.Root`.
+ *
+ * Then, first of all, we have:
+ * {{{
+ * indexedRootElem.elem == indexedRootElem.rootElem
+ * }}}
+ *
  * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
@@ -51,11 +58,11 @@ import scala.collection.immutable
  * }}}
  * the following (rather obvious) properties hold for indexed elements:
  * {{{
- * elems forall (e => e.rootElem == this.rootElem)
+ * elems forall (e => e.rootElem == indexedRootElem.rootElem)
  *
  * (elems map (_.elemPath)) == elemPaths
  *
- * elems forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => e.rootElem.findWithElemPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * Analogous remarks apply to the other query methods. For example, given:
@@ -67,11 +74,11 @@ import scala.collection.immutable
  * }}}
  * we have:
  * {{{
- * elems forall (e => e.rootElem == this.rootElem)
+ * elems forall (e => e.rootElem == indexedRootElem.rootElem)
  *
  * (elems map (_.elemPath)) == elemPaths
  *
- * elems forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => e.rootElem.findWithElemPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * @author Chris de Vreeze
