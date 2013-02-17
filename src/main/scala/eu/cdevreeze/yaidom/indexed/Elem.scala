@@ -44,19 +44,29 @@ import scala.collection.immutable
  *
  * ==Elem more formally==
  *
- * The following (rather obvious) properties hold for indexed elements:
+ * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
  * val elemPaths = indexedRootElem.elem.findAllElemOrSelfPaths
+ * }}}
+ * the following (rather obvious) properties hold for indexed elements:
+ * {{{
+ * elems forall (e => e.rootElem == this.rootElem)
+ *
  * (elems map (_.elemPath)) == elemPaths
  *
  * elems forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
- * Analogous remarks apply to the other query methods. For example:
+ * Analogous remarks apply to the other query methods. For example, given:
  * {{{
  * val elemsContainingPlus = indexedRootElem filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
  * val pathsOfElemsContainingPlus = indexedRootElem.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+ * }}}
+ * we have:
+ * {{{
+ * elemsContainingPlus forall (e => e.rootElem == this.rootElem)
+ *
  * (elemsContainingPlus map (_.elemPath)) == pathsOfElemsContainingPlus
  *
  * elemsContainingPlus forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
