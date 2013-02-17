@@ -60,16 +60,18 @@ import scala.collection.immutable
  *
  * Analogous remarks apply to the other query methods. For example, given:
  * {{{
- * val elemsContainingPlus = indexedRootElem filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
- * val pathsOfElemsContainingPlus = indexedRootElem.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+ * // Let p be a predicate (yaidom.Elem => Boolean)
+ *
+ * val elems = indexedRootElem filterElems { e => p(e.elem) }
+ * val elemPaths = indexedRootElem.elem filterElemPaths p
  * }}}
  * we have:
  * {{{
- * elemsContainingPlus forall (e => e.rootElem == this.rootElem)
+ * elems forall (e => e.rootElem == this.rootElem)
  *
- * (elemsContainingPlus map (_.elemPath)) == pathsOfElemsContainingPlus
+ * (elems map (_.elemPath)) == elemPaths
  *
- * elemsContainingPlus forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => indexedRootElem.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * @author Chris de Vreeze
