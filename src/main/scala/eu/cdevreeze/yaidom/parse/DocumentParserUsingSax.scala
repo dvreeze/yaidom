@@ -84,6 +84,8 @@ import org.xml.sax.ext.LexicalHandler
  * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingSax`, but adapts the `parse` method.
  * This would make it possible to set additional properties on the XML Reader, for example.
  *
+ * As can be seen above, parsing is based on the JAXP `SAXParserFactory` instead of the SAX 2.0 `XMLReaderFactory`.
+ *
  * A `DocumentParserUsingSax` instance can be re-used multiple times, from the same thread.
  * If the `SAXParserFactory` is thread-safe, it can even be re-used from multiple threads.
  * Typically a `SAXParserFactory` cannot be trusted to be thread-safe, however. In a web application,

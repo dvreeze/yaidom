@@ -67,7 +67,7 @@ import scala.collection.immutable
  *
  * Analogous remarks apply to the other query methods. For example, given:
  * {{{
- * // Let p be a predicate (yaidom.Elem => Boolean)
+ * // Let p be a predicate of type (yaidom.Elem => Boolean)
  *
  * val elems = indexedRootElem filterElems { e => p(e.elem) }
  * val elemPaths = indexedRootElem.elem filterElemPaths p
