@@ -42,6 +42,25 @@ import scala.collection.immutable
  *   } yield bookElm
  * }}}
  *
+ * ==Design considerations==
+ *
+ * Conceptually, indexed elements are owned by their root element. This could have been expressed in the type system, by
+ * introducing class "IndexedElem", having a member type "IndexedElem.Elem". In such a design, the rootElem would live only
+ * in type "IndexedElem", and would be absent in the "Indexed.Elem" member type. Such a design would make it difficult to
+ * erroneously mix indexed elements from different indexed trees, each having different root elements. On the other hand, such a
+ * design would (intentionally) make each "Elem" a member of a specific "IndexedElem" instance, which could be somewhat cumbersome
+ * to use.
+ *
+ * The design of this `indexed.Elem` class does not make the "owner" of each indexed element as explicit as in the alternative
+ * design described above. Still, the API user can only create top-level indexed elements, so in practice "ownership" should
+ * be somewhat less of an issue.
+ *
+ * In a way, there are similarities between these indexed elements and JAXP DOM trees. After all, when querying a DOM element
+ * for other DOM elements, each such returned element knows its owning document and therefore all of its descendants. This is also
+ * true for indexed elements. The big difference, of course, is that yaidom indexed elements are "immutable snapshots" of
+ * XML data within its context. If they come from queries on the same explicitly created top-level indexed element "snapshot",
+ * then they belong to that same (top-level) "immutable snapshot".
+ *
  * ==Elem more formally==
  *
  * Let `indexedRootElem` be a root element, so `indexedRootElem.elemPath == ElemPath.Root`.
@@ -83,7 +102,7 @@ import scala.collection.immutable
  *
  * @author Chris de Vreeze
  */
-final class Elem(
+final class Elem private[indexed] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   val elemPath: ElemPath) extends ElemLike[Elem] with HasParent[Elem] with HasText with Immutable {
 
@@ -126,22 +145,15 @@ final class Elem(
    * Returns `this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }`
    */
   override def parentOption: Option[Elem] =
-    this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }
+    this.elemPath.parentPathOption map { path => new Elem(this.rootElem, path) }
 }
 
 object Elem {
 
   /**
-   * Calls `new Elem(rootElem, elemPath)`
-   */
-  def apply(rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
-    new Elem(rootElem, elemPath)
-  }
-
-  /**
-   * Calls `apply(rootElem, ElemPath.Root)`
+   * Calls `new Elem(rootElem, ElemPath.Root)`
    */
   def apply(rootElem: eu.cdevreeze.yaidom.Elem): Elem = {
-    apply(rootElem, ElemPath.Root)
+    new Elem(rootElem, ElemPath.Root)
   }
 }

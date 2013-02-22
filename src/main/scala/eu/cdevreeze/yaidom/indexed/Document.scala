@@ -36,6 +36,8 @@ final class Document(
   require(processingInstructions ne null)
   require(comments ne null)
 
+  require(documentElement.elemPath == ElemPath.Root, "The document element must have the root ElemPath")
+
   def document: eu.cdevreeze.yaidom.Document =
     new eu.cdevreeze.yaidom.Document(baseUriOption, documentElement.elem, processingInstructions, comments)
 
