@@ -39,26 +39,26 @@ class XmlLiteralTest extends Suite {
 
   @Test def testXmlLiteral1() {
     val doc: Document = getDocument1
-    
+
     val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
     val expectedBookTitles = List(
-        "A First Course in Database Systems",
-        "Database Systems: The Complete Book",
-        "Hector and Jeff's Database Hints",
-        "Jennifer's Economical Database Hints")
-        
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")
+
     expect(expectedBookTitles) {
       bookTitles
     }
-    
+
     val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
-    
+
     expect(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
-    
+
     val expectedScope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
-    
+
     expect(expectedScope) {
       doc.documentElement.scope
     }
@@ -70,26 +70,26 @@ class XmlLiteralTest extends Suite {
 
   @Test def testXmlLiteral2() {
     val doc: Document = getDocument2
-    
+
     val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
     val expectedBookTitles = List(
-        "A First Course in Database Systems",
-        "Database Systems: The Complete Book",
-        "Hector and Jeff's Database Hints",
-        "Jennifer's Economical Database Hints")
-        
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")
+
     expect(expectedBookTitles) {
       bookTitles
     }
-    
+
     val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
-    
+
     expect(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
-    
+
     val expectedScope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
-    
+
     expect(expectedScope) {
       doc.documentElement.scope
     }
@@ -101,26 +101,26 @@ class XmlLiteralTest extends Suite {
 
   @Test def testXmlLiteral3() {
     val doc: Document = getDocument3
-    
+
     val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
     val expectedBookTitles = List(
-        "A First Course in Database Systems",
-        "Database Systems: The Complete Book",
-        "Hector and Jeff's Database Hints",
-        "Jennifer's Economical Database Hints")
-        
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")
+
     expect(expectedBookTitles) {
       bookTitles
     }
-    
+
     val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
-    
+
     expect(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
-    
+
     val expectedScope = Scope.from("books" -> "http://bookstore")
-    
+
     expect(expectedScope) {
       doc.documentElement.scope
     }
@@ -132,25 +132,25 @@ class XmlLiteralTest extends Suite {
 
   @Test def testXmlLiteral4() {
     val doc: Document = getDocument4
-    
+
     expect(1) {
       doc.documentElement.findAllElemsOrSelf.size
     }
   }
 
   @Test def testWrongXmlLiterals() {
-    val doc = xml"""<a>${ "b" }</a>"""
+    val doc = xml"""<a>${"b"}</a>"""
 
     intercept[java.lang.RuntimeException] {
-      xml"""<a>=${ "b" }</a>"""
+      xml"""<a>=${"b"}</a>"""
     }
 
     intercept[java.lang.RuntimeException] {
-      xml"""<a>ab${ "b" }cd</a>"""
+      xml"""<a>ab${"b"}cd</a>"""
     }
 
     intercept[java.lang.RuntimeException] {
-      xml"""<${ "a" }>wrong</${ "a" }>"""
+      xml"""<${"a"}>wrong</${"a"}>"""
     }
 
     intercept[SAXParseException] {
@@ -158,15 +158,15 @@ class XmlLiteralTest extends Suite {
     }
 
     intercept[SAXParseException] {
-      xml"""<a><b>${ "x" }</a></b>"""
+      xml"""<a><b>${"x"}</a></b>"""
     }
 
     intercept[java.lang.RuntimeException] {
-      xml"""<a x=">${ "wrong" }<">abc</a>"""
+      xml"""<a x=">${"wrong"}<">abc</a>"""
     }
 
     intercept[java.lang.RuntimeException] {
-      xml"""<a x="ab${ "wrong" }cd">abc</a>"""
+      xml"""<a x="ab${"wrong"}cd">abc</a>"""
     }
   }
 
@@ -174,24 +174,24 @@ class XmlLiteralTest extends Suite {
     val doc =
       xml"""<?xml version="1.0" encoding="UTF-8"?>
 <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
-	<Book ISBN="ISBN-0-13-713526-2" Price=${ 85.toString } Edition="3rd">
-		<Title>${ "A First Course in Database Systems" }</Title>
+	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
+		<Title>${"A First Course in Database Systems"}</Title>
 		<Authors>${
-			val elemBuilders =
-			  List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map { case (firstName, lastName) =>
-			    elem(
-			      qname = QName("Author"),
-			      children = Vector(
-			        textElem(QName("First_Name"), firstName),
-			        textElem(QName("Last_Name"), lastName)
-			      ))
-			  }
-			val scope = Scope.from("" -> "http://bookstore")
-			elemBuilders map { elemBuilder => elemBuilder.build(scope) }
-		}</Authors>
+        val elemBuilders =
+          List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map {
+            case (firstName, lastName) =>
+              elem(
+                qname = QName("Author"),
+                children = Vector(
+                  textElem(QName("First_Name"), firstName),
+                  textElem(QName("Last_Name"), lastName)))
+          }
+        val scope = Scope.from("" -> "http://bookstore")
+        elemBuilders map { elemBuilder => elemBuilder.build(scope) }
+      }</Authors>
 	</Book>
 	<Book ISBN="ISBN-0-13-815504-6" Price="100">
-		<Title>${ "Database Systems: The Complete Book" }</Title>
+		<Title>${"Database Systems: The Complete Book"}</Title>
 		<Authors>
 			<Author>
 				<First_Name>Hector</First_Name>
@@ -246,36 +246,36 @@ class XmlLiteralTest extends Suite {
 	</Magazine>
 </books:Bookstore>
 """
-      
+
     doc
   }
 
   private def getDocument2: Document = {
     val elems = {
       val elemBuilders =
-        List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map { case (firstName, lastName) =>
-          elem(
-            qname = QName("Author"),
-            children = Vector(
-              textElem(QName("First_Name"), firstName),
-              textElem(QName("Last_Name"), lastName)
-            ))
+        List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map {
+          case (firstName, lastName) =>
+            elem(
+              qname = QName("Author"),
+              children = Vector(
+                textElem(QName("First_Name"), firstName),
+                textElem(QName("Last_Name"), lastName)))
         }
       val scope = Scope.from("" -> "http://bookstore")
       elemBuilders map { elemBuilder => elemBuilder.build(scope) }
     }
-    
+
     val doc =
       xml"""
 <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
-	<Book ISBN="ISBN-0-13-713526-2" Price=${ 85.toString } Edition="3rd">
-		<Title>${ "A First Course in Database Systems" }</Title>
+	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
+		<Title>${"A First Course in Database Systems"}</Title>
 		<Authors>${
-          elems
-		}</Authors>
+        elems
+      }</Authors>
 	</Book>
 	<Book ISBN="ISBN-0-13-815504-6" Price="100">
-		<Title>${ "Database Systems: The Complete Book" }</Title>
+		<Title>${"Database Systems: The Complete Book"}</Title>
 		<Authors>
 			<Author>
 				<First_Name>Hector</First_Name>
@@ -330,7 +330,7 @@ class XmlLiteralTest extends Suite {
 	</Magazine>
 </books:Bookstore>
 """
-      
+
     doc
   }
 
@@ -338,24 +338,24 @@ class XmlLiteralTest extends Suite {
     val doc =
       xml"""
 <books:Bookstore xmlns:books="http://bookstore">
-	<books:Book ISBN="ISBN-0-13-713526-2" Price=${ 85.toString } Edition="3rd">
-		<books:Title>${ "A First Course in Database Systems" }</books:Title>
+	<books:Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
+		<books:Title>${"A First Course in Database Systems"}</books:Title>
 		<books:Authors>${
-			val elemBuilders =
-			  List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map { case (firstName, lastName) =>
-			    elem(
-			      qname = QName("books:Author"),
-			      children = Vector(
-			        textElem(QName("books:First_Name"), firstName),
-			        textElem(QName("books:Last_Name"), lastName)
-			      ))
-			  }
-			val scope = Scope.from("books" -> "http://bookstore")
-			elemBuilders map { elemBuilder => elemBuilder.build(scope) }
-		}</books:Authors>
+        val elemBuilders =
+          List(("Jeffrey", "Ullman"), ("Jennifer", "Widom")) map {
+            case (firstName, lastName) =>
+              elem(
+                qname = QName("books:Author"),
+                children = Vector(
+                  textElem(QName("books:First_Name"), firstName),
+                  textElem(QName("books:Last_Name"), lastName)))
+          }
+        val scope = Scope.from("books" -> "http://bookstore")
+        elemBuilders map { elemBuilder => elemBuilder.build(scope) }
+      }</books:Authors>
 	</books:Book>
 	<books:Book ISBN="ISBN-0-13-815504-6" Price="100">
-		<books:Title>${ "Database Systems: The Complete Book" }</books:Title>
+		<books:Title>${"Database Systems: The Complete Book"}</books:Title>
 		<books:Authors>
 			<books:Author>
 				<books:First_Name>Hector</books:First_Name>
@@ -410,7 +410,7 @@ class XmlLiteralTest extends Suite {
 	</books:Magazine>
 </books:Bookstore>
 """
-      
+
     doc
   }
 
