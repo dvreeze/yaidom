@@ -18,8 +18,9 @@ package eu.cdevreeze.yaidom
 package literal
 
 import java.io._
-import javax.xml.parsers.SAXParserFactory
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
+import javax.xml.parsers.{ SAXParserFactory, SAXParser }
+import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException, ContentHandler }
+import org.xml.sax.helpers.DefaultHandler
 import scala.collection.{ immutable, mutable }
 import scala.annotation.tailrec
 
@@ -64,6 +65,16 @@ object XmlLiterals {
       def canBeChildNodes(i: Int): Boolean =
         argCanBeChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))
 
+      val (saxParser, handler) = getXmlPartSaxParser
+
+      def checkContextOfAttrValue(i: Int) {
+        checkContextOfAttributeValue(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, handler)
+      }
+
+      def checkContextOfChildren(i: Int) {
+        checkContextOfChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, handler)
+      }
+
       require(
         (0 until args.size) forall { i => canBeAttributeValue(i) || canBeChildNodes(i) },
         "All arguments must be potential attribute values or child node sequences")
@@ -83,9 +94,13 @@ object XmlLiterals {
 
         for (i <- 0 until partsButFirst.size) {
           if (canBeAttributeValue(i)) {
+            checkContextOfAttrValue(i)
+
             sb ++= quotedAttrValuePlaceholder(i)
           } else {
             assert(canBeChildNodes(i))
+            checkContextOfChildren(i)
+
             sb ++= childrenPlaceholderText(i)
           }
           sb ++= partsButFirst(i)
@@ -190,6 +205,59 @@ object XmlLiterals {
       case _ => false
     }
 
+    private def checkContextOfAttributeValue(arg: Any, partBefore: String, partAfter: String)(parser: SAXParser, handler: DefaultHandler) {
+      require(argCanBeAttributeValue(arg, partBefore, partAfter))
+
+      val startElemIdx = partBefore lastIndexWhere { c => c == '<' }
+      require(startElemIdx >= 0, "Expected element having an attribute with attribute value '%s'".format(arg.toString))
+      val sameElemPartBefore = partBefore.substring(startElemIdx)
+
+      val endElemIdx = partAfter indexWhere { c => c == '>' }
+      require(endElemIdx >= 0, "Expected start tag having attribute with attribute value '%s' to end".format(arg.toString))
+      val sameElemPartAfter = partAfter.take(endElemIdx + 1)
+      val selfEndingElemPartAfter =
+        if (sameElemPartAfter.endsWith("/>")) sameElemPartAfter else sameElemPartAfter.dropRight(1) + "/>"
+
+      val emptyAttrValue = "\"\""
+      val xmlString = sameElemPartBefore + emptyAttrValue + selfEndingElemPartAfter
+
+      assert(xmlString.startsWith("<"))
+      assert(xmlString.endsWith("/>"))
+      require(xmlString.count(_ == '<') == 1,
+        "Expected element having an attribute with attribute value '%s'".format(arg.toString))
+      require(xmlString.count(_ == '>') == 1,
+        "Expected element having an attribute with attribute value '%s'".format(arg.toString))
+
+      val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
+
+      parser.parse(is, handler)
+    }
+
+    private def checkContextOfChildNodes(arg: Any, partBefore: String, partAfter: String)(parser: SAXParser, handler: DefaultHandler) {
+      require(argCanBeChildNodes(arg, partBefore, partAfter))
+
+      val startElemIdx = partBefore lastIndexWhere { c => c == '<' }
+      require(startElemIdx >= 0, "Expected element having parameter child nodes")
+      val sameElemPartBefore = partBefore.substring(startElemIdx)
+
+      val endElemIdx = partAfter indexWhere { c => c == '>' }
+      require(endElemIdx >= 0, "Expected element having parameter child nodes")
+      val sameElemPartAfter = partAfter.take(endElemIdx + 1)
+
+      val xmlString = sameElemPartBefore + sameElemPartAfter
+
+      assert(xmlString.startsWith("<"))
+      assert(xmlString.endsWith(">"))
+      require((sameElemPartBefore.trim + sameElemPartAfter.trim).contains("><"),
+        "Expected element having parameter child nodes")
+      require(xmlString.count(_ == '<') == 2, "Expected element having parameter child nodes")
+      require(xmlString.count(_ == '>') == 2, "Expected element having parameter child nodes")
+
+      val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
+
+      parser.parse(is, handler)
+    }
+
     private def hasAllowedArgumentType(arg: Any): Boolean = arg match {
       case s: String => true
       case n: Node => true
@@ -256,6 +324,29 @@ object XmlLiterals {
         () => new parse.DefaultElemProducingSaxHandler with MyEntityResolver with MyErrorHandler)
 
       result
+    }
+
+    private def getXmlPartSaxParser: (SAXParser, DefaultHandler) = {
+      val spf = SAXParserFactory.newInstance
+      spf.setFeature("http://xml.org/sax/features/namespaces", false)
+      spf.setFeature("http://xml.org/sax/features/namespace-prefixes", false)
+
+      val saxParser = spf.newSAXParser
+
+      trait MyEntityResolver extends EntityResolver {
+        override def resolveEntity(publicId: String, systemId: String): InputSource = {
+          new InputSource(new StringReader(""))
+        }
+      }
+
+      trait MyErrorHandler extends ErrorHandler {
+        override def warning(exc: SAXParseException) { throw exc }
+        override def error(exc: SAXParseException) { throw exc }
+        override def fatalError(exc: SAXParseException) { throw exc }
+      }
+
+      val handler = new DefaultHandler with MyEntityResolver with MyErrorHandler
+      (saxParser, handler)
     }
 
     @tailrec
