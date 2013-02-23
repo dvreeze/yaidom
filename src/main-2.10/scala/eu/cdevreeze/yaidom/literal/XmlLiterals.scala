@@ -41,6 +41,8 @@ object XmlLiterals {
     private val attrValuePlaceholderPrefix = placeholderPrefix + "attrvalue_"
 
     def xml(args: Any*): Document = {
+      assert(sc.parts.size == 1 + args.size)
+
       require(sc.parts forall (part => !part.contains(placeholderPrefix)),
         "The XML must not contain placeholder prefix %s".format(placeholderPrefix))
 
@@ -77,12 +79,14 @@ object XmlLiterals {
 
         val partsButFirst = parts.drop(1)
 
+        assert(args.size == partsButFirst.size)
+
         for (i <- 0 until partsButFirst.size) {
           if (canBeAttributeValue(i)) {
             sb ++= quotedAttrValuePlaceholder(i)
           } else {
             assert(canBeChildNodes(i))
-            sb ++= childrenPlaceholder(i)
+            sb ++= childrenPlaceholderText(i)
           }
           sb ++= partsButFirst(i)
         }
@@ -101,16 +105,16 @@ object XmlLiterals {
 
       // Replace the placeholders by Strings or Nodes. To that end, first look up the parameter ElemPaths.
 
-      val parameterPaths: Seq[ParameterPath] = findParameterPaths(indexed.Document(doc), args)
+      val parameterParentPaths: Seq[ParameterParentElemPath] = findParameterParentElemPaths(indexed.Document(doc), args)
 
-      val unmatchedParIndexes = (0 until args.size).toSet.diff(parameterPaths.map(_.parameterIndex).toSet)
+      val unmatchedParIndexes = (0 until args.size).toSet.diff(parameterParentPaths.map(_.parameterIndex).toSet)
       require(
         unmatchedParIndexes.isEmpty,
         "Not all arguments are placed correctly. Offending argument indexes (0-based): %s".format(unmatchedParIndexes.mkString(", ")))
 
-      for (parPath <- parameterPaths) {
-        val parIdx = parPath.parameterIndex
-        val kind = parPath.parameterKind
+      for (parParentPath <- parameterParentPaths) {
+        val parIdx = parParentPath.parameterIndex
+        val kind = parParentPath.parameterKind
 
         if (kind == AttributeValueKind)
           require(canBeAttributeValue(parIdx), "Expected valid attribute value at an attribute value position")
@@ -119,16 +123,18 @@ object XmlLiterals {
       }
 
       val resultDoc: Document =
-        parameterPaths.reverse.foldLeft(doc) { (tmpDoc, parPath) =>
-          val parIdx = parPath.parameterIndex
+        parameterParentPaths.reverse.foldLeft(doc) { (tmpDoc, parParentPath) =>
+          val parIdx = parParentPath.parameterIndex
 
-          val e = doc.documentElement.getWithElemPath(parPath.path)
+          val elem = doc.documentElement.getWithElemPath(parParentPath.path)
 
-          if (parPath.parameterKind == ChildNodesKind) {
+          if (parParentPath.parameterKind == ChildNodesKind) {
             val nodes = extractNodes(args(parIdx))
             require(!nodes.isEmpty, "Expected Node, Node sequence or String for parameter %d (0-based)".format(parIdx))
 
-            tmpDoc.updated(parPath.path) { e =>
+            tmpDoc.updated(parParentPath.path) { e =>
+              // Repairing namespaces in order to prevent namespace undeclarations (for prefixes)
+
               val newChildren = nodes.toIndexedSeq map {
                 case ch: Elem => NodeBuilder.fromElem(ch)(Scope.Empty).build(e.scope)
                 case ch => ch
@@ -137,31 +143,46 @@ object XmlLiterals {
               newE
             }
           } else {
-            assert(parPath.parameterKind == AttributeValueKind)
-            val attrOption = e.attributes find { case (attr, value) => value == attrValuePlaceholder(parIdx) }
+            assert(parParentPath.parameterKind == AttributeValueKind)
+
+            val attrOption = elem.attributes find { case (attr, value) => value == attrValuePlaceholder(parIdx) }
             require(attrOption.isDefined, "Expected attribute for parameter %d (0-based)".format(parIdx))
             val (attrName, attrValue) = attrOption.get
 
-            tmpDoc.updated(parPath.path) { e =>
+            tmpDoc.updated(parParentPath.path) { e =>
               val newE = e.plusAttribute(attrName, args(parIdx).toString)
               newE
             }
           }
         }
+
       resultDoc
     }
 
-    private def childrenPlaceholder(idx: Int): String = childrenPlaceholderPrefix + idx
+    private def childrenPlaceholderText(idx: Int): String = childrenPlaceholderPrefix + idx
 
     private def attrValuePlaceholder(idx: Int): String = attrValuePlaceholderPrefix + idx
 
     private def quotedAttrValuePlaceholder(idx: Int): String = """"%s"""".format(attrValuePlaceholder(idx))
 
+    /**
+     * Returns true if the given argument, surrounded by the given "parts" (which should be free of comments and CDATA),
+     * is possibly an attribute value. The argument type is checked, and the surroundings of the argument are checked somewhat.
+     *
+     * If true is returned, there is still no guarantee that the argument is indeed parsed as attribute value by the XML parser.
+     */
     private def argCanBeAttributeValue(arg: Any, partBefore: String, partAfter: String): Boolean = arg match {
-      case s: String if partBefore.endsWith("=") => true
+      case s: String if partBefore.endsWith("=") &&
+        (partAfter.trim.startsWith(">") || partAfter.headOption.getOrElse('x').isWhitespace) => true
       case _ => false
     }
 
+    /**
+     * Returns true if the given argument, surrounded by the given "parts" (which should be free of comments and CDATA),
+     * is possibly a sequence of nodes. The argument type is checked, and the surroundings of the argument are checked somewhat.
+     *
+     * If true is returned, there is still no guarantee that the argument is indeed parsed as node sequence by the XML parser.
+     */
     private def argCanBeChildNodes(arg: Any, partBefore: String, partAfter: String): Boolean = arg match {
       case s: String if partBefore.trim.endsWith(">") && partAfter.trim.startsWith("</") => true
       case n: Node if partBefore.trim.endsWith(">") && partAfter.trim.startsWith("</") => true
@@ -192,10 +213,10 @@ object XmlLiterals {
       e.attributes.map(_._2).contains(attrValuePlaceholder(idx))
 
     private def matchesChildNodesPlaceholder(e: Elem, idx: Int): Boolean =
-      e.text.trim == childrenPlaceholder(idx)
+      e.text.trim == childrenPlaceholderText(idx)
 
-    private def findParameterPaths(doc: indexed.Document, args: Seq[Any]): immutable.IndexedSeq[ParameterPath] = {
-      val result: immutable.IndexedSeq[ParameterPath] = (0 until args.length).toIndexedSeq flatMap { idx =>
+    private def findParameterParentElemPaths(doc: indexed.Document, args: Seq[Any]): immutable.IndexedSeq[ParameterParentElemPath] = {
+      val result: immutable.IndexedSeq[ParameterParentElemPath] = (0 until args.length).toIndexedSeq flatMap { idx =>
         val elemOption = doc.documentElement findElemOrSelf { e =>
           val matchesAttrValue = matchesAttributeValuePlaceholder(e.elem, idx)
           val matchesChildren = matchesChildNodesPlaceholder(e.elem, idx)
@@ -208,7 +229,7 @@ object XmlLiterals {
           if (matchesAttributeValuePlaceholder(e.elem, idx)) AttributeValueKind else ChildNodesKind
         } getOrElse ChildNodesKind
 
-        elemOption map { e => ParameterPath(idx, e.elemPath, kind) }
+        elemOption map { e => ParameterParentElemPath(idx, e.elemPath, kind) }
       }
       result
     }
@@ -292,5 +313,5 @@ object XmlLiterals {
   private[literal] object AttributeValueKind extends ParameterKind
   private[literal] object ChildNodesKind extends ParameterKind
 
-  private[literal] final case class ParameterPath(parameterIndex: Int, path: ElemPath, parameterKind: ParameterKind) extends Immutable
+  private[literal] final case class ParameterParentElemPath(parameterIndex: Int, path: ElemPath, parameterKind: ParameterKind) extends Immutable
 }
