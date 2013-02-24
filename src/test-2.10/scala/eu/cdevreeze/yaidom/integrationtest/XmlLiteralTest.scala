@@ -56,6 +56,13 @@ class XmlLiteralTest extends Suite {
     expect(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
+    expect(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
+      (firstBookElemOption.get \\ "Author") map { author =>
+        val firstName = (author \ "First_Name").map(_.text).mkString
+        val lastName = (author \ "Last_Name").map(_.text).mkString
+        (firstName, lastName)
+      }
+    }
 
     val expectedScope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
@@ -64,6 +71,11 @@ class XmlLiteralTest extends Suite {
     }
     expect(Set(expectedScope)) {
       val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
+      result.toSet
+    }
+
+    expect(Set("http://bookstore")) {
+      val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
       result.toSet
     }
   }
@@ -87,6 +99,13 @@ class XmlLiteralTest extends Suite {
     expect(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
+    expect(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
+      (firstBookElemOption.get \\ "Author") map { author =>
+        val firstName = (author \ "First_Name").map(_.text).mkString
+        val lastName = (author \ "Last_Name").map(_.text).mkString
+        (firstName, lastName)
+      }
+    }
 
     val expectedScope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
@@ -95,6 +114,11 @@ class XmlLiteralTest extends Suite {
     }
     expect(Set(expectedScope)) {
       val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
+      result.toSet
+    }
+
+    expect(Set("http://bookstore")) {
+      val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
       result.toSet
     }
   }
@@ -118,6 +142,13 @@ class XmlLiteralTest extends Suite {
     expect(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
+    expect(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
+      (firstBookElemOption.get \\ "Author") map { author =>
+        val firstName = (author \ "First_Name").map(_.text).mkString
+        val lastName = (author \ "Last_Name").map(_.text).mkString
+        (firstName, lastName)
+      }
+    }
 
     val expectedScope = Scope.from("books" -> "http://bookstore")
 
@@ -128,6 +159,11 @@ class XmlLiteralTest extends Suite {
       val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
       result.toSet
     }
+
+    expect(Set("http://bookstore")) {
+      val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
+      result.toSet
+    }
   }
 
   @Test def testXmlLiteral4() {
@@ -136,10 +172,15 @@ class XmlLiteralTest extends Suite {
     expect(1) {
       doc.documentElement.findAllElemsOrSelf.size
     }
+
+    expect(Set("http://bookstore")) {
+      val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
+      result.toSet
+    }
   }
 
   @Test def testWrongXmlLiterals() {
-    val doc = xml"""<a>${"b"}</a>"""
+    xml"""<a>${"b"}</a>"""
 
     intercept[java.lang.RuntimeException] {
       xml"""<a>=${"b"}</a>"""
@@ -168,6 +209,172 @@ class XmlLiteralTest extends Suite {
     intercept[java.lang.RuntimeException] {
       xml"""<a x="ab${"wrong"}cd">abc</a>"""
     }
+
+    xml"""<a x=${1.toString}>abc</a>"""
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a x=${1}>abc</a>"""
+    }
+
+    xml"""<a x=${"http://aRealAttribute"}>abc</a>"""
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a xmlns=${"http://notARealAttribute"}>abc</a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a xmlns:pref=${"http://notARealAttribute"}>abc</a>"""
+    }
+
+    // TODO Should a RuntimeException be thrown instead?
+    intercept[SAXParseException] {
+      xml"""<a><!-- ignored comment -->${"b"}</a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a><!-- ignored comment ${"b"}--></a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a><![CDATA[ ignored CDATA ]]>${"b"}</a>"""
+    }
+
+    intercept[java.lang.RuntimeException] {
+      xml"""<a><![CDATA[ ignored CDATA ${"b"}]]></a>"""
+    }
+  }
+
+  @Test def testUpdateEmployee() {
+    val doc: Document = getEmployeeDocument
+
+    expect(11) {
+      doc.documentElement.findAllElemsOrSelf.size
+    }
+    expect(1) {
+      doc.allComments.size
+    }
+
+    val ns = "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser"
+
+    def updateEmployee(empElem: Elem): Elem = {
+      require(empElem.resolvedName == EName(ns, "Employee"))
+
+      val gender = (empElem \ "gender") map (_.text) mkString ""
+      val genderPrefix = if (gender == "Male") "M" else "F"
+      val newId = genderPrefix + (empElem \@ "id").head
+
+      val newName = (empElem \ "name").map(_.text).mkString.toUpperCase
+
+      xml"""<Employee xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser" id=${newId}>
+		<name>${newName}</name>
+		<age>${(empElem \ "age").map(_.text).mkString}</age>
+		<role>${(empElem \ "role").map(_.text).mkString}</role>
+		<salary>10000</salary>
+	</Employee>""".documentElement
+    }
+
+    val pf: PartialFunction[Elem, Elem] = {
+      case empElem: Elem if empElem.localName == "Employee" => updateEmployee(empElem)
+    }
+    val newDoc = doc.updated(pf)
+
+    val resolvedNewRoot = resolved.Elem(newDoc.documentElement).removeAllInterElementWhitespace
+
+    expect(11) {
+      resolvedNewRoot.findAllElemsOrSelf.size
+    }
+    expect(List(
+      EName(ns, "Employees"),
+      EName(ns, "Employee"),
+      EName(ns, "name"),
+      EName(ns, "age"),
+      EName(ns, "role"),
+      EName(ns, "salary"),
+      EName(ns, "Employee"),
+      EName(ns, "name"),
+      EName(ns, "age"),
+      EName(ns, "role"),
+      EName(ns, "salary"))) {
+      resolvedNewRoot.findAllElemsOrSelf map { _.resolvedName }
+    }
+    expect(List("M1", "F2")) {
+      resolvedNewRoot.filterElems(EName(ns, "Employee")) map (_.attribute(EName("id")))
+    }
+    expect(List(
+      EName(ns, "name"),
+      EName(ns, "age"),
+      EName(ns, "role"),
+      EName(ns, "salary"),
+      EName(ns, "name"),
+      EName(ns, "age"),
+      EName(ns, "role"),
+      EName(ns, "salary"))) {
+
+      for {
+        empElem <- resolvedNewRoot.filterElems(EName(ns, "Employee"))
+        empChildElem <- empElem.allChildElems
+      } yield empChildElem.resolvedName
+    }
+
+    expect(List("PANKAJ", "LISA")) {
+      for {
+        empElem <- resolvedNewRoot.filterElems(EName(ns, "Employee"))
+        nameElem <- empElem.filterChildElems(EName(ns, "name"))
+      } yield nameElem.text
+    }
+
+    val expectedResolvedNewRoot = {
+      import resolved._
+
+      Elem(
+        EName(ns, "Employees"),
+        Map(),
+        Vector(
+          Elem(
+            EName(ns, "Employee"),
+            Map(EName("id") -> "M1"),
+            Vector(
+              Elem(
+                EName(ns, "name"),
+                Map(),
+                Vector(Text("PANKAJ"))),
+              Elem(
+                EName(ns, "age"),
+                Map(),
+                Vector(Text("29"))),
+              Elem(
+                EName(ns, "role"),
+                Map(),
+                Vector(Text("Java Developer"))),
+              Elem(
+                EName(ns, "salary"),
+                Map(),
+                Vector(Text("10000"))))),
+          Elem(
+            EName(ns, "Employee"),
+            Map(EName("id") -> "F2"),
+            Vector(
+              Elem(
+                EName(ns, "name"),
+                Map(),
+                Vector(Text("LISA"))),
+              Elem(
+                EName(ns, "age"),
+                Map(),
+                Vector(Text("35"))),
+              Elem(
+                EName(ns, "role"),
+                Map(),
+                Vector(Text("CSS Developer"))),
+              Elem(
+                EName(ns, "salary"),
+                Map(),
+                Vector(Text("10000"))))))).removeAllInterElementWhitespace
+    }
+
+    expect(expectedResolvedNewRoot) {
+      resolvedNewRoot
+    }
   }
 
   private def getDocument1: Document = {
@@ -182,12 +389,14 @@ class XmlLiteralTest extends Suite {
             case (firstName, lastName) =>
               elem(
                 qname = QName("Author"),
+                namespaces = Declarations.from("" -> "http://bookstore"),
                 children = Vector(
                   textElem(QName("First_Name"), firstName),
                   textElem(QName("Last_Name"), lastName)))
           }
-        val scope = Scope.from("" -> "http://bookstore")
-        elemBuilders map { elemBuilder => elemBuilder.build(scope) }
+
+        require(elemBuilders forall (_.canBuild(Scope.Empty)))
+        elemBuilders map { elemBuilder => elemBuilder.build() }
       }</Authors>
 	</Book>
 	<Book ISBN="ISBN-0-13-815504-6" Price="100">
@@ -257,12 +466,14 @@ class XmlLiteralTest extends Suite {
           case (firstName, lastName) =>
             elem(
               qname = QName("Author"),
+              namespaces = Declarations.from("" -> "http://bookstore"),
               children = Vector(
                 textElem(QName("First_Name"), firstName),
                 textElem(QName("Last_Name"), lastName)))
         }
-      val scope = Scope.from("" -> "http://bookstore")
-      elemBuilders map { elemBuilder => elemBuilder.build(scope) }
+
+      require(elemBuilders forall (_.canBuild(Scope.Empty)))
+      elemBuilders map { elemBuilder => elemBuilder.build() }
     }
 
     val doc =
@@ -346,12 +557,14 @@ class XmlLiteralTest extends Suite {
             case (firstName, lastName) =>
               elem(
                 qname = QName("books:Author"),
+                namespaces = Declarations.from("books" -> "http://bookstore"),
                 children = Vector(
                   textElem(QName("books:First_Name"), firstName),
                   textElem(QName("books:Last_Name"), lastName)))
           }
-        val scope = Scope.from("books" -> "http://bookstore")
-        elemBuilders map { elemBuilder => elemBuilder.build(scope) }
+
+        require(elemBuilders forall (_.canBuild(Scope.Empty)))
+        elemBuilders map { elemBuilder => elemBuilder.build() }
       }</books:Authors>
 	</books:Book>
 	<books:Book ISBN="ISBN-0-13-815504-6" Price="100">
@@ -417,6 +630,30 @@ class XmlLiteralTest extends Suite {
   private def getDocument4: Document = {
     val doc =
       xml"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />"""
+
+    doc
+  }
+
+  private def getEmployeeDocument: Document = {
+    val doc =
+      xml"""
+    <!-- See http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser 
+	(but updated with namespace) -->
+<Employees
+	xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser">
+	<Employee id="1">
+		<name>Pankaj</name>
+		<age>29</age>
+		<role>Java Developer</role>
+		<gender>Male</gender>
+	</Employee>
+	<Employee id="2">
+		<name>Lisa</name>
+		<age>35</age>
+		<role>CSS Developer</role>
+		<gender>Female</gender>
+	</Employee>
+</Employees>"""
 
     doc
   }

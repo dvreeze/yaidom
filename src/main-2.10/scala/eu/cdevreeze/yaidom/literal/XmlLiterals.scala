@@ -65,14 +65,14 @@ object XmlLiterals {
       def canBeChildNodes(i: Int): Boolean =
         argCanBeChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))
 
-      val (saxParser, handler) = getXmlPartSaxParser
+      val saxParser = getSaxParser
 
       def checkContextOfAttrValue(i: Int) {
-        checkContextOfAttributeValue(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, handler)
+        checkContextOfAttributeValue(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, getSaxHandler)
       }
 
       def checkContextOfChildren(i: Int) {
-        checkContextOfChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, handler)
+        checkContextOfChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, getSaxHandler)
       }
 
       require(
@@ -205,7 +205,12 @@ object XmlLiterals {
       case _ => false
     }
 
-    private def checkContextOfAttributeValue(arg: Any, partBefore: String, partAfter: String)(parser: SAXParser, handler: DefaultHandler) {
+    /**
+     * Performs a stronger check than `argCanBeAttributeValue`, throwing an exception if the check fails.
+     *
+     * In this check, a SAX parser tries to parse the surrounding element that may have the given attribute value.
+     */
+    private def checkContextOfAttributeValue(arg: Any, partBefore: String, partAfter: String)(saxParser: SAXParser, handler: DefaultHandler) {
       require(argCanBeAttributeValue(arg, partBefore, partAfter))
 
       val startElemIdx = partBefore lastIndexWhere { c => c == '<' }
@@ -230,10 +235,15 @@ object XmlLiterals {
 
       val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
 
-      parser.parse(is, handler)
+      saxParser.parse(is, handler)
     }
 
-    private def checkContextOfChildNodes(arg: Any, partBefore: String, partAfter: String)(parser: SAXParser, handler: DefaultHandler) {
+    /**
+     * Performs a stronger check than `argCanBeChildNodes`, throwing an exception if the check fails.
+     *
+     * In this check, a SAX parser tries to parse the surrounding element that may have the given children.
+     */
+    private def checkContextOfChildNodes(arg: Any, partBefore: String, partAfter: String)(saxParser: SAXParser, handler: DefaultHandler) {
       require(argCanBeChildNodes(arg, partBefore, partAfter))
 
       val startElemIdx = partBefore lastIndexWhere { c => c == '<' }
@@ -255,7 +265,7 @@ object XmlLiterals {
 
       val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
 
-      parser.parse(is, handler)
+      saxParser.parse(is, handler)
     }
 
     private def hasAllowedArgumentType(arg: Any): Boolean = arg match {
@@ -326,13 +336,16 @@ object XmlLiterals {
       result
     }
 
-    private def getXmlPartSaxParser: (SAXParser, DefaultHandler) = {
+    private def getSaxParser: SAXParser = {
       val spf = SAXParserFactory.newInstance
       spf.setFeature("http://xml.org/sax/features/namespaces", false)
       spf.setFeature("http://xml.org/sax/features/namespace-prefixes", false)
 
       val saxParser = spf.newSAXParser
+      saxParser
+    }
 
+    private def getSaxHandler: DefaultHandler = {
       trait MyEntityResolver extends EntityResolver {
         override def resolveEntity(publicId: String, systemId: String): InputSource = {
           new InputSource(new StringReader(""))
@@ -346,7 +359,7 @@ object XmlLiterals {
       }
 
       val handler = new DefaultHandler with MyEntityResolver with MyErrorHandler
-      (saxParser, handler)
+      handler
     }
 
     @tailrec
