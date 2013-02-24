@@ -31,6 +31,10 @@ import scala.annotation.tailrec
  *
  * The underlying parser can not yet be configured.
  *
+ * Note: Try to avoid very large String arguments (in the StringContext). Otherwise the JVM may respond with:
+ * "java.lang.ClassFormatError: Unknown constant tag XX in class file", where XX is a number (e.g. 32). This is a 64K
+ * String limit of the JVM. Fortunately, there is usually a way to avoid very large String arguments.
+ *
  * @author Chris de Vreeze
  */
 object XmlLiterals {
@@ -65,14 +69,14 @@ object XmlLiterals {
       def canBeChildNodes(i: Int): Boolean =
         argCanBeChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))
 
-      val saxParser = getSaxParser
+      val saxParser = getSaxParserForPartParsing
 
       def checkContextOfAttrValue(i: Int) {
-        checkContextOfAttributeValue(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, getSaxHandler)
+        checkContextOfAttributeValue(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, getSaxHandlerForPartParsing)
       }
 
       def checkContextOfChildren(i: Int) {
-        checkContextOfChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, getSaxHandler)
+        checkContextOfChildNodes(args(i), partsWithoutCommentsAndCData(i), partsWithoutCommentsAndCData(i + 1))(saxParser, getSaxHandlerForPartParsing)
       }
 
       require(
@@ -336,7 +340,7 @@ object XmlLiterals {
       result
     }
 
-    private def getSaxParser: SAXParser = {
+    private def getSaxParserForPartParsing: SAXParser = {
       val spf = SAXParserFactory.newInstance
       spf.setFeature("http://xml.org/sax/features/namespaces", false)
       spf.setFeature("http://xml.org/sax/features/namespace-prefixes", false)
@@ -345,7 +349,7 @@ object XmlLiterals {
       saxParser
     }
 
-    private def getSaxHandler: DefaultHandler = {
+    private def getSaxHandlerForPartParsing: DefaultHandler = {
       trait MyEntityResolver extends EntityResolver {
         override def resolveEntity(publicId: String, systemId: String): InputSource = {
           new InputSource(new StringReader(""))
