@@ -25,7 +25,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.SAXParseException
 import NodeBuilder._
-import literal.XmlLiterals._
+import literal._
 
 /**
  * XML literal test case.

@@ -23,4 +23,14 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-package object literal
+package object literal {
+
+  implicit class XmlLiteralHelper(val sc: StringContext) {
+
+    private val helper = new XmlLiterals.XmlLiteralHelper(sc)
+
+    def xml(args: Any*): Document = {
+      helper.xml(args: _*)
+    }
+  }
+}

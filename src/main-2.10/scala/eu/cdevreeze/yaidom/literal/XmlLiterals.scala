@@ -31,15 +31,15 @@ import scala.annotation.tailrec
  *
  * The underlying parser can not yet be configured.
  *
- * Note: Try to avoid very large String arguments (in the StringContext). Otherwise the JVM may respond with:
+ * Note: Try to avoid very large String (literal) arguments (in the StringContext). Otherwise the JVM may respond with:
  * "java.lang.ClassFormatError: Unknown constant tag XX in class file", where XX is a number (e.g. 32). This is a 64K
- * String limit of the JVM. Fortunately, there is usually a way to avoid very large String arguments.
+ * String literal limit of the JVM. Fortunately, there is usually a way to avoid very large String literal arguments.
  *
  * @author Chris de Vreeze
  */
-object XmlLiterals {
+private[literal] object XmlLiterals {
 
-  implicit class XmlHelper(val sc: StringContext) {
+  private[literal] final class XmlLiteralHelper(val sc: StringContext) {
 
     private val placeholderPrefix = "___par_"
     private val childrenPlaceholderPrefix = placeholderPrefix + "children_"
