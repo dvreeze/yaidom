@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom
 
 import scala.collection.{ immutable, mutable }
+import scala.annotation.tailrec
 
 /**
  * API and implementation trait for elements that can be asked for the ancestor elements, if any.
@@ -57,10 +58,18 @@ trait HasParent[E <: HasParent[E]] { self: E =>
   /**
    * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option
    */
-  final def findAncestorOrSelf(p: E => Boolean): Option[E] = ancestorsOrSelf find p
+  @tailrec
+  final def findAncestorOrSelf(p: E => Boolean): Option[E] = {
+    if (p(self)) Some(self) else {
+      val optParent = parentOption
+      if (optParent.isEmpty) None else optParent.get.findAncestorOrSelf(p)
+    }
+  }
 
   /**
    * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option
    */
-  final def findAncestor(p: E => Boolean): Option[E] = ancestors find p
+  final def findAncestor(p: E => Boolean): Option[E] = {
+    parentOption flatMap { e => e.findAncestorOrSelf(p) }
+  }
 }
