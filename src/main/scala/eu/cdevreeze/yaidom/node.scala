@@ -235,6 +235,16 @@ final class Elem(
     else withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))
   }
 
+  /**
+   * Functionally removes the given attribute, if present.
+   *
+   * More precisely, returns `withAttributes(self.attributes filterNot (_._1 == attributeName))`.
+   */
+  def minusAttribute(attributeName: QName): Elem = {
+    val newAttributes = self.attributes filterNot { case (attrName, attrValue) => attrName == attributeName }
+    withAttributes(newAttributes)
+  }
+
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 

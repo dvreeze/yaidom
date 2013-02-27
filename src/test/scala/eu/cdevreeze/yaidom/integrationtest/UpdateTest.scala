@@ -238,6 +238,12 @@ class UpdateTest extends Suite {
     expect(expectedResolvedNewRoot) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
     }
+
+    // Same check, but invoking plusAttribute and minusAttribute as well.
+    expect(expectedResolvedNewRoot) {
+      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace.
+        minusAttribute(QName("x")).plusAttribute(QName("x"), "v").minusAttribute(QName("x")))
+    }
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom function topmostUpdated */
