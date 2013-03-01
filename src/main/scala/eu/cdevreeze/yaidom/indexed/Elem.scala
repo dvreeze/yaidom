@@ -133,6 +133,18 @@ final class Elem private[indexed] (
   override def hashCode: Int = (rootElem, elemPath).hashCode
 
   /**
+   * Returns the namespaces declared in this element.
+   *
+   * If the original parsed XML document contained duplicate namespace declarations (i.e. namespace declarations that are the same
+   * as some namespace declarations in their context), these duplicate namespace declarations were lost during parsing of the
+   * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
+   */
+  final def namespaces: Declarations = {
+    val parentScope = this.parentOption map { e => e.elem.scope } getOrElse (Scope.Empty)
+    parentScope.relativize(this.elem.scope)
+  }
+
+  /**
    * Returns the concatenation of the texts of text children, including whitespace. Non-text children are ignored.
    * If there are no text children, the empty string is returned.
    */
