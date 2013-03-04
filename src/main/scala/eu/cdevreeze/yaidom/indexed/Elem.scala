@@ -133,6 +133,11 @@ final class Elem private[indexed] (
   override def hashCode: Int = (rootElem, elemPath).hashCode
 
   /**
+   * Returns `this.elem.scope`
+   */
+  final def scope: Scope = this.elem.scope
+
+  /**
    * Returns the namespaces declared in this element.
    *
    * If the original parsed XML document contained duplicate namespace declarations (i.e. namespace declarations that are the same

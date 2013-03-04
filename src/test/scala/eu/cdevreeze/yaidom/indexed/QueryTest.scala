@@ -37,6 +37,27 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class QueryTest extends Suite {
 
+  @Test def testQueryAll() {
+    require(indexedBookstore.localName == "Bookstore")
+
+    val elems = indexedBookstore.findAllElemsOrSelf
+
+    expect(true) {
+      !elems.isEmpty
+    }
+
+    expect(true) {
+      elems forall { e =>
+        val parentScope = e.parentOption.map(_.scope).getOrElse(Scope.Empty)
+        parentScope.resolve(e.namespaces) == e.scope
+      }
+    }
+
+    expect(indexedBookstore.elem.findAllElemsOrSelf) {
+      elems map { e => e.elem }
+    }
+  }
+
   @Test def testQueryBookTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
