@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringEscapeUtils
  *
  * This API is safe to use, because of the use of "immutability everywhere". On the down-side, this very likely negatively
  * affects performance. On the other hand, the design is such that repeated nested indentation (shifting) does not cause
- * any string concatenation, until the lines are all materialized.
+ * many unnecessary string concatenations.
  *
  * @author Chris de Vreeze
  */
@@ -33,24 +33,50 @@ private[yaidom] object PrettyPrinting {
 
   private val NewLine = "%n".format()
 
-  final class Line(val indent: Int, val line: String) {
-    require(line ne null)
-    require(line.lines.size <= 1, "Expected no newlines in the passed string, starting with '%s'".format(line.take(30)))
+  /**
+   * Line, consisting of an indent, followed by 0 or more prefixes, followed by the initial content of the line, followed
+   * by 0 or more suffixes (which are stored in reverse order).
+   *
+   * This class is designed to make `LineSeq` operations such as `append` and `prepend` efficient, without creating any
+   * unnecessary string literals.
+   */
+  final class Line(val indent: Int, val initialLine: String, val prefixes: List[String], val suffixesReversed: List[String]) {
+    require(initialLine ne null)
+    require(initialLine.indexOf('\n') < 0)
+    require(prefixes forall (s => s.indexOf('\n') < 0))
+    require(suffixesReversed forall (s => s.indexOf('\n') < 0))
+
+    def this(indent: Int, line: String) = this(indent, line, Nil, Nil)
 
     def this(line: String) = this(0, line)
 
     /** Functionally adds an indent */
     def plusIndent(addedIndent: Int): Line = {
-      if (addedIndent == 0) this else new Line(addedIndent + indent, line)
+      if (addedIndent == 0) this else new Line(addedIndent + indent, initialLine, prefixes, suffixesReversed)
     }
 
-    /** Functionally adds a trailing string (which must contain no newline) to this line */
-    def +(s: String): Line = {
-      if (s.isEmpty) this else new Line(indent, (line + s))
+    /** Functionally appends a trailing string (which must contain no newline) to this line */
+    def append(s: String): Line = {
+      if (s.isEmpty) this else new Line(indent, initialLine, prefixes, (s :: suffixesReversed))
     }
 
-    /** Returns the resulting line as complete materialized line String with indentation */
-    override def toString: String = (" " * indent) + line
+    /** Functionally prepends a string (which must contain no newline) to this line */
+    def prepend(s: String): Line = {
+      if (s.isEmpty) this else new Line(indent, initialLine, s :: prefixes, suffixesReversed)
+    }
+
+    /**
+     * Adds the string representation of this line to the given StringBuilder, without creating any new string literals.
+     */
+    def addToStringBuilder(sb: StringBuilder): Unit = {
+      for (i <- 0 until indent) sb.append(' ')
+
+      prefixes foreach { s => sb.append(s) }
+
+      sb.append(initialLine)
+
+      suffixesReversed.reverse foreach { s => sb.append(s) }
+    }
   }
 
   /**
@@ -65,14 +91,31 @@ private[yaidom] object PrettyPrinting {
     val lines = s.linesWithSeparators
 
     val result = new StringBuilder
-    result.append("\"")
+    result.append('"')
 
     for (line <- lines) {
-      result.append(StringEscapeUtils.escapeJava(line))
+      appendEscapedJava(result, line)
     }
 
-    result.append("\"")
+    result.append('"')
     result.toString
+  }
+
+  private val commonWhitespace = Set('\r', '\n', ' ', '\t')
+
+  private def appendEscapedJava(sb: StringBuilder, s: String) {
+    if (s forall (c => java.lang.Character.isLetterOrDigit(c) || commonWhitespace.contains(c))) appendNaivelyEscapedJava(sb, s)
+    else sb.append(StringEscapeUtils.escapeJava(s))
+  }
+
+  private def appendNaivelyEscapedJava(sb: StringBuilder, s: String) {
+    // Expecting only letters, digits or "common" whitespace
+    for (c <- s) {
+      if (c == '\r') sb ++= "\\r"
+      else if (c == '\n') sb ++= "\\n"
+      else if (c == '\t') sb ++= "\\t"
+      else sb += c
+    }
   }
 
   /**
@@ -89,12 +132,21 @@ private[yaidom] object PrettyPrinting {
       val linesButLast = lines.dropRight(1)
       val lastLine = lines.last
 
+      val sb = new StringBuilder
+
       for (line <- linesButLast) {
-        val resultLine = new Line("\"" + StringEscapeUtils.escapeJava(line) + "\" +")
-        result += resultLine
+        sb.clear()
+        sb.append("\"")
+        appendEscapedJava(sb, line)
+        sb.append("\" +")
+        result += new Line(sb.toString)
       }
 
-      result += new Line("\"" + StringEscapeUtils.escapeJava(lastLine) + "\"")
+      sb.clear()
+      sb.append("\"")
+      appendEscapedJava(sb, lastLine)
+      sb.append("\"")
+      result += new Line(sb.toString)
     }
 
     new LineSeq(result.toIndexedSeq)
@@ -119,7 +171,7 @@ private[yaidom] object PrettyPrinting {
       require(s.indexOf('\n') < 0, "The string to append must not have any newlines")
 
       if (lines.isEmpty) this else {
-        val result = lines.dropRight(1) :+ (lines.last + s)
+        val result = lines.dropRight(1) :+ (lines.last.append(s))
         new LineSeq(result)
       }
     }
@@ -132,9 +184,9 @@ private[yaidom] object PrettyPrinting {
       require(s.indexOf('\n') < 0, "The string to prepend must not have any newlines")
 
       if (lines.isEmpty) this else {
-        val indent = s.size
+        val indent = s.length
 
-        val firstLine = new Line(lines(0).indent, (s + lines(0).line))
+        val firstLine = lines(0).prepend(s)
         val linesButFirstOne = lines.drop(1) map { line => line.plusIndent(indent) }
         new LineSeq(firstLine +: linesButFirstOne)
       }
@@ -143,8 +195,21 @@ private[yaidom] object PrettyPrinting {
     /** Returns the LineSeq consisting of these lines followed by the lines of `otherLineSeq` */
     def ++(otherLineSeq: LineSeq): LineSeq = new LineSeq(this.lines ++ otherLineSeq.lines)
 
-    /** Returns the String representation, concatenating all lines, and separating them by newlines */
-    def mkString: String = lines.map(_.toString).mkString(NewLine)
+    /**
+     * Adds the string representation of this line to the given StringBuilder, without creating any new string literals.
+     *
+     * That is, equivalent to appending `lines.map(_.toString).mkString(NewLine)`
+     */
+    def addToStringBuilder(sb: StringBuilder): Unit = {
+      if (!lines.isEmpty) {
+        lines.head.addToStringBuilder(sb)
+
+        for (line <- lines.drop(1)) {
+          sb ++= NewLine
+          line.addToStringBuilder(sb)
+        }
+      }
+    }
   }
 
   object LineSeq {
@@ -179,7 +244,7 @@ private[yaidom] object PrettyPrinting {
 
           if (!grp.lines.isEmpty) {
             lines ++= grp.lines.dropRight(1)
-            lines += (grp.lines.last + separator)
+            lines += (grp.lines.last.append(separator))
           }
         }
         lines ++= lastGroup.lines

@@ -96,7 +96,11 @@ final class Document(
   /** Returns `withDocumentElement(this.documentElement.topmostUpdated(pf))` */
   def topmostUpdated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.topmostUpdated(pf))
 
-  final def toTreeRepr(): String = toTreeReprAsLineSeq(0)(2).mkString
+  final def toTreeRepr(): String = {
+    val sb = new StringBuilder
+    toTreeReprAsLineSeq(0)(2).addToStringBuilder(sb)
+    sb.toString
+  }
 
   /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
   final override def toString: String = toTreeRepr

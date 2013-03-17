@@ -63,7 +63,11 @@ sealed trait Node extends Immutable with Serializable {
    * <li>When parsing the string into a `NodeBuilder`, the following is out of scope: character escaping (for XML), entity resolving, "ignorable" whitespace handling, etc.</li>
    * </ul>
    */
-  final def toTreeRepr(parentScope: Scope): String = toTreeReprAsLineSeq(parentScope, 0)(2).mkString
+  final def toTreeRepr(parentScope: Scope): String = {
+    val sb = new StringBuilder
+    toTreeReprAsLineSeq(parentScope, 0)(2).addToStringBuilder(sb)
+    sb.toString
+  }
 
   /** Same as `toTreeRepr(emptyScope)` */
   final def toTreeRepr: String = toTreeRepr(Scope.Empty)
