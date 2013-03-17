@@ -27,6 +27,8 @@ import org.apache.commons.lang3.StringEscapeUtils
  *
  * The "tree representation" expressions are themselves valid Scala code!
  *
+ * Note: Parsing large "tree representations" is very slow.
+ *
  * @author Chris de Vreeze
  */
 object TreeReprParsers extends JavaTokenParsers {

@@ -23,6 +23,10 @@ import scala.collection.immutable
 /**
  * `Document`, containing an "indexed" document element.
  *
+ * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ParentElemApi` does not
+ * apply to documents. Therefore, given a document, querying for elements (other than the document element itself) always goes
+ * via the document element.
+ *
  * @author Chris de Vreeze
  */
 final class Document(
