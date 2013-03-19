@@ -465,7 +465,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -475,7 +475,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol, yaidomConvertPackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol, yaidomConvertPackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -485,7 +485,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol, yaidomParsePackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol, yaidomParsePackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -495,7 +495,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol, yaidomPrintPackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol, yaidomPrintPackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -505,7 +505,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol, yaidomDomPackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol, yaidomDomPackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -515,7 +515,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol, yaidomResolvedPackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol, yaidomResolvedPackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -525,7 +525,7 @@ class DependencyTest extends Suite {
 
     val packageDependencies: Set[Symbol] = getPackageDependencies(tpes)
 
-    expect(Set(yaidomPackageSymbol, yaidomXLinkPackageSymbol)) {
+    expectResult(Set(yaidomPackageSymbol, yaidomXLinkPackageSymbol)) {
       packageDependencies filter { sym => isYaidomPackage(sym) && (sym != thisPackage) }
     }
   }
@@ -543,7 +543,7 @@ class DependencyTest extends Suite {
     val unexpectedPackages: Set[Symbol] =
       packages filterNot { pkgSym => isScalaOrJavaPackage(pkgSym) || isYaidomTopLevelPackage(pkgSym) || (pkgSym == thisPackage) }
 
-    expect(Set()) {
+    expectResult(Set()) {
       unexpectedPackages
     }
 

@@ -39,7 +39,123 @@ import NodeBuilder._
 @RunWith(classOf[JUnitRunner])
 class ValidationTest extends Suite {
 
+  import ValidationTest._
+
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
+
+  // Specific validators for this "schema", putting the DSL into action. In other words, the functions below ARE the "schema".
+
+  import NameOccurrences._
+
+  def validateUSAddress(elm: Elem): ValidationResult = {
+    val validator =
+      and(
+        sequence(
+          one(EName("name")) validatedBy { e => validateStringElem(e) },
+          one(EName("street")) validatedBy { e => validateStringElem(e) },
+          one(EName("city")) validatedBy { e => validateStringElem(e) },
+          one(EName("state")) validatedBy { e => validateStringElem(e) },
+          one(EName("zip")) validatedBy { e => validateStringElem(e) }),
+        hasAttribute(EName("country")))
+    validator.apply(elm)
+  }
+
+  def validateItems(elm: Elem): ValidationResult = {
+    val validator =
+      sequence(
+        zeroOrMore(EName("item")) validatedBy (and(
+          sequence(
+            one(EName("productName")) validatedBy { e => validateStringElem(e) },
+            one(EName("quantity")) validatedBy { e => validateStringElem(e) },
+            one(EName("USPrice")) validatedBy { e => validateStringElem(e) },
+            zeroOrOne(EName("comment")) validatedBy { e => validateStringElem(e) },
+            zeroOrOne(EName("shipDate")) validatedBy { e => validateStringElem(e) }),
+          hasAttribute(EName("partNum")))))
+    validator.apply(elm)
+  }
+
+  def validatePurchaseOrder(elm: Elem): ValidationResult = {
+    val validator =
+      and(
+        sequence(
+          one(EName("shipTo")) validatedBy { e => validateUSAddress(e) },
+          one(EName("billTo")) validatedBy { e => validateUSAddress(e) },
+          zeroOrOne(EName("comment")) validatedBy { e => validateStringElem(e) },
+          one(EName("items")) validatedBy { e => validateItems(e) }),
+        hasAttribute(EName("orderDate")))
+    validator.apply(elm)
+  }
+
+  def validateRootElement(elm: Elem): ValidationResult = {
+    val validator =
+      and(
+        hasName(EName("purchaseOrder")),
+        hasAttribute(EName("orderDate")),
+        validatePurchaseOrder _)
+    validator.apply(elm)
+  }
+
+  // The tests themselves
+
+  @Test def testValidateAddress() {
+    val elmBuilder =
+      elem(
+        qname = QName("Address"),
+        attributes = Vector(QName("country") -> "US"),
+        children = Vector(
+          textElem(QName("name"), "Alice Smith"),
+          textElem(QName("street"), "123 Maple Street"),
+          textElem(QName("city"), "Mill Valley"),
+          textElem(QName("state"), "CA"),
+          textElem(QName("zip"), "90952")))
+    val addressElm = elmBuilder.build()
+
+    val validationResult = validateUSAddress(addressElm)
+
+    expectResult(true) {
+      validationResult.success
+    }
+
+    val wrongAddressElm = addressElm.plusChild(textElem(QName("bogus"), "true").build())
+
+    val nonOkValidationResult = validateUSAddress(wrongAddressElm)
+
+    expectResult(false) {
+      nonOkValidationResult.success
+    }
+
+    val anotherWrongAddressElm = addressElm.plusChild(2, textElem(QName("bogus"), "true").build())
+
+    val anotherNonOkValidationResult = validateUSAddress(anotherWrongAddressElm)
+
+    expectResult(false) {
+      anotherNonOkValidationResult.success
+    }
+  }
+
+  @Test def testValidatePurchaseOrder() {
+    val docParser = DocumentParserUsingSax.newInstance
+    val is = classOf[ValidationTest].getResourceAsStream("po.xml")
+    val doc = docParser.parse(is)
+
+    val validationResult = validateRootElement(doc.documentElement)
+
+    expectResult(true) {
+      validationResult.success
+    }
+
+    val extraCommentElm = textElem(QName("comment"), "That's it for now, folks").build()
+    val wrongDoc = doc.withDocumentElement(doc.documentElement.plusChild(extraCommentElm))
+
+    val nonOkValidationResult = validateRootElement(wrongDoc.documentElement)
+
+    expectResult(false) {
+      nonOkValidationResult.success
+    }
+  }
+}
+
+object ValidationTest {
 
   final class ValidationResult private (val success: Boolean, val messages: immutable.Seq[String])
 
@@ -126,116 +242,5 @@ class ValidationTest extends Suite {
   def validateStringElem(elm: Elem): ValidationResult = {
     val ok = elm.allChildElems.isEmpty
     if (ok) ValidationResult.ok else ValidationResult.notOk("%s is not a string element".format(elm.resolvedName))
-  }
-
-  // Specific validators for this "schema", putting the DSL into action. In other words, the functions below ARE the "schema".
-
-  import NameOccurrences._
-
-  def validateUSAddress(elm: Elem): ValidationResult = {
-    val validator =
-      and(
-        sequence(
-          one(EName("name")) validatedBy { e => validateStringElem(e) },
-          one(EName("street")) validatedBy { e => validateStringElem(e) },
-          one(EName("city")) validatedBy { e => validateStringElem(e) },
-          one(EName("state")) validatedBy { e => validateStringElem(e) },
-          one(EName("zip")) validatedBy { e => validateStringElem(e) }),
-        hasAttribute(EName("country")))
-    validator.apply(elm)
-  }
-
-  def validateItems(elm: Elem): ValidationResult = {
-    val validator =
-      sequence(
-        zeroOrMore(EName("item")) validatedBy (and(
-          sequence(
-            one(EName("productName")) validatedBy { e => validateStringElem(e) },
-            one(EName("quantity")) validatedBy { e => validateStringElem(e) },
-            one(EName("USPrice")) validatedBy { e => validateStringElem(e) },
-            zeroOrOne(EName("comment")) validatedBy { e => validateStringElem(e) },
-            zeroOrOne(EName("shipDate")) validatedBy { e => validateStringElem(e) }),
-          hasAttribute(EName("partNum")))))
-    validator.apply(elm)
-  }
-
-  def validatePurchaseOrder(elm: Elem): ValidationResult = {
-    val validator =
-      and(
-        sequence(
-          one(EName("shipTo")) validatedBy { e => validateUSAddress(e) },
-          one(EName("billTo")) validatedBy { e => validateUSAddress(e) },
-          zeroOrOne(EName("comment")) validatedBy { e => validateStringElem(e) },
-          one(EName("items")) validatedBy { e => validateItems(e) }),
-        hasAttribute(EName("orderDate")))
-    validator.apply(elm)
-  }
-
-  def validateRootElement(elm: Elem): ValidationResult = {
-    val validator =
-      and(
-        hasName(EName("purchaseOrder")),
-        hasAttribute(EName("orderDate")),
-        validatePurchaseOrder _)
-    validator.apply(elm)
-  }
-
-  // The tests themselves
-
-  @Test def testValidateAddress() {
-    val elmBuilder =
-      elem(
-        qname = QName("Address"),
-        attributes = Vector(QName("country") -> "US"),
-        children = Vector(
-          textElem(QName("name"), "Alice Smith"),
-          textElem(QName("street"), "123 Maple Street"),
-          textElem(QName("city"), "Mill Valley"),
-          textElem(QName("state"), "CA"),
-          textElem(QName("zip"), "90952")))
-    val addressElm = elmBuilder.build()
-
-    val validationResult = validateUSAddress(addressElm)
-
-    expect(true) {
-      validationResult.success
-    }
-
-    val wrongAddressElm = addressElm.plusChild(textElem(QName("bogus"), "true").build())
-
-    val nonOkValidationResult = validateUSAddress(wrongAddressElm)
-
-    expect(false) {
-      nonOkValidationResult.success
-    }
-
-    val anotherWrongAddressElm = addressElm.plusChild(2, textElem(QName("bogus"), "true").build())
-
-    val anotherNonOkValidationResult = validateUSAddress(anotherWrongAddressElm)
-
-    expect(false) {
-      anotherNonOkValidationResult.success
-    }
-  }
-
-  @Test def testValidatePurchaseOrder() {
-    val docParser = DocumentParserUsingSax.newInstance
-    val is = classOf[ValidationTest].getResourceAsStream("po.xml")
-    val doc = docParser.parse(is)
-
-    val validationResult = validateRootElement(doc.documentElement)
-
-    expect(true) {
-      validationResult.success
-    }
-
-    val extraCommentElm = textElem(QName("comment"), "That's it for now, folks").build()
-    val wrongDoc = doc.withDocumentElement(doc.documentElement.plusChild(extraCommentElm))
-
-    val nonOkValidationResult = validateRootElement(wrongDoc.documentElement)
-
-    expect(false) {
-      nonOkValidationResult.success
-    }
   }
 }

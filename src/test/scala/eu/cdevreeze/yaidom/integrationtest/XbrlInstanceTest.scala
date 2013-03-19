@@ -42,28 +42,28 @@ class XbrlInstanceTest extends Suite {
 
     // Check "references"
 
-    expect(1) {
+    expectResult(1) {
       xbrlInstance.schemaRefs.size
     }
-    expect(1) {
+    expectResult(1) {
       xbrlInstance.linkbaseRefs.size
     }
-    expect(0) {
+    expectResult(0) {
       xbrlInstance.roleRefs.size
     }
-    expect(0) {
+    expectResult(0) {
       xbrlInstance.arcroleRefs.size
     }
-    expect(2) {
+    expectResult(2) {
       xbrlInstance.footnoteLinks.size
     }
 
     // Check units
 
-    expect(3) {
+    expectResult(3) {
       xbrlInstance.units.size
     }
-    expect(Set("U-Monetary", "U-Shares", "U-Pure")) {
+    expectResult(Set("U-Monetary", "U-Shares", "U-Pure")) {
       val result = xbrlInstance.units map { _.id }
       result.toSet
     }
@@ -76,15 +76,15 @@ class XbrlInstanceTest extends Suite {
     assert(iContexts.size >= 30, "Expected at least 30 'instant' contexts")
     assert(dContexts.size >= 30, "Expected at least 30 'start-end-date' contexts")
 
-    expect((xbrlInstance.contexts).toSet) {
+    expectResult((xbrlInstance.contexts).toSet) {
       (iContexts ++ dContexts).toSet
     }
 
-    expect(Set(EName(nsXbrli, "instant"))) {
+    expectResult(Set(EName(nsXbrli, "instant"))) {
       val result = iContexts flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
       result.toSet
     }
-    expect(Set(EName(nsXbrli, "startDate"), EName(nsXbrli, "endDate"))) {
+    expectResult(Set(EName(nsXbrli, "startDate"), EName(nsXbrli, "endDate"))) {
       val result = dContexts flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
       result.toSet
     }
@@ -93,14 +93,14 @@ class XbrlInstanceTest extends Suite {
 
     assert(xbrlInstance.topLevelFacts.size >= 50)
 
-    expect(0) {
+    expectResult(0) {
       xbrlInstance.topLevelTuples.size
     }
-    expect(xbrlInstance.topLevelFacts.size) {
+    expectResult(xbrlInstance.topLevelFacts.size) {
       xbrlInstance.topLevelItems.size
     }
 
-    expect(Set(Some("http://xasb.org/gaap"))) {
+    expectResult(Set(Some("http://xasb.org/gaap"))) {
       val topLevelFacts = xbrlInstance.topLevelFacts
       val result = topLevelFacts map { fact => fact.wrappedElem.resolvedName.namespaceUriOption }
       result.toSet
@@ -130,30 +130,30 @@ class XbrlInstanceTest extends Suite {
 
     val xbrlElm: Elem = xbrlInstance.toElem
 
-    expect(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(xbrlElm).removeAllInterElementWhitespace
     }
 
     // XBRL rule 1
 
-    expect(EName(nsXbrli, "xbrl")) {
+    expectResult(EName(nsXbrli, "xbrl")) {
       xbrlElm.resolvedName
     }
 
     // XBRL rule 2
 
-    expect(EName(nsLink, "schemaRef")) {
+    expectResult(EName(nsLink, "schemaRef")) {
       xbrlElm.allChildElems.headOption.getOrElse(sys.error("First xbrl child must be schemaRef")).resolvedName
     }
 
     val schemaRefElms = xbrlElm.filterChildElems(EName(nsLink, "schemaRef"))
 
-    expect(true) {
+    expectResult(true) {
       schemaRefElms forall { e =>
         e.resolvedAttributes.toMap.keySet == Set(EName(nsXLink, "type"), EName(nsXLink, "href"))
       }
     }
-    expect(true) {
+    expectResult(true) {
       schemaRefElms forall { e =>
         e.attribute(EName(nsXLink, "type")) == "simple"
       }
@@ -161,7 +161,7 @@ class XbrlInstanceTest extends Suite {
 
     // XBRL rule 3
 
-    expect(true) {
+    expectResult(true) {
       val contextElms = xbrlElm filterChildElems { e => XbrlInstance.mustBeContext(e)(xbrlElm) }
       !contextElms.isEmpty
     }
@@ -170,7 +170,7 @@ class XbrlInstanceTest extends Suite {
 
     // XBRL rule 4
 
-    expect(true) {
+    expectResult(true) {
       val unitElms = xbrlElm filterChildElems { e => XbrlInstance.mustBeUnit(e)(xbrlElm) }
       !unitElms.isEmpty
     }
@@ -179,7 +179,7 @@ class XbrlInstanceTest extends Suite {
 
     // XBRL rule 5
 
-    expect(true) {
+    expectResult(true) {
       val topLevelFactElms = xbrlElm filterChildElems { e => XbrlInstance.mustBeTopLevelFact(e)(xbrlElm) }
       !topLevelFactElms.isEmpty
     }

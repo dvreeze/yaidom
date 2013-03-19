@@ -34,70 +34,70 @@ class QNameTest extends Suite {
   @Test def testUnprefixedName() {
     val qname = UnprefixedName("Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname.localPart
     }
-    expect(None) {
+    expectResult(None) {
       qname.prefixOption
     }
 
     val qname2 = QName("Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname2.localPart
     }
-    expect(None) {
+    expectResult(None) {
       qname2.prefixOption
     }
-    expect(qname) {
+    expectResult(qname) {
       qname2
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname2.hashCode
     }
 
     val qname3 = QName(None, "Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname3.localPart
     }
-    expect(None) {
+    expectResult(None) {
       qname3.prefixOption
     }
-    expect(qname) {
+    expectResult(qname) {
       qname3
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname3.hashCode
     }
 
     val qname4 = QName("Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname4.localPart
     }
-    expect(None) {
+    expectResult(None) {
       qname4.prefixOption
     }
-    expect(qname) {
+    expectResult(qname) {
       qname4
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname4.hashCode
     }
 
     val qname5 = QName("Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname5.localPart
     }
-    expect(None) {
+    expectResult(None) {
       qname5.prefixOption
     }
-    expect(qname) {
+    expectResult(qname) {
       qname5
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname5.hashCode
     }
 
@@ -121,85 +121,85 @@ class QNameTest extends Suite {
   @Test def testPrefixedName() {
     val qname = PrefixedName("books", "Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname.localPart
     }
-    expect(Some("books")) {
+    expectResult(Some("books")) {
       qname.prefixOption
     }
-    expect("books") {
+    expectResult("books") {
       qname.prefix
     }
 
     val qname2: PrefixedName = PrefixedName("books", "Bookstore")
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname2.localPart
     }
-    expect(Some("books")) {
+    expectResult(Some("books")) {
       qname2.prefixOption
     }
-    expect("books") {
+    expectResult("books") {
       qname2.prefix
     }
-    expect(qname) {
+    expectResult(qname) {
       qname2
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname2.hashCode
     }
 
     val qname3: PrefixedName = QName(Some("books"), "Bookstore").asInstanceOf[PrefixedName]
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname3.localPart
     }
-    expect(Some("books")) {
+    expectResult(Some("books")) {
       qname3.prefixOption
     }
-    expect("books") {
+    expectResult("books") {
       qname3.prefix
     }
-    expect(qname) {
+    expectResult(qname) {
       qname3
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname3.hashCode
     }
 
     val qname4 = QName("books:Bookstore").asInstanceOf[PrefixedName]
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname4.localPart
     }
-    expect(Some("books")) {
+    expectResult(Some("books")) {
       qname4.prefixOption
     }
-    expect("books") {
+    expectResult("books") {
       qname4.prefix
     }
-    expect(qname) {
+    expectResult(qname) {
       qname4
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname4.hashCode
     }
 
     val qname5 = QName("books:Bookstore").asInstanceOf[PrefixedName]
 
-    expect("Bookstore") {
+    expectResult("Bookstore") {
       qname5.localPart
     }
-    expect(Some("books")) {
+    expectResult(Some("books")) {
       qname5.prefixOption
     }
-    expect("books") {
+    expectResult("books") {
       qname5.prefix
     }
-    expect(qname) {
+    expectResult(qname) {
       qname5
     }
-    expect(qname.hashCode) {
+    expectResult(qname.hashCode) {
       qname5.hashCode
     }
 

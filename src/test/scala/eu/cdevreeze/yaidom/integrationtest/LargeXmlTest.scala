@@ -90,13 +90,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val emailPaths = resolvedRoot findTopmostElemPaths { e => e.localName == "email" } take (10)
     val emailElms = resolvedRoot findTopmostElems { e => e.localName == "email" } take (10)
 
-    expect(10) {
+    expectResult(10) {
       emailPaths.size
     }
-    expect(10) {
+    expectResult(10) {
       emailElms.size
     }
-    expect(emailElms) {
+    expectResult(emailElms) {
       emailPaths map { path => resolvedRoot.getWithElemPath(path) }
     }
   }
@@ -183,7 +183,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs2 = System.currentTimeMillis()
     logger.info("[testProcessLargeTreeRepr] Calling toString took %d ms".format(endMs2 - startMs2))
 
-    expect("document(") {
+    expectResult("document(") {
       treeRepr.take("document(".length)
     }
 
@@ -280,11 +280,11 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    expect(true) {
+    expectResult(true) {
       val phoneElms = (rootElm \\ "phone") filter { e => e.text.size == 1000 }
       phoneElms.size < 4000
     }
-    expect(true) {
+    expectResult(true) {
       val phoneElms = (rootElm \\ "phone") filter { e => e.text.size == 2046 }
       phoneElms.size > 15000
     }
@@ -363,7 +363,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
-    expect(false) {
+    expectResult(false) {
       oldPhoneElm.text == newPhone
     }
 
@@ -378,7 +378,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
-    expect(true) {
+    expectResult(true) {
       newPhoneElm.text == newPhone
     }
 
@@ -393,14 +393,14 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
 
-    expect(false) {
+    expectResult(false) {
       resolvedElm1 == resolvedElm2
     }
-    expect(false) {
+    expectResult(false) {
       resolvedElm1 == resolvedElm3
     }
 
-    expect(true) {
+    expectResult(true) {
       resolvedElm2 == resolvedElm3
     }
   }
@@ -423,7 +423,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
-    expect(false) {
+    expectResult(false) {
       oldPhoneElm.text == newPhone
     }
 
@@ -438,7 +438,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
-    expect(true) {
+    expectResult(true) {
       newPhoneElm.text == newPhone
     }
   }
@@ -448,7 +448,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    expect(Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))) {
+    expectResult(Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))) {
       val result = elm.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }

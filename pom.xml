@@ -173,8 +173,8 @@
 
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_${scala.version}</artifactId>
-			<version>1.8</version>
+			<artifactId>scalatest_${scala.binary.version}</artifactId>
+			<version>1.9.1</version>
 			<scope>test</scope>
 		</dependency>
 

@@ -63,7 +63,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artists = artistElms map { _.text }
 
-    expect(List("An other artist")) {
+    expectResult(List("An other artist")) {
       artists
     }
 
@@ -77,7 +77,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artists2 = artistElms2 map { _.text }
 
-    expect(List("An other artist")) {
+    expectResult(List("An other artist")) {
       artists2
     }
   }
@@ -97,7 +97,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artistsConcatenated = artists.mkString
 
-    expect("An other artist") {
+    expectResult("An other artist") {
       artistsConcatenated
     }
 
@@ -111,7 +111,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artistsConcatenated2 = artists2.mkString
 
-    expect("An other artist") {
+    expectResult("An other artist") {
       artistsConcatenated2
     }
 
@@ -125,7 +125,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val firstArtist = artists3.headOption.getOrElse("")
 
-    expect("An other artist") {
+    expectResult("An other artist") {
       firstArtist
     }
   }
@@ -145,7 +145,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val price = prices.headOption.getOrElse(sys.error("Expected price")).toDouble
 
-    expect(10) {
+    expectResult(10) {
       price.toInt
     }
   }

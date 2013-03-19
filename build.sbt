@@ -11,7 +11,7 @@ version := "0.6.8-SNAPSHOT"
 
 scalaVersion := "2.10.1"
 
-crossScalaVersions := Seq("2.10.0", "2.9.2", "2.9.1", "2.9.0-1", "2.9.0")
+crossScalaVersions := Seq("2.10.1", "2.9.2", "2.9.1", "2.9.0-1", "2.9.0")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
@@ -35,12 +35,7 @@ libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.1"
 
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
-libraryDependencies <+= scalaBinaryVersion { version =>
-  if (version.contains("2.10"))
-    "org.scalatest" % "scalatest_2.10.0" % "1.8" % "test"
-  else
-    "org.scalatest" %% "scalatest" % "1.8" % "test"
-}
+libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 

@@ -44,7 +44,7 @@ class QueryTest extends Suite {
     val bookTitles =
       (bookstore \ "Book") map { e => e getChildElem (_.localName == "Title") }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -56,7 +56,7 @@ class QueryTest extends Suite {
     val bookTitlePaths =
       bookstore findTopmostElemPaths { _.localName == "Title" } filter { path => path.containsName(EName("Book")) }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -79,7 +79,7 @@ class QueryTest extends Suite {
         title <- bookOrMagazine findChildElem { _.localName == "Title" }
       } yield title
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -96,7 +96,7 @@ class QueryTest extends Suite {
         if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
       } yield titlePath
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -116,7 +116,7 @@ class QueryTest extends Suite {
     val titles =
       for (ch <- bookstore.allChildElems) yield ch.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -133,7 +133,7 @@ class QueryTest extends Suite {
         if titlePath.entries.size == 2
       } yield titlePath
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -153,7 +153,7 @@ class QueryTest extends Suite {
     val titles =
       for (title <- bookstore filterElems (_.localName == "Title")) yield title
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -169,7 +169,7 @@ class QueryTest extends Suite {
         titlePath <- bookstore filterElemPaths { _.localName == "Title" }
       } yield titlePath
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -199,11 +199,11 @@ class QueryTest extends Suite {
 
     val paths = bookstore.findAllElemOrSelfPaths
 
-    expect(elements.size) {
+    expectResult(elements.size) {
       paths.size
     }
 
-    expect(elements map (e => resolved.Elem(e))) {
+    expectResult(elements map (e => resolved.Elem(e))) {
       paths map { path => bookstore.getWithElemPath(path) } map { e => resolved.Elem(e) }
     }
   }
@@ -218,7 +218,7 @@ class QueryTest extends Suite {
     val isbns =
       for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
 
-    expect(Set(
+    expectResult(Set(
       "ISBN-0-13-713526-2",
       "ISBN-0-13-815504-6",
       "ISBN-0-11-222222-3",
@@ -226,7 +226,7 @@ class QueryTest extends Suite {
       isbns.toSet
     }
 
-    expect(Set(
+    expectResult(Set(
       "ISBN-0-13-713526-2",
       "ISBN-0-13-815504-6",
       "ISBN-0-11-222222-3",
@@ -249,7 +249,7 @@ class QueryTest extends Suite {
         if price.toInt < 90
       } yield book
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -257,7 +257,7 @@ class QueryTest extends Suite {
       result.toSet
     }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -281,7 +281,7 @@ class QueryTest extends Suite {
         if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -298,7 +298,7 @@ class QueryTest extends Suite {
         if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -313,7 +313,7 @@ class QueryTest extends Suite {
       }
     }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -351,7 +351,7 @@ class QueryTest extends Suite {
       result.toSet
     }
 
-    expect(Set(
+    expectResult(Set(
       "Jeffrey Ullman",
       "Jennifer Widom",
       "Hector Garcia-Molina")) {
@@ -370,7 +370,7 @@ class QueryTest extends Suite {
         if !book.filterChildElems(EName("Remark")).isEmpty
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -392,7 +392,7 @@ class QueryTest extends Suite {
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -416,7 +416,7 @@ class QueryTest extends Suite {
         titlePathOption
       }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
@@ -440,7 +440,7 @@ class QueryTest extends Suite {
         if authorFirstName == "Jeffrey"
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -464,7 +464,7 @@ class QueryTest extends Suite {
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
       result.toSet
@@ -485,7 +485,7 @@ class QueryTest extends Suite {
         }
       } yield bookElm
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
@@ -508,7 +508,7 @@ class QueryTest extends Suite {
         bookstore.getWithElemPath(bookPath)
       }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
@@ -532,7 +532,7 @@ class QueryTest extends Suite {
       } yield secondAuthor
 
     val secondAuthorLastNames = secondAuthors map { e => e getChildElem { _.localName == "Last_Name" } }
-    expect(Set(
+    expectResult(Set(
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
@@ -553,7 +553,7 @@ class QueryTest extends Suite {
         if remark.trimmedText.indexOf("great") >= 0
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set("Database Systems: The Complete Book")) {
+    expectResult(Set("Database Systems: The Complete Book")) {
       val result = titles map { _.trimmedText }
       result.toSet
     }
@@ -576,7 +576,7 @@ class QueryTest extends Suite {
         if !booksWithSameName.isEmpty
       } yield magazine
 
-    expect(Set("Hector and Jeff's Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints")) {
       val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -627,7 +627,7 @@ class QueryTest extends Suite {
       val result = elms map { _.qname }
       result.toSet
     }
-    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
+    expectResult(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       qnames
     }
 
@@ -643,7 +643,7 @@ class QueryTest extends Suite {
 
     assert(paths.size > 10, "Expected more than 10 matching element paths")
 
-    expect(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
+    expectResult(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       val result = paths map { path => bookstore.getWithElemPath(path).qname }
       result.toSet
     }
@@ -670,7 +670,7 @@ class QueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expect(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
       val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -696,7 +696,7 @@ class QueryTest extends Suite {
         if (nextOption.isDefined || prevOption.isDefined)
       } yield bookOrMagazinePath
 
-    expect(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
       val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -720,7 +720,7 @@ class QueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expect(Set("Hector and Jeff's Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints")) {
       val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -746,7 +746,7 @@ class QueryTest extends Suite {
         if (nextBookOption.isDefined || prevBookOption.isDefined)
       } yield bookOrMagazinePath
 
-    expect(Set("Hector and Jeff's Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints")) {
       val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -780,7 +780,7 @@ class QueryTest extends Suite {
         if authorNames forall { name => name.indexOf("J") >= 0 }
       } yield book
 
-    expect(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
+    expectResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
       val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -801,7 +801,7 @@ class QueryTest extends Suite {
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
       } yield book.getChildElem(EName("Title"))
 
-    expect(Set(
+    expectResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = titles map { _.trimmedText }
       result.toSet
@@ -840,10 +840,10 @@ class QueryTest extends Suite {
           fromElem(title)(Scope.Empty),
           textElem(QName("First_Name"), searchedForFirstNames.head))).build()
 
-    expect(2) {
+    expectResult(2) {
       titleAndFirstNames.size
     }
-    expect(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
       val result = titleElms.flatten map { e => e.trimmedText }
       result.toSet
@@ -872,7 +872,7 @@ class QueryTest extends Suite {
     val averagePrice =
       textElem(QName("Average"), (prices.sum.toDouble / prices.size).toString).build()
 
-    expect(65) {
+    expectResult(65) {
       averagePrice.trimmedText.toDouble.intValue
     }
   }
@@ -913,14 +913,14 @@ class QueryTest extends Suite {
           fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
           textElem(QName("Price"), price.toString))).build()
 
-    expect(2) {
+    expectResult(2) {
       cheapBooks.size
     }
-    expect(Set(50, 25)) {
+    expectResult(Set(50, 25)) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
       result.toSet
     }
-    expect(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
       result.toSet
     }
@@ -959,13 +959,13 @@ class QueryTest extends Suite {
           textElem(QName("Price"), price.toString))).build()
     }
 
-    expect(4) {
+    expectResult(4) {
       books.size
     }
-    expect(List(25, 50, 85, 100)) {
+    expectResult(List(25, 50, 85, 100)) {
       books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
     }
-    expect(List(
+    expectResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
@@ -991,7 +991,7 @@ class QueryTest extends Suite {
         lastName <- (bookstore.filterElems(EName("Last_Name")) map (e => e.trimmedText)).distinct
       } yield lastName
 
-    expect(Set(
+    expectResult(Set(
       "Ullman",
       "Widom",
       "Garcia-Molina")) {
@@ -1041,25 +1041,25 @@ class QueryTest extends Suite {
           textElem(QName("Title1"), bookTitle(book1)),
           textElem(QName("Title2"), bookTitle(book2)))).build()
 
-    expect(5) {
+    expectResult(5) {
       pairs.size
     }
-    expect(3) {
+    expectResult(3) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book1.build()) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book1.build())).size
     }
-    expect(3) {
+    expectResult(3) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book2.build()) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book2.build())).size
     }
-    expect(2) {
+    expectResult(2) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book3.build()) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book3.build())).size
     }
-    expect(2) {
+    expectResult(2) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book4.build()) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book4.build())).size
@@ -1132,7 +1132,7 @@ class QueryTest extends Suite {
 
     val invertedBookstore: Elem = Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks)
 
-    expect(3) {
+    expectResult(3) {
       invertedBookstore.allChildElems.size
     }
   }
@@ -1156,7 +1156,7 @@ class QueryTest extends Suite {
         }
       }
 
-    expect(Set(EName("BookTitle"), EName("MagazineTitle"))) {
+    expectResult(Set(EName("BookTitle"), EName("MagazineTitle"))) {
       bookOrMagazineTitles.map(e => e.resolvedName).toSet
     }
     val ngCount = bookOrMagazineTitles count { e => e.trimmedText == "National Geographic" }
@@ -1186,17 +1186,17 @@ class QueryTest extends Suite {
         case e if e.resolvedName == EName("Book") => removePrice(e)
       }
 
-    expect(4) {
+    expectResult(4) {
       bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    expect(0) {
+    expectResult(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    expect(4) {
+    expectResult(4) {
       val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
-    expect(0) {
+    expectResult(0) {
       val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
@@ -1233,7 +1233,7 @@ class QueryTest extends Suite {
         case e if e.resolvedName == EName("Author") => combineName(e)
       }
 
-    expect(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
+    expectResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
       val result = bookstoreWithCombinedNames.filterElems(EName("Name")) map { _.trimmedText }
       result.toSet
     }
@@ -1260,7 +1260,7 @@ class QueryTest extends Suite {
 
     // Although the partial function is defined for any path containing an Author, only the Author elements are functionally updated!
 
-    expect(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
+    expectResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
       EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {
 
       val result = updatedBookstoreElm.findAllElemsOrSelf map { _.resolvedName }
@@ -1323,7 +1323,7 @@ class QueryTest extends Suite {
       EName("Magazine"),
       EName("Title"))
 
-    expect(depthFirstElmNames) {
+    expectResult(depthFirstElmNames) {
       elms map { _.resolvedName }
     }
   }
@@ -1349,10 +1349,10 @@ class QueryTest extends Suite {
       } yield lastNameElm.text
     val firstAuthorLastName = authorLastNames.head
 
-    expect("Hector and Jeff's Database Hints") {
+    expectResult("Hector and Jeff's Database Hints") {
       title
     }
-    expect("Ullman") {
+    expectResult("Ullman") {
       firstAuthorLastName
     }
   }

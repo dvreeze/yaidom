@@ -48,16 +48,16 @@ class XbrlSchemaTest extends Suite {
 
     val tns = "http://xasb.org/gaap"
 
-    expect(tns) {
+    expectResult(tns) {
       xbrlSchema.attributeOption(EName("targetNamespace")).getOrElse("")
     }
 
-    expect(true) {
+    expectResult(true) {
       // We query each element definition for the target namespace of the root (!) element
       elmDefs forall { e => e.rootElem.attributeOption(EName("targetNamespace")) == Some(tns) }
     }
 
-    expect(Set(EName(tns, "AMinusMinusMember"), EName(tns, "APlusPlusPlusMember"))) {
+    expectResult(Set(EName(tns, "AMinusMinusMember"), EName(tns, "APlusPlusPlusMember"))) {
       val conceptENames = elmDefs map { e =>
         // We query each element definition for the target namespace of the root (!) element
         val tnsOption = e.rootElem.attributeOption(EName("targetNamespace"))
@@ -73,18 +73,18 @@ class XbrlSchemaTest extends Suite {
 
     val elemPaths = xbrlSchema.elem.findAllElemOrSelfPaths
 
-    expect(elemPaths) {
+    expectResult(elemPaths) {
       xbrlSchema.findAllElemsOrSelf map { _.elemPath }
     }
 
     val elemsContainingPlus = xbrlSchema filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
     val pathsOfElemsContainingPlus = xbrlSchema.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
 
-    expect(pathsOfElemsContainingPlus) {
+    expectResult(pathsOfElemsContainingPlus) {
       elemsContainingPlus map (_.elemPath)
     }
 
-    expect(true) {
+    expectResult(true) {
       elemsContainingPlus forall { e => xbrlSchema.elem.findWithElemPath(e.elemPath) == Some(e.elem) }
     }
   }

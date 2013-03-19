@@ -40,6 +40,8 @@ import print._
 @RunWith(classOf[JUnitRunner])
 class AirportExampleTest extends Suite {
 
+  import AirportExampleTest._
+
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsWebServiceX = "http://www.webserviceX.NET"
@@ -97,7 +99,7 @@ class AirportExampleTest extends Suite {
       val result = beAirportsDoc.documentElement collectFromElems { case e if e.localName == "Country" => e.trimmedText }
       result.toSet
     }
-    expect(Set("Belgium")) {
+    expectResult(Set("Belgium")) {
       beAirportCountries
     }
 
@@ -105,7 +107,7 @@ class AirportExampleTest extends Suite {
       val result = nlAirportsDoc.documentElement collectFromElems { case e if e.localName == "CountryCode" => e.trimmedText }
       result.toSet
     }
-    expect(Set("461")) {
+    expectResult(Set("461")) {
       nlAirportCountryCodes
     }
 
@@ -113,7 +115,7 @@ class AirportExampleTest extends Suite {
       val result = deAirportsDoc.documentElement collectFromElems { case e if e.localName == "CountryAbbrviation" => e.trimmedText }
       result.toSet
     }
-    expect(Set("DE")) {
+    expectResult(Set("DE")) {
       deAirportCountryAbbrevs
     }
 
@@ -137,19 +139,19 @@ class AirportExampleTest extends Suite {
     }
 
     // The highest German airport is Oberpfaffenhofen (Munich)
-    expect("OBF") {
+    expectResult("OBF") {
       airportCode(highestDeAirport)
     }
     assert(airportElevationInFeet(highestDeAirport) > 1800)
     assert(airportElevationInFeet(highestDeAirport) < 2000)
 
     // The highest Belgian airport is Liege
-    expect("LGG") {
+    expectResult("LGG") {
       airportCode(highestBeAirport)
     }
 
     // The highest Dutch airport is Maastricht
-    expect("MST") {
+    expectResult("MST") {
       airportCode(highestNlAirport)
     }
 
@@ -237,7 +239,7 @@ class AirportExampleTest extends Suite {
         scope = scope,
         children = deAirportsDoc.documentElement.allChildElems ++ beAirportsDoc.documentElement.allChildElems ++ nlAirportsDoc.documentElement.allChildElems)
 
-    expect(deAirportsDoc.documentElement.allChildElems.size + beAirportsDoc.documentElement.allChildElems.size + nlAirportsDoc.documentElement.allChildElems.size) {
+    expectResult(deAirportsDoc.documentElement.allChildElems.size + beAirportsDoc.documentElement.allChildElems.size + nlAirportsDoc.documentElement.allChildElems.size) {
       airportRootElm.allChildElems.size
     }
 
@@ -371,14 +373,14 @@ class AirportExampleTest extends Suite {
     val enameTable = EName(nsWebServiceX, "Table")
 
     // The root element must be named NewDataSet
-    expect(enameNewDataSet) {
+    expectResult(enameNewDataSet) {
       root.resolvedName
     }
 
     val tableElms = root.allChildElems
 
     // The root child elements must all be named Table
-    expect(Set(enameTable)) {
+    expectResult(Set(enameTable)) {
       val elmNames = tableElms map { _.resolvedName }
       elmNames.toSet
     }
@@ -404,13 +406,13 @@ class AirportExampleTest extends Suite {
       EName(nsWebServiceX, "LongitudeEperW"))
 
     // The root grandchild elements must all have names mentioned above (in Set propertyENames)
-    expect(propertyENames) {
+    expectResult(propertyENames) {
       val elmNames = tablePropertyElms map { _.resolvedName }
       elmNames.toSet
     }
 
     // The root grandchild elements must have no child elements themselves
-    expect(0) {
+    expectResult(0) {
       val elms = tablePropertyElms flatMap { _.allChildElems }
       elms.size
     }
@@ -453,6 +455,9 @@ class AirportExampleTest extends Suite {
 
     e.getChildElem(EName(nsWebServiceX, "AirportCode")).trimmedText
   }
+}
+
+object AirportExampleTest {
 
   final case class LatLon(val lat: Double, val lon: Double) {
     import scala.math._

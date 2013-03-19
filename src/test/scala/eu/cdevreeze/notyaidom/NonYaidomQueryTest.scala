@@ -42,47 +42,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class NonYaidomQueryTest extends Suite {
 
-  /**
-   * Naive node trait, with only subclasses for elements and text nodes.
-   */
-  sealed trait Node extends Immutable
-
-  /**
-   * Naive element class, which for example is not namespace-aware.
-   *
-   * This class shows how methods allChildElems and findAllElemsOrSelf, along with the Scala
-   * Collections API, already provide a pretty powerful XML querying API.
-   */
-  final class Elem(
-    val name: String,
-    val attributes: Map[String, String],
-    val children: immutable.IndexedSeq[Node]) extends Node { self =>
-
-    def this(name: String, children: immutable.IndexedSeq[Node]) =
-      this(name, Map(), children)
-
-    def allChildElems: immutable.IndexedSeq[Elem] =
-      children collect { case e: Elem => e }
-
-    /**
-     * Finds all descendant elements and self.
-     */
-    def findAllElemsOrSelf: immutable.IndexedSeq[Elem] = {
-      // Recursive, but not tail-recursive
-      val elms = allChildElems flatMap { _.findAllElemsOrSelf }
-      self +: elms
-    }
-
-    def text: String = {
-      val textStrings = children collect { case t: Text => t.text }
-      textStrings.mkString
-    }
-  }
-
-  /**
-   * Naive text node class.
-   */
-  final case class Text(val text: String) extends Node
+  import NonYaidomQueryTest._
 
   @Test def testQueryBookTitles() {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
@@ -95,7 +55,7 @@ class NonYaidomQueryTest extends Suite {
         result.get
       }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -117,7 +77,7 @@ class NonYaidomQueryTest extends Suite {
         title <- bookOrMagazine.allChildElems find { _.name == "Title" }
       } yield title
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -140,7 +100,7 @@ class NonYaidomQueryTest extends Suite {
         result.get
       }
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -160,7 +120,7 @@ class NonYaidomQueryTest extends Suite {
     val titles =
       for (title <- bookstore.findAllElemsOrSelf if title.name == "Title") yield title
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -197,7 +157,7 @@ class NonYaidomQueryTest extends Suite {
     val isbns =
       for (book <- bookstore.allChildElems if book.name == "Book") yield book.attributes("ISBN")
 
-    expect(Set(
+    expectResult(Set(
       "ISBN-0-13-713526-2",
       "ISBN-0-13-815504-6",
       "ISBN-0-11-222222-3",
@@ -218,7 +178,7 @@ class NonYaidomQueryTest extends Suite {
         if price.toInt < 90
       } yield book
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -239,7 +199,7 @@ class NonYaidomQueryTest extends Suite {
         title <- book.allChildElems find { _.name == "Title" }
       } yield title
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -277,7 +237,7 @@ class NonYaidomQueryTest extends Suite {
       result.toSet
     }
 
-    expect(Set(
+    expectResult(Set(
       "Jeffrey Ullman",
       "Jennifer Widom",
       "Hector Garcia-Molina")) {
@@ -296,7 +256,7 @@ class NonYaidomQueryTest extends Suite {
         if !book.allChildElems.filter(_.name == "Remark").isEmpty
       } yield book.allChildElems.filter(_.name == "Title").head
 
-    expect(Set(
+    expectResult(Set(
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
@@ -319,7 +279,7 @@ class NonYaidomQueryTest extends Suite {
         if authorLastName == "Ullman"
       } yield book.allChildElems.find(_.name == "Title").get
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
@@ -350,7 +310,7 @@ class NonYaidomQueryTest extends Suite {
           (book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey")))
       } yield book.allChildElems.find(_.name == "Title").get
 
-    expect(Set(
+    expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
@@ -374,7 +334,7 @@ class NonYaidomQueryTest extends Suite {
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
       } yield book.allChildElems.find(_.name == "Title").get
 
-    expect(Set(
+    expectResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
       result.toSet
@@ -396,7 +356,7 @@ class NonYaidomQueryTest extends Suite {
       } yield secondAuthor
 
     val secondAuthorLastNames = secondAuthors map { e => e.allChildElems.find(_.name == "Last_Name").get }
-    expect(Set(
+    expectResult(Set(
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
@@ -417,7 +377,7 @@ class NonYaidomQueryTest extends Suite {
         if remark.text.trim.indexOf("great") >= 0
       } yield book.allChildElems.find(_.name == "Title").get
 
-    expect(Set("Database Systems: The Complete Book")) {
+    expectResult(Set("Database Systems: The Complete Book")) {
       val result = titles map { _.text.trim }
       result.toSet
     }
@@ -440,7 +400,7 @@ class NonYaidomQueryTest extends Suite {
         if !booksWithSameName.isEmpty
       } yield magazine
 
-    expect(Set("Hector and Jeff's Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints")) {
       val result = magazines flatMap { mag => mag.findAllElemsOrSelf find (_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -467,7 +427,7 @@ class NonYaidomQueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expect(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
       val result = booksAndMagazines flatMap { mag => mag.findAllElemsOrSelf find (_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -491,7 +451,7 @@ class NonYaidomQueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expect(Set("Hector and Jeff's Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints")) {
       val result = booksAndMagazines flatMap { mag => mag.findAllElemsOrSelf find (_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -525,7 +485,7 @@ class NonYaidomQueryTest extends Suite {
         if authorNames forall { name => name.indexOf("J") >= 0 }
       } yield book
 
-    expect(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
+    expectResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
       val result = books flatMap { book => book.findAllElemsOrSelf.find(_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -553,7 +513,7 @@ class NonYaidomQueryTest extends Suite {
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
       } yield book.allChildElems.find(_.name == "Title").get
 
-    expect(Set(
+    expectResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = titles map { _.text.trim }
       result.toSet
@@ -590,10 +550,10 @@ class NonYaidomQueryTest extends Suite {
           title,
           textElem("First_Name", searchedForFirstNames.head)))
 
-    expect(2) {
+    expectResult(2) {
       titleAndFirstNames.size
     }
-    expect(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val titleElms = titleAndFirstNames map { e => e.findAllElemsOrSelf filter { _.name == "Title" } }
       val result = titleElms.flatten map { e => e.text.trim }
       result.toSet
@@ -620,7 +580,7 @@ class NonYaidomQueryTest extends Suite {
     val averagePrice =
       textElem("Average", (prices.sum.toDouble / prices.size).toString)
 
-    expect(65) {
+    expectResult(65) {
       averagePrice.text.trim.toDouble.intValue
     }
   }
@@ -659,14 +619,14 @@ class NonYaidomQueryTest extends Suite {
           book.allChildElems.find(_.name == "Title").get,
           textElem("Price", price.toString)))
 
-    expect(2) {
+    expectResult(2) {
       cheapBooks.size
     }
-    expect(Set(50, 25)) {
+    expectResult(Set(50, 25)) {
       val result = cheapBooks flatMap { e => e.findAllElemsOrSelf filter { _.name == "Price" } } map { e => e.text.trim.toDouble.intValue }
       result.toSet
     }
-    expect(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val result = cheapBooks flatMap { e => e.findAllElemsOrSelf filter { _.name == "Title" } } map { e => e.text.trim }
       result.toSet
     }
@@ -703,13 +663,13 @@ class NonYaidomQueryTest extends Suite {
           textElem("Price", price.toString)))
     }
 
-    expect(4) {
+    expectResult(4) {
       books.size
     }
-    expect(List(25, 50, 85, 100)) {
+    expectResult(List(25, 50, 85, 100)) {
       books flatMap { e => e.findAllElemsOrSelf filter { _.name == "Price" } } map { e => e.text.trim.toDouble.intValue }
     }
-    expect(List(
+    expectResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
@@ -735,7 +695,7 @@ class NonYaidomQueryTest extends Suite {
         lastName <- (bookstore.findAllElemsOrSelf filter { _.name == "Last_Name" } map (e => e.text.trim)).distinct
       } yield lastName
 
-    expect(Set(
+    expectResult(Set(
       "Ullman",
       "Widom",
       "Garcia-Molina")) {
@@ -783,25 +743,25 @@ class NonYaidomQueryTest extends Suite {
           textElem("Title1", bookTitle(book1)),
           textElem("Title2", bookTitle(book2))))
 
-    expect(5) {
+    expectResult(5) {
       pairs.size
     }
-    expect(3) {
+    expectResult(3) {
       pairs.filter(pair =>
         pair.allChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book1) ||
           pair.allChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book1)).size
     }
-    expect(3) {
+    expectResult(3) {
       pairs.filter(pair =>
         pair.allChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book2) ||
           pair.allChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book2)).size
     }
-    expect(2) {
+    expectResult(2) {
       pairs.filter(pair =>
         pair.allChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book3) ||
           pair.allChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book3)).size
     }
-    expect(2) {
+    expectResult(2) {
       pairs.filter(pair =>
         pair.allChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book4) ||
           pair.allChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book4)).size
@@ -868,7 +828,7 @@ class NonYaidomQueryTest extends Suite {
 
     val invertedBookstore: Elem = new Elem(name = "InvertedBookstore", children = authorsWithBooks)
 
-    expect(3) {
+    expectResult(3) {
       invertedBookstore.allChildElems.size
     }
   }
@@ -890,7 +850,7 @@ class NonYaidomQueryTest extends Suite {
         }
       }
 
-    expect(Set("BookTitle", "MagazineTitle")) {
+    expectResult(Set("BookTitle", "MagazineTitle")) {
       bookOrMagazineTitles.map(e => e.name).toSet
     }
     val ngCount = bookOrMagazineTitles count { e => e.text.trim == "National Geographic" }
@@ -1027,4 +987,49 @@ class NonYaidomQueryTest extends Suite {
       children = Vector(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
   }
+}
+
+object NonYaidomQueryTest {
+
+  /**
+   * Naive node trait, with only subclasses for elements and text nodes.
+   */
+  sealed trait Node extends Immutable
+
+  /**
+   * Naive element class, which for example is not namespace-aware.
+   *
+   * This class shows how methods allChildElems and findAllElemsOrSelf, along with the Scala
+   * Collections API, already provide a pretty powerful XML querying API.
+   */
+  final class Elem(
+    val name: String,
+    val attributes: Map[String, String],
+    val children: immutable.IndexedSeq[Node]) extends Node { self =>
+
+    def this(name: String, children: immutable.IndexedSeq[Node]) =
+      this(name, Map(), children)
+
+    def allChildElems: immutable.IndexedSeq[Elem] =
+      children collect { case e: Elem => e }
+
+    /**
+     * Finds all descendant elements and self.
+     */
+    def findAllElemsOrSelf: immutable.IndexedSeq[Elem] = {
+      // Recursive, but not tail-recursive
+      val elms = allChildElems flatMap { _.findAllElemsOrSelf }
+      self +: elms
+    }
+
+    def text: String = {
+      val textStrings = children collect { case t: Text => t.text }
+      textStrings.mkString
+    }
+  }
+
+  /**
+   * Naive text node class.
+   */
+  final case class Text(val text: String) extends Node
 }

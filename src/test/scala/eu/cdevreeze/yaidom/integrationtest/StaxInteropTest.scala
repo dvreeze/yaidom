@@ -60,16 +60,16 @@ class StaxInteropTest extends Suite {
 
     val root: Elem = staxParser.parse(is).documentElement
 
-    expect(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    expectResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
     }
-    expect(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    expectResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(8) {
+    expectResult(8) {
       root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expect(3) {
+    expectResult(3) {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
@@ -88,16 +88,16 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect((root.findAllElems map (e => e.localName)).toSet) {
+    expectResult((root.findAllElems map (e => e.localName)).toSet) {
       (root2.findAllElems map (e => e.localName)).toSet
     }
-    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root2.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root2.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expect {
+    expectResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -109,16 +109,16 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect((root.findAllElems map (e => e.localName)).toSet) {
+    expectResult((root.findAllElems map (e => e.localName)).toSet) {
       (root3.findAllElems map (e => e.localName)).toSet
     }
-    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root3.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root3.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expect {
+    expectResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -141,16 +141,16 @@ class StaxInteropTest extends Suite {
 
     val root4 = doc2.documentElement
 
-    expect((root.findAllElems map (e => e.localName)).toSet) {
+    expectResult((root.findAllElems map (e => e.localName)).toSet) {
       (root4.findAllElems map (e => e.localName)).toSet
     }
-    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root4.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root4.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expect {
+    expectResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -162,16 +162,16 @@ class StaxInteropTest extends Suite {
 
     val root5: resolved.Elem = resolved.Elem(doc.documentElement)
 
-    expect((root.findAllElems map (e => e.localName)).toSet) {
+    expectResult((root.findAllElems map (e => e.localName)).toSet) {
       (root5.findAllElems map (e => e.localName)).toSet
     }
-    expect((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root5.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expect(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root5.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expect {
+    expectResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -189,7 +189,7 @@ class StaxInteropTest extends Suite {
 
     val root: Elem = staxParser.parse(is).documentElement
 
-    expect(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -208,7 +208,7 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -217,7 +217,7 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -233,19 +233,19 @@ class StaxInteropTest extends Suite {
     val document: Document = staxParser.parse(is)
     val root: Elem = document.documentElement
 
-    expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set(QName("root"), QName("child"))) {
+    expectResult(Set(QName("root"), QName("child"))) {
       val result = root.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expect("This is trivial XML") {
+    expectResult("This is trivial XML") {
       val result = document.comments map { com => com.text.trim }
       result.mkString
     }
-    expect("Trivial XML") {
+    expectResult("Trivial XML") {
       val result = root.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -265,19 +265,19 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set(QName("root"), QName("child"))) {
+    expectResult(Set(QName("root"), QName("child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expect("This is trivial XML") {
+    expectResult("This is trivial XML") {
       val result = document2.comments map { com => com.text.trim }
       result.mkString
     }
-    expect("Trivial XML") {
+    expectResult("Trivial XML") {
       val result = root2.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -287,19 +287,19 @@ class StaxInteropTest extends Suite {
     val document3: Document = DocBuilder.fromDocument(document2).build()
     val root3: Elem = document3.documentElement
 
-    expect(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set(QName("root"), QName("child"))) {
+    expectResult(Set(QName("root"), QName("child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expect("This is trivial XML") {
+    expectResult("This is trivial XML") {
       val result = document3.comments map { com => com.text.trim }
       result.mkString
     }
-    expect("Trivial XML") {
+    expectResult("Trivial XML") {
       val result = root3.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -335,12 +335,12 @@ class StaxInteropTest extends Suite {
         EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
         EName(ns, "notation"))
 
-    expect(xsElmENames) {
+    expectResult(xsElmENames) {
       val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     // Remember, coalescing is set to true!
-    expect(Set(0, 1)) {
+    expectResult(Set(0, 1)) {
       val result = root \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -351,14 +351,14 @@ class StaxInteropTest extends Suite {
         result.headOption
       }
 
-      expect(true) {
+      expectResult(true) {
         forChoiceDefOption.isDefined
       }
 
       val forChoiceDefDocumentation: String =
         forChoiceDefOption.get.filterElems(EName(ns, "documentation")) flatMap { e => e.trimmedText } mkString ""
 
-      expect("A utility type, not for public use") {
+      expectResult("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
       }
     }
@@ -375,7 +375,7 @@ class StaxInteropTest extends Suite {
       val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
 
       // The XML string contains "&lt;", but the parsed text should contain an unescaped "<" instead
-      expect(true) {
+      expectResult(true) {
         documentationText.containsSlice("""XML Schema language.  The documentation (within <documentation> elements)""")
       }
     }
@@ -396,17 +396,17 @@ class StaxInteropTest extends Suite {
           }
         } yield idConstraintElm
 
-      expect(1) {
+      expectResult(1) {
         identityConstraintElms.size
       }
 
       val selectorElms = identityConstraintElms.head \ EName(ns, "selector")
 
-      expect(1) {
+      expectResult(1) {
         selectorElms.size
       }
 
-      expect(""".//xs:key|.//xs:unique|.//xs:keyref""") {
+      expectResult(""".//xs:key|.//xs:unique|.//xs:keyref""") {
         selectorElms.head.attributeOption(EName("xpath")).getOrElse("")
       }
     }
@@ -421,7 +421,7 @@ class StaxInteropTest extends Suite {
             e.attributeOption(EName("abstract")) == Some("true")
         }
 
-      expect(1) {
+      expectResult(1) {
         complexTypeElms.size
       }
 
@@ -433,41 +433,41 @@ class StaxInteropTest extends Suite {
       val attributeElms = complexTypeElms.head.filterElems(EName(ns, "attribute"))
       val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
-      expect(Set(EName("base"))) {
+      expectResult(Set(EName("base"))) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
-      expect(Set("xs:annotated")) {
+      expectResult(Set("xs:annotated")) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.values }
         result.toSet
       }
 
-      expect(Set()) {
+      expectResult(Set()) {
         val result = sequenceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expect(Set(EName("minOccurs"))) {
+      expectResult(Set(EName("minOccurs"))) {
         val result = choiceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expect(Set(EName("name"), EName("type"))) {
+      expectResult(Set(EName("name"), EName("type"))) {
         val result = elementElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expect(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
+      expectResult(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
         val result = groupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expect(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
+      expectResult(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
         val result = attributeElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expect(Set(EName("ref"))) {
+      expectResult(Set(EName("ref"))) {
         val result = attributeGroupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
@@ -484,11 +484,11 @@ class StaxInteropTest extends Suite {
 
       val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
 
-      expect(1) {
+      expectResult(1) {
         patternElms.size
       }
 
-      expect("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
+      expectResult("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
         patternElms.head.attributeOption(EName("value")).getOrElse("")
       }
     }
@@ -509,11 +509,11 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(xsElmENames) {
+    expectResult(xsElmENames) {
       val result = root2 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set(0, 1)) {
+    expectResult(Set(0, 1)) {
       val result = root2 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -528,11 +528,11 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(xsElmENames) {
+    expectResult(xsElmENames) {
       val result = root3 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expect(Set(0, 1)) {
+    expectResult(Set(0, 1)) {
       val result = root3 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -557,22 +557,22 @@ class StaxInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildText(rootElm: Elem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expect(true) {
+      expectResult(true) {
         childOption.isDefined
       }
       // Remember, coalescing is set to true!
-      expect(1) {
+      expectResult(1) {
         childOption.get.textChildren.size
       }
       val text = "This text contains an entity reference, viz. hi"
-      expect(text) {
+      expectResult(text) {
         childOption.get.trimmedText.take(text.length)
       }
     }
@@ -593,7 +593,7 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -604,7 +604,7 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -625,31 +625,31 @@ class StaxInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildTextAndEntityRef(rootElm: Elem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expect(true) {
+      expectResult(true) {
         childOption.isDefined
       }
-      expect(2) {
+      expectResult(2) {
         val result = childOption.get.textChildren filter { t => t.text.trim != "" }
         result.size
       }
-      expect(1) {
+      expectResult(1) {
         val result = childOption.get.children collect { case er: EntityRef => er }
         result.size
       }
-      expect(EntityRef("hello")) {
+      expectResult(EntityRef("hello")) {
         val entityRefs = childOption.get.children collect { case er: EntityRef => er }
         val entityRef: EntityRef = entityRefs.head
         entityRef
       }
       val s = "This text contains an entity reference, viz."
-      expect(s) {
+      expectResult(s) {
         childOption.get.trimmedText.take(s.length)
       }
     }
@@ -671,7 +671,7 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -682,7 +682,7 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -701,7 +701,7 @@ class StaxInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -720,7 +720,7 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -729,7 +729,7 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -748,31 +748,31 @@ class StaxInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expect(2) {
+      expectResult(2) {
         childElms.size
       }
 
       val text = "Jansen & co"
 
       // Remember: we set the parser to coalescing!
-      expect(Set(text)) {
+      expectResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
 
-      expect(Set(text)) {
+      expectResult(Set(text)) {
         val result = childElms map { e => e.attributeOption(EName("about")).getOrElse("Missing text") }
         result.toSet
       }
 
-      expect(Set(text)) {
+      expectResult(Set(text)) {
         val result = rootElm.commentChildren map { c => c.text.trim }
         result.toSet
       }
@@ -794,7 +794,7 @@ class StaxInteropTest extends Suite {
 
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -805,7 +805,7 @@ class StaxInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -824,20 +824,20 @@ class StaxInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expect(2) {
+      expectResult(2) {
         childElms.size
       }
 
       val text = "\u20AC 200"
 
-      expect(Set(text)) {
+      expectResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
@@ -849,7 +849,7 @@ class StaxInteropTest extends Suite {
 
     val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expect(Set(EName(ns, "root"), EName(ns, "child"))) {
+    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -949,21 +949,21 @@ class StaxInteropTest extends Suite {
 
     val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
 
-    expect(4) {
+    expectResult(4) {
       tableRowElms.size
     }
 
     val isbnElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(1).headOption }
     val isbns = isbnElms map { e => e.trimmedText }
 
-    expect(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
+    expectResult(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
       isbns.toSet
     }
 
     val authorsElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(3).headOption }
     val authors = authorsElms map { e => e.trimmedText }
 
-    expect(Set(
+    expectResult(Set(
       "Jeffrey Ullman, Jennifer Widom",
       "Hector Garcia-Molina, Jeffrey Ullman, Jennifer Widom",
       "Jeffrey Ullman, Hector Garcia-Molina",
@@ -997,41 +997,41 @@ class StaxInteropTest extends Suite {
 
     val doc = parser.parse(classOf[StaxInteropTest].getResourceAsStream("cars.xml"))
 
-    expect("records") {
+    expectResult("records") {
       doc.documentElement.localName
     }
 
     val recordsElm = doc.documentElement
 
-    expect(3) {
+    expectResult(3) {
       (recordsElm \ "car").size
     }
 
-    expect(10) {
+    expectResult(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
     val firstRecordElm = (recordsElm \ "car")(0)
 
-    expect("car") {
+    expectResult("car") {
       firstRecordElm.localName
     }
 
-    expect("Holden") {
+    expectResult("Holden") {
       firstRecordElm.attribute(EName("make"))
     }
 
-    expect("Australia") {
+    expectResult("Australia") {
       firstRecordElm.getChildElem(_.localName == "country").trimmedText
     }
 
-    expect(2) {
+    expectResult(2) {
       val carElms = recordsElm \ "car"
       val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
       result.size
     }
 
-    expect(Set("Holden", "Peel")) {
+    expectResult(Set("Holden", "Peel")) {
       val carElms = recordsElm \ "car"
       val pattern = ".*s.*a.*".r.pattern
 
@@ -1043,7 +1043,7 @@ class StaxInteropTest extends Suite {
       (resultElms map (e => e.attribute(EName("make")))).toSet
     }
 
-    expect(Set("speed", "size", "price")) {
+    expectResult(Set("speed", "size", "price")) {
       val result = recordsElm collectFromElemsOrSelf { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
@@ -1054,11 +1054,11 @@ class StaxInteropTest extends Suite {
     val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
-    expect("New Zealand") {
+    expectResult("New Zealand") {
       updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).getChildElem(_.localName == "country").trimmedText
     }
 
-    expect(List("Royale", "P50", "HSV Maloo")) {
+    expectResult(List("Royale", "P50", "HSV Maloo")) {
       val carElms = recordsElm \ "car"
       val resultElms = carElms sortBy { e => e.attributeOption(EName("year")).getOrElse("0").toInt }
       resultElms map { e => e.attribute(EName("name")) }
@@ -1078,10 +1078,10 @@ class StaxInteropTest extends Suite {
 
     val root: Elem = staxParser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
-    expect(4) {
+    expectResult(4) {
       (root \\! "Book").size
     }
-    expect(4) {
+    expectResult(4) {
       (root \\! "Magazine").size
     }
   }

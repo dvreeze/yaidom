@@ -47,16 +47,16 @@ class XmlLiteralTest extends Suite {
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")
 
-    expect(expectedBookTitles) {
+    expectResult(expectedBookTitles) {
       bookTitles
     }
 
     val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
 
-    expect(Some("85")) {
+    expectResult(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
-    expect(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
+    expectResult(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
       (firstBookElemOption.get \\ "Author") map { author =>
         val firstName = (author \ "First_Name").map(_.text).mkString
         val lastName = (author \ "Last_Name").map(_.text).mkString
@@ -66,15 +66,15 @@ class XmlLiteralTest extends Suite {
 
     val expectedScope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
-    expect(expectedScope) {
+    expectResult(expectedScope) {
       doc.documentElement.scope
     }
-    expect(Set(expectedScope)) {
+    expectResult(Set(expectedScope)) {
       val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
       result.toSet
     }
 
-    expect(Set("http://bookstore")) {
+    expectResult(Set("http://bookstore")) {
       val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
       result.toSet
     }
@@ -90,16 +90,16 @@ class XmlLiteralTest extends Suite {
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")
 
-    expect(expectedBookTitles) {
+    expectResult(expectedBookTitles) {
       bookTitles
     }
 
     val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
 
-    expect(Some("85")) {
+    expectResult(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
-    expect(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
+    expectResult(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
       (firstBookElemOption.get \\ "Author") map { author =>
         val firstName = (author \ "First_Name").map(_.text).mkString
         val lastName = (author \ "Last_Name").map(_.text).mkString
@@ -109,15 +109,15 @@ class XmlLiteralTest extends Suite {
 
     val expectedScope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
-    expect(expectedScope) {
+    expectResult(expectedScope) {
       doc.documentElement.scope
     }
-    expect(Set(expectedScope)) {
+    expectResult(Set(expectedScope)) {
       val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
       result.toSet
     }
 
-    expect(Set("http://bookstore")) {
+    expectResult(Set("http://bookstore")) {
       val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
       result.toSet
     }
@@ -133,16 +133,16 @@ class XmlLiteralTest extends Suite {
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")
 
-    expect(expectedBookTitles) {
+    expectResult(expectedBookTitles) {
       bookTitles
     }
 
     val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
 
-    expect(Some("85")) {
+    expectResult(Some("85")) {
       firstBookElemOption flatMap { e => (e \@ "Price") }
     }
-    expect(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
+    expectResult(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
       (firstBookElemOption.get \\ "Author") map { author =>
         val firstName = (author \ "First_Name").map(_.text).mkString
         val lastName = (author \ "Last_Name").map(_.text).mkString
@@ -152,15 +152,15 @@ class XmlLiteralTest extends Suite {
 
     val expectedScope = Scope.from("books" -> "http://bookstore")
 
-    expect(expectedScope) {
+    expectResult(expectedScope) {
       doc.documentElement.scope
     }
-    expect(Set(expectedScope)) {
+    expectResult(Set(expectedScope)) {
       val result = firstBookElemOption.get.findAllElemsOrSelf map { _.scope }
       result.toSet
     }
 
-    expect(Set("http://bookstore")) {
+    expectResult(Set("http://bookstore")) {
       val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
       result.toSet
     }
@@ -169,11 +169,11 @@ class XmlLiteralTest extends Suite {
   @Test def testXmlLiteral4() {
     val doc: Document = getDocument4
 
-    expect(1) {
+    expectResult(1) {
       doc.documentElement.findAllElemsOrSelf.size
     }
 
-    expect(Set("http://bookstore")) {
+    expectResult(Set("http://bookstore")) {
       val result = doc.documentElement.findAllElemsOrSelf map { e => e.resolvedName.namespaceUriOption.getOrElse("http://bogusNamespace") }
       result.toSet
     }
@@ -247,10 +247,10 @@ class XmlLiteralTest extends Suite {
   @Test def testUpdateEmployee() {
     val doc: Document = getEmployeeDocument
 
-    expect(11) {
+    expectResult(11) {
       doc.documentElement.findAllElemsOrSelf.size
     }
-    expect(1) {
+    expectResult(1) {
       doc.allComments.size
     }
 
@@ -280,10 +280,10 @@ class XmlLiteralTest extends Suite {
 
     val resolvedNewRoot = resolved.Elem(newDoc.documentElement).removeAllInterElementWhitespace
 
-    expect(11) {
+    expectResult(11) {
       resolvedNewRoot.findAllElemsOrSelf.size
     }
-    expect(List(
+    expectResult(List(
       EName(ns, "Employees"),
       EName(ns, "Employee"),
       EName(ns, "name"),
@@ -297,10 +297,10 @@ class XmlLiteralTest extends Suite {
       EName(ns, "salary"))) {
       resolvedNewRoot.findAllElemsOrSelf map { _.resolvedName }
     }
-    expect(List("M1", "F2")) {
+    expectResult(List("M1", "F2")) {
       resolvedNewRoot.filterElems(EName(ns, "Employee")) map (_.attribute(EName("id")))
     }
-    expect(List(
+    expectResult(List(
       EName(ns, "name"),
       EName(ns, "age"),
       EName(ns, "role"),
@@ -316,7 +316,7 @@ class XmlLiteralTest extends Suite {
       } yield empChildElem.resolvedName
     }
 
-    expect(List("PANKAJ", "LISA")) {
+    expectResult(List("PANKAJ", "LISA")) {
       for {
         empElem <- resolvedNewRoot.filterElems(EName(ns, "Employee"))
         nameElem <- empElem.filterChildElems(EName(ns, "name"))
@@ -372,7 +372,7 @@ class XmlLiteralTest extends Suite {
                 Vector(Text("10000"))))))).removeAllInterElementWhitespace
     }
 
-    expect(expectedResolvedNewRoot) {
+    expectResult(expectedResolvedNewRoot) {
       resolvedNewRoot
     }
   }

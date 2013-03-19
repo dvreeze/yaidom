@@ -36,55 +36,55 @@ class XmlStringUtilsTest extends Suite {
   @Test def testNameValidity() {
     import XmlStringUtils._
 
-    expect(true) {
+    expectResult(true) {
       isAllowedElementLocalName("Drivers_License_Number")
     }
-    expect(false) {
+    expectResult(false) {
       isAllowedElementLocalName("Driver's_License_Number")
     }
 
-    expect(true) {
+    expectResult(true) {
       isAllowedElementLocalName("month-day-year")
     }
-    expect(false) {
+    expectResult(false) {
       isAllowedElementLocalName("month/day/year")
     }
 
-    expect(true) {
+    expectResult(true) {
       isAllowedElementLocalName("first_name")
     }
-    expect(false) {
+    expectResult(false) {
       isAllowedElementLocalName("first name")
     }
 
-    expect(true) {
+    expectResult(true) {
       isAllowedElementLocalName("_4-lane")
     }
-    expect(false) {
+    expectResult(false) {
       isAllowedElementLocalName("4-lane")
     }
 
-    expect(true) {
+    expectResult(true) {
       isProbablyValidXmlName("xmlns")
     }
-    expect(true) {
+    expectResult(true) {
       isAllowedElementLocalName("xmlns")
     }
 
-    expect(true) {
+    expectResult(true) {
       isProbablyValidXmlName("cars:tire")
     }
-    expect(false) {
+    expectResult(false) {
       isAllowedElementLocalName("cars:tire")
     }
 
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("")
     }
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("<")
     }
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("&")
     }
   }
@@ -95,35 +95,35 @@ class XmlStringUtilsTest extends Suite {
     // To parse simple XPath expressions, we want to establish that "/", "*", "[" and "]" are never themselves
     // part of qualified names.
 
-    expect(true) {
+    expectResult(true) {
       isProbablyValidXmlName("tire")
     }
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("/tire")
     }
 
-    expect(true) {
+    expectResult(true) {
       isProbablyValidXmlName("cars:tire")
     }
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("/cars:tire")
     }
 
-    expect(true) {
+    expectResult(true) {
       isProbablyValidXmlName("tire")
     }
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("tire[1]")
     }
 
-    expect(true) {
+    expectResult(true) {
       isProbablyValidXmlName("cars:tire")
     }
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("cars:tire[1]")
     }
 
-    expect(false) {
+    expectResult(false) {
       isProbablyValidXmlName("*")
     }
   }

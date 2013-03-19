@@ -51,13 +51,13 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed1.xml"))
     val rootElm = doc.documentElement
 
-    expect(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
+    expectResult(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
       rootElm.findAllElemsOrSelf map { _.qname }
     }
 
     val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
 
-    expect(Declarations.from("" -> nsAtom, "xhtml" -> nsXhtml, "my" -> nsExamples)) {
+    expectResult(Declarations.from("" -> nsAtom, "xhtml" -> nsXhtml, "my" -> nsExamples)) {
       rootElmBuilder.namespaces
     }
     assert(rootElmBuilder.findAllElems forall (eb => eb.namespaces.isEmpty))
@@ -70,19 +70,19 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed2.xml"))
     val rootElm = doc.documentElement
 
-    expect(List(QName("feed"), QName("title"), QName("rights"), QName("div"), QName("strong"), QName("em"))) {
+    expectResult(List(QName("feed"), QName("title"), QName("rights"), QName("div"), QName("strong"), QName("em"))) {
       rootElm.findAllElemsOrSelf map { _.qname }
     }
 
     val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
 
-    expect(Declarations.from("" -> nsAtom)) {
+    expectResult(Declarations.from("" -> nsAtom)) {
       rootElmBuilder.namespaces
     }
-    expect(Declarations.from("example" -> nsExamples)) {
+    expectResult(Declarations.from("example" -> nsExamples)) {
       rootElmBuilder findElem { eb => eb.qname == QName("rights") } map { _.namespaces } getOrElse (Declarations.Empty)
     }
-    expect(Declarations.from("" -> nsXhtml)) {
+    expectResult(Declarations.from("" -> nsXhtml)) {
       rootElmBuilder findElem { eb => eb.qname == QName("div") } map { _.namespaces } getOrElse (Declarations.Empty)
     }
   }
@@ -94,21 +94,21 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed3.xml"))
     val rootElm = doc.documentElement
 
-    expect(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
+    expectResult(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
       rootElm.findAllElemsOrSelf map { _.qname }
     }
 
     val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
 
-    expect(Declarations.from("" -> nsAtom, "xhtml" -> nsXhtml, "my" -> nsExamples)) {
+    expectResult(Declarations.from("" -> nsAtom, "xhtml" -> nsXhtml, "my" -> nsExamples)) {
       rootElmBuilder.namespaces
     }
     // Superfluous namespace declarations not restored
-    expect(Declarations.Empty) {
+    expectResult(Declarations.Empty) {
       rootElmBuilder findElem { eb => eb.qname == QName("rights") } map { _.namespaces } getOrElse (Declarations.Empty)
     }
     // Superfluous namespace declarations not restored
-    expect(Declarations.Empty) {
+    expectResult(Declarations.Empty) {
       rootElmBuilder findElem { eb => eb.qname == QName("div") } map { _.namespaces } getOrElse (Declarations.Empty)
     }
   }
@@ -122,7 +122,7 @@ class NamespaceTest extends Suite {
     val doc2 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed2.xml"))
     val rootElm2 = doc2.documentElement
 
-    expect(resolved.Elem(rootElm1)) {
+    expectResult(resolved.Elem(rootElm1)) {
       resolved.Elem(rootElm2)
     }
   }
@@ -136,31 +136,31 @@ class NamespaceTest extends Suite {
     val doc2 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("simpleStylesheet2.xsl"))
     val rootElm2 = doc2.documentElement
 
-    expect(resolved.Elem(rootElm1)) {
+    expectResult(resolved.Elem(rootElm1)) {
       resolved.Elem(rootElm2)
     }
 
     val elm1Option = rootElm1 findElem { e => e.qname == QName("xsl:template") }
 
-    expect(Some(EName("{http://www.w3.org/1999/XSL/Transform}template"))) {
+    expectResult(Some(EName("{http://www.w3.org/1999/XSL/Transform}template"))) {
       elm1Option.map(_.resolvedName)
     }
 
     val elm2Option = rootElm2 findElem { e => e.qname == QName("template") }
 
-    expect(Some(EName("{http://www.w3.org/1999/XSL/Transform}template"))) {
+    expectResult(Some(EName("{http://www.w3.org/1999/XSL/Transform}template"))) {
       elm2Option.map(_.resolvedName)
     }
 
     val htmlElm1Option = rootElm1 findElem { e => e.qname == QName("html") }
 
-    expect(Some(EName("html"))) {
+    expectResult(Some(EName("html"))) {
       htmlElm1Option.map(_.resolvedName)
     }
 
     val htmlElm2Option = rootElm2 findElem { e => e.qname == QName("html") }
 
-    expect(Some(EName("html"))) {
+    expectResult(Some(EName("html"))) {
       htmlElm2Option.map(_.resolvedName)
     }
   }
@@ -175,7 +175,7 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
     val rootElm = doc.documentElement
 
-    expect(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
+    expectResult(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
       rootElm collectFromElemsOrSelf { case e => e.resolvedName }
     }
   }
@@ -197,11 +197,11 @@ class NamespaceTest extends Suite {
         EName("{http://EXAMPLE.COM/uri2/}bar"),
         EName("{../uri3}baz"))
 
-    expect(enames) {
+    expectResult(enames) {
       rootElm collectFromElemsOrSelf { case e => e.resolvedName }
     }
 
-    expect(3) {
+    expectResult(3) {
       Set(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri/}foo"), EName("{http://EXAMPLE.COM/uri}foo")).size
     }
   }
@@ -219,7 +219,7 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
     val rootElm = doc.documentElement
 
-    expect(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
+    expectResult(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
       rootElm collectFromElemsOrSelf { case e => e.resolvedName }
     }
   }
@@ -234,11 +234,11 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
     val rootElm = doc.documentElement
 
-    expect(List(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri}bar"))) {
+    expectResult(List(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri}bar"))) {
       rootElm collectFromElemsOrSelf { case e => e.resolvedName }
     }
 
-    expect(Some("en")) {
+    expectResult(Some("en")) {
       rootElm findElem { e => e.localName == "bar" } flatMap
         { e => e.attributeOption(EName("{http://www.w3.org/XML/1998/namespace}lang")) }
     }
@@ -259,20 +259,20 @@ class NamespaceTest extends Suite {
     val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
     val rootElm = doc.documentElement
 
-    expect(Scope.from("my" -> "http://xmlportfolio.com/xmlguild-examples")) {
+    expectResult(Scope.from("my" -> "http://xmlportfolio.com/xmlguild-examples")) {
       rootElm.scope
     }
 
     val simpleElmOption = rootElm findElem { _.qname == QName("simple") }
     val simpleElm = simpleElmOption.getOrElse(sys.error("Expected element 'simple'"))
 
-    expect(EName("simple")) {
+    expectResult(EName("simple")) {
       simpleElm.resolvedName
     }
-    expect(Scope.Empty) {
+    expectResult(Scope.Empty) {
       simpleElm.scope
     }
-    expect(List(EName("simple"), EName("remark"))) {
+    expectResult(List(EName("simple"), EName("remark"))) {
       simpleElm.findAllElemsOrSelf map { _.resolvedName }
     }
   }
@@ -283,98 +283,98 @@ class NamespaceTest extends Suite {
     val rootElm = doc.documentElement
 
     val feedElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsAtom, "feed") }
-    expect(true) {
+    expectResult(true) {
       feedElmOption.isDefined
     }
-    expect(rootElm) {
+    expectResult(rootElm) {
       feedElmOption.get
     }
 
     val titleElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsAtom, "title") }
-    expect(true) {
+    expectResult(true) {
       titleElmOption.isDefined
     }
 
     val rightsElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsAtom, "rights") }
-    expect(true) {
+    expectResult(true) {
       rightsElmOption.isDefined
     }
 
-    expect(List(feedElmOption.get, titleElmOption.get, rightsElmOption.get)) {
+    expectResult(List(feedElmOption.get, titleElmOption.get, rightsElmOption.get)) {
       rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsAtom) }
     }
 
     val divElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsXhtml, "div") }
-    expect(true) {
+    expectResult(true) {
       divElmOption.isDefined
     }
 
     val strongElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsXhtml, "strong") }
-    expect(true) {
+    expectResult(true) {
       strongElmOption.isDefined
     }
 
     val emElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsXhtml, "em") }
-    expect(true) {
+    expectResult(true) {
       emElmOption.isDefined
     }
 
-    expect(List(divElmOption.get, strongElmOption.get, emElmOption.get)) {
+    expectResult(List(divElmOption.get, strongElmOption.get, emElmOption.get)) {
       rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXhtml) }
     }
-    expect("verbally process") {
+    expectResult("verbally process") {
       strongElmOption.get.text
     }
-    expect(3) {
+    expectResult(3) {
       divElmOption.get.removeAllInterElementWhitespace.textChildren.size
     }
-    expect("from the authors.") {
+    expectResult("from the authors.") {
       divElmOption.get.removeAllInterElementWhitespace.textChildren.last.text.trim
     }
-    expect(List(strongElmOption.get, emElmOption.get)) {
+    expectResult(List(strongElmOption.get, emElmOption.get)) {
       divElmOption.get.allChildElems
     }
-    expect(5) {
+    expectResult(5) {
       divElmOption.get.removeAllInterElementWhitespace.children.size
     }
-    expect(resolved.Elem(emElmOption.get)) {
+    expectResult(resolved.Elem(emElmOption.get)) {
       val child = divElmOption.get.removeAllInterElementWhitespace.children(3)
       resolved.Node(child)
     }
 
-    expect(Set(nsAtom, nsXhtml)) {
+    expectResult(Set(nsAtom, nsXhtml)) {
       val namespaces = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedName.namespaceUriOption }
       namespaces.toSet
     }
 
-    expect("xhtml") {
+    expectResult("xhtml") {
       rightsElmOption.get.attributeOption(EName("type")).getOrElse("")
     }
-    expect("silly") {
+    expectResult("silly") {
       rightsElmOption.get.attributeOption(EName(nsExamples, "type")).getOrElse("")
     }
 
     val rootElm2 = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).build(Scope.Empty)
 
-    expect(resolved.Elem(rootElm)) {
+    expectResult(resolved.Elem(rootElm)) {
       resolved.Elem(rootElm2)
     }
 
     val rootElm3 = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).build(Scope.from("" -> nsAtom))
 
-    expect(resolved.Elem(rootElm)) {
+    expectResult(resolved.Elem(rootElm)) {
       resolved.Elem(rootElm3)
     }
 
     val rootElm4 = NodeBuilder.fromElem(doc.documentElement)(Scope.from("atom" -> nsAtom)).build(Scope.Empty)
 
-    expect(resolved.Elem(rootElm)) {
+    expectResult(resolved.Elem(rootElm)) {
       resolved.Elem(rootElm4)
     }
 
     val rootElm5 = NodeBuilder.fromElem(doc.documentElement)(Scope.from("" -> nsAtom)).build(Scope.from("" -> nsAtom))
 
-    expect(resolved.Elem(rootElm)) {
+    expectResult(resolved.Elem(rootElm)) {
       resolved.Elem(rootElm5)
     }
 
@@ -383,15 +383,15 @@ class NamespaceTest extends Suite {
     val xml = docPrinter.print(doc)
     val doc6 = docParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
 
-    expect(resolved.Elem(rootElm)) {
+    expectResult(resolved.Elem(rootElm)) {
       resolved.Elem(doc6.documentElement)
     }
 
-    expect(resolved.Elem(rootElm).findAllElemsOrSelf) {
+    expectResult(resolved.Elem(rootElm).findAllElemsOrSelf) {
       rootElm.findAllElemsOrSelf map { e => resolved.Elem(e) }
     }
 
-    expect(resolved.Elem(rootElm) filterElemsOrSelf (_.resolvedName.namespaceUriOption == Some(nsAtom))) {
+    expectResult(resolved.Elem(rootElm) filterElemsOrSelf (_.resolvedName.namespaceUriOption == Some(nsAtom))) {
       rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsAtom) } map { e => resolved.Elem(e) }
     }
   }

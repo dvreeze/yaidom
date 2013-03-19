@@ -80,10 +80,10 @@ class FriendFeedTest extends Suite {
 
     // 2. Check document structure
 
-    expect("feed") {
+    expectResult("feed") {
       feedElm.localName
     }
-    expect(Set("entry")) {
+    expectResult(Set("entry")) {
       val childNames = feedElm.allChildElems map { _.localName }
       childNames.toSet
     }
@@ -112,7 +112,7 @@ class FriendFeedTest extends Suite {
               Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
     }
 
-    expect(expectedTwitterSummaryElm) {
+    expectResult(expectedTwitterSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
       resolved.Elem(twitterSummaryElm).removeAllInterElementWhitespace
     }
@@ -133,7 +133,7 @@ class FriendFeedTest extends Suite {
               Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
     }
 
-    expect(expectedGoogleReaderSummaryElm) {
+    expectResult(expectedGoogleReaderSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
       resolved.Elem(googleReaderSummaryElm).removeAllInterElementWhitespace
     }
@@ -188,7 +188,7 @@ class FriendFeedTest extends Suite {
             Vector())))
     }
 
-    expect(expectedStatsElm) {
+    expectResult(expectedStatsElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
       resolved.Elem(statsElm).removeAllInterElementWhitespace
     }
@@ -231,7 +231,7 @@ class FriendFeedTest extends Suite {
         children = serviceElms)
     }
 
-    expect(expectedStatsElm) {
+    expectResult(expectedStatsElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
       resolved.Elem(stats2Elm).removeAllInterElementWhitespace
     }
