@@ -121,7 +121,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
           logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
         case 3 =>
           val emails = {
-            val result = doc.documentElement collectFromElemsOrSelf {
+            val result = doc.documentElement.findAllElemsOrSelf collect {
               case e if e.resolvedName == EName("email") => e.trimmedText
             }
             result.toSet

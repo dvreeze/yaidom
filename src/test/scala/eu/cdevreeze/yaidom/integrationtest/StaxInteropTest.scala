@@ -1044,7 +1044,7 @@ class StaxInteropTest extends Suite {
     }
 
     expectResult(Set("speed", "size", "price")) {
-      val result = recordsElm collectFromElemsOrSelf { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
+      val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
 

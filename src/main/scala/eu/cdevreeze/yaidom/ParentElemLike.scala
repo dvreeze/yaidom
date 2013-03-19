@@ -49,7 +49,7 @@ import scala.collection.{ immutable, mutable }
  * }}}
  * or:
  * {{{
- * root collectFromElemsOrSelf { case e: Elem => e.normalizedText }
+ * root.findAllElemsOrSelf collect { case e: Elem => e.normalizedText }
  * }}}
  * As another example (also using the `HasText` trait as mixin), all text containing the string "query" can be found as follows:
  * {{{
@@ -57,7 +57,7 @@ import scala.collection.{ immutable, mutable }
  * }}}
  * or:
  * {{{
- * root collectFromElemsOrSelf { case e: Elem if e.text.contains("query") => e.text }
+ * root.findAllElemsOrSelf collect { case e: Elem if e.text.contains("query") => e.text }
  * }}}
  *
  * ==ParentElemLike more formally==
@@ -90,7 +90,6 @@ import scala.collection.{ immutable, mutable }
  * Below follows a summary of those groups of `ParentElemLike` element collection retrieval methods:
  * <ul>
  * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
- * <li>'''Collecting data''': `collectFromChildElems`, `collectFromElems` and `collectFromElemsOrSelf`</li>
  * <li>'''Finding topmost obeying some predicate''' (not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
  * </ul>
  *
@@ -123,10 +122,6 @@ import scala.collection.{ immutable, mutable }
  *   else
  *     (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
  * }
- *
- * elm.collectFromChildElems(pf) == elm.allChildElems.collect(pf)
- * elm.collectFromElems(pf) == elm.findAllElems.collect(pf)
- * elm.collectFromElemsOrSelf(pf) == elm.findAllElemsOrSelf.collect(pf)
  * }}}
  *
  * Again, the actual implementations may be more efficient, but are consistent with these definitions.
@@ -356,9 +351,6 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
   /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
 
-  /** Returns `allChildElems collect pf` */
-  final def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] = allChildElems collect pf
-
   /** Returns the first found child element obeying the given predicate, if any, wrapped in an `Option` */
   final def findChildElem(p: E => Boolean): Option[E] = {
     val result = filterChildElems(p)
@@ -406,19 +398,11 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
   /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
-  /** Returns (the equivalent of) `findAllElemsOrSelf collect pf` */
-  final def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
-    filterElemsOrSelf { e => pf.isDefinedAt(e) } collect pf
-
   /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
   final def findAllElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.findAllElemsOrSelf }
 
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
-
-  /** Returns (the equivalent of) `findAllElems collect pf` */
-  final def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B] =
-    filterElems { e => pf.isDefinedAt(e) } collect pf
 
   /**
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.

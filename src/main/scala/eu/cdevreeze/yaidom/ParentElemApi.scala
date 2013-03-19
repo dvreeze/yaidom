@@ -44,9 +44,6 @@ trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
   /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */
   def \(p: E => Boolean): immutable.IndexedSeq[E]
 
-  /** Returns `allChildElems collect pf` */
-  def collectFromChildElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B]
-
   /** Returns the first found child element obeying the given predicate, if any, wrapped in an `Option` */
   def findChildElem(p: E => Boolean): Option[E]
 
@@ -65,17 +62,11 @@ trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
   /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
   def \\(p: E => Boolean): immutable.IndexedSeq[E]
 
-  /** Returns (the equivalent of) `findAllElemsOrSelf collect pf` */
-  def collectFromElemsOrSelf[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B]
-
   /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
   def findAllElems: immutable.IndexedSeq[E]
 
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   def filterElems(p: E => Boolean): immutable.IndexedSeq[E]
-
-  /** Returns (the equivalent of) `findAllElems collect pf` */
-  def collectFromElems[B](pf: PartialFunction[E, B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.

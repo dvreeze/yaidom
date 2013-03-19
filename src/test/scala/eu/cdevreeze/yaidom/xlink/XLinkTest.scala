@@ -38,17 +38,17 @@ class XLinkTest extends Suite {
 
   private def doTest(root: Elem) {
     expectResult(Set(EName("courseload"), EName("tooltip"), EName("person"), EName("course"), EName("gpa"), EName("go"))) {
-      val enames = sampleXml.wrappedElem collectFromElemsOrSelf { case e => e.resolvedName }
+      val enames = sampleXml.wrappedElem.findAllElemsOrSelf collect { case e => e.resolvedName }
       enames.toSet
     }
 
     expectResult(Some(sampleXml.wrappedElem)) {
-      val result = sampleXml.wrappedElem collectFromElemsOrSelf { case e if XLink.mustBeExtendedLink(e) => e }
+      val result = sampleXml.wrappedElem.findAllElemsOrSelf collect { case e if XLink.mustBeExtendedLink(e) => e }
       result.headOption
     }
 
     expectResult(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
-      val result = sampleXml.wrappedElem collectFromElems { case e if XLink.mustBeLocator(e) => Locator(e).href.toString }
+      val result = sampleXml.wrappedElem.findAllElems collect { case e if XLink.mustBeLocator(e) => Locator(e).href.toString }
       result.toSet
     }
 
@@ -59,9 +59,9 @@ class XLinkTest extends Suite {
 
     val fromToHrefPairs: immutable.IndexedSeq[(String, String)] =
       for {
-        arc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeArc(e) && Arc(e).fromOption == Some("CS-101") && Arc(e).toOption == Some("student62") => Arc(e) }
-        fromLoc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.fromOption => Locator(e) }
-        toLoc <- sampleXml.wrappedElem collectFromChildElems { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.toOption => Locator(e) }
+        arc <- sampleXml.wrappedElem.allChildElems collect { case e if XLink.mustBeArc(e) && Arc(e).fromOption == Some("CS-101") && Arc(e).toOption == Some("student62") => Arc(e) }
+        fromLoc <- sampleXml.wrappedElem.allChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.fromOption => Locator(e) }
+        toLoc <- sampleXml.wrappedElem.allChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.toOption => Locator(e) }
       } yield (fromLoc.href.toString, toLoc.href.toString)
 
     expectResult(Some("courses/cs101.xml")) {

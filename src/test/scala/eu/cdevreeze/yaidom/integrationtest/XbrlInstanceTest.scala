@@ -380,24 +380,24 @@ object XbrlInstanceTest {
       require(mustBeInstance(root))
 
       val contexts: immutable.IndexedSeq[XbrlContext] =
-        root collectFromChildElems { case e if mustBeContext(e)(root) => new XbrlContext(e) }
+        root.allChildElems collect { case e if mustBeContext(e)(root) => new XbrlContext(e) }
 
       val units: immutable.IndexedSeq[XbrlUnit] =
-        root collectFromChildElems { case e if mustBeUnit(e)(root) => new XbrlUnit(e) }
+        root.allChildElems collect { case e if mustBeUnit(e)(root) => new XbrlUnit(e) }
 
       val topLevelFacts: immutable.IndexedSeq[XbrlFact] =
-        root collectFromChildElems { case e if mustBeTopLevelFact(e)(root) => XbrlFact(e) }
+        root.allChildElems collect { case e if mustBeTopLevelFact(e)(root) => XbrlFact(e) }
 
       val schemaRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root collectFromChildElems { case e if mustBeSchemaRef(e)(root) => xlink.SimpleLink(e) }
+        root.allChildElems collect { case e if mustBeSchemaRef(e)(root) => xlink.SimpleLink(e) }
       val linkbaseRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root collectFromChildElems { case e if mustBeLinkbaseRef(e)(root) => xlink.SimpleLink(e) }
+        root.allChildElems collect { case e if mustBeLinkbaseRef(e)(root) => xlink.SimpleLink(e) }
       val roleRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root collectFromChildElems { case e if mustBeRoleRef(e)(root) => xlink.SimpleLink(e) }
+        root.allChildElems collect { case e if mustBeRoleRef(e)(root) => xlink.SimpleLink(e) }
       val arcroleRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root collectFromChildElems { case e if mustBeArcroleRef(e)(root) => xlink.SimpleLink(e) }
+        root.allChildElems collect { case e if mustBeArcroleRef(e)(root) => xlink.SimpleLink(e) }
       val footnoteLinks: immutable.IndexedSeq[xlink.ExtendedLink] =
-        root collectFromChildElems { case e if mustBeFootnoteLink(e)(root) => xlink.ExtendedLink(e) }
+        root.allChildElems collect { case e if mustBeFootnoteLink(e)(root) => xlink.ExtendedLink(e) }
 
       new XbrlInstance(
         rootQName = root.qname,

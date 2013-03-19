@@ -102,18 +102,18 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms = bookstore.allChildElems
-    val magazineElms = bookstore collectFromChildElems {
+    val magazineElms = bookstore.allChildElems collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore collectFromChildElems {
+    val bookElms = bookstore.allChildElems collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore collectFromChildElems {
+      bookstore.allChildElems collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
     val cheapBookPrices =
-      bookstore collectFromChildElems {
+      bookstore.allChildElems collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 =>
           e.attribute(EName("Price")).toInt
       }
@@ -207,14 +207,14 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
-    val magazineElms = bookstore collectFromElems {
+    val magazineElms = bookstore.findAllElems collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore collectFromElems {
+    val bookElms = bookstore.findAllElems collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore collectFromElems {
+      bookstore.findAllElems collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
 
@@ -310,14 +310,14 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElemsOrSelf
-    val magazineElms = bookstore collectFromElemsOrSelf {
+    val magazineElms = bookstore.findAllElemsOrSelf collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore collectFromElemsOrSelf {
+    val bookElms = bookstore.findAllElemsOrSelf collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore collectFromElemsOrSelf {
+      bookstore.findAllElemsOrSelf collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
 
@@ -544,7 +544,7 @@ class ElemLikeTest extends Suite {
     }
 
     expectResult(8) {
-      val result = bookstore.collectFromElems(pf)
+      val result = bookstore.findAllElems.collect(pf)
       result.size
     }
 
@@ -570,15 +570,15 @@ class ElemLikeTest extends Suite {
       }
 
       expectResult(elm.allChildElems.collect(pf)) {
-        elm.collectFromChildElems(pf)
+        elm.allChildElems.collect(pf)
       }
 
       expectResult(elm.findAllElems.collect(pf)) {
-        elm.collectFromElems(pf)
+        elm.findAllElems.collect(pf)
       }
 
       expectResult(elm.findAllElemsOrSelf.collect(pf)) {
-        elm.collectFromElemsOrSelf(pf)
+        elm.findAllElemsOrSelf.collect(pf)
       }
 
       expectResult(elm.allChildElems flatMap (_ \\! p)) {

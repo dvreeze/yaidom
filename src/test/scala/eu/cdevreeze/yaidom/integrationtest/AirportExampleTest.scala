@@ -96,7 +96,7 @@ class AirportExampleTest extends Suite {
     // 2. Sanity checks on the documents
 
     val beAirportCountries = {
-      val result = beAirportsDoc.documentElement collectFromElems { case e if e.localName == "Country" => e.trimmedText }
+      val result = beAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "Country" => e.trimmedText }
       result.toSet
     }
     expectResult(Set("Belgium")) {
@@ -104,7 +104,7 @@ class AirportExampleTest extends Suite {
     }
 
     val nlAirportCountryCodes = {
-      val result = nlAirportsDoc.documentElement collectFromElems { case e if e.localName == "CountryCode" => e.trimmedText }
+      val result = nlAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "CountryCode" => e.trimmedText }
       result.toSet
     }
     expectResult(Set("461")) {
@@ -112,7 +112,7 @@ class AirportExampleTest extends Suite {
     }
 
     val deAirportCountryAbbrevs = {
-      val result = deAirportsDoc.documentElement collectFromElems { case e if e.localName == "CountryAbbrviation" => e.trimmedText }
+      val result = deAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "CountryAbbrviation" => e.trimmedText }
       result.toSet
     }
     expectResult(Set("DE")) {

@@ -176,7 +176,7 @@ class NamespaceTest extends Suite {
     val rootElm = doc.documentElement
 
     expectResult(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
-      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+      rootElm.findAllElemsOrSelf collect { case e => e.resolvedName }
     }
   }
 
@@ -198,7 +198,7 @@ class NamespaceTest extends Suite {
         EName("{../uri3}baz"))
 
     expectResult(enames) {
-      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+      rootElm.findAllElemsOrSelf collect { case e => e.resolvedName }
     }
 
     expectResult(3) {
@@ -220,7 +220,7 @@ class NamespaceTest extends Suite {
     val rootElm = doc.documentElement
 
     expectResult(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
-      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+      rootElm.findAllElemsOrSelf collect { case e => e.resolvedName }
     }
   }
 
@@ -235,7 +235,7 @@ class NamespaceTest extends Suite {
     val rootElm = doc.documentElement
 
     expectResult(List(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri}bar"))) {
-      rootElm collectFromElemsOrSelf { case e => e.resolvedName }
+      rootElm.findAllElemsOrSelf collect { case e => e.resolvedName }
     }
 
     expectResult(Some("en")) {
