@@ -84,9 +84,4 @@ trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
 
   /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   def findElem(p: E => Boolean): Option[E]
-
-  /**
-   * Computes an index on the given function taking an element, that is, returns `findAllElemsOrSelf groupBy f`.
-   */
-  def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]]
 }

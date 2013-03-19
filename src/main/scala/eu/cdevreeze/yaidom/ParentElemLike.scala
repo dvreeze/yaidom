@@ -455,9 +455,4 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     val elms = self.allChildElems.view flatMap { ch => ch findElemOrSelf p }
     elms.headOption
   }
-
-  /**
-   * Computes an index on the given function taking an element, that is, returns `findAllElemsOrSelf groupBy f`.
-   */
-  final def getIndex[K](f: E => K): Map[K, immutable.IndexedSeq[E]] = findAllElemsOrSelf groupBy f
 }
