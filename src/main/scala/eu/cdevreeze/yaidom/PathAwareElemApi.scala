@@ -42,12 +42,12 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
   /**
    * Returns all child elements with their `ElemPath` entries, in the correct order. This method should be very efficient.
    *
-   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   * The implementation must be such that the following holds: `(findAllChildElemsWithPathEntries map (_._1)) == findAllChildElems`
    */
-  def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
 
-  /** Returns `allChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
-  def allChildElemPaths: immutable.IndexedSeq[ElemPath]
+  /** Returns `findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
+  def findAllChildElemPaths: immutable.IndexedSeq[ElemPath]
 
   /** Returns the paths of child elements obeying the given predicate */
   def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath]
@@ -97,7 +97,7 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
 
   /**
    * Returns the `ElemPath` entries of all child elements, in the correct order.
-   * Equivalent to `allChildElemsWithPathEntries map { _._2 }`.
+   * Equivalent to `findAllChildElemsWithPathEntries map { _._2 }`.
    */
-  def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry]
+  def findAllChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry]
 }

@@ -40,7 +40,7 @@ class ElemLikeTest extends Suite {
   @Test def testChildElems() {
     require(bookstore.localName == "Bookstore")
 
-    val bookstoreChildElms = bookstore.allChildElems
+    val bookstoreChildElms = bookstore.findAllChildElems
     val magazineElms = bookstore \ "Magazine"
     val bookElms = bookstore \ "Book"
     val cheapBookElms =
@@ -66,7 +66,7 @@ class ElemLikeTest extends Suite {
     assert(bookElms.toSet.subsetOf(bookstoreChildElms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
-    expectResult(bookstore.allChildElems filter (_.localName == "Magazine")) {
+    expectResult(bookstore.findAllChildElems filter (_.localName == "Magazine")) {
       bookstore \ "Magazine"
     }
 
@@ -101,19 +101,19 @@ class ElemLikeTest extends Suite {
   @Test def testCollectFromChildElems() {
     require(bookstore.localName == "Bookstore")
 
-    val bookstoreChildElms = bookstore.allChildElems
-    val magazineElms = bookstore.allChildElems collect {
+    val bookstoreChildElms = bookstore.findAllChildElems
+    val magazineElms = bookstore.findAllChildElems collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore.allChildElems collect {
+    val bookElms = bookstore.findAllChildElems collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore.allChildElems collect {
+      bookstore.findAllChildElems collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
     val cheapBookPrices =
-      bookstore.allChildElems collect {
+      bookstore.findAllChildElems collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 =>
           e.attribute(EName("Price")).toInt
       }
@@ -198,7 +198,7 @@ class ElemLikeTest extends Suite {
       result.toSet
     }
 
-    expectResult(bookstore.allChildElems flatMap (_.findAllElemsOrSelf)) {
+    expectResult(bookstore.findAllChildElems flatMap (_.findAllElemsOrSelf)) {
       bookstore.findAllElems
     }
   }
@@ -301,7 +301,7 @@ class ElemLikeTest extends Suite {
       result.toSet
     }
 
-    expectResult(immutable.IndexedSeq(bookstore) ++ (bookstore.allChildElems flatMap (_.findAllElemsOrSelf))) {
+    expectResult(immutable.IndexedSeq(bookstore) ++ (bookstore.findAllChildElems flatMap (_.findAllElemsOrSelf))) {
       bookstore.findAllElemsOrSelf
     }
   }
@@ -388,7 +388,7 @@ class ElemLikeTest extends Suite {
       cheapBookElm findElem { _.localName == "Remark" } map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
     }
     expectResult("An indispensable companion to your textbook") {
-      cheapBookElm findElem { e => e.localName == "Remark" && e.allChildElems.isEmpty } map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm findElem { e => e.localName == "Remark" && e.findAllChildElems.isEmpty } map { _.trimmedText } getOrElse (sys.error("Missing Remark"))
     }
 
     expectResult(Set("Ullman", "Garcia-Molina")) {
@@ -501,7 +501,7 @@ class ElemLikeTest extends Suite {
       bookstore.findWithElemPath(path) map { _.trimmedText }
     }
 
-    val bookstoreChildIndexes = bookstore.allChildElemPathEntries
+    val bookstoreChildIndexes = bookstore.findAllChildElemPathEntries
 
     expectResult(8) {
       bookstoreChildIndexes.size
@@ -549,15 +549,15 @@ class ElemLikeTest extends Suite {
     }
 
     for (elm <- allElms) {
-      expectResult((elm.allChildElems flatMap (_.findAllElemsOrSelf))) {
+      expectResult((elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) {
         elm.findAllElems
       }
 
-      expectResult((immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf)))) {
+      expectResult((immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf)))) {
         elm.findAllElemsOrSelf
       }
 
-      expectResult(elm.allChildElems.filter(p)) {
+      expectResult(elm.findAllChildElems.filter(p)) {
         elm \ p
       }
 
@@ -569,8 +569,8 @@ class ElemLikeTest extends Suite {
         elm \\ p
       }
 
-      expectResult(elm.allChildElems.collect(pf)) {
-        elm.allChildElems.collect(pf)
+      expectResult(elm.findAllChildElems.collect(pf)) {
+        elm.findAllChildElems.collect(pf)
       }
 
       expectResult(elm.findAllElems.collect(pf)) {
@@ -581,11 +581,11 @@ class ElemLikeTest extends Suite {
         elm.findAllElemsOrSelf.collect(pf)
       }
 
-      expectResult(elm.allChildElems flatMap (_ \\! p)) {
+      expectResult(elm.findAllChildElems flatMap (_ \\! p)) {
         elm.findTopmostElems(p)
       }
 
-      expectResult(if (p(elm)) immutable.IndexedSeq(elm) else (elm.allChildElems flatMap (_ \\! p))) {
+      expectResult(if (p(elm)) immutable.IndexedSeq(elm) else (elm.findAllChildElems flatMap (_ \\! p))) {
         elm \\! p
       }
 
@@ -619,11 +619,11 @@ class ElemLikeTest extends Suite {
         (elm \\! p flatMap (_ \\ p))
       }
 
-      expectResult(elm.allChildElems flatMap (_ \\ p)) {
+      expectResult(elm.findAllChildElems flatMap (_ \\ p)) {
         elm.filterElems(p)
       }
 
-      expectResult((immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_ \\ p))) {
+      expectResult((immutable.IndexedSeq(elm).filter(p)) ++ (elm.findAllChildElems flatMap (_ \\ p))) {
         elm \\ p
       }
 

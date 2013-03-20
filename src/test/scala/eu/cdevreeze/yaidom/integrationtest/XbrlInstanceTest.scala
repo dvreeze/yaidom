@@ -81,11 +81,11 @@ class XbrlInstanceTest extends Suite {
     }
 
     expectResult(Set(EName(nsXbrli, "instant"))) {
-      val result = iContexts flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
+      val result = iContexts flatMap { (ctx: XbrlContext) => ctx.period.findAllChildElems map { e => e.resolvedName } }
       result.toSet
     }
     expectResult(Set(EName(nsXbrli, "startDate"), EName(nsXbrli, "endDate"))) {
-      val result = dContexts flatMap { (ctx: XbrlContext) => ctx.period.allChildElems map { e => e.resolvedName } }
+      val result = dContexts flatMap { (ctx: XbrlContext) => ctx.period.findAllChildElems map { e => e.resolvedName } }
       result.toSet
     }
 
@@ -143,7 +143,7 @@ class XbrlInstanceTest extends Suite {
     // XBRL rule 2
 
     expectResult(EName(nsLink, "schemaRef")) {
-      xbrlElm.allChildElems.headOption.getOrElse(sys.error("First xbrl child must be schemaRef")).resolvedName
+      xbrlElm.findAllChildElems.headOption.getOrElse(sys.error("First xbrl child must be schemaRef")).resolvedName
     }
 
     val schemaRefElms = xbrlElm.filterChildElems(EName(nsLink, "schemaRef"))
@@ -311,7 +311,7 @@ object XbrlInstanceTest {
   final class XbrlTuple(override val wrappedElem: Elem) extends XbrlFact(wrappedElem) {
     require(wrappedElem.attributeOption(EName("contextRef")).isEmpty)
 
-    def childFacts: immutable.IndexedSeq[XbrlFact] = wrappedElem.allChildElems map { e => XbrlFact(e) }
+    def childFacts: immutable.IndexedSeq[XbrlFact] = wrappedElem.findAllChildElems map { e => XbrlFact(e) }
   }
 
   object XbrlInstance {
@@ -320,7 +320,7 @@ object XbrlInstanceTest {
 
     def mustBeTopLevelFact(e: Elem)(root: Elem): Boolean = {
       // Approximation
-      val childElms = root.allChildElems
+      val childElms = root.findAllChildElems
 
       if (!childElms.contains(e)) false else {
         !Set(nsXbrli, nsLink).contains(e.resolvedName.namespaceUriOption.getOrElse(nsXbrli))
@@ -335,7 +335,7 @@ object XbrlInstanceTest {
       val result = e.resolvedName == EName(nsLink, "schemaRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
-        require(root.allChildElems.contains(e))
+        require(root.findAllChildElems.contains(e))
       }
       result
     }
@@ -344,7 +344,7 @@ object XbrlInstanceTest {
       val result = e.resolvedName == EName(nsLink, "linkbaseRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
-        require(root.allChildElems.contains(e))
+        require(root.findAllChildElems.contains(e))
       }
       result
     }
@@ -353,7 +353,7 @@ object XbrlInstanceTest {
       val result = e.resolvedName == EName(nsLink, "roleRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
-        require(root.allChildElems.contains(e))
+        require(root.findAllChildElems.contains(e))
       }
       result
     }
@@ -362,7 +362,7 @@ object XbrlInstanceTest {
       val result = e.resolvedName == EName(nsLink, "arcroleRef")
       if (result) {
         require(xlink.XLink.mustBeSimpleLink(e))
-        require(root.allChildElems.contains(e))
+        require(root.findAllChildElems.contains(e))
       }
       result
     }
@@ -371,7 +371,7 @@ object XbrlInstanceTest {
       val result = e.resolvedName == EName(nsLink, "footnoteLink")
       if (result) {
         require(xlink.XLink.mustBeExtendedLink(e))
-        require(root.allChildElems.contains(e))
+        require(root.findAllChildElems.contains(e))
       }
       result
     }
@@ -380,24 +380,24 @@ object XbrlInstanceTest {
       require(mustBeInstance(root))
 
       val contexts: immutable.IndexedSeq[XbrlContext] =
-        root.allChildElems collect { case e if mustBeContext(e)(root) => new XbrlContext(e) }
+        root.findAllChildElems collect { case e if mustBeContext(e)(root) => new XbrlContext(e) }
 
       val units: immutable.IndexedSeq[XbrlUnit] =
-        root.allChildElems collect { case e if mustBeUnit(e)(root) => new XbrlUnit(e) }
+        root.findAllChildElems collect { case e if mustBeUnit(e)(root) => new XbrlUnit(e) }
 
       val topLevelFacts: immutable.IndexedSeq[XbrlFact] =
-        root.allChildElems collect { case e if mustBeTopLevelFact(e)(root) => XbrlFact(e) }
+        root.findAllChildElems collect { case e if mustBeTopLevelFact(e)(root) => XbrlFact(e) }
 
       val schemaRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root.allChildElems collect { case e if mustBeSchemaRef(e)(root) => xlink.SimpleLink(e) }
+        root.findAllChildElems collect { case e if mustBeSchemaRef(e)(root) => xlink.SimpleLink(e) }
       val linkbaseRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root.allChildElems collect { case e if mustBeLinkbaseRef(e)(root) => xlink.SimpleLink(e) }
+        root.findAllChildElems collect { case e if mustBeLinkbaseRef(e)(root) => xlink.SimpleLink(e) }
       val roleRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root.allChildElems collect { case e if mustBeRoleRef(e)(root) => xlink.SimpleLink(e) }
+        root.findAllChildElems collect { case e if mustBeRoleRef(e)(root) => xlink.SimpleLink(e) }
       val arcroleRefs: immutable.IndexedSeq[xlink.SimpleLink] =
-        root.allChildElems collect { case e if mustBeArcroleRef(e)(root) => xlink.SimpleLink(e) }
+        root.findAllChildElems collect { case e if mustBeArcroleRef(e)(root) => xlink.SimpleLink(e) }
       val footnoteLinks: immutable.IndexedSeq[xlink.ExtendedLink] =
-        root.allChildElems collect { case e if mustBeFootnoteLink(e)(root) => xlink.ExtendedLink(e) }
+        root.findAllChildElems collect { case e if mustBeFootnoteLink(e)(root) => xlink.ExtendedLink(e) }
 
       new XbrlInstance(
         rootQName = root.qname,

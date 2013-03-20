@@ -37,7 +37,7 @@ import scala.collection.{ immutable, mutable }
  * It is important that the abstract methods are mutually consistent in their implementations. For example, the following equality
  * must hold (for some concrete class `E` that mixes in this trait):
  * {{{
- * e.allChildElems == (e.children collect { case e: E => e })
+ * e.findAllChildElems == (e.children collect { case e: E => e })
  * }}}
  *
  * @tparam N The node supertype of the element subtype

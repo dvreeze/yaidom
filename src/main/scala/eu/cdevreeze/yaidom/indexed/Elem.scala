@@ -115,9 +115,9 @@ final class Elem private[indexed] (
    * These child elements share the same rootElem with this element, but differ in the element paths, which have one more
    * "path entry".
    */
-  override def allChildElems: immutable.IndexedSeq[Elem] = {
+  override def findAllChildElems: immutable.IndexedSeq[Elem] = {
     // Remember: this function must be as fast as possible!
-    val childElemPathEntries = elem.allChildElemPathEntries
+    val childElemPathEntries = elem.findAllChildElemPathEntries
     childElemPathEntries map { entry => new Elem(rootElem, elemPath.append(entry)) }
   }
 

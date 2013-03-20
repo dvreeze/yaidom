@@ -116,7 +116,7 @@ final class ElemBuilder(
   type NodeType = Elem
 
   /** Returns the element children as ElemBuilder instances */
-  override def allChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
+  override def findAllChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
 
   /**
    * Creates an `Elem` from this element builder, using the passed parent scope.
@@ -156,7 +156,7 @@ final class ElemBuilder(
 
     // Recursive calls (not tail-recursive)
     undeclaredPrefixesForThisElem.isEmpty && {
-      allChildElems forall { e => e.canBuild(newScope) }
+      findAllChildElems forall { e => e.canBuild(newScope) }
     }
   }
 

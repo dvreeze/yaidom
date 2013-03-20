@@ -71,8 +71,8 @@ class EqualityTest extends Suite {
 
     assert(root1.children.size > root2.children.size)
     assert(root1.textChildren.size > root2.textChildren.size)
-    expectResult(root1.allChildElems.size) {
-      root2.allChildElems.size
+    expectResult(root1.findAllChildElems.size) {
+      root2.findAllChildElems.size
     }
 
     // 4. Check that the `resolved` trees (after removing element content whitespace) are equal
@@ -82,8 +82,8 @@ class EqualityTest extends Suite {
 
     assert(resolvedRoot1.children.size > resolvedRoot2.children.size)
     assert(resolvedRoot1.textChildren.size > resolvedRoot2.textChildren.size)
-    expectResult(resolvedRoot1.allChildElems.size) {
-      resolvedRoot2.allChildElems.size
+    expectResult(resolvedRoot1.findAllChildElems.size) {
+      resolvedRoot2.findAllChildElems.size
     }
 
     val adaptedResolvedRoot1 = resolvedRoot1.removeAllInterElementWhitespace

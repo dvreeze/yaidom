@@ -75,7 +75,7 @@ final class DomElem(
   override type DomType = w3c.dom.Element
 
   /** Returns the element children */
-  override def allChildElems: immutable.IndexedSeq[DomElem] = children collect { case e: DomElem => e }
+  override def findAllChildElems: immutable.IndexedSeq[DomElem] = children collect { case e: DomElem => e }
 
   override def resolvedName: EName = {
     // This is of course a very inefficient implementation

@@ -170,7 +170,7 @@ class JDomWrapperTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -740,7 +740,7 @@ object JDomWrapperTest {
       childList flatMap { ch => JDomNode.wrapNodeOption(ch) }
     }
 
-    override def allChildElems: immutable.IndexedSeq[JDomElem] = children collect { case e: JDomElem => e }
+    override def findAllChildElems: immutable.IndexedSeq[JDomElem] = children collect { case e: JDomElem => e }
 
     override def resolvedName: EName = {
       val jdomNs = wrappedNode.getNamespace

@@ -71,7 +71,7 @@ class BasicXmlProcessingTest extends Suite {
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
     expectResult("hi1yellow") {
-      foo.allChildElems.map(_.text).mkString
+      foo.findAllChildElems.map(_.text).mkString
     }
     expectResult("hi1yellow") {
       foo.removeAllInterElementWhitespace.findAllElems.map(_.text).mkString

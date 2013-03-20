@@ -192,15 +192,15 @@ final class Elem(
   }
 
   /** Returns the element children */
-  override def allChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
+  override def findAllChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   /**
    * Returns all child elements with their `ElemPath` entries, in the correct order.
    *
-   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   * The implementation must be such that the following holds: `(findAllChildElemsWithPathEntries map (_._1)) == findAllChildElems`
    */
-  override def allChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = {
-    val childElms = allChildElems
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = {
+    val childElms = findAllChildElems
     val entries = childIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
     assert(childElms.size == entries.size)
     childElms.zip(entries)
@@ -297,12 +297,12 @@ final class Elem(
       case _ => false
     }
 
-    val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!allChildElems.isEmpty)
+    val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!findAllChildElems.isEmpty)
 
     // Recursive, but not tail-recursive
 
     val newChildren = {
-      val remainder = if (doStripWhitespace) allChildElems else children
+      val remainder = if (doStripWhitespace) findAllChildElems else children
 
       remainder map {
         case e: Elem => e.removeAllInterElementWhitespace

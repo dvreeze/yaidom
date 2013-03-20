@@ -60,7 +60,7 @@ final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedEle
   require(xlinkType == "extended")
 
   /** Stored XLink children, preventing recreations of XLink children, possibly at the expense of somewhat more memory usage */
-  val xlinkChildren: immutable.IndexedSeq[XLink] = wrappedElem.allChildElems collect { case e if mustBeXLink(e) => XLink(e) }
+  val xlinkChildren: immutable.IndexedSeq[XLink] = wrappedElem.findAllChildElems collect { case e if mustBeXLink(e) => XLink(e) }
 
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)
   def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleEName)
@@ -102,7 +102,7 @@ final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
   def showOption: Option[String] = wrappedElem.attributeOption(XLinkShowEName)
   def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateEName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.findAllChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
 trait LabeledXLink extends XLink {
@@ -119,7 +119,7 @@ final class Locator(override val wrappedElem: Elem) extends XLink(wrappedElem) w
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)
   def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleEName)
 
-  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.allChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
+  def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.findAllChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
 final class Resource(override val wrappedElem: Elem) extends XLink(wrappedElem) with LabeledXLink {

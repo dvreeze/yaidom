@@ -312,7 +312,7 @@ class XmlLiteralTest extends Suite {
 
       for {
         empElem <- resolvedNewRoot.filterElems(EName(ns, "Employee"))
-        empChildElem <- empElem.allChildElems
+        empChildElem <- empElem.findAllChildElems
       } yield empChildElem.resolvedName
     }
 

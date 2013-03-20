@@ -84,7 +84,7 @@ class FriendFeedTest extends Suite {
       feedElm.localName
     }
     expectResult(Set("entry")) {
-      val childNames = feedElm.allChildElems map { _.localName }
+      val childNames = feedElm.findAllChildElems map { _.localName }
       childNames.toSet
     }
 
@@ -216,7 +216,7 @@ class FriendFeedTest extends Suite {
       }
 
       val serviceElms = serviceIds map { serviceId =>
-        val serviceCount = feedElm.allChildElems count { entryElm =>
+        val serviceCount = feedElm.findAllChildElems count { entryElm =>
           getEntryServiceId(entryElm) == serviceId
         }
 

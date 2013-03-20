@@ -372,7 +372,7 @@ class DependencyTest extends Suite {
   @Test def testDependenciesOfPathAwareElemLike() {
     testDependenciesWithinYaidomTopLevel(
       typeOf[eu.cdevreeze.yaidom.PathAwareElemLike[_]],
-      "allChildElemPaths",
+      "findAllChildElemPaths",
       expectedDependenciesOfPathAwareElemLike)
   }
 

@@ -30,7 +30,7 @@ import scala.collection.{ immutable, mutable }
  * knows only about element nodes, so other node types than elements are not known to this API.
  *
  * Based on its supertraits `ElemLike` and `ParentElemLike`, this trait offers a rich `ElemPath` query API. Two additional abstract methods
- * other than those required by the supertraits need to be implemented, viz. `findWithElemPathEntry` and `allChildElemsWithPathEntries`.
+ * other than those required by the supertraits need to be implemented, viz. `findWithElemPathEntry` and `findAllChildElemsWithPathEntries`.
  *
  * This trait is extended by trait `UpdatableElemLike`, and therefore mixed in by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
  *
@@ -79,7 +79,7 @@ import scala.collection.{ immutable, mutable }
  *
  * Analogously to the `ParentElemLike` API, there are 3 '''core''' element path retrieval methods:
  * <ul>
- * <li>Method `allChildElemPaths`, returning the paths (relative to this element) of all '''child''' elements</li>
+ * <li>Method `findAllChildElemPaths`, returning the paths (relative to this element) of all '''child''' elements</li>
  * <li>Method `findAllElemPaths`, finding the paths (relative to this element) of all '''descendant''' elements</li>
  * <li>Method `findAllElemOrSelfPaths`, finding the paths (relative to this element) of all '''descendant''' elements '''or self'''</li>
  * </ul>
@@ -103,7 +103,7 @@ import scala.collection.{ immutable, mutable }
  * {{{
  * (elm.findAllElemOrSelfPaths map (path => elm.getWithElemPath(path))) == elm.findAllElemsOrSelf
  * (elm.findAllElemPaths map (path => elm.getWithElemPath(path))) == elm.findAllElems
- * (elm.allChildElemPaths map (path => elm.getWithElemPath(path))) == elm.allChildElems
+ * (elm.findAllChildElemPaths map (path => elm.getWithElemPath(path))) == elm.findAllChildElems
  *
  * (elm.filterElemOrSelfPaths(p) map (path => elm.getWithElemPath(path))) == elm.filterElemsOrSelf(p)
  * (elm.filterElemPaths(p) map (path => elm.getWithElemPath(path))) == elm.filterElems(p)
@@ -137,21 +137,21 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   /**
    * Returns all child elements with their `ElemPath` entries, in the correct order. This method should be very efficient.
    *
-   * The implementation must be such that the following holds: `(allChildElemsWithPathEntries map (_._1)) == allChildElems`
+   * The implementation must be such that the following holds: `(findAllChildElemsWithPathEntries map (_._1)) == findAllChildElems`
    */
-  def allChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
 
-  /** Returns `allChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
-  final def allChildElemPaths: immutable.IndexedSeq[ElemPath] =
-    allChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }
+  /** Returns `findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
+  final def findAllChildElemPaths: immutable.IndexedSeq[ElemPath] =
+    findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }
 
   /** Returns the paths of child elements obeying the given predicate */
   final def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    allChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => ElemPath.from(pe) }
+    findAllChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => ElemPath.from(pe) }
 
   /** Returns the path of the first found child element obeying the given predicate, if any, wrapped in an `Option` */
   final def findChildElemPath(p: E => Boolean): Option[ElemPath] = {
-    allChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => ElemPath.from(pe) }
+    findAllChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => ElemPath.from(pe) }
   }
 
   /** Returns the path of the single child element obeying the given predicate, and throws an exception otherwise */
@@ -164,7 +164,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   /** Returns the path of this element followed by the paths of all descendant elements (that is, the descendant-or-self elements) */
   final def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath] = {
     // Not tail-recursive, but the depth should typically be limited
-    val remainder = allChildElemsWithPathEntries flatMap {
+    val remainder = findAllChildElemsWithPathEntries flatMap {
       case (e, pe) => e.findAllElemOrSelfPaths map { path => path.prepend(pe) }
     }
 
@@ -177,7 +177,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
    */
   final def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
     // Not tail-recursive, but the depth should typically be limited
-    val remainder = allChildElemsWithPathEntries flatMap {
+    val remainder = findAllChildElemsWithPathEntries flatMap {
       case (e, pe) => e.filterElemOrSelfPaths(p) map { path => path.prepend(pe) }
     }
 
@@ -186,11 +186,11 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
 
   /** Returns the paths of all descendant elements (not including this element). Equivalent to `findAllElemOrSelfPaths.drop(1)` */
   final def findAllElemPaths: immutable.IndexedSeq[ElemPath] =
-    allChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findAllElemOrSelfPaths map { path => path.prepend(pe) } }
+    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findAllElemOrSelfPaths map { path => path.prepend(pe) } }
 
   /** Returns the paths of descendant elements obeying the given predicate, that is, the paths of `findAllElems filter p` */
   final def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    allChildElemsWithPathEntries flatMap { case (ch, pe) => ch.filterElemOrSelfPaths(p) map { path => path.prepend(pe) } }
+    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.filterElemOrSelfPaths(p) map { path => path.prepend(pe) } }
 
   /**
    * Returns the paths of the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
@@ -198,7 +198,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   final def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
     if (p(self)) immutable.IndexedSeq(ElemPath.Root) else {
       // Not tail-recursive, but the depth should typically be limited
-      val result = allChildElemsWithPathEntries flatMap {
+      val result = findAllChildElemsWithPathEntries flatMap {
         case (e, pe) => e.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) }
       }
       result
@@ -207,7 +207,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
 
   /** Returns the paths of the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    allChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) } }
+    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) } }
 
   /** Returns the path of the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElemOrSelfPath(p: E => Boolean): Option[ElemPath] = {
@@ -217,7 +217,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
 
   /** Returns the path of the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElemPath(p: E => Boolean): Option[ElemPath] = {
-    val elms = self.allChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findElemOrSelfPath(p) map { path => path.prepend(pe) } }
+    val elms = self.findAllChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findElemOrSelfPath(p) map { path => path.prepend(pe) } }
     elms.headOption
   }
 
@@ -249,9 +249,9 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
 
   /**
    * Returns the `ElemPath` entries of all child elements, in the correct order.
-   * Equivalent to `allChildElemsWithPathEntries map { _._2 }`.
+   * Equivalent to `findAllChildElemsWithPathEntries map { _._2 }`.
    */
-  final def allChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
-    allChildElemsWithPathEntries map { _._2 }
+  final def findAllChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
+    findAllChildElemsWithPathEntries map { _._2 }
   }
 }

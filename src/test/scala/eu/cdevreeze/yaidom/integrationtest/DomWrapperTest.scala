@@ -158,7 +158,7 @@ class DomWrapperTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 

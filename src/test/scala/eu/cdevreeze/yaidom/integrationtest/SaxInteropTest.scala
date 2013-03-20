@@ -1062,7 +1062,7 @@ class SaxInteropTest extends Suite {
 
     val ulElm = ulElms.head
 
-    val liElms = ulElm.allChildElems
+    val liElms = ulElm.findAllChildElems
 
     expectResult(List("li")) {
       val result = liElms map { _.localName }
@@ -1091,7 +1091,7 @@ class SaxInteropTest extends Suite {
 
     val ulElm2 = ulElms2.head
 
-    val liElms2 = ulElm2.allChildElems
+    val liElms2 = ulElm2.findAllChildElems
 
     expectResult(List("li")) {
       val result = liElms2 map { _.localName }
@@ -1110,7 +1110,7 @@ class SaxInteropTest extends Suite {
 
     val ulElm3 = ulElms3.head
 
-    val liElms3 = ulElm3.allChildElems
+    val liElms3 = ulElm3.findAllChildElems
 
     expectResult(List("li")) {
       val result = liElms3 map { _.localName }

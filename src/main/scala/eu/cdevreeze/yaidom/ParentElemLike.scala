@@ -62,7 +62,7 @@ import scala.collection.{ immutable, mutable }
  *
  * ==ParentElemLike more formally==
  *
- * The only abstract method is `allChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
+ * The only abstract method is `findAllChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
  *
  * As said above, this trait only knows about elements, not about other node types. Hence this trait has no knowledge about child nodes in
  * general. Hence the single type parameter, for the captured element type itself.
@@ -70,16 +70,16 @@ import scala.collection.{ immutable, mutable }
  * Trait `ParentElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ParentElemLike`
  * has 3 '''core''' element collection retrieval methods. These 3 methods (in order of subset relation) are:
  * <ul>
- * <li>Abstract method `allChildElems`, returning all '''child''' elements</li>
+ * <li>Abstract method `findAllChildElems`, returning all '''child''' elements</li>
  * <li>Method `findAllElems`, finding all '''descendant''' elements</li>
  * <li>Method `findAllElemsOrSelf`, finding all '''descendant''' elements '''or self'''</li>
  * </ul>
  *
  * We define method `findAllElems` and `findAllElemsOrSelf` (recursively) as follows (in terms of equality):
  * {{{
- * elm.findAllElems == { elm.allChildElems flatMap (_.findAllElemsOrSelf) }
+ * elm.findAllElems == { elm.findAllChildElems flatMap (_.findAllElemsOrSelf) }
  *
- * elm.findAllElemsOrSelf == { elm +: (elm.allChildElems flatMap (_.findAllElemsOrSelf)) }
+ * elm.findAllElemsOrSelf == { elm +: (elm.findAllChildElems flatMap (_.findAllElemsOrSelf)) }
  * }}}
  *
  * The actual implementations may be different and more efficient, but they are consistent with these definitions.
@@ -106,21 +106,21 @@ import scala.collection.{ immutable, mutable }
  *
  * We define some of those methods as follows (in terms of equality):
  * {{{
- * elm.filterChildElems(p) == (elm.allChildElems filter p)
+ * elm.filterChildElems(p) == (elm.findAllChildElems filter p)
  *
- * elm.filterElems(p) == (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ * elm.filterElems(p) == (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
  *
  * elm.filterElemsOrSelf(p) == {
- *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p)))
+ *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
  * }
  *
- * elm.findTopmostElems(p) == (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * elm.findTopmostElems(p) == (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
  *
  * elm.findTopmostElemsOrSelf(p) == {
  *   if (p(elm))
  *     immutable.IndexedSeq(elm)
  *   else
- *     (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ *     (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
  * }
  * }}}
  *
@@ -184,12 +184,12 @@ import scala.collection.{ immutable, mutable }
  * If `elm` has no child elements, then the LHS can be rewritten as follows:
  * {{{
  * elm.filterElemsOrSelf(p)
- * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElemsOrSelf
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElemsOrSelf
  * immutable.IndexedSeq(elm).filter(p) ++ (Seq() flatMap (_.filterElemsOrSelf(p))) // there are no child elements
  * immutable.IndexedSeq(elm).filter(p) ++ Seq() // flatMap on empty sequence returns empty sequence
  * immutable.IndexedSeq(elm).filter(p) // property of concatenation: xs ++ Seq() == xs
  * (immutable.IndexedSeq(elm) ++ Seq()).filter(p) // property of concatenation: xs ++ Seq() == xs
- * (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p // flatMap on empty sequence (of child elements) returns empty sequence
+ * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) filter p // flatMap on empty sequence (of child elements) returns empty sequence
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
  * which is the RHS.
@@ -208,10 +208,10 @@ import scala.collection.{ immutable, mutable }
  * If `elm` does have child elements, the LHS can be rewritten as:
  * {{{
  * elm.filterElemsOrSelf(p)
- * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElemsOrSelf
- * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (ch => ch.findAllElemsOrSelf filter p)) // induction hypothesis
- * immutable.IndexedSeq(elm).filter(p) ++ ((elm.allChildElems.flatMap(ch => ch.findAllElemsOrSelf)) filter p) // property (b)
- * (immutable.IndexedSeq(elm) ++ (elm.allChildElems flatMap (_.findAllElemsOrSelf))) filter p // property (a)
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElemsOrSelf
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (ch => ch.findAllElemsOrSelf filter p)) // induction hypothesis
+ * immutable.IndexedSeq(elm).filter(p) ++ ((elm.findAllChildElems.flatMap(ch => ch.findAllElemsOrSelf)) filter p) // property (b)
+ * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) filter p // property (a)
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
  * which is the RHS.
@@ -227,9 +227,9 @@ import scala.collection.{ immutable, mutable }
  * After all, the LHS can be rewritten as follows:
  * {{{
  * elm.filterElems(p)
- * (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElems
- * (elm.allChildElems flatMap (e => e.findAllElemsOrSelf.filter(p))) // using the property proven above
- * (elm.allChildElems flatMap (_.findAllElemsOrSelf)) filter p // using property (b) above
+ * (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElems
+ * (elm.findAllChildElems flatMap (e => e.findAllElemsOrSelf.filter(p))) // using the property proven above
+ * (elm.findAllChildElems flatMap (_.findAllElemsOrSelf)) filter p // using property (b) above
  * elm.findAllElems filter p // definition of findAllElems
  * }}}
  * which is the RHS.
@@ -265,11 +265,11 @@ import scala.collection.{ immutable, mutable }
  * If `elm` does have child elements, and `p(elm)` does not hold, the LHS can be rewritten as:
  * {{{
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p)))
- * (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElemsOrSelf, knowing that p(elm) does not hold
- * elm.allChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
- * elm.allChildElems flatMap (_.filterElemsOrSelf(p)) // induction hypothesis
- * immutable.IndexedSeq() ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of concatenation
- * immutable.IndexedSeq(elm).filter(p) ++ (elm.allChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filter, knowing that p(elm) does not hold
+ * (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElemsOrSelf, knowing that p(elm) does not hold
+ * elm.findAllChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
+ * elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)) // induction hypothesis
+ * immutable.IndexedSeq() ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of concatenation
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filter, knowing that p(elm) does not hold
  * elm.filterElemsOrSelf(p) // definition of filterElems
  * }}}
  * which is the RHS.
@@ -284,9 +284,9 @@ import scala.collection.{ immutable, mutable }
  * After all, the LHS can be rewritten to:
  * {{{
  * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p)))
- * (elm.allChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElems
- * elm.allChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
- * elm.allChildElems flatMap (_.filterElemsOrSelf(p)) // using the property proven above
+ * (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElems
+ * elm.findAllChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
+ * elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)) // using the property proven above
  * elm.filterElems(p) // definition of filterElems
  * }}}
  * which is the RHS.
@@ -339,14 +339,11 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
 
   /**
    * Returns all child elements, in the correct order. The faster this method is, the faster the other `ParentElemLike` methods will be.
-   *
-   * Note that this method is named "allChildElems" instead of "findAllChildElems". The latter name would be more consistent
-   * with the rest of this API, but the chosen name illustrates that `allChildElems` is seen more as "data" than as a "computation".
    */
-  def allChildElems: immutable.IndexedSeq[E]
+  def findAllChildElems: immutable.IndexedSeq[E]
 
   /** Returns the child elements obeying the given predicate */
-  final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems filter p
+  final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems filter p
 
   /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
@@ -371,7 +368,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: E) {
       result += elm
-      elm.allChildElems foreach { e => accumulate(e) }
+      elm.findAllChildElems foreach { e => accumulate(e) }
     }
 
     accumulate(self)
@@ -388,7 +385,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: E) {
       if (p(elm)) result += elm
-      elm.allChildElems foreach { e => accumulate(e) }
+      elm.findAllChildElems foreach { e => accumulate(e) }
     }
 
     accumulate(self)
@@ -399,10 +396,10 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
   final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
   /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
-  final def findAllElems: immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch.findAllElemsOrSelf }
+  final def findAllElems: immutable.IndexedSeq[E] = findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
 
   /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
-  final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = allChildElems flatMap { ch => ch filterElemsOrSelf p }
+  final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
 
   /**
    * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
@@ -413,7 +410,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: E) {
       if (p(elm)) result += elm else {
-        elm.allChildElems foreach { e => accumulate(e) }
+        elm.findAllChildElems foreach { e => accumulate(e) }
       }
     }
 
@@ -426,14 +423,14 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
 
   /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
-    allChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
+    findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
   /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElemOrSelf(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatch(elm: E): Option[E] = {
       if (p(elm)) Some(elm) else {
-        val childElms = elm.allChildElems
+        val childElms = elm.findAllChildElems
 
         var i = 0
         var result: Option[E] = None
@@ -452,7 +449,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
 
   /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElem(p: E => Boolean): Option[E] = {
-    val elms = self.allChildElems.view flatMap { ch => ch findElemOrSelf p }
+    val elms = self.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
     elms.headOption
   }
 }

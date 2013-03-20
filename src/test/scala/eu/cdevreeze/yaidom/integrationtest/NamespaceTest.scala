@@ -332,7 +332,7 @@ class NamespaceTest extends Suite {
       divElmOption.get.removeAllInterElementWhitespace.textChildren.last.text.trim
     }
     expectResult(List(strongElmOption.get, emElmOption.get)) {
-      divElmOption.get.allChildElems
+      divElmOption.get.findAllChildElems
     }
     expectResult(5) {
       divElmOption.get.removeAllInterElementWhitespace.children.size

@@ -174,7 +174,7 @@ class AirportExampleTest extends Suite {
     val maxDistance = 160.0
 
     val nlAirportsCloseToArnhem = {
-      val airportElms = nlAirportsDoc.documentElement.allChildElems
+      val airportElms = nlAirportsDoc.documentElement.findAllChildElems
 
       airportElms filter { e =>
         val latLon = LatLon(airportLatitude(e), airportLongitude(e))
@@ -183,7 +183,7 @@ class AirportExampleTest extends Suite {
     }
 
     val deAirportsCloseToArnhem = {
-      val airportElms = deAirportsDoc.documentElement.allChildElems
+      val airportElms = deAirportsDoc.documentElement.findAllChildElems
 
       airportElms filter { e =>
         val latLon = LatLon(airportLatitude(e), airportLongitude(e))
@@ -237,10 +237,10 @@ class AirportExampleTest extends Suite {
       Elem(
         qname = QName("NewDataSet"),
         scope = scope,
-        children = deAirportsDoc.documentElement.allChildElems ++ beAirportsDoc.documentElement.allChildElems ++ nlAirportsDoc.documentElement.allChildElems)
+        children = deAirportsDoc.documentElement.findAllChildElems ++ beAirportsDoc.documentElement.findAllChildElems ++ nlAirportsDoc.documentElement.findAllChildElems)
 
-    expectResult(deAirportsDoc.documentElement.allChildElems.size + beAirportsDoc.documentElement.allChildElems.size + nlAirportsDoc.documentElement.allChildElems.size) {
-      airportRootElm.allChildElems.size
+    expectResult(deAirportsDoc.documentElement.findAllChildElems.size + beAirportsDoc.documentElement.findAllChildElems.size + nlAirportsDoc.documentElement.findAllChildElems.size) {
+      airportRootElm.findAllChildElems.size
     }
 
     // The airport codes we are now interested in
@@ -349,7 +349,7 @@ class AirportExampleTest extends Suite {
     val distanceFrankfurtBrussels: Double = {
       val airportElms =
         for {
-          airportElm <- airportSummaryRoot.allChildElems
+          airportElm <- airportSummaryRoot.findAllChildElems
           airportCodeElm = airportElm getChildElem (_.localName == "AirportCode")
           if airportCodeElm.trimmedText == "FRA"
         } yield airportElm
@@ -377,7 +377,7 @@ class AirportExampleTest extends Suite {
       root.resolvedName
     }
 
-    val tableElms = root.allChildElems
+    val tableElms = root.findAllChildElems
 
     // The root child elements must all be named Table
     expectResult(Set(enameTable)) {
@@ -385,7 +385,7 @@ class AirportExampleTest extends Suite {
       elmNames.toSet
     }
 
-    val tablePropertyElms = tableElms flatMap { e => e.allChildElems }
+    val tablePropertyElms = tableElms flatMap { e => e.findAllChildElems }
 
     val propertyENames = Set(
       EName(nsWebServiceX, "AirportCode"),
@@ -413,7 +413,7 @@ class AirportExampleTest extends Suite {
 
     // The root grandchild elements must have no child elements themselves
     expectResult(0) {
-      val elms = tablePropertyElms flatMap { _.allChildElems }
+      val elms = tablePropertyElms flatMap { _.findAllChildElems }
       elms.size
     }
   }

@@ -201,7 +201,7 @@ object ValidationTest {
   }
 
   def sequence(nameOccsWithValidators: NameOccurrencesWithValidator*): ElemValidator = { elm: Elem =>
-    var remainingChildElms = elm.allChildElems
+    var remainingChildElms = elm.findAllChildElems
     var lastValidationResult = ValidationResult.ok
 
     for (nameOccsWithValidator <- nameOccsWithValidators) {
@@ -240,7 +240,7 @@ object ValidationTest {
   }
 
   def validateStringElem(elm: Elem): ValidationResult = {
-    val ok = elm.allChildElems.isEmpty
+    val ok = elm.findAllChildElems.isEmpty
     if (ok) ValidationResult.ok else ValidationResult.notOk("%s is not a string element".format(elm.resolvedName))
   }
 }

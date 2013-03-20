@@ -114,7 +114,7 @@ class QueryTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val titles =
-      for (ch <- bookstore.allChildElems) yield ch.getChildElem(EName("Title"))
+      for (ch <- bookstore.findAllChildElems) yield ch.getChildElem(EName("Title"))
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -193,7 +193,7 @@ class QueryTest extends Suite {
 
     val childrenAlsoIncluded =
       elements forall { e =>
-        e.allChildElems forall { ch => elements.contains(ch) }
+        e.findAllChildElems forall { ch => elements.contains(ch) }
       }
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
 
@@ -1133,7 +1133,7 @@ class QueryTest extends Suite {
     val invertedBookstore: Elem = Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks)
 
     expectResult(3) {
-      invertedBookstore.allChildElems.size
+      invertedBookstore.findAllChildElems.size
     }
   }
 

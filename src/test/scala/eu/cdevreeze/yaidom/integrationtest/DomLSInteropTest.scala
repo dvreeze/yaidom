@@ -515,7 +515,7 @@ class DomLSInteropTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -688,7 +688,7 @@ class DomLSInteropTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root2 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root2 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -707,7 +707,7 @@ class DomLSInteropTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root3 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root3 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -735,7 +735,7 @@ class DomLSInteropTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root4 \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root4 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 

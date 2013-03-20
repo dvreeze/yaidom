@@ -166,7 +166,7 @@ class XomWrapperTest extends Suite {
       result.toSet
     }
     expectResult(Set(0, 1)) {
-      val result = root \\ { e => e.allChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
 
@@ -687,7 +687,7 @@ object XomWrapperTest {
 
     override type DomType = nu.xom.Element
 
-    override def allChildElems: immutable.IndexedSeq[XomElem] = children collect { case e: XomElem => e }
+    override def findAllChildElems: immutable.IndexedSeq[XomElem] = children collect { case e: XomElem => e }
 
     override def resolvedName: EName = {
       val ns: String = wrappedNode.getNamespaceURI

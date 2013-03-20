@@ -59,9 +59,9 @@ class XLinkTest extends Suite {
 
     val fromToHrefPairs: immutable.IndexedSeq[(String, String)] =
       for {
-        arc <- sampleXml.wrappedElem.allChildElems collect { case e if XLink.mustBeArc(e) && Arc(e).fromOption == Some("CS-101") && Arc(e).toOption == Some("student62") => Arc(e) }
-        fromLoc <- sampleXml.wrappedElem.allChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.fromOption => Locator(e) }
-        toLoc <- sampleXml.wrappedElem.allChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.toOption => Locator(e) }
+        arc <- sampleXml.wrappedElem.findAllChildElems collect { case e if XLink.mustBeArc(e) && Arc(e).fromOption == Some("CS-101") && Arc(e).toOption == Some("student62") => Arc(e) }
+        fromLoc <- sampleXml.wrappedElem.findAllChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.fromOption => Locator(e) }
+        toLoc <- sampleXml.wrappedElem.findAllChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.toOption => Locator(e) }
       } yield (fromLoc.href.toString, toLoc.href.toString)
 
     expectResult(Some("courses/cs101.xml")) {
