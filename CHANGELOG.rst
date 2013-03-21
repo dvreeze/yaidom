@@ -3,6 +3,29 @@ CHANGELOG
 =========
 
 
+0.6.8
+=====
+
+This version is probably the last release before version 0.7.0. It does contain a few breaking changes.
+
+* Breaking API change: renamed method ``allChildElems`` to ``findAllChildElems``
+* Breaking API changes (related):
+
+  * Renamed ``allChildElemsWithPathEntries`` to ``findAllChildElemsWithPathEntries``
+  * Renamed ``allChildElemPathEntries`` to ``findAllChildElemPathEntries``
+  * Renamed ``allChildElemPaths`` to ``findAllChildElemPaths``
+  
+* Breaking API changes: removed methods ``collectFromChildElems``, ``collectFromElems`` and ``collectFromElemsOrSelf``
+* Breaking API change: removed method ``getIndex``
+* Added ``indexed.Elem`` methods ``scope`` and ``namespaces``
+* Added method ``Elem.minusAttribute``
+* Performance improvements to ``Elem.toString``
+* Worked on XML literal support
+* Scala and ScalaTest upgrade (versions 2.10.1 and 1.9.1, respectively)
+
+Hopefully only documentation updates and small non-breaking fixes will be the difference between version 0.6.8 and
+upcoming version 0.7.0. In other words, hopefully the API is stable from now on.
+
 0.6.7
 =====
 
