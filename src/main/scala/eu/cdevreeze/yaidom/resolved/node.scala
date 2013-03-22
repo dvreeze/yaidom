@@ -76,7 +76,7 @@ final case class Elem(
   require(children ne null)
 
   @throws(classOf[java.io.ObjectStreamException])
-  def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
+  private[resolved] def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
 
   /** Cache for speeding up child element lookups by element path */
   private val childIndexesByPathEntries: Map[ElemPath.Entry, Int] = {
@@ -306,7 +306,7 @@ object Node {
 
 object Elem {
 
-  private[yaidom] final class ElemSerializationProxy(
+  private[resolved] final class ElemSerializationProxy(
     val resolvedName: EName,
     val resolvedAttributes: Map[EName, String],
     val children: immutable.IndexedSeq[Node]) extends Serializable {

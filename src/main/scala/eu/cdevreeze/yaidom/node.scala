@@ -149,7 +149,7 @@ final class Elem(
   require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
 
   @throws(classOf[java.io.ObjectStreamException])
-  def writeReplace(): Any = new Elem.ElemSerializationProxy(qname, attributes, scope, children)
+  private[yaidom] def writeReplace(): Any = new Elem.ElemSerializationProxy(qname, attributes, scope, children)
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   val attributeScope: Scope = scope.withoutDefaultNamespace
