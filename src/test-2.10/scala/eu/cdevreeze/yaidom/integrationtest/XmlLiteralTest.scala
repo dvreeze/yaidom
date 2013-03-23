@@ -180,67 +180,66 @@ class XmlLiteralTest extends Suite {
   }
 
   @Test def testWrongXmlLiterals() {
-    xml"""<a>${"b"}</a>"""
+    elem"""<a>${"b"}</a>"""
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<a>=${"b"}</a>"""
+    intercept[java.lang.Exception] {
+      elem"""<a>=${"b"}</a>"""
     }
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<a>ab${"b"}cd</a>"""
+    intercept[java.lang.Exception] {
+      elem"""<a>ab${"b"}cd</a>"""
     }
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<${"a"}>wrong</${"a"}>"""
-    }
-
-    intercept[SAXParseException] {
-      xml"""<a><b></a></b>"""
+    intercept[java.lang.Exception] {
+      elem"""<${"a"}>wrong</${"a"}>"""
     }
 
     intercept[SAXParseException] {
-      xml"""<a><b>${"x"}</a></b>"""
+      elem"""<a><b></a></b>"""
     }
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<a x=">${"wrong"}<">abc</a>"""
-    }
-
-    intercept[java.lang.RuntimeException] {
-      xml"""<a x="ab${"wrong"}cd">abc</a>"""
-    }
-
-    xml"""<a x=${1.toString}>abc</a>"""
-
-    intercept[java.lang.RuntimeException] {
-      xml"""<a x=${1}>abc</a>"""
-    }
-
-    xml"""<a x=${"http://aRealAttribute"}>abc</a>"""
-
-    intercept[java.lang.RuntimeException] {
-      xml"""<a xmlns=${"http://notARealAttribute"}>abc</a>"""
-    }
-
-    intercept[java.lang.RuntimeException] {
-      xml"""<a xmlns:pref=${"http://notARealAttribute"}>abc</a>"""
-    }
-
-    // TODO Should a RuntimeException be thrown instead?
     intercept[SAXParseException] {
-      xml"""<a><!-- ignored comment -->${"b"}</a>"""
+      elem"""<a><b>${"x"}</a></b>"""
     }
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<a><!-- ignored comment ${"b"}--></a>"""
+    intercept[java.lang.Exception] {
+      elem"""<a x=">${"wrong"}<">abc</a>"""
     }
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<a><![CDATA[ ignored CDATA ]]>${"b"}</a>"""
+    intercept[java.lang.Exception] {
+      elem"""<a x="ab${"wrong"}cd">abc</a>"""
     }
 
-    intercept[java.lang.RuntimeException] {
-      xml"""<a><![CDATA[ ignored CDATA ${"b"}]]></a>"""
+    elem"""<a x=${1.toString}>abc</a>"""
+
+    intercept[java.lang.Exception] {
+      elem"""<a x=${1}>abc</a>"""
+    }
+
+    elem"""<a x=${"http://aRealAttribute"}>abc</a>"""
+
+    intercept[java.lang.Exception] {
+      elem"""<a xmlns=${"http://notARealAttribute"}>abc</a>"""
+    }
+
+    intercept[java.lang.Exception] {
+      elem"""<a xmlns:pref=${"http://notARealAttribute"}>abc</a>"""
+    }
+
+    intercept[java.lang.Exception] {
+      elem"""<a><!-- ignored comment -->${"b"}</a>"""
+    }
+
+    intercept[java.lang.Exception] {
+      elem"""<a><!-- ignored comment ${"b"}--></a>"""
+    }
+
+    intercept[java.lang.Exception] {
+      elem"""<a><![CDATA[ ignored CDATA ]]>${"b"}</a>"""
+    }
+
+    intercept[java.lang.Exception] {
+      elem"""<a><![CDATA[ ignored CDATA ${"b"}]]></a>"""
     }
   }
 
@@ -265,12 +264,12 @@ class XmlLiteralTest extends Suite {
 
       val newName = (empElem \ "name").map(_.text).mkString.toUpperCase
 
-      xml"""<Employee xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser" id=${newId}>
+      elem"""<Employee xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser" id=${newId}>
 		<name>${newName}</name>
 		<age>${(empElem \ "age").map(_.text).mkString}</age>
 		<role>${(empElem \ "role").map(_.text).mkString}</role>
 		<salary>10000</salary>
-	</Employee>""".documentElement
+	</Employee>"""
     }
 
     val pf: PartialFunction[Elem, Elem] = {
@@ -378,8 +377,8 @@ class XmlLiteralTest extends Suite {
   }
 
   private def getDocument1: Document = {
-    val doc =
-      xml"""<?xml version="1.0" encoding="UTF-8"?>
+    val elm =
+      elem"""<?xml version="1.0" encoding="UTF-8"?>
 <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
 	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
 		<Title>${"A First Course in Database Systems"}</Title>
@@ -456,7 +455,7 @@ class XmlLiteralTest extends Suite {
 </books:Bookstore>
 """
 
-    doc
+    Document(elm)
   }
 
   private def getDocument2: Document = {
@@ -477,7 +476,7 @@ class XmlLiteralTest extends Suite {
     }
 
     val doc =
-      xml"""
+      doc"""
 <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
 	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
 		<Title>${"A First Course in Database Systems"}</Title>
@@ -546,10 +545,10 @@ class XmlLiteralTest extends Suite {
   }
 
   private def getDocument3: Document = {
-    val doc =
-      xml"""
+    val elm =
+      elem"""
 <books:Bookstore xmlns:books="http://bookstore">
-	<books:Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
+	<books:Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition=${"3rd"}>
 		<books:Title>${"A First Course in Database Systems"}</books:Title>
 		<books:Authors>${
         val elemBuilders =
@@ -624,19 +623,19 @@ class XmlLiteralTest extends Suite {
 </books:Bookstore>
 """
 
-    doc
+    Document(elm)
   }
 
   private def getDocument4: Document = {
-    val doc =
-      xml"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />"""
+    val elm =
+      elem"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />"""
 
-    doc
+    Document(elm)
   }
 
   private def getEmployeeDocument: Document = {
     val doc =
-      xml"""
+      doc"""
     <!-- See http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser 
 	(but updated with namespace) -->
 <Employees

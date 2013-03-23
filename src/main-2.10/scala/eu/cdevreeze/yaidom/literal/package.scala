@@ -29,8 +29,12 @@ package object literal {
 
     private val helper = new XmlLiterals.XmlLiteralHelper(sc)
 
-    def xml(args: Any*): Document = {
-      helper.xml(args: _*)
+    def doc(args: Any*): Document = {
+      helper.doc(args: _*)
+    }
+
+    def elem(args: Any*): Elem = {
+      helper.doc(args: _*).documentElement
     }
   }
 }
