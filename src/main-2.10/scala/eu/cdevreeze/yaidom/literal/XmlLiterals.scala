@@ -44,15 +44,11 @@ private[literal] object XmlLiterals {
     private val placeholderWithoutQuotes = "___par___"
     private val placeholder = "\"" + placeholderWithoutQuotes + "\""
 
-    def doc(args: Any*): Document = {
+    def xmlDoc(args: Any*): Document = {
       sc.checkLengths(args)
 
       require(sc.parts forall (part => !part.contains(placeholderWithoutQuotes)),
         "The XML must not contain placeholder %s".format(placeholderWithoutQuotes))
-
-      require(
-        args forall (arg => hasAllowedArgumentType(arg)),
-        "All arguments must be of an allowed argument type (String, Node or Seq[Node])")
 
       val xmlWithPlaceholders = sc.standardInterpolator(identity, args.map(arg => placeholder))
       val editedXmlWithPlaceholders = replaceXmlDeclaration(xmlWithPlaceholders)
@@ -64,7 +60,7 @@ private[literal] object XmlLiterals {
       val allowedPlaceholderCount = countAllowedPlaceholders(docWithPlaceholders.documentElement, None)
       require(
         allowedPlaceholderCount == args.length,
-        "Arguments are only allowed as attribute value or element content")
+        "Arguments are only allowed as attribute value or (entire) element content")
 
       val (rootElems, remainingArgs) = updatePlaceholders(docWithPlaceholders.documentElement, None, args)
       require(remainingArgs.isEmpty, "Problem filling in the arguments")
@@ -74,7 +70,7 @@ private[literal] object XmlLiterals {
       doc
     }
 
-    private def countAllowedPlaceholders[N <: Node](node: N, parentOption: Option[Elem]): Int = node match {
+    private def countAllowedPlaceholders(node: Node, parentOption: Option[Elem]): Int = node match {
       case t: Text =>
         val parentHasOnlyText = parentOption.get.children forall (ch => ch.isInstanceOf[Text])
 
@@ -99,6 +95,9 @@ private[literal] object XmlLiterals {
 
         if (parentHasOnlyText && (parentOption.get.text.trim == placeholder) && (t.text.trim == placeholder)) {
           val arg = args.headOption.getOrElse(sys.error("Problem updating placeholders"))
+          require(
+            hasAllowedArgumentType(arg),
+            "All arguments must be of an allowed argument type (String, Node or Seq[Node])")
 
           val newNodes: Seq[Node] = extractNodes(arg)
           (newNodes, args.tail)

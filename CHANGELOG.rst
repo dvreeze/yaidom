@@ -20,7 +20,7 @@ This version is probably the last release before version 0.7.0. It does contain 
 * Added ``indexed.Elem`` methods ``scope`` and ``namespaces``
 * Added method ``Elem.minusAttribute``
 * Performance improvements to ``Elem.toString``
-* Worked on XML literal support
+* Worked on XML literal support, but the result is still highly experimental
 * Scala and ScalaTest upgrade (versions 2.10.1 and 1.9.1, respectively)
 
 Hopefully only documentation updates and small non-breaking fixes will be the difference between version 0.6.8 and

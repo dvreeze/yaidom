@@ -180,66 +180,66 @@ class XmlLiteralTest extends Suite {
   }
 
   @Test def testWrongXmlLiterals() {
-    elem"""<a>${"b"}</a>"""
+    xmlElem"""<a>${"b"}</a>"""
 
     intercept[java.lang.Exception] {
-      elem"""<a>=${"b"}</a>"""
+      xmlElem"""<a>=${"b"}</a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a>ab${"b"}cd</a>"""
+      xmlElem"""<a>ab${"b"}cd</a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<${"a"}>wrong</${"a"}>"""
+      xmlElem"""<${"a"}>wrong</${"a"}>"""
     }
 
     intercept[SAXParseException] {
-      elem"""<a><b></a></b>"""
+      xmlElem"""<a><b></a></b>"""
     }
 
     intercept[SAXParseException] {
-      elem"""<a><b>${"x"}</a></b>"""
+      xmlElem"""<a><b>${"x"}</a></b>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a x=">${"wrong"}<">abc</a>"""
+      xmlElem"""<a x=">${"wrong"}<">abc</a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a x="ab${"wrong"}cd">abc</a>"""
+      xmlElem"""<a x="ab${"wrong"}cd">abc</a>"""
     }
 
-    elem"""<a x=${1.toString}>abc</a>"""
+    xmlElem"""<a x=${1.toString}>abc</a>"""
 
     intercept[java.lang.Exception] {
-      elem"""<a x=${1}>abc</a>"""
+      xmlElem"""<a x=${1}>abc</a>"""
     }
 
-    elem"""<a x=${"http://aRealAttribute"}>abc</a>"""
+    xmlElem"""<a x=${"http://aRealAttribute"}>abc</a>"""
 
     intercept[java.lang.Exception] {
-      elem"""<a xmlns=${"http://notARealAttribute"}>abc</a>"""
-    }
-
-    intercept[java.lang.Exception] {
-      elem"""<a xmlns:pref=${"http://notARealAttribute"}>abc</a>"""
+      xmlElem"""<a xmlns=${"http://notARealAttribute"}>abc</a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a><!-- ignored comment -->${"b"}</a>"""
+      xmlElem"""<a xmlns:pref=${"http://notARealAttribute"}>abc</a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a><!-- ignored comment ${"b"}--></a>"""
+      xmlElem"""<a><!-- ignored comment -->${"b"}</a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a><![CDATA[ ignored CDATA ]]>${"b"}</a>"""
+      xmlElem"""<a><!-- ignored comment ${"b"}--></a>"""
     }
 
     intercept[java.lang.Exception] {
-      elem"""<a><![CDATA[ ignored CDATA ${"b"}]]></a>"""
+      xmlElem"""<a><![CDATA[ ignored CDATA ]]>${"b"}</a>"""
+    }
+
+    intercept[java.lang.Exception] {
+      xmlElem"""<a><![CDATA[ ignored CDATA ${"b"}]]></a>"""
     }
   }
 
@@ -264,7 +264,7 @@ class XmlLiteralTest extends Suite {
 
       val newName = (empElem \ "name").map(_.text).mkString.toUpperCase
 
-      elem"""<Employee xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser" id=${newId}>
+      xmlElem"""<Employee xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser" id=${newId}>
 		<name>${newName}</name>
 		<age>${(empElem \ "age").map(_.text).mkString}</age>
 		<role>${(empElem \ "role").map(_.text).mkString}</role>
@@ -378,9 +378,9 @@ class XmlLiteralTest extends Suite {
 
   private def getDocument1: Document = {
     val elm =
-      elem"""<?xml version="1.0" encoding="UTF-8"?>
+      xmlElem"""<?xml version="1.0" encoding="UTF-8"?>
 <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
-	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
+	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition=${"3rd"}>
 		<Title>${"A First Course in Database Systems"}</Title>
 		<Authors>${
         val elemBuilders =
@@ -476,7 +476,7 @@ class XmlLiteralTest extends Suite {
     }
 
     val doc =
-      doc"""
+      xmlDoc"""
 <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
 	<Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition="3rd">
 		<Title>${"A First Course in Database Systems"}</Title>
@@ -546,7 +546,7 @@ class XmlLiteralTest extends Suite {
 
   private def getDocument3: Document = {
     val elm =
-      elem"""
+      xmlElem"""
 <books:Bookstore xmlns:books="http://bookstore">
 	<books:Book ISBN="ISBN-0-13-713526-2" Price=${85.toString} Edition=${"3rd"}>
 		<books:Title>${"A First Course in Database Systems"}</books:Title>
@@ -628,14 +628,14 @@ class XmlLiteralTest extends Suite {
 
   private def getDocument4: Document = {
     val elm =
-      elem"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />"""
+      xmlElem"""<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore" />"""
 
     Document(elm)
   }
 
   private def getEmployeeDocument: Document = {
     val doc =
-      doc"""
+      xmlDoc"""
     <!-- See http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser 
 	(but updated with namespace) -->
 <Employees
