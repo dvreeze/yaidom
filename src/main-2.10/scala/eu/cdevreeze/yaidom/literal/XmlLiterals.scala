@@ -135,7 +135,7 @@ private[literal] object XmlLiterals {
 
         val newElem = e.withAttributes(newAttributes).withChildren(newChildren)
         (Vector(newElem) -> currentArgs)
-      case _ => sys.error("Problem updating placeholders")
+      case n => (Vector(n), args)
     }
 
     private def hasAllowedArgumentType(arg: Any): Boolean = arg match {
