@@ -24,6 +24,35 @@ import scala.collection.immutable
  * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
  * an XML database would not use the ``ParentElemLike`` implementation, for reasons of efficiency.
  *
+ * The following properties must hold (in the absence of side-effects):
+ * {{{
+ * // Filtering
+ *
+ * elem.filterChildElems(p) == elem.findAllChildElems.filter(p)
+ *
+ * elem.filterElems(p) == elem.findAllElems.filter(p)
+ *
+ * elem.filterElemsOrSelf(p) == elem.findAllElemsOrSelf.filter(p)
+ *
+ * // Finding
+ *
+ * elem.findChildElem(p) == elem.filterChildElems(p).headOption
+ *
+ * elem.findElem(p) == elem.filterElems(p).headOption
+ *
+ * elem.findElemOrSelf(p) == elem.filterElemsOrSelf(p).headOption
+ *
+ * // Finding topmost
+ *
+ * elem.findTopmostElems(p) == (elem.filterElems(p) filter (e1 => e1.filterElems(p) forall (e2 => !p(e2))))
+ *
+ * elem.findTopmostElemsOrSelf(p) == (elem.filterElemsOrSelf(p) filter (e1 => e1.filterElems(p) forall (e2 => !p(e2))))
+ *
+ * // Getting single result
+ *
+ * elem.getChildElem(p) == elem.findChildElem(p).get
+ * }}}
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
