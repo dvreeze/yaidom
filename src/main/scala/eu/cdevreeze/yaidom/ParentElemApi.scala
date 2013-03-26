@@ -44,9 +44,23 @@ import scala.collection.immutable
  *
  * // Finding topmost
  *
- * elem.findTopmostElems(p) == (elem.filterElems(p) filter (e1 => e1.findAllElems forall (e2 => !p(e2))))
+ * elem.findTopmostElems(p) == {
+ *   elem.filterElems(p) filter { e =>
+ *     val hasNoMatchingAncestor = elem.filterElems(p) forall { _.findElem(_ == e).isEmpty }
+ *     hasNoMatchingAncestor
+ *   }
+ * }
  *
- * elem.findTopmostElemsOrSelf(p) == (elem.filterElemsOrSelf(p) filter (e1 => e1.findAllElems forall (e2 => !p(e2))))
+ * elem.findTopmostElemsOrSelf(p) == {
+ *   elem.filterElemsOrSelf(p) filter { e =>
+ *     val hasNoMatchingAncestor = elem.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
+ *     hasNoMatchingAncestor
+ *   }
+ * }
+ *
+ * (elem.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elem.filterElems(p))
+ *
+ * (elem.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elem.filterElemsOrSelf(p))
  * }}}
  *
  * @tparam E The captured element subtype
