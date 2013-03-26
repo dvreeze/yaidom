@@ -47,10 +47,6 @@ import scala.collection.immutable
  * elem.findTopmostElems(p) == (elem.filterElems(p) filter (e1 => e1.filterElems(p) forall (e2 => !p(e2))))
  *
  * elem.findTopmostElemsOrSelf(p) == (elem.filterElemsOrSelf(p) filter (e1 => e1.filterElems(p) forall (e2 => !p(e2))))
- *
- * // Getting single result
- *
- * elem.getChildElem(p) == elem.findChildElem(p).get
  * }}}
  *
  * @tparam E The captured element subtype
