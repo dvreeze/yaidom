@@ -100,7 +100,15 @@ private[literal] object XmlLiterals {
             "All arguments must be of an allowed argument type (String, Node or Seq[Node])")
 
           val newNodes: Seq[Node] = extractNodes(arg)
-          (newNodes, args.tail)
+
+          // Repairing namespaces in order to prevent namespace undeclarations (for prefixes)
+
+          val adaptedNewNodes: Seq[Node] = newNodes map {
+            case che: Elem => che.notUndeclaringPrefixes(parentOption.get.scope)
+            case n => n
+          }
+
+          (adaptedNewNodes, args.tail)
         } else (Vector(t), args)
       case e: Elem =>
         var currentArgs = args
@@ -121,15 +129,7 @@ private[literal] object XmlLiterals {
           e.children flatMap { ch =>
             val (newChildren, restArgs) = updatePlaceholders(ch, Some(e), currentArgs)
             currentArgs = restArgs
-
-            // Repairing namespaces in order to prevent namespace undeclarations (for prefixes)
-
-            newChildren map { ch =>
-              ch match {
-                case che: Elem => NodeBuilder.fromElem(che)(Scope.Empty).build(e.scope)
-                case n => n
-              }
-            }
+            newChildren
           }
 
         val newElem = e.withAttributes(newAttributes).withChildren(newChildren)
