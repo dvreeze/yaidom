@@ -152,10 +152,26 @@ In `W3C XML Schema: DOs and DON'Ts`_, Kohsuke Kawaguchi (of Hudson/Jenkins fame,
 of XML Schema. Some (partly) disagree; see `W3C XML Schema Design Patterns: Avoiding Complexity`_. Both articles show one thing:
 XML Schema is (very) complex.
 
-Part of what makes XML Schema so complex is revealed in `MSL. A Model for W3C XML Schema`_, in particular Appendix A. For example,
+Part of what makes XML Schema so complex is illustrated in `MSL. A Model for W3C XML Schema`_, in particular Appendix A. For example,
 restriction in XML Schema is not transitive, which is quite counter-intuitive. The set of rules defining restriction is of enormous
 complexity, and according to the authors of the MSL paper ad-hoc as well. No wonder it is so hard to gain an in-depth understanding
 of XML Schema.
+
+Some recurring themes that contribute to the complexity of XML Schema are:
+
+* Lack of orthogonality, in the loose sense of the word
+
+  * Different rules for global and local schema components
+  * No clear syntactic distinction between semantically distinct components (such as particles and local element declarations)
+  * Very complex constraints on schema components, such as those on particles
+  * Vague rules/practices for composing schemas from schema documents
+
+* Schemas (and schema components) serving multiple purposes
+
+  * Validation of instance documents against the schema
+  * "Inserting" data into instance documents by default and fixed values
+  * Four different purposes of element declarations: type validation, default/fixed values, "database-like constraints", tag substitutability
+  * Types not just describing data that is found in the instance, but also describing expected processing (such as default values)
 
 Yaidom is unaware of schema types (or DTD types). Attribute values and text node content are simply strings in yaidom.
 
