@@ -55,8 +55,10 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       var depth = 0
       val result = eventIterator map { ev =>
         ev match {
-          case start: StartElement => depth += 1; new EventWithDepth(start, depth)
-          case end: EndElement => val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
+          case start: StartElement =>
+            depth += 1; new EventWithDepth(start, depth)
+          case end: EndElement =>
+            val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
           case _ => new EventWithDepth(ev, depth)
         }
       }
@@ -101,8 +103,10 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       var depth = 0
       val result = eventIterator map { ev =>
         ev match {
-          case start: StartElement => depth += 1; new EventWithDepth(start, depth)
-          case end: EndElement => val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
+          case start: StartElement =>
+            depth += 1; new EventWithDepth(start, depth)
+          case end: EndElement =>
+            val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
           case _ => new EventWithDepth(ev, depth)
         }
       }
