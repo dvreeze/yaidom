@@ -30,12 +30,12 @@ import scala.collection.immutable
  * @author Chris de Vreeze
  */
 final class Document(
-  val baseUriOption: Option[URI],
+  val uriOption: Option[URI],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends Immutable {
 
-  require(baseUriOption ne null)
+  require(uriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -43,20 +43,20 @@ final class Document(
   require(documentElement.elemPath == ElemPath.Root, "The document element must have the root ElemPath")
 
   def document: eu.cdevreeze.yaidom.Document =
-    new eu.cdevreeze.yaidom.Document(baseUriOption, documentElement.elem, processingInstructions, comments)
+    new eu.cdevreeze.yaidom.Document(uriOption, documentElement.elem, processingInstructions, comments)
 
   override def toString: String = document.toString
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
-    baseUriOption = this.baseUriOption,
+    uriOption = this.uriOption,
     documentElement = newRoot,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
-  /** Creates a copy, but with the new baseUriOption passed as parameter newBaseUriOption */
-  def withBaseUriOption(newBaseUriOption: Option[URI]): Document = new Document(
-    baseUriOption = newBaseUriOption,
+  /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
+  def withBaseUriOption(newUriOption: Option[URI]): Document = new Document(
+    uriOption = newUriOption,
     documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -65,16 +65,16 @@ final class Document(
 object Document {
 
   def apply(
-    baseUriOption: Option[URI],
+    uriOption: Option[URI],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(baseUriOption, documentElement, processingInstructions, comments)
+    new Document(uriOption, documentElement, processingInstructions, comments)
   }
 
   def apply(documentElement: Elem): Document = apply(None, documentElement)
 
   def apply(d: eu.cdevreeze.yaidom.Document): Document =
-    new Document(d.baseUriOption, indexed.Elem(d.documentElement), d.processingInstructions, d.comments)
+    new Document(d.uriOption, indexed.Elem(d.documentElement), d.processingInstructions, d.comments)
 }

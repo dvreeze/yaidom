@@ -32,7 +32,7 @@ import PrettyPrinting._
  * are irrelevant for Documents, unlike for "elements".</li>
  * </ul>
  *
- * A `Document` is constructed from an optional base URI, a document element (as `Elem`), top-level processing instructions,
+ * A `Document` is constructed from an optional URI, a document element (as `Elem`), top-level processing instructions,
  * if any, and top-level comments, if any.
  *
  * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ParentElemApi` does not
@@ -43,12 +43,12 @@ import PrettyPrinting._
  */
 @SerialVersionUID(1L)
 final class Document(
-  val baseUriOption: Option[URI],
+  val uriOption: Option[URI],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends Immutable with Serializable {
 
-  require(baseUriOption ne null)
+  require(uriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -76,14 +76,14 @@ final class Document(
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
-    baseUriOption = this.baseUriOption,
+    uriOption = this.uriOption,
     documentElement = newRoot,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
-  /** Creates a copy, but with the new baseUriOption passed as parameter newBaseUriOption */
-  def withBaseUriOption(newBaseUriOption: Option[URI]): Document = new Document(
-    baseUriOption = newBaseUriOption,
+  /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
+  def withBaseUriOption(newUriOption: Option[URI]): Document = new Document(
+    uriOption = newUriOption,
     documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -112,12 +112,12 @@ final class Document(
   private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): LineSeq = {
     val parentScope = Scope.Empty
 
-    val baseUriOptionLineSeq: LineSeq =
-      if (this.baseUriOption.isEmpty) {
-        val line = "baseUriOption = None"
+    val uriOptionLineSeq: LineSeq =
+      if (this.uriOption.isEmpty) {
+        val line = "uriOption = None"
         LineSeq(line)
       } else {
-        val line = "baseUriOption = Some(%s)".format(toStringLiteral(this.baseUriOption.get.toString))
+        val line = "uriOption = Some(%s)".format(toStringLiteral(this.uriOption.get.toString))
         LineSeq(line)
       }
 
@@ -159,7 +159,7 @@ final class Document(
         Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
       }
 
-    val contentParts: Vector[LineSeq] = Vector(Some(baseUriOptionLineSeq), Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
+    val contentParts: Vector[LineSeq] = Vector(Some(uriOptionLineSeq), Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
     val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
 
     LineSeqSeq(
@@ -172,21 +172,21 @@ final class Document(
 object Document {
 
   /**
-   * Creates a `Document` from an optional base URI, the document element, and the top-level comments and processing
+   * Creates a `Document` from an optional URI, the document element, and the top-level comments and processing
    * instructions, if any. Unlike the primary constructor, this factory method defaults the processing instructions and
-   * comments to empty collections. In other words, only the optional base URI and the document element are mandatory parameters.
+   * comments to empty collections. In other words, only the optional URI and the document element are mandatory parameters.
    */
   def apply(
-    baseUriOption: Option[URI],
+    uriOption: Option[URI],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(baseUriOption, documentElement, processingInstructions, comments)
+    new Document(uriOption, documentElement, processingInstructions, comments)
   }
 
   /**
-   * Creates a `Document` from only the document element. The base URI is empty, and so are the collections of top-level
+   * Creates a `Document` from only the document element. The URI is empty, and so are the collections of top-level
    * comments and processing instructions.
    */
   def apply(documentElement: Elem): Document = apply(None, documentElement)

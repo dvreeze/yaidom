@@ -24,19 +24,19 @@ import PrettyPrinting._
  * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
  * A `DocBuilder` is itself not a `NodeBuilder`.
  *
- * A `DocBuilder` is constructed from an optional base URI, a document element (as `ElemBuilder`), top-level processing
+ * A `DocBuilder` is constructed from an optional URI, a document element (as `ElemBuilder`), top-level processing
  * instruction builders, if any, and top-level comment builders, if any.
  *
  * @author Chris de Vreeze
  */
 @SerialVersionUID(1L)
 final class DocBuilder(
-  val baseUriOption: Option[URI],
+  val uriOption: Option[URI],
   val documentElement: ElemBuilder,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
   val comments: immutable.IndexedSeq[CommentBuilder]) extends Immutable with Serializable { self =>
 
-  require(baseUriOption ne null)
+  require(uriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -55,7 +55,7 @@ final class DocBuilder(
     val parentScope = Scope.Empty
 
     Document(
-      baseUriOption = self.baseUriOption,
+      uriOption = self.uriOption,
       documentElement = documentElement.build(parentScope),
       processingInstructions = processingInstructions map { (pi: ProcessingInstructionBuilder) => pi.build(parentScope) },
       comments = comments map { (c: CommentBuilder) => c.build(parentScope) })
@@ -79,7 +79,7 @@ object DocBuilder {
     val parentScope = Scope.Empty
 
     new DocBuilder(
-      baseUriOption = doc.baseUriOption,
+      uriOption = doc.uriOption,
       documentElement = fromElem(doc.documentElement)(parentScope),
       processingInstructions = doc.processingInstructions collect { case pi: ProcessingInstruction => fromProcessingInstruction(pi) },
       comments = doc.comments collect { case c => fromComment(c) })

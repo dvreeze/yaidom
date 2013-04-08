@@ -557,13 +557,13 @@ object Elem {
 object Node {
 
   def document(
-    baseUriOption: Option[String] = None,
+    uriOption: Option[String] = None,
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
     comments: immutable.IndexedSeq[Comment] = Vector()): Document = {
 
     new Document(
-      baseUriOption map { uriString => new URI(uriString) },
+      uriOption map { uriString => new URI(uriString) },
       documentElement,
       processingInstructions,
       comments)

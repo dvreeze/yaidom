@@ -62,7 +62,7 @@ object TreeReprParsers extends JavaTokenParsers {
   }
 
   def docBaseUriOptionPart: Parser[Option[URI]] = {
-    "baseUriOption" ~> "=" ~> docBaseUriOption ^^ { x => x map { s => new URI(s) } }
+    "uriOption" ~> "=" ~> docBaseUriOption ^^ { x => x map { s => new URI(s) } }
   }
 
   def docBaseUriOption: Parser[Option[String]] = (docBaseUriEmpty | docBaseUriDefined)

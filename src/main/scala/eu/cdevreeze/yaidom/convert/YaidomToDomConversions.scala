@@ -47,7 +47,7 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
       val docRoot: Element = convertElem(document.documentElement, doc, Scope.Empty)
       doc.appendChild(docRoot)
 
-      if (document.baseUriOption.isDefined) doc.setDocumentURI(document.baseUriOption.get.toString)
+      if (document.uriOption.isDefined) doc.setDocumentURI(document.uriOption.get.toString)
 
       doc
     }

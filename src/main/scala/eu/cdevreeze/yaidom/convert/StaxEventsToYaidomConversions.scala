@@ -187,13 +187,13 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
     it.next()
 
-    val baseUriOption: Option[URI] =
+    val uriOption: Option[URI] =
       if ((startDocument.getSystemId eq null) || (startDocument.getSystemId == "")) None else {
         Some(new URI(startDocument.getSystemId))
       }
 
     val doc: Document = new Document(
-      baseUriOption = baseUriOption,
+      uriOption = uriOption,
       documentElement = docElement,
       processingInstructions = pis.toIndexedSeq,
       comments = comments.toIndexedSeq)
