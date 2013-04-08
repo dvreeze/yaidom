@@ -82,7 +82,7 @@ final class Document(
     comments = this.comments)
 
   /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
-  def withBaseUriOption(newUriOption: Option[URI]): Document = new Document(
+  def withUriOption(newUriOption: Option[URI]): Document = new Document(
     uriOption = newUriOption,
     documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
