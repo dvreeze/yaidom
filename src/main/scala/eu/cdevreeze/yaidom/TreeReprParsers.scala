@@ -47,30 +47,30 @@ object TreeReprParsers extends JavaTokenParsers {
 
   def document: Parser[DocBuilder] =
     "document" ~> "(" ~> documentContent <~ ")" ^^ {
-      case (baseUriOpt, elm, optPis, optComments) =>
+      case (uriOpt, elm, optPis, optComments) =>
         val pis = optPis.getOrElse(Vector[ProcessingInstructionBuilder]())
         val comments = optComments.getOrElse(Vector[CommentBuilder]())
-        new DocBuilder(baseUriOpt, elm, pis, comments)
+        new DocBuilder(uriOpt, elm, pis, comments)
     }
 
   type DocumentContent = (Option[URI], ElemBuilder, Option[Vector[ProcessingInstructionBuilder]], Option[Vector[CommentBuilder]])
 
   def documentContent: Parser[DocumentContent] = {
-    (docBaseUriOptionPart <~ ",") ~ documentElementPart ~ opt("," ~> docProcessingInstructionsPart) ~ opt("," ~> docCommentsPart) ^^ {
+    (docUriOptionPart <~ ",") ~ documentElementPart ~ opt("," ~> docProcessingInstructionsPart) ~ opt("," ~> docCommentsPart) ^^ {
       case uriPart ~ elmPart ~ piPart ~ commentsPart => (uriPart, elmPart, piPart, commentsPart)
     }
   }
 
-  def docBaseUriOptionPart: Parser[Option[URI]] = {
-    "uriOption" ~> "=" ~> docBaseUriOption ^^ { x => x map { s => new URI(s) } }
+  def docUriOptionPart: Parser[Option[URI]] = {
+    "uriOption" ~> "=" ~> docUriOption ^^ { x => x map { s => new URI(s) } }
   }
 
-  def docBaseUriOption: Parser[Option[String]] = (docBaseUriEmpty | docBaseUriDefined)
+  def docUriOption: Parser[Option[String]] = (docUriEmpty | docUriDefined)
 
-  def docBaseUriEmpty: Parser[Option[String]] =
+  def docUriEmpty: Parser[Option[String]] =
     "None" ^^ { x => None }
 
-  def docBaseUriDefined: Parser[Option[String]] =
+  def docUriDefined: Parser[Option[String]] =
     "Some" ~> "(" ~> stringLiteral2 <~ ")" ^^ { x => Some(unwrapStringLiteral(x)) }
 
   def documentElementPart: Parser[ElemBuilder] =
