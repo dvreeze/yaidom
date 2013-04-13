@@ -17,7 +17,8 @@
 package eu.cdevreeze.yaidom
 package parse
 
-import java.io.InputStream
+import java.io.{ InputStream, File }
+import java.net.URI
 
 /**
  * [[eu.cdevreeze.yaidom.Document]] parser.
@@ -30,7 +31,7 @@ import java.io.InputStream
  * typical usage is easy, and complex scenarios are still possible. The idea is that the parser is configured once, and
  * that it should be re-usable multiple times.
  *
- * Method `parse` takes an `InputStream` instead of `Source` object, because that works better with a DOM implementation.
+ * One of the `parse` methods takes an `InputStream` instead of `Source` object, because that works better with a DOM implementation.
  *
  * Although `DocumentParser` instances should be re-usable multiple times, implementing classes are encouraged to indicate
  * to what extent re-use of a parser instance is indeed supported (single-threaded, or even multi-threaded).
@@ -41,4 +42,10 @@ trait DocumentParser {
 
   /** Parses the input stream into a [[eu.cdevreeze.yaidom.Document]]. This method should close the input stream afterwards. */
   def parse(inputStream: InputStream): Document
+
+  /** Parses the content of the given URI into a [[eu.cdevreeze.yaidom.Document]]. */
+  def parse(uri: URI): Document
+
+  /** Parses the content of the given File into a [[eu.cdevreeze.yaidom.Document]]. */
+  def parse(file: File): Document
 }

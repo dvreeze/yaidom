@@ -96,7 +96,7 @@ import org.xml.sax.ext.LexicalHandler
 final class DocumentParserUsingSax(
   val parserFactory: SAXParserFactory,
   val parserCreator: SAXParserFactory => SAXParser,
-  val handlerCreator: () => ElemProducingSaxHandler) extends DocumentParser {
+  val handlerCreator: () => ElemProducingSaxHandler) extends AbstractDocumentParser {
 
   /**
    * Parses the input stream into a yaidom `Document`. Closes the input stream afterwards.

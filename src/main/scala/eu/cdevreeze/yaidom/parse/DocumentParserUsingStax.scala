@@ -71,7 +71,7 @@ import convert.StaxConversions._
  *
  * @author Chris de Vreeze
  */
-final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends DocumentParser {
+final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends AbstractDocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {

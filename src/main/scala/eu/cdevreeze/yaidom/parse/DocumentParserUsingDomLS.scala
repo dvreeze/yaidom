@@ -75,7 +75,7 @@ import convert.DomConversions._
  */
 final class DocumentParserUsingDomLS(
   val domImplementation: DOMImplementationLS,
-  val parserCreator: DOMImplementationLS => LSParser) extends DocumentParser {
+  val parserCreator: DOMImplementationLS => LSParser) extends AbstractDocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {

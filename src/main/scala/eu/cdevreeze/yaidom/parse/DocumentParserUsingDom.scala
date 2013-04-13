@@ -89,7 +89,7 @@ import convert.DomConversions._
  */
 final class DocumentParserUsingDom(
   val docBuilderFactory: DocumentBuilderFactory,
-  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends DocumentParser {
+  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends AbstractDocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
