@@ -105,12 +105,12 @@ final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
   def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.findAllChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
-trait LabeledXLink extends XLink {
+abstract class LabeledXLink(override val wrappedElem: Elem) extends XLink(wrappedElem) {
 
   def labelOption: Option[String]
 }
 
-final class Locator(override val wrappedElem: Elem) extends XLink(wrappedElem) with LabeledXLink {
+final class Locator(override val wrappedElem: Elem) extends LabeledXLink(wrappedElem) {
   require(xlinkType == "locator")
   require(wrappedElem.attributeOption(XLinkHrefEName).isDefined, "Missing %s".format(XLinkHrefEName))
 
@@ -122,7 +122,7 @@ final class Locator(override val wrappedElem: Elem) extends XLink(wrappedElem) w
   def titleXLinks: immutable.IndexedSeq[Title] = wrappedElem.findAllChildElems collect { case e if XLink.mustBeTitle(e) => Title(e) }
 }
 
-final class Resource(override val wrappedElem: Elem) extends XLink(wrappedElem) with LabeledXLink {
+final class Resource(override val wrappedElem: Elem) extends LabeledXLink(wrappedElem) {
   require(xlinkType == "resource")
 
   def labelOption: Option[String] = wrappedElem.attributeOption(XLinkLabelEName)
