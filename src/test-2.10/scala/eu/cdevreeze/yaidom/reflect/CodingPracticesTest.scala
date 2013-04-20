@@ -19,6 +19,7 @@ package reflect
 
 import java.{ util => jutil, io => jio }
 import scala.collection.immutable
+import scala.annotation.tailrec
 import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
@@ -41,7 +42,7 @@ class CodingPracticesTest extends Suite {
   val ru = scala.reflect.runtime.universe
   import ru._
 
-  private val selectedTypes: Seq[Type] = Vector(
+  private val selectedTypes: Set[Type] = Set(
     typeOf[DocBuilder],
     typeOf[convert.DomConversions.type],
     typeOf[convert.StaxConversions.type],
@@ -57,9 +58,7 @@ class CodingPracticesTest extends Suite {
     val tpes: Set[Type] = {
       def p(tpe: Type): Boolean = if (tpe.typeSymbol == NoSymbol) false else isYaidomPackage(tpe.typeSymbol.owner)
 
-      val result = selectedTypes flatMap { tpe => collectTypes(tpe, p _) }
-      val erasedResult = result map { _.erasure }
-      erasedResult.toSet
+      collectErasedTypesRecursively(selectedTypes, p _)
     }
 
     val expectedTraits = Set(
@@ -102,7 +101,19 @@ class CodingPracticesTest extends Suite {
     }
   }
 
-  private def collectTypes(tpe: Type, p: Type => Boolean, remainingDepth: Int = 10): Seq[Type] = {
+  @tailrec
+  private def collectErasedTypesRecursively(tpes: Set[Type], p: Type => Boolean, acc: Set[Type] = Set()): Set[Type] = {
+    val stepResult = tpes flatMap { tpe => collectErasedTypes(tpe, p) }
+
+    val newAcc = acc union stepResult
+
+    if (newAcc.size == acc.size) {
+      assert(newAcc == acc)
+      newAcc
+    } else collectErasedTypesRecursively(newAcc.diff(acc), p, newAcc)
+  }
+
+  private def collectErasedTypes(tpe: Type, p: Type => Boolean): Set[Type] = {
     val terms: Iterable[Symbol] = tpe.members filter { _.isTerm }
     val baseClasses: Seq[Symbol] = tpe.baseClasses
     val baseClassTypes = baseClasses map { sym => sym.asType.toType }
@@ -116,11 +127,8 @@ class CodingPracticesTest extends Suite {
       }
     }
 
-    val currTypes = (baseClassTypes ++ termTypes :+ tpe).distinct.filter(p)
-    val result =
-      if (remainingDepth >= 1) currTypes
-      else currTypes ++ currTypes.flatMap(tpe => collectTypes(tpe, p, remainingDepth - 1))
-    result.distinct
+    val currTypes = (baseClassTypes ++ termTypes :+ tpe).filter(p).map(_.erasure)
+    currTypes.toSet
   }
 
   private def methodSignatureTypes(methodType: MethodType): Set[Type] = {
