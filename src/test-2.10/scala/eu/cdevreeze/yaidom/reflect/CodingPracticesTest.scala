@@ -44,6 +44,7 @@ class CodingPracticesTest extends Suite {
 
   private val selectedTypes: Set[Type] = Set(
     typeOf[DocBuilder],
+    typeOf[ElemPathBuilder],
     typeOf[convert.DomConversions.type],
     typeOf[convert.StaxConversions.type],
     typeOf[dom.DomDocument],
@@ -54,13 +55,15 @@ class CodingPracticesTest extends Suite {
     typeOf[xlink.ExtendedLink],
     typeOf[xlink.LabeledXLink])
 
-  @Test def testNoValVarInTraits() {
-    val tpes: Set[Type] = {
-      def p(tpe: Type): Boolean = if (tpe.typeSymbol == NoSymbol) false else isYaidomPackage(tpe.typeSymbol.owner)
+  private val tpes: Set[Type] = {
+    def p(tpe: Type): Boolean = if (tpe.typeSymbol == NoSymbol) false else isYaidomPackage(tpe.typeSymbol.owner)
 
-      collectErasedTypesRecursively(selectedTypes, p _)
-    }
+    findErasedTypes(selectedTypes, p _)
+  }
 
+  for (tpe <- tpes.toSeq.sortBy(_.toString)) logger.info(s"Found type: $tpe")
+
+  @Test def testNoValAndVarInTraits() {
     val expectedTraits = Set(
       typeOf[ElemApi[_]].erasure,
       typeOf[ElemLike[_]].erasure,
@@ -102,37 +105,43 @@ class CodingPracticesTest extends Suite {
   }
 
   @tailrec
-  private def collectErasedTypesRecursively(tpes: Set[Type], p: Type => Boolean): Set[Type] = {
-    // Very naive and inefficient
+  private def findErasedTypes(tpes: Set[Type], p: Type => Boolean, ignoredTypes: Set[Type] = Set()): Set[Type] = {
+    val erasedTypes = tpes map { _.erasure }
+    val filteredTypes = erasedTypes.diff(ignoredTypes)
 
-    require(tpes forall (tpe => p(tpe.erasure)), s"Expected property to hold on erasures of $tpes")
-    val stepResult = tpes flatMap { tpe => collectErasedTypes(tpe, p) }
+    val currentlyFoundTypes = filteredTypes flatMap { tpe => findErasedTypesInType(tpe, p) }
 
-    assert(tpes.map(_.erasure).subsetOf(stepResult))
+    assert(filteredTypes.filter(p).subsetOf(currentlyFoundTypes))
 
-    if (stepResult.size == tpes.size) {
-      assert(stepResult == tpes)
-      stepResult
-    } else collectErasedTypesRecursively(stepResult, p)
+    val (newIgnoredTypes, newTypes) = currentlyFoundTypes.partition(erasedTypes)
+    val nextErasedTypes = erasedTypes.union(newTypes)
+
+    if (nextErasedTypes.size == erasedTypes.size) erasedTypes
+    else {
+      // Recursive call
+      findErasedTypes(nextErasedTypes, p, newIgnoredTypes.union(ignoredTypes))
+    }
   }
 
-  private def collectErasedTypes(tpe: Type, p: Type => Boolean): Set[Type] = {
-    require(p(tpe.erasure), s"Expected property to hold on erasure of $tpe")
+  private def findErasedTypesInType(tpe: Type, p: Type => Boolean): Set[Type] = {
+    val termSymbols: Iterable[Symbol] = tpe.members filter { _.isTerm }
 
-    val terms: Iterable[Symbol] = tpe.members filter { _.isTerm }
+    val typeSymbols: Iterable[Symbol] = tpe.members filter { _.isType }
+    val types: Iterable[Type] = typeSymbols map { sym => sym.asType.toType }
+
     val baseClasses: Seq[Symbol] = tpe.baseClasses
     val baseClassTypes = baseClasses map { sym => sym.asType.toType }
 
-    val termTypeSignatures = terms map { _.typeSignatureIn(tpe) }
+    val termTypeSignatures = termSymbols map { _.typeSignatureIn(tpe) }
 
-    val termTypes: Set[Type] = termTypeSignatures.toSet flatMap { (tpe: Type) =>
+    val termTypes: Iterable[Type] = termTypeSignatures flatMap { tpe: Type =>
       tpe match {
         case methodType: MethodType => methodSignatureTypes(methodType)
-        case tpe: Type => Set(tpe)
+        case tpe: Type => Seq(tpe)
       }
     }
 
-    val currTypes = (baseClassTypes ++ termTypes :+ tpe).map(_.erasure).filter(p)
+    val currTypes = (baseClassTypes ++ termTypes ++ types :+ tpe).map(_.erasure).filter(p)
     currTypes.toSet
   }
 
