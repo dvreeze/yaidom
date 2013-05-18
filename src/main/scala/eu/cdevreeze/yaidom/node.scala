@@ -126,7 +126,7 @@ sealed trait Node extends Immutable with Serializable {
  *
  * val bookElms =
  *   for {
- *     bookElm <- bookstoreElm \ "Book"
+ *     bookElm <- bookstoreElm \ (_.localName == "Book")
  *     price <- bookElm \@ EName("Price")
  *     if price.toInt < 90
  *   } yield bookElm
@@ -141,7 +141,7 @@ final class Elem(
   val scope: Scope,
   override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
-  require(qname ne null)
+  // Note that qname is a value class instance
   require(attributes ne null)
   require(scope ne null)
   require(children ne null)

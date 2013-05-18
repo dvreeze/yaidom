@@ -61,7 +61,7 @@ class XbrlSchemaTest extends Suite {
       val conceptENames = elmDefs map { e =>
         // We query each element definition for the target namespace of the root (!) element
         val tnsOption = e.rootElem.attributeOption(EName("targetNamespace"))
-        val localName = (e \@ "name").getOrElse("")
+        val localName = (e \@ EName("name")).getOrElse("")
         val result = EName(tnsOption, localName)
         result
       }

@@ -40,7 +40,7 @@ class XmlLiteralTest extends Suite {
   @Test def testXmlLiteral1() {
     val doc: Document = getDocument1
 
-    val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
+    val bookTitles = (doc.documentElement \ (_.localName == "Book")) flatMap { e => (e \ (_.localName == "Title")) map (_.text) }
     val expectedBookTitles = List(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
@@ -51,15 +51,15 @@ class XmlLiteralTest extends Suite {
       bookTitles
     }
 
-    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
+    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ EName("ISBN")) == Some("ISBN-0-13-713526-2") }
 
     expectResult(Some("85")) {
-      firstBookElemOption flatMap { e => (e \@ "Price") }
+      firstBookElemOption flatMap { e => (e \@ EName("Price")) }
     }
     expectResult(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
-      (firstBookElemOption.get \\ "Author") map { author =>
-        val firstName = (author \ "First_Name").map(_.text).mkString
-        val lastName = (author \ "Last_Name").map(_.text).mkString
+      (firstBookElemOption.get \\ (_.localName == "Author")) map { author =>
+        val firstName = (author \ (_.localName == "First_Name")).map(_.text).mkString
+        val lastName = (author \ (_.localName == "Last_Name")).map(_.text).mkString
         (firstName, lastName)
       }
     }
@@ -83,7 +83,7 @@ class XmlLiteralTest extends Suite {
   @Test def testXmlLiteral2() {
     val doc: Document = getDocument2
 
-    val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
+    val bookTitles = (doc.documentElement \ (_.localName == "Book")) flatMap { e => (e \ (_.localName == "Title")) map (_.text) }
     val expectedBookTitles = List(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
@@ -94,15 +94,15 @@ class XmlLiteralTest extends Suite {
       bookTitles
     }
 
-    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
+    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ EName("ISBN")) == Some("ISBN-0-13-713526-2") }
 
     expectResult(Some("85")) {
-      firstBookElemOption flatMap { e => (e \@ "Price") }
+      firstBookElemOption flatMap { e => (e \@ EName("Price")) }
     }
     expectResult(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
-      (firstBookElemOption.get \\ "Author") map { author =>
-        val firstName = (author \ "First_Name").map(_.text).mkString
-        val lastName = (author \ "Last_Name").map(_.text).mkString
+      (firstBookElemOption.get \\ (_.localName == "Author")) map { author =>
+        val firstName = (author \ (_.localName == "First_Name")).map(_.text).mkString
+        val lastName = (author \ (_.localName == "Last_Name")).map(_.text).mkString
         (firstName, lastName)
       }
     }
@@ -126,7 +126,7 @@ class XmlLiteralTest extends Suite {
   @Test def testXmlLiteral3() {
     val doc: Document = getDocument3
 
-    val bookTitles = (doc.documentElement \ "Book") flatMap { e => (e \ "Title") map (_.text) }
+    val bookTitles = (doc.documentElement \ (_.localName == "Book")) flatMap { e => (e \ (_.localName == "Title")) map (_.text) }
     val expectedBookTitles = List(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
@@ -137,15 +137,15 @@ class XmlLiteralTest extends Suite {
       bookTitles
     }
 
-    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ "ISBN") == Some("ISBN-0-13-713526-2") }
+    val firstBookElemOption = doc.documentElement findChildElem { e => e.localName == "Book" && (e \@ EName("ISBN")) == Some("ISBN-0-13-713526-2") }
 
     expectResult(Some("85")) {
-      firstBookElemOption flatMap { e => (e \@ "Price") }
+      firstBookElemOption flatMap { e => (e \@ EName("Price")) }
     }
     expectResult(List(("Jeffrey", "Ullman"), ("Jennifer", "Widom"))) {
-      (firstBookElemOption.get \\ "Author") map { author =>
-        val firstName = (author \ "First_Name").map(_.text).mkString
-        val lastName = (author \ "Last_Name").map(_.text).mkString
+      (firstBookElemOption.get \\ (_.localName == "Author")) map { author =>
+        val firstName = (author \ (_.localName == "First_Name")).map(_.text).mkString
+        val lastName = (author \ (_.localName == "Last_Name")).map(_.text).mkString
         (firstName, lastName)
       }
     }
@@ -258,16 +258,16 @@ class XmlLiteralTest extends Suite {
     def updateEmployee(empElem: Elem): Elem = {
       require(empElem.resolvedName == EName(ns, "Employee"))
 
-      val gender = (empElem \ "gender") map (_.text) mkString ""
+      val gender = (empElem \ (_.localName == "gender")) map (_.text) mkString ""
       val genderPrefix = if (gender == "Male") "M" else "F"
-      val newId = genderPrefix + (empElem \@ "id").head
+      val newId = genderPrefix + (empElem \@ EName("id")).head
 
-      val newName = (empElem \ "name").map(_.text).mkString.toUpperCase
+      val newName = (empElem \ (_.localName == "name")).map(_.text).mkString.toUpperCase
 
       xmlElem"""<Employee xmlns="http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser" id=${newId}>
 		<name>${newName}</name>
-		<age>${(empElem \ "age").map(_.text).mkString}</age>
-		<role>${(empElem \ "role").map(_.text).mkString}</role>
+		<age>${(empElem \ (_.localName == "age")).map(_.text).mkString}</age>
+		<role>${(empElem \ (_.localName == "role")).map(_.text).mkString}</role>
 		<salary>10000</salary>
 	</Employee>"""
     }

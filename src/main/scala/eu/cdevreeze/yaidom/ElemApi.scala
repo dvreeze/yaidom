@@ -54,22 +54,16 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
    * Returns the first found attribute value of an attribute with the given local name, if any, wrapped in an `Option`.
    * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
    */
-  def findAttribute(localName: String): Option[String]
+  def findAttributeByLocalName(localName: String): Option[String]
 
   /** Shorthand for `attributeOption(expandedName)` */
   def \@(expandedName: EName): Option[String]
-
-  /** Shorthand for `findAttribute(localName)` */
-  def \@(localName: String): Option[String]
 
   /** Returns the child elements with the given expanded name */
   def filterChildElems(expandedName: EName): immutable.IndexedSeq[E]
 
   /** Shorthand for `filterChildElems(expandedName)`. */
   def \(expandedName: EName): immutable.IndexedSeq[E]
-
-  /** Shorthand for `filterChildElems { _.localName == localName }`. */
-  def \(localName: String): immutable.IndexedSeq[E]
 
   /** Returns the first found child element with the given expanded name, if any, wrapped in an `Option` */
   def findChildElem(expandedName: EName): Option[E]
@@ -83,9 +77,6 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
   /** Shorthand for `filterElemsOrSelf(expandedName)`. */
   def \\(expandedName: EName): immutable.IndexedSeq[E]
 
-  /** Shorthand for `filterElemsOrSelf { _.localName == localName }`. */
-  def \\(localName: String): immutable.IndexedSeq[E]
-
   /** Returns the descendant elements with the given expanded name */
   def filterElems(expandedName: EName): immutable.IndexedSeq[E]
 
@@ -94,9 +85,6 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
 
   /** Shorthand for `findTopmostElemsOrSelf(expandedName)`. */
   def \\!(expandedName: EName): immutable.IndexedSeq[E]
-
-  /** Shorthand for `findTopmostElemsOrSelf { _.localName == localName }`. */
-  def \\!(localName: String): immutable.IndexedSeq[E]
 
   /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   def findTopmostElems(expandedName: EName): immutable.IndexedSeq[E]

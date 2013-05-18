@@ -58,7 +58,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     val artistElms =
       for {
         cdElm <- doc.documentElement \\ { e => e.localName == "cd" && e.attributeOption(EName("genre")) == Some("metal") }
-        artistElm <- cdElm \ "artist"
+        artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm
 
     val artists = artistElms map { _.text }
@@ -71,8 +71,8 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artistElms2 =
       for {
-        cdElm <- (doc.documentElement \\ "cd") filter { _.attributeOption(EName("genre")) == Some("metal") }
-        artistElm <- cdElm \ "artist"
+        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter { _.attributeOption(EName("genre")) == Some("metal") }
+        artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm
 
     val artists2 = artistElms2 map { _.text }
@@ -92,7 +92,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     val artists =
       for {
         cdElm <- doc.documentElement \\ { e => e.localName == "cd" && e.attributeOption(EName("genre")) == Some("metal") }
-        artistElm <- cdElm \ "artist"
+        artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm.text
 
     val artistsConcatenated = artists.mkString
@@ -105,8 +105,8 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artists2 =
       for {
-        cdElm <- (doc.documentElement \\ "cd") filter { _.attributeOption(EName("genre")) == Some("metal") }
-        artistElm <- cdElm \ "artist"
+        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter { _.attributeOption(EName("genre")) == Some("metal") }
+        artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm.text
 
     val artistsConcatenated2 = artists2.mkString
@@ -119,8 +119,8 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
     val artists3 =
       for {
-        cdElm <- (doc.documentElement \\ "cd") filter { _.attributeOption(EName("genre")) == Some("metal") }
-        artistElm <- cdElm \ "artist"
+        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter { _.attributeOption(EName("genre")) == Some("metal") }
+        artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm.text
 
     val firstArtist = artists3.headOption.getOrElse("")
@@ -140,7 +140,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     val prices =
       for {
         cdElm <- doc.documentElement \\ { e => e.localName == "cd" && e.attributeOption(EName("genre")) == Some("metal") }
-        artistElm <- cdElm \ "price"
+        artistElm <- cdElm \ (_.localName == "price")
       } yield artistElm.text
 
     val price = prices.headOption.getOrElse(sys.error("Expected price")).toDouble

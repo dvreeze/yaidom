@@ -55,7 +55,7 @@ import scala.collection.{ immutable, mutable }
  * val bookAuthorElms =
  *   for {
  *     bookElm <- bookstoreElm \\ EName("Book")
- *     authorElm <- bookElm \\! "Author"
+ *     authorElm <- bookElm findTopmostElems { _.localName == "Author" }
  *   } yield authorElm
  * }}}
  *

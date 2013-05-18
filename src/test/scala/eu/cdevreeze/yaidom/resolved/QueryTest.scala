@@ -43,7 +43,7 @@ class QueryTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val bookTitles =
-      (bookstore \ "Book") map { e => e getChildElem (_.localName == "Title") }
+      (bookstore \ (_.localName == "Book")) map { e => e getChildElem (_.localName == "Title") }
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -245,8 +245,8 @@ class QueryTest extends Suite {
 
     val books =
       for {
-        book <- bookstore \ "Book"
-        price <- book \@ "Price"
+        book <- bookstore \ (_.localName == "Book")
+        price <- book \@ EName("Price")
         if price.toInt < 90
       } yield book
 
@@ -277,8 +277,8 @@ class QueryTest extends Suite {
 
     val titles =
       for {
-        book <- bookstore \ "Book"
-        price <- book \@ "Price"
+        book <- bookstore \ (_.localName == "Book")
+        price <- book \@ EName("Price")
         if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
 
@@ -330,8 +330,8 @@ class QueryTest extends Suite {
 
     val cheapBookElms =
       for {
-        bookElm <- bookstore \ "Book"
-        price <- bookElm \@ "Price"
+        bookElm <- bookstore \ (_.localName == "Book")
+        price <- bookElm \@ EName("Price")
         if price.toInt < 90
       } yield bookElm
 
@@ -339,7 +339,7 @@ class QueryTest extends Suite {
       val result =
         for {
           cheapBookElm <- cheapBookElms
-          authorElm <- cheapBookElm \\ "Author"
+          authorElm <- cheapBookElm \\ (_.localName == "Author")
         } yield {
           val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
           val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
@@ -367,7 +367,7 @@ class QueryTest extends Suite {
 
     val bookTitles =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         if !book.filterChildElems(EName("Remark")).isEmpty
       } yield book.getChildElem(EName("Title"))
 
@@ -386,10 +386,10 @@ class QueryTest extends Suite {
 
     val bookTitles =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
+        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
@@ -432,12 +432,12 @@ class QueryTest extends Suite {
 
     val bookTitles =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
+        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
         if authorLastName == "Ullman"
-        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e => e \ "First_Name" } map { _.trimmedText }
+        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "First_Name") } map { _.trimmedText }
         if authorFirstName == "Jeffrey"
       } yield book.getChildElem(EName("Title"))
 
@@ -456,10 +456,10 @@ class QueryTest extends Suite {
 
     val bookTitles =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         authors = book.getChildElem(EName("Authors"))
         lastNameStrings = for {
-          author <- authors \ "Author"
+          author <- authors \ (_.localName == "Author")
           lastNameString = author.getChildElem(EName("Last_Name")).trimmedText
         } yield lastNameString
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
@@ -480,7 +480,7 @@ class QueryTest extends Suite {
     val bookElms =
       for {
         bookElm <- bookstore filterChildElems { _.localName == "Book" }
-        if (bookElm \\ "Author") exists { e =>
+        if (bookElm \\ (_.localName == "Author")) exists { e =>
           ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
             ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
         }
@@ -525,9 +525,9 @@ class QueryTest extends Suite {
 
     val secondAuthors =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         authors = book.getChildElem(EName("Authors"))
-        authorColl = authors \ "Author"
+        authorColl = authors \ (_.localName == "Author")
         if authorColl.size >= 2
         secondAuthor <- authorColl.drop(1).headOption
       } yield secondAuthor
@@ -549,8 +549,8 @@ class QueryTest extends Suite {
 
     val titles =
       for {
-        book <- bookstore \ "Book"
-        remark <- book \ "Remark"
+        book <- bookstore \ (_.localName == "Book")
+        remark <- book \ (_.localName == "Remark")
         if remark.trimmedText.indexOf("great") >= 0
       } yield book.getChildElem(EName("Title"))
 
@@ -567,10 +567,10 @@ class QueryTest extends Suite {
 
     val magazines =
       for {
-        magazine <- bookstore \ "Magazine"
+        magazine <- bookstore \ (_.localName == "Magazine")
         magazineTitle = magazine.getChildElem(EName("Title")).trimmedText
         booksWithSameName = for {
-          book <- bookstore \ "Book"
+          book <- bookstore \ (_.localName == "Book")
           bookTitle = book.getChildElem(EName("Title")).trimmedText
           if magazineTitle == bookTitle
         } yield book
@@ -769,7 +769,7 @@ class QueryTest extends Suite {
 
     val books =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         authorNames = {
           val result = for {
             author <- book.filterElems(EName("Author"))
@@ -793,7 +793,7 @@ class QueryTest extends Suite {
 
     val titles =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         authorNames = {
           val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("Last_Name")).trimmedText }
           result.toSet
@@ -824,7 +824,7 @@ class QueryTest extends Suite {
 
     val titleAndFirstNames =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         title = book.getChildElem(EName("Title"))
         authorFirstNames = {
           val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("First_Name")).trimmedText }
@@ -865,8 +865,8 @@ class QueryTest extends Suite {
 
     val prices: immutable.IndexedSeq[Double] =
       for {
-        book <- bookstore \ "Book"
-        price <- book \@ "Price"
+        book <- bookstore \ (_.localName == "Book")
+        price <- book \@ EName("Price")
       } yield price.toDouble
     val averagePrice =
       textElem(QName("Average"), (prices.sum.toDouble / prices.size).toString).build()
@@ -893,7 +893,7 @@ class QueryTest extends Suite {
 
     val prices: immutable.IndexedSeq[Double] =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         price = book.attribute(EName("Price")).toDouble
       } yield price
 
@@ -901,7 +901,7 @@ class QueryTest extends Suite {
 
     val cheapBooks =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         price = book.attribute(EName("Price")).toDouble
         if price < avg
       } yield Elem(
@@ -946,7 +946,7 @@ class QueryTest extends Suite {
 
     val books = {
       for {
-        book <- bookstore \ "Book" sortWith { cheaper _ }
+        book <- bookstore \ (_.localName == "Book") sortWith { cheaper _ }
         price = book.attribute(EName("Price")).toDouble
       } yield Elem(
         resolvedName = EName("Book"),
@@ -1015,7 +1015,7 @@ class QueryTest extends Suite {
     def bookAuthorLastNames(book: Elem): Set[String] = {
       val authors = book.getChildElem(EName("Authors"))
       val result = for {
-        author <- authors \ "Author"
+        author <- authors \ (_.localName == "Author")
         lastName = author getChildElem { _.localName == "Last_Name" }
         lastNameValue: String = lastName.trimmedText
       } yield lastNameValue
@@ -1026,8 +1026,8 @@ class QueryTest extends Suite {
 
     val pairs =
       for {
-        book1 <- bookstore \ "Book"
-        book2 <- bookstore \ "Book"
+        book1 <- bookstore \ (_.localName == "Book")
+        book2 <- bookstore \ (_.localName == "Book")
         if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
         if bookTitle(book1) < bookTitle(book2)
       } yield Elem(
@@ -1084,7 +1084,7 @@ class QueryTest extends Suite {
 
     def books(authorLastName: String) =
       for {
-        book <- bookstore \ "Book"
+        book <- bookstore \ (_.localName == "Book")
         author <- book.filterElems(EName("Author"))
         if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
@@ -1331,8 +1331,8 @@ class QueryTest extends Suite {
 
     val authorLastNames =
       for {
-        authorsElm <- bookElm \ "Authors"
-        lastNameElm <- authorsElm \\ "Last_Name"
+        authorsElm <- bookElm \ (_.localName == "Authors")
+        lastNameElm <- authorsElm \\ (_.localName == "Last_Name")
       } yield lastNameElm.text
     val firstAuthorLastName = authorLastNames.head
 

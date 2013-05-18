@@ -66,21 +66,21 @@ class XmlToFlatFileTest extends Suite {
 
     val columnMapping = Vector(
       { bookElem: Elem =>
-        val id = (bookElem \@ "id").mkString.trim
+        val id = (bookElem \@ EName("id")).mkString.trim
         id.padTo(5, ' ').take(5)
       },
       { bookElem: Elem =>
-        val lastName = (bookElem \ "author").map(_.text).mkString.split(',').apply(0).trim
+        val lastName = (bookElem \ (_.localName == "author")).map(_.text).mkString.split(',').apply(0).trim
         lastName.padTo(15, ' ').take(15)
       },
       { bookElem: Elem =>
-        val firstName = (bookElem \ "author").map(_.text).mkString.split(',').apply(1).trim
+        val firstName = (bookElem \ (_.localName == "author")).map(_.text).mkString.split(',').apply(1).trim
         firstName.padTo(10, ' ').take(10)
       })
 
     val separator = System.getProperty("line.separator")
 
-    val rows = (rootElem \ "book") map { e =>
+    val rows = (rootElem \ (_.localName == "book")) map { e =>
       val columns = columnMapping map { f => f(e) }
       columns.mkString + separator
     }

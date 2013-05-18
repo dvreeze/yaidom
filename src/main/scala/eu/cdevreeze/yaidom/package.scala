@@ -137,7 +137,7 @@ package eu.cdevreeze
  *
  * val bookElms =
  *   for {
- *     bookElm <- bookstoreElm \ "Book"
+ *     bookElm <- bookstoreElm \ (_.localName == "Book")
  *     price <- bookElm \@ EName("Price")
  *     if price.toInt < 90
  *   } yield bookElm
@@ -158,7 +158,7 @@ package eu.cdevreeze
  * val ullmanBookElms =
  *   for {
  *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
- *     if (bookElm \\ "Author") exists { e =>
+ *     if (bookElm \\ (_.localName == "Author")) exists { e =>
  *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
  *     }

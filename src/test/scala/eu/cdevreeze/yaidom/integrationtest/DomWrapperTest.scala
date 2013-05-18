@@ -625,14 +625,14 @@ class DomWrapperTest extends Suite {
     val recordsElm = domDoc.documentElement
 
     expectResult(3) {
-      (recordsElm \ "car").size
+      (recordsElm \ (_.localName == "car")).size
     }
 
     expectResult(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ "car")(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
     expectResult("car") {
       firstRecordElm.localName
@@ -647,13 +647,13 @@ class DomWrapperTest extends Suite {
     }
 
     expectResult(2) {
-      val carElms = recordsElm \ "car"
+      val carElms = recordsElm \ (_.localName == "car")
       val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
       result.size
     }
 
     expectResult(Set("Holden", "Peel")) {
-      val carElms = recordsElm \ "car"
+      val carElms = recordsElm \ (_.localName == "car")
       val pattern = ".*s.*a.*".r.pattern
 
       val resultElms = carElms filter { e =>
@@ -686,12 +686,12 @@ class DomWrapperTest extends Suite {
     val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")) == Some("AddressRecord") }
 
     expectResult(Some("AddressRecord")) {
-      anElementDeclOption flatMap { e => (e \@ "name") }
+      anElementDeclOption flatMap { e => (e \@ EName("name")) }
     }
 
     val tnsOption = anElementDeclOption flatMap { e =>
       val ancestorOption = e findAncestor (ancestorElm => ancestorElm.resolvedName == EName(nsXmlSchema, "schema"))
-      ancestorOption flatMap { e => (e \@ "targetNamespace") }
+      ancestorOption flatMap { e => (e \@ EName("targetNamespace")) }
     }
 
     expectResult(Some("http://xasb.org/gaap")) {

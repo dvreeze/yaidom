@@ -281,11 +281,11 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
     expectResult(true) {
-      val phoneElms = (rootElm \\ "phone") filter { e => e.text.size == 1000 }
+      val phoneElms = (rootElm \\ (_.localName == "phone")) filter { e => e.text.size == 1000 }
       phoneElms.size < 4000
     }
     expectResult(true) {
-      val phoneElms = (rootElm \\ "phone") filter { e => e.text.size == 2046 }
+      val phoneElms = (rootElm \\ (_.localName == "phone")) filter { e => e.text.size == 2046 }
       phoneElms.size > 15000
     }
 

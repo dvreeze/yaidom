@@ -71,12 +71,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -136,12 +136,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -206,12 +206,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -315,12 +315,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -449,12 +449,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -567,12 +567,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -675,12 +675,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -745,12 +745,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -836,12 +836,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS", QName("app", "system") -> "R32")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS", EName(nsApp, "system") -> "R32")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -881,12 +881,12 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS", QName("prod", "system") -> "R32")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS", EName(ns, "system") -> "R32")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
@@ -977,22 +977,22 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
 
     expectResult(Map(QName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName("system") -> "US-DRESS")) {
-      val sizeElemOption = (doc.documentElement \\ "size").headOption
+      val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map()) {
-      val nameElemOption = (doc.documentElement \\ "name").headOption
+      val nameElemOption = (doc.documentElement \\ (_.localName == "name")).headOption
       nameElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
     expectResult(Map(EName(nsProd2, "value") -> "blue")) {
-      val colorElemOption = (doc.documentElement \\ "color").headOption
+      val colorElemOption = (doc.documentElement \\ (_.localName == "color")).headOption
       colorElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 

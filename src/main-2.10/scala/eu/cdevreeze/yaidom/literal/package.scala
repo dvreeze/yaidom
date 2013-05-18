@@ -22,8 +22,8 @@ package eu.cdevreeze.yaidom
  * Example usage:
  * {{{
  * def transformBook(book: Elem): Elem = {
- *   val title = (book \ "Title").map(_.text).mkString
- *   val isbn = (book \@ "ISBN").getOrElse("")
+ *   val title = (book \ (_.localName == "Title")).map(_.text).mkString
+ *   val isbn = (book \@ EName("ISBN")).getOrElse("")
  *
  *   xmlElem"""&lt;book title=${ title } isbn=${ isbn }&gt;
  *   &lt;/book&gt;"""
@@ -31,7 +31,7 @@ package eu.cdevreeze.yaidom
  *
  * xmlDoc"""&lt;bookstore bookCount=${ books.size.toString }&gt;
  * ${
- *   for (book <- bookstore \ "Book")
+ *   for (book <- bookstore \ (_.localName == "Book"))
  *   yield transformBook(book)
  * }
  * &lt;/bookstore&gt;"""

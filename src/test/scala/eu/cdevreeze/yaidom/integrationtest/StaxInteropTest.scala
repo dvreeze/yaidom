@@ -1004,14 +1004,14 @@ class StaxInteropTest extends Suite {
     val recordsElm = doc.documentElement
 
     expectResult(3) {
-      (recordsElm \ "car").size
+      (recordsElm \ (_.localName == "car")).size
     }
 
     expectResult(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ "car")(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
     expectResult("car") {
       firstRecordElm.localName
@@ -1026,13 +1026,13 @@ class StaxInteropTest extends Suite {
     }
 
     expectResult(2) {
-      val carElms = recordsElm \ "car"
+      val carElms = recordsElm \ (_.localName == "car")
       val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
       result.size
     }
 
     expectResult(Set("Holden", "Peel")) {
-      val carElms = recordsElm \ "car"
+      val carElms = recordsElm \ (_.localName == "car")
       val pattern = ".*s.*a.*".r.pattern
 
       val resultElms = carElms filter { e =>
@@ -1059,7 +1059,7 @@ class StaxInteropTest extends Suite {
     }
 
     expectResult(List("Royale", "P50", "HSV Maloo")) {
-      val carElms = recordsElm \ "car"
+      val carElms = recordsElm \ (_.localName == "car")
       val resultElms = carElms sortBy { e => e.attributeOption(EName("year")).getOrElse("0").toInt }
       resultElms map { e => e.attribute(EName("name")) }
     }
@@ -1079,10 +1079,10 @@ class StaxInteropTest extends Suite {
     val root: Elem = staxParser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
     expectResult(4) {
-      (root \\! "Book").size
+      (root \\! (_.localName == "Book")).size
     }
     expectResult(4) {
-      (root \\! "Magazine").size
+      (root \\! (_.localName == "Magazine")).size
     }
   }
 

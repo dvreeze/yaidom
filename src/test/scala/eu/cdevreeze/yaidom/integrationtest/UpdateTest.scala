@@ -196,9 +196,9 @@ class UpdateTest extends Suite {
 
     val pf: PartialFunction[Elem, Elem] = {
       case e: Elem if e.localName == "Employee" =>
-        val gender = (e \ "gender") map (_.text) mkString ""
+        val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
-        val newId = genderPrefix + (e \@ "id").head
+        val newId = genderPrefix + (e \@ EName("id")).head
 
         val scope = e.scope ++ Scope.from("" -> "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser")
         val salaryElem = textElem(QName("salary"), "10000").build(scope)
@@ -221,16 +221,16 @@ class UpdateTest extends Suite {
     // Is the parsed expected update result indeed as expected?
 
     expectResult(Seq("M1", "F2")) {
-      (expectedResolvedNewRoot \\ "Employee") flatMap (_ \@ "id")
+      (expectedResolvedNewRoot \\ (_.localName == "Employee")) flatMap (_ \@ EName("id"))
     }
     expectResult(Seq("PANKAJ", "LISA")) {
-      (expectedResolvedNewRoot \\ "name") map (_.text)
+      (expectedResolvedNewRoot \\ (_.localName == "name")) map (_.text)
     }
     expectResult(Seq()) {
-      (expectedResolvedNewRoot \\ "gender")
+      (expectedResolvedNewRoot \\ (_.localName == "gender"))
     }
     expectResult(Seq("10000", "10000")) {
-      (expectedResolvedNewRoot \\ "salary") map (_.text)
+      (expectedResolvedNewRoot \\ (_.localName == "salary")) map (_.text)
     }
 
     // Finally we check the result of the functional update against this parsed expected update result
@@ -262,9 +262,9 @@ class UpdateTest extends Suite {
 
     val pf: PartialFunction[Elem, Elem] = {
       case e: Elem if e.localName == "Employee" =>
-        val gender = (e \ "gender") map (_.text) mkString ""
+        val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
-        val newId = genderPrefix + (e \@ "id").head
+        val newId = genderPrefix + (e \@ EName("id")).head
 
         val scope = e.scope ++ Scope.from("" -> "http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser")
         val salaryElem = textElem(QName("salary"), "10000").build(scope)
@@ -289,16 +289,16 @@ class UpdateTest extends Suite {
     // Is the parsed expected update result indeed as expected?
 
     expectResult(Seq("M1", "F2")) {
-      (expectedResolvedNewRoot \\ "Employee") flatMap (_ \@ "id")
+      (expectedResolvedNewRoot \\ (_.localName == "Employee")) flatMap (_ \@ EName("id"))
     }
     expectResult(Seq("Pankaj", "Lisa")) {
-      (expectedResolvedNewRoot \\ "name") map (_.text)
+      (expectedResolvedNewRoot \\ (_.localName == "name")) map (_.text)
     }
     expectResult(Seq()) {
-      (expectedResolvedNewRoot \\ "gender")
+      (expectedResolvedNewRoot \\ (_.localName == "gender"))
     }
     expectResult(Seq("10000", "10000")) {
-      (expectedResolvedNewRoot \\ "salary") map (_.text)
+      (expectedResolvedNewRoot \\ (_.localName == "salary")) map (_.text)
     }
 
     // Finally we check the result of the functional update against this parsed expected update result

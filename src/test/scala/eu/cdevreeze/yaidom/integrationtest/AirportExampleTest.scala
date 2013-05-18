@@ -122,7 +122,7 @@ class AirportExampleTest extends Suite {
     // 3. Check elevation query results
 
     def highestAirport(root: Elem): Elem = {
-      val tableElms = root \\ "Table"
+      val tableElms = root \\ (_.localName == "Table")
       val sorted = tableElms sortBy { (e: Elem) =>
         e findChildElem { _.localName == "RunwayElevationFeet" } map { e => e.trimmedText.toInt } getOrElse (0)
       }
@@ -357,8 +357,8 @@ class AirportExampleTest extends Suite {
 
       val distances =
         for {
-          distanceElm <- airportElm \\ "Distance"
-          airportElm <- distanceElm \ "Airport"
+          distanceElm <- airportElm \\ (_.localName == "Distance")
+          airportElm <- distanceElm \ (_.localName == "Airport")
           if airportElm.attribute(EName("code")) == "BRU"
         } yield airportElm.trimmedText.toDouble
       val distance = distances.headOption.getOrElse(sys.error("Expected distance to BRU"))

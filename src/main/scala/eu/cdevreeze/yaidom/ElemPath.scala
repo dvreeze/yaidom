@@ -198,8 +198,7 @@ object ElemPath {
 
   /** An entry in an `ElemPath`, as an expanded element name plus zero-based index of the elem as child element (with that name) of the parent. */
   final case class Entry(elementName: EName, index: Int) extends Immutable {
-
-    require(elementName ne null)
+    // Note that elementName is a value class instance
     require(index >= 0)
 
     /** Position (1-based) of the element as child of the parent. Is 1 + index. */

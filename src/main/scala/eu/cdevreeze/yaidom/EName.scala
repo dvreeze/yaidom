@@ -29,30 +29,31 @@ import javax.xml.namespace.{ QName => JQName }
  * The short class name illustrates that expanded names are at least as important as qualified names, and should be
  * equally easy to construct (using the companion object).
  *
- * Typical usage may lead to an explosion of different EName objects that are equal. That is a bit wasteful.
- * Of course the user can define constants for ENames that are used often. Maybe in the future SIP-15 (value classes)
- * can help make ENames completely inlined, thus making it efficient to use them at a large scale.
+ * Class EName is a value class for efficiency, thus avoiding an explosion of objects that are equal.
  *
  * @author Chris de Vreeze
  */
-final case class EName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
-  require(namespaceUriOption ne null)
-  require {
-    namespaceUriOption forall { ns => (ns ne null) && (ns.length > 0) }
-  }
-  require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
+final class EName private (val value: String) extends AnyVal with Serializable {
+  import EName._
+
+  def namespaceUriOption: Option[String] = parseNamespaceUriOption(value)
+
+  def localPart: String = parseLocalPart(value)
 
   /** Given an optional prefix, creates a `QName` from this `EName` */
   def toQName(prefixOption: Option[String]): QName = {
-    require(namespaceUriOption.isDefined || prefixOption.isEmpty)
-    QName(prefixOption, localPart)
+    val nsUriOption = namespaceUriOption
+    val localName = localPart
+    require(nsUriOption.isDefined || prefixOption.isEmpty)
+    QName(prefixOption, localName)
   }
 
   /** Given an optional prefix, creates a `javax.xml.namespace.QName` from this EName */
   def toJavaQName(prefixOption: Option[String]): JQName = {
-    require(namespaceUriOption.isDefined || prefixOption.isEmpty)
-    new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
+    val nsUriOption = namespaceUriOption
+    val localName = localPart
+    require(nsUriOption.isDefined || prefixOption.isEmpty)
+    new JQName(nsUriOption.getOrElse(XMLConstants.NULL_NS_URI), localName, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
   }
 
   /** The `String` representation, in the format of the `javax.xml.namespace.QName.toString` method */
@@ -61,30 +62,64 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
 
 object EName {
 
-  /** Creates an `EName` from a namespaceUri and a localPart */
-  def apply(namespaceUri: String, localPart: String): EName = EName(Some(namespaceUri), localPart)
-
-  /** Shorthand for `parse(s)` */
-  def apply(s: String): EName = parse(s)
-
-  /** Creates an `EName` from a `javax.xml.namespace.QName` */
-  def fromJavaQName(jqname: JQName): EName = jqname match {
-    case jqname: JQName if (jqname.getNamespaceURI eq null) || (jqname.getNamespaceURI == XMLConstants.NULL_NS_URI) =>
-      EName(None, jqname.getLocalPart)
-    case _ => EName(Some(jqname.getNamespaceURI), jqname.getLocalPart)
+  /** Creates an `EName` from an optional namespaceUri and a localPart */
+  def apply(namespaceUriOption: Option[String], localPart: String): EName = {
+    if (namespaceUriOption.isEmpty) apply(localPart) else {
+      val nsUri = namespaceUriOption.get
+      apply(s"{$nsUri}$localPart")
+    }
   }
 
-  /** Parses a `String` into an `EName`. The `String` must conform to the `toString` format of an `EName` */
-  def parse(s: String): EName = s match {
-    case s if s.startsWith("{") =>
-      val idx = s indexWhere { c => c == '}' }
-      require(idx >= 2 && idx < s.length - 1)
-      val ns = s.slice(1, idx)
-      val localPart = s.slice(idx + 1, s.length)
-      EName(Some(ns), localPart)
-    case _ =>
-      require(s.indexOf("{") < 0)
-      require(s.indexOf("}") < 0)
-      EName(None, s)
+  /** Creates an `EName` from a namespaceUri and a localPart */
+  def apply(namespaceUri: String, localPart: String): EName = {
+    apply(s"{$namespaceUri}$localPart")
+  }
+
+  /** Shorthand for `new EName(s)`, but first checking the string value */
+  def apply(s: String): EName = {
+    check(s)
+    new EName(s)
+  }
+
+  /** Creates an `EName` from a `javax.xml.namespace.QName` */
+  def fromJavaQName(jqname: JQName): EName = EName(jqname.toString)
+
+  private def parseNamespaceUriOption(value: String): Option[String] = {
+    if (value.startsWith("{")) {
+      val idx = value.indexOf('}')
+      require(idx >= 2 && idx < value.length - 1)
+      val ns = value.substring(1, idx)
+      Some(ns)
+    } else {
+      require(value.indexOf("{") < 0)
+      require(value.indexOf("}") < 0)
+      None
+    }
+  }
+
+  private def parseLocalPart(value: String): String = {
+    if (value.startsWith("{")) {
+      val idx = value.indexOf('}')
+      require(idx >= 2 && idx < value.length - 1)
+      val localName = value.substring(idx + 1, value.length)
+      localName
+    } else {
+      require(value.indexOf("{") < 0)
+      require(value.indexOf("}") < 0)
+      value
+    }
+  }
+
+  private def check(value: String) {
+    require(value ne null)
+    val nsUriOption = parseNamespaceUriOption(value)
+    val localName = parseLocalPart(value)
+
+    require(nsUriOption ne null)
+    require {
+      nsUriOption forall { ns => (ns ne null) && (ns.length > 0) }
+    }
+    require(localName ne null)
+    require(XmlStringUtils.isAllowedElementLocalName(localName), "'%s' is not an allowed name".format(localName))
   }
 }

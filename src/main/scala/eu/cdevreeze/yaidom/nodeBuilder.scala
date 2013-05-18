@@ -106,7 +106,7 @@ final class ElemBuilder(
   val namespaces: Declarations,
   val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] { self =>
 
-  require(qname ne null)
+  // Note that qname is a value class instance
   require(attributes ne null)
   require(namespaces ne null)
   require(children ne null)

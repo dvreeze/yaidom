@@ -80,27 +80,27 @@ class BasicXmlProcessingTest extends Suite {
       foo.removeAllInterElementWhitespace.findAllElemsOrSelf.map(_.text).mkString
     }
 
-    val bars = foo \ "bar"
+    val bars = foo \ (_.localName == "bar")
 
     expectResult(List("bar", "bar", "bar")) {
       bars map { _.localName }
     }
 
     expectResult("hi 1 yellow") {
-      val bars = foo \ "bar"
+      val bars = foo \ (_.localName == "bar")
       bars map { _.text } mkString " "
     }
 
     expectResult(List("greet", "count", "color")) {
-      (foo \ "bar") map { _.attributeOption(EName("type")).getOrElse("") }
+      (foo \ (_.localName == "bar")) map { _.attributeOption(EName("type")).getOrElse("") }
     }
     expectResult(List("greet", "count", "color")) {
       // Knowing that the attribute "type" is always present
-      (foo \ "bar") map { _.attribute(EName("type")) }
+      (foo \ (_.localName == "bar")) map { _.attribute(EName("type")) }
     }
 
     expectResult(List("greet" -> "hi", "count" -> "1", "color" -> "yellow")) {
-      (foo \ "bar") map { e => (e.attribute(EName("type")) -> e.text) }
+      (foo \ (_.localName == "bar")) map { e => (e.attribute(EName("type")) -> e.text) }
     }
 
     // Again verbose but "precise" creation of an Elem
@@ -127,14 +127,14 @@ class BasicXmlProcessingTest extends Suite {
                 qname = QName("z"),
                 attributes = Vector(QName("x") -> "4")))))).build()
 
-    val zs = baz \\ "z"
+    val zs = baz \\ (_.localName == "z")
 
     expectResult(List("z", "z", "z", "z")) {
       zs map { _.localName }
     }
 
     expectResult(List("1", "2", "3", "4")) {
-      (baz \\ "z") map { _.attribute(EName("x")) }
+      (baz \\ (_.localName == "z")) map { _.attribute(EName("x")) }
     }
 
     val fooString = """<foo><bar type="greet">hi</bar><bar type="count">1</bar><bar type="color">yellow</bar></foo>"""
@@ -161,7 +161,7 @@ class BasicXmlProcessingTest extends Suite {
     val docParser = DocumentParserUsingSax.newInstance
     val musicElm: Elem = docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
 
-    val songs = (musicElm \\ "song") map { songElm =>
+    val songs = (musicElm \\ (_.localName == "song")) map { songElm =>
       Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))
     }
 
@@ -171,14 +171,14 @@ class BasicXmlProcessingTest extends Suite {
       totalTime
     }
 
-    val artists = (musicElm \ "artist") map { artistElm =>
+    val artists = (musicElm \ (_.localName == "artist")) map { artistElm =>
       val name = artistElm.attribute(EName("name"))
 
-      val albums = (artistElm \ "album") map { albumElm =>
+      val albums = (artistElm \ (_.localName == "album")) map { albumElm =>
         val title = albumElm.attribute(EName("title"))
         val description = albumElm.getChildElem(EName("description")).text
 
-        val songs = (albumElm \ "song") map { songElm =>
+        val songs = (albumElm \ (_.localName == "song")) map { songElm =>
           Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))
         }
 
