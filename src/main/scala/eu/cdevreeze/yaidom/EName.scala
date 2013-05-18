@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom
 
 import javax.xml.XMLConstants
 import javax.xml.namespace.{ QName => JQName }
+import EName._
 
 /**
  * Expanded name. See http://www.w3.org/TR/xml-names11/. It has a localPart and an optional namespace URI.
@@ -34,7 +35,6 @@ import javax.xml.namespace.{ QName => JQName }
  * @author Chris de Vreeze
  */
 final class EName private (val value: String) extends AnyVal with Serializable {
-  import EName._
 
   def namespaceUriOption: Option[String] = parseNamespaceUriOption(value)
 
@@ -101,7 +101,7 @@ object EName {
     if (value.startsWith("{")) {
       val idx = value.indexOf('}')
       require(idx >= 2 && idx < value.length - 1)
-      val localName = value.substring(idx + 1, value.length)
+      val localName = value.substring(idx + 1)
       localName
     } else {
       require(value.indexOf("{") < 0)

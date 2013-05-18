@@ -22,6 +22,7 @@ import java.net.URI
 import javax.xml.XMLConstants
 import javax.xml.stream._
 import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
+import javax.xml.namespace.{ QName => JQName }
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable, Iterator, BufferedIterator }
 import StaxEventsToYaidomConversions._
@@ -305,12 +306,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val currScope = parentScope.resolve(declarations)
 
     val elemEName = EName.fromJavaQName(startElement.getName)
-    val elemPrefixOption: Option[String] = QName.prefixOptionFromJavaQName(startElement.getName)
+    val elemPrefixOption: Option[String] = prefixOptionFromJavaQName(startElement.getName)
 
     val currAttrs: immutable.IndexedSeq[(QName, String)] = {
       val attributes: List[Attribute] = startElement.getAttributes.asScala.toList collect { case a: Attribute => a }
       val result = attributes map { a =>
-        val prefixOption: Option[String] = QName.prefixOptionFromJavaQName(a.getName)
+        val prefixOption: Option[String] = prefixOptionFromJavaQName(a.getName)
         val name = EName.fromJavaQName(a.getName).toQName(prefixOption)
         (name -> a.getValue)
       }
@@ -320,6 +321,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here
 
     Elem(elemEName.toQName(elemPrefixOption), currAttrs, currScope, immutable.IndexedSeq())
+  }
+
+  /** Gets an optional prefix from a `javax.xml.namespace.QName` */
+  private def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
+    val prefix: String = jqname.getPrefix
+    if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
 }
 
