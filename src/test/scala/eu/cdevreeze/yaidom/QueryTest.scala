@@ -40,9 +40,6 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val bookTitles =
       (bookstore \ "Book") map { e => e getChildElem (_.localName == "Title") }
@@ -57,7 +54,7 @@ class QueryTest extends Suite {
     }
 
     val bookTitlePaths =
-      bookstore findTopmostElemPaths { _.localName == "Title" } filter { path => path.containsName(ename("Book")) }
+      bookstore findTopmostElemPaths { _.localName == "Title" } filter { path => path.containsName(EName("Book")) }
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -73,9 +70,6 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     // Using only the ParentElemLike API (except for method localName)...
 
@@ -98,8 +92,8 @@ class QueryTest extends Suite {
 
     val bookOrMagazineTitlePaths =
       for {
-        titlePath <- bookstore filterElemPaths { _.resolvedName == ename("Title") }
-        if titlePath.parentPath.endsWithName(ename("Book")) || titlePath.parentPath.endsWithName(ename("Magazine"))
+        titlePath <- bookstore filterElemPaths { _.resolvedName == EName("Title") }
+        if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
       } yield titlePath
 
     expectResult(Set(
@@ -118,12 +112,9 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val titles =
-      for (ch <- bookstore.findAllChildElems) yield ch.getChildElem(ename("Title"))
+      for (ch <- bookstore.findAllChildElems) yield ch.getChildElem(EName("Title"))
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -138,7 +129,7 @@ class QueryTest extends Suite {
 
     val titlePaths =
       for {
-        titlePath <- bookstore findTopmostElemPaths { _.resolvedName == ename("Title") }
+        titlePath <- bookstore findTopmostElemPaths { _.resolvedName == EName("Title") }
         if titlePath.entries.size == 2
       } yield titlePath
 
@@ -158,9 +149,6 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val titles =
       for (title <- bookstore filterElems (_.localName == "Title")) yield title
@@ -197,9 +185,6 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//*
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val elements = bookstore.findAllElemsOrSelf
 
@@ -227,14 +212,11 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     // Using only the ParentElemLike API (except for method localName)...
 
     val isbns =
-      for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(ename("ISBN"))
+      for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
 
     expectResult(Set(
       "ISBN-0-13-713526-2",
@@ -250,7 +232,7 @@ class QueryTest extends Suite {
       "ISBN-0-11-222222-3",
       "ISBN-9-88-777777-6")) {
       val result =
-        for (bookPath <- bookstore filterChildElemPaths (e => e.localName == "Book")) yield bookstore.getWithElemPath(bookPath).attribute(ename("ISBN"))
+        for (bookPath <- bookstore filterChildElemPaths (e => e.localName == "Book")) yield bookstore.getWithElemPath(bookPath).attribute(EName("ISBN"))
       result.toSet
     }
   }
@@ -259,9 +241,6 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val books =
       for {
@@ -274,7 +253,7 @@ class QueryTest extends Suite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(ename("Title")) map { _.trimmedText } }
+      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
 
@@ -283,7 +262,7 @@ class QueryTest extends Suite {
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
       val result = books flatMap { book =>
-        book findElemPath (e => e.resolvedName == ename("Title")) map
+        book findElemPath (e => e.resolvedName == EName("Title")) map
           { path => book.getWithElemPath(path).trimmedText }
       }
       result.toSet
@@ -294,16 +273,13 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val titles =
       for {
         book <- bookstore \ "Book"
         price <- book \@ "Price"
         if price.toInt < 90
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -318,9 +294,9 @@ class QueryTest extends Suite {
     val titles2 =
       for {
         book <- bookstore filterChildElems { _.localName == "Book" }
-        price <- book.attributeOption(ename("Price"))
+        price <- book.attributeOption(EName("Price"))
         if price.toInt < 90
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -331,9 +307,9 @@ class QueryTest extends Suite {
     }
 
     val titlePaths = bookstore.findAllElemPaths filter { path =>
-      path.endsWithName(ename("Title")) && {
+      path.endsWithName(EName("Title")) && {
         val parentElm = bookstore.getWithElemPath(path.parentPath)
-        parentElm.localName == "Book" && parentElm.attribute(ename("Price")).toInt < 90
+        parentElm.localName == "Book" && parentElm.attribute(EName("Price")).toInt < 90
       }
     }
 
@@ -350,9 +326,6 @@ class QueryTest extends Suite {
     // Own example..
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val cheapBookElms =
       for {
@@ -390,15 +363,12 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val bookTitles =
       for {
         book <- bookstore \ "Book"
-        if !book.filterChildElems(ename("Remark")).isEmpty
-      } yield book.getChildElem(ename("Title"))
+        if !book.filterChildElems(EName("Remark")).isEmpty
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "Database Systems: The Complete Book",
@@ -412,18 +382,15 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val bookTitles =
       for {
         book <- bookstore \ "Book"
-        if book.attribute(ename("Price")).toInt < 90
+        if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
         authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
         if authorLastName == "Ullman"
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -434,17 +401,17 @@ class QueryTest extends Suite {
 
     val bookTitlePaths =
       bookstore findTopmostElemPaths { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } filter { path =>
-        require(path.endsWithName(ename("Last_Name")))
-        path.containsName(ename("Book")) && {
-          val bookPath = path.ancestorPaths.filter(_.endsWithName(ename("Book"))).head
+        require(path.endsWithName(EName("Last_Name")))
+        path.containsName(EName("Book")) && {
+          val bookPath = path.ancestorPaths.filter(_.endsWithName(EName("Book"))).head
           val bookElm = bookstore.getWithElemPath(bookPath)
-          bookElm.attribute(ename("Price")).toInt < 90
+          bookElm.attribute(EName("Price")).toInt < 90
         }
       } flatMap { path =>
-        require(path.endsWithName(ename("Last_Name")))
-        val bookPath = path.ancestorPaths.filter(_.endsWithName(ename("Book"))).head
+        require(path.endsWithName(EName("Last_Name")))
+        val bookPath = path.ancestorPaths.filter(_.endsWithName(EName("Book"))).head
         val bookElm = bookstore.getWithElemPath(bookPath)
-        val titlePathOption = bookElm findElemPath { e => e.resolvedName == ename("Title") } map
+        val titlePathOption = bookElm findElemPath { e => e.resolvedName == EName("Title") } map
           { relativeTitlePath => bookPath ++ relativeTitlePath }
         titlePathOption
       }
@@ -461,20 +428,17 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val bookTitles =
       for {
         book <- bookstore \ "Book"
-        if book.attribute(ename("Price")).toInt < 90
+        if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
         authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ "Last_Name" } map { _.trimmedText }
         if authorLastName == "Ullman"
         authorFirstName <- authors \ { _.localName == "Author" } flatMap { e => e \ "First_Name" } map { _.trimmedText }
         if authorFirstName == "Jeffrey"
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -488,20 +452,17 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val bookTitles =
       for {
         book <- bookstore \ "Book"
-        authors = book.getChildElem(ename("Authors"))
+        authors = book.getChildElem(EName("Authors"))
         lastNameStrings = for {
           author <- authors \ "Author"
-          lastNameString = author.getChildElem(ename("Last_Name")).trimmedText
+          lastNameString = author.getChildElem(EName("Last_Name")).trimmedText
         } yield lastNameString
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "Hector and Jeff's Database Hints")) {
@@ -514,9 +475,6 @@ class QueryTest extends Suite {
     // Own example
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val bookElms =
       for {
@@ -563,14 +521,11 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//Authors/Author[2]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val secondAuthors =
       for {
         book <- bookstore \ "Book"
-        authors = book.getChildElem(ename("Authors"))
+        authors = book.getChildElem(EName("Authors"))
         authorColl = authors \ "Author"
         if authorColl.size >= 2
         secondAuthor <- authorColl.drop(1).headOption
@@ -590,16 +545,13 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//Book[contains(Remark, "great")]/Title
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val titles =
       for {
         book <- bookstore \ "Book"
         remark <- book \ "Remark"
         if remark.trimmedText.indexOf("great") >= 0
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set("Database Systems: The Complete Book")) {
       val result = titles map { _.trimmedText }
@@ -611,24 +563,21 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val magazines =
       for {
         magazine <- bookstore \ "Magazine"
-        magazineTitle = magazine.getChildElem(ename("Title")).trimmedText
+        magazineTitle = magazine.getChildElem(EName("Title")).trimmedText
         booksWithSameName = for {
           book <- bookstore \ "Book"
-          bookTitle = book.getChildElem(ename("Title")).trimmedText
+          bookTitle = book.getChildElem(EName("Title")).trimmedText
           if magazineTitle == bookTitle
         } yield book
         if !booksWithSameName.isEmpty
       } yield magazine
 
     expectResult(Set("Hector and Jeff's Database Hints")) {
-      val result = magazines flatMap { mag => mag.findElem(ename("Title")) map { _.trimmedText } }
+      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
@@ -637,9 +586,6 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
       def getChildPathEntry(e: Elem, nodeIdx: Int): ElemPath.Entry = {
@@ -671,7 +617,7 @@ class QueryTest extends Suite {
     val elms =
       for {
         desc <- bookStoreWithPaths.findAllElems
-        path = ElemPath.fromCanonicalXPath(desc.attribute(ename("elemPath")))(Scope.Empty)
+        path = ElemPath.fromCanonicalXPath(desc.attribute(EName("elemPath")))(Scope.Empty)
         parent <- bookstore.findWithElemPath(path.parentPath)
         if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
       } yield desc
@@ -707,14 +653,11 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val booksAndMagazines =
       for {
         bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-        titleString: String = bookOrMagazine.getChildElem(ename("Title")).trimmedText
+        titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         otherBooksAndMagazines = {
           val result = bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
           result.toSet -- Set(bookOrMagazine)
@@ -728,7 +671,7 @@ class QueryTest extends Suite {
       } yield bookOrMagazine
 
     expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = booksAndMagazines flatMap { mag => mag.findElem(ename("Title")) map { _.trimmedText } }
+      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
 
@@ -738,23 +681,23 @@ class QueryTest extends Suite {
       for {
         bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
         bookOrMagazine = bookstore.getWithElemPath(bookOrMagazinePath)
-        title = bookOrMagazine.getChildElem(ename("Title")).trimmedText
+        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
         nextChildren = bookstore.children.drop(nodeIndex + 1)
         prevChildren = bookstore.children.take(nodeIndex)
         nextOption = nextChildren find {
-          case e: Elem if (e.getChildElem(ename("Title")).trimmedText == title) => true
+          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
           case n: Node => false
         } collect { case e: Elem => e }
         prevOption = prevChildren find {
-          case e: Elem if (e.getChildElem(ename("Title")).trimmedText == title) => true
+          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
           case n: Node => false
         } collect { case e: Elem => e }
         if (nextOption.isDefined || prevOption.isDefined)
       } yield bookOrMagazinePath
 
     expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(ename("Title")) map { _.trimmedText } }
+      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
@@ -763,15 +706,12 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val booksAndMagazines =
       for {
         bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-        titleString: String = bookOrMagazine.getChildElem(ename("Title")).trimmedText
-        otherBooks = bookstore.filterChildElems(ename("Book")).toSet -- Set(bookOrMagazine)
+        titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
+        otherBooks = bookstore.filterChildElems(EName("Book")).toSet -- Set(bookOrMagazine)
         titles = otherBooks map { e => e getChildElem { _.localName == "Title" } }
         titleStrings = {
           val result = titles map { _.trimmedText }
@@ -781,7 +721,7 @@ class QueryTest extends Suite {
       } yield bookOrMagazine
 
     expectResult(Set("Hector and Jeff's Database Hints")) {
-      val result = booksAndMagazines flatMap { mag => mag.findElem(ename("Title")) map { _.trimmedText } }
+      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
 
@@ -791,23 +731,23 @@ class QueryTest extends Suite {
       for {
         bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
         bookOrMagazine = bookstore.getWithElemPath(bookOrMagazinePath)
-        title = bookOrMagazine.getChildElem(ename("Title")).trimmedText
+        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
         nextChildren = bookstore.children.drop(nodeIndex + 1)
         prevChildren = bookstore.children.take(nodeIndex)
         nextBookOption = nextChildren find {
-          case e: Elem if (e.localName == "Book") && (e.getChildElem(ename("Title")).trimmedText == title) => true
+          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
           case n: Node => false
         } collect { case e: Elem => e }
         prevBookOption = prevChildren find {
-          case e: Elem if (e.localName == "Book") && (e.getChildElem(ename("Title")).trimmedText == title) => true
+          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
           case n: Node => false
         } collect { case e: Elem => e }
         if (nextBookOption.isDefined || prevBookOption.isDefined)
       } yield bookOrMagazinePath
 
     expectResult(Set("Hector and Jeff's Database Hints")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(ename("Title")) map { _.trimmedText } }
+      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
@@ -826,17 +766,14 @@ class QueryTest extends Suite {
    */
   @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val books =
       for {
         book <- bookstore \ "Book"
         authorNames = {
           val result = for {
-            author <- book.filterElems(ename("Author"))
-            firstName = author.getChildElem(ename("First_Name"))
+            author <- book.filterElems(EName("Author"))
+            firstName = author.getChildElem(EName("First_Name"))
           } yield firstName.trimmedText
           result.toSet
         }
@@ -844,7 +781,7 @@ class QueryTest extends Suite {
       } yield book
 
     expectResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(ename("Title")) map { _.trimmedText } }
+      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
@@ -853,19 +790,16 @@ class QueryTest extends Suite {
     // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val titles =
       for {
         book <- bookstore \ "Book"
         authorNames = {
-          val result = book.filterElems(ename("Author")) map { _.getChildElem(ename("Last_Name")).trimmedText }
+          val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("Last_Name")).trimmedText }
           result.toSet
         }
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
-      } yield book.getChildElem(ename("Title"))
+      } yield book.getChildElem(EName("Title"))
 
     expectResult(Set(
       "Hector and Jeff's Database Hints")) {
@@ -887,18 +821,15 @@ class QueryTest extends Suite {
    */
   @Test def testQueryBooksWithAuthorInTitle() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     val titleAndFirstNames =
       for {
         book <- bookstore \ "Book"
-        title = book.getChildElem(ename("Title"))
+        title = book.getChildElem(EName("Title"))
         authorFirstNames = {
-          val result = book.filterElems(ename("Author")) map { _.getChildElem(ename("First_Name")).trimmedText }
+          val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("First_Name")).trimmedText }
           result.toSet
         }
         searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
@@ -913,7 +844,7 @@ class QueryTest extends Suite {
       titleAndFirstNames.size
     }
     expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val titleElms = titleAndFirstNames map { e => e.filterElems(ename("Title")) }
+      val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
       val result = titleElms.flatten map { e => e.trimmedText }
       result.toSet
     }
@@ -930,9 +861,6 @@ class QueryTest extends Suite {
    */
   @Test def testQueryAverageBookPrice() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
@@ -963,16 +891,13 @@ class QueryTest extends Suite {
    */
   @Test def testQueryBooksPricedBelowAverage() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     val prices: immutable.IndexedSeq[Double] =
       for {
         book <- bookstore \ "Book"
-        price = book.attribute(ename("Price")).toDouble
+        price = book.attribute(EName("Price")).toDouble
       } yield price
 
     val avg: Double = prices.sum.toDouble / prices.size
@@ -980,23 +905,23 @@ class QueryTest extends Suite {
     val cheapBooks =
       for {
         book <- bookstore \ "Book"
-        price = book.attribute(ename("Price")).toDouble
+        price = book.attribute(EName("Price")).toDouble
         if price < avg
       } yield elem(
         qname = QName("Book"),
         children = Vector(
-          fromElem(book.getChildElem(ename("Title")))(Scope.Empty),
+          fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
           textElem(QName("Price"), price.toString))).build()
 
     expectResult(2) {
       cheapBooks.size
     }
     expectResult(Set(50, 25)) {
-      val result = cheapBooks flatMap { e => e.filterElems(ename("Price")) } map { e => e.trimmedText.toDouble.intValue }
+      val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
       result.toSet
     }
     expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val result = cheapBooks flatMap { e => e.filterElems(ename("Title")) } map { e => e.trimmedText }
+      val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
       result.toSet
     }
   }
@@ -1014,26 +939,23 @@ class QueryTest extends Suite {
    */
   @Test def testQueryBooksOrderedByPrice() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     def cheaper(book1: Elem, book2: Elem): Boolean = {
-      val price1 = book1.attribute(ename("Price")).toInt
-      val price2 = book2.attribute(ename("Price")).toInt
+      val price1 = book1.attribute(EName("Price")).toInt
+      val price2 = book2.attribute(EName("Price")).toInt
       price1 < price2
     }
 
     val books = {
       for {
         book <- bookstore \ "Book" sortWith { cheaper _ }
-        price = book.attribute(ename("Price")).toDouble
+        price = book.attribute(EName("Price")).toDouble
       } yield elem(
         qname = QName("Book"),
         children = Vector(
-          fromElem(book.getChildElem(ename("Title")))(Scope.Empty),
+          fromElem(book.getChildElem(EName("Title")))(Scope.Empty),
           textElem(QName("Price"), price.toString))).build()
     }
 
@@ -1041,14 +963,14 @@ class QueryTest extends Suite {
       books.size
     }
     expectResult(List(25, 50, 85, 100)) {
-      books flatMap { e => e.filterElems(ename("Price")) } map { e => e.trimmedText.toDouble.intValue }
+      books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
     }
     expectResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
       "Database Systems: The Complete Book")) {
-      books flatMap { e => e.filterElems(ename("Title")) } map { e => e.trimmedText }
+      books flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
     }
   }
 
@@ -1063,13 +985,10 @@ class QueryTest extends Suite {
    */
   @Test def testQueryLastNames() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val lastNameValues: immutable.IndexedSeq[String] =
       for {
-        lastName <- (bookstore.filterElems(ename("Last_Name")) map (e => e.trimmedText)).distinct
+        lastName <- (bookstore.filterElems(EName("Last_Name")) map (e => e.trimmedText)).distinct
       } yield lastName
 
     expectResult(Set(
@@ -1095,14 +1014,11 @@ class QueryTest extends Suite {
    */
   @Test def testQueryBookPairsFromSameAuthor() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     def bookAuthorLastNames(book: Elem): Set[String] = {
-      val authors = book.getChildElem(ename("Authors"))
+      val authors = book.getChildElem(EName("Authors"))
       val result = for {
         author <- authors \ "Author"
         lastName = author getChildElem { _.localName == "Last_Name" }
@@ -1111,7 +1027,7 @@ class QueryTest extends Suite {
       result.toSet
     }
 
-    def bookTitle(book: Elem): String = book.getChildElem(ename("Title")).trimmedText
+    def bookTitle(book: Elem): String = book.getChildElem(EName("Title")).trimmedText
 
     val pairs =
       for {
@@ -1130,23 +1046,23 @@ class QueryTest extends Suite {
     }
     expectResult(3) {
       pairs.filter(pair =>
-        pair.getChildElem(ename("Title1")).trimmedText == bookTitle(book1.build()) ||
-          pair.getChildElem(ename("Title2")).trimmedText == bookTitle(book1.build())).size
+        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book1.build()) ||
+          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book1.build())).size
     }
     expectResult(3) {
       pairs.filter(pair =>
-        pair.getChildElem(ename("Title1")).trimmedText == bookTitle(book2.build()) ||
-          pair.getChildElem(ename("Title2")).trimmedText == bookTitle(book2.build())).size
+        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book2.build()) ||
+          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book2.build())).size
     }
     expectResult(2) {
       pairs.filter(pair =>
-        pair.getChildElem(ename("Title1")).trimmedText == bookTitle(book3.build()) ||
-          pair.getChildElem(ename("Title2")).trimmedText == bookTitle(book3.build())).size
+        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book3.build()) ||
+          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book3.build())).size
     }
     expectResult(2) {
       pairs.filter(pair =>
-        pair.getChildElem(ename("Title1")).trimmedText == bookTitle(book4.build()) ||
-          pair.getChildElem(ename("Title2")).trimmedText == bookTitle(book4.build())).size
+        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book4.build()) ||
+          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book4.build())).size
     }
   }
 
@@ -1169,21 +1085,18 @@ class QueryTest extends Suite {
    */
   @Test def testQueryInvertedBookstore() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     def books(authorLastName: String) =
       for {
         book <- bookstore \ "Book"
-        author <- book.filterElems(ename("Author"))
-        if author.getChildElem(ename("Last_Name")).trimmedText == authorLastName
+        author <- book.filterElems(EName("Author"))
+        if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
         val attrs = book.attributes filter { case (qn, v) => Set(QName("ISBN"), QName("Price")).contains(qn) }
 
-        val children = book.filterChildElems(ename("Title")) map { e => NodeBuilder.fromElem(e)(book.scope) }
+        val children = book.filterChildElems(EName("Title")) map { e => NodeBuilder.fromElem(e)(book.scope) }
 
         elem(
           qname = QName("Book"),
@@ -1194,18 +1107,18 @@ class QueryTest extends Suite {
     val authorsWithBooks =
       for {
         lastNameValue <- {
-          val result = bookstore.filterElems(ename("Author")) map { e => e.getChildElem(ename("Last_Name")).trimmedText }
+          val result = bookstore.filterElems(EName("Author")) map { e => e.getChildElem(EName("Last_Name")).trimmedText }
           result.distinct
         }
       } yield {
         val author: Elem = {
           val result = for {
-            author <- bookstore.filterElems(ename("Author"))
-            if author.getChildElem(ename("Last_Name")).trimmedText == lastNameValue
+            author <- bookstore.filterElems(EName("Author"))
+            if author.getChildElem(EName("Last_Name")).trimmedText == lastNameValue
           } yield author
           result.head
         }
-        val firstNameValue: String = author.getChildElem(ename("First_Name")).trimmedText
+        val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
 
         val foundBooks = books(lastNameValue)
         val bookBuilders = foundBooks map { book => fromElem(book)(Scope.Empty) }
@@ -1227,9 +1140,6 @@ class QueryTest extends Suite {
   @Test def testQueryBookAndMagazineTitlesRelabeled() {
     // Taken from the XSLT demo
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
@@ -1237,16 +1147,16 @@ class QueryTest extends Suite {
       for {
         bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
       } yield {
-        val titleString = bookOrMagazine.getChildElem(ename("Title")).trimmedText
+        val titleString = bookOrMagazine.getChildElem(EName("Title")).trimmedText
 
-        if (bookOrMagazine.resolvedName == ename("Book")) {
+        if (bookOrMagazine.resolvedName == EName("Book")) {
           textElem(QName("BookTitle"), titleString).build()
         } else {
           textElem(QName("MagazineTitle"), titleString).build()
         }
       }
 
-    expectResult(Set(ename("BookTitle"), ename("MagazineTitle"))) {
+    expectResult(Set(EName("BookTitle"), EName("MagazineTitle"))) {
       bookOrMagazineTitles.map(e => e.resolvedName).toSet
     }
     val ngCount = bookOrMagazineTitles count { e => e.trimmedText == "National Geographic" }
@@ -1261,12 +1171,9 @@ class QueryTest extends Suite {
     // Transforms the XML tree, leaving out book prices
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     def removePrice(book: Elem): Elem = {
-      require(book.resolvedName == ename("Book"))
+      require(book.resolvedName == EName("Book"))
       Elem(
         qname = book.qname,
         attributes = book.attributes filter { case (qn, v) => qn != QName("Price") },
@@ -1276,21 +1183,21 @@ class QueryTest extends Suite {
 
     val bookstoreWithoutPrices: Elem =
       bookstore updated {
-        case e if e.resolvedName == ename("Book") => removePrice(e)
+        case e if e.resolvedName == EName("Book") => removePrice(e)
       }
 
     expectResult(4) {
-      bookstore.filterElems(ename("Book")) count { e => e.attributeOption(ename("Price")).isDefined }
+      bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     expectResult(0) {
-      bookstoreWithoutPrices.filterElems(ename("Book")) count { e => e.attributeOption(ename("Price")).isDefined }
+      bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     expectResult(4) {
-      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == ename("Book")) && (e.attributeOption(ename("Price")).isDefined) }
+      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
     expectResult(0) {
-      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == ename("Book")) && (e.attributeOption(ename("Price")).isDefined) }
+      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
   }
@@ -1303,17 +1210,14 @@ class QueryTest extends Suite {
     // Transforms the XML tree, combining first and last names into Name elements
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     def combineName(author: Elem): Elem = {
-      require(author.resolvedName == ename("Author"))
+      require(author.resolvedName == EName("Author"))
 
-      val firstNameValue: String = author.getChildElem(ename("First_Name")).trimmedText
-      val lastNameValue: String = author.getChildElem(ename("Last_Name")).trimmedText
+      val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
+      val lastNameValue: String = author.getChildElem(EName("Last_Name")).trimmedText
       val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
       val name: ElemBuilder = textElem(QName("Name"), nameValue)
 
@@ -1326,11 +1230,11 @@ class QueryTest extends Suite {
 
     val bookstoreWithCombinedNames: Elem =
       bookstore updated {
-        case e if e.resolvedName == ename("Author") => combineName(e)
+        case e if e.resolvedName == EName("Author") => combineName(e)
       }
 
     expectResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
-      val result = bookstoreWithCombinedNames.filterElems(ename("Name")) map { _.trimmedText }
+      val result = bookstoreWithCombinedNames.filterElems(EName("Name")) map { _.trimmedText }
       result.toSet
     }
   }
@@ -1343,15 +1247,12 @@ class QueryTest extends Suite {
     // Transforms the XML tree, giving a namespace to Author elements
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     import NodeBuilder._
 
     val updatedBookstoreElm: Elem =
       bookstore updated {
-        case e if e.resolvedName == ename("Author") =>
+        case e if e.resolvedName == EName("Author") =>
           val newScope = e.scope.resolve(Declarations.from("abc" -> "http://def"))
           val newElmName = QName("abc", e.localName)
           Elem(newElmName, e.attributes, newScope, e.children)
@@ -1359,8 +1260,8 @@ class QueryTest extends Suite {
 
     // Although the partial function is defined for any path containing an Author, only the Author elements are functionally updated!
 
-    expectResult(Set(ename("Bookstore"), ename("Magazine"), ename("Title"), ename("Book"), ename("Authors"),
-      EName("{http://def}Author"), ename("First_Name"), ename("Last_Name"), ename("Remark"))) {
+    expectResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
+      EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {
 
       val result = updatedBookstoreElm.findAllElemsOrSelf map { _.resolvedName }
       result.toSet
@@ -1369,61 +1270,58 @@ class QueryTest extends Suite {
 
   @Test def testDepthFirst() {
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     // Returns descendant-or-self elements in depth-first order, that is, in document order
     val elms = bookstore.findAllElemsOrSelf
 
     val depthFirstElmNames = List(
-      ename("Bookstore"),
-      ename("Book"),
-      ename("Title"),
-      ename("Authors"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Book"),
-      ename("Title"),
-      ename("Authors"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Remark"),
-      ename("Book"),
-      ename("Title"),
-      ename("Authors"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Remark"),
-      ename("Book"),
-      ename("Title"),
-      ename("Authors"),
-      ename("Author"),
-      ename("First_Name"),
-      ename("Last_Name"),
-      ename("Magazine"),
-      ename("Title"),
-      ename("Magazine"),
-      ename("Title"),
-      ename("Magazine"),
-      ename("Title"),
-      ename("Magazine"),
-      ename("Title"))
+      EName("Bookstore"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Remark"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Remark"),
+      EName("Book"),
+      EName("Title"),
+      EName("Authors"),
+      EName("Author"),
+      EName("First_Name"),
+      EName("Last_Name"),
+      EName("Magazine"),
+      EName("Title"),
+      EName("Magazine"),
+      EName("Title"),
+      EName("Magazine"),
+      EName("Title"),
+      EName("Magazine"),
+      EName("Title"))
 
     expectResult(depthFirstElmNames) {
       elms map { _.resolvedName }
@@ -1436,13 +1334,10 @@ class QueryTest extends Suite {
     // explicit (about elements, expanded names, etc.).
 
     require(bookstore.localName == "Bookstore")
-    require(noNs.cachedENameOption("Book").isDefined)
-
-    import noNs._
 
     val isbn = "ISBN-0-11-222222-3"
 
-    val bookElmOption = bookstore findElem { e => e.localName == "Book" && e.attributeOption(ename("ISBN")) == Some(isbn) }
+    val bookElmOption = bookstore findElem { e => e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn) }
     val bookElm = bookElmOption.getOrElse(sys.error("Expected Book with ISBN %s".format(isbn)))
 
     val title = bookElm.getChildElem(_.localName == "Title").text
@@ -1603,10 +1498,5 @@ class QueryTest extends Suite {
       qname = QName("Bookstore"),
       children = Vector(
         book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
-  }
-
-  private val noNs: NoNamespace = {
-    val localNames = bookstore.findAllElemsOrSelf map { _.resolvedName } filter { _.namespaceUriOption.isEmpty } map { _.localPart }
-    NoNamespace(localNames.toSet)
   }
 }
