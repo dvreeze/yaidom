@@ -138,12 +138,14 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
 
     val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
 
+    val attrScope = elm.attributeScope
+
     val attributeIterable: Iterable[Attribute] = {
       val result = elm.attributes map { kv =>
         val attrQName = kv._1
         val value = kv._2
-        val attrEName = elm.attributeScope.resolveQNameOption(attrQName).getOrElse(sys.error(
-          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, elm.attributeScope)))
+        val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
+          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, attrScope)))
         val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
 
         xmlEventFactory.createAttribute(attrJavaQName, value)

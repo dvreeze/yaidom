@@ -90,7 +90,7 @@ final class DomElem(
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
+      val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attrScope)))
       (expandedName -> attValue)
     }
   }

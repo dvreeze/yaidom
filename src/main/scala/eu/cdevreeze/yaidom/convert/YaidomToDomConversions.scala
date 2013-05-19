@@ -150,12 +150,14 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
       }
     }
 
+    val attrScope = elm.attributeScope
+
     for ((attrQName, attrValue) <- elm.attributes) {
       if (attrQName.prefixOption.isEmpty) {
         element.setAttribute(attrQName.localPart, attrValue)
       } else {
-        val attrEName = elm.attributeScope.resolveQNameOption(attrQName).getOrElse(sys.error(
-          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, elm.attributeScope)))
+        val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
+          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, attrScope)))
         val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
         element.setAttributeNS(attrJavaQName.getNamespaceURI, attrQName.toString, attrValue)
       }

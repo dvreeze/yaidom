@@ -151,19 +151,18 @@ final class Elem(
   @throws(classOf[java.io.ObjectStreamException])
   private[yaidom] def writeReplace(): Any = new Elem.ElemSerializationProxy(qname, attributes, scope, children)
 
-  /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
-  val attributeScope: Scope = scope.withoutDefaultNamespace
-
   /** The `Elem` name as `EName`, obtained by resolving the element `QName` against the `Scope` */
   override val resolvedName: EName =
     scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
 
   /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
   override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
+    val attrScope = attributeScope
+
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attributeScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
+      val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attrScope)))
       (expandedName -> attValue)
     }
   }
@@ -190,6 +189,9 @@ final class Elem(
     val result = acc.toMap
     result
   }
+
+  /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
+  def attributeScope: Scope = scope.withoutDefaultNamespace
 
   /** Returns the element children */
   override def findAllChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
