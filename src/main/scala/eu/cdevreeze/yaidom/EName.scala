@@ -29,7 +29,26 @@ import javax.xml.namespace.{ QName => JQName }
  * The short class name illustrates that expanded names are at least as important as qualified names, and should be
  * equally easy to construct (using the companion object).
  *
- * Typical usage may lead to an explosion of different EName objects that are equal.
+ * Typical usage may lead to an explosion of different EName objects that are equal. Therefore, application code
+ * is encouraged to define and use constants for frequently used ENames. For example, for the XML Schema namespace
+ * (and analogous to the XLink constants in yaidom):
+ * {{{
+ * val XsNamespace = "http://www.w3.org/2001/XMLSchema"
+ *
+ * val XsElementEName = EName(XsNamespace, "element")
+ * val XsAttributeEName = EName(XsNamespace, "attribute")
+ * val XsComplexTypeEName = EName(XsNamespace, "complexType")
+ * val XsSimpleTypeEName = EName(XsNamespace, "simpleType")
+ * // ...
+ * }}}
+ * In this example, the EName constant names are in upper camel case, starting with the ("preferred") prefix, followed by the
+ * local part, and ending with suffix "EName".
+ *
+ * Implementation note: It was tried as alternative implementation to define EName as (Scala 2.10) value class. The EName would
+ * then wrap the expanded name as string representation (in James Clark notation). One cost would be that parsing the (optional)
+ * namespace URI and the local name would occur far more frequently. Another cost would be that the alternative implementation
+ * would not directly express that an EName is a combination of an optional namespace URI and a local part. Therefore that alternative
+ * implementation has been abandoned.
  *
  * @author Chris de Vreeze
  */

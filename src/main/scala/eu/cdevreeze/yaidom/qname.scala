@@ -31,7 +31,25 @@ import javax.xml.namespace.{ QName => JQName }
  *
  * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.EName]].
  *
- * Typical usage may lead to an explosion of different QName objects that are equal.
+ * Typical usage may lead to an explosion of different QName objects that are equal. Therefore, application code
+ * is encouraged to define and use constants for frequently used QNames. For example, for the XML Schema namespace:
+ * {{{
+ * val XsPrefix = "xs"
+ *
+ * val XsElementQName = QName(XsPrefix, "element")
+ * val XsAttributeQName = QName(XsPrefix, "attribute")
+ * val XsComplexTypeQName = QName(XsPrefix, "complexType")
+ * val XsSimpleTypeQName = QName(XsPrefix, "simpleType")
+ * // ...
+ * }}}
+ * In this example, the QName constant names are in upper camel case, starting with the prefix, followed by the local part,
+ * and ending with suffix "QName".
+ *
+ * Implementation note: It was tried as alternative implementation to define the QName subclasses as (Scala 2.10) value classes.
+ * The QName would then wrap the qualified name as string representation (with or without prefix). One cost would be that parsing
+ * the (optional) prefix and the local name would occur far more frequently. Another cost would be that the alternative implementation
+ * would not directly express that a QName is a combination of an optional prefix and a local part. Therefore that alternative
+ * implementation has been abandoned.
  *
  * @author Chris de Vreeze
  */
