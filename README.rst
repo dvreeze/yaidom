@@ -83,6 +83,6 @@ as follows (in an SBT or Maven build):
     </dependency>
 
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.
-Yaidom requires at least Scala 2.10.
+Yaidom has been cross-built for several Scala versions, leading to artifactIds yaidom_2.9.1, yaidom_2.9.2, etc..
 
 Yaidom requires Java version 1.6 or later.

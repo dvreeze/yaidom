@@ -31,60 +31,36 @@ import javax.xml.namespace.{ QName => JQName }
  *
  * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.EName]].
  *
- * The QName subclasses are value classes for efficiency, thus avoiding an explosion of objects that are equal.
+ * Typical usage may lead to an explosion of different QName objects that are equal.
  *
  * @author Chris de Vreeze
  */
-sealed trait QName extends Any {
+sealed trait QName extends Immutable with Serializable {
 
   def localPart: String
   def prefixOption: Option[String]
 }
 
-final class UnprefixedName private (val value: String) extends AnyVal with QName with Serializable {
-
-  override def localPart: String = value
+final case class UnprefixedName(override val localPart: String) extends QName {
+  require(localPart ne null)
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   override def prefixOption: Option[String] = None
 
   /** The `String` representation as it appears in XML, that is, the localPart */
-  override def toString: String = value
+  override def toString: String = localPart
 }
 
-object UnprefixedName {
-
-  /** Shorthand for `new UnprefixedName(s)`, but first checking the parameter */
-  def apply(localPart: String): UnprefixedName = {
-    require(localPart ne null)
-    require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
-
-    new UnprefixedName(localPart)
-  }
-}
-
-final class PrefixedName private (val value: String) extends AnyVal with QName with Serializable {
-
-  def prefix: String = value.substring(0, value.indexOf(':'))
-
-  override def localPart: String = value.substring(value.indexOf(':') + 1)
+final case class PrefixedName(prefix: String, override val localPart: String) extends QName {
+  require(prefix ne null)
+  require(XmlStringUtils.isAllowedPrefix(prefix), "'%s' is not an allowed prefix name".format(prefix))
+  require(localPart ne null)
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
 
   override def prefixOption: Option[String] = Some(prefix)
 
   /** The `String` representation as it appears in XML. For example, <code>xs:schema</code> */
-  override def toString: String = value
-}
-
-object PrefixedName {
-
-  /** Shorthand for `new PrefixedName(s)`, but first checking the parameters */
-  def apply(prefix: String, localPart: String): PrefixedName = {
-    require(prefix ne null)
-    require(XmlStringUtils.isAllowedPrefix(prefix), "'%s' is not an allowed prefix name".format(prefix))
-    require(localPart ne null)
-    require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
-
-    new PrefixedName(s"$prefix:$localPart")
-  }
+  override def toString: String = "%s:%s".format(prefix, localPart)
 }
 
 object QName {

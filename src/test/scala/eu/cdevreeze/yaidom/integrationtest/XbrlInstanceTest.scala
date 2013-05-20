@@ -210,7 +210,7 @@ object XbrlInstanceTest {
     val topLevelFacts: immutable.IndexedSeq[XbrlFact],
     val footnoteLinks: immutable.IndexedSeq[xlink.ExtendedLink]) extends Immutable { self =>
 
-    // Note that rootQName is a value class instance
+    require(rootQName ne null)
     require(rootAttributes ne null)
     require(rootScope ne null)
     require(schemaRefs ne null)

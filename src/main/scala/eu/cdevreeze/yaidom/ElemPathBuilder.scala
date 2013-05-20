@@ -77,7 +77,7 @@ object ElemPathBuilder {
 
   /** An entry in an `ElemPathBuilder`, as an qname plus zero-based index of the elem as child (with that name) of the parent. */
   final case class Entry(qname: QName, index: Int) extends Immutable {
-    // Note that qname is a value class instance
+    require(qname ne null)
     require(index >= 0)
 
     /** Builds the `ElemPath.Entry`, using the passed `Scope`, which must be invertible */

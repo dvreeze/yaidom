@@ -103,6 +103,11 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
   @Ignore @Test def testParseLargeXmlRepeatedly() {
+    val FirstNameEName = EName("firstName")
+    val LastNameEName = EName("lastName")
+    val ContactEName = EName("contact")
+    val EmailEName = EName("email")
+
     for (i <- (0 until 200).par) {
       val parser = DocumentParserUsingSax.newInstance
 
@@ -111,24 +116,24 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
       (i % 5) match {
         case 0 =>
-          val firstNameElms = doc.documentElement.filterElems(EName("firstName"))
+          val firstNameElms = doc.documentElement.filterElems(FirstNameEName)
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
         case 1 =>
-          val lastNameElms = doc.documentElement.filterElems(EName("lastName"))
+          val lastNameElms = doc.documentElement.filterElems(LastNameEName)
           logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
         case 2 =>
-          val contactElms = doc.documentElement \\ EName("contact")
+          val contactElms = doc.documentElement \\ ContactEName
           logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
         case 3 =>
           val emails = {
             val result = doc.documentElement.findAllElemsOrSelf collect {
-              case e if e.resolvedName == EName("email") => e.trimmedText
+              case e if e.resolvedName == EmailEName => e.trimmedText
             }
             result.toSet
           }
           logger.info("Different e-mails (%d): %s. Thread %s".format(emails.size, emails, Thread.currentThread.getName))
         case 4 =>
-          val firstNameElms = doc.documentElement \\ EName("firstName")
+          val firstNameElms = doc.documentElement \\ FirstNameEName
           logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
       }
     }

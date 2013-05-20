@@ -141,7 +141,7 @@ final class Elem(
   val scope: Scope,
   override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
-  // Note that qname is a value class instance
+  require(qname ne null)
   require(attributes ne null)
   require(scope ne null)
   require(children ne null)

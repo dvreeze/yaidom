@@ -71,7 +71,7 @@ final case class Elem(
   override val resolvedAttributes: Map[EName, String],
   override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
 
-  // Note that resolvedName is a value class instance
+  require(resolvedName ne null)
   require(resolvedAttributes ne null)
   require(children ne null)
 
