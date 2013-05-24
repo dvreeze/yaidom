@@ -121,7 +121,8 @@ import scala.collection.{ immutable, mutable }
  * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (ch => ch.findAllElemsOrSelf filter p)) // induction hypothesis
  * immutable.IndexedSeq(elm).filter(p) ++ ((elm.findAllChildElems.flatMap(ch => ch.findAllElemsOrSelf)) filter p) // property (b)
  * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) filter p // property (a)
- * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // definition of findAllElemsOrSelf
+ * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // definition of findAllElemsOrSelf
+ * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // filtering with predicate that is always true
  * elm.filterElemsOrSelf(e => true) filter p // definition of filterElemsOrSelf
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
