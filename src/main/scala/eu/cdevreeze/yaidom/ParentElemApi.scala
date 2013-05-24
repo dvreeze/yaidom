@@ -21,26 +21,40 @@ import scala.collection.immutable
 /**
  * API for elements as containers of elements, as element nodes in a node tree. See [[eu.cdevreeze.yaidom.ParentElemLike]].
  *
- * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
- * an XML database would not use the ``ParentElemLike`` implementation, for reasons of efficiency.
+ * This purely abstract query API trait leaves the implementation (but not the semantics) completely open. For example,
+ * an implementation backed by an XML database would not use the ``ParentElemLike`` implementation, for reasons of efficiency.
  *
- * The following properties must hold (in the absence of side-effects):
+ * The basic operations of this trait are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
+ * and ``\\!`` (alias for ``findTopmostElemsOrSelf``). Their semantics must be as if they had been defined as follows:
+ * {{{
+ * def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] =
+ *   this.findAllChildElems.filter(p)
+ *
+ * def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] =
+ *   Vector(this).filter(p) ++ (this.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
+ *
+ * def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] =
+ *   if (p(this)) Vector(this)
+ *   else (this.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+ * }}}
+ *
+ * Similarly, we could have defined:
+ * {{{
+ * def filterElems(p: E => Boolean): immutable.IndexedSeq[E] =
+ *   this.findAllChildElems flatMap (_.filterElemsOrSelf(p))
+ *
+ * def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
+ *   this.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))
+ * }}}
+ *
+ * The following properties must hold (in the absence of side-effects), and can indeed be proven (given the documented
+ * "definitions" of these operations):
  * {{{
  * // Filtering
- *
- * elem.filterChildElems(p) == elem.findAllChildElems.filter(p)
  *
  * elem.filterElems(p) == elem.findAllElems.filter(p)
  *
  * elem.filterElemsOrSelf(p) == elem.findAllElemsOrSelf.filter(p)
- *
- * // Finding
- *
- * elem.findChildElem(p) == elem.filterChildElems(p).headOption
- *
- * elem.findElem(p) == elem.filterElems(p).headOption
- *
- * elem.findElemOrSelf(p) == elem.filterElemsOrSelf(p).headOption
  *
  * // Finding topmost
  *
@@ -70,46 +84,93 @@ import scala.collection.immutable
 trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
 
   /**
-   * Returns all child elements, in the correct order.
+   * Returns '''all child elements''', in the correct order. Other operations can be defined in terms of this one.
    */
   def findAllChildElems: immutable.IndexedSeq[E]
 
-  /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
+  /**
+   * Returns all descendant elements (not including this element). This method could be defined as `filterElems { e => true }`.
+   * Equivalent to `findAllElemsOrSelf.drop(1)`.
+   */
   def findAllElems: immutable.IndexedSeq[E]
 
-  /** Returns this element followed by all descendant elements (that is, the descendant-or-self elements) */
+  /**
+   * Returns this element followed by all descendant elements (that is, the descendant-or-self elements).
+   * This method could be defined as `filterElemsOrSelf { e => true }`.
+   */
   def findAllElemsOrSelf: immutable.IndexedSeq[E]
 
-  /** Returns the child elements obeying the given predicate */
+  /**
+   * '''Core method''' that returns the child elements obeying the given predicate. This method could be defined as:
+   * {{{
+   * def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] =
+   *   this.findAllChildElems.filter(p)
+   * }}}
+   */
   def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E]
 
-  /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
+  /**
+   * Returns the descendant elements obeying the given predicate.
+   * This method could be defined as:
+   * {{{
+   * this.findAllChildElems flatMap (_.filterElemsOrSelf(p))
+   * }}}
+   */
   def filterElems(p: E => Boolean): immutable.IndexedSeq[E]
 
   /**
-   * Returns the descendant-or-self elements that obey the given predicate.
-   * That is, the result is equivalent to `findAllElemsOrSelf filter p`.
+   * '''Core method''' that returns the descendant-or-self elements obeying the given predicate. This method could be defined as:
+   * {{{
+   * def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] =
+   *   Vector(this).filter(p) ++ (this.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
+   * }}}
+   *
+   * It can be proven that the result is equivalent to `findAllElemsOrSelf filter p`.
    */
   def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E]
 
-  /** Returns the first found child element obeying the given predicate, if any, wrapped in an `Option` */
+  /**
+   * Returns the first found child element obeying the given predicate, if any, wrapped in an `Option`.
+   * This method could be defined as `filterChildElems(p).headOption`.
+   */
   def findChildElem(p: E => Boolean): Option[E]
 
-  /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
+  /**
+   * Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option`.
+   * This method could be defined as `filterElems(p).headOption`.
+   */
   def findElem(p: E => Boolean): Option[E]
 
-  /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
+  /**
+   * Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option`.
+   * This method could be defined as `filterElemsOrSelf(p).headOption`.
+   */
   def findElemOrSelf(p: E => Boolean): Option[E]
 
-  /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
+  /**
+   * Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate.
+   * This method could be defined as:
+   * {{{
+   * this.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))
+   * }}}
+   */
   def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E]
 
   /**
-   * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
+   * '''Core method''' that returns the descendant-or-self elements obeying the given predicate, such that no ancestor obeys the predicate.
+   * This method could be defined as:
+   * {{{
+   * def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] =
+   *   if (p(this)) Vector(this)
+   *   else (this.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+   * }}}
    */
   def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E]
 
-  /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
+  /**
+   * Returns the single child element obeying the given predicate, and throws an exception otherwise.
+   * This method could be defined as `findChildElem(p).get`.
+   */
   def getChildElem(p: E => Boolean): E
 
   /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */

@@ -63,107 +63,14 @@ import scala.collection.{ immutable, mutable }
  * ==ParentElemLike more formally==
  *
  * The only abstract method is `findAllChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
+ * This is entirely consistent with the semantics defined in the `ParentElemApi` trait. Indeed, the implementation of the methods
+ * follows the semantics defined there.
  *
- * As said above, this trait only knows about elements, not about other node types. Hence this trait has no knowledge about child nodes in
- * general. Hence the single type parameter, for the captured element type itself.
- *
- * Trait `ParentElemLike` has many methods for retrieving elements, but they are pretty easy to remember. First of all, an `ParentElemLike`
- * has 3 '''core''' element collection retrieval methods. These 3 methods (in order of subset relation) are:
- * <ul>
- * <li>Abstract method `findAllChildElems`, returning all '''child''' elements</li>
- * <li>Method `findAllElems`, finding all '''descendant''' elements</li>
- * <li>Method `findAllElemsOrSelf`, finding all '''descendant''' elements '''or self'''</li>
- * </ul>
- *
- * We define method `findAllElems` and `findAllElemsOrSelf` (recursively) as follows (in terms of equality):
- * {{{
- * elm.findAllElems == { elm.findAllChildElems flatMap (_.findAllElemsOrSelf) }
- *
- * elm.findAllElemsOrSelf == { elm +: (elm.findAllChildElems flatMap (_.findAllElemsOrSelf)) }
- * }}}
- *
- * The actual implementations may be different and more efficient, but they are consistent with these definitions.
- *
- * Strictly speaking, these '''core''' element collection retrieval methods, in combination with Scala's Collections API, should in theory
- * be enough for all element collection needs. For conciseness (and performance), there are more element (collection) retrieval methods.
- *
- * Below follows a summary of those groups of `ParentElemLike` element collection retrieval methods:
- * <ul>
- * <li>'''Filtering''': `filterChildElems`, `filterElems` and `filterElemsOrSelf`</li>
- * <li>'''Finding topmost obeying some predicate''' (not for child elements): `findTopmostElems` and `findTopmostElemsOrSelf`</li>
- * </ul>
- *
- * Often it is appropriate to query for collections of elements, but sometimes it is appropriate to query for individual elements.
- * Therefore there are also some `ParentElemLike` methods returning at most one element. These methods are as follows:
- * <ul>
- * <li>'''Finding first obeying some predicate''' (depth-first search): `findChildElem` and `getChildElem`, `findElem` and `findElemOrSelf`</li>
- * </ul>
- *
- * These element (collection) retrieval methods process and return elements in depth-first order
- * (see http://en.wikipedia.org/wiki/Depth-first_search). In other words, they process and return elements in document order,
- * which is the order encountered when reading the XML string from top to bottom. (This happens to be consistent with XPath 2.0,
- * where path expression results must be in document order.)
- *
- * We define some of those methods as follows (in terms of equality):
- * {{{
- * elm.filterChildElems(p) == (elm.findAllChildElems filter p)
- *
- * elm.filterElems(p) == (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
- *
- * elm.filterElemsOrSelf(p) == {
- *   (immutable.IndexedSeq(elm).filter(p)) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
- * }
- *
- * elm.findTopmostElems(p) == (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- *
- * elm.findTopmostElemsOrSelf(p) == {
- *   if (p(elm))
- *     immutable.IndexedSeq(elm)
- *   else
- *     (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
- * }
- * }}}
- *
- * Again, the actual implementations may be more efficient, but are consistent with these definitions.
- *
- * Given the definitions above, there are some provable properties about these methods that are also intuitively true, and give
- * semantics to these methods. Assuming no side-effects etc. (see below for the precise assumptions made), some of these equalities are:
- * {{{
- * elm.filterElems(p) == elm.findAllElems.filter(p)
- * elm.filterElemsOrSelf(p) == elm.findAllElemsOrSelf.filter(p)
- *
- * elm.findTopmostElems(p) == {
- *   elm.filterElems(p) filter { e =>
- *     val hasNoMatchingAncestor = elm.filterElems(p) forall { _.findElem(_ == e).isEmpty }
- *     hasNoMatchingAncestor
- *   }
- * }
- *
- * elm.findTopmostElemsOrSelf(p) == {
- *   elm.filterElemsOrSelf(p) filter { e =>
- *     val hasNoMatchingAncestor = elm.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
- *     hasNoMatchingAncestor
- *   }
- * }
- * }}}
- * The latter put differently:
- * {{{
- * (elm.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElems(p))
- * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == (elm.filterElemsOrSelf(p))
- * }}}
- *
- * The methods returning at most one element trivially correspond to expressions containing calls to element collection
- * retrieval methods. For example, in the absence of side-effects etc. (see below for the precise assumptions made), the following holds:
- * {{{
- * elm.findElemOrSelf(p) == elm.filterElemsOrSelf(p).headOption
- * elm.findElemOrSelf(p) == elm.findTopmostElemsOrSelf(p).headOption
- * }}}
- *
- * ==ParentElemLike even more formally==
+ * In the `ParentElemApi` trait, some (simple) provable laws were mentioned. Some proofs follow below.
  *
  * ===1. Proving property about filterElemsOrSelf===
  *
- * Below follows a proof by structural induction of one of the above-mentioned properties.
+ * Below follows a proof by structural induction of one of the laws mentioned in the documentation of trait `ParentElemApi`.
  *
  * First we make a few assumptions, for this proof, and (implicitly) for the other proofs:
  * <ul>
@@ -189,7 +96,9 @@ import scala.collection.{ immutable, mutable }
  * immutable.IndexedSeq(elm).filter(p) ++ Seq() // flatMap on empty sequence returns empty sequence
  * immutable.IndexedSeq(elm).filter(p) // property of concatenation: xs ++ Seq() == xs
  * (immutable.IndexedSeq(elm) ++ Seq()).filter(p) // property of concatenation: xs ++ Seq() == xs
- * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) filter p // flatMap on empty sequence (of child elements) returns empty sequence
+ * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // flatMap on empty sequence (of child elements) returns empty sequence
+ * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // filtering with predicate that is always true
+ * elm.filterElemsOrSelf(e => true) filter p // definition of filterElemsOrSelf
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
  * which is the RHS.
@@ -212,6 +121,8 @@ import scala.collection.{ immutable, mutable }
  * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (ch => ch.findAllElemsOrSelf filter p)) // induction hypothesis
  * immutable.IndexedSeq(elm).filter(p) ++ ((elm.findAllChildElems.flatMap(ch => ch.findAllElemsOrSelf)) filter p) // property (b)
  * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) filter p // property (a)
+ * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // definition of findAllElemsOrSelf
+ * elm.filterElemsOrSelf(e => true) filter p // definition of filterElemsOrSelf
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
  * which is the RHS.
@@ -230,6 +141,8 @@ import scala.collection.{ immutable, mutable }
  * (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filterElems
  * (elm.findAllChildElems flatMap (e => e.findAllElemsOrSelf.filter(p))) // using the property proven above
  * (elm.findAllChildElems flatMap (_.findAllElemsOrSelf)) filter p // using property (b) above
+ * (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true))) filter p // definition of findAllElemsOrSelf
+ * elm.filterElems(e => true) filter p // definition of filterElems
  * elm.findAllElems filter p // definition of findAllElems
  * }}}
  * which is the RHS.
@@ -337,31 +250,23 @@ import scala.collection.{ immutable, mutable }
  */
 trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E =>
 
-  /**
-   * Returns all child elements, in the correct order. The faster this method is, the faster the other `ParentElemLike` methods will be.
-   */
   def findAllChildElems: immutable.IndexedSeq[E]
 
-  /** Returns the child elements obeying the given predicate */
   final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems filter p
 
-  /** Shorthand for `filterChildElems(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
 
-  /** Returns the first found child element obeying the given predicate, if any, wrapped in an `Option` */
   final def findChildElem(p: E => Boolean): Option[E] = {
     val result = filterChildElems(p)
     result.headOption
   }
 
-  /** Returns the single child element obeying the given predicate, and throws an exception otherwise */
   final def getChildElem(p: E => Boolean): E = {
     val result = filterChildElems(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
     result.head
   }
 
-  /** Returns this element followed by all descendant elements (that is, the descendant-or-self elements) */
   final def findAllElemsOrSelf: immutable.IndexedSeq[E] = {
     val result = mutable.ArrayBuffer[E]()
 
@@ -375,10 +280,6 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     result.toIndexedSeq
   }
 
-  /**
-   * Returns the descendant-or-self elements that obey the given predicate.
-   * That is, the result is equivalent to `findAllElemsOrSelf filter p`.
-   */
   final def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
     val result = mutable.ArrayBuffer[E]()
 
@@ -392,18 +293,12 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     result.toIndexedSeq
   }
 
-  /** Shorthand for `filterElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
 
-  /** Returns all descendant elements (not including this element). Equivalent to `findAllElemsOrSelf.drop(1)` */
   final def findAllElems: immutable.IndexedSeq[E] = findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
 
-  /** Returns the descendant elements obeying the given predicate, that is, `findAllElems filter p` */
   final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
 
-  /**
-   * Returns the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
-   */
   final def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
     val result = mutable.ArrayBuffer[E]()
 
@@ -418,14 +313,11 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     result.toIndexedSeq
   }
 
-  /** Shorthand for `findTopmostElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
   final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(p)
 
-  /** Returns the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
   final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
     findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
-  /** Returns the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElemOrSelf(p: E => Boolean): Option[E] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatch(elm: E): Option[E] = {
@@ -447,7 +339,6 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     findMatch(self)
   }
 
-  /** Returns the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   final def findElem(p: E => Boolean): Option[E] = {
     val elms = self.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
     elms.headOption
