@@ -20,12 +20,16 @@ scalacOptions <++= scalaBinaryVersion map { version =>
 }
 
 (unmanagedSourceDirectories in Compile) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq(new java.io.File("src/main-2.10/scala"))
+  // Currently support for yaidom XML literals switched off
+  // val newSourceDirs = Seq(new java.io.File("src/main-2.10/scala"))
+  val newSourceDirs = Seq()
   if (version.contains("2.10")) newSourceDirs else Seq()
 }
 
 (unmanagedSourceDirectories in Test) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq(new java.io.File("src/test-2.10/scala"))
+  // Currently support for yaidom XML literals switched off
+  // val newSourceDirs = Seq(new java.io.File("src/test-2.10/scala"))
+  val newSourceDirs = Seq()
   if (version.contains("2.10")) newSourceDirs else Seq()
 }
 
