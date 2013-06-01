@@ -101,14 +101,22 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     attrs.toIndexedSeq map { attr: scala.xml.MetaData => (toQName(attr) -> attr.value(0).text) }
   }
 
-  /** Converts the `scala.xml.NamespaceBinding` to a yaidom `Scope` */
+  /**
+   * Converts the `scala.xml.NamespaceBinding` to a yaidom `Scope`.
+   *
+   * This implementation is very brittle because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
+   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
+   */
   final def extractScope(scope: scala.xml.NamespaceBinding): Scope = {
     if ((scope eq null) || (scope.uri eq null)) Scope.Empty
     else {
-      val prefix =
-        if (scope.prefix eq null) "" else scope.prefix
+      val prefix = if (scope.prefix eq null) "" else scope.prefix
+
+      // This is not correct, but the above-mentioned bug should not cause Scope construction to throw an exception...
+      val scopeForPrefix = if (scope.uri.isEmpty) Scope.Empty else Scope.from(prefix -> scope.uri)
+
       // Recursive call (not tail-recursive)
-      Scope.from(prefix -> scope.uri) ++ extractScope(scope.parent)
+      extractScope(scope.parent) ++ scopeForPrefix
     }
   }
 
