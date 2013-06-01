@@ -77,17 +77,17 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  /**
-   * Currently this test is ignored because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
-   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
-   */
-  @Ignore @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml() {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("strangeXml.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
     val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
+
+    // This test works in spite of of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
+    // (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
+    // See method ScalaXmlToYaidomConversions.extractScope for the reason why. That method works around the bug.
 
     expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -346,11 +346,7 @@ class ScalaXmlWrapperTest extends Suite {
     checkChildText(root)
   }
 
-  /**
-   * Currently this test is ignored because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
-   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
-   */
-  @Ignore @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations() {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -359,6 +355,10 @@ class ScalaXmlWrapperTest extends Suite {
     val root: ScalaXmlElem = domDoc.documentElement
 
     val ns = "urn:foo:bar"
+
+    // This test works in spite of of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
+    // (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
+    // See method ScalaXmlToYaidomConversions.extractScope for the reason why. That method works around the bug.
 
     expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }

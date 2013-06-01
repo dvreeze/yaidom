@@ -104,19 +104,26 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   /**
    * Converts the `scala.xml.NamespaceBinding` to a yaidom `Scope`.
    *
-   * This implementation is very brittle because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
-   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
+   * This implementation is brittle because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
+   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858). Still, this implementation
+   * tries to work around that bug.
    */
   final def extractScope(scope: scala.xml.NamespaceBinding): Scope = {
     if ((scope eq null) || (scope.uri eq null)) Scope.Empty
     else {
       val prefix = if (scope.prefix eq null) "" else scope.prefix
 
-      // This is not correct, but the above-mentioned bug should not cause Scope construction to throw an exception...
-      val scopeForPrefix = if (scope.uri.isEmpty) Scope.Empty else Scope.from(prefix -> scope.uri)
+      // Recursive call (not tail-recursive), and working around the above-mentioned bug
 
-      // Recursive call (not tail-recursive)
-      extractScope(scope.parent) ++ scopeForPrefix
+      val parentScope = extractScope(scope.parent)
+
+      if (scope.uri.isEmpty) {
+        // Works for the default namespace too (knowing that prefix is no longer null but can be empty)
+        parentScope -- Set(prefix)
+      } else {
+        // Works for namespace overrides too
+        parentScope ++ Scope.from(prefix -> scope.uri)
+      }
     }
   }
 

@@ -107,16 +107,14 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  /**
-   * See discussion on https://github.com/djspiewak/anti-xml/issues/78.
-   *
-   * Currently this test is ignored because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
-   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
-   */
-  @Ignore @Test def testConvertStrangeXml() {
+  @Test def testConvertStrangeXml() {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(strangeXml)
+
+    // This test works in spite of of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
+    // (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
+    // See method ScalaXmlToYaidomConversions.extractScope for the reason why. That method works around the bug.
 
     expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
