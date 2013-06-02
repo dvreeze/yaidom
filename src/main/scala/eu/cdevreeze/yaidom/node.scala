@@ -242,6 +242,14 @@ final class Elem(
   }
 
   /**
+   * Functionally adds or updates the given attribute, if a value is given.
+   * That is, returns `if (attributeValueOption.isEmpty) self else plusAttribute(attributeName, attributeValueOption.get)`.
+   */
+  def plusAttributeOption(attributeName: QName, attributeValueOption: Option[String]): Elem = {
+    if (attributeValueOption.isEmpty) self else plusAttribute(attributeName, attributeValueOption.get)
+  }
+
+  /**
    * Functionally removes the given attribute, if present.
    *
    * More precisely, returns `withAttributes(self.attributes filterNot (_._1 == attributeName))`.
