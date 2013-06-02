@@ -3,6 +3,41 @@ CHANGELOG
 =========
 
 
+0.6.9
+=====
+
+This is still another version leading up to version 0.7.0. It does contain a few breaking changes.
+
+* Big breaking API change: XML literals are gone (i.e. hidden), and replaced by conversions from Scala XML to yaidom
+
+  * The conversions from Scala XML to yaidom make it possible to create Scala XML literals, and immediately convert them to yaidom
+  * Yaidom XML literals, on the other hand, need a lot of work before they become useful
+  * One problem with the yaidom XML literals is the runtime cost, of XML parsing at each use (instead of having a macro "compile" them)
+  * Another problem with yaidom XML literals is the restrictions w.r.t. where parameters can be used
+  * The conversions between Scala XML Elems and yaidom Elems are one-way, from Scala XML to yaidom
+  * These conversions make it possible to use Scala XML literals as if they are "yaidom XML literals"
+  * These conversions even work around nasty XML Scala namespace-related bugs, such as SI-6939
+  
+* Breaking API change: removed overloaded ``\``, ``\\``, ``\\!`` and ``\@`` methods taking just a local name (as string)
+
+  * An experiment was conducted to make EName and QName (Scala 2.10) value classes, to avoid EName/QName object explosion
+  * In this experiment, the overloads above had to go (and they violated the "precision" of yaidom anyway)
+  * This experimental change has been reverted (for now), but I want to keep the option open to use value classes for EName/QName in the future
+  * So the overloaded methods above have been removed, and are not expected to come back
+  * In the spirit of "precise" querying, also renamed ``findAttribute`` (taking a local name) to ``findAttributeByLocalName``
+
+* Breaking API change: renamed ``baseUriOption`` to ``uriOption``, and ``withBaseUriOption`` to ``withUriOption``
+* Breaking API change: removed method ``QName.prefixOptionFromJavaQName``
+* Added some overloaded ``DocumentParser.parse`` methods
+* ``LabeledXLink`` is no longer a trait with a val, but is now an abstract class
+
+As for the maturity of parts of yaidom:
+
+* Its querying support is most mature. The APIs ("abstractions") are simple and clear, and seem to work well.
+* Its functional update support is still rather basic. It should first mature outside of yaidom, instead of further postponing version 0.7.0.
+* Its XML literal support simply was not useful yet, so an alternative has been provided in version 0.6.9 (instead of further postponing version 0.7.0).
+
+
 0.6.8
 =====
 
@@ -26,6 +61,7 @@ This version is probably the last release before version 0.7.0. It does contain 
 Hopefully only documentation updates and small non-breaking fixes will be the difference between version 0.6.8 and
 upcoming version 0.7.0. In other words, hopefully the API is stable from now on.
 
+
 0.6.7
 =====
 
@@ -41,6 +77,7 @@ This version is again one step closer to version 0.7.0. It contains small improv
 * Moved method ``plusChild`` (taking one parameter) up to ``UpdatableElemLike``
 * A few bug fixes
 * More tests, and more documentation
+
 
 0.6.6
 =====
@@ -61,6 +98,7 @@ query API and the "conceptual surface area".
 
 * More tests
 
+
 0.6.5
 =====
 
@@ -80,6 +118,7 @@ expected that future release 0.7.0 will be pretty much like this release, except
 * Breaking API change: Renamed ``DomNode.wrapOption`` to ``DomNode.wrapNodeOption``
 * Added method ``Elem.plusAttribute`` (now that attributes can be ordered)
 * Experimental, and only for Scala 2.10: XML literals (a first naive version)
+
 
 0.6.4
 =====
