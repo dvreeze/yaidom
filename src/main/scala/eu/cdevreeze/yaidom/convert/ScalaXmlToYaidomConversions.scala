@@ -35,6 +35,8 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
 
   /**
    * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.Document]]. The resulting yaidom Document has no document URI.
+   *
+   * If the input Scala XML Document is not namespace-valid, an exception will be thrown.
    */
   final def convertToDocument(v: scala.xml.Document): Document = {
     val docChildren = v.children
@@ -52,6 +54,8 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
 
   /**
    * Converts an `scala.xml.Elem` to an [[eu.cdevreeze.yaidom.Elem]].
+   *
+   * If the input Scala XML Elem is not namespace-valid, an exception will be thrown.
    */
   final def convertToElem(v: scala.xml.Elem): Elem = {
     val qname: QName = toQName(v)
@@ -73,6 +77,9 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
       case e: scala.xml.Elem => Some(convertToElem(e))
       case cdata: scala.xml.PCData => Some(convertToCData(cdata))
       case t: scala.xml.Text => Some(convertToText(t))
+      case at: scala.xml.Atom[_] =>
+        // Possibly an evaluated "parameter" in an XML literal
+        Some(Text(text = at.data.toString, isCData = false))
       case pi: scala.xml.ProcInstr => Some(convertToProcessingInstruction(pi))
       case er: scala.xml.EntityRef => Some(convertToEntityRef(er))
       case c: scala.xml.Comment => Some(convertToComment(c))
