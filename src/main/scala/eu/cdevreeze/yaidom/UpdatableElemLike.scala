@@ -88,23 +88,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
    * The method throws an exception if no element is found with the given path.
    */
   final def updated(path: ElemPath)(f: E => E): E = {
-    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
-    // "functional updates" (among other efficient operations).
-
     if (path == ElemPath.Root) f(self)
-    else {
-      val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
-      val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
-      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
-
-      // Recursive, but not tail-recursive
-      val updatedChildTree: E = foundChildElm.updated(path.withoutFirstEntry)(f)
-
-      val updatedChildren: immutable.IndexedSeq[N] =
-        self.children.updated(foundChildElmNodeIdx, updatedChildTree)
-
-      self.withChildren(updatedChildren)
-    }
+    else updatedWithNodeSeq(path) { e => Vector(f(e)) }
   }
 
   /** Returns `updated(path) { e => newElem }` */
@@ -174,6 +159,114 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
         assert(pf.isDefinedAt(e))
 
         acc.updated(path, pf(e))
+    }
+    result
+  }
+
+  /**
+   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
+   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). If the given path is the
+   * root path, this element itself is returned unchanged.
+   *
+   * The method throws an exception if no element is found with the given path.
+   */
+  final def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
+    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
+    // "functional updates" (among other efficient operations).
+
+    if (path == ElemPath.Root) self
+    else if (path.entries.size == 1) {
+      val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
+      val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
+      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
+
+      val updatedChildren: immutable.IndexedSeq[N] =
+        self.children.patch(foundChildElmNodeIdx, f(foundChildElm), 1)
+
+      self.withChildren(updatedChildren)
+    } else {
+      val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
+      val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
+      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
+
+      // Recursive, but not tail-recursive
+      val updatedChildTree: E = foundChildElm.updatedWithNodeSeq(path.withoutFirstEntry)(f)
+
+      val updatedChildren: immutable.IndexedSeq[N] =
+        self.children.updated(foundChildElmNodeIdx, updatedChildTree)
+
+      self.withChildren(updatedChildren)
+    }
+  }
+
+  /** Returns `updatedWithNodeSeq(path) { e => newNodes }` */
+  final def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E =
+    updatedWithNodeSeq(path) { e => newNodes }
+
+  /**
+   * Functionally updates the descendant elements for which the partial function is defined,
+   * within the tree of which this element is the root element.
+   *
+   * This function is equivalent to:
+   * {{{
+   * val p = { e: E => pf.isDefinedAt(e) }
+   * val pathsReversed = filterElemPaths(p).reverse
+   *
+   * pathsReversed.foldLeft(self) { case (acc, path) =>
+   *   val e = acc.findWithElemPath(path).get
+   *   acc.updatedWithNodeSeq(path, pf(e))
+   * }
+   * }}}
+   *
+   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
+   * and partly because many intermediate element objects may be created. Typically, when all elements must be "functionally
+   * updated" (so when the partial function is defined for all elements), it is better to do so by recursion, without using
+   * this function.
+   */
+  final def updatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
+    val p = { e: E => pf.isDefinedAt(e) }
+    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
+    val pathsReversed = filterElemPaths(p).reverse
+
+    val result: E = pathsReversed.foldLeft(self) {
+      case (acc, path) =>
+        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
+        assert(pf.isDefinedAt(e))
+
+        acc.updatedWithNodeSeq(path, pf(e))
+    }
+    result
+  }
+
+  /**
+   * Functionally updates the topmost descendant elements for which the partial function is defined,
+   * within the tree of which this element is the root element.
+   *
+   * This function is equivalent to:
+   * {{{
+   * val p = { e: E => pf.isDefinedAt(e) }
+   * val pathsReversed = findTopmostElemPaths(p).reverse
+   *
+   * pathsReversed.foldLeft(self) { case (acc, path) =>
+   *   val e = acc.findWithElemPath(path).get
+   *   acc.updatedWithNodeSeq(path, pf(e))
+   * }
+   * }}}
+   *
+   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
+   * and partly because many intermediate element objects may be created.
+   */
+  final def topmostUpdatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
+    val p = { e: E => pf.isDefinedAt(e) }
+    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
+    val pathsReversed = findTopmostElemPaths(p).reverse
+
+    val result: E = pathsReversed.foldLeft(self) {
+      case (acc, path) =>
+        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
+        assert(pf.isDefinedAt(e))
+
+        acc.updatedWithNodeSeq(path, pf(e))
     }
     result
   }

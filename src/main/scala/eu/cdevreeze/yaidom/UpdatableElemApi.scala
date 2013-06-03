@@ -102,4 +102,50 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * }}}
    */
   def topmostUpdated(pf: PartialFunction[E, E]): E
+
+  /**
+   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
+   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). If the given path is the
+   * root path, this element itself is returned unchanged.
+   *
+   * The method throws an exception if no element is found with the given path.
+   */
+  def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E
+
+  /** Returns `updatedWithNodeSeq(path) { e => newNodes }` */
+  def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E
+
+  /**
+   * Functionally updates the descendant elements for which the partial function is defined,
+   * within the tree of which this element is the root element.
+   *
+   * This function is equivalent to:
+   * {{{
+   * val p = { e: E => pf.isDefinedAt(e) }
+   * val pathsReversed = filterElemPaths(p).reverse
+   *
+   * pathsReversed.foldLeft(self) { case (acc, path) =>
+   *   val e = acc.findWithElemPath(path).get
+   *   acc.updatedWithNodeSeq(path, pf(e))
+   * }
+   * }}}
+   */
+  def updatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E
+
+  /**
+   * Functionally updates the topmost descendant elements for which the partial function is defined,
+   * within the tree of which this element is the root element.
+   *
+   * This function is equivalent to:
+   * {{{
+   * val p = { e: E => pf.isDefinedAt(e) }
+   * val pathsReversed = findTopmostElemPaths(p).reverse
+   *
+   * pathsReversed.foldLeft(self) { case (acc, path) =>
+   *   val e = acc.findWithElemPath(path).get
+   *   acc.updatedWithNodeSeq(path, pf(e))
+   * }
+   * }}}
+   */
+  def topmostUpdatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E
 }
