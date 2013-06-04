@@ -42,7 +42,7 @@ import scala.collection.immutable
  * // First define pf2, and let E be type Elem (it could be another element type as well, of course)
  *
  * val pf2: PartialFunction[Elem, Elem] = {
- *   case e: Elem if pf.isDefinedAt(e) && elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
+ *   case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
  * }
  *
  * // Then the following holds (in terms of '=='):
@@ -136,7 +136,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). If the given path is the
    * root path, this element itself is returned unchanged.
    *
-   * This function is equivalent to:
+   * This function could be defined as follows:
    * {{{
    * if (path == ElemPath.Root) self
    * else {
@@ -144,7 +144,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *   val childNodeIndex = parentElem.childNodeIndex(path.lastEntry)
    *   val childElem = parentElem.findWithElemPathEntry(path.lastEntry).get
    *
-   *   updated(parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
+   *   updated(path.parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
    * }
    * }}}
    * After all, this is just a functional update that replaces the parent element.

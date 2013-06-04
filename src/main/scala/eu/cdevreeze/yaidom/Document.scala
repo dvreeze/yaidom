@@ -100,6 +100,22 @@ final class Document(
   /** Returns `withDocumentElement(this.documentElement.topmostUpdated(pf))` */
   def topmostUpdated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.topmostUpdated(pf))
 
+  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(path)(f))` */
+  def updatedWithNodeSeq(path: ElemPath)(f: Elem => immutable.IndexedSeq[Node]): Document =
+    withDocumentElement(this.documentElement.updatedWithNodeSeq(path)(f))
+
+  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))` */
+  def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[Node]): Document =
+    withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))
+
+  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(pf))` */
+  def updatedWithNodeSeq(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document =
+    withDocumentElement(this.documentElement.updatedWithNodeSeq(pf))
+
+  /** Returns `withDocumentElement(this.documentElement.topmostUpdatedWithNodeSeq(pf))` */
+  def topmostUpdatedWithNodeSeq(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document =
+    withDocumentElement(this.documentElement.topmostUpdatedWithNodeSeq(pf))
+
   final def toTreeRepr(): String = {
     val sb = new StringBuilder
     toTreeReprAsLineSeq(0)(2).addToStringBuilder(sb)
