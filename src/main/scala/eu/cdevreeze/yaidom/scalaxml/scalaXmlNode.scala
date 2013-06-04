@@ -1,0 +1,180 @@
+/*
+ * Copyright 2011 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.cdevreeze.yaidom
+package scalaxml
+
+import java.{ util => jutil }
+import scala.collection.{ immutable, mutable }
+import convert.ScalaXmlConversions._
+
+/**
+ * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
+ * [[eu.cdevreeze.yaidom.ElemApi]] API.
+ *
+ * Use these wrappers only if there is a specific need for them. They have far more runtime costs than native yaidom elements.
+ *
+ * The wrappers are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
+ * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML node.
+ *
+ * @author Chris de Vreeze
+ */
+sealed trait ScalaXmlNode {
+
+  type DomType <: scala.xml.Node
+
+  def wrappedNode: DomType
+
+  final override def toString: String = wrappedNode.toString
+}
+
+trait ScalaXmlParentNode extends ScalaXmlNode {
+
+  final def children: immutable.IndexedSeq[ScalaXmlNode] = {
+    wrappedNode.child.toIndexedSeq flatMap { n: scala.xml.Node => ScalaXmlNode.wrapNodeOption(n) }
+  }
+}
+
+final class ScalaXmlDocument(
+  val wrappedNode: scala.xml.Document) {
+
+  require(wrappedNode ne null)
+
+  def documentElement: ScalaXmlElem = ScalaXmlNode.wrapElement(wrappedNode.docElem.asInstanceOf[scala.xml.Elem])
+}
+
+final class ScalaXmlElem(
+  override val wrappedNode: scala.xml.Elem) extends ScalaXmlParentNode with ElemLike[ScalaXmlElem] with HasText { self =>
+
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.Elem
+
+  override def findAllChildElems: immutable.IndexedSeq[ScalaXmlElem] = children collect { case e: ScalaXmlElem => e }
+
+  override def resolvedName: EName = {
+    val scope = extractScope(wrappedNode.scope)
+    val qname = toQName(wrappedNode)
+    scope.resolveQNameOption(qname).getOrElse(
+      sys.error("Could not resolve QName from prefix %s and label %s".format(Option(wrappedNode.prefix).getOrElse(""), wrappedNode.label)))
+  }
+
+  override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
+    val attrScope = extractScope(wrappedNode.scope).withoutDefaultNamespace
+    attributes map {
+      case (attrName, attrValue) =>
+        val ename = attrScope.resolveQNameOption(attrName).getOrElse(
+          sys.error("Could not resolve attribute name %s".format(attrName)))
+        (ename, attrValue)
+    }
+  }
+
+  def qname: QName = toQName(wrappedNode)
+
+  def attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(wrappedNode.attributes)
+
+  /** Returns the text children */
+  def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }
+
+  /** Returns the comment children */
+  def commentChildren: immutable.IndexedSeq[ScalaXmlComment] = children collect { case c: ScalaXmlComment => c }
+
+  /**
+   * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
+   * If there are no text children, the empty string is returned.
+   */
+  override def text: String = {
+    val textStrings = textChildren map { t => t.text }
+    textStrings.mkString
+  }
+}
+
+final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode {
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.Text
+
+  def text: String = wrappedNode.text
+
+  def trimmedText: String = text.trim
+
+  def normalizedText: String = XmlStringUtils.normalizeString(text)
+}
+
+final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends ScalaXmlNode {
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.PCData
+
+  def text: String = wrappedNode.text
+
+  def trimmedText: String = text.trim
+
+  def normalizedText: String = XmlStringUtils.normalizeString(text)
+}
+
+/**
+ * Wrapper around a Scala XML Atom that is not Text or PCData
+ */
+final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends ScalaXmlNode {
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.Atom[_]
+
+  def text: String = wrappedNode.data.toString
+}
+
+final class ScalaXmlProcessingInstruction(override val wrappedNode: scala.xml.ProcInstr) extends ScalaXmlNode {
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.ProcInstr
+}
+
+final class ScalaXmlEntityRef(override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode {
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.EntityRef
+}
+
+final class ScalaXmlComment(override val wrappedNode: scala.xml.Comment) extends ScalaXmlNode {
+  require(wrappedNode ne null)
+
+  override type DomType = scala.xml.Comment
+
+  def text: String = wrappedNode.commentText
+}
+
+object ScalaXmlNode {
+
+  def wrapNodeOption(node: scala.xml.Node): Option[ScalaXmlNode] = {
+    node match {
+      case e: scala.xml.Elem => Some(new ScalaXmlElem(e))
+      case cdata: scala.xml.PCData => Some(new ScalaXmlCData(cdata))
+      case t: scala.xml.Text => Some(new ScalaXmlText(t))
+      case at: scala.xml.Atom[_] =>
+        // Possibly an evaluated "parameter" in an XML literal
+        Some(new ScalaXmlAtom(at))
+      case pi: scala.xml.ProcInstr => Some(new ScalaXmlProcessingInstruction(pi))
+      case er: scala.xml.EntityRef => Some(new ScalaXmlEntityRef(er))
+      case c: scala.xml.Comment => Some(new ScalaXmlComment(c))
+      case _ => None
+    }
+  }
+
+  def wrapDocument(doc: scala.xml.Document): ScalaXmlDocument = new ScalaXmlDocument(doc)
+
+  def wrapElement(elm: scala.xml.Elem): ScalaXmlElem = new ScalaXmlElem(elm)
+}
