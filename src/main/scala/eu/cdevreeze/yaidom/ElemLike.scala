@@ -101,80 +101,55 @@ import scala.collection.{ immutable, mutable }
  */
 trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] with ElemApi[E] { self: E =>
 
-  /** Resolved name of the element, as `EName` */
   def resolvedName: EName
 
-  /**
-   * The attributes as a mapping from `EName`s (instead of `QName`s) to values.
-   *
-   * The implementation must ensure that `resolvedAttributes.toMap.size == resolvedAttributes.size`.
-   */
   def resolvedAttributes: immutable.Iterable[(EName, String)]
 
-  /** The local name (or local part). Convenience method. */
   final def localName: String = resolvedName.localPart
 
-  /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */
   final def attributeOption(expandedName: EName): Option[String] = resolvedAttributes.toMap.get(expandedName)
 
-  /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
-  final def attribute(expandedName: EName): String = attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
+  final def attribute(expandedName: EName): String =
+    attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
 
-  /**
-   * Returns the first found attribute value of an attribute with the given local name, if any, wrapped in an `Option`.
-   * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
-   */
   final def findAttributeByLocalName(localName: String): Option[String] = {
     val matchingAttrs = resolvedAttributes filter { case (en, v) => en.localPart == localName }
     matchingAttrs.map(_._2).headOption
   }
 
-  /** Shorthand for `attributeOption(expandedName)` */
   final def \@(expandedName: EName): Option[String] = attributeOption(expandedName)
 
-  /** Returns the child elements with the given expanded name */
   final def filterChildElems(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
 
-  /** Shorthand for `filterChildElems(expandedName)`. */
   final def \(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems(expandedName)
 
-  /** Returns the first found child element with the given expanded name, if any, wrapped in an `Option` */
   final def findChildElem(expandedName: EName): Option[E] = {
     findChildElem { e => e.resolvedName == expandedName }
   }
 
-  /** Returns the single child element with the given expanded name, and throws an exception otherwise */
   final def getChildElem(expandedName: EName): E = {
     val result = filterChildElems(expandedName)
     require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
     result.head
   }
 
-  /** Returns the descendant-or-self elements that have the given expanded name */
   final def filterElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
 
-  /** Shorthand for `filterElemsOrSelf(expandedName)`. */
   final def \\(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf(expandedName)
 
-  /** Returns the descendant elements with the given expanded name */
   final def filterElems(expandedName: EName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
 
-  /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] =
     findTopmostElemsOrSelf { e => e.resolvedName == expandedName }
 
-  /** Shorthand for `findTopmostElemsOrSelf(expandedName)`. */
   final def \\!(expandedName: EName): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(expandedName)
 
-  /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
   final def findTopmostElems(expandedName: EName): immutable.IndexedSeq[E] =
     findTopmostElems { e => e.resolvedName == expandedName }
 
-  /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */
   final def findElemOrSelf(expandedName: EName): Option[E] =
     findElemOrSelf { e => e.resolvedName == expandedName }
 
-  /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
   final def findElem(expandedName: EName): Option[E] =
     findElem { e => e.resolvedName == expandedName }
 }

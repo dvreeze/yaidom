@@ -24,6 +24,34 @@ import scala.collection.immutable
  * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
  * an XML database would not use the ``UpdatableElemLike`` implementation, for reasons of efficiency.
  *
+ * There are 2 groups of "functional update" methods that work with `ElemPath` instances (implicitly or explicitly:
+ * <ul>
+ * <li>Overloaded `updated` methods. They use an "update function" from elements to elements, and call it on the root element as well.</li>
+ * <li>Overloaded `updatedWithNodeSeq` methods. They use an "update function" from elements to node sequences, and do not call it on the root element.</li>
+ * </ul>
+ *
+ * The second group of "functional update" methods can be implemented in terms of the first group of methods. The second group of
+ * methods allow for flexible "functional updates", because an element can be "replaced" by an arbitrary sequence of nodes.
+ * For example, with the `updatedWithNodeSeq` (and `topmostUpdatedWithNodeSeq`) functions, it is easy to write functions to
+ * functionally delete elements, insert nodes before or after an element, etc.
+ *
+ * Below follow some formal properties that the "functional update" support obeys.
+ *
+ * For example, the following property (trivially) holds:
+ * {{{
+ * // First define pf2, and let E be type Elem (it could be another element type as well, of course)
+ *
+ * val pf2: PartialFunction[Elem, Elem] = {
+ *   case e: Elem if pf.isDefinedAt(e) && !elem.filterElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
+ * }
+ *
+ * // Then the following holds (in terms of '=='):
+ *
+ * elem.topmostUpdated(pf) == elem.updated(pf2)
+ * }}}
+ * 
+ * An analogous property holds for `topmostUpdatedWithNodeSeq` (taking a partial function) in terms of `updatedWithNodeSeq`.
+ *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
@@ -59,8 +87,8 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
   def minusChild(index: Int): E
 
   /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
+   * '''Core method''' that "functionally updates" the tree with this element as root element, by applying the passed function
+   * to the element that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path.
    */
@@ -107,6 +135,19 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
    * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). If the given path is the
    * root path, this element itself is returned unchanged.
+   *
+   * This function is equivalent to:
+   * {{{
+   * if (path == ElemPath.Root) self
+   * else {
+   *   val parentElem = getWithElemPath(path.parentPath)
+   *   val childNodeIndex = parentElem.childNodeIndex(path.lastEntry)
+   *   val childElem = parentElem.findWithElemPathEntry(path.lastEntry).get
+   *
+   *   updated(parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
+   * }
+   * }}}
+   * After all, this is just a functional update that replaces the parent element.
    *
    * The method throws an exception if no element is found with the given path.
    */

@@ -49,10 +49,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   // See https://pario.zendesk.com/entries/20124208-lesson-6-complex-xslt-example for an example of what we must be able to express easily.
 
-  /** Returns the child nodes of this element, in the correct order */
   def children: immutable.IndexedSeq[N]
 
-  /** Returns an element with the same name, attributes and scope as this element, but with the given child nodes */
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
   /**
@@ -64,35 +62,39 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
    */
   def childNodeIndex(childPathEntry: ElemPath.Entry): Int
 
-  /** Shorthand for `withChildren(children.updated(index, newChild))` */
   final def withUpdatedChildren(index: Int, newChild: N): E =
     withChildren(children.updated(index, newChild))
 
-  /** Shorthand for `withChildren(children.patch(from, newChildren, replace))` */
   final def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[N], replace: Int): E =
     withChildren(children.patch(from, newChildren, replace))
 
-  /** Returns a copy in which the given child has been inserted at the given position (0-based) */
   final def plusChild(index: Int, child: N): E = withPatchedChildren(index, Vector(child, children(index)), 1)
 
-  /** Returns a copy in which the given child has been inserted at the end */
   final def plusChild(child: N): E = withChildren(children :+ child)
 
-  /** Returns a copy in which the child at the given position (0-based) has been removed */
   final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
 
-  /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
-   *
-   * The method throws an exception if no element is found with the given path.
-   */
   final def updated(path: ElemPath)(f: E => E): E = {
+    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
+    // "functional updates" (among other efficient operations).
+
     if (path == ElemPath.Root) f(self)
-    else updatedWithNodeSeq(path) { e => Vector(f(e)) }
+    else {
+      val firstEntry = path.firstEntry
+      val foundChildElm: E = self.findWithElemPathEntry(firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
+      val foundChildElmNodeIdx = self.childNodeIndex(firstEntry)
+      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
+
+      // Recursive, but not tail-recursive
+      val updatedChildTree: E = foundChildElm.updated(path.withoutFirstEntry)(f)
+
+      val updatedChildren: immutable.IndexedSeq[N] =
+        self.children.updated(foundChildElmNodeIdx, updatedChildTree)
+
+      self.withChildren(updatedChildren)
+    }
   }
 
-  /** Returns `updated(path) { e => newElem }` */
   final def updated(path: ElemPath, newElem: E): E = updated(path) { e => newElem }
 
   /**
@@ -163,43 +165,25 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     result
   }
 
-  /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). If the given path is the
-   * root path, this element itself is returned unchanged.
-   *
-   * The method throws an exception if no element is found with the given path.
-   */
   final def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
-    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
-    // "functional updates" (among other efficient operations).
-
     if (path == ElemPath.Root) self
-    else if (path.entries.size == 1) {
-      val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
-      val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
-      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
+    else {
+      assert(path.parentPathOption.isDefined)
+      val parentPath = path.parentPath
+      val parentElem = getWithElemPath(parentPath)
 
-      val updatedChildren: immutable.IndexedSeq[N] =
-        self.children.patch(foundChildElmNodeIdx, f(foundChildElm), 1)
+      val lastEntry = path.lastEntry
+      val childNodeIndex = parentElem.childNodeIndex(lastEntry)
+      assert(childNodeIndex >= 0)
 
-      self.withChildren(updatedChildren)
-    } else {
-      val foundChildElm: E = self.findWithElemPathEntry(path.firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
-      val foundChildElmNodeIdx = self.childNodeIndex(path.firstEntry)
-      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
+      val childElemOption = parentElem.findWithElemPathEntry(lastEntry)
+      assert(childElemOption.isDefined)
+      val childElem = childElemOption.get
 
-      // Recursive, but not tail-recursive
-      val updatedChildTree: E = foundChildElm.updatedWithNodeSeq(path.withoutFirstEntry)(f)
-
-      val updatedChildren: immutable.IndexedSeq[N] =
-        self.children.updated(foundChildElmNodeIdx, updatedChildTree)
-
-      self.withChildren(updatedChildren)
+      updated(parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
     }
   }
 
-  /** Returns `updatedWithNodeSeq(path) { e => newNodes }` */
   final def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E =
     updatedWithNodeSeq(path) { e => newNodes }
 
