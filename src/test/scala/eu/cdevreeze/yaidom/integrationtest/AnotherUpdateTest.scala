@@ -71,6 +71,16 @@ class AnotherUpdateTest extends Suite {
     expectResult(resolved.Elem(docWithoutMags.documentElement)) {
       resolved.Elem(doc.documentElement).updatedWithNodeSeq(deleteMagsResolved)
     }
+
+    val deleteMags2: PartialFunction[Elem, Vector[Node]] = {
+      case e: Elem if doc.documentElement.findTopmostElemsOrSelf(e2 => deleteMags.isDefinedAt(e2)).contains(e) => deleteMags(e)
+    }
+
+    // Checking a general property
+
+    expectResult(resolved.Elem(doc.documentElement.topmostUpdatedWithNodeSeq(deleteMags))) {
+      resolved.Elem(doc.documentElement.updatedWithNodeSeq(deleteMags2))
+    }
   }
 
   @Test def testInsertAfter() {

@@ -47,7 +47,7 @@ import scala.collection.immutable
  *
  * // Then the following holds (in terms of '=='):
  *
- * elem.topmostUpdated(pf) == elem.updated(pf2)
+ * resolved.Elem(elem.topmostUpdated(pf)) == resolved.Elem(elem.updated(pf2))
  * }}}
  *
  * An analogous property holds for `topmostUpdatedWithNodeSeq` (taking a partial function) in terms of `updatedWithNodeSeq`.
