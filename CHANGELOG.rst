@@ -10,20 +10,20 @@ This is still another version leading up to version 0.7.0. It does contain a few
 
 * Big breaking API change: XML literals are gone (i.e. hidden), and replaced by conversions from Scala XML to yaidom
 
-  * The conversions from Scala XML to yaidom make it possible to create Scala XML literals, and immediately convert them to yaidom
-  * Yaidom XML literals, on the other hand, need a lot of work before they become useful
-  * One problem with the yaidom XML literals is the runtime cost, of XML parsing at each use (instead of having a macro "compile" them)
-  * Another problem with yaidom XML literals is the restrictions w.r.t. where parameters can be used
-  * The conversions between Scala XML Elems and yaidom Elems are one-way, from Scala XML to yaidom
+  * The conversions from Scala XML to yaidom make it possible to create Scala XML literals, and immediately convert them to yaidom Elems
+  * Yaidom XML literals, on the other hand, still need a lot of work before they become useful
+  * One problem with the yaidom XML literals concerns the runtime costs of XML parsing at each use (instead of having a macro "compile" them)
+  * Another problem with yaidom XML literals concerns the restrictions w.r.t. the locations of parameters
+  * The conversions between Scala XML Elems and yaidom Elems are one-way only, from Scala XML to yaidom
   * These conversions make it possible to use Scala XML literals as if they are "yaidom XML literals"
   * These conversions even work around nasty XML Scala namespace-related bugs, such as SI-6939
   
 * Breaking API change: removed overloaded ``\``, ``\\``, ``\\!`` and ``\@`` methods taking just a local name (as string)
 
   * An experiment was conducted to make EName and QName (Scala 2.10) value classes, to avoid EName/QName object explosion
-  * In this experiment, the overloads above had to go (and they violated the "precision" of yaidom anyway)
+  * In this experiment, the overloads above had to go (besides, they violated the "precision" of yaidom anyway)
   * This experimental change has been reverted (for now), but I want to keep the option open to use value classes for EName/QName in the future
-  * So the overloaded methods above have been removed, and are not expected to come back
+  * So the overloaded methods above have been removed (probably permanently)
   * In the spirit of "precise" querying, also renamed ``findAttribute`` (taking a local name) to ``findAttributeByLocalName``
 
 * Breaking API change: renamed ``baseUriOption`` to ``uriOption``, and ``withBaseUriOption`` to ``withUriOption``
@@ -33,9 +33,9 @@ This is still another version leading up to version 0.7.0. It does contain a few
 
 As for the maturity of parts of yaidom:
 
-* Its querying support is most mature. The APIs ("abstractions") are simple and clear, and seem to work well.
-* Its functional update support is still rather basic. It should first mature outside of yaidom, instead of further postponing version 0.7.0.
-* Its XML literal support simply was not useful yet, so an alternative has been provided in version 0.6.9 (instead of further postponing version 0.7.0).
+* Its querying support is the most mature part. The APIs ("abstractions") are simple and clear, and seem to work well.
+* Its functional update support is still rather basic. It should first mature, without postponing version 0.7.0 too much.
+* Its XML literal support simply is not useful yet, so an alternative has been provided in version 0.6.9 (instead of further postponing version 0.7.0).
 
 
 0.6.8

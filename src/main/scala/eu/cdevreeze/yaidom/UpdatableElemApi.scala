@@ -24,7 +24,7 @@ import scala.collection.immutable
  * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
  * an XML database would not use the ``UpdatableElemLike`` implementation, for reasons of efficiency.
  *
- * There are 2 groups of "functional update" methods that work with `ElemPath` instances (implicitly or explicitly:
+ * There are 2 groups of "functional update" methods that work with `ElemPath` instances (implicitly or explicitly):
  * <ul>
  * <li>Overloaded `updated` methods. They use an "update function" from elements to elements, and call it on the root element as well.</li>
  * <li>Overloaded `updatedWithNodeSeq` methods. They use an "update function" from elements to node sequences, and do not call it on the root element.</li>
@@ -32,8 +32,8 @@ import scala.collection.immutable
  *
  * The second group of "functional update" methods can be implemented in terms of the first group of methods. The second group of
  * methods allow for flexible "functional updates", because an element can be "replaced" by an arbitrary sequence of nodes.
- * For example, with the `updatedWithNodeSeq` (and `topmostUpdatedWithNodeSeq`) functions, it is easy to write functions to
- * functionally delete elements, insert nodes before or after an element, etc.
+ * For example, with the `updatedWithNodeSeq` (and `topmostUpdatedWithNodeSeq`) functions (taking a partial function parameter),
+ * it is easy to write functions to functionally delete elements, insert nodes before or after an element, etc.
  *
  * Below follow some formal properties that the "functional update" support obeys.
  *
@@ -42,14 +42,14 @@ import scala.collection.immutable
  * // First define pf2, and let E be type Elem (it could be another element type as well, of course)
  *
  * val pf2: PartialFunction[Elem, Elem] = {
- *   case e: Elem if pf.isDefinedAt(e) && !elem.filterElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
+ *   case e: Elem if pf.isDefinedAt(e) && elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
  * }
  *
  * // Then the following holds (in terms of '=='):
  *
  * elem.topmostUpdated(pf) == elem.updated(pf2)
  * }}}
- * 
+ *
  * An analogous property holds for `topmostUpdatedWithNodeSeq` (taking a partial function) in terms of `updatedWithNodeSeq`.
  *
  * @tparam N The node supertype of the element subtype
