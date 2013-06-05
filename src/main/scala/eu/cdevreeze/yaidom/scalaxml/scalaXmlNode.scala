@@ -25,7 +25,9 @@ import convert.ScalaXmlConversions._
  * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
  * [[eu.cdevreeze.yaidom.ElemApi]] API.
  *
- * Use these wrappers only if there is a specific need for them. They have far more runtime costs than native yaidom elements.
+ * Use these wrappers only if there is a specific need for them, because these wrappers do have their costs (such as the creation
+ * of lots of query result objects, the repeated costs of querying element/attribute names, the conceptual differences between
+ * Scala XML and native yaidom nodes, etc.).
  *
  * The wrappers are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML node.
@@ -48,14 +50,12 @@ trait ScalaXmlParentNode extends ScalaXmlNode {
   }
 }
 
-final class ScalaXmlDocument(
-  val wrappedNode: scala.xml.Document) {
-
-  require(wrappedNode ne null)
-
-  def documentElement: ScalaXmlElem = ScalaXmlNode.wrapElement(wrappedNode.docElem.asInstanceOf[scala.xml.Elem])
-}
-
+/**
+ * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.ElemApi]] API.
+ *
+ * The wrapper instances are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
+ * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
+ */
 final class ScalaXmlElem(
   override val wrappedNode: scala.xml.Elem) extends ScalaXmlParentNode with ElemLike[ScalaXmlElem] with HasText { self =>
 
@@ -173,8 +173,6 @@ object ScalaXmlNode {
       case _ => None
     }
   }
-
-  def wrapDocument(doc: scala.xml.Document): ScalaXmlDocument = new ScalaXmlDocument(doc)
 
   def wrapElement(elm: scala.xml.Elem): ScalaXmlElem = new ScalaXmlElem(elm)
 }

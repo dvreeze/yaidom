@@ -56,7 +56,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("books.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -80,7 +80,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("strangeXml.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -98,7 +98,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXml.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -319,7 +319,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -349,7 +349,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -369,7 +369,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -405,7 +405,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("cars.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val root: ScalaXmlElem = domDoc.documentElement
 
@@ -468,7 +468,7 @@ class ScalaXmlWrapperTest extends Suite {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("gaap.xsd")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
-    val domDoc: ScalaXmlDocument = ScalaXmlNode.wrapDocument(doc)
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
     val elementDecls = domDoc.documentElement filterElems { e =>
       e.resolvedName == EName(nsXmlSchema, "element")
