@@ -42,7 +42,7 @@ import javax.xml.transform.stream.StreamResult
  */
 final class DocumentPrinterUsingSax(
   val saxTransformerFactory: SAXTransformerFactory,
-  val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler) extends DocumentPrinter {
+  val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler) extends AbstractDocumentPrinter {
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val handler = transformerHandlerCreator(saxTransformerFactory)

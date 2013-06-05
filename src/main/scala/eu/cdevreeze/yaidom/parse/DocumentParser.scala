@@ -21,7 +21,7 @@ import java.io.{ InputStream, File }
 import java.net.URI
 
 /**
- * [[eu.cdevreeze.yaidom.Document]] parser.
+ * [[eu.cdevreeze.yaidom.Document]] parser. This trait is purely abstract.
  *
  * Implementing classes deal with the details of parsing XML strings/streams into yaidom `Document`s.
  * The [[eu.cdevreeze.yaidom]] package itself is agnostic of those details.

@@ -52,7 +52,7 @@ final class DocumentPrinterUsingDomLS(
   val docBuilderFactory: DocumentBuilderFactory,
   val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
   val domImplementation: DOMImplementationLS,
-  val serializerCreator: DOMImplementationLS => LSSerializer) extends DocumentPrinter { self =>
+  val serializerCreator: DOMImplementationLS => LSSerializer) extends AbstractDocumentPrinter { self =>
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)

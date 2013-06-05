@@ -20,7 +20,7 @@ package print
 import java.io.{ OutputStream, ByteArrayOutputStream }
 
 /**
- * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a `String` or byte array).
+ * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a `String` or byte array). This trait is purely abstract.
  *
  * Implementing classes deal with the details of printing yaidom documents as XML strings or byte arrays.
  * The [[eu.cdevreeze.yaidom]] package itself is agnostic of those details.
@@ -46,11 +46,7 @@ trait DocumentPrinter {
   def print(doc: Document, encoding: String, outputStream: OutputStream): Unit
 
   /** Converts the `Document` to a byte array, using the given encoding. May use a lot of memory for large XML documents. */
-  final def print(doc: Document, encoding: String): Array[Byte] = {
-    val bos = new ByteArrayOutputStream
-    print(doc, encoding, bos)
-    bos.toByteArray
-  }
+  def print(doc: Document, encoding: String): Array[Byte]
 
   /**
    * Converts the `Document` to a `String`. May use a lot of memory for large XML documents.
@@ -65,19 +61,13 @@ trait DocumentPrinter {
   def omittingXmlDeclaration: DocumentPrinter
 
   /** Converts the `Elem` to a byte array, omitting the XML declaration */
-  final def print(elm: Elem, encoding: String): Array[Byte] = {
-    val printer = omittingXmlDeclaration
-    printer.print(Document(elm), encoding)
-  }
+  def print(elm: Elem, encoding: String): Array[Byte]
 
   /**
    * Serializes the `Elem` to an output stream, omitting the XML declaration.
    * This method should close the output stream afterwards.
    */
-  final def print(elm: Elem, encoding: String, outputStream: OutputStream): Unit = {
-    val printer = omittingXmlDeclaration
-    printer.print(Document(elm), encoding, outputStream)
-  }
+  def print(elm: Elem, encoding: String, outputStream: OutputStream): Unit
 
   /**
    * Converts the `Elem` to a `String`, omitting the XML declaration. May use a lot of memory for large XML documents.
@@ -86,8 +76,5 @@ trait DocumentPrinter {
    * (and of the encoding mentioned in the XML declaration, if any), consider using one of the other overloaded
    * `print` methods taking an `Elem`.
    */
-  final def print(elm: Elem): String = {
-    val printer = omittingXmlDeclaration
-    printer.print(Document(elm))
-  }
+  def print(elm: Elem): String
 }

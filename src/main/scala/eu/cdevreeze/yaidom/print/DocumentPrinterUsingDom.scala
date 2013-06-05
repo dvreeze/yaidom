@@ -79,7 +79,7 @@ final class DocumentPrinterUsingDom(
   val docBuilderFactory: DocumentBuilderFactory,
   val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
   val transformerFactory: TransformerFactory,
-  val transformerCreator: TransformerFactory => Transformer) extends DocumentPrinter {
+  val transformerCreator: TransformerFactory => Transformer) extends AbstractDocumentPrinter {
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)

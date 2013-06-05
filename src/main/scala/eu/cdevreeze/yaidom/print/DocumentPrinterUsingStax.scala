@@ -41,7 +41,7 @@ import convert.YaidomToStaxEventsConversions
  */
 sealed class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,
-  val outputFactory: XMLOutputFactory) extends DocumentPrinter {
+  val outputFactory: XMLOutputFactory) extends AbstractDocumentPrinter {
 
   val omitXmlDeclaration: Boolean = false
 
