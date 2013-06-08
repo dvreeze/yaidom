@@ -147,6 +147,24 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *   updated(path.parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
    * }
    * }}}
+   * or, put differently:
+   * {{{
+   * // First define function g as follows:
+   *
+   * def g(e: Elem): Elem = {
+   *   if (path == ElemPath.Root) e
+   *   else {
+   *     e.withPatchedChildren(
+   *       e.childNodeIndex(path.lastEntry),
+   *       f(e.findWithElemPathEntry(path.lastEntry).get),
+   *       1)
+   *   }
+   * }
+   *
+   * // Then the function updatedWithNodeSeq(path)(f) could be defined as:
+   *
+   * updated(path.parentPathOption.getOrElse(ElemPath.Root))(g)
+   * }}}
    * After all, this is just a functional update that replaces the parent element.
    *
    * The method throws an exception if no element is found with the given path.

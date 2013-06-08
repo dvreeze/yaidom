@@ -27,7 +27,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingDom
 import print.DocumentPrinterUsingDom
-import NodeBuilder._
+import convert.ScalaXmlConversions._
 
 /**
  * Another XML functional update test case.
@@ -72,15 +72,7 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(doc.documentElement).updatedWithNodeSeq(deleteMagsResolved)
     }
 
-    val deleteMags2: PartialFunction[Elem, Vector[Node]] = {
-      case e: Elem if doc.documentElement.findTopmostElemsOrSelf(e2 => deleteMags.isDefinedAt(e2)).contains(e) => deleteMags(e)
-    }
-
-    // Checking a general property
-
-    expectResult(resolved.Elem(doc.documentElement.topmostUpdatedWithNodeSeq(deleteMags))) {
-      resolved.Elem(doc.documentElement.updatedWithNodeSeq(deleteMags2))
-    }
+    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, deleteMags)
   }
 
   @Test def testInsertAfter() {
@@ -89,35 +81,26 @@ class AnotherUpdateTest extends Suite {
     val doc: Document = docParser.parse(is)
 
     val newBook = {
-      import NodeBuilder._
+      val scalaElem =
+        <Book xmlns="http://bookstore" ISBN="978-0981531649" Price="37" Edition="2nd">
+          <Title>Programming in Scala: A Comprehensive Step-by-Step Guide</Title>
+          <Authors>
+            <Author>
+              <First_Name>Martin</First_Name>
+              <Last_Name>Odersky</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Lex</First_Name>
+              <Last_Name>Spoon</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Bill</First_Name>
+              <Last_Name>Venners</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
 
-      val eb =
-        elem(
-          qname = QName("Book"),
-          attributes = Vector(QName("ISBN") -> "978-0981531649", QName("Price") -> "37", QName("Edition") -> "2nd"),
-          namespaces = Declarations.from("" -> "http://bookstore"),
-          children = Vector(
-            textElem(QName("Title"), "Programming in Scala: A Comprehensive Step-by-Step Guide"),
-            elem(
-              qname = QName("Authors"),
-              children = Vector(
-                elem(
-                  qname = QName("Author"),
-                  children = Vector(
-                    textElem(QName("First_Name"), "Martin"),
-                    textElem(QName("Last_Name"), "Odersky"))),
-                elem(
-                  qname = QName("Author"),
-                  children = Vector(
-                    textElem(QName("First_Name"), "Lex"),
-                    textElem(QName("Last_Name"), "Spoon"))),
-                elem(
-                  qname = QName("Author"),
-                  children = Vector(
-                    textElem(QName("First_Name"), "Bill"),
-                    textElem(QName("Last_Name"), "Venners")))))))
-
-      eb.build(doc.documentElement.scope)
+      convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
     val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
@@ -144,6 +127,51 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
+    }
+
+    val insertBook: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
+      case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(e, newBook)
+    }
+    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, insertBook)
+
+    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(e, newBook) })
+  }
+
+  private def testPropertyAboutTopmostUpdated(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
+    val pf2: PartialFunction[Elem, Elem] = {
+      case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
+    }
+
+    expectResult(resolved.Elem(elem.updated(pf2))) {
+      resolved.Elem(elem.topmostUpdated(pf))
+    }
+  }
+
+  private def testPropertyAboutTopmostUpdatedWithNodeSeq(elem: Elem, pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Unit = {
+    val pf2: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
+      case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
+    }
+
+    expectResult(resolved.Elem(elem.updatedWithNodeSeq(pf2))) {
+      resolved.Elem(elem.topmostUpdatedWithNodeSeq(pf))
+    }
+  }
+
+  private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: ElemPath, f: Elem => immutable.IndexedSeq[Node]): Unit = {
+    def g(e: Elem): Elem = {
+      if (path == ElemPath.Root) e
+      else {
+        e.withPatchedChildren(
+          e.childNodeIndex(path.lastEntry),
+          f(e.findWithElemPathEntry(path.lastEntry).get),
+          1)
+      }
+    }
+
+    val updatedElem = elem.updated(path.parentPathOption.getOrElse(ElemPath.Root))(g)
+
+    expectResult(resolved.Elem(updatedElem)) {
+      resolved.Elem(elem.updatedWithNodeSeq(path)(f))
     }
   }
 }
