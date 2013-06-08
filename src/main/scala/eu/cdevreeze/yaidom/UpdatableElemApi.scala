@@ -39,7 +39,7 @@ import scala.collection.immutable
  *
  * For example, the following property (trivially) holds:
  * {{{
- * // First define pf2, and let E be type Elem (it could be another element type as well, of course)
+ * // First define pf2, and let E be type Elem
  *
  * val pf2: PartialFunction[Elem, Elem] = {
  *   case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
@@ -51,6 +51,27 @@ import scala.collection.immutable
  * }}}
  *
  * An analogous property holds for `topmostUpdatedWithNodeSeq` (taking a partial function) in terms of `updatedWithNodeSeq`.
+ *
+ * Another property reduces `updatedWithNodeSeq` to `updated`:
+ * {{{
+ * // Let E be type Elem, and define pf2 as follows:
+ *
+ * val pf2: PartialFunction[Elem, Elem] = {
+ *   case e: Elem if !e.filterChildElems(che => pf.isDefinedAt(che)).isEmpty =>
+ *     val childElemsWithPathEntries = e.findAllChildElemsWithPathEntries.filter(elemPathPair => pf.isDefinedAt(elemPathPair._1)).reverse
+ *
+ *     childElemsWithPathEntries.foldLeft(e) { case (acc, (che, pathEntry)) =>
+ *       acc.withPatchedChildren(acc.childNodeIndex(pathEntry), pf(che), 1)
+ *     }
+ * }
+ *
+ * // Then the following holds (in terms of '=='):
+ *
+ * resolved.Elem(elem.updatedWithNodeSeq(pf)) == resolved.Elem(elem.updated(pf2))
+ * }}}
+ *
+ * In summary, the functional update methods can all be understood (directly or indirectly) in terms of method
+ * `updated(path)(f)`.
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
@@ -138,17 +159,6 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * This function could be defined as follows:
    * {{{
-   * if (path == ElemPath.Root) self
-   * else {
-   *   val parentElem = getWithElemPath(path.parentPath)
-   *   val childNodeIndex = parentElem.childNodeIndex(path.lastEntry)
-   *   val childElem = parentElem.findWithElemPathEntry(path.lastEntry).get
-   *
-   *   updated(path.parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
-   * }
-   * }}}
-   * or, put differently:
-   * {{{
    * // First define function g as follows:
    *
    * def g(e: Elem): Elem = {
@@ -165,7 +175,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * updated(path.parentPathOption.getOrElse(ElemPath.Root))(g)
    * }}}
-   * After all, this is just a functional update that replaces the parent element.
+   * After all, this is just a functional update that replaces the parent element, if it exists.
    *
    * The method throws an exception if no element is found with the given path.
    */

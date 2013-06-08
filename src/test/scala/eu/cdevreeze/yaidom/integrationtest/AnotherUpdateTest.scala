@@ -73,6 +73,8 @@ class AnotherUpdateTest extends Suite {
     }
 
     testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, deleteMags)
+
+    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, deleteMags)
   }
 
   @Test def testInsertAfter() {
@@ -135,6 +137,8 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, insertBook)
 
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(e, newBook) })
+
+    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, insertBook)
   }
 
   private def testPropertyAboutTopmostUpdated(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
@@ -172,6 +176,23 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(updatedElem)) {
       resolved.Elem(elem.updatedWithNodeSeq(path)(f))
+    }
+  }
+
+  private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Unit = {
+    val pf2: PartialFunction[Elem, Elem] = {
+      case e: Elem if !e.filterChildElems(che => pf.isDefinedAt(che)).isEmpty =>
+        val childElemsWithPathEntries =
+          e.findAllChildElemsWithPathEntries.filter(elemPathPair => pf.isDefinedAt(elemPathPair._1)).reverse
+
+        childElemsWithPathEntries.foldLeft(e) {
+          case (acc, (che, pathEntry)) =>
+            acc.withPatchedChildren(acc.childNodeIndex(pathEntry), pf(che), 1)
+        }
+    }
+
+    expectResult(resolved.Elem(elem.updated(pf2))) {
+      resolved.Elem(elem.updatedWithNodeSeq(pf))
     }
   }
 }
