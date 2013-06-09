@@ -141,6 +141,175 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, insertBook)
   }
 
+  @Test def testInsertBefore() {
+    val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
+
+    val doc: Document = docParser.parse(is)
+
+    val newBook = {
+      val scalaElem =
+        <Book xmlns="http://bookstore" ISBN="978-0981531649" Price="37" Edition="2nd">
+          <Title>Programming in Scala: A Comprehensive Step-by-Step Guide</Title>
+          <Authors>
+            <Author>
+              <First_Name>Martin</First_Name>
+              <Last_Name>Odersky</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Lex</First_Name>
+              <Last_Name>Spoon</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Bill</First_Name>
+              <Last_Name>Venners</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
+
+      convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
+    }
+
+    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+
+    val docWithScalaBook: Document = {
+      val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
+      result.withDocumentElement(result.documentElement.prettify(4))
+    }
+
+    val newLastBookPathButOne: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
+    val newLastBookButOne: Elem = docWithScalaBook.documentElement.getWithElemPath(newLastBookPathButOne)
+
+    expectResult("Programming in Scala") {
+      (newLastBookButOne \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
+    }
+
+    val docWithoutNonDatabaseBook: Document = {
+      val deleteNonDatabaseBook: PartialFunction[Elem, Vector[Node]] = {
+        case e: Elem if e.localName == "Book" && (e \ (_.localName == "Title")).head.text.contains("Scala") => Vector[Node]()
+      }
+
+      docWithScalaBook.updatedWithNodeSeq(deleteNonDatabaseBook)
+    }
+
+    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
+    }
+
+    val insertBook: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
+      case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(newBook, e)
+    }
+    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, insertBook)
+
+    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(newBook, e) })
+
+    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, insertBook)
+  }
+
+  @Test def testInsertAsFirstInto() {
+    val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
+
+    val doc: Document = docParser.parse(is)
+
+    val newBook = {
+      val scalaElem =
+        <Book xmlns="http://bookstore" ISBN="978-0981531649" Price="37" Edition="2nd">
+          <Title>Programming in Scala: A Comprehensive Step-by-Step Guide</Title>
+          <Authors>
+            <Author>
+              <First_Name>Martin</First_Name>
+              <Last_Name>Odersky</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Lex</First_Name>
+              <Last_Name>Spoon</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Bill</First_Name>
+              <Last_Name>Venners</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
+
+      convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
+    }
+
+    val insertBook: PartialFunction[Elem, Elem] = {
+      case e: Elem if e.localName == "Bookstore" => e.plusChild(0, newBook)
+    }
+
+    val docWithScalaBook: Document = {
+      val result = doc.updated(insertBook)
+      result.withDocumentElement(result.documentElement.prettify(4))
+    }
+
+    val newFirstBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
+    val newFirstBook: Elem = docWithScalaBook.documentElement.getWithElemPath(newFirstBookPath)
+
+    expectResult("Programming in Scala") {
+      (newFirstBook \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
+    }
+
+    val docWithoutNonDatabaseBook: Document = {
+      val deleteNonDatabaseBook: PartialFunction[Elem, Vector[Node]] = {
+        case e: Elem if e.localName == "Book" && (e \ (_.localName == "Title")).head.text.contains("Scala") => Vector[Node]()
+      }
+
+      docWithScalaBook.updatedWithNodeSeq(deleteNonDatabaseBook)
+    }
+
+    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
+    }
+
+    testPropertyAboutTopmostUpdated(doc.documentElement, insertBook)
+  }
+
+  @Test def testUpdate() {
+    val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
+
+    val doc: Document = docParser.parse(is)
+
+    val updateMag: PartialFunction[Elem, Elem] = {
+      case e: Elem if (e \ (_.localName == "Title")).map(_.text).mkString == "National Geographic" =>
+        e.plusAttribute(QName("Month"), "January").plusAttribute(QName("Year"), "2010")
+    }
+
+    val updatedDoc: Document = {
+      val result = doc.updated(updateMag)
+      result.withDocumentElement(result.documentElement.prettify(4))
+    }
+
+    val updateMag2: PartialFunction[Elem, Vector[Node]] = {
+      case e: Elem if updateMag.isDefinedAt(e) => Vector(updateMag(e))
+    }
+
+    val updatedDoc2: Document = {
+      val result = doc.updatedWithNodeSeq(updateMag2)
+      result.withDocumentElement(result.documentElement.prettify(4))
+    }
+
+    expectResult(resolved.Elem(updatedDoc.documentElement)) {
+      resolved.Elem(updatedDoc2.documentElement)
+    }
+
+    val newMag = {
+      val results =
+        (updatedDoc.documentElement \ (che =>
+          che.localName == "Magazine" && (che \ (_.localName == "Title")).head.text == "National Geographic"))
+      results.head
+    }
+
+    expectResult("2010") {
+      (newMag \@ EName("Year")).getOrElse("")
+    }
+
+    testPropertyAboutTopmostUpdated(doc.documentElement, updateMag)
+
+    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, updateMag2)
+
+    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, updateMag2)
+  }
+
   private def testPropertyAboutTopmostUpdated(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
     val pf2: PartialFunction[Elem, Elem] = {
       case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
