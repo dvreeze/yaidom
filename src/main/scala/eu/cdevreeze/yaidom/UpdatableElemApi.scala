@@ -39,7 +39,7 @@ import scala.collection.immutable
  *
  * For example, the following property (trivially) holds:
  * {{{
- * // First define pf2, and let E be type Elem
+ * // First define pf2 in terms of partial function pf, and let E be type Elem
  *
  * val pf2: PartialFunction[Elem, Elem] = {
  *   case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
@@ -58,7 +58,8 @@ import scala.collection.immutable
  *
  * val pf2: PartialFunction[Elem, Elem] = {
  *   case e: Elem if !e.filterChildElems(che => pf.isDefinedAt(che)).isEmpty =>
- *     val childElemsWithPathEntries = e.findAllChildElemsWithPathEntries.filter(elemPathPair => pf.isDefinedAt(elemPathPair._1)).reverse
+ *     val childElemsWithPathEntries =
+ *       e.findAllChildElemsWithPathEntries.filter(elemPathPair => pf.isDefinedAt(elemPathPair._1)).reverse
  *
  *     childElemsWithPathEntries.foldLeft(e) { case (acc, (che, pathEntry)) =>
  *       acc.withPatchedChildren(acc.childNodeIndex(pathEntry), pf(che), 1)

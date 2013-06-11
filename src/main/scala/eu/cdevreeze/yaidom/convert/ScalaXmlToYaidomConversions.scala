@@ -105,7 +105,11 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
 
   /** Converts attributes, given as `scala.xml.MetaData`, to an `immutable.IndexedSeq[(QName, String)]`. */
   final def extractAttributes(attrs: scala.xml.MetaData): immutable.IndexedSeq[(QName, String)] = {
-    attrs.toIndexedSeq map { attr: scala.xml.MetaData => (toQName(attr) -> attr.value(0).text) }
+    attrs.toIndexedSeq map { attr: scala.xml.MetaData =>
+      val attrValue = attr.value
+      val attrValueText = if (attrValue.size >= 1) attrValue(0).text else ""
+      (toQName(attr) -> attrValueText)
+    }
   }
 
   /**
