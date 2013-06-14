@@ -678,7 +678,8 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testUndeclaringPrefixedNamespace() {
+  /** Disabled test, because it is unclear what behavior to expect w.r.t. Scala XML literals and XML 1.1. */
+  @Ignore @Test def testUndeclaringPrefixedNamespace() {
     // Note: undeclaring prefixes is only allowed for XML version 1.1
 
     val xml =
