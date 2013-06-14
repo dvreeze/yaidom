@@ -343,6 +343,8 @@ final class Elem(
       case _ => false
     }
 
+    val tabOrSpace = if (useTab) '\t' else ' '
+
     // Not an efficient implementation. It is recursive, but not tail-recursive.
 
     def prettify(elm: Elem, currentIndent: Int): Elem = {
@@ -352,8 +354,8 @@ final class Elem(
 
       if (doPrettify) {
         val newIndent = currentIndent + indent
-        val indentText = Text(newLine + (" " * newIndent), false)
-        val endIndentText = Text(newLine + (" " * currentIndent), false)
+        val indentText = Text(newLine + (tabOrSpace * newIndent), false)
+        val endIndentText = Text(newLine + (tabOrSpace * currentIndent), false)
 
         val prettifiedChildNodes = childNodes map {
           case e: Elem => prettify(e, newIndent)
