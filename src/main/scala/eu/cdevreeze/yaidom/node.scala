@@ -327,14 +327,8 @@ final class Elem(
    * "Prettifies" this Elem. That is, first calls method `removeAllInterElementWhitespace`, and then transforms the result
    * by inserting text nodes with newlines and whitespace for indentation.
    */
-  def prettify(indent: Int, newLine: String = "\n"): Elem = prettify(' ' * indent, newLine)
-
-  /**
-   * "Prettifies" this Elem. That is, first calls method `removeAllInterElementWhitespace`, and then transforms the result
-   * by inserting text nodes with newlines and whitespace for indentation.
-   */
-  def prettify(indentString: String, newLine: String): Elem = {
-    require(indentString.trim.isEmpty, "The indent string must only contain whitespace characters")
+  def prettify(indent: Int, useTab: Boolean = false, newLine: String = "\n"): Elem = {
+    require(indent >= 0, "The indent can not be negative")
     require(
       newLine.size >= 1 && newLine.size <= 2 && (newLine.forall(c => c == '\n' || c == '\r')),
       "The newline must be a valid newline")
@@ -351,18 +345,18 @@ final class Elem(
 
     // Not an efficient implementation. It is recursive, but not tail-recursive.
 
-    def prettify(elm: Elem, currentIndentString: String): Elem = {
+    def prettify(elm: Elem, currentIndent: Int): Elem = {
       val childNodes = elm.children
       val hasElemChild = findChildElem(e => true).isDefined
       val doPrettify = (childNodes forall (n => !isText(n))) && (hasElemChild)
 
       if (doPrettify) {
-        val newIndentString = currentIndentString + indentString
-        val indentText = Text(newLine + newIndentString, false)
-        val endIndentText = Text(newLine + currentIndentString, false)
+        val newIndent = currentIndent + indent
+        val indentText = Text(newLine + (" " * newIndent), false)
+        val endIndentText = Text(newLine + (" " * currentIndent), false)
 
         val prettifiedChildNodes = childNodes map {
-          case e: Elem => prettify(e, newIndentString)
+          case e: Elem => prettify(e, newIndent)
           case n => n
         }
 
@@ -375,7 +369,7 @@ final class Elem(
       }
     }
 
-    prettify(this.removeAllInterElementWhitespace, "")
+    prettify(this.removeAllInterElementWhitespace, 0)
   }
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
