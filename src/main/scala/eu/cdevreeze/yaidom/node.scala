@@ -343,7 +343,7 @@ final class Elem(
       case _ => false
     }
 
-    val tabOrSpace = if (useTab) '\t' else ' '
+    val tabOrSpace = if (useTab) "\t" else " "
 
     // Not an efficient implementation. It is recursive, but not tail-recursive.
 
