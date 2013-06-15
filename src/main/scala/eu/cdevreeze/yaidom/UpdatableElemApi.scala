@@ -77,7 +77,7 @@ import scala.collection.immutable
  *
  * If the property holds if partial function pf is defined for only one element, it can also be understood to hold if pf
  * is defined only for (some or all) child elements of one given parent element. Note that the functional updates are
- * performed in reverse order of the child element path entries, so these path entries retain valid during the updates.
+ * performed in reverse order of the child element path entries, so these path entries remain valid during the updates.
  *
  * The general case (where pf can be any partial function from elements to node sequences) needs to be proven by structural
  * induction.
