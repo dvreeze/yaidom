@@ -71,19 +71,16 @@ import scala.collection.immutable
  * resolved.Elem(elem.updatedWithNodeSeq(pf)) == resolved.Elem(elem.updated(pf2))
  * }}}
  *
- * This property can be understood by first understanding it to hold if partial function pf is defined for only one element.
- * After all, in that case the property reduces to the "definition" of method `updatedWithNodeSeq` (taking one ElemPath and a
- * function) in terms of method `updated` (taking the parent path and a function transforming the parent element).
+ * It is easy to understand the subcase where partial function pf is defined only for one element. After all, in that case
+ * the property reduces to the "definition" of method `updatedWithNodeSeq` (taking one ElemPath and a function) in terms of
+ * method `updated` (taking the parent path and a function transforming the parent element).
  *
  * If the property holds if partial function pf is defined for only one element, it can also be understood to hold if pf
- * is defined only for (some or all) child elements of one given parent element. Note that the functional updates of the
- * parent element are performed in reverse order of the child element path entries, so these path entries retain valid during
- * the updates.
+ * is defined only for (some or all) child elements of one given parent element. Note that the functional updates are
+ * performed in reverse order of the child element path entries, so these path entries retain valid during the updates.
  *
- * Finally, if the property holds if partial function pf is defined for only child elements of one parent element, it also holds
- * for arbitrary partial function pf. To understand this, note that functional updates of child elements of the same parent
- * element are not interleaved with functional updates of child elements of another parent element. Hence, intuitively the
- * above-mentioned property holds for arbitrary partial function pf (from elements to node sequences).
+ * The general case (where pf can be any partial function from elements to node sequences) needs to be proven by structural
+ * induction.
  *
  * In summary, the functional update methods can all be understood (directly or indirectly) in terms of method
  * `updated(path)(f)`.
