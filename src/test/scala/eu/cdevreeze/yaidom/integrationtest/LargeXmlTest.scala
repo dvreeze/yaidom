@@ -432,18 +432,12 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       oldPhoneElm.text == newPhone
     }
 
-    val tempPhone = "<phone-placeholder>"
-
-    val alteredDoc: Document = doc.updated(path) { e =>
-      e.withChildren(Vector(Text(tempPhone, false)))
-    }
-
     // Update, using a partial function. Note that this is probably inefficient for very large XML documents.
 
     val start2Ms = System.currentTimeMillis()
 
-    val updatedDoc: Document = alteredDoc updated {
-      case e if (e.localName == "phone") && (e.text == tempPhone) => e.withChildren(Vector(Text(newPhone, false)))
+    val updatedDoc: Document = doc updated {
+      case e if (e.localName == "phone") && (e == oldPhoneElm) => e.withChildren(Vector(Text(newPhone, false)))
     }
 
     val end2Ms = System.currentTimeMillis()
