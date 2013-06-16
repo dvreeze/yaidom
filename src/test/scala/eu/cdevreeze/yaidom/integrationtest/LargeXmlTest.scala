@@ -432,19 +432,27 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       oldPhoneElm.text == newPhone
     }
 
+    val tempPhone = "<phone-placeholder>"
+
+    val alteredDoc: Document = doc.updated(path) { e =>
+      e.withChildren(Vector(Text(tempPhone, false)))
+    }
+
     // Update, using a partial function. Note that this is probably inefficient for very large XML documents.
 
     val start2Ms = System.currentTimeMillis()
-    val updatedDoc: Document = doc updated {
-      case e if (e.localName == "phone") && (e == oldPhoneElm) => e.withChildren(Vector(Text(newPhone, false)))
+
+    val updatedDoc: Document = alteredDoc updated {
+      case e if (e.localName == "phone") && (e.text == tempPhone) => e.withChildren(Vector(Text(newPhone, false)))
     }
+
     val end2Ms = System.currentTimeMillis()
     logger.info("Updating an element in the document (using a partial function) took %d ms".format(end2Ms - start2Ms))
 
     val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
-    expectResult(true) {
-      newPhoneElm.text == newPhone
+    expectResult(newPhone) {
+      newPhoneElm.text
     }
   }
 

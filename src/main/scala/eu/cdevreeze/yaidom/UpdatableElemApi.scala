@@ -52,7 +52,14 @@ import scala.collection.immutable
  *
  * An analogous property holds for `topmostUpdatedWithNodeSeq` (taking a partial function) in terms of `updatedWithNodeSeq`.
  *
- * Another property reduces `updatedWithNodeSeq` to `updated`:
+ * Another property reduces `updated` (taking a partial function) to `transform`:
+ * {{{
+ * val f: E => E = { e => if (pf.isDefinedAt(e)) pf(e) else e }
+ *
+ * resolved.Elem(elem.updated(pf)) == resolved.Elem(elem.transform(f))
+ * }}}
+ *
+ * Yet another property reduces `updatedWithNodeSeq` to `updated`:
  * {{{
  * // Let E be type Elem, and define pf2 as follows:
  *

@@ -262,6 +262,8 @@ class AnotherUpdateTest extends Suite {
     }
 
     testPropertyAboutTopmostUpdated(doc.documentElement, insertBook)
+
+    testPropertyAboutUpdatedAsTransform(doc.documentElement, insertBook)
   }
 
   @Test def testUpdate() {
@@ -308,6 +310,8 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, updateMag2)
 
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, updateMag2)
+
+    testPropertyAboutUpdatedAsTransform(doc.documentElement, updateMag)
   }
 
   private def testPropertyAboutTopmostUpdated(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
@@ -362,6 +366,14 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(elem.updated(pf2))) {
       resolved.Elem(elem.updatedWithNodeSeq(pf))
+    }
+  }
+
+  private def testPropertyAboutUpdatedAsTransform(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
+    val f: Elem => Elem = { e => if (pf.isDefinedAt(e)) pf(e) else e }
+
+    expectResult(resolved.Elem(elem.transform(f))) {
+      resolved.Elem(elem.updated(pf))
     }
   }
 }

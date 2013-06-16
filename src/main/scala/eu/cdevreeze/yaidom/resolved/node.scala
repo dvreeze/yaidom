@@ -69,7 +69,7 @@ sealed trait Node extends Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -128,6 +128,15 @@ final case class Elem(
   override def findWithElemPathEntry(entry: ElemPath.Entry): Option[Elem] = {
     val idx = childNodeIndex(entry)
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
+  }
+
+  override def mapChildElems(f: Elem => Elem): Elem = {
+    val newChildren =
+      children map {
+        case e: Elem => f(e)
+        case n: Node => n
+      }
+    withChildren(newChildren)
   }
 
   /** Returns the text children */

@@ -139,7 +139,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Elem] with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -220,6 +220,15 @@ final class Elem(
   override def findWithElemPathEntry(entry: ElemPath.Entry): Option[Elem] = {
     val idx = childNodeIndex(entry)
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
+  }
+
+  override def mapChildElems(f: Elem => Elem): Elem = {
+    val newChildren =
+      children map {
+        case e: Elem => f(e)
+        case n: Node => n
+      }
+    withChildren(newChildren)
   }
 
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
