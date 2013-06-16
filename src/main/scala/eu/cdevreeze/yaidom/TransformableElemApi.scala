@@ -41,12 +41,12 @@ trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
    * withChildren(newChildren)
    * }}}
    */
-  def mapChildElems(f: E => E): E
+  def withMappedChildElems(f: E => E): E
 
   /**
    * This function could be defined as:
    * {{{
-   * f(mapChildElems (e => e.transform(f)))
+   * f(withMappedChildElems (e => e.transform(f)))
    * }}}
    */
   def transform(f: E => E): E

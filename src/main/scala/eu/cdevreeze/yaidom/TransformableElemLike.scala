@@ -23,7 +23,7 @@ import scala.collection.{ immutable, mutable }
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
- * Based on abstract method `mapChildElems`, this trait offers a somewhat richer API for transforming elements.
+ * Based on abstract method `withMappedChildElems`, this trait offers a somewhat richer API for transforming elements.
  *
  * @tparam E The captured element subtype
  *
@@ -31,9 +31,9 @@ import scala.collection.{ immutable, mutable }
  */
 trait TransformableElemLike[E <: TransformableElemLike[E]] extends TransformableElemApi[E] { self: E =>
 
-  def mapChildElems(f: E => E): E
+  def withMappedChildElems(f: E => E): E
 
   final def transform(f: E => E): E = {
-    f(mapChildElems(e => e.transform(f)))
+    f(withMappedChildElems(e => e.transform(f)))
   }
 }

@@ -222,7 +222,7 @@ final class Elem(
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }
 
-  override def mapChildElems(f: Elem => Elem): Elem = {
+  override def withMappedChildElems(f: Elem => Elem): Elem = {
     val newChildren =
       children map {
         case e: Elem => f(e)
