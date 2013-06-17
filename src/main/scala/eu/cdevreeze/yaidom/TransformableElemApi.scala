@@ -22,6 +22,15 @@ import scala.collection.immutable
  * "Transformable" element. It defines a contract for transformations, applying an element transforming function to all elements in
  * an element tree. See [[eu.cdevreeze.yaidom.TransformableElemLike]].
  *
+ * The big conceptual difference with "updatable" elements (in trait `UpdatableElemLike[N, E]`) is that "transformations" are
+ * about applying some transforming function to all descendant-or-self elements, while "(functional) updates" are mainly about
+ * "updates" at given element paths (either explicitly, by passing the path, or implicitly, by passing a partial function
+ * from elements to elements/node collections).
+ *
+ * In spite of these differences, "updates" can be understood in terms of equivalent "transformations". Concerning performance,
+ * as a rule of thumb it is best to prefer "updates" (`UpdatableElemApi`) if only relatively few element paths are involved,
+ * and to prefer "transformations" (`TransformableElemApi`) otherwise.
+ *
  * This purely abstract API leaves the implementation completely open.
  *
  * @tparam E The captured element subtype
@@ -31,7 +40,10 @@ import scala.collection.immutable
 trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
 
   /**
-   * Returns the equivalent of:
+   * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
+   * child nodes occur in the result element unaltered.
+   *
+   * That is, returns the equivalent of:
    * {{{
    * val newChildren =
    *   children map {
@@ -44,10 +56,8 @@ trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
   def withMappedChildElems(f: E => E): E
 
   /**
-   * This function could be defined as:
-   * {{{
-   * f(withMappedChildElems (e => e.transform(f)))
-   * }}}
+   * Transforms the element by applying the given function to all its descendant-or-self elements (while leaving non-element
+   * nodes unaltered in the result). That is, returns `f(withMappedChildElems (e => e.transform(f)))`.
    */
   def transform(f: E => E): E
 }

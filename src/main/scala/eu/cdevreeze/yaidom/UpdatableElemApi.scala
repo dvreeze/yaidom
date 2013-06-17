@@ -21,6 +21,8 @@ import scala.collection.immutable
 /**
  * "Updatable" element. It defines a contract for "functional updates". See [[eu.cdevreeze.yaidom.UpdatableElemLike]].
  *
+ * For the conceptual difference with "transformable" elements, see trait [[eu.cdevreeze.yaidom.TransformableElemApi]].
+ *
  * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
  * an XML database would not use the ``UpdatableElemLike`` implementation, for reasons of efficiency.
  *
