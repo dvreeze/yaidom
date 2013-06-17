@@ -94,6 +94,131 @@ import scala.collection.immutable
  * In summary, the functional update methods can all be understood (directly or indirectly) in terms of method
  * `updated(path)(f)`.
  *
+ * ==UpdatableElemApi more formally==
+ *
+ * Below follows a proof by structural induction of the property that given:
+ * {{{
+ * val f: E => E = { e => if (pf.isDefinedAt(e)) pf(e) else e }
+ * }}}
+ * we have:
+ * {{{
+ * resolved.Elem(elem.updated(pf)) == resolved.Elem(elem.transform(f))
+ * }}}
+ *
+ * For the proof, let:
+ * {{{
+ * val p = { e: E => pf.isDefinedAt(e) }
+ *
+ * val pathsReversed = elem.filterElemOrSelfPaths(p).reverse
+ * }}}
+ *
+ * In the proof, we use the following (yet unproven) property, called property (1.):
+ * {{{
+ * resolved.Elem(elem.updated(pf)) == {
+ *   val withChildResults = elem withMappedChildElems (che => che.updated(pf))
+ *   resolved.Elem(if (pf.isDefinedAt(withChildResults)) pf(withChildResults) else withChildResults)
+ * }
+ * }}}
+ *
+ * __Base case__
+ *
+ * If `elem` has no child elements, and pf is defined at elem, then the LHS can be rewritten (modulo `resolved.Elem` equality)
+ * as follows:
+ * {{{
+ * elem.updated(pf)
+ *
+ * // Definition of updated
+ *
+ * pathsReversed.foldLeft(elem) { case (acc, path) =>
+ *   acc.updated(path, pf(acc.getWithElemPath(path)))
+ * }
+ *
+ * // No child elements, and pf is defined at elem, so pathsReversed only contains ElemPath.Root
+ *
+ * elem.updated(ElemPath.Root, pf(elem.getWithElemPath(ElemPath.Root)))
+ *
+ * // Using the root path for getting an element
+ *
+ * elem.updated(ElemPath.Root, pf(elem))
+ *
+ * // In terms of another overloaded function called updated
+ *
+ * elem.updated(ElemPath.Root) { e => pf(elem) }
+ *
+ * // Definition of updated (taking path and function), applied to the root path. See implementation in UpdatableElemLike.
+ *
+ * pf(elem)
+ *
+ * // Definition of f
+ *
+ * f(elem)
+ *
+ * // Definitions of transform and withMappedChildElems, given that there are no child elements
+ *
+ * elem.transform(f)
+ * }}}
+ * which is the RHS.
+ *
+ * If `elem` has no child elements, and pf is not defined at elem, then the LHS can be rewritten (modulo `resolved.Elem` equality)
+ * as follows:
+ * {{{
+ * elem.updated(pf)
+ *
+ * // Definition of updated
+ *
+ * pathsReversed.foldLeft(elem) { case (acc, path) =>
+ *   acc.updated(path, pf(acc.getWithElemPath(path)))
+ * }
+ *
+ * // No child elements, and pf is not defined at elem, so pathsReversed is empty, and the foldLeft just returns elem
+ *
+ * elem
+ *
+ * // Definition of f, given that in this case f(elem) is equal to elem
+ *
+ * f(elem)
+ *
+ * // Definitions of transform and withMappedChildElems, given that there are no child elements
+ *
+ * elem.transform(f)
+ * }}}
+ * which is the RHS.
+ *
+ * __Inductive step__
+ *
+ * If `elem` does have child elements, the LHS can be rewritten (modulo `resolved.Elem` equality) as:
+ * {{{
+ * elem.updated(pf)
+ *
+ * // Property (1.)
+ *
+ * {
+ *   val withChildResults = elem withMappedChildElems (che => che.updated(pf))
+ *   if (pf.isDefinedAt(withChildResults)) pf(withChildResults) else withChildResults
+ * }
+ *
+ * // Induction hypothesis
+ *
+ * {
+ *   val withChildResults = elem withMappedChildElems (che => che.transform(f))
+ *   if (pf.isDefinedAt(withChildResults)) pf(withChildResults) else withChildResults
+ * }
+ *
+ * // Definition of f
+ *
+ * {
+ *   val withChildResults = elem withMappedChildElems (che => che.transform(f))
+ *   f(withChildResults)
+ * }
+ *
+ * // Definition of transform
+ *
+ * elem.transform(f)
+ * }}}
+ * which is the RHS.
+ *
+ * This completes the proof.
+ *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
