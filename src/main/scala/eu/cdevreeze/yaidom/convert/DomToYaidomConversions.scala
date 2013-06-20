@@ -28,6 +28,10 @@ import scala.collection.{ immutable, mutable }
  * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.Elem]] and
  * from `org.w3c.dom.Document` to [[eu.cdevreeze.yaidom.Document]].
  *
+ * This converter regards the input more like an "ElemBuilder" than an "Elem", in that namespace declarations instead of
+ * scopes are extracted from input "elements", and in that conversions to yaidom Elems take an additional parent scope
+ * parameter (against which namespace declarations are resolved to get the scope of the yaidom element).
+ *
  * @author Chris de Vreeze
  */
 trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {

@@ -37,7 +37,8 @@ import scala.collection.immutable
  * For example, with the `updatedWithNodeSeq` (and `topmostUpdatedWithNodeSeq`) functions (taking a partial function parameter),
  * it is easy to write functions to functionally delete elements, insert nodes before or after an element, etc.
  *
- * Below follow some formal properties that the "functional update" support obeys.
+ * Below follow some formal properties that the "functional update" support obeys. We assume the use of side-effect-free functions
+ * only.
  *
  * For example, the following property (trivially) holds:
  * {{{
@@ -60,6 +61,8 @@ import scala.collection.immutable
  *
  * resolved.Elem(elem.updated(pf)) == resolved.Elem(elem.transform(f))
  * }}}
+ * Beware that this equality may not hold if pf depends on element object identities, because `transform` "changes" object
+ * identities more aggressively than `updated`.
  *
  * Yet another property reduces `updatedWithNodeSeq` to `updated`:
  * {{{
@@ -115,8 +118,7 @@ import scala.collection.immutable
  * In the proof, we use the following (yet unproven) property, called property (1.):
  * {{{
  * resolved.Elem(elem.updated(pf)) == {
- *   val withChildResults = elem withMappedChildElems (che => che.updated(pf))
- *   resolved.Elem(if (pf.isDefinedAt(withChildResults)) pf(withChildResults) else withChildResults)
+ *   resolved.Elem(f(elem withMappedChildElems (che => che.updated(pf))))
  * }
  * }}}
  *
@@ -192,24 +194,11 @@ import scala.collection.immutable
  *
  * // Property (1.)
  *
- * {
- *   val withChildResults = elem withMappedChildElems (che => che.updated(pf))
- *   if (pf.isDefinedAt(withChildResults)) pf(withChildResults) else withChildResults
- * }
+ * f(elem withMappedChildElems (che => che.updated(pf)))
  *
  * // Induction hypothesis
  *
- * {
- *   val withChildResults = elem withMappedChildElems (che => che.transform(f))
- *   if (pf.isDefinedAt(withChildResults)) pf(withChildResults) else withChildResults
- * }
- *
- * // Definition of f
- *
- * {
- *   val withChildResults = elem withMappedChildElems (che => che.transform(f))
- *   f(withChildResults)
- * }
+ * f(elem withMappedChildElems (che => che.transform(f)))
  *
  * // Definition of transform
  *

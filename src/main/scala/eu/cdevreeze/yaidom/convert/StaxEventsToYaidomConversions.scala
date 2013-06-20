@@ -33,6 +33,10 @@ import StaxEventsToYaidomConversions._
  *
  * There are also analogous conversions that take an `Iterator[XMLEvent]` instead. These can be used to reduce memory usage.
  *
+ * This converter regards the input event stream more like an "ElemBuilder" than an "Elem", in that namespace declarations instead
+ * of scopes are extracted from input "elements", and in that conversions to yaidom Elems take an additional parent scope
+ * parameter (against which namespace declarations are resolved to get the scope of the yaidom element).
+ *
  * @author Chris de Vreeze
  */
 trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {

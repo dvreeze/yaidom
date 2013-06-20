@@ -66,14 +66,13 @@ final class ScalaXmlElem(
   override def findAllChildElems: immutable.IndexedSeq[ScalaXmlElem] = children collect { case e: ScalaXmlElem => e }
 
   override def resolvedName: EName = {
-    val scope = extractScope(wrappedNode.scope)
     val qname = toQName(wrappedNode)
     scope.resolveQNameOption(qname).getOrElse(
       sys.error("Could not resolve QName from prefix %s and label %s".format(Option(wrappedNode.prefix).getOrElse(""), wrappedNode.label)))
   }
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
-    val attrScope = extractScope(wrappedNode.scope).withoutDefaultNamespace
+    val attrScope = scope.withoutDefaultNamespace
     attributes map {
       case (attrName, attrValue) =>
         val ename = attrScope.resolveQNameOption(attrName).getOrElse(
@@ -85,6 +84,8 @@ final class ScalaXmlElem(
   def qname: QName = toQName(wrappedNode)
 
   def attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(wrappedNode.attributes)
+
+  def scope: Scope = extractScope(wrappedNode.scope)
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }

@@ -29,6 +29,10 @@ import scala.collection.{ immutable, mutable }
  *
  * This converter is handy when one wants to use XML literals (as offered by standard Scala XML) in combination with yaidom.
  *
+ * This converter regards the input more like an "Elem" than an "ElemBuilder", in that scopes instead of namespace
+ * declarations are extracted from input "elements", and in that conversions to yaidom Elems do not take any additional parent
+ * scope parameter.
+ *
  * @author Chris de Vreeze
  */
 trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document] with ConverterToElem[scala.xml.Elem] {
