@@ -105,6 +105,14 @@ class ScalaXmlInteropTest extends Suite {
       val result = root5 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+
+    // 4. Convert to Scala XML and back
+
+    val root6 = convertToElem(convertElem(root))
+
+    expectResult(resolved.Elem(root)) {
+      resolved.Elem(root6)
+    }
   }
 
   @Test def testConvertStrangeXml() {
@@ -146,6 +154,14 @@ class ScalaXmlInteropTest extends Suite {
     expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
+    }
+
+    // 4. Convert to Scala XML and back
+
+    val root5 = convertToElem(convertElem(root))
+
+    expectResult(resolved.Elem(root)) {
+      resolved.Elem(root5)
     }
   }
 
@@ -212,6 +228,14 @@ class ScalaXmlInteropTest extends Suite {
     expectResult("Trivial XML") {
       val result = root4.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
+    }
+
+    // 4. Convert to Scala XML and back
+
+    val root5 = convertToElem(convertElem(root))
+
+    expectResult(resolved.Elem(root)) {
+      resolved.Elem(root5)
     }
   }
 
@@ -282,6 +306,14 @@ class ScalaXmlInteropTest extends Suite {
     }
 
     checkChildTextAndEntityRef(root4)
+
+    // 4. Convert to Scala XML and back
+
+    val root5 = convertToElem(convertElem(root))
+
+    expectResult(resolved.Elem(root)) {
+      resolved.Elem(root5)
+    }
   }
 
   @Test def testConvertXmlWithNamespaceUndeclarations() {
@@ -321,6 +353,14 @@ class ScalaXmlInteropTest extends Suite {
     expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
+    }
+
+    // 4. Convert to Scala XML and back
+
+    val root5 = convertToElem(convertElem(root))
+
+    expectResult(resolved.Elem(root)) {
+      resolved.Elem(root5)
     }
   }
 
@@ -457,6 +497,14 @@ class ScalaXmlInteropTest extends Suite {
     }
 
     doChecks(root3)
+
+    // 4. Convert to Scala XML and back
+
+    val root5 = convertToElem(convertElem(root))
+
+    expectResult(resolved.Elem(root)) {
+      resolved.Elem(root5)
+    }
   }
 
   /**
@@ -531,6 +579,14 @@ class ScalaXmlInteropTest extends Suite {
       val carElms = recordsElm \ (_.localName == "car")
       val resultElms = carElms sortBy { e => e.attributeOption(EName("year")).getOrElse("0").toInt }
       resultElms map { e => e.attribute(EName("name")) }
+    }
+
+    // Convert to Scala XML and back
+
+    val newRoot = convertToElem(convertElem(doc.documentElement))
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(newRoot)
     }
   }
 

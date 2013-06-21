@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom
 package convert
 
 /**
- * Conversions between yaidom nodes and Scala XML nodes, currently only in one direction, from Scala XML to yaidom.
+ * Conversions between yaidom nodes and Scala XML nodes.
  *
  * These conversions are handy when one wants to use XML literals (as offered by standard Scala XML) in combination with yaidom.
  *
@@ -33,4 +33,4 @@ package convert
  *
  * @author Chris de Vreeze
  */
-object ScalaXmlConversions extends ScalaXmlToYaidomConversions
+object ScalaXmlConversions extends YaidomToScalaXmlConversions with ScalaXmlToYaidomConversions

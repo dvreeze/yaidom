@@ -30,6 +30,7 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.scalaxml._
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 
 /**
  * Scala XML wrapper test case. It shows that we can easily create `ElemLike` wrappers around Scala XML Elems.
@@ -74,6 +75,15 @@ class ScalaXmlWrapperTest extends Suite {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
+    }
   }
 
   @Test def testParseStrangeXml() {
@@ -91,6 +101,15 @@ class ScalaXmlWrapperTest extends Suite {
     expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
+    }
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
     }
   }
 
@@ -113,6 +132,15 @@ class ScalaXmlWrapperTest extends Suite {
     expectResult("Trivial XML") {
       val result = root.findAllElemsOrSelf flatMap { e => e.commentChildren.map(_.text.trim) }
       result.mkString
+    }
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
     }
   }
 
@@ -313,6 +341,15 @@ class ScalaXmlWrapperTest extends Suite {
     }
 
     checkFieldPattern(root)
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
+    }
   }
 
   @Test def testParseXmlWithExpandedEntityRef() {
@@ -343,6 +380,15 @@ class ScalaXmlWrapperTest extends Suite {
     }
 
     checkChildText(root)
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
+    }
   }
 
   @Test def testParseXmlWithNamespaceUndeclarations() {
@@ -362,6 +408,15 @@ class ScalaXmlWrapperTest extends Suite {
     expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
+    }
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
     }
   }
 
@@ -395,6 +450,15 @@ class ScalaXmlWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
+    }
   }
 
   /**
@@ -459,6 +523,15 @@ class ScalaXmlWrapperTest extends Suite {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(root.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
+    }
   }
 
   /**
@@ -484,6 +557,15 @@ class ScalaXmlWrapperTest extends Suite {
 
     expectResult(Some("http://xasb.org/gaap")) {
       tnsOption
+    }
+
+    // Convert to yaidom and back, and back to yaidom
+
+    val newRootElem1 = convertToElem(domDoc.documentElement.wrappedNode)
+    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    expectResult(resolved.Elem(newRootElem1)) {
+      resolved.Elem(newRootElem1)
     }
   }
 }
