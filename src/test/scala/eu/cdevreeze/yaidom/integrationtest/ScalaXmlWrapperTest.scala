@@ -82,7 +82,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -109,7 +109,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -140,7 +140,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -348,7 +348,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -387,7 +387,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -416,7 +416,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -457,7 +457,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -530,7 +530,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 
@@ -565,7 +565,7 @@ class ScalaXmlWrapperTest extends Suite {
     val newRootElem2 = convertToElem(convertElem(newRootElem1))
 
     expectResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem1)
+      resolved.Elem(newRootElem2)
     }
   }
 }
