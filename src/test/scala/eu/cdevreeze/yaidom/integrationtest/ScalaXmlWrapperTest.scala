@@ -76,10 +76,15 @@ class ScalaXmlWrapperTest extends Suite {
       result.size
     }
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -103,10 +108,15 @@ class ScalaXmlWrapperTest extends Suite {
       result.toSet
     }
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -134,10 +144,15 @@ class ScalaXmlWrapperTest extends Suite {
       result.mkString
     }
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -342,10 +357,15 @@ class ScalaXmlWrapperTest extends Suite {
 
     checkFieldPattern(root)
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -381,10 +401,15 @@ class ScalaXmlWrapperTest extends Suite {
 
     checkChildText(root)
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -410,10 +435,15 @@ class ScalaXmlWrapperTest extends Suite {
       result.toSet
     }
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -451,10 +481,15 @@ class ScalaXmlWrapperTest extends Suite {
 
     doChecks(root)
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -524,10 +559,15 @@ class ScalaXmlWrapperTest extends Suite {
       result.toSet
     }
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
     val newRootElem1 = convertToElem(root.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
@@ -542,6 +582,8 @@ class ScalaXmlWrapperTest extends Suite {
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
     val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
+
+    val root: ScalaXmlElem = domDoc.documentElement
 
     val elementDecls = domDoc.documentElement filterElems { e =>
       e.resolvedName == EName(nsXmlSchema, "element")
@@ -559,13 +601,44 @@ class ScalaXmlWrapperTest extends Suite {
       tnsOption
     }
 
-    // Convert to yaidom and back, and back to yaidom
+    // Convert to yaidom and back, and back to yaidom, and check for equalities
 
-    val newRootElem1 = convertToElem(domDoc.documentElement.wrappedNode)
-    val newRootElem2 = convertToElem(convertElem(newRootElem1))
+    val newRootElem1 = convertToElem(root.wrappedNode)
+
+    val root2 = new ScalaXmlElem(convertElem(newRootElem1))
+
+    testEquality(root, root2)
+
+    val newRootElem2 = convertToElem(root2.wrappedNode)
 
     expectResult(resolved.Elem(newRootElem1)) {
       resolved.Elem(newRootElem2)
     }
+  }
+
+  private def testEquality(wrapperElem1: ScalaXmlElem, wrapperElem2: ScalaXmlElem): Unit = {
+    expectResult(true) {
+      ScalaXmlWrapperTest.areEqual(wrapperElem1, wrapperElem2)
+    }
+  }
+}
+
+object ScalaXmlWrapperTest {
+
+  case class NameAttributesAndText(elementName: EName, attributes: Map[EName, String], text: String)
+
+  /**
+   * Tests 2 ScalaXmlElem instances for equality. The equality is based on finding the same descendant-or-self elements
+   * in the same order, where a pair of elements is considered equal if they have the same element EName, the same
+   * attribute map (from ENames to values), and the same text. Prefixes and scopes are not compared for equality.
+   */
+  private def areEqual(wrapperElem1: ScalaXmlElem, wrapperElem2: ScalaXmlElem): Boolean = {
+    val elems1 = wrapperElem1.findAllElemsOrSelf
+    val elems2 = wrapperElem2.findAllElemsOrSelf
+
+    val namesAndAttrs1 = elems1 map (e => NameAttributesAndText(e.resolvedName, e.resolvedAttributes.toMap, e.text))
+    val namesAndAttrs2 = elems2 map (e => NameAttributesAndText(e.resolvedName, e.resolvedAttributes.toMap, e.text))
+
+    namesAndAttrs1 == namesAndAttrs2
   }
 }

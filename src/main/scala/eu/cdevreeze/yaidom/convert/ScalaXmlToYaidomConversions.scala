@@ -124,7 +124,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
    * tries to work around that bug.
    */
   final def extractScope(scope: scala.xml.NamespaceBinding): Scope = {
-    if ((scope eq null) || (scope.uri eq null)) Scope.Empty
+    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) Scope.Empty
     else {
       val prefix = if (scope.prefix eq null) "" else scope.prefix
 

@@ -43,13 +43,6 @@ sealed trait ScalaXmlNode {
   final override def toString: String = wrappedNode.toString
 }
 
-trait ScalaXmlParentNode extends ScalaXmlNode {
-
-  final def children: immutable.IndexedSeq[ScalaXmlNode] = {
-    wrappedNode.child.toIndexedSeq flatMap { n: scala.xml.Node => ScalaXmlNode.wrapNodeOption(n) }
-  }
-}
-
 /**
  * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.ElemApi]] API.
  *
@@ -57,7 +50,7 @@ trait ScalaXmlParentNode extends ScalaXmlNode {
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends ScalaXmlParentNode with ElemLike[ScalaXmlElem] with HasText { self =>
+  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ElemLike[ScalaXmlElem] with HasText { self =>
 
   require(wrappedNode ne null)
 
@@ -79,6 +72,10 @@ final class ScalaXmlElem(
           sys.error("Could not resolve attribute name %s".format(attrName)))
         (ename, attrValue)
     }
+  }
+
+  def children: immutable.IndexedSeq[ScalaXmlNode] = {
+    wrappedNode.child.toIndexedSeq flatMap { n: scala.xml.Node => ScalaXmlNode.wrapNodeOption(n) }
   }
 
   def qname: QName = toQName(wrappedNode)
