@@ -3,6 +3,35 @@ CHANGELOG
 =========
 
 
+0.6.10
+======
+
+This version improves "functional update" support as well as "Scala XML literal" support (before version 0.7.0 arrives).
+
+* Improved "functional update" support
+
+  * Added ``updatedWithNodeSeq`` and ``topmostUpdatedWithNodeSeq`` methods to ``UpdatableElemApi`` and ``UpdatableElemLike``
+  * These methods are defined (directly or indirectly) in terms of ``updated``
+  * Yet these methods make functional updates more practical, by offering updates that replace elements by collections of nodes
+
+* Added ``TransformableElemApi`` and ``TransformableElemLike``
+
+  * "Transformations" apply a transformation function to all descendant-or-self methods
+  * In contrast, "(functional) updates" apply update functions only to elements at given (implicit or explicit) paths
+  * "Transformations" and "(functional) updates" can express pretty much the same, but have different performance characteristics
+  * Roughly, if only a few elements in an element tree need to be updated, prefer "updates", and otherwise prefer "transformations"
+
+* Added ``YaidomToScalaXmlConversions``,  as a result of which there are now conversion between Scala XML and yaidom in both directions
+* Added ``ScalaXmlElem``, which is an ``ElemLike`` query API wrapper around Scala XML elements
+* Added ``AbstractDocumentPrinter``, making ``DocumentPrinter``purely abstract (analogous to document parsers)
+* Richer ``prettify`` method, optionally changing newline characters and using tabs instead of spaces
+* Some documentation changes and bug fixes, and more tests
+
+This version offers many "tools" for creation of and updates to XML trees, such as support for Scala XML literals (converting them
+to yaidom and vice versa, or querying them using the yaidom query API), "transformations", and (functional) updates (replacing
+elements by elements, or elements by node collections).
+
+
 0.6.9
 =====
 
