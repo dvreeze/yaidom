@@ -21,10 +21,10 @@ This version improves "functional update" support as well as "Scala XML literal"
   * "Transformations" and "(functional) updates" can express pretty much the same, but have different performance characteristics
   * Roughly, if only a few elements in an element tree need to be updated, prefer "updates", and otherwise prefer "transformations"
 
-* Added ``YaidomToScalaXmlConversions``,  as a result of which there are now conversion between Scala XML and yaidom in both directions
+* Added ``YaidomToScalaXmlConversions``,  as a result of which there are now conversions between Scala XML and yaidom in both directions
 * Added ``ScalaXmlElem``, which is an ``ElemLike`` query API wrapper around Scala XML elements
-* Added ``AbstractDocumentPrinter``, making ``DocumentPrinter``purely abstract (analogous to document parsers)
-* Richer ``prettify`` method, optionally changing newline characters and using tabs instead of spaces
+* Added ``AbstractDocumentPrinter``, making ``DocumentPrinter`` purely abstract (analogous to document parsers)
+* Richer ``prettify`` method, optionally changing newline characters and optionally using tabs instead of spaces
 * Some documentation changes and bug fixes, and more tests
 
 This version offers many "tools" for creation of and updates to XML trees, such as support for Scala XML literals (converting them
