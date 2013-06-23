@@ -13,6 +13,7 @@ This version improves "functional update" support as well as "Scala XML literal"
   * Added ``updatedWithNodeSeq`` and ``topmostUpdatedWithNodeSeq`` methods to ``UpdatableElemApi`` and ``UpdatableElemLike``
   * These methods are defined (directly or indirectly) in terms of ``updated``
   * Yet these methods make functional updates more practical, by offering updates that replace elements by collections of nodes
+  * They are even powerful enough to express what are separate operations in XQuery Update, such as insertions, deletions etc.
 
 * Added ``TransformableElemApi`` and ``TransformableElemLike``
 
@@ -25,6 +26,7 @@ This version improves "functional update" support as well as "Scala XML literal"
 * Added ``ScalaXmlElem``, which is an ``ElemLike`` query API wrapper around Scala XML elements
 * Added ``AbstractDocumentPrinter``, making ``DocumentPrinter`` purely abstract (analogous to document parsers)
 * Richer ``prettify`` method, optionally changing newline characters and optionally using tabs instead of spaces
+* Added ``copy`` method to classes Elem and ElemBuilder
 * Some documentation changes and bug fixes, and more tests
 
 This version offers many "tools" for creation of and updates to XML trees, such as support for Scala XML literals (converting them
