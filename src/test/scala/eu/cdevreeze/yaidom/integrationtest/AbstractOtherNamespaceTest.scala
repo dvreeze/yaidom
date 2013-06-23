@@ -1054,4 +1054,386 @@ abstract class AbstractOtherNamespaceTest extends Suite {
       resolvedElem
     }
   }
+
+  @Test def testFixNamespaceDeclaration() {
+    val xml =
+      """|<prod:product xmlns:prod="http://datypic.com/prod">
+         |  <prod:number>557</prod:number>
+         |  <prod:size system="US-DRESS">10</prod:size>
+         |</prod:product>
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
+      doc.documentElement.findAllElemsOrSelf map { _.qname }
+    }
+
+    val ns = "http://datypic.com/prod"
+
+    expectResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
+      doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+    }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(true) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  @Test def testFixMultipleNamespaceDeclarations() {
+    val xml =
+      """|<ord:order xmlns:ord="http://datypic.com/ord"
+         |           xmlns:prod="http://datypic.com/prod">
+         |  <ord:number>123ABBCC123</ord:number>
+         |  <ord:items>
+         |    <prod:product>
+         |      <prod:number>557</prod:number>
+         |      <prod:size system="US-DRESS">10</prod:size>
+         |    </prod:product>
+         |  </ord:items>
+         |</ord:order>      
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(
+      List(
+        QName("ord", "order"),
+        QName("ord", "number"),
+        QName("ord", "items"),
+        QName("prod", "product"),
+        QName("prod", "number"),
+        QName("prod", "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      }
+
+    val nsOrd = "http://datypic.com/ord"
+    val nsProd = "http://datypic.com/prod"
+
+    expectResult(
+      List(
+        EName(nsOrd, "order"),
+        EName(nsOrd, "number"),
+        EName(nsOrd, "items"),
+        EName(nsProd, "product"),
+        EName(nsProd, "number"),
+        EName(nsProd, "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(true) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  @Test def testFixNamespacesHavingDefaultNamespaceDeclaration() {
+    val xml =
+      """|<order xmlns="http://datypic.com/ord"
+         |       xmlns:prod="http://datypic.com/prod">
+         |  <number>123ABBCC123</number>
+         |  <items>
+         |    <prod:product>
+         |      <prod:number>557</prod:number>
+         |      <prod:size system="US-DRESS">10</prod:size>
+         |    </prod:product>
+         |  </items>
+         |</order>
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(
+      List(
+        QName("order"),
+        QName("number"),
+        QName("items"),
+        QName("prod", "product"),
+        QName("prod", "number"),
+        QName("prod", "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      }
+
+    val nsOrd = "http://datypic.com/ord"
+    val nsProd = "http://datypic.com/prod"
+
+    expectResult(
+      List(
+        EName(nsOrd, "order"),
+        EName(nsOrd, "number"),
+        EName(nsOrd, "items"),
+        EName(nsProd, "product"),
+        EName(nsProd, "number"),
+        EName(nsProd, "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(true) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  @Test def testFixNamespaceDeclarationsInMultipleTags() {
+    val xml =
+      """|<order xmlns="http://datypic.com/ord">
+         |  <number>123ABBCC123</number>
+         |  <items>
+         |    <prod:product xmlns:prod="http://datypic.com/prod">
+         |      <prod:number>557</prod:number>
+         |      <prod:size system="US-DRESS">10</prod:size>
+         |    </prod:product>
+         |  </items>
+         |</order>
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(
+      List(
+        QName("order"),
+        QName("number"),
+        QName("items"),
+        QName("prod", "product"),
+        QName("prod", "number"),
+        QName("prod", "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      }
+
+    val nsOrd = "http://datypic.com/ord"
+    val nsProd = "http://datypic.com/prod"
+
+    expectResult(
+      List(
+        EName(nsOrd, "order"),
+        EName(nsOrd, "number"),
+        EName(nsOrd, "items"),
+        EName(nsProd, "product"),
+        EName(nsProd, "number"),
+        EName(nsProd, "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(false) {
+      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(true) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  @Test def testFixNamespacesHavingOverriddenNamespaceDeclaration() {
+    val xml =
+      """|<order xmlns="http://datypic.com/ord"
+         |       xmlns:prod="http://datypic.com/prod">
+         |  <number>123ABBCC123</number>
+         |  <items>
+         |    <prod:product>
+         |      <prod:number xmlns:prod="http://datypic.com/prod2">
+         |        557</prod:number>
+         |      <prod:size system="US-DRESS">10</prod:size>
+         |    </prod:product>
+         |  </items>
+         |</order>      
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(
+      List(
+        QName("order"),
+        QName("number"),
+        QName("items"),
+        QName("prod", "product"),
+        QName("prod", "number"),
+        QName("prod", "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      }
+
+    val nsOrd = "http://datypic.com/ord"
+    val nsProd = "http://datypic.com/prod"
+    val nsProd2 = "http://datypic.com/prod2"
+
+    expectResult(
+      List(
+        EName(nsOrd, "order"),
+        EName(nsOrd, "number"),
+        EName(nsOrd, "items"),
+        EName(nsProd, "product"),
+        EName(nsProd2, "number"),
+        EName(nsProd, "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(false) {
+      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(false) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  @Test def testFixNamespacesHavingOverriddenDefaultNamespaceDeclaration() {
+    val xml =
+      """|<order xmlns="http://datypic.com/ord">
+         |  <number>123ABBCC123</number>
+         |  <items>
+         |    <product xmlns="http://datypic.com/prod">
+         |      <number>557</number>
+         |      <size system="US-DRESS">10</size>
+         |    </product>
+         |  </items>
+         |</order>      
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(
+      List(
+        QName("order"),
+        QName("number"),
+        QName("items"),
+        QName("product"),
+        QName("number"),
+        QName("size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      }
+
+    val nsOrd = "http://datypic.com/ord"
+    val nsProd = "http://datypic.com/prod"
+
+    expectResult(
+      List(
+        EName(nsOrd, "order"),
+        EName(nsOrd, "number"),
+        EName(nsOrd, "items"),
+        EName(nsProd, "product"),
+        EName(nsProd, "number"),
+        EName(nsProd, "size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(false) {
+      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(false) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  @Test def testFixNamespacesHavingUndeclaredDefaultNamespace() {
+    val xml =
+      """|<order xmlns="http://datypic.com/ord">
+         |  <number>123ABBCC123</number>
+         |  <items>
+         |    <product xmlns="">
+         |      <number>557</number>
+         |      <size system="US-DRESS">10</size>
+         |    </product>
+         |  </items>
+         |</order>      
+         |""".stripMargin.trim
+
+    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    expectResult(
+      List(
+        QName("order"),
+        QName("number"),
+        QName("items"),
+        QName("product"),
+        QName("number"),
+        QName("size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      }
+
+    val nsOrd = "http://datypic.com/ord"
+
+    expectResult(
+      List(
+        EName(nsOrd, "order"),
+        EName(nsOrd, "number"),
+        EName(nsOrd, "items"),
+        EName("product"),
+        EName("number"),
+        EName("size"))) {
+        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      }
+
+    val fixedDoc = organizeNamespaces(doc)
+
+    expectResult(false) {
+      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(false) {
+      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+    }
+
+    expectResult(resolved.Elem(doc.documentElement)) {
+      resolved.Elem(fixedDoc.documentElement)
+    }
+  }
+
+  private def organizeNamespaces(doc: Document): Document =
+    doc.withDocumentElement(organizeNamespaces(doc.documentElement))
+
+  private def organizeNamespaces(rootElem: Elem): Elem = {
+    val maxScope = findMaxTopLevelScope(rootElem)
+
+    def fillScope(e: Elem, parentOption: Option[Elem]): Elem = {
+      // Just checking assumptions about transformations using this fillScope function
+      require(parentOption.isEmpty || resolved.Elem(parentOption.get).findAllChildElems.contains(resolved.Elem(e)))
+
+      val newScope = maxScope ++ e.scope
+      require(e.scope.withoutDefaultNamespace.subScopeOf(newScope.withoutDefaultNamespace))
+
+      e.copy(scope = newScope)
+    }
+
+    rootElem.transform(fillScope _, None)
+  }
+
+  private def findMaxTopLevelScope(elem: Elem): Scope = {
+    elem.findAllElemsOrSelf.foldLeft(elem.scope.withoutDefaultNamespace) { (acc, e) =>
+      acc ++ Scope.from(e.scope.withoutDefaultNamespace.map filterKeys (pref => !acc.map.keySet.contains(pref)))
+    }
+  }
 }

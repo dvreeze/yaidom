@@ -210,7 +210,7 @@ final class Elem(
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
-    new Elem(qname, attributes, scope, newChildren)
+    copy(children = newChildren)
   }
 
   override def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
@@ -231,9 +231,21 @@ final class Elem(
     withChildren(newChildren)
   }
 
+  /**
+   * Creates a copy, altered with the explicitly passed parameters (for qname, attributes, scope and children).
+   */
+  def copy(
+    qname: QName = this.qname,
+    attributes: immutable.IndexedSeq[(QName, String)] = this.attributes,
+    scope: Scope = this.scope,
+    children: immutable.IndexedSeq[Node] = this.children): Elem = {
+
+    new Elem(qname, attributes, scope, children)
+  }
+
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
   def withAttributes(newAttributes: immutable.IndexedSeq[(QName, String)]): Elem = {
-    new Elem(qname, newAttributes, scope, children)
+    copy(attributes = newAttributes)
   }
 
   /**

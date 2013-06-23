@@ -97,26 +97,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def updated(path: ElemPath, newElem: E): E = updated(path) { e => newElem }
 
-  /**
-   * Functionally updates the descendant-or-self elements for which the partial function is defined,
-   * within the tree of which this element is the root element.
-   *
-   * This function is equivalent to:
-   * {{{
-   * val p = { e: E => pf.isDefinedAt(e) }
-   * val pathsReversed = filterElemOrSelfPaths(p).reverse
-   *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updated(path, pf(e))
-   * }
-   * }}}
-   *
-   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
-   * and partly because many intermediate element objects may be created. Typically, when all elements must be "functionally
-   * updated" (so when the partial function is defined for all elements), it is better to do so by recursion, without using
-   * this function.
-   */
   final def updated(pf: PartialFunction[E, E]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
     // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
@@ -132,24 +112,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     result
   }
 
-  /**
-   * Functionally updates the topmost descendant-or-self elements for which the partial function is defined,
-   * within the tree of which this element is the root element.
-   *
-   * This function is equivalent to:
-   * {{{
-   * val p = { e: E => pf.isDefinedAt(e) }
-   * val pathsReversed = findTopmostElemOrSelfPaths(p).reverse
-   *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updated(path, pf(e))
-   * }
-   * }}}
-   *
-   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
-   * and partly because many intermediate element objects may be created.
-   */
   final def topmostUpdated(pf: PartialFunction[E, E]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
     // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
@@ -187,26 +149,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
   final def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E =
     updatedWithNodeSeq(path) { e => newNodes }
 
-  /**
-   * Functionally updates the descendant elements for which the partial function is defined,
-   * within the tree of which this element is the root element.
-   *
-   * This function is equivalent to:
-   * {{{
-   * val p = { e: E => pf.isDefinedAt(e) }
-   * val pathsReversed = filterElemPaths(p).reverse
-   *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updatedWithNodeSeq(path, pf(e))
-   * }
-   * }}}
-   *
-   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
-   * and partly because many intermediate element objects may be created. Typically, when all elements must be "functionally
-   * updated" (so when the partial function is defined for all elements), it is better to do so by recursion, without using
-   * this function.
-   */
   final def updatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
     // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
@@ -222,24 +164,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     result
   }
 
-  /**
-   * Functionally updates the topmost descendant elements for which the partial function is defined,
-   * within the tree of which this element is the root element.
-   *
-   * This function is equivalent to:
-   * {{{
-   * val p = { e: E => pf.isDefinedAt(e) }
-   * val pathsReversed = findTopmostElemPaths(p).reverse
-   *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updatedWithNodeSeq(path, pf(e))
-   * }
-   * }}}
-   *
-   * This can be an expensive function, partly because (repeatedly) finding elements by element paths can be expensive,
-   * and partly because many intermediate element objects may be created.
-   */
   final def topmostUpdatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
     val p = { e: E => pf.isDefinedAt(e) }
     // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!

@@ -36,4 +36,8 @@ trait TransformableElemLike[E <: TransformableElemLike[E]] extends Transformable
   final def transform(f: E => E): E = {
     f(withMappedChildElems(e => e.transform(f)))
   }
+
+  final def transform(f: (E, Option[E]) => E, parentOption: Option[E]): E = {
+    f(withMappedChildElems(e => e.transform(f, Some(this))), parentOption)
+  }
 }

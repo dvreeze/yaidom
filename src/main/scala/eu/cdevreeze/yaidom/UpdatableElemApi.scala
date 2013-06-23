@@ -262,10 +262,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * val p = { e: E => pf.isDefinedAt(e) }
    * val pathsReversed = filterElemOrSelfPaths(p).reverse
    *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updated(path, pf(e))
-   * }
+   * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path)(pf) }
    * }}}
    */
   def updated(pf: PartialFunction[E, E]): E
@@ -279,10 +276,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * val p = { e: E => pf.isDefinedAt(e) }
    * val pathsReversed = findTopmostElemOrSelfPaths(p).reverse
    *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updated(path, pf(e))
-   * }
+   * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path)(pf) }
    * }}}
    */
   def topmostUpdated(pf: PartialFunction[E, E]): E
@@ -328,10 +322,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * val p = { e: E => pf.isDefinedAt(e) }
    * val pathsReversed = filterElemPaths(p).reverse
    *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updatedWithNodeSeq(path, pf(e))
-   * }
+   * pathsReversed.foldLeft(self) { case (acc, path) => acc.updatedWithNodeSeq(path)(pf) }
    * }}}
    */
   def updatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E
@@ -345,10 +336,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * val p = { e: E => pf.isDefinedAt(e) }
    * val pathsReversed = findTopmostElemPaths(p).reverse
    *
-   * pathsReversed.foldLeft(self) { case (acc, path) =>
-   *   val e = acc.findWithElemPath(path).get
-   *   acc.updatedWithNodeSeq(path, pf(e))
-   * }
+   * pathsReversed.foldLeft(self) { case (acc, path) => acc.updatedWithNodeSeq(path)(pf) }
    * }}}
    */
   def topmostUpdatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E

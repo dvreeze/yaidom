@@ -56,8 +56,23 @@ trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
   def withMappedChildElems(f: E => E): E
 
   /**
-   * Transforms the element by applying the given function to all its descendant-or-self elements (while leaving non-element
-   * nodes unaltered in the result). That is, returns `f(withMappedChildElems (e => e.transform(f)))`.
+   * Transforms the element by applying the given function to all its descendant-or-self elements.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * f(withMappedChildElems (e => e.transform(f)))
+   * }}}
    */
   def transform(f: E => E): E
+
+  /**
+   * Transforms the element by applying the given function to all its descendant-or-self elements, passing an optional
+   * (untransformed) parent element as well.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * f(withMappedChildElems(e => e.transform(f, Some(this))), parentOption)
+   * }}}
+   */
+  def transform(f: (E, Option[E]) => E, parentOption: Option[E]): E
 }

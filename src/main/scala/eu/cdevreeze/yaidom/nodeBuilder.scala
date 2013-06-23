@@ -104,7 +104,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] with TransformableElemLike[ElemBuilder] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -117,6 +117,15 @@ final class ElemBuilder(
 
   /** Returns the element children as ElemBuilder instances */
   override def findAllChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
+
+  override def withMappedChildElems(f: ElemBuilder => ElemBuilder): ElemBuilder = {
+    val newChildren =
+      children map {
+        case e: ElemBuilder => f(e)
+        case n: NodeBuilder => n
+      }
+    withChildren(newChildren)
+  }
 
   /**
    * Creates an `Elem` from this element builder, using the passed parent scope.
@@ -135,9 +144,21 @@ final class ElemBuilder(
       children map { ch => ch.build(newScope) })
   }
 
+  /**
+   * Creates a copy, altered with the explicitly passed parameters (for qname, attributes, namespaces and children).
+   */
+  def copy(
+    qname: QName = this.qname,
+    attributes: immutable.IndexedSeq[(QName, String)] = this.attributes,
+    namespaces: Declarations = this.namespaces,
+    children: immutable.IndexedSeq[NodeBuilder] = this.children): ElemBuilder = {
+
+    new ElemBuilder(qname, attributes, namespaces, children)
+  }
+
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   def withChildren(newChildren: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
-    new ElemBuilder(qname, attributes, namespaces, newChildren)
+    copy(children = newChildren)
   }
 
   /** Returns `withChildren(self.children :+ newChild)`. */
