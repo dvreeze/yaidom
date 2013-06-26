@@ -104,7 +104,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] with TransformableElemLike[ElemBuilder] { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -123,6 +123,15 @@ final class ElemBuilder(
       children map {
         case e: ElemBuilder => f(e)
         case n: NodeBuilder => n
+      }
+    withChildren(newChildren)
+  }
+
+  override def withFlatMappedChildElems(f: ElemBuilder => immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    val newChildren =
+      children flatMap {
+        case e: ElemBuilder => f(e)
+        case n: NodeBuilder => Vector(n)
       }
     withChildren(newChildren)
   }

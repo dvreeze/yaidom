@@ -25,13 +25,16 @@ import scala.collection.{ immutable, mutable }
  *
  * Based on abstract method `withMappedChildElems`, this trait offers a somewhat richer API for transforming elements.
  *
+ * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait TransformableElemLike[E <: TransformableElemLike[E]] extends TransformableElemApi[E] { self: E =>
+trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends TransformableElemApi[N, E] { self: E =>
 
   def withMappedChildElems(f: E => E): E
+
+  def withFlatMappedChildElems(f: E => immutable.IndexedSeq[N]): E
 
   final def transform(f: E => E): E = {
     f(withMappedChildElems(e => e.transform(f)))
@@ -39,5 +42,16 @@ trait TransformableElemLike[E <: TransformableElemLike[E]] extends Transformable
 
   final def transform(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E = {
     f(withMappedChildElems(e => e.transform(f, (ancestry :+ self))), ancestry)
+  }
+
+  final def transformToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
+    f(withFlatMappedChildElems(e => e.transformToNodeSeq(f)))
+  }
+
+  final def transformToNodeSeq(
+    f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
+    ancestry: immutable.IndexedSeq[E]): immutable.IndexedSeq[N] = {
+
+    f(withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self))), ancestry)
   }
 }

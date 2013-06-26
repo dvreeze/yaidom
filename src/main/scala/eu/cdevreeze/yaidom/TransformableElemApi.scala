@@ -33,11 +33,12 @@ import scala.collection.immutable
  *
  * This purely abstract API leaves the implementation completely open.
  *
+ * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
+trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E =>
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
@@ -54,6 +55,22 @@ trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
    * }}}
    */
   def withMappedChildElems(f: E => E): E
+
+  /**
+   * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
+   * child nodes occur in the result element unaltered.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * val newChildren =
+   *   children flatMap {
+   *     case e: E => f(e)
+   *     case n: N => Vector(n)
+   *   }
+   * withChildren(newChildren)
+   * }}}
+   */
+  def withFlatMappedChildElems(f: E => immutable.IndexedSeq[N]): E
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements.
@@ -75,4 +92,27 @@ trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
    * }}}
    */
   def transform(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
+
+  /**
+   * Transforms the element to a node sequence by applying the given function to all its descendant-or-self elements.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * f(withFlatMappedChildElems (e => e.transformToNodeSeq(f)))
+   * }}}
+   */
+  def transformToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+
+  /**
+   * Transforms the element to a node sequence by applying the given function to all its descendant-or-self elements,
+   * passing its ancestors (as sequence of elements, starting with the "root" element) as well.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * f(withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self))), ancestry)
+   * }}}
+   */
+  def transformToNodeSeq(
+    f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
+    ancestry: immutable.IndexedSeq[E]): immutable.IndexedSeq[N]
 }
