@@ -1418,9 +1418,10 @@ abstract class AbstractOtherNamespaceTest extends Suite {
   private def organizeNamespaces(rootElem: Elem): Elem = {
     val maxScope = findMaxTopLevelScope(rootElem)
 
-    def fillScope(e: Elem, parentOption: Option[Elem]): Elem = {
+    def fillScope(e: Elem, ancestry: immutable.IndexedSeq[Elem]): Elem = {
       // Just checking assumptions about transformations using this fillScope function
-      require(parentOption.isEmpty || resolved.Elem(parentOption.get).findAllChildElems.contains(resolved.Elem(e)))
+      require(ancestry.isEmpty || resolved.Elem(ancestry.last).findAllChildElems.contains(resolved.Elem(e)))
+      require(ancestry.isEmpty || resolved.Elem(rootElem) == resolved.Elem(ancestry.head))
 
       val newScope = maxScope ++ e.scope
       require(e.scope.withoutDefaultNamespace.subScopeOf(newScope.withoutDefaultNamespace))
@@ -1428,7 +1429,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
       e.copy(scope = newScope)
     }
 
-    rootElem.transform(fillScope _, None)
+    rootElem.transform(fillScope _, Vector())
   }
 
   private def findMaxTopLevelScope(elem: Elem): Scope = {

@@ -66,13 +66,13 @@ trait TransformableElemApi[E <: TransformableElemApi[E]] { self: E =>
   def transform(f: E => E): E
 
   /**
-   * Transforms the element by applying the given function to all its descendant-or-self elements, passing an optional
-   * (untransformed) parent element as well.
+   * Transforms the element by applying the given function to all its descendant-or-self elements, passing its ancestors
+   * (as sequence of elements, starting with the "root" element) as well.
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(withMappedChildElems(e => e.transform(f, Some(this))), parentOption)
+   * f(withMappedChildElems(e => e.transform(f, (ancestry :+ self))), ancestry)
    * }}}
    */
-  def transform(f: (E, Option[E]) => E, parentOption: Option[E]): E
+  def transform(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
 }

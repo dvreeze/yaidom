@@ -37,7 +37,7 @@ trait TransformableElemLike[E <: TransformableElemLike[E]] extends Transformable
     f(withMappedChildElems(e => e.transform(f)))
   }
 
-  final def transform(f: (E, Option[E]) => E, parentOption: Option[E]): E = {
-    f(withMappedChildElems(e => e.transform(f, Some(this))), parentOption)
+  final def transform(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E = {
+    f(withMappedChildElems(e => e.transform(f, (ancestry :+ self))), ancestry)
   }
 }
