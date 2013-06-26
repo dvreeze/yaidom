@@ -54,4 +54,15 @@ trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends 
 
     f(withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self))), ancestry)
   }
+
+  final def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E = {
+    withFlatMappedChildElems(e => e.transformToNodeSeq(f))
+  }
+
+  final def transformElemsToNodeSeq(
+    f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
+    ancestry: immutable.IndexedSeq[E]): E = {
+
+    withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self)))
+  }
 }

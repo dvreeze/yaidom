@@ -115,4 +115,29 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
   def transformToNodeSeq(
     f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
     ancestry: immutable.IndexedSeq[E]): immutable.IndexedSeq[N]
+
+  /**
+   * Transforms each descendant element to a node sequence by applying the given function to all its descendant elements.
+   * The function is not applied to this element itself.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * withFlatMappedChildElems(e => e.transformToNodeSeq(f))
+   * }}}
+   */
+  def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
+
+  /**
+   * Transforms each descendant element to a node sequence by applying the given function to all its descendant elements,
+   * passing its ancestors (as sequence of elements, starting with the "root" element) as well. The function is not applied
+   * to this element itself.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self)))
+   * }}}
+   */
+  def transformElemsToNodeSeq(
+    f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
+    ancestry: immutable.IndexedSeq[E]): E
 }
