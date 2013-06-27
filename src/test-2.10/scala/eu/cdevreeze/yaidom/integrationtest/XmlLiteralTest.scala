@@ -272,10 +272,11 @@ class XmlLiteralTest extends Suite {
 	</Employee>"""
     }
 
-    val pf: PartialFunction[Elem, Elem] = {
+    val f: PartialFunction[Elem, Elem] = {
       case empElem: Elem if empElem.localName == "Employee" => updateEmployee(empElem)
+      case elem: Elem => elem
     }
-    val newDoc = doc.updated(pf)
+    val newDoc = doc.transform(f)
 
     val resolvedNewRoot = resolved.Elem(newDoc.documentElement).removeAllInterElementWhitespace
 
