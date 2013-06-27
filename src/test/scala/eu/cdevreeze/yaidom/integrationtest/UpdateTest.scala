@@ -98,7 +98,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  @Test def testUpdateUsingUpdatedFunction() {
+  @Test def testUpdateUsingTransform() {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -112,8 +112,8 @@ class UpdateTest extends Suite {
 
     val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
     val doc2 = Document(
-      turnBookAttributeIntoElemUsingUpdatedFunction(
-        turnBookAttributeIntoElemUsingUpdatedFunction(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+      turnBookAttributeIntoElem(
+        turnBookAttributeIntoElem(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
     expectResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
@@ -127,8 +127,8 @@ class UpdateTest extends Suite {
 
     val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
     val updatedResolvedElm =
-      turnBookAttributeIntoElemUsingUpdatedFunction(
-        turnBookAttributeIntoElemUsingUpdatedFunction(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
+      turnBookAttributeIntoElem(
+        turnBookAttributeIntoElem(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
 
     expectResult(false) {
       resolvedOriginalElm == resolvedUpdatedElm
@@ -139,7 +139,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  @Test def testUpdateUsingTopmostUpdatedFunction() {
+  @Test def testUpdateUsingTransformTopmost() {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -153,8 +153,8 @@ class UpdateTest extends Suite {
 
     val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
     val doc2 = Document(
-      turnBookAttributeIntoElemUsingTopmostUpdatedFunction(
-        turnBookAttributeIntoElemUsingTopmostUpdatedFunction(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+      turnBookAttributeIntoElemTransformingTopmost(
+        turnBookAttributeIntoElemTransformingTopmost(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
     expectResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
@@ -181,7 +181,7 @@ class UpdateTest extends Suite {
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom functional updates */
-  @Test def testAnotherUpdateUsingUpdatedFunction() {
+  @Test def testAnotherUpdate() {
     val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
 
     val doc: Document = docParser.parse(is)
@@ -194,7 +194,7 @@ class UpdateTest extends Suite {
     // 3. Element gender removed
     // 4. Element salary added (with value 10000)
 
-    val pf: PartialFunction[Elem, Elem] = {
+    val f: Elem => Elem = {
       case e: Elem if e.localName == "Employee" =>
         val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
@@ -206,9 +206,10 @@ class UpdateTest extends Suite {
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
       case e: Elem if e.localName == "name" =>
         e.withChildren(Vector(Text(e.text.toUpperCase, false)))
+      case e: Elem => e
     }
 
-    val updatedDoc = doc updated pf
+    val updatedDoc = doc.transform(f)
     val formattedUpdatedDoc = updatedDoc.withDocumentElement(updatedDoc.documentElement.prettify(4))
 
     logger.info("Result of update (using function updated):%n%s".format(docPrinter.print(formattedUpdatedDoc.documentElement)))
@@ -247,7 +248,7 @@ class UpdateTest extends Suite {
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom function topmostUpdated */
-  @Test def testAnotherUpdateUsingTopmostUpdatedFunction() {
+  @Test def testAnotherUpdateUsingTransformTopmost() {
     val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
 
     val doc: Document = docParser.parse(is)
@@ -260,7 +261,7 @@ class UpdateTest extends Suite {
     // 3. Element gender removed
     // 4. Element salary added (with value 10000)
 
-    val pf: PartialFunction[Elem, Elem] = {
+    val f: Elem => Elem = {
       case e: Elem if e.localName == "Employee" =>
         val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
@@ -272,18 +273,19 @@ class UpdateTest extends Suite {
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
       case e: Elem if e.localName == "name" =>
         e.withChildren(Vector(Text(e.text.toUpperCase, false)))
+      case e: Elem => e
     }
 
-    // Using the topmostUpdated method, the name update is not picked up!
+    // The name update is also picked up.
 
-    val updatedDoc = doc topmostUpdated pf
+    val updatedDoc = doc.transform(f)
     val formattedUpdatedDoc = updatedDoc.withDocumentElement(updatedDoc.documentElement.prettify(4))
 
     logger.info("Result of update (using function topmostUpdated):%n%s".format(docPrinter.print(formattedUpdatedDoc.documentElement)))
 
     // Parse and check the file with the expected updated result
 
-    val expectedNewDoc = docParser.parse(classOf[UpdateTest].getResourceAsStream("anotherUpdatedEmployee.xml"))
+    val expectedNewDoc = docParser.parse(classOf[UpdateTest].getResourceAsStream("updatedEmployee.xml"))
     val expectedResolvedNewRoot = resolved.Elem(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
 
     // Is the parsed expected update result indeed as expected?
@@ -291,7 +293,7 @@ class UpdateTest extends Suite {
     expectResult(Seq("M1", "F2")) {
       (expectedResolvedNewRoot \\ (_.localName == "Employee")) flatMap (_ \@ EName("id"))
     }
-    expectResult(Seq("Pankaj", "Lisa")) {
+    expectResult(Seq("PANKAJ", "LISA")) {
       (expectedResolvedNewRoot \\ (_.localName == "name")) map (_.text)
     }
     expectResult(Seq()) {
@@ -302,6 +304,13 @@ class UpdateTest extends Suite {
     }
 
     // Finally we check the result of the functional update against this parsed expected update result
+
+    expectResult(expectedResolvedNewRoot.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.map(_.resolvedName)
+    }
+    expectResult(expectedResolvedNewRoot.findAllElemsOrSelf.flatMap(_.resolvedAttributes)) {
+      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.flatMap(_.resolvedAttributes)
+    }
 
     expectResult(expectedResolvedNewRoot) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
@@ -330,36 +339,52 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def turnBookAttributeIntoElemUsingUpdatedFunction(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
-    val pf: PartialFunction[Elem, Elem] = {
+  private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    val f: Elem => Elem = {
       case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+      case e => e
     }
 
-    rootElm updated pf
+    rootElm.transform(f)
   }
 
-  private def turnBookAttributeIntoElemUsingUpdatedFunction(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
-    val pf: PartialFunction[resolved.Elem, resolved.Elem] = {
+  private def turnBookAttributeIntoElem(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
+    val f: resolved.Elem => resolved.Elem = {
       case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+      case e => e
     }
 
-    rootElm updated pf
+    rootElm.transform(f)
   }
 
-  private def turnBookAttributeIntoElemUsingTopmostUpdatedFunction(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
-    val pf: PartialFunction[Elem, Elem] = {
-      case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+  private def turnBookAttributeIntoElemTransformingTopmost(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    val f: (Elem, immutable.IndexedSeq[Elem]) => Elem = {
+      case (e, ancestry) => e match {
+        case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined =>
+          if (ancestry.exists(che => che.resolvedName == EName("{http://bookstore}Book") && che.attributeOption(EName(attrName)).isDefined))
+            e
+          else
+            upd(e, attrName)
+        case e => e
+      }
     }
 
-    rootElm topmostUpdated pf
+    rootElm.transform(f, Vector())
   }
 
   private def turnBookAttributeIntoElemUsingTopmostUpdatedFunction(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
-    val pf: PartialFunction[resolved.Elem, resolved.Elem] = {
-      case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
+    val f: (resolved.Elem, immutable.IndexedSeq[resolved.Elem]) => resolved.Elem = {
+      case (e, ancestry) => e match {
+        case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined =>
+          if (ancestry.exists(che => che.resolvedName == EName("{http://bookstore}Book") && che.attributeOption(EName(attrName)).isDefined))
+            e
+          else
+            upd(e, attrName)
+        case e => e
+      }
     }
 
-    rootElm topmostUpdated pf
+    rootElm.transform(f, Vector())
   }
 
   def updateBook(bookElm: Elem, attrName: String): Elem = {

@@ -410,13 +410,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testUpdateAgain() {
+  @Test def testTransform() {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testUpdateAgain] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info("[testTransform] Parsing (into a Document) took %d ms".format(endMs - startMs))
 
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
@@ -432,16 +432,20 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       oldPhoneElm.text == newPhone
     }
 
-    // Update, using a partial function. Note that this is probably inefficient for very large XML documents.
+    // Transform, using a function (updating many phone elements). Note that this is probably inefficient for very large XML documents.
 
     val start2Ms = System.currentTimeMillis()
 
-    val updatedDoc: Document = doc updated {
-      case e if (e.localName == "phone") && (e == oldPhoneElm) => e.withChildren(Vector(Text(newPhone, false)))
+    def doUpdate(e: Elem): Elem = e match {
+      case e if (e.localName == "phone") && (resolved.Elem(e) == resolved.Elem(oldPhoneElm)) =>
+        e.withChildren(Vector(Text(newPhone, false)))
+      case e => e
     }
 
+    val updatedDoc: Document = doc.transform(doUpdate)
+
     val end2Ms = System.currentTimeMillis()
-    logger.info("Updating an element in the document (using a partial function) took %d ms".format(end2Ms - start2Ms))
+    logger.info("Transforming an element in the document (using a function) took %d ms".format(end2Ms - start2Ms))
 
     val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 

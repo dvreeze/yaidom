@@ -31,7 +31,6 @@ import scala.collection.{ immutable, mutable }
  * <ul>
  * <li>Convenience methods for functional updates given a child node index (range)</li>
  * <li>Methods for functional updates given an `ElemPath`</li>
- * <li>A method for functional updates, given a partial function from elements to node collections</li>
  * </ul>
  *
  * It is important that the abstract methods are mutually consistent in their implementations. For example, the following equality
@@ -97,36 +96,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def updated(path: ElemPath, newElem: E): E = updated(path) { e => newElem }
 
-  final def updated(pf: PartialFunction[E, E]): E = {
-    val p = { e: E => pf.isDefinedAt(e) }
-    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
-    val pathsReversed = filterElemOrSelfPaths(p).reverse
-
-    val result: E = pathsReversed.foldLeft(self) {
-      case (acc, path) =>
-        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
-        assert(pf.isDefinedAt(e))
-
-        acc.updated(path, pf(e))
-    }
-    result
-  }
-
-  final def topmostUpdated(pf: PartialFunction[E, E]): E = {
-    val p = { e: E => pf.isDefinedAt(e) }
-    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
-    val pathsReversed = findTopmostElemOrSelfPaths(p).reverse
-
-    val result: E = pathsReversed.foldLeft(self) {
-      case (acc, path) =>
-        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
-        assert(pf.isDefinedAt(e))
-
-        acc.updated(path, pf(e))
-    }
-    result
-  }
-
   final def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
     if (path == ElemPath.Root) self
     else {
@@ -148,34 +117,4 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E =
     updatedWithNodeSeq(path) { e => newNodes }
-
-  final def updatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
-    val p = { e: E => pf.isDefinedAt(e) }
-    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
-    val pathsReversed = filterElemPaths(p).reverse
-
-    val result: E = pathsReversed.foldLeft(self) {
-      case (acc, path) =>
-        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
-        assert(pf.isDefinedAt(e))
-
-        acc.updatedWithNodeSeq(path, pf(e))
-    }
-    result
-  }
-
-  final def topmostUpdatedWithNodeSeq(pf: PartialFunction[E, immutable.IndexedSeq[N]]): E = {
-    val p = { e: E => pf.isDefinedAt(e) }
-    // Very important to process paths in reverse order, because ElemPaths can become invalid during (functional) updates!!
-    val pathsReversed = findTopmostElemPaths(p).reverse
-
-    val result: E = pathsReversed.foldLeft(self) {
-      case (acc, path) =>
-        val e = acc.findWithElemPath(path).getOrElse(sys.error("Path %s not existing in root %s".format(path, acc)))
-        assert(pf.isDefinedAt(e))
-
-        acc.updatedWithNodeSeq(path, pf(e))
-    }
-    result
-  }
 }

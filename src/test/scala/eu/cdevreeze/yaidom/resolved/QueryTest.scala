@@ -1175,8 +1175,9 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore updated {
+      bookstore transform {
         case e if e.resolvedName == EName("Book") => removePrice(e)
+        case e => e
       }
 
     expectResult(4) {
@@ -1219,8 +1220,9 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore updated {
+      bookstore transform {
         case e if e.resolvedName == EName("Author") => combineName(e)
+        case e => e
       }
 
     expectResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
@@ -1239,13 +1241,14 @@ class QueryTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val updatedBookstoreElm: Elem =
-      bookstore updated {
+      bookstore transform {
         case e if e.resolvedName == EName("Author") =>
           val newElmName = EName("http://def", e.localName)
           Elem(newElmName, e.resolvedAttributes, e.children)
+        case e => e
       }
 
-    // Although the partial function is defined for any path containing an Author, only the Author elements are functionally updated!
+    // Only the Author elements are functionally changed!
 
     expectResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
       EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {

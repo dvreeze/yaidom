@@ -94,12 +94,6 @@ final class Document(
   /** Returns `updated(path) { e => newElem }` */
   def updated(path: ElemPath, newElem: Elem): Document = updated(path) { e => newElem }
 
-  /** Returns `withDocumentElement(this.documentElement.updated(pf))` */
-  def updated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.updated(pf))
-
-  /** Returns `withDocumentElement(this.documentElement.topmostUpdated(pf))` */
-  def topmostUpdated(pf: PartialFunction[Elem, Elem]): Document = withDocumentElement(this.documentElement.topmostUpdated(pf))
-
   /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(path)(f))` */
   def updatedWithNodeSeq(path: ElemPath)(f: Elem => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updatedWithNodeSeq(path)(f))
@@ -108,13 +102,25 @@ final class Document(
   def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))
 
-  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(pf))` */
-  def updatedWithNodeSeq(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document =
-    withDocumentElement(this.documentElement.updatedWithNodeSeq(pf))
+  /** Returns `withDocumentElement(this.documentElement.transform(f))` */
+  def transform(f: Elem => Elem): Document =
+    withDocumentElement(this.documentElement.transform(f))
 
-  /** Returns `withDocumentElement(this.documentElement.topmostUpdatedWithNodeSeq(pf))` */
-  def topmostUpdatedWithNodeSeq(pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Document =
-    withDocumentElement(this.documentElement.topmostUpdatedWithNodeSeq(pf))
+  /** Returns `withDocumentElement(this.documentElement.transform(f, ancestry))` */
+  def transform(f: (Elem, immutable.IndexedSeq[Elem]) => Elem, ancestry: immutable.IndexedSeq[Elem]): Document =
+    withDocumentElement(this.documentElement.transform(f, ancestry))
+
+  /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))` */
+  def transformElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Document =
+    withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))
+
+  /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, ancestry))` */
+  final def transformElemsToNodeSeq(
+    f: (Elem, immutable.IndexedSeq[Elem]) => immutable.IndexedSeq[Node],
+    ancestry: immutable.IndexedSeq[Elem]): Document = {
+
+    withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, ancestry))
+  }
 
   final def toTreeRepr(): String = {
     val sb = new StringBuilder

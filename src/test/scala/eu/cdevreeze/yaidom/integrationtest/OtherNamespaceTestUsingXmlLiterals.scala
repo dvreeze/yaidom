@@ -474,14 +474,15 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedAlmostEquivalentElem = resolved.Elem(almostEquivalentDoc.documentElement)
 
-    val pf: PartialFunction[resolved.Elem, resolved.Elem] = {
+    val f: resolved.Elem => resolved.Elem = {
       case e: resolved.Elem if e.resolvedName == EName(nsProd, "number") =>
         val scope = doc.documentElement.scope ++ Scope.from("prod" -> nsProd2)
         val v = (doc.documentElement \\ EName(nsProd2, "number")).map(_.text).mkString
         val result = NodeBuilder.textElem(QName("prod", "number"), v).build(scope)
         resolved.Elem(result)
+      case e => e
     }
-    val resolvedEquivalentElem = resolvedAlmostEquivalentElem.updated(pf)
+    val resolvedEquivalentElem = resolvedAlmostEquivalentElem.transform(f)
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 

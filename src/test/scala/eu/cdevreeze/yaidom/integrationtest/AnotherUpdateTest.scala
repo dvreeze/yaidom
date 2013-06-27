@@ -30,7 +30,7 @@ import print.DocumentPrinterUsingDom
 import convert.ScalaXmlConversions._
 
 /**
- * Another XML functional update test case.
+ * Another XML functional update test case. More precisely, mainly a transformation test case.
  *
  * @author Chris de Vreeze
  */
@@ -46,11 +46,12 @@ class AnotherUpdateTest extends Suite {
 
     val doc: Document = docParser.parse(is)
 
-    val deleteMags: PartialFunction[Elem, Vector[Node]] = {
+    val deleteMags: Elem => Vector[Node] = {
       case elem: Elem if elem.localName == "Magazine" => Vector[Node]()
+      case elem: Elem => Vector(elem)
     }
 
-    val docWithoutMags: Document = doc.updatedWithNodeSeq(deleteMags)
+    val docWithoutMags: Document = doc.transformElemsToNodeSeq(deleteMags)
 
     expectResult(doc.documentElement.findAllChildElems.size - 4) {
       docWithoutMags.documentElement.findAllChildElems.size
@@ -64,17 +65,14 @@ class AnotherUpdateTest extends Suite {
       docWithoutMags.documentElement.filterElemsOrSelf(_.localName == "Magazine").size
     }
 
-    val deleteMagsResolved: PartialFunction[resolved.Elem, Vector[resolved.Node]] = {
+    val deleteMagsResolved: resolved.Elem => Vector[resolved.Node] = {
       case elem: resolved.Elem if elem.resolvedName.localPart == "Magazine" => Vector[resolved.Node]()
+      case elem: resolved.Elem => Vector(elem)
     }
 
     expectResult(resolved.Elem(docWithoutMags.documentElement)) {
-      resolved.Elem(doc.documentElement).updatedWithNodeSeq(deleteMagsResolved)
+      resolved.Elem(doc.documentElement).transformElemsToNodeSeq(deleteMagsResolved)
     }
-
-    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, deleteMags)
-
-    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, deleteMags)
   }
 
   @Test def testInsertAfter() {
@@ -120,11 +118,12 @@ class AnotherUpdateTest extends Suite {
     }
 
     val docWithoutNonDatabaseBook: Document = {
-      val deleteNonDatabaseBook: PartialFunction[Elem, Vector[Node]] = {
+      val deleteNonDatabaseBook: Elem => Vector[Node] = {
         case e: Elem if e.localName == "Book" && (e \ (_.localName == "Title")).head.text.contains("Scala") => Vector[Node]()
+        case e: Elem => Vector(e)
       }
 
-      docWithScalaBook.updatedWithNodeSeq(deleteNonDatabaseBook)
+      docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
@@ -134,11 +133,8 @@ class AnotherUpdateTest extends Suite {
     val insertBook: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
       case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(e, newBook)
     }
-    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, insertBook)
 
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(e, newBook) })
-
-    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, insertBook)
   }
 
   @Test def testInsertBefore() {
@@ -184,11 +180,12 @@ class AnotherUpdateTest extends Suite {
     }
 
     val docWithoutNonDatabaseBook: Document = {
-      val deleteNonDatabaseBook: PartialFunction[Elem, Vector[Node]] = {
+      val deleteNonDatabaseBook: Elem => Vector[Node] = {
         case e: Elem if e.localName == "Book" && (e \ (_.localName == "Title")).head.text.contains("Scala") => Vector[Node]()
+        case e: Elem => Vector(e)
       }
 
-      docWithScalaBook.updatedWithNodeSeq(deleteNonDatabaseBook)
+      docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
@@ -198,11 +195,8 @@ class AnotherUpdateTest extends Suite {
     val insertBook: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
       case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(newBook, e)
     }
-    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, insertBook)
 
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(newBook, e) })
-
-    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, insertBook)
   }
 
   @Test def testInsertAsFirstInto() {
@@ -233,12 +227,13 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val insertBook: PartialFunction[Elem, Elem] = {
+    val insertBook: Elem => Elem = {
       case e: Elem if e.localName == "Bookstore" => e.plusChild(0, newBook)
+      case e: Elem => e
     }
 
     val docWithScalaBook: Document = {
-      val result = doc.updated(insertBook)
+      val result = doc.transform(insertBook)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -250,20 +245,17 @@ class AnotherUpdateTest extends Suite {
     }
 
     val docWithoutNonDatabaseBook: Document = {
-      val deleteNonDatabaseBook: PartialFunction[Elem, Vector[Node]] = {
+      val deleteNonDatabaseBook: Elem => Vector[Node] = {
         case e: Elem if e.localName == "Book" && (e \ (_.localName == "Title")).head.text.contains("Scala") => Vector[Node]()
+        case e: Elem => Vector(e)
       }
 
-      docWithScalaBook.updatedWithNodeSeq(deleteNonDatabaseBook)
+      docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
-
-    testPropertyAboutTopmostUpdated(doc.documentElement, insertBook)
-
-    testPropertyAboutUpdatedAsTransform(doc.documentElement, insertBook)
   }
 
   @Test def testUpdate() {
@@ -271,22 +263,24 @@ class AnotherUpdateTest extends Suite {
 
     val doc: Document = docParser.parse(is)
 
-    val updateMag: PartialFunction[Elem, Elem] = {
+    val updateMag: Elem => Elem = {
       case e: Elem if (e \ (_.localName == "Title")).map(_.text).mkString == "National Geographic" =>
         e.plusAttribute(QName("Month"), "January").plusAttribute(QName("Year"), "2010")
+      case e: Elem => e
     }
 
     val updatedDoc: Document = {
-      val result = doc.updated(updateMag)
+      val result = doc.transform(updateMag)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val updateMag2: PartialFunction[Elem, Vector[Node]] = {
-      case e: Elem if updateMag.isDefinedAt(e) => Vector(updateMag(e))
+    val updateMag2: Elem => Vector[Node] = {
+      case e: Elem if (e \ (_.localName == "Title")).map(_.text).mkString == "National Geographic" => Vector(updateMag(e))
+      case e: Elem => Vector(e)
     }
 
     val updatedDoc2: Document = {
-      val result = doc.updatedWithNodeSeq(updateMag2)
+      val result = doc.transformElemsToNodeSeq(updateMag2)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -303,34 +297,6 @@ class AnotherUpdateTest extends Suite {
 
     expectResult("2010") {
       (newMag \@ EName("Year")).getOrElse("")
-    }
-
-    testPropertyAboutTopmostUpdated(doc.documentElement, updateMag)
-
-    testPropertyAboutTopmostUpdatedWithNodeSeq(doc.documentElement, updateMag2)
-
-    testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, updateMag2)
-
-    testPropertyAboutUpdatedAsTransform(doc.documentElement, updateMag)
-  }
-
-  private def testPropertyAboutTopmostUpdated(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
-    val pf2: PartialFunction[Elem, Elem] = {
-      case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
-    }
-
-    expectResult(resolved.Elem(elem.updated(pf2))) {
-      resolved.Elem(elem.topmostUpdated(pf))
-    }
-  }
-
-  private def testPropertyAboutTopmostUpdatedWithNodeSeq(elem: Elem, pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Unit = {
-    val pf2: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
-      case e: Elem if elem.findTopmostElemsOrSelf(e2 => pf.isDefinedAt(e2)).contains(e) => pf(e)
-    }
-
-    expectResult(resolved.Elem(elem.updatedWithNodeSeq(pf2))) {
-      resolved.Elem(elem.topmostUpdatedWithNodeSeq(pf))
     }
   }
 
@@ -349,31 +315,6 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(updatedElem)) {
       resolved.Elem(elem.updatedWithNodeSeq(path)(f))
-    }
-  }
-
-  private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, pf: PartialFunction[Elem, immutable.IndexedSeq[Node]]): Unit = {
-    val pf2: PartialFunction[Elem, Elem] = {
-      case e: Elem if !e.filterChildElems(che => pf.isDefinedAt(che)).isEmpty =>
-        val childElemsWithPathEntries =
-          e.findAllChildElemsWithPathEntries.filter(elemPathPair => pf.isDefinedAt(elemPathPair._1)).reverse
-
-        childElemsWithPathEntries.foldLeft(e) {
-          case (acc, (che, pathEntry)) =>
-            acc.withPatchedChildren(acc.childNodeIndex(pathEntry), pf(che), 1)
-        }
-    }
-
-    expectResult(resolved.Elem(elem.updated(pf2))) {
-      resolved.Elem(elem.updatedWithNodeSeq(pf))
-    }
-  }
-
-  private def testPropertyAboutUpdatedAsTransform(elem: Elem, pf: PartialFunction[Elem, Elem]): Unit = {
-    val f: Elem => Elem = { e => if (pf.isDefinedAt(e)) pf(e) else e }
-
-    expectResult(resolved.Elem(elem.transform(f))) {
-      resolved.Elem(elem.updated(pf))
     }
   }
 }

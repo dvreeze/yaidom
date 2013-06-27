@@ -1098,10 +1098,11 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem = {
-      val pf: PartialFunction[eu.cdevreeze.yaidom.Elem, eu.cdevreeze.yaidom.Elem] = {
+      val pf: eu.cdevreeze.yaidom.Elem => eu.cdevreeze.yaidom.Elem = {
         case e: eu.cdevreeze.yaidom.Elem if e.resolvedName == EName("Book") => removePrice(e)
+        case e: eu.cdevreeze.yaidom.Elem => e
       }
-      val result = indexedBookstore.elem updated pf
+      val result = indexedBookstore.elem transform pf
       Elem(result)
     }
 
