@@ -298,6 +298,8 @@ class AnotherUpdateTest extends Suite {
     expectResult("2010") {
       (newMag \@ EName("Year")).getOrElse("")
     }
+
+    testPropertyAboutTransformInTermsOfUpdated(doc.documentElement, updateMag)
   }
 
   private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: ElemPath, f: Elem => immutable.IndexedSeq[Node]): Unit = {
@@ -315,6 +317,16 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(updatedElem)) {
       resolved.Elem(elem.updatedWithNodeSeq(path)(f))
+    }
+  }
+
+  private def testPropertyAboutTransformInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
+    val expectedResult = elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) =>
+      acc.updated(path)(f)
+    }
+
+    expectResult(resolved.Elem(expectedResult)) {
+      resolved.Elem(elem.transform(f))
     }
   }
 }

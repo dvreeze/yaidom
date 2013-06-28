@@ -36,6 +36,66 @@ import scala.collection.immutable
  * Note that in a way this API can be seen as the "update" counterpart of query API `ParentElemApi`, in that the 3 "axes"
  * of child elements, descendant elements, and descendant-or-self elements can be recognized.
  *
+ * ==TransformableElemApi more formally==
+ *
+ * The `TransformableElemApi` trait obeys an interesting property about `transform` in terms of `UpdatableElemApi.updated`.
+ *
+ * That is:
+ * {{{
+ * resolved.Elem(elem.transform(f)) ==
+ *   resolved.Elem(elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
+ * }}}
+ *
+ * This property can be proven by structural induction as follows:
+ *
+ * __Base case__
+ *
+ * If `elem` has no child elements, then the LHS can be rewritten as follows (modulo resolved.Elem equality):
+ * {{{
+ * elem.transform(f)
+ * f(elem.withMappedChildElems (e => e.transform(f))) // by definition
+ * f(elem) // there are no child elements
+ * elem.updated(ElemPath.Root)(f) // by definition
+ * Vector(ElemPath.Root).reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) } // by definition of foldLeft
+ * elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) } // there are no child elements
+ * }}}
+ * which is the RHS.
+ *
+ * __Inductive step__
+ *
+ * If `elem` does have child elements, the LHS can be rewritten as:
+ * {{{
+ * elem.transform(f)
+ * f(elem.withMappedChildElems (e => e.transform(f))) // by definition
+ *
+ * // induction hypothesis
+ * f(elem.withMappedChildElems { e =>
+ *   e.findAllElemOrSelfPaths.reverse.foldLeft(e) { (acc, path) => acc.updated(path)(f) }
+ * })
+ *
+ * // by definition of withMappedChildElems
+ * f(elem.withChildren(elem.children map {
+ *   case e: Elem => e.findAllElemOrSelfPaths.reverse.foldLeft(e) { (acc, path) => acc.updated(path)(f) }
+ *   case n: Node => n
+ * }))
+ *
+ * // rewriting the functional update of the children, and reversing (without affecting the result)
+ * f(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { case (acc, pathEntry) =>
+ *   acc.updated(pathEntry) { che =>
+ *     che.findAllElemOrSelfPaths.reverse.foldLeft(che) { (acc2, path) => acc2.updated(path)(f) }
+ *   }
+ * })
+ *
+ * // by definition of updated (minding the order of functional updates)
+ * f(elem.findAllElemPaths.reverse.foldLeft(elem) { case (acc, path) => acc.updated(path)(f) })
+ *
+ * // by definition of findAllElemOrSelfPaths, and because elem.updated(ElemPath.Root)(f) returns f(elem)
+ * elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { case (acc, path) => acc.updated(path)(f) }
+ * }}}
+ * which is the RHS.
+ *
+ * This completes the proof.
+ *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *

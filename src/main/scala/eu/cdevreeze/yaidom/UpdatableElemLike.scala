@@ -73,24 +73,19 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
 
-  final def updated(path: ElemPath)(f: E => E): E = {
-    // This implementation has been inspired by Scala's immutable Vector, which offers efficient
-    // "functional updates" (among other efficient operations).
+  final def updated(pathEntry: ElemPath.Entry)(f: E => E): E = {
+    val idx = self.childNodeIndex(pathEntry)
+    assert(idx >= 0, "Expected non-negative child node index")
 
+    self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
+  }
+
+  final def updated(path: ElemPath)(f: E => E): E = {
     if (path == ElemPath.Root) f(self)
     else {
-      val firstEntry = path.firstEntry
-      val foundChildElm: E = self.findWithElemPathEntry(firstEntry).getOrElse(sys.error("No child element found with path %s".format(path)))
-      val foundChildElmNodeIdx = self.childNodeIndex(firstEntry)
-      assert(foundChildElmNodeIdx >= 0, "Expected non-negative child node index")
-
       // Recursive, but not tail-recursive
-      val updatedChildTree: E = foundChildElm.updated(path.withoutFirstEntry)(f)
 
-      val updatedChildren: immutable.IndexedSeq[N] =
-        self.children.updated(foundChildElmNodeIdx, updatedChildTree)
-
-      self.withChildren(updatedChildren)
+      updated(path.firstEntry) { e => e.updated(path.withoutFirstEntry)(f) }
     }
   }
 

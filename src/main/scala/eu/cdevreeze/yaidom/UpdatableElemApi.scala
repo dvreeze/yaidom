@@ -71,9 +71,29 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
 
   /**
    * '''Core method''' that "functionally updates" the tree with this element as root element, by applying the passed function
+   * to the element that has the given [[eu.cdevreeze.yaidom.ElemPath.Entry]] (compared to this element as root).
+   *
+   * The method throws an exception if no element is found with the given path entry.
+   *
+   * It can be defined as follows:
+   * {{{
+   * val idx = self.childNodeIndex(pathEntry)
+   * self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
+   * }}}
+   */
+  def updated(pathEntry: ElemPath.Entry)(f: E => E): E
+
+  /**
+   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
    * to the element that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path.
+   *
+   * It can be defined (recursively) as follows:
+   * {{{
+   * if (path == ElemPath.Root) f(self)
+   * else updated(path.firstEntry) { e => e.updated(path.withoutFirstEntry)(f) }
+   * }}}
    */
   def updated(path: ElemPath)(f: E => E): E
 
