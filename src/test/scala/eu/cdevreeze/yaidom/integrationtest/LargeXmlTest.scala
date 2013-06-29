@@ -442,7 +442,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       case e => e
     }
 
-    val updatedDoc: Document = doc.transformElemsOrSelf(doUpdate)
+    val updatedDoc: Document = doc.transformElemsOrSelf(doUpdate _)
 
     val end2Ms = System.currentTimeMillis()
     logger.info("Transforming an element in the document (using a function) took %d ms".format(end2Ms - start2Ms))
