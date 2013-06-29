@@ -302,6 +302,8 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformChildElemsInTermsOfUpdated(doc.documentElement, updateMag)
 
     testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(doc.documentElement, updateMag)
+
+    testPropertyAboutTransformElemsInTermsOfUpdated(doc.documentElement, updateMag)
   }
 
   private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: ElemPath, f: Elem => immutable.IndexedSeq[Node]): Unit = {
@@ -330,6 +332,14 @@ class AnotherUpdateTest extends Suite {
     expectResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformChildElems(f))
     }
+
+    val expectedResult2 = elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) =>
+      acc.updated(pathEntry)(f)
+    }
+
+    expectResult(resolved.Elem(expectedResult2)) {
+      resolved.Elem(elem.transformChildElems(f))
+    }
   }
 
   private def testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
@@ -339,6 +349,16 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElemsOrSelf(f))
+    }
+  }
+
+  private def testPropertyAboutTransformElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
+    val expectedResult = elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) =>
+      acc.updated(path)(f)
+    }
+
+    expectResult(resolved.Elem(expectedResult)) {
+      resolved.Elem(elem.transformElems(f))
     }
   }
 }

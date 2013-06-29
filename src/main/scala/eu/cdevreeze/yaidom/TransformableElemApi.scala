@@ -19,17 +19,17 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * "Transformable" element. It defines a contract for transformations, applying an element transforming function to all elements in
- * an element tree. See [[eu.cdevreeze.yaidom.TransformableElemLike]].
+ * "Transformable" element. It defines a contract for transformations, applying an element transforming function to some or all
+ * elements in an element tree. See [[eu.cdevreeze.yaidom.TransformableElemLike]].
  *
  * The big conceptual difference with "updatable" elements (in trait `UpdatableElemLike[N, E]`) is that "transformations" are
- * about applying some transforming function to all descendant-or-self elements, while "(functional) updates" are about
+ * about applying some transforming function to some or all descendant-or-self elements, while "(functional) updates" are about
  * "updates" at a given element path. So "transformations" are bulk updates, not using element paths, and "(functional) updates"
  * are single element updates, at a given element path.
  *
- * In spite of these differences, "updates" can be understood in terms of equivalent "transformations". Concerning performance,
- * as a rule of thumb it is best to prefer "updates" (`UpdatableElemApi`) if only relatively few element paths are involved,
- * and to prefer "transformations" (`TransformableElemApi`) otherwise.
+ * In spite of these differences, "transformations" can be understood in terms of equivalent repeated "updates". Concerning
+ * performance, it is best to avoid "updates" (`UpdatableElemApi`) if many element paths are involved. Those "updates" are
+ * not meant for bulk updates, whereas "transformations" are.
  *
  * This purely abstract API leaves the implementation completely open.
  *
@@ -42,13 +42,13 @@ import scala.collection.immutable
  *
  * First of all, we have the following property about '''transformChildElems in terms of updated''':
  * {{{
- * resolved.Elem(elem.transformChildElems) ==
- *   resolved.Elem(elem.findAllChildElemPaths.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
+ * resolved.Elem(elem.transformChildElems(f)) ==
+ *   resolved.Elem(elem.findAllChildElemPathEntries.foldLeft(elem) { (acc, pathEntry) => acc.updated(pathEntry)(f) })
  * }}}
  *
  * After all, the LHS can be rewritten as follows (modulo resolved.Elem equality):
  * {{{
- * elem.transformChildElems
+ * elem.transformChildElems(f)
  *
  * // by definition
  * elem.withChildren(elem.children map {
@@ -60,20 +60,26 @@ import scala.collection.immutable
  * elem.findAllChildElemPathEntries.foldLeft(elem) { case (acc, pathEntry) =>
  *   acc.updated(pathEntry)(f)
  * }
- *
- * // path entries can be seen as one-entry element paths
- * elem.findAllChildElemPaths.foldLeft(elem) { case (acc, path) =>
- *   acc.updated(path)(f)
- * }
  * }}}
  * which is the RHS. This completes the proof.
  *
  * If we reverse the child element paths, the property still holds:
  * {{{
- * resolved.Elem(elem.transformChildElems) ==
+ * resolved.Elem(elem.transformChildElems(f)) ==
+ *   resolved.Elem(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) => acc.updated(pathEntry)(f) })
+ * }}}
+ * After all, each element is replaced by 1 element, so the child element path entries remain valid during the update.
+ *
+ * It easily follows that the same property holds for (child element) paths instead of path entries:
+ * {{{
+ * resolved.Elem(elem.transformChildElems(f)) ==
+ *   resolved.Elem(elem.findAllChildElemPaths.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
+ * }}}
+ * or:
+ * {{{
+ * resolved.Elem(elem.transformChildElems(f)) ==
  *   resolved.Elem(elem.findAllChildElemPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
- * After all, each element is replaced by 1 element, so the child element paths remain valid during the update.
  *
  * Furthermore, the following property about '''transformElemsOrSelf in terms of updated''' holds:
  * {{{
@@ -104,13 +110,13 @@ import scala.collection.immutable
  * f(elem.transformChildElems (e => e.transformElemsOrSelf(f))) // by definition
  *
  * // property about transformChildElems in terms of updated
- * f(elem.findAllChildElemPaths.reverse.foldLeft(elem) { case (acc, path) =>
- *   acc.updated(path) { che => che.transformElemsOrSelf(f) }
+ * f(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { case (acc, pathEntry) =>
+ *   acc.updated(pathEntry) { che => che.transformElemsOrSelf(f) }
  * })
  *
  * // induction hypothesis
- * f(elem.findAllChildElemPaths.reverse.foldLeft(elem) { case (acc, path) =>
- *   acc.updated(path) { che => che.findAllElemOrSelfPaths.reverse.foldLeft(acc) { (acc2, path2) => acc2.updated(path2)(f) } }
+ * f(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { case (acc, pathEntry) =>
+ *   acc.updated(pathEntry) { che => che.findAllElemOrSelfPaths.reverse.foldLeft(acc) { (acc2, path) => acc2.updated(path)(f) } }
  * })
  *
  * // recursive definition of updated, and keeping order in mind
@@ -122,6 +128,12 @@ import scala.collection.immutable
  * which is the RHS.
  *
  * This completes the proof.
+ *
+ * It easily follows that the following property about '''transformElems in terms of updated''' holds:
+ * {{{
+ * resolved.Elem(elem.transformElems(f)) ==
+ *   resolved.Elem(elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
+ * }}}
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
