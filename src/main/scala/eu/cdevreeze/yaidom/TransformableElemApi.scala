@@ -209,7 +209,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))))
+   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))), ancestry)
    * }}}
    *
    * In other words, returns the equivalent of:
