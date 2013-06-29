@@ -233,7 +233,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val docWithScalaBook: Document = {
-      val result = doc.transform(insertBook)
+      val result = doc.transformElemsOrSelf(insertBook)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -270,7 +270,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val updatedDoc: Document = {
-      val result = doc.transform(updateMag)
+      val result = doc.transformElemsOrSelf(updateMag)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -326,7 +326,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     expectResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transform(f))
+      resolved.Elem(elem.transformElemsOrSelf(f))
     }
   }
 }

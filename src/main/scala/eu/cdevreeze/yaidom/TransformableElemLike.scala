@@ -23,7 +23,7 @@ import scala.collection.{ immutable, mutable }
  *
  * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
  *
- * Based on abstract method `withMappedChildElems`, this trait offers a somewhat richer API for transforming elements.
+ * Based on abstract method `transformChildElems`, this trait offers a somewhat richer API for transforming elements.
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
@@ -32,37 +32,37 @@ import scala.collection.{ immutable, mutable }
  */
 trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends TransformableElemApi[N, E] { self: E =>
 
-  def withMappedChildElems(f: E => E): E
+  def transformChildElems(f: E => E): E
 
-  def withFlatMappedChildElems(f: E => immutable.IndexedSeq[N]): E
+  def transformChildElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
 
-  final def transform(f: E => E): E = {
-    f(withMappedChildElems(e => e.transform(f)))
+  final def transformElemsOrSelf(f: E => E): E = {
+    f(transformChildElems(e => e.transformElemsOrSelf(f)))
   }
 
-  final def transform(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E = {
-    f(withMappedChildElems(e => e.transform(f, (ancestry :+ self))), ancestry)
+  final def transformElemsOrSelf(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E = {
+    f(transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self))), ancestry)
   }
 
-  final def transformToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
-    f(withFlatMappedChildElems(e => e.transformToNodeSeq(f)))
+  final def transformElemsOrSelfToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
+    f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
   }
 
-  final def transformToNodeSeq(
+  final def transformElemsOrSelfToNodeSeq(
     f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
     ancestry: immutable.IndexedSeq[E]): immutable.IndexedSeq[N] = {
 
-    f(withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self))), ancestry)
+    f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))), ancestry)
   }
 
   final def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E = {
-    withFlatMappedChildElems(e => e.transformToNodeSeq(f))
+    transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
   }
 
   final def transformElemsToNodeSeq(
     f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
     ancestry: immutable.IndexedSeq[E]): E = {
 
-    withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self)))
+    transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self)))
   }
 }

@@ -38,11 +38,11 @@ import scala.collection.immutable
  *
  * ==TransformableElemApi more formally==
  *
- * The `TransformableElemApi` trait obeys an interesting property about `transform` in terms of `UpdatableElemApi.updated`.
+ * The `TransformableElemApi` trait obeys an interesting property about `transformElemsOrSelf` in terms of `UpdatableElemApi.updated`.
  *
  * That is:
  * {{{
- * resolved.Elem(elem.transform(f)) ==
+ * resolved.Elem(elem.transformElemsOrSelf(f)) ==
  *   resolved.Elem(elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
  *
@@ -52,8 +52,8 @@ import scala.collection.immutable
  *
  * If `elem` has no child elements, then the LHS can be rewritten as follows (modulo resolved.Elem equality):
  * {{{
- * elem.transform(f)
- * f(elem.withMappedChildElems (e => e.transform(f))) // by definition
+ * elem.transformElemsOrSelf(f)
+ * f(elem.transformChildElems (e => e.transformElemsOrSelf(f))) // by definition
  * f(elem) // there are no child elements
  * elem.updated(ElemPath.Root)(f) // by definition
  * Vector(ElemPath.Root).reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) } // by definition of foldLeft
@@ -65,15 +65,15 @@ import scala.collection.immutable
  *
  * If `elem` does have child elements, the LHS can be rewritten as:
  * {{{
- * elem.transform(f)
- * f(elem.withMappedChildElems (e => e.transform(f))) // by definition
+ * elem.transformElemsOrSelf(f)
+ * f(elem.transformChildElems (e => e.transformElemsOrSelf(f))) // by definition
  *
  * // induction hypothesis
- * f(elem.withMappedChildElems { e =>
+ * f(elem.transformChildElems { e =>
  *   e.findAllElemOrSelfPaths.reverse.foldLeft(e) { (acc, path) => acc.updated(path)(f) }
  * })
  *
- * // by definition of withMappedChildElems
+ * // by definition of transformChildElems
  * f(elem.withChildren(elem.children map {
  *   case e: Elem => e.findAllElemOrSelfPaths.reverse.foldLeft(e) { (acc, path) => acc.updated(path)(f) }
  *   case n: Node => n
@@ -117,7 +117,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * withChildren(newChildren)
    * }}}
    */
-  def withMappedChildElems(f: E => E): E
+  def transformChildElems(f: E => E): E
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
@@ -133,17 +133,17 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * withChildren(newChildren)
    * }}}
    */
-  def withFlatMappedChildElems(f: E => immutable.IndexedSeq[N]): E
+  def transformChildElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner.
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(withMappedChildElems (e => e.transform(f)))
+   * f(transformChildElems (e => e.transformElemsOrSelf(f)))
    * }}}
    */
-  def transform(f: E => E): E
+  def transformElemsOrSelf(f: E => E): E
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner,
@@ -151,10 +151,10 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(withMappedChildElems(e => e.transform(f, (ancestry :+ self))), ancestry)
+   * f(transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self))), ancestry)
    * }}}
    */
-  def transform(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
+  def transformElemsOrSelf(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
 
   /**
    * Transforms the element to a node sequence by applying the given function to all its descendant-or-self elements,
@@ -162,7 +162,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(withFlatMappedChildElems (e => e.transformToNodeSeq(f)))
+   * f(transformChildElemsToNodeSeq (e => e.transformElemsOrSelfToNodeSeq(f)))
    * }}}
    *
    * In other words, returns the equivalent of:
@@ -170,7 +170,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * f(transformElemsToNodeSeq(f))
    * }}}
    */
-  def transformToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+  def transformElemsOrSelfToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
 
   /**
    * Transforms the element to a node sequence by applying the given function to all its descendant-or-self elements,
@@ -178,7 +178,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self))), ancestry)
+   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))), ancestry)
    * }}}
    *
    * In other words, returns the equivalent of:
@@ -186,7 +186,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * f(transformElemsToNodeSeq(f, ancestry), ancestry)
    * }}}
    */
-  def transformToNodeSeq(
+  def transformElemsOrSelfToNodeSeq(
     f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
     ancestry: immutable.IndexedSeq[E]): immutable.IndexedSeq[N]
 
@@ -196,7 +196,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * withFlatMappedChildElems(e => e.transformToNodeSeq(f))
+   * transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
    * }}}
    */
   def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
@@ -208,7 +208,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * withFlatMappedChildElems(e => e.transformToNodeSeq(f, (ancestry :+ self)))
+   * transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self)))
    * }}}
    */
   def transformElemsToNodeSeq(

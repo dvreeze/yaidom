@@ -102,13 +102,13 @@ final class Document(
   def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))
 
-  /** Returns `withDocumentElement(this.documentElement.transform(f))` */
-  def transform(f: Elem => Elem): Document =
-    withDocumentElement(this.documentElement.transform(f))
+  /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */
+  def transformElemsOrSelf(f: Elem => Elem): Document =
+    withDocumentElement(this.documentElement.transformElemsOrSelf(f))
 
-  /** Returns `withDocumentElement(this.documentElement.transform(f, ancestry))` */
-  def transform(f: (Elem, immutable.IndexedSeq[Elem]) => Elem, ancestry: immutable.IndexedSeq[Elem]): Document =
-    withDocumentElement(this.documentElement.transform(f, ancestry))
+  /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f, ancestry))` */
+  def transformElemsOrSelf(f: (Elem, immutable.IndexedSeq[Elem]) => Elem, ancestry: immutable.IndexedSeq[Elem]): Document =
+    withDocumentElement(this.documentElement.transformElemsOrSelf(f, ancestry))
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))` */
   def transformElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Document =

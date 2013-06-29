@@ -482,7 +482,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolved.Elem(result)
       case e => e
     }
-    val resolvedEquivalentElem = resolvedAlmostEquivalentElem.transform(f)
+    val resolvedEquivalentElem = resolvedAlmostEquivalentElem.transformElemsOrSelf(f)
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 

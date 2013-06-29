@@ -1102,7 +1102,7 @@ class QueryTest extends Suite {
         case e: eu.cdevreeze.yaidom.Elem if e.resolvedName == EName("Book") => removePrice(e)
         case e: eu.cdevreeze.yaidom.Elem => e
       }
-      val result = indexedBookstore.elem.transform(f)
+      val result = indexedBookstore.elem.transformElemsOrSelf(f)
       Elem(result)
     }
 
