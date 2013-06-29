@@ -73,6 +73,8 @@ class AnotherUpdateTest extends Suite {
     expectResult(resolved.Elem(docWithoutMags.documentElement)) {
       resolved.Elem(doc.documentElement).transformElemsToNodeSeq(deleteMagsResolved)
     }
+
+    testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags)
   }
 
   @Test def testInsertAfter() {
@@ -130,11 +132,14 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
-    val insertBook: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
+    val insertBook: Elem => immutable.IndexedSeq[Node] = {
       case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(e, newBook)
+      case e: Elem => Vector(e)
     }
 
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(e, newBook) })
+
+    testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
   }
 
   @Test def testInsertBefore() {
@@ -192,11 +197,14 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
-    val insertBook: PartialFunction[Elem, immutable.IndexedSeq[Node]] = {
+    val insertBook: Elem => immutable.IndexedSeq[Node] = {
       case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(newBook, e)
+      case e: Elem => Vector(e)
     }
 
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(newBook, e) })
+
+    testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
   }
 
   @Test def testInsertAsFirstInto() {
@@ -256,6 +264,8 @@ class AnotherUpdateTest extends Suite {
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
+
+    testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, { e => Vector(insertBook(e)) })
   }
 
   @Test def testUpdate() {
@@ -304,6 +314,8 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(doc.documentElement, updateMag)
 
     testPropertyAboutTransformElemsInTermsOfUpdated(doc.documentElement, updateMag)
+
+    testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, { e => Vector(updateMag(e)) })
   }
 
   private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: ElemPath, f: Elem => immutable.IndexedSeq[Node]): Unit = {
@@ -359,6 +371,16 @@ class AnotherUpdateTest extends Suite {
 
     expectResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElems(f))
+    }
+  }
+
+  private def testPropertyAboutTransformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Unit = {
+    def g(elem: Elem): Elem = elem.transformChildElemsToNodeSeq(che => f(che))
+
+    val expectedResult = elem.transformElemsOrSelf(g)
+
+    expectResult(resolved.Elem(expectedResult)) {
+      resolved.Elem(elem.transformElemsToNodeSeq(f))
     }
   }
 }

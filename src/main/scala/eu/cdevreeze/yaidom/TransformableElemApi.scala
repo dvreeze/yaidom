@@ -119,7 +119,12 @@ import scala.collection.immutable
  *   acc.updated(pathEntry) { che => che.findAllElemOrSelfPaths.reverse.foldLeft(acc) { (acc2, path) => acc2.updated(path)(f) } }
  * })
  *
- * // recursive definition of updated, and keeping order in mind
+ * // put differently, keeping order in mind
+ * f(elem.findAllElemPaths.reverse.foldLeft(elem) { case (acc, path) =>
+ *   acc.updated(path.firstEntry) { che => che.updated(path.withoutFirstEntry)(f) }
+ * })
+ *
+ * // recursive definition of updated
  * f(elem.findAllElemPaths.reverse.foldleft(elem) { case (acc, path) => acc.updated(path)(f) })
  *
  * // by definition of findAllElemOrSelfPaths, and because elem.updated(ElemPath.Root)(f) returns f(elem)
@@ -267,6 +272,11 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * That is, returns the equivalent of:
    * {{{
    * transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
+   * }}}
+   *
+   * It is equivalent to the following expression:
+   * {{{
+   * transformElemsOrSelf { e => e.transformChildElemsToNodeSeq(che => f(che)) }
    * }}}
    */
   def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
