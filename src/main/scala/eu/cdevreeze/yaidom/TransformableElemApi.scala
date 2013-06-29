@@ -142,6 +142,11 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * {{{
    * f(transformChildElems (e => e.transformElemsOrSelf(f)))
    * }}}
+   *
+   * In other words, returns the equivalent of:
+   * {{{
+   * f(transformElems(f))
+   * }}}
    */
   def transformElemsOrSelf(f: E => E): E
 
@@ -153,16 +158,42 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * {{{
    * f(transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self))), ancestry)
    * }}}
+   *
+   * In other words, returns the equivalent of:
+   * {{{
+   * f(transformElems(f, ancestry), ancestry)
+   * }}}
    */
   def transformElemsOrSelf(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
 
   /**
-   * Transforms the element to a node sequence by applying the given function to all its descendant-or-self elements,
+   * Transforms the element by applying the given function to all its descendant elements, in a bottom-up manner.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * transformChildElems (e => e.transformElemsOrSelf(f))
+   * }}}
+   */
+  def transformElems(f: E => E): E
+
+  /**
+   * Transforms the element by applying the given function to all its descendant elements, in a bottom-up manner,
+   * passing its ancestors (as sequence of elements, starting with the "root" element) as well.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self)))
+   * }}}
+   */
+  def transformElems(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
+
+  /**
+   * Transforms each descendant element to a node sequence by applying the given function to all its descendant-or-self elements,
    * in a bottom-up manner.
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElemsToNodeSeq (e => e.transformElemsOrSelfToNodeSeq(f)))
+   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
    * }}}
    *
    * In other words, returns the equivalent of:
@@ -178,7 +209,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))), ancestry)
+   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))))
    * }}}
    *
    * In other words, returns the equivalent of:

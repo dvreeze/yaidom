@@ -44,6 +44,12 @@ trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends 
     f(transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self))), ancestry)
   }
 
+  final def transformElems(f: E => E): E =
+    transformChildElems(e => e.transformElemsOrSelf(f))
+
+  final def transformElems(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E =
+    transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self)))
+
   final def transformElemsOrSelfToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
     f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
   }

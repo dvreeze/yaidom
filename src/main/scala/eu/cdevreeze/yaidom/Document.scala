@@ -106,20 +106,18 @@ final class Document(
   def transformElemsOrSelf(f: Elem => Elem): Document =
     withDocumentElement(this.documentElement.transformElemsOrSelf(f))
 
-  /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f, ancestry))` */
-  def transformElemsOrSelf(f: (Elem, immutable.IndexedSeq[Elem]) => Elem, ancestry: immutable.IndexedSeq[Elem]): Document =
-    withDocumentElement(this.documentElement.transformElemsOrSelf(f, ancestry))
+  /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f, Vector()))` */
+  def transformElemsOrSelf(f: (Elem, immutable.IndexedSeq[Elem]) => Elem): Document =
+    withDocumentElement(this.documentElement.transformElemsOrSelf(f, Vector()))
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))` */
   def transformElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))
 
-  /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, ancestry))` */
-  final def transformElemsToNodeSeq(
-    f: (Elem, immutable.IndexedSeq[Elem]) => immutable.IndexedSeq[Node],
-    ancestry: immutable.IndexedSeq[Elem]): Document = {
+  /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, Vector()))` */
+  final def transformElemsToNodeSeq(f: (Elem, immutable.IndexedSeq[Elem]) => immutable.IndexedSeq[Node]): Document = {
 
-    withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, ancestry))
+    withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, Vector()))
   }
 
   final def toTreeRepr(): String = {
