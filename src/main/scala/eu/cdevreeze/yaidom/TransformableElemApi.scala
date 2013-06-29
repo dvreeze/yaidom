@@ -38,9 +38,44 @@ import scala.collection.immutable
  *
  * ==TransformableElemApi more formally==
  *
- * The `TransformableElemApi` trait obeys an interesting property about `transformElemsOrSelf` in terms of `UpdatableElemApi.updated`.
+ * The `TransformableElemApi` trait obeys some interesting properties.
  *
- * That is:
+ * First of all, we have the following property about '''transformChildElems in terms of updated''':
+ * {{{
+ * resolved.Elem(elem.transformChildElems) ==
+ *   resolved.Elem(elem.findAllChildElemPaths.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
+ * }}}
+ *
+ * After all, the LHS can be rewritten as follows (modulo resolved.Elem equality):
+ * {{{
+ * elem.transformChildElems
+ *
+ * // by definition
+ * elem.withChildren(elem.children map {
+ *   case e: E => f(e)
+ *   case n: N => n
+ * })
+ *
+ * // rewriting the child element update, using foldLeft and element path entries
+ * elem.findAllChildElemPathEntries.foldLeft(elem) { case (acc, pathEntry) =>
+ *   acc.updated(pathEntry)(f)
+ * }
+ *
+ * // path entries can be seen as one-entry element paths
+ * elem.findAllChildElemPaths.foldLeft(elem) { case (acc, path) =>
+ *   acc.updated(path)(f)
+ * }
+ * }}}
+ * which is the RHS. This completes the proof.
+ *
+ * If we reverse the child element paths, the property still holds:
+ * {{{
+ * resolved.Elem(elem.transformChildElems) ==
+ *   resolved.Elem(elem.findAllChildElemPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
+ * }}}
+ * After all, each element is replaced by 1 element, so the child element paths remain valid during the update.
+ *
+ * Furthermore, the following property about '''transformElemsOrSelf in terms of updated''' holds:
  * {{{
  * resolved.Elem(elem.transformElemsOrSelf(f)) ==
  *   resolved.Elem(elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
@@ -68,26 +103,18 @@ import scala.collection.immutable
  * elem.transformElemsOrSelf(f)
  * f(elem.transformChildElems (e => e.transformElemsOrSelf(f))) // by definition
  *
+ * // property about transformChildElems in terms of updated
+ * f(elem.findAllChildElemPaths.reverse.foldLeft(elem) { case (acc, path) =>
+ *   acc.updated(path) { che => che.transformElemsOrSelf(f) }
+ * })
+ *
  * // induction hypothesis
- * f(elem.transformChildElems { e =>
- *   e.findAllElemOrSelfPaths.reverse.foldLeft(e) { (acc, path) => acc.updated(path)(f) }
+ * f(elem.findAllChildElemPaths.reverse.foldLeft(elem) { case (acc, path) =>
+ *   acc.updated(path) { che => che.findAllElemOrSelfPaths.reverse.foldLeft(acc) { (acc2, path2) => acc2.updated(path2)(f) } }
  * })
  *
- * // by definition of transformChildElems
- * f(elem.withChildren(elem.children map {
- *   case e: Elem => e.findAllElemOrSelfPaths.reverse.foldLeft(e) { (acc, path) => acc.updated(path)(f) }
- *   case n: Node => n
- * }))
- *
- * // rewriting the functional update of the children, and reversing (without affecting the result)
- * f(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { case (acc, pathEntry) =>
- *   acc.updated(pathEntry) { che =>
- *     che.findAllElemOrSelfPaths.reverse.foldLeft(che) { (acc2, path) => acc2.updated(path)(f) }
- *   }
- * })
- *
- * // by definition of updated (minding the order of functional updates)
- * f(elem.findAllElemPaths.reverse.foldLeft(elem) { case (acc, path) => acc.updated(path)(f) })
+ * // recursive definition of updated, and keeping order in mind
+ * f(elem.findAllElemPaths.reverse.foldleft(elem) { case (acc, path) => acc.updated(path)(f) })
  *
  * // by definition of findAllElemOrSelfPaths, and because elem.updated(ElemPath.Root)(f) returns f(elem)
  * elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { case (acc, path) => acc.updated(path)(f) }
