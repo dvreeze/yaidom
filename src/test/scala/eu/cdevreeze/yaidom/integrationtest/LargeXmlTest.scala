@@ -437,17 +437,30 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val start2Ms = System.currentTimeMillis()
 
     def doUpdate(e: Elem): Elem = e match {
-      case e if (e.localName == "phone") && (resolved.Elem(e) == resolved.Elem(oldPhoneElm)) =>
+      case e if (e.localName == "phone") && (e.text == oldPhoneElm.text) =>
         e.withChildren(Vector(Text(newPhone, false)))
       case e => e
     }
 
-    val updatedDoc: Document = doc.transformElemsOrSelf(doUpdate _)
+    var updatedDoc: Document = doc.transformElemsOrSelf(doUpdate _)
 
     val end2Ms = System.currentTimeMillis()
-    logger.info("Transforming an element in the document (using a function) took %d ms".format(end2Ms - start2Ms))
+    logger.info("Transforming an element in the document (using method transformElemsOrSelf) took %d ms".format(end2Ms - start2Ms))
 
-    val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    var newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    expectResult(newPhone) {
+      newPhoneElm.text
+    }
+
+    val start3Ms = System.currentTimeMillis()
+
+    updatedDoc = doc.transformElemsToNodeSeq(e => Vector(doUpdate(e)))
+
+    val end3Ms = System.currentTimeMillis()
+    logger.info("Transforming an element in the document (using method transformElemsToNodeSeq) took %d ms".format(end3Ms - start3Ms))
+
+    newPhoneElm = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(newPhone) {
       newPhoneElm.text

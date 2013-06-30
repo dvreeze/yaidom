@@ -75,6 +75,8 @@ class AnotherUpdateTest extends Suite {
     }
 
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags)
+
+    testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags, deleteMagsResolved)
   }
 
   @Test def testInsertAfter() {
@@ -140,6 +142,11 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(e, newBook) })
 
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
+
+    testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
+      case e: resolved.Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(e, resolved.Elem(newBook))
+      case e: resolved.Elem => Vector(e)
+    })
   }
 
   @Test def testInsertBefore() {
@@ -205,6 +212,11 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutUpdatedWithNodeSeq(doc.documentElement, lastBookPath, { e => Vector(newBook, e) })
 
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
+
+    testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
+      case e: resolved.Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(resolved.Elem(newBook), e)
+      case e: resolved.Elem => Vector(e)
+    })
   }
 
   @Test def testInsertAsFirstInto() {
@@ -380,6 +392,16 @@ class AnotherUpdateTest extends Suite {
     val expectedResult = elem.transformElemsOrSelf(g)
 
     expectResult(resolved.Elem(expectedResult)) {
+      resolved.Elem(elem.transformElemsToNodeSeq(f))
+    }
+  }
+
+  private def testSymmetryPropertyAboutTransformElemsToNodeSeq(
+    elem: Elem,
+    f: Elem => immutable.IndexedSeq[Node],
+    g: resolved.Elem => immutable.IndexedSeq[resolved.Node]): Unit = {
+
+    expectResult(resolved.Elem(elem).transformElemsToNodeSeq(g)) {
       resolved.Elem(elem.transformElemsToNodeSeq(f))
     }
   }
