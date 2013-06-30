@@ -140,6 +140,48 @@ import scala.collection.immutable
  *   resolved.Elem(elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
  *
+ * Another property is about '''transformElemsToNodeSeq in terms of transformElemsOrSelf''':
+ * {{{
+ * resolved.Elem(elem.transformElemsToNodeSeq(f)) ==
+ *   resolved.Elem(elem.transformElemsOrSelf { e => e.transformChildElemsToNodeSeq(che => f(che)) })
+ * }}}
+ *
+ * First, define function `g` as follows:
+ * {{{
+ * def g(e: Elem): Elem = e.transformChildElemsToNodeSeq(che => f(che))
+ * }}}
+ *
+ * This property can be proven by structural induction as follows:
+ *
+ * __Base case__
+ *
+ * If `elem` has no child elements, then the LHS can be rewritten as follows (modulo resolved.Elem equality):
+ * {{{
+ * elem.transformElemsToNodeSeq(f)
+ * elem.transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)) // by definition
+ * elem // there are no child elements
+ * elem.transformElems(g) // there are no child elements
+ * g(elem.transformElems(g)) // g(elem) is the same as elem, since there are no child elements
+ * elem.transformElemsOrSelf(g)
+ * }}}
+ * which is the RHS.
+ *
+ * __Inductive step__
+ *
+ * If `elem` does have child elements, the LHS can be rewritten as:
+ * {{{
+ * elem.transformElemsToNodeSeq(f)
+ * elem.transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)) // by definition
+ * elem.transformChildElemsToNodeSeq(e => f(e.transformElemsToNodeSeq(f))) // by definition of transformElemsOrSelfToNodeSeq
+ * elem.transformChildElemsToNodeSeq(e => f(e.transformElemsOrSelf(g))) // induction hypothesis
+ * g(elem.transformChildElems(e => e.transformElemsOrSelf(g))) // definition of g
+ * g(elem.transformElems(g)) // definition of transformElems
+ * elem.transformElemsOrSelf(g) // definition of transformElemsOrSelf
+ * }}}
+ * which is the RHS.
+ *
+ * This completes the proof.
+ *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
