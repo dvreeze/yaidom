@@ -363,11 +363,6 @@ final class Elem(
       newLine.size >= 1 && newLine.size <= 2 && (newLine.forall(c => c == '\n' || c == '\r')),
       "The newline must be a valid newline")
 
-    def isWhitespaceText(n: Node): Boolean = n match {
-      case t: Text if t.trimmedText.isEmpty => true
-      case _ => false
-    }
-
     def isText(n: Node): Boolean = n match {
       case t: Text => true
       case _ => false
@@ -401,7 +396,17 @@ final class Elem(
       }
     }
 
-    prettify(this.removeAllInterElementWhitespace, 0)
+    def containsWhitespaceOnly(elem: Elem): Boolean = {
+      elem.children forall {
+        case t: Text if t.text.trim.isEmpty => true
+        case n => false
+      }
+    }
+
+    def fixIfWhitespaceOnly(elem: Elem): Elem =
+      if (containsWhitespaceOnly(elem)) elem.withChildren(Vector()) else elem
+
+    prettify(this.removeAllInterElementWhitespace, 0).transformElemsOrSelf(fixIfWhitespaceOnly _)
   }
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {

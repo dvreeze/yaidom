@@ -1417,8 +1417,8 @@ parent Author element by text (for the name). Here is the first attempt, using a
 
 We see successfully "updated" result XML, where the Author elements only have text as child nodes, namely the author names.
 
-Now we are going to do almost the same transformation, but this time using a bulk ``UpdatableElemLike.updated`` method, and
-inserting new Name elements::
+Now we are going to do almost the same transformation, but this time using a bulk ``TransformableElemLike.transformElemsOrSelf`` method
+(not the different trait!), and inserting new Name elements::
 
   val doc: Document = docParser.parse(new ByteArrayInputStream(xmlBytes))
 
@@ -1444,7 +1444,7 @@ inserting new Name elements::
   }
 
   // Do the "functional update"
-  val newDoc: Document = doc updated {
+  val newDoc: Document = doc transformElemsOrSelf {
     case e if e.resolvedName == EName("{http://bookstore}Author") => updateAuthor(e)
   }
 
@@ -1454,9 +1454,9 @@ inserting new Name elements::
   val newXmlString = new String(newXmlBytes, "UTF-8")
 
 Again we see successfully "updated" result XML, where the First_Name and Last_Name elements have been replaced by Name elements.
-Check the ``UpdatableElemLike`` API documentation for more details on "functional updates" in yaidom.
+Check the ``UpdatableElemLike`` and ``TransformableElemLike`` API documentation for more details on "functional updates" in yaidom.
 
-Functional updates using the appropriate methods in trait ``UpdatableElemLike`` benefit from the safety resulting from
+Functional updates using the appropriate methods in traits ``UpdatableElemLike`` and ``TransformableElemLike`` benefit from the safety resulting from
 a functional style of programming (easy to reason about, thread-safety). Yet they do come with a cost, especially if many
 functional updates are done on large documents. An alternative may be to convert immutable Documents to DOM trees, update them
 in-place, and then convert back to immutable Documents. If these updates are local to a function that is functional from the

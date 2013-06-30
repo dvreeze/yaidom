@@ -3,6 +3,31 @@ CHANGELOG
 =========
 
 
+0.6.11
+======
+
+This version offers completely reworked "functional update/transformation" support. The ElemPath-based bulk updates have
+been removed, because they were far too inefficient. The "transformation" support, however, has been enhanced a lot.
+
+* Big breaking API change: ``UpdatableElemApi`` has been made smaller
+
+  * All functional updates taking a PartialFunction have been removed (``updated``, ``topmostUpdated`` and ``updatedWithNodeSeq``)
+  * They were bulk updates (implicitly) based on element paths, which is very inefficient
+  * Added ``updated`` method taking an ``ElemPath.Entry`` (and a function in its 2nd parameter list)
+  
+* Big breaking API change: ``TransformableElemApi`` has been enhanced a lot
+
+  * Like ``UpdatableElemApi``, trait ``TransformableElemApi`` now takes 2 type parameters, viz. the node type and the element type
+  * Method ``transform`` has been renamed to ``transformElemsOrSelf``
+  * Added methods such as ``transformElems``, ``transformChildElems``
+  * Also added methods such as ``transformElemsOrSelfToNodeSeq``, ``transformElemsToNodeSeq`` and ``transformChildElemsToNodeSeq``
+  * Trait ``TransformableElemApi`` elegantly reminds of ``ParentElemLike``, except that it is for querying instead of updates
+  * Trait ``TransformableElemApi`` is even mixed in by ``ElemBuilder``
+  
+In summary, the functional update support of the preceding release was not good enough to be frozen (in upcoming version 0.7.0).
+Hence this version 0.6.11.
+
+
 0.6.10
 ======
 
