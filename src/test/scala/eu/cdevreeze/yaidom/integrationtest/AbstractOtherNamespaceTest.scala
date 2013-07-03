@@ -495,7 +495,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
         resolved.Elem(result)
       case e: resolved.Elem => e
     }
-    val resolvedEquivalentElem = resolvedAlmostEquivalentElem.replaceAllElemsOrSelf(f)
+    val resolvedEquivalentElem = resolvedAlmostEquivalentElem.transformElemsOrSelf(f)
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
@@ -1430,7 +1430,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
       e.copy(scope = newScope)
     }
 
-    rootElem.replaceAllElemsOrSelf(fillScope _, Vector())
+    rootElem.transformElemsOrSelf(fillScope _, Vector())
   }
 
   private def findMaxTopLevelScope(elem: Elem): Scope = {

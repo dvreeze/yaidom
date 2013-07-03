@@ -222,7 +222,7 @@ final class Elem(
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }
 
-  override def replaceAllChildElems(f: Elem => Elem): Elem = {
+  override def transformChildElems(f: Elem => Elem): Elem = {
     val newChildren =
       children map {
         case e: Elem => f(e)
@@ -231,7 +231,7 @@ final class Elem(
     withChildren(newChildren)
   }
 
-  override def replaceAllChildElemsByNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Elem = {
+  override def transformChildElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Elem = {
     val newChildren =
       children flatMap {
         case e: Elem => f(e)
@@ -406,7 +406,7 @@ final class Elem(
     def fixIfWhitespaceOnly(elem: Elem): Elem =
       if (containsWhitespaceOnly(elem)) elem.withChildren(Vector()) else elem
 
-    prettify(this.removeAllInterElementWhitespace, 0).replaceAllElemsOrSelf(fixIfWhitespaceOnly _)
+    prettify(this.removeAllInterElementWhitespace, 0).transformElemsOrSelf(fixIfWhitespaceOnly _)
   }
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {

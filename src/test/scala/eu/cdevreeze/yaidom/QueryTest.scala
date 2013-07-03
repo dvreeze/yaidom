@@ -1182,7 +1182,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore replaceAllElemsOrSelf {
+      bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Book") => removePrice(e)
         case e => e
       }
@@ -1230,7 +1230,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore replaceAllElemsOrSelf {
+      bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") => combineName(e)
         case e => e
       }
@@ -1253,7 +1253,7 @@ class QueryTest extends Suite {
     import NodeBuilder._
 
     val updatedBookstoreElm: Elem =
-      bookstore replaceAllElemsOrSelf {
+      bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") =>
           val newScope = e.scope.resolve(Declarations.from("abc" -> "http://def"))
           val newElmName = QName("abc", e.localName)

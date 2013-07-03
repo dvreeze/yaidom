@@ -1175,7 +1175,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore replaceAllElemsOrSelf {
+      bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Book") => removePrice(e)
         case e => e
       }
@@ -1220,7 +1220,7 @@ class QueryTest extends Suite {
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore replaceAllElemsOrSelf {
+      bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") => combineName(e)
         case e => e
       }
@@ -1241,7 +1241,7 @@ class QueryTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     val updatedBookstoreElm: Elem =
-      bookstore replaceAllElemsOrSelf {
+      bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") =>
           val newElmName = EName("http://def", e.localName)
           Elem(newElmName, e.resolvedAttributes, e.children)

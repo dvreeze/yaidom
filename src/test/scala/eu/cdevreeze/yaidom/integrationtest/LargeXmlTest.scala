@@ -442,10 +442,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       case e => e
     }
 
-    var updatedDoc: Document = doc.replaceAllElemsOrSelf(doUpdate _)
+    var updatedDoc: Document = doc.transformElemsOrSelf(doUpdate _)
 
     val end2Ms = System.currentTimeMillis()
-    logger.info("Transforming an element in the document (using method replaceAllElemsOrSelf) took %d ms".format(end2Ms - start2Ms))
+    logger.info("Transforming an element in the document (using method transformElemsOrSelf) took %d ms".format(end2Ms - start2Ms))
 
     var newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
@@ -455,10 +455,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val start3Ms = System.currentTimeMillis()
 
-    updatedDoc = doc.replaceAllElemsByNodeSeq(e => Vector(doUpdate(e)))
+    updatedDoc = doc.transformElemsToNodeSeq(e => Vector(doUpdate(e)))
 
     val end3Ms = System.currentTimeMillis()
-    logger.info("Transforming an element in the document (using method replaceAllElemsByNodeSeq) took %d ms".format(end3Ms - start3Ms))
+    logger.info("Transforming an element in the document (using method transformElemsToNodeSeq) took %d ms".format(end3Ms - start3Ms))
 
     newPhoneElm = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
