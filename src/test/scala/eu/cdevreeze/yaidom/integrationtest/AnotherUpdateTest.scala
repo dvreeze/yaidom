@@ -51,7 +51,7 @@ class AnotherUpdateTest extends Suite {
       case elem: Elem => Vector(elem)
     }
 
-    val docWithoutMags: Document = doc.transformElemsToNodeSeq(deleteMags)
+    val docWithoutMags: Document = doc.replaceAllElemsByNodeSeq(deleteMags)
 
     expectResult(doc.documentElement.findAllChildElems.size - 4) {
       docWithoutMags.documentElement.findAllChildElems.size
@@ -71,7 +71,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     expectResult(resolved.Elem(docWithoutMags.documentElement)) {
-      resolved.Elem(doc.documentElement).transformElemsToNodeSeq(deleteMagsResolved)
+      resolved.Elem(doc.documentElement).replaceAllElemsByNodeSeq(deleteMagsResolved)
     }
 
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags)
@@ -127,7 +127,7 @@ class AnotherUpdateTest extends Suite {
         case e: Elem => Vector(e)
       }
 
-      docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
+      docWithScalaBook.replaceAllElemsByNodeSeq(deleteNonDatabaseBook)
     }
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
@@ -197,7 +197,7 @@ class AnotherUpdateTest extends Suite {
         case e: Elem => Vector(e)
       }
 
-      docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
+      docWithScalaBook.replaceAllElemsByNodeSeq(deleteNonDatabaseBook)
     }
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
@@ -253,7 +253,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val docWithScalaBook: Document = {
-      val result = doc.transformElemsOrSelf(insertBook)
+      val result = doc.replaceAllElemsOrSelf(insertBook)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -270,7 +270,7 @@ class AnotherUpdateTest extends Suite {
         case e: Elem => Vector(e)
       }
 
-      docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
+      docWithScalaBook.replaceAllElemsByNodeSeq(deleteNonDatabaseBook)
     }
 
     expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
@@ -292,7 +292,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val updatedDoc: Document = {
-      val result = doc.transformElemsOrSelf(updateMag)
+      val result = doc.replaceAllElemsOrSelf(updateMag)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -302,7 +302,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val updatedDoc2: Document = {
-      val result = doc.transformElemsToNodeSeq(updateMag2)
+      val result = doc.replaceAllElemsByNodeSeq(updateMag2)
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -354,7 +354,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     expectResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformChildElems(f))
+      resolved.Elem(elem.replaceAllChildElems(f))
     }
 
     val expectedResult2 = elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) =>
@@ -362,7 +362,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     expectResult(resolved.Elem(expectedResult2)) {
-      resolved.Elem(elem.transformChildElems(f))
+      resolved.Elem(elem.replaceAllChildElems(f))
     }
   }
 
@@ -372,7 +372,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     expectResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformElemsOrSelf(f))
+      resolved.Elem(elem.replaceAllElemsOrSelf(f))
     }
   }
 
@@ -382,17 +382,17 @@ class AnotherUpdateTest extends Suite {
     }
 
     expectResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformElems(f))
+      resolved.Elem(elem.replaceAllElems(f))
     }
   }
 
   private def testPropertyAboutTransformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Unit = {
-    def g(elem: Elem): Elem = elem.transformChildElemsToNodeSeq(che => f(che))
+    def g(elem: Elem): Elem = elem.replaceAllChildElemsByNodeSeq(che => f(che))
 
-    val expectedResult = elem.transformElemsOrSelf(g)
+    val expectedResult = elem.replaceAllElemsOrSelf(g)
 
     expectResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformElemsToNodeSeq(f))
+      resolved.Elem(elem.replaceAllElemsByNodeSeq(f))
     }
   }
 
@@ -401,8 +401,8 @@ class AnotherUpdateTest extends Suite {
     f: Elem => immutable.IndexedSeq[Node],
     g: resolved.Elem => immutable.IndexedSeq[resolved.Node]): Unit = {
 
-    expectResult(resolved.Elem(elem).transformElemsToNodeSeq(g)) {
-      resolved.Elem(elem.transformElemsToNodeSeq(f))
+    expectResult(resolved.Elem(elem).replaceAllElemsByNodeSeq(g)) {
+      resolved.Elem(elem.replaceAllElemsByNodeSeq(f))
     }
   }
 }

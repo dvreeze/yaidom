@@ -276,7 +276,7 @@ class XmlLiteralTest extends Suite {
       case empElem: Elem if empElem.localName == "Employee" => updateEmployee(empElem)
       case elem: Elem => elem
     }
-    val newDoc = doc.transformElemsOrSelf(f)
+    val newDoc = doc.replaceAllElemsOrSelf(f)
 
     val resolvedNewRoot = resolved.Elem(newDoc.documentElement).removeAllInterElementWhitespace
 

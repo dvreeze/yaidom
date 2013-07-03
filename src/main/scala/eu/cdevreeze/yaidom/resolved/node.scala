@@ -130,7 +130,7 @@ final case class Elem(
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }
 
-  override def transformChildElems(f: Elem => Elem): Elem = {
+  override def replaceAllChildElems(f: Elem => Elem): Elem = {
     val newChildren =
       children map {
         case e: Elem => f(e)
@@ -139,7 +139,7 @@ final case class Elem(
     withChildren(newChildren)
   }
 
-  override def transformChildElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Elem = {
+  override def replaceAllChildElemsByNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Elem = {
     val newChildren =
       children flatMap {
         case e: Elem => f(e)

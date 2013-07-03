@@ -40,15 +40,15 @@ import scala.collection.immutable
  *
  * The `TransformableElemApi` trait obeys some interesting properties.
  *
- * First of all, we have the following property about '''transformChildElems in terms of updated''':
+ * First of all, we have the following property about '''replaceAllChildElems in terms of updated''':
  * {{{
- * resolved.Elem(elem.transformChildElems(f)) ==
+ * resolved.Elem(elem.replaceAllChildElems(f)) ==
  *   resolved.Elem(elem.findAllChildElemPathEntries.foldLeft(elem) { (acc, pathEntry) => acc.updated(pathEntry)(f) })
  * }}}
  *
  * After all, the LHS can be rewritten as follows (modulo resolved.Elem equality):
  * {{{
- * elem.transformChildElems(f)
+ * elem.replaceAllChildElems(f)
  *
  * // by definition
  * elem.withChildren(elem.children map {
@@ -65,25 +65,25 @@ import scala.collection.immutable
  *
  * If we reverse the child element paths, the property still holds:
  * {{{
- * resolved.Elem(elem.transformChildElems(f)) ==
+ * resolved.Elem(elem.replaceAllChildElems(f)) ==
  *   resolved.Elem(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) => acc.updated(pathEntry)(f) })
  * }}}
  * After all, each element is replaced by 1 element, so the child element path entries remain valid during the update.
  *
  * It easily follows that the same property holds for (child element) paths instead of path entries:
  * {{{
- * resolved.Elem(elem.transformChildElems(f)) ==
+ * resolved.Elem(elem.replaceAllChildElems(f)) ==
  *   resolved.Elem(elem.findAllChildElemPaths.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
  * or:
  * {{{
- * resolved.Elem(elem.transformChildElems(f)) ==
+ * resolved.Elem(elem.replaceAllChildElems(f)) ==
  *   resolved.Elem(elem.findAllChildElemPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
  *
- * Furthermore, the following property about '''transformElemsOrSelf in terms of updated''' holds:
+ * Furthermore, the following property about '''replaceAllElemsOrSelf in terms of updated''' holds:
  * {{{
- * resolved.Elem(elem.transformElemsOrSelf(f)) ==
+ * resolved.Elem(elem.replaceAllElemsOrSelf(f)) ==
  *   resolved.Elem(elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
  *
@@ -93,8 +93,8 @@ import scala.collection.immutable
  *
  * If `elem` has no child elements, then the LHS can be rewritten as follows (modulo resolved.Elem equality):
  * {{{
- * elem.transformElemsOrSelf(f)
- * f(elem.transformChildElems (e => e.transformElemsOrSelf(f))) // by definition
+ * elem.replaceAllElemsOrSelf(f)
+ * f(elem.replaceAllChildElems (e => e.replaceAllElemsOrSelf(f))) // by definition
  * f(elem) // there are no child elements
  * elem.updated(ElemPath.Root)(f) // by definition
  * Vector(ElemPath.Root).reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) } // by definition of foldLeft
@@ -106,12 +106,12 @@ import scala.collection.immutable
  *
  * If `elem` does have child elements, the LHS can be rewritten as:
  * {{{
- * elem.transformElemsOrSelf(f)
- * f(elem.transformChildElems (e => e.transformElemsOrSelf(f))) // by definition
+ * elem.replaceAllElemsOrSelf(f)
+ * f(elem.replaceAllChildElems (e => e.replaceAllElemsOrSelf(f))) // by definition
  *
- * // property about transformChildElems in terms of updated
+ * // property about replaceAllChildElems in terms of updated
  * f(elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { case (acc, pathEntry) =>
- *   acc.updated(pathEntry) { che => che.transformElemsOrSelf(f) }
+ *   acc.updated(pathEntry) { che => che.replaceAllElemsOrSelf(f) }
  * })
  *
  * // induction hypothesis
@@ -134,21 +134,21 @@ import scala.collection.immutable
  *
  * This completes the proof.
  *
- * It easily follows that the following property about '''transformElems in terms of updated''' holds:
+ * It easily follows that the following property about '''replaceAllElems in terms of updated''' holds:
  * {{{
- * resolved.Elem(elem.transformElems(f)) ==
+ * resolved.Elem(elem.replaceAllElems(f)) ==
  *   resolved.Elem(elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) => acc.updated(path)(f) })
  * }}}
  *
- * Another property is about '''transformElemsToNodeSeq in terms of transformElemsOrSelf''':
+ * Another property is about '''replaceAllElemsByNodeSeq in terms of replaceAllElemsOrSelf''':
  * {{{
- * resolved.Elem(elem.transformElemsToNodeSeq(f)) ==
- *   resolved.Elem(elem.transformElemsOrSelf { e => e.transformChildElemsToNodeSeq(che => f(che)) })
+ * resolved.Elem(elem.replaceAllElemsByNodeSeq(f)) ==
+ *   resolved.Elem(elem.replaceAllElemsOrSelf { e => e.replaceAllChildElemsByNodeSeq(che => f(che)) })
  * }}}
  *
  * First, define function `g` as follows:
  * {{{
- * def g(e: Elem): Elem = e.transformChildElemsToNodeSeq(che => f(che))
+ * def g(e: Elem): Elem = e.replaceAllChildElemsByNodeSeq(che => f(che))
  * }}}
  *
  * This property can be proven by structural induction as follows:
@@ -157,12 +157,12 @@ import scala.collection.immutable
  *
  * If `elem` has no child elements, then the LHS can be rewritten as follows (modulo resolved.Elem equality):
  * {{{
- * elem.transformElemsToNodeSeq(f)
- * elem.transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)) // by definition
+ * elem.replaceAllElemsByNodeSeq(f)
+ * elem.replaceAllChildElemsByNodeSeq(e => e.replaceAllElemsOrSelfByNodeSeq(f)) // by definition
  * elem // there are no child elements
- * elem.transformElems(g) // there are no child elements
- * g(elem.transformElems(g)) // g(elem) is the same as elem, since there are no child elements
- * elem.transformElemsOrSelf(g)
+ * elem.replaceAllElems(g) // there are no child elements
+ * g(elem.replaceAllElems(g)) // g(elem) is the same as elem, since there are no child elements
+ * elem.replaceAllElemsOrSelf(g)
  * }}}
  * which is the RHS.
  *
@@ -170,13 +170,13 @@ import scala.collection.immutable
  *
  * If `elem` does have child elements, the LHS can be rewritten as:
  * {{{
- * elem.transformElemsToNodeSeq(f)
- * elem.transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)) // by definition
- * elem.transformChildElemsToNodeSeq(e => f(e.transformElemsToNodeSeq(f))) // by definition of transformElemsOrSelfToNodeSeq
- * elem.transformChildElemsToNodeSeq(e => f(e.transformElemsOrSelf(g))) // induction hypothesis
- * g(elem.transformChildElems(e => e.transformElemsOrSelf(g))) // definition of g
- * g(elem.transformElems(g)) // definition of transformElems
- * elem.transformElemsOrSelf(g) // definition of transformElemsOrSelf
+ * elem.replaceAllElemsByNodeSeq(f)
+ * elem.replaceAllChildElemsByNodeSeq(e => e.replaceAllElemsOrSelfByNodeSeq(f)) // by definition
+ * elem.replaceAllChildElemsByNodeSeq(e => f(e.replaceAllElemsByNodeSeq(f))) // by definition of replaceAllElemsOrSelfByNodeSeq
+ * elem.replaceAllChildElemsByNodeSeq(e => f(e.replaceAllElemsOrSelf(g))) // induction hypothesis
+ * g(elem.replaceAllChildElems(e => e.replaceAllElemsOrSelf(g))) // definition of g
+ * g(elem.replaceAllElems(g)) // definition of replaceAllElems
+ * elem.replaceAllElemsOrSelf(g) // definition of replaceAllElemsOrSelf
  * }}}
  * which is the RHS.
  *
@@ -203,7 +203,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * withChildren(newChildren)
    * }}}
    */
-  def transformChildElems(f: E => E): E
+  def replaceAllChildElems(f: E => E): E
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
@@ -219,22 +219,22 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * withChildren(newChildren)
    * }}}
    */
-  def transformChildElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
+  def replaceAllChildElemsByNodeSeq(f: E => immutable.IndexedSeq[N]): E
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner.
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElems (e => e.transformElemsOrSelf(f)))
+   * f(replaceAllChildElems (e => e.replaceAllElemsOrSelf(f)))
    * }}}
    *
    * In other words, returns the equivalent of:
    * {{{
-   * f(transformElems(f))
+   * f(replaceAllElems(f))
    * }}}
    */
-  def transformElemsOrSelf(f: E => E): E
+  def replaceAllElemsOrSelf(f: E => E): E
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner,
@@ -242,25 +242,25 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self))), ancestry)
+   * f(replaceAllChildElems(e => e.replaceAllElemsOrSelf(f, (ancestry :+ self))), ancestry)
    * }}}
    *
    * In other words, returns the equivalent of:
    * {{{
-   * f(transformElems(f, ancestry), ancestry)
+   * f(replaceAllElems(f, ancestry), ancestry)
    * }}}
    */
-  def transformElemsOrSelf(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
+  def replaceAllElemsOrSelf(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
 
   /**
    * Transforms the element by applying the given function to all its descendant elements, in a bottom-up manner.
    *
    * That is, returns the equivalent of:
    * {{{
-   * transformChildElems (e => e.transformElemsOrSelf(f))
+   * replaceAllChildElems (e => e.replaceAllElemsOrSelf(f))
    * }}}
    */
-  def transformElems(f: E => E): E
+  def replaceAllElems(f: E => E): E
 
   /**
    * Transforms the element by applying the given function to all its descendant elements, in a bottom-up manner,
@@ -268,10 +268,10 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * transformChildElems(e => e.transformElemsOrSelf(f, (ancestry :+ self)))
+   * replaceAllChildElems(e => e.replaceAllElemsOrSelf(f, (ancestry :+ self)))
    * }}}
    */
-  def transformElems(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
+  def replaceAllElems(f: (E, immutable.IndexedSeq[E]) => E, ancestry: immutable.IndexedSeq[E]): E
 
   /**
    * Transforms each descendant element to a node sequence by applying the given function to all its descendant-or-self elements,
@@ -279,15 +279,15 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
+   * f(replaceAllChildElemsByNodeSeq(e => e.replaceAllElemsOrSelfByNodeSeq(f)))
    * }}}
    *
    * In other words, returns the equivalent of:
    * {{{
-   * f(transformElemsToNodeSeq(f))
+   * f(replaceAllElemsByNodeSeq(f))
    * }}}
    */
-  def transformElemsOrSelfToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+  def replaceAllElemsOrSelfByNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
 
   /**
    * Transforms the element to a node sequence by applying the given function to all its descendant-or-self elements,
@@ -295,15 +295,15 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self))), ancestry)
+   * f(replaceAllChildElemsByNodeSeq(e => e.replaceAllElemsOrSelfByNodeSeq(f, (ancestry :+ self))), ancestry)
    * }}}
    *
    * In other words, returns the equivalent of:
    * {{{
-   * f(transformElemsToNodeSeq(f, ancestry), ancestry)
+   * f(replaceAllElemsByNodeSeq(f, ancestry), ancestry)
    * }}}
    */
-  def transformElemsOrSelfToNodeSeq(
+  def replaceAllElemsOrSelfByNodeSeq(
     f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
     ancestry: immutable.IndexedSeq[E]): immutable.IndexedSeq[N]
 
@@ -313,15 +313,15 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
+   * replaceAllChildElemsByNodeSeq(e => e.replaceAllElemsOrSelfByNodeSeq(f))
    * }}}
    *
    * It is equivalent to the following expression:
    * {{{
-   * transformElemsOrSelf { e => e.transformChildElemsToNodeSeq(che => f(che)) }
+   * replaceAllElemsOrSelf { e => e.replaceAllChildElemsByNodeSeq(che => f(che)) }
    * }}}
    */
-  def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
+  def replaceAllElemsByNodeSeq(f: E => immutable.IndexedSeq[N]): E
 
   /**
    * Transforms each descendant element to a node sequence by applying the given function to all its descendant elements,
@@ -330,10 +330,10 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    *
    * That is, returns the equivalent of:
    * {{{
-   * transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f, (ancestry :+ self)))
+   * replaceAllChildElemsByNodeSeq(e => e.replaceAllElemsOrSelfByNodeSeq(f, (ancestry :+ self)))
    * }}}
    */
-  def transformElemsToNodeSeq(
+  def replaceAllElemsByNodeSeq(
     f: (E, immutable.IndexedSeq[E]) => immutable.IndexedSeq[N],
     ancestry: immutable.IndexedSeq[E]): E
 }

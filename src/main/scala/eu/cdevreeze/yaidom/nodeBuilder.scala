@@ -118,7 +118,7 @@ final class ElemBuilder(
   /** Returns the element children as ElemBuilder instances */
   override def findAllChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
 
-  override def transformChildElems(f: ElemBuilder => ElemBuilder): ElemBuilder = {
+  override def replaceAllChildElems(f: ElemBuilder => ElemBuilder): ElemBuilder = {
     val newChildren =
       children map {
         case e: ElemBuilder => f(e)
@@ -127,7 +127,7 @@ final class ElemBuilder(
     withChildren(newChildren)
   }
 
-  override def transformChildElemsToNodeSeq(f: ElemBuilder => immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+  override def replaceAllChildElemsByNodeSeq(f: ElemBuilder => immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
     val newChildren =
       children flatMap {
         case e: ElemBuilder => f(e)

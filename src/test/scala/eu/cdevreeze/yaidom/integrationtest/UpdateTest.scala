@@ -209,7 +209,7 @@ class UpdateTest extends Suite {
       case e: Elem => e
     }
 
-    val updatedDoc = doc.transformElemsOrSelf(f)
+    val updatedDoc = doc.replaceAllElemsOrSelf(f)
     val formattedUpdatedDoc = updatedDoc.withDocumentElement(updatedDoc.documentElement.prettify(4))
 
     logger.info("Result of update (using function updated):%n%s".format(docPrinter.print(formattedUpdatedDoc.documentElement)))
@@ -278,7 +278,7 @@ class UpdateTest extends Suite {
 
     // The name update is also picked up.
 
-    val updatedDoc = doc.transformElemsOrSelf(f)
+    val updatedDoc = doc.replaceAllElemsOrSelf(f)
     val formattedUpdatedDoc = updatedDoc.withDocumentElement(updatedDoc.documentElement.prettify(4))
 
     logger.info("Result of update (using function topmostUpdated):%n%s".format(docPrinter.print(formattedUpdatedDoc.documentElement)))
@@ -345,7 +345,7 @@ class UpdateTest extends Suite {
       case e => e
     }
 
-    rootElm.transformElemsOrSelf(f)
+    rootElm.replaceAllElemsOrSelf(f)
   }
 
   private def turnBookAttributeIntoElem(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
@@ -354,7 +354,7 @@ class UpdateTest extends Suite {
       case e => e
     }
 
-    rootElm.transformElemsOrSelf(f)
+    rootElm.replaceAllElemsOrSelf(f)
   }
 
   private def turnBookAttributeIntoElemTransformingTopmost(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
@@ -369,7 +369,7 @@ class UpdateTest extends Suite {
       }
     }
 
-    rootElm.transformElemsOrSelf(f, Vector())
+    rootElm.replaceAllElemsOrSelf(f, Vector())
   }
 
   private def turnBookAttributeIntoElemUsingTopmostUpdatedFunction(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
@@ -384,7 +384,7 @@ class UpdateTest extends Suite {
       }
     }
 
-    rootElm.transformElemsOrSelf(f, Vector())
+    rootElm.replaceAllElemsOrSelf(f, Vector())
   }
 
   def updateBook(bookElm: Elem, attrName: String): Elem = {

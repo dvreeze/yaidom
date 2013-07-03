@@ -235,7 +235,7 @@ class BasicXmlProcessingTest extends Suite {
     val musicElm3 = docParser.parse(new jio.ByteArrayInputStream(musicXml.getBytes(Codec.UTF8.toString))).documentElement
 
     val musicElmWithoutLinks: Elem =
-      musicElm transformElemsOrSelf {
+      musicElm replaceAllElemsOrSelf {
         case e if e.localName == "description" =>
           val updatedAttrs = e.attributes filterNot { case (qn, v) => qn == QName("link") }
           Elem(e.qname, updatedAttrs, e.scope, e.children)
