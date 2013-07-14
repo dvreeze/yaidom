@@ -65,6 +65,67 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
+  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths() {
+    val paths = bookstore.findAllElemOrSelfPaths.toSet
+
+    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+      elem match {
+        case e: Elem if e.localName == "Authors" =>
+          val authors = e.filterChildElems(che => che.localName == "Author")
+          e.withChildren(authors.take(1))
+        case e: Elem => e
+      }
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
+  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths() {
+    val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
+
+    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+      elem match {
+        case e: Elem if e.localName == "Authors" =>
+          val authors = e.filterChildElems(che => che.localName == "Author")
+          e.withChildren(authors.take(1))
+        case e: Elem => e
+      }
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
+  @Test def testRetainFirstAuthorsUsingUpdatedAtPaths() {
+    val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
+
+    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+      require(elem.localName == "Authors")
+      val authors = elem.filterChildElems(che => che.localName == "Author")
+      elem.withChildren(authors.take(1))
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
+  @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths() {
+    val paths = bookstore.filterElemPaths(e => e.localName == "Author").toSet
+
+    val updatedElem = bookstore.updatedWithNodeSeqAtPaths(paths) { (elem, path) =>
+      require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")
+      if (path.lastEntry.index == 0) Vector(elem) else Vector()
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
   private val bookstore: Elem = {
     val scalaXmlElem =
       <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
