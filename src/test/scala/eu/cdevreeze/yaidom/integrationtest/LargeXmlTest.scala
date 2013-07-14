@@ -410,6 +410,70 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
+  @Test def testUpdateUsingPaths() {
+    val parser = DocumentParserUsingDom.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
+    val endMs = System.currentTimeMillis()
+    logger.info("[testUpdateUsingPaths] Parsing (into a Document) took %d ms".format(endMs - startMs))
+
+    val rootElm = doc.documentElement
+    val allElms = rootElm.findAllElemsOrSelf
+    assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
+
+    val path = ElemPathBuilder.from(QName("contact") -> 2499, QName("phone") -> 0).build(Scope.Empty)
+    // Arbitrarily adding root path as extra (ignored) update path
+    val paths = Set(path, ElemPath.Root)
+
+    val newPhone = "012-34567890"
+
+    val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    expectResult(false) {
+      oldPhoneElm.text == newPhone
+    }
+
+    // Update, using a fixed path.
+
+    val start2Ms = System.currentTimeMillis()
+    val updatedDoc: Document = doc.updatedAtPaths(paths) { (e, p) =>
+      if (p == path) e.withChildren(Vector(Text(newPhone, false)))
+      else e
+    }
+    val end2Ms = System.currentTimeMillis()
+    logger.info("Updating an element in the document (using paths) took %d ms".format(end2Ms - start2Ms))
+
+    val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    expectResult(true) {
+      newPhoneElm.text == newPhone
+    }
+
+    // Comparing the corresponding resolved elements
+
+    val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
+
+    val resolvedDocElm = resolved.Elem(doc.documentElement)
+    val resolvedElm2: resolved.Elem = resolvedDocElm.updatedAtPaths(paths) { (e, p) =>
+      if (p == path) e.withChildren(Vector(resolved.Text(newPhone)))
+      else e
+    }
+
+    val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
+
+    expectResult(false) {
+      resolvedElm1 == resolvedElm2
+    }
+    expectResult(false) {
+      resolvedElm1 == resolvedElm3
+    }
+
+    expectResult(true) {
+      resolvedElm2 == resolvedElm3
+    }
+  }
+
   @Test def testTransform() {
     val parser = DocumentParserUsingDom.newInstance
 

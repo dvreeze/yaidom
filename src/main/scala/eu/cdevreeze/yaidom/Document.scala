@@ -102,23 +102,17 @@ final class Document(
   def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))
 
+  /** Returns `withDocumentElement(this.documentElement.updatedAtPaths(paths)(f))` */
+  def updatedAtPaths(paths: Set[ElemPath])(f: (Elem, ElemPath) => Elem): Document =
+    withDocumentElement(this.documentElement.updatedAtPaths(paths)(f))
+
   /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */
   def transformElemsOrSelf(f: Elem => Elem): Document =
     withDocumentElement(this.documentElement.transformElemsOrSelf(f))
 
-  /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f, Vector()))` */
-  def transformElemsOrSelf(f: (Elem, immutable.IndexedSeq[Elem]) => Elem): Document =
-    withDocumentElement(this.documentElement.transformElemsOrSelf(f, Vector()))
-
   /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))` */
   def transformElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))
-
-  /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, Vector()))` */
-  final def transformElemsToNodeSeq(f: (Elem, immutable.IndexedSeq[Elem]) => immutable.IndexedSeq[Node]): Document = {
-
-    withDocumentElement(this.documentElement.transformElemsToNodeSeq(f, Vector()))
-  }
 
   final def toTreeRepr(): String = {
     val sb = new StringBuilder

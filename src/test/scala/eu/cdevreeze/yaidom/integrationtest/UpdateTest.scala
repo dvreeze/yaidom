@@ -98,6 +98,47 @@ class UpdateTest extends Suite {
     }
   }
 
+  @Test def testUpdateUsingPathSet() {
+    val is = classOf[UpdateTest].getResourceAsStream("books.xml")
+
+    val doc1: Document = docParser.parse(is)
+
+    expectResult(Set(EName("Price"), EName("Edition"))) {
+      attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
+    }
+    expectResult(Set()) {
+      elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
+    }
+
+    val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
+    val doc2 = Document(
+      turnBookAttributeIntoElemUsingPathSet[Node, Elem](
+        turnBookAttributeIntoElemUsingPathSet[Node, Elem](doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+
+    expectResult(Set()) {
+      attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
+    }
+    expectResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
+      elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
+    }
+
+    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
+    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
+
+    val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
+    val updatedResolvedElm =
+      turnBookAttributeIntoElemUsingPathSet[resolved.Node, resolved.Elem](
+        turnBookAttributeIntoElemUsingPathSet[resolved.Node, resolved.Elem](resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
+
+    expectResult(false) {
+      resolvedOriginalElm == resolvedUpdatedElm
+    }
+
+    expectResult(true) {
+      resolvedUpdatedElm == updatedResolvedElm
+    }
+  }
+
   @Test def testUpdateUsingTransform() {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
@@ -129,47 +170,6 @@ class UpdateTest extends Suite {
     val updatedResolvedElm =
       turnBookAttributeIntoElem(
         turnBookAttributeIntoElem(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
-
-    expectResult(false) {
-      resolvedOriginalElm == resolvedUpdatedElm
-    }
-
-    expectResult(true) {
-      resolvedUpdatedElm == updatedResolvedElm
-    }
-  }
-
-  @Test def testUpdateUsingTransformTopmost() {
-    val is = classOf[UpdateTest].getResourceAsStream("books.xml")
-
-    val doc1: Document = docParser.parse(is)
-
-    expectResult(Set(EName("Price"), EName("Edition"))) {
-      attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
-    }
-    expectResult(Set()) {
-      elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
-    }
-
-    val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
-    val doc2 = Document(
-      turnBookAttributeIntoElemTransformingTopmost(
-        turnBookAttributeIntoElemTransformingTopmost(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
-
-    expectResult(Set()) {
-      attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
-    }
-    expectResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
-      elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
-    }
-
-    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
-    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
-
-    val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
-    val updatedResolvedElm =
-      turnBookAttributeIntoElemUsingTopmostUpdatedFunction(
-        turnBookAttributeIntoElemUsingTopmostUpdatedFunction(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
 
     expectResult(false) {
       resolvedOriginalElm == resolvedUpdatedElm
@@ -339,6 +339,17 @@ class UpdateTest extends Suite {
     }
   }
 
+  private def turnBookAttributeIntoElemUsingPathSet[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
+    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
+      path.endsWithName(EName("{http://bookstore}Book"))
+    }
+
+    rootElm.updatedAtPaths(matchingPaths.toSet) { (elem, path) =>
+      require(rootElm.findWithElemPath(path).isDefined)
+      upd(elem, attrName)
+    }
+  }
+
   private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
     val f: Elem => Elem = {
       case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
@@ -355,36 +366,6 @@ class UpdateTest extends Suite {
     }
 
     rootElm.transformElemsOrSelf(f)
-  }
-
-  private def turnBookAttributeIntoElemTransformingTopmost(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
-    val f: (Elem, immutable.IndexedSeq[Elem]) => Elem = {
-      case (e, ancestry) => e match {
-        case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined =>
-          if (ancestry.exists(che => che.resolvedName == EName("{http://bookstore}Book") && che.attributeOption(EName(attrName)).isDefined))
-            e
-          else
-            upd(e, attrName)
-        case e => e
-      }
-    }
-
-    rootElm.transformElemsOrSelf(f, Vector())
-  }
-
-  private def turnBookAttributeIntoElemUsingTopmostUpdatedFunction(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
-    val f: (resolved.Elem, immutable.IndexedSeq[resolved.Elem]) => resolved.Elem = {
-      case (e, ancestry) => e match {
-        case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined =>
-          if (ancestry.exists(che => che.resolvedName == EName("{http://bookstore}Book") && che.attributeOption(EName(attrName)).isDefined))
-            e
-          else
-            upd(e, attrName)
-        case e => e
-      }
-    }
-
-    rootElm.transformElemsOrSelf(f, Vector())
   }
 
   def updateBook(bookElm: Elem, attrName: String): Elem = {

@@ -156,4 +156,43 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E =
     updatedWithNodeSeq(path) { e => newNodes }
+
+  final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => immutable.IndexedSeq[N]): E = {
+    if (pathEntries.isEmpty) self
+    else {
+      val indexesByPathEntries: Map[ElemPath.Entry, Int] = self.childNodeIndexesByPathEntries.filterKeys(pathEntries)
+      require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
+
+      val newChildGroups: immutable.IndexedSeq[immutable.IndexedSeq[N]] =
+        indexesByPathEntries.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
+          case (acc, (pathEntry, idx)) =>
+            val nodesAtIdx = acc(idx)
+            assert(nodesAtIdx.size == 1)
+            val che = nodesAtIdx.head.asInstanceOf[E]
+            val newNodes = f(che, pathEntry)
+            acc.updated(idx, newNodes)
+        }
+      self.withChildren(newChildGroups.flatten)
+    }
+  }
+
+  final def updatedWithNodeSeqAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => immutable.IndexedSeq[N]): E = {
+    if (paths.isEmpty) self
+    else {
+      val pathsByParentPaths: Map[ElemPath, Set[ElemPath]] =
+        paths.filter(path => !path.isRoot).groupBy(path => path.parentPath)
+
+      self.updatedAtPaths(pathsByParentPaths.keySet) { (elem, path) =>
+        val childPathsOption = pathsByParentPaths.get(path)
+        assert(childPathsOption.isDefined)
+        val childPaths = childPathsOption.get
+        assert(childPaths.forall(p => p.parentPathOption == Some(path)))
+        val childPathEntries = childPaths.map(_.lastEntry)
+
+        elem.updatedWithNodeSeqAtPathEntries(childPathEntries) { (che, pathEntry) =>
+          f(che, path.append(pathEntry))
+        }
+      }
+    }
+  }
 }

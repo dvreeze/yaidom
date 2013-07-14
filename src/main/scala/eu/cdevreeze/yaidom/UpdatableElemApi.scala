@@ -92,6 +92,15 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
    * to all child elements with the given path entries (compared to this element as root).
+   *
+   * It can be defined as follows (ignoring exceptions):
+   * {{{
+   * val newChildren = childNodeIndexesByPathEntries.filterKeys(pathEntries).foldLeft(children) {
+   *   case (acc, (pathEntry, idx)) =>
+   *     acc.updated(idx, f(acc(idx).asInstanceOf[E], pathEntry))
+   * }
+   * withChildren(newChildren)
+   * }}}
    */
   def updatedAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => E): E
 
@@ -115,6 +124,27 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
    * to all descendant-or-self elements with the given paths (compared to this element as root).
+   *
+   * It can be defined (recursively) as follows (ignoring exceptions):
+   * {{{
+   * def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E = {
+   *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
+   *   val resultWithoutSelf = self.updatedAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
+   *     val che = findWithElemPathEntry(pathEntry).get
+   *     val newChe = che.updatedAtPaths(paths.map(_.withoutFirstEntry)) { (elem, relativePath) =>
+   *       f(elem, relativePath.prepend(pathEntry))
+   *     }
+   *     newChe
+   *   }
+   *   if (paths.contains(ElemPath.Root)) f(resultWithoutSelf, ElemPath.Root) else resultWithoutSelf
+   * }
+   * }}}
+   *
+   * It is also equivalent to:
+   * {{{
+   * val pathsReversed = findAllElemOrSelfPaths.filter(p => paths.contains(p)).reverse
+   * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path) { e => f(e, path) } }
+   * }}}
    */
   def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E
 
@@ -149,4 +179,38 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
 
   /** Returns `updatedWithNodeSeq(path) { e => newNodes }` */
   def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E
+
+  /**
+   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
+   * to all child elements with the given path entries (compared to this element as root).
+   *
+   * It can be defined as follows (ignoring exceptions):
+   * {{{
+   * val indexesByPathEntries = childNodeIndexesByPathEntries.filterKeys(pathEntries)
+   * val newChildGroups =
+   *   indexesByPathEntries.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
+   *     case (acc, (pathEntry, idx)) =>
+   *       acc.updated(idx, f(acc(idx).head.asInstanceOf[E], pathEntry))
+   *   }
+   * withChildren(newChildGroups.flatten)
+   * }}}
+   */
+  def updatedWithNodeSeqAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => immutable.IndexedSeq[N]): E
+
+  /**
+   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
+   * to all descendant elements with the given paths (compared to this element as root), but ignoring the root path.
+   *
+   * It can be defined as follows (ignoring exceptions):
+   * {{{
+   * val pathsByParentPaths = paths.filter(path => !path.isRoot).groupBy(path => path.parentPath)
+   * self.updatedAtPaths(pathsByParentPaths.keySet) { (elem, path) =>
+   *   val childPathEntries = pathsByParentPaths(path).map(_.lastEntry)
+   *   elem.updatedWithNodeSeqAtPathEntries(childPathEntries) { (che, pathEntry) =>
+   *     f(che, path.append(pathEntry))
+   *   }
+   * }
+   * }}}
+   */
+  def updatedWithNodeSeqAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => immutable.IndexedSeq[N]): E
 }

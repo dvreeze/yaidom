@@ -1,0 +1,203 @@
+/*
+ * Copyright 2011 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.cdevreeze.yaidom
+package integrationtest
+
+import java.{ util => jutil, io => jio }
+import scala.collection.immutable
+import org.junit.{ Test, Before }
+import org.junit.runner.RunWith
+import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.junit.JUnitRunner
+import convert.ScalaXmlConversions._
+
+/**
+ * Alternative updates test case. It demonstrates many ways of performing functional updates.
+ *
+ * Acknowledgments: The sample XML is part of the online course "Introduction to Databases", by professor Widom at
+ * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
+ * issues.
+ *
+ * @author Chris de Vreeze
+ */
+@RunWith(classOf[JUnitRunner])
+class AlternativeUpdatesTest extends Suite {
+
+  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
+
+  @Test def testRetainFirstAuthorsUsingTransformElemsOrSelf() {
+    val updatedElem = bookstore transformElemsOrSelf {
+      case e: Elem if e.localName == "Authors" =>
+        val authors = e.filterChildElems(che => che.localName == "Author")
+        e.withChildren(authors.take(1))
+      case e: Elem => e
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
+  @Test def testRetainFirstAuthorsUsingTransformElems() {
+    val updatedElem = bookstore transformElems {
+      case e: Elem if e.localName == "Authors" =>
+        val authors = e.filterChildElems(che => che.localName == "Author")
+        e.withChildren(authors.take(1))
+      case e: Elem => e
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
+  private val bookstore: Elem = {
+    val scalaXmlElem =
+      <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
+        <Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
+          <Title>A First Course in Database Systems</Title>
+          <Authors>
+            <Author>
+              <First_Name>Jeffrey</First_Name>
+              <Last_Name>Ullman</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Jennifer</First_Name>
+              <Last_Name>Widom</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
+        <Book ISBN="ISBN-0-13-815504-6" Price="100">
+          <Title>Database Systems: The Complete Book</Title>
+          <Authors>
+            <Author>
+              <First_Name>Hector</First_Name>
+              <Last_Name>Garcia-Molina</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Jeffrey</First_Name>
+              <Last_Name>Ullman</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Jennifer</First_Name>
+              <Last_Name>Widom</Last_Name>
+            </Author>
+          </Authors>
+          <Remark>
+            Buy this book bundled with "A First Course" - a great deal!
+          </Remark>
+        </Book>
+        <Book ISBN="ISBN-0-11-222222-3" Price="50">
+          <Title>Hector and Jeff's Database Hints</Title>
+          <Authors>
+            <Author>
+              <First_Name>Jeffrey</First_Name>
+              <Last_Name>Ullman</Last_Name>
+            </Author>
+            <Author>
+              <First_Name>Hector</First_Name>
+              <Last_Name>Garcia-Molina</Last_Name>
+            </Author>
+          </Authors>
+          <Remark>An indispensable companion to your textbook</Remark>
+        </Book>
+        <Book ISBN="ISBN-9-88-777777-6" Price="25">
+          <Title>Jennifer's Economical Database Hints</Title>
+          <Authors>
+            <Author>
+              <First_Name>Jennifer</First_Name>
+              <Last_Name>Widom</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
+        <Magazine Month="January" Year="2009">
+          <Title>National Geographic</Title>
+        </Magazine>
+        <Magazine Month="February" Year="2009">
+          <Title>National Geographic</Title>
+        </Magazine>
+        <Magazine Month="February" Year="2009">
+          <Title>Newsweek</Title>
+        </Magazine>
+        <Magazine Month="March" Year="2009">
+          <Title>Hector and Jeff's Database Hints</Title>
+        </Magazine>
+      </books:Bookstore>
+
+    convertToElem(scalaXmlElem)
+  }
+
+  private val bookstoreWithOnlyFirstAuthors: Elem = {
+    val scalaXmlElem =
+      <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
+        <Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
+          <Title>A First Course in Database Systems</Title>
+          <Authors>
+            <Author>
+              <First_Name>Jeffrey</First_Name>
+              <Last_Name>Ullman</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
+        <Book ISBN="ISBN-0-13-815504-6" Price="100">
+          <Title>Database Systems: The Complete Book</Title>
+          <Authors>
+            <Author>
+              <First_Name>Hector</First_Name>
+              <Last_Name>Garcia-Molina</Last_Name>
+            </Author>
+          </Authors>
+          <Remark>
+            Buy this book bundled with "A First Course" - a great deal!
+          </Remark>
+        </Book>
+        <Book ISBN="ISBN-0-11-222222-3" Price="50">
+          <Title>Hector and Jeff's Database Hints</Title>
+          <Authors>
+            <Author>
+              <First_Name>Jeffrey</First_Name>
+              <Last_Name>Ullman</Last_Name>
+            </Author>
+          </Authors>
+          <Remark>An indispensable companion to your textbook</Remark>
+        </Book>
+        <Book ISBN="ISBN-9-88-777777-6" Price="25">
+          <Title>Jennifer's Economical Database Hints</Title>
+          <Authors>
+            <Author>
+              <First_Name>Jennifer</First_Name>
+              <Last_Name>Widom</Last_Name>
+            </Author>
+          </Authors>
+        </Book>
+        <Magazine Month="January" Year="2009">
+          <Title>National Geographic</Title>
+        </Magazine>
+        <Magazine Month="February" Year="2009">
+          <Title>National Geographic</Title>
+        </Magazine>
+        <Magazine Month="February" Year="2009">
+          <Title>Newsweek</Title>
+        </Magazine>
+        <Magazine Month="March" Year="2009">
+          <Title>Hector and Jeff's Database Hints</Title>
+        </Magazine>
+      </books:Bookstore>
+
+    convertToElem(scalaXmlElem)
+  }
+}
