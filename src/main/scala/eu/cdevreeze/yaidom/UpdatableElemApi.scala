@@ -49,8 +49,14 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
   /**
-   * Returns the child node index of the given `ElemPath.Entry` with respect to this element as parent element.
-   * If the path entry is not found, -1 is returned.
+   * Returns a Map from path entries (with respect to this element as parent element) to child node indexes.
+   * The faster this method is, the better.
+   */
+  def childNodeIndexesByPathEntries: Map[ElemPath.Entry, Int]
+
+  /**
+   * Shorthand for `childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)`.
+   * The faster this method is, the better.
    */
   def childNodeIndex(childPathEntry: ElemPath.Entry): Int
 
@@ -85,6 +91,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
+   * to all child elements with the given path entries (compared to this element as root).
+   */
+  def updatedAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => E): E
+
+  /**
+   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
    * to the element that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path.
@@ -99,6 +111,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
 
   /** Returns `updated(path) { e => newElem }` */
   def updated(path: ElemPath, newElem: E): E
+
+  /**
+   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
+   * to all descendant-or-self elements with the given paths (compared to this element as root).
+   */
+  def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E
 
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element

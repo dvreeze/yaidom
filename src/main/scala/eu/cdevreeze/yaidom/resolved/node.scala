@@ -79,7 +79,7 @@ final case class Elem(
   private[resolved] def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
 
   /** Cache for speeding up child element lookups by element path */
-  private val childIndexesByPathEntries: Map[ElemPath.Entry, Int] = {
+  override val childNodeIndexesByPathEntries: Map[ElemPath.Entry, Int] = {
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
     val elementNameCounts = mutable.Map[EName, Int]()
@@ -111,7 +111,7 @@ final case class Elem(
    */
   override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = {
     val childElms = findAllChildElems
-    val entries = childIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
+    val entries = childNodeIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
     assert(childElms.size == entries.size)
     childElms.zip(entries)
   }
@@ -119,10 +119,6 @@ final case class Elem(
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     new Elem(resolvedName, resolvedAttributes, newChildren)
-  }
-
-  override def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
-    childIndexesByPathEntries.getOrElse(childPathEntry, -1)
   }
 
   override def findWithElemPathEntry(entry: ElemPath.Entry): Option[Elem] = {

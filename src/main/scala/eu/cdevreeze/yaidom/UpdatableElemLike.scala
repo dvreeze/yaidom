@@ -52,14 +52,11 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
-  /**
-   * Returns the child node index of the given `ElemPath.Entry` with respect to this element as parent element.
-   * If the path entry is not found, -1 is returned.
-   *
-   * Methods `updated` (taking `ElemPath`s) heavily use this method to turn `ElemPath`s into child node indexes.
-   * This method should therefore be very fast (preferably using a cache from ElemPath.Entry instances to indexes).
-   */
-  def childNodeIndex(childPathEntry: ElemPath.Entry): Int
+  def childNodeIndexesByPathEntries: Map[ElemPath.Entry, Int]
+
+  final def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
+    childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)
+  }
 
   final def withUpdatedChildren(index: Int, newChild: N): E =
     withChildren(children.updated(index, newChild))
@@ -75,9 +72,25 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def updated(pathEntry: ElemPath.Entry)(f: E => E): E = {
     val idx = self.childNodeIndex(pathEntry)
-    assert(idx >= 0, "Expected non-negative child node index")
+    require(idx >= 0, "Expected non-negative child node index")
 
     self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
+  }
+
+  final def updatedAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => E): E = {
+    if (pathEntries.isEmpty) self
+    else {
+      val indexesByPathEntries: Map[ElemPath.Entry, Int] = self.childNodeIndexesByPathEntries.filterKeys(pathEntries)
+      require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
+
+      val newChildren = indexesByPathEntries.foldLeft(self.children) {
+        case (acc, (pathEntry, idx)) =>
+          val che = acc(idx).asInstanceOf[E]
+          val updatedChe = f(che, pathEntry)
+          acc.updated(idx, updatedChe)
+      }
+      self.withChildren(newChildren)
+    }
   }
 
   final def updated(path: ElemPath)(f: E => E): E = {
@@ -91,16 +104,47 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def updated(path: ElemPath, newElem: E): E = updated(path) { e => newElem }
 
+  final def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E = {
+    if (paths.isEmpty) self
+    else {
+      val pathsByPathEntries: Map[ElemPath.Entry, Set[ElemPath]] =
+        paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
+
+      val resultsByPathEntries: Map[ElemPath.Entry, E] =
+        pathsByPathEntries map {
+          case (pathEntry, paths) =>
+            val che = self.findWithElemPathEntry(pathEntry).getOrElse(sys.error("Incorrect path entry %s".format(pathEntry)))
+
+            val relativePaths = paths.map(_.withoutFirstEntry)
+
+            // Recursive call, but not tail-recursive
+
+            val newChe = che.updatedAtPaths(relativePaths) { (elem, relativePath) =>
+              val path = relativePath.prepend(pathEntry)
+              f(elem, path)
+            }
+            (pathEntry -> newChe)
+        }
+
+      val resultWithoutSelf = self.updatedAtPathEntries(resultsByPathEntries.keySet) { (che, pathEntry) =>
+        assert(resultsByPathEntries.contains(pathEntry))
+        resultsByPathEntries(pathEntry)
+      }
+
+      if (paths.contains(ElemPath.Root)) f(resultWithoutSelf, ElemPath.Root) else resultWithoutSelf
+    }
+  }
+
   final def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
     if (path == ElemPath.Root) self
     else {
       assert(path.parentPathOption.isDefined)
       val parentPath = path.parentPath
-      val parentElem = getWithElemPath(parentPath)
+      val parentElem = findWithElemPath(parentPath).getOrElse(sys.error("Incorrect parent path %s".format(parentPath)))
 
       val lastEntry = path.lastEntry
       val childNodeIndex = parentElem.childNodeIndex(lastEntry)
-      assert(childNodeIndex >= 0)
+      require(childNodeIndex >= 0, "Incorrect path entry %s".format(lastEntry))
 
       val childElemOption = parentElem.findWithElemPathEntry(lastEntry)
       assert(childElemOption.isDefined)
