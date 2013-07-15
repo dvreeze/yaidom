@@ -156,9 +156,11 @@ class AlternativeUpdatesTest extends Suite {
     val paths = bookstore.findAllElemOrSelfPaths.toSet
 
     var foundPaths = Vector[ElemPath]()
+    var foundElemsWithoutChildren = Vector[Elem]()
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       foundPaths = foundPaths :+ path
+      foundElemsWithoutChildren = foundElemsWithoutChildren :+ elem.withChildren(Vector())
 
       elem match {
         case e: Elem if e.localName == "Authors" =>
@@ -174,6 +176,15 @@ class AlternativeUpdatesTest extends Suite {
 
     expectResult(paths) {
       foundPaths.toSet
+    }
+    expectResult(foundPaths.size) {
+      foundElemsWithoutChildren.size
+    }
+    expectResult(true) {
+      foundPaths.zip(foundElemsWithoutChildren) forall {
+        case (path, elem) =>
+          resolved.Elem(bookstore.getWithElemPath(path).withChildren(Vector())) == resolved.Elem(elem)
+      }
     }
   }
 
