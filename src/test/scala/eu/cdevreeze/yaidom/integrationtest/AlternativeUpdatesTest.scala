@@ -39,7 +39,7 @@ class AlternativeUpdatesTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testRetainFirstAuthorsUsingTransformElemsOrSelf() {
+  @Test def testRetainFirstAuthorsUsingTransformElemsOrSelf(): Unit = {
     val updatedElem = bookstore transformElemsOrSelf {
       case e: Elem if e.localName == "Authors" =>
         val authors = e.filterChildElems(che => che.localName == "Author")
@@ -52,7 +52,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingTransformElems() {
+  @Test def testRetainFirstAuthorsUsingTransformElems(): Unit = {
     val updatedElem = bookstore transformElems {
       case e: Elem if e.localName == "Authors" =>
         val authors = e.filterChildElems(che => che.localName == "Author")
@@ -65,7 +65,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths() {
+  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths(): Unit = {
     val paths = bookstore.findAllElemOrSelfPaths.toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
@@ -82,7 +82,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths() {
+  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths(): Unit = {
     val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
@@ -99,7 +99,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedAtPaths() {
+  @Test def testRetainFirstAuthorsUsingUpdatedAtPaths(): Unit = {
     val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
@@ -113,13 +113,39 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths() {
+  @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths(): Unit = {
     val paths = bookstore.filterElemPaths(e => e.localName == "Author").toSet
 
     val updatedElem = bookstore.updatedWithNodeSeqAtPaths(paths) { (elem, path) =>
       require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")
       if (path.lastEntry.index == 0) Vector(elem) else Vector()
     }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+  }
+
+  @Test def testRetainFirstAuthorsUsingDom(): Unit = {
+    val domDoc = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    val domBookstore = convert.DomConversions.convertElem(bookstore, domDoc, Scope.Empty)
+    require(domBookstore.getOwnerDocument == domDoc, "Expected the owner document to be the created DOM Document")
+
+    val bookstoreWrapper = new dom.DomElem(domBookstore)
+
+    val nonFirstAuthorWrappers =
+      for {
+        authorsWrapper <- bookstoreWrapper.filterElems(_.localName == "Authors")
+        nonFirstAuthorWrapper <- authorsWrapper.filterChildElems(_.localName == "Author").drop(1)
+      } yield nonFirstAuthorWrapper
+
+    for (domAuthor <- nonFirstAuthorWrappers.map(_.wrappedNode)) {
+      val domParent = domAuthor.getParentNode
+      domParent.removeChild(domAuthor)
+    }
+
+    // The state of bookstoreWrapper is its wrapped DOM element, which has been updated
+    val updatedElem = convert.DomConversions.convertToElem(bookstoreWrapper.wrappedNode, Scope.Empty)
 
     expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
