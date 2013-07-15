@@ -152,6 +152,31 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
+  @Test def testUpdatedAtPathsInternally(): Unit = {
+    val paths = bookstore.findAllElemOrSelfPaths.toSet
+
+    var foundPaths = Vector[ElemPath]()
+
+    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+      foundPaths = foundPaths :+ path
+
+      elem match {
+        case e: Elem if e.localName == "Authors" =>
+          val authors = e.filterChildElems(che => che.localName == "Author")
+          e.withChildren(authors.take(1))
+        case e: Elem => e
+      }
+    }
+
+    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem(updatedElem.prettify(2))
+    }
+
+    expectResult(paths) {
+      foundPaths.toSet
+    }
+  }
+
   private val bookstore: Elem = {
     val scalaXmlElem =
       <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
