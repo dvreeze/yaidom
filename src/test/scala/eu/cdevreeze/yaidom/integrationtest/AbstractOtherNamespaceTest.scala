@@ -1431,7 +1431,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
 
   private def findMaxTopLevelScope(elem: Elem): Scope = {
     elem.findAllElemsOrSelf.foldLeft(elem.scope.withoutDefaultNamespace) { (acc, e) =>
-      acc ++ Scope.from(e.scope.withoutDefaultNamespace.map filterKeys (pref => !acc.map.keySet.contains(pref)))
+      acc ++ (e.scope.withoutDefaultNamespace filterKeys (pref => !acc.keySet.contains(pref)))
     }
   }
 }

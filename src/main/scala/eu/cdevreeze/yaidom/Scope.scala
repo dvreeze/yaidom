@@ -212,6 +212,15 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /** Returns true if this is a superscope of the given parameter `Scope`. A `Scope` is considered superscope of itself. */
   def superScopeOf(scope: Scope): Boolean = scope.subScopeOf(this)
 
+  /** Returns `Scope.from(this.map.filter(p))`. */
+  def filter(p: ((String, String)) => Boolean): Scope = Scope.from(this.map.filter(p))
+
+  /** Returns `Scope.from(this.map.filterKeys(p))`. */
+  def filterKeys(p: String => Boolean): Scope = Scope.from(this.map.filterKeys(p))
+
+  /** Returns `this.map.keySet`. */
+  def keySet: Set[String] = this.map.keySet
+
   /**
    * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
    * to this `Scope`.
