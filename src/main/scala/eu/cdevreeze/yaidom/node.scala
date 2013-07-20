@@ -305,6 +305,45 @@ final class Elem(
   }
 
   /**
+   * Returns the QName value of the attribute with the given expanded name, if any, wrapped in an `Option`.
+   * If the attribute exists, but its value is not a QName, an exception is thrown.
+   */
+  def attributeAsQNameOption(expandedName: EName): Option[QName] =
+    attributeOption(expandedName).map(v => QName(v.trim))
+
+  /** Returns the QName value of the attribute with the given expanded name, and throws an exception otherwise */
+  def attributeAsQName(expandedName: EName): QName =
+    attributeAsQNameOption(expandedName).getOrElse(
+      sys.error("Missing QName-valued attribute %s".format(expandedName)))
+
+  /**
+   * Returns the resolved QName value (as EName) of the attribute with the given expanded name, if any, wrapped in an `Option`.
+   * None is returned if the attribute does not exist. If the QName value cannot be resolved given the scope of the element,
+   * an exception is thrown.
+   */
+  def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
+    attributeAsQNameOption(expandedName) map { qname =>
+      scope.resolveQNameOption(qname).getOrElse(
+        sys.error("Could not resolve QName-valued attribute value %s, given scope [%s]".format(qname, scope)))
+    }
+  }
+
+  /**
+   * Returns the resolved QName value (as EName) of the attribute with the given expanded name, and throws an exception otherwise
+   */
+  def attributeAsResolvedQName(expandedName: EName): EName =
+    attributeAsResolvedQNameOption(expandedName).getOrElse(
+      sys.error("Missing QName-valued attribute %s".format(expandedName)))
+
+  /** Returns `QName(text.trim)` */
+  def textAsQName: QName = QName(text.trim)
+
+  /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
+  def textAsResolvedQName: EName =
+    scope.resolveQNameOption(textAsQName).getOrElse(
+      sys.error("Could not resolve QName-valued element text %s, given scope [%s]".format(qname, scope)))
+
+  /**
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
    * prefixed namespace undeclarations, given the passed parent scope. Note that XML 1.0 does not allow prefix undeclarations.
    */
