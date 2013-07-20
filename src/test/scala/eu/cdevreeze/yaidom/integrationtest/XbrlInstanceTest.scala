@@ -228,6 +228,28 @@ class XbrlInstanceTest extends Suite {
       dimensionMembers
     }
   }
+
+  @Test def testQueryUnits() {
+    // Testing the retrieval of element text (without prefix, but using the default namespace!) as QNames, resolved as Elems ...
+
+    val parser = DocumentParserUsingDom.newInstance()
+    val doc: Document = parser.parse(classOf[XbrlInstanceTest].getResourceAsStream("sample-xbrl-instance.xml"))
+
+    val xbrlInstance = new XbrlInstance(doc.documentElement)
+
+    val allUnits = xbrlInstance.findAllUnits
+    val allMeasures = allUnits.map(e => e.getChildElem(EName(XbrliNamespace, "measure")))
+
+    val measureENames = allMeasures.map(e => e.wrappedElem.textAsResolvedQName).toSet
+
+    expectResult(Set(
+      EName("http://www.xbrl.org/2003/iso4217", "USD"),
+      EName(XbrliNamespace, "shares"),
+      EName(XbrliNamespace, "pure"))) {
+
+      measureENames
+    }
+  }
 }
 
 object XbrlInstanceTest {
