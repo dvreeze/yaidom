@@ -196,7 +196,7 @@ class XbrlInstanceTest extends Suite {
   }
 
   @Test def testQueryDimensions() {
-    // Testing the retrieval of attributes and element text as QNames, resolved as Elems ...
+    // Testing the retrieval of attributes and element text as QNames, resolved as ENames ...
 
     val parser = DocumentParserUsingDom.newInstance()
     val doc: Document = parser.parse(classOf[XbrlInstanceTest].getResourceAsStream("sample-xbrl-instance.xml"))
@@ -230,7 +230,7 @@ class XbrlInstanceTest extends Suite {
   }
 
   @Test def testQueryUnits() {
-    // Testing the retrieval of element text (without prefix, but using the default namespace!) as QNames, resolved as Elems ...
+    // Testing the retrieval of element text (without prefix, but using the default namespace!) as QNames, resolved as ENames ...
 
     val parser = DocumentParserUsingDom.newInstance()
     val doc: Document = parser.parse(classOf[XbrlInstanceTest].getResourceAsStream("sample-xbrl-instance.xml"))
