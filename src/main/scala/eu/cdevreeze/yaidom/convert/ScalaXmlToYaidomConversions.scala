@@ -31,7 +31,10 @@ import scala.collection.{ immutable, mutable }
  *
  * This converter regards the input more like an "Elem" than an "ElemBuilder", in that scopes instead of namespace
  * declarations are extracted from input "elements", and in that conversions to yaidom Elems do not take any additional parent
- * scope parameter.
+ * scope parameter. On the other hand, Scala XML NamespaceBindings try to be a bit of both yaidom Scopes and yaidom Declarations.
+ * 
+ * Beware that conversion from Scala XML Elems to yaidom Elems will fail if the Scala XML Elem uses namespaces in element and/or
+ * attribute names that have not been declared!
  *
  * @author Chris de Vreeze
  */
@@ -133,7 +136,8 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
       val parentScope = extractScope(scope.parent)
 
       if (scope.uri.isEmpty) {
-        // Works for the default namespace too (knowing that prefix is no longer null but can be empty)
+        // Namespace undeclaration (which, looking at the NamespaceBinding API doc, seems not to exist)
+        // Works for the default namespace too (knowing that "edited" prefix is not null but can be empty)
         parentScope -- Set(prefix)
       } else {
         // Works for namespace overrides too

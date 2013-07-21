@@ -22,7 +22,7 @@ package eu.cdevreeze.yaidom
  * This wrapper is useful for scenarios where Scala XML literals with parameters are used. Typical parameters are
  * Scala XML node sequences, and they can be built in a "yaidom way", using these wrappers.
  *
- * For some namespace-related pitfalls, see [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]].
+ * For some namespace-related pitfalls and peculiarities, see [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]].
  *
  * @author Chris de Vreeze
  */

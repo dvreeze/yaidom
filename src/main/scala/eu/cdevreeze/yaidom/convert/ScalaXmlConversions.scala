@@ -31,6 +31,9 @@ package convert
  * useImmutableElem(elem)
  * }}}
  *
+ * See [[eu.cdevreeze.yaidom.convert.YaidomToScalaXmlConversions]] and in particular [[eu.cdevreeze.yaidom.convert.ScalaXmlToYaidomConversions]]
+ * for some pitfalls and peculiarities when using these conversions.
+ *
  * @author Chris de Vreeze
  */
 object ScalaXmlConversions extends YaidomToScalaXmlConversions with ScalaXmlToYaidomConversions
