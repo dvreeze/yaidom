@@ -49,7 +49,7 @@ sealed trait ScalaXmlNode {
  * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.ElemApi]] API.
  *
  * Keep in mind that the `ElemApi` specific part of the API is a broken abstraction. If the wrapped Scala XML element
- * misses some namespace declarations for used element or attribute names, the resolved element and/or attribute names
+ * misses some namespace declarations for used element or attribute names, these element and/or attribute names
  * cannot be resolved, and exceptions are thrown when querying for them! The `ParentElemApi` part of the API does not
  * suffer from this broken abstraction, so is less dangerous to use.
  *
@@ -65,12 +65,18 @@ final class ScalaXmlElem(
 
   override def findAllChildElems: immutable.IndexedSeq[ScalaXmlElem] = children collect { case e: ScalaXmlElem => e }
 
+  /**
+   * Returns the resolved name of the element. Note that there is no guarantee that the element name can be resolved!
+   */
   override def resolvedName: EName = {
     val qname = toQName(wrappedNode)
     scope.resolveQNameOption(qname).getOrElse(
       sys.error("Could not resolve QName from prefix %s and label %s".format(Option(wrappedNode.prefix).getOrElse(""), wrappedNode.label)))
   }
 
+  /**
+   * Returns the "resolved attributes". Note that there is no guarantee that the attributes names can be resolved!
+   */
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = scope.withoutDefaultNamespace
     attributes map {
@@ -89,6 +95,9 @@ final class ScalaXmlElem(
 
   def attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(wrappedNode.attributes)
 
+  /**
+   * Returns the scope of the element. Note that there is no guarantee that this scope is complete!
+   */
   def scope: Scope = extractScope(wrappedNode.scope)
 
   /** Returns the text children */
