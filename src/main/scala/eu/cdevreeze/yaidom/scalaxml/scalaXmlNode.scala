@@ -29,6 +29,8 @@ import convert.ScalaXmlConversions._
  * of lots of query result objects, the repeated costs of querying element/attribute names, the conceptual differences between
  * Scala XML and native yaidom nodes, etc.).
  *
+ * For some namespace-related pitfalls, see [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]].
+ *
  * The wrappers are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML node.
  *
@@ -45,6 +47,11 @@ sealed trait ScalaXmlNode {
 
 /**
  * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.ElemApi]] API.
+ *
+ * Keep in mind that the `ElemApi` specific part of the API is a broken abstraction. If the wrapped Scala XML element
+ * misses some namespace declarations for used element or attribute names, the resolved element and/or attribute names
+ * cannot be resolved, and exceptions are thrown when querying for them! The `ParentElemApi` part of the API does not
+ * suffer from this broken abstraction, so is less dangerous to use.
  *
  * The wrapper instances are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
