@@ -48,8 +48,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
   }
 
   /**
-   * Converts a yaidom `Elem` to a Scala XML element. It is not guaranteed that the result has no unnecessary duplicated
-   * namespace declarations.
+   * Converts a yaidom `Elem` to a Scala XML element. The result contains unnecessary duplicated namespace declarations!
    */
   final def convertElem(elm: Elem): scala.xml.Elem = {
     // Not tail-recursive, but the recursion depth should be limited
@@ -62,16 +61,8 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
 
     val children: immutable.IndexedSeq[scala.xml.Node] = elm.children map { ch => convertNode(ch) }
 
-    val editedChildren = children map {
-      case e: scala.xml.Elem if toScope(e.scope) == toScope(nsBinding) =>
-        // Reusing the same NamespaceBinding, in order to prevent duplicate namespace declarations
-        // This only covers the situation where the Scope remains exactly the same
-        e.copy(scope = nsBinding)
-      case n => n
-    }
-
     // Note that this constructor has been deprecated since Scala 2.10 (but it was the only constructor in older Scala versions)
-    new scala.xml.Elem(prefix, label, attributes, nsBinding, editedChildren: _*)
+    new scala.xml.Elem(prefix, label, attributes, nsBinding, children: _*)
   }
 
   /**
@@ -140,34 +131,6 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
           scala.xml.NamespaceBinding(pref, nsUri, acc)
       }
       nsBinding
-    }
-  }
-
-  /**
-   * Converts the `scala.xml.NamespaceBinding` to a yaidom `Scope`. Same as extractScope in ScalaXmlToYaidomConversions, but
-   * repeated here in order to be independent of ScalaXmlToYaidomConversions.
-   *
-   * This implementation is brittle because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
-   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858). Still, this implementation
-   * tries to work around that bug.
-   */
-  private def toScope(scope: scala.xml.NamespaceBinding): Scope = {
-    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) Scope.Empty
-    else {
-      val prefix = if (scope.prefix eq null) "" else scope.prefix
-
-      // Recursive call (not tail-recursive), and working around the above-mentioned bug
-
-      val parentScope = toScope(scope.parent)
-
-      if (scope.uri.isEmpty) {
-        // Namespace undeclaration (which, looking at the NamespaceBinding API doc, seems not to exist)
-        // Works for the default namespace too (knowing that "edited" prefix is not null but can be empty)
-        parentScope -- Set(prefix)
-      } else {
-        // Works for namespace overrides too
-        parentScope ++ Scope.from(prefix -> scope.uri)
-      }
     }
   }
 }
