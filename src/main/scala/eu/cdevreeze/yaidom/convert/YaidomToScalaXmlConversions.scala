@@ -38,7 +38,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
    * Converts a yaidom node to a Scala XML node, given a parent Scala XML scope.
    *
    * The parent NamespaceBinding is passed as extra parameter, in order to try to prevent the creation of any unnecessary
-   * namespace declarations (which currently only works if an element has the same scope as its parent).
+   * namespace declarations.
    */
   final def convertNode(node: Node, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.Node = {
     node match {
@@ -60,7 +60,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
    * Converts a yaidom `Elem` to a Scala XML element, given a parent Scala XML scope.
    *
    * The parent NamespaceBinding is passed as extra parameter, in order to try to prevent the creation of any unnecessary
-   * namespace declarations (which currently only works if an element has the same scope as its parent).
+   * namespace declarations.
    */
   final def convertElem(elm: Elem, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.Elem = {
     // Not tail-recursive, but the recursion depth should be limited
@@ -71,8 +71,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
     val attributes = convertAttributes(elm.attributes)
 
     val decls = toScope(parentNamespaceBinding).relativize(elm.scope)
-    val nsBinding =
-      if (decls.isEmpty) parentNamespaceBinding else convertScope(elm.scope)
+    val nsBinding = convertScope(elm.scope, parentNamespaceBinding)
 
     val children: immutable.IndexedSeq[scala.xml.Node] = elm.children.map(ch => convertNode(ch, nsBinding))
 
@@ -144,6 +143,31 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
       val nsBinding: scala.xml.NamespaceBinding = scopeAsSeq.foldLeft(topScope) {
         case (acc, (pref, nsUri)) =>
           scala.xml.NamespaceBinding(pref, nsUri, acc)
+      }
+      nsBinding
+    }
+  }
+
+  /**
+   * Converts the yaidom Scope to a Scala XML NamespaceBinding, but tries to keep re-use the parent NamespaceBinding
+   * (possible prepending some "children") as much as possible. This helps in preventing many creations of duplicate
+   * namespace declarations.
+   *
+   * See method scala.xml.NamespaceBinding.buildString(StringBuilder, scala.xml.NamespaceBinding) for how (implicit) namespace
+   * declarations are inferred from a NamespaceBinding and one of its ancestors.
+   */
+  private def convertScope(scope: Scope, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.NamespaceBinding = {
+    val decls = toScope(parentNamespaceBinding).relativize(scope)
+
+    if (!decls.retainingUndeclarations.isEmpty) {
+      // No way to re-use the immutable parent NamespaceBinding, so converting the scope without using the parent NamespaceBinding
+      convertScope(scope)
+    } else {
+      val nsBinding = decls.map.foldLeft(parentNamespaceBinding) {
+        case (acc, (pref, uri)) =>
+          val editedPrefix = if ((pref ne null) && (pref.isEmpty)) null.asInstanceOf[String] else pref
+
+          scala.xml.NamespaceBinding(editedPrefix, uri, acc)
       }
       nsBinding
     }
