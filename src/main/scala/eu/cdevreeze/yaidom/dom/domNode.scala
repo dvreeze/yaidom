@@ -191,3 +191,34 @@ object DomNode {
 
   def wrapElement(elm: w3c.dom.Element): DomElem = new DomElem(elm)
 }
+
+object DomDocument {
+
+  def apply(wrappedNode: w3c.dom.Document): DomDocument = new DomDocument(wrappedNode)
+}
+
+object DomElem {
+
+  def apply(wrappedNode: w3c.dom.Element): DomElem = new DomElem(wrappedNode)
+}
+
+object DomText {
+
+  def apply(wrappedNode: w3c.dom.Text): DomText = new DomText(wrappedNode)
+}
+
+object DomProcessingInstruction {
+
+  def apply(wrappedNode: w3c.dom.ProcessingInstruction): DomProcessingInstruction =
+    new DomProcessingInstruction(wrappedNode)
+}
+
+object DomEntityRef {
+
+  def apply(wrappedNode: w3c.dom.EntityReference): DomEntityRef = new DomEntityRef(wrappedNode)
+}
+
+object DomComment {
+
+  def apply(wrappedNode: w3c.dom.Comment): DomComment = new DomComment(wrappedNode)
+}

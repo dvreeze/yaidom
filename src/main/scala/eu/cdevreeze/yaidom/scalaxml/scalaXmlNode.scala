@@ -190,3 +190,34 @@ object ScalaXmlNode {
 
   def wrapElement(elm: scala.xml.Elem): ScalaXmlElem = new ScalaXmlElem(elm)
 }
+
+object ScalaXmlElem {
+
+  def apply(wrappedNode: scala.xml.Elem): ScalaXmlElem = new ScalaXmlElem(wrappedNode)
+}
+
+object ScalaXmlText {
+
+  def apply(wrappedNode: scala.xml.Text): ScalaXmlText = new ScalaXmlText(wrappedNode)
+}
+
+object ScalaXmlAtom {
+
+  def apply(wrappedNode: scala.xml.Atom[_]): ScalaXmlAtom = new ScalaXmlAtom(wrappedNode)
+}
+
+object ScalaXmlProcessingInstruction {
+
+  def apply(wrappedNode: scala.xml.ProcInstr): ScalaXmlProcessingInstruction =
+    new ScalaXmlProcessingInstruction(wrappedNode)
+}
+
+object ScalaXmlEntityRef {
+
+  def apply(wrappedNode: scala.xml.EntityRef): ScalaXmlEntityRef = new ScalaXmlEntityRef(wrappedNode)
+}
+
+object ScalaXmlComment {
+
+  def apply(wrappedNode: scala.xml.Comment): ScalaXmlComment = new ScalaXmlComment(wrappedNode)
+}
