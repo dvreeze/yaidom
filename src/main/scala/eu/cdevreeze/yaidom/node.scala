@@ -345,11 +345,13 @@ final class Elem(
 
   /**
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
-   * prefixed namespace undeclarations, given the passed parent scope. Note that XML 1.0 does not allow prefix undeclarations.
+   * prefixed namespace undeclarations, given the passed "reference" scope containing the prefixes that must not be undeclared
+   * anywhere in the tree. Note that XML 1.0 does not allow prefix undeclarations, and this method helps avoid them.
    */
-  def notUndeclaringPrefixes(parentScope: Scope): Elem = {
-    val newScope = parentScope.notUndeclaringPrefixes(this.scope)
+  def notUndeclaringPrefixes(referenceScope: Scope): Elem = {
+    val newScope = referenceScope.notUndeclaringPrefixes(this.scope)
     assert(this.scope.subScopeOf(newScope))
+    assert(this.scope.defaultNamespaceOption == newScope.defaultNamespaceOption)
 
     // Recursive (non-tail-recursive) call
     val newChildren = children map {

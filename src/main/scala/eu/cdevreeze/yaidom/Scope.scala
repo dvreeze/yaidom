@@ -316,6 +316,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     val result = onlyDefault ++ withoutDefault
 
     assert(scope.subScopeOf(result))
+    assert(scope.defaultNamespaceOption == result.defaultNamespaceOption)
     result
   }
 
@@ -330,27 +331,6 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
     val prefixScopeString = (map - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
-  }
-
-  /**
-   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`. In other words, returns the minimal superscope `sc` of
-   * `scope` such that `this.relativize(sc)` contains no namespace undeclarations.
-   *
-   * Note that:
-   * {{{
-   * scope.subScopeOf(this.notUndeclaring(scope))
-   * }}}
-   * This does not necessarily mean that `scope.resolveQNameOption(qname) == this.notUndeclaring(scope).resolveQNameOption(qname)`.
-   * After all, for any unqualified name `qname`, if this scope has a default namespace but the passed scope does not, the LHS
-   * uses no namespace to resolve `qname`, whereas the RHS uses the default namespace.
-   */
-  def notUndeclaring(scope: Scope): Scope = {
-    val decls = this.relativize(scope)
-    val result = this.resolve(decls.withoutUndeclarations)
-
-    assert(scope.subScopeOf(result))
-    assert(this.relativize(result).retainingUndeclarations.isEmpty)
-    result
   }
 
   /**
@@ -379,6 +359,27 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    */
   def prefixOption(namespaceUri: String): Option[String] = {
     this.map collectFirst { case (pref, ns) if (pref != DefaultNsPrefix) && (ns == namespaceUri) => pref }
+  }
+
+  /**
+   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`. In other words, returns the minimal superscope `sc` of
+   * `scope` such that `this.relativize(sc)` contains no namespace undeclarations.
+   *
+   * Note that:
+   * {{{
+   * scope.subScopeOf(this.notUndeclaring(scope))
+   * }}}
+   * This does not necessarily mean that `scope.resolveQNameOption(qname) == this.notUndeclaring(scope).resolveQNameOption(qname)`.
+   * After all, for any unqualified name `qname`, if this scope has a default namespace but the passed scope does not, the LHS
+   * uses no namespace to resolve `qname`, whereas the RHS uses the default namespace.
+   */
+  private def notUndeclaring(scope: Scope): Scope = {
+    val decls = this.relativize(scope)
+    val result = this.resolve(decls.withoutUndeclarations)
+
+    assert(scope.subScopeOf(result))
+    assert(this.relativize(result).retainingUndeclarations.isEmpty)
+    result
   }
 }
 
