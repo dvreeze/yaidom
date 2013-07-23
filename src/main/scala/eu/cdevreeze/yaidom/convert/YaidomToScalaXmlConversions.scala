@@ -35,11 +35,14 @@ import eu.cdevreeze.yaidom
 trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
 
   /**
-   * Converts a yaidom node to a Scala XML node.
+   * Converts a yaidom node to a Scala XML node, given a parent Scala XML scope.
+   *
+   * The parent NamespaceBinding is passed as extra parameter, in order to try to prevent the creation of any unnecessary
+   * namespace declarations (which currently only works if an element has the same scope as its parent).
    */
-  final def convertNode(node: Node): scala.xml.Node = {
+  final def convertNode(node: Node, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.Node = {
     node match {
-      case e: Elem => convertElem(e)
+      case e: Elem => convertElem(e, parentNamespaceBinding)
       case t: Text => convertText(t)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi)
       case er: EntityRef => convertEntityRef(er)
@@ -48,18 +51,30 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
   }
 
   /**
-   * Converts a yaidom `Elem` to a Scala XML element. The result contains unnecessary duplicated namespace declarations!
+   * Converts a yaidom `Elem` to a Scala XML element.
    */
-  final def convertElem(elm: Elem): scala.xml.Elem = {
+  final def convertElem(elm: Elem): scala.xml.Elem =
+    convertElem(elm, scala.xml.TopScope)
+
+  /**
+   * Converts a yaidom `Elem` to a Scala XML element, given a parent Scala XML scope.
+   *
+   * The parent NamespaceBinding is passed as extra parameter, in order to try to prevent the creation of any unnecessary
+   * namespace declarations (which currently only works if an element has the same scope as its parent).
+   */
+  final def convertElem(elm: Elem, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.Elem = {
     // Not tail-recursive, but the recursion depth should be limited
 
     val prefix = elm.qname.prefixOption.orNull
     val label = elm.qname.localPart
 
     val attributes = convertAttributes(elm.attributes)
-    val nsBinding = convertScope(elm.scope)
 
-    val children: immutable.IndexedSeq[scala.xml.Node] = elm.children map { ch => convertNode(ch) }
+    val decls = toScope(parentNamespaceBinding).relativize(elm.scope)
+    val nsBinding =
+      if (decls.isEmpty) parentNamespaceBinding else convertScope(elm.scope)
+
+    val children: immutable.IndexedSeq[scala.xml.Node] = elm.children.map(ch => convertNode(ch, nsBinding))
 
     // Note that this constructor has been deprecated since Scala 2.10 (but it was the only constructor in older Scala versions)
     new scala.xml.Elem(prefix, label, attributes, nsBinding, children: _*)
@@ -131,6 +146,36 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
           scala.xml.NamespaceBinding(pref, nsUri, acc)
       }
       nsBinding
+    }
+  }
+
+  /**
+   * Converts the `scala.xml.NamespaceBinding` to a yaidom `Scope`.
+   *
+   * This implementation is brittle because of bug: SI 6939: Namespace binding (xmlns) is duplicated if a child redefines a prefix.
+   * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858). Still, this implementation
+   * tries to work around that bug.
+   *
+   * This method is the same as extractScope in ScalaXmlToYaidomConversions, but repeated here in order not to depend on that
+   * other trait.
+   */
+  private def toScope(scope: scala.xml.NamespaceBinding): Scope = {
+    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) Scope.Empty
+    else {
+      val prefix = if (scope.prefix eq null) "" else scope.prefix
+
+      // Recursive call (not tail-recursive), and working around the above-mentioned bug
+
+      val parentScope = toScope(scope.parent)
+
+      if (scope.uri.isEmpty) {
+        // Namespace undeclaration (which, looking at the NamespaceBinding API doc, seems not to exist)
+        // Works for the default namespace too (knowing that "edited" prefix is not null but can be empty)
+        parentScope -- Set(prefix)
+      } else {
+        // Works for namespace overrides too
+        parentScope ++ Scope.from(prefix -> scope.uri)
+      }
     }
   }
 }
