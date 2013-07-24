@@ -101,11 +101,11 @@ import scala.collection.immutable
  *
  * Methods `relativize` and `resolve` also obey the following equality:
  * {{{
- * scope.relativize(scope.resolve(declarations)) == scope.minimized(declarations)
+ * scope.relativize(scope.resolve(declarations)) == scope.minimize(declarations)
  * }}}
- * where `scope.minimized(declarations)` is defined by the following equality:
+ * where `scope.minimize(declarations)` is defined by the following equality:
  * {{{
- * scope.minimized(declarations) == {
+ * scope.minimize(declarations) == {
  *   val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
  *   val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(scope.map.keySet)
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
@@ -147,7 +147,7 @@ import scala.collection.immutable
  * }}}
  * so, as a result:
  * {{{
- * scope.relativize(scope.resolve(declarations)) == scope.minimized(declarations)
+ * scope.relativize(scope.resolve(declarations)) == scope.minimize(declarations)
  * }}}
  *
  * This and the preceding (proven) property are analogous to corresponding properties in the `URI` class.
@@ -283,7 +283,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /**
    * Returns the smallest sub-declarations `decl` of `declarations` such that `this.resolve(decl) == this.resolve(declarations)`
    */
-  def minimized(declarations: Declarations): Declarations = {
+  def minimize(declarations: Declarations): Declarations = {
     val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => this.map.getOrElse(pref, "") != ns }
     val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(this.map.keySet)
 
@@ -294,29 +294,32 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   }
 
   /**
-   * Returns `scope.retainingDefaultNamespace ++ this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)`.
+   * Returns the minimal superscope `sc` of this Scope such that `referenceScope.withoutDefaultNamespace.relativize(sc)`
+   * contains no namespace undeclarations. That is, returns `referenceScope.withoutDefaultNamespace ++ this`.
+   * In other words, returns `notUndeclaringNamespacesIn(referenceScope.withoutDefaultNamespace)`.
    *
-   * Note that for each QName `qname` for which `scope.resolveQNameOption(qname).isDefined`, we have:
+   * Note that the following properties hold, for the return value `result`:
    * {{{
-   * scope.resolveQNameOption(qname) == this.notUndeclaringPrefixes(scope).resolveQNameOption(qname)
+   * this.withoutDefaultNamespace.subScopeOf(result.withoutDefaultNamespace)
+   *
+   * this.defaultNamespaceOption == result.defaultNamespaceOption
    * }}}
-   * and that:
-   * {{{
-   * scope.subScopeOf(this.notUndeclaringPrefixes(scope))
-   * }}}
+   * Hence, each QName resolved by this Scope is resolved by the result Scope to exactly the same EName.
    *
    * This property is handy when adding child elements to a parent `Elem`. By invoking this method (recursively) for the descendant
-   * elements, against the parent `Scope`, we can create `Elem` trees without any unnecessary undeclarations
+   * elements, against the document element `Scope`, we can create `Elem` trees without any unnecessary undeclarations
    * (which are implicit, of course, because `Elem`s contain Scopes, not Declarations). There is indeed a corresponding method
    * in class `Elem`, which does just that.
    */
-  def notUndeclaringPrefixes(scope: Scope): Scope = {
-    val onlyDefault = scope.retainingDefaultNamespace
-    val withoutDefault = this.withoutDefaultNamespace.notUndeclaring(scope.withoutDefaultNamespace)
-    val result = onlyDefault ++ withoutDefault
+  def notUndeclaringPrefixedNamespacesIn(referenceScope: Scope): Scope = {
+    val result = notUndeclaringNamespacesIn(referenceScope.withoutDefaultNamespace)
 
-    assert(scope.subScopeOf(result))
-    assert(scope.defaultNamespaceOption == result.defaultNamespaceOption)
+    // Each QName resolved by this Scope has the same EName when resolved by the result Scope
+    assert(this.withoutDefaultNamespace.subScopeOf(result.withoutDefaultNamespace))
+    assert(this.defaultNamespaceOption == result.defaultNamespaceOption)
+
+    // There are no namespace undeclarations in referenceScope.withoutDefaultNamespace.relativize(result)
+    assert(referenceScope.withoutDefaultNamespace.relativize(result).retainingUndeclarations.isEmpty)
     result
   }
 
@@ -334,23 +337,14 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   }
 
   /**
-   * Returns `this.resolve(this.relativize(scope).withoutUndeclarations)`. In other words, returns the minimal superscope `sc` of
-   * `scope` such that `this.relativize(sc)` contains no namespace undeclarations.
-   *
-   * Note that:
-   * {{{
-   * scope.subScopeOf(this.notUndeclaring(scope))
-   * }}}
-   * This does not necessarily mean that `scope.resolveQNameOption(qname) == this.notUndeclaring(scope).resolveQNameOption(qname)`.
-   * After all, for any unqualified name `qname`, if this scope has a default namespace but the passed scope does not, the LHS
-   * uses no namespace to resolve `qname`, whereas the RHS uses the default namespace.
+   * Returns the minimal superscope `sc` of this Scope such that `referenceScope.relativize(sc)` contains no
+   * namespace undeclarations. That is, returns `referenceScope ++ this`.
    */
-  def notUndeclaring(scope: Scope): Scope = {
-    val decls = this.relativize(scope)
-    val result = this.resolve(decls.withoutUndeclarations)
+  def notUndeclaringNamespacesIn(referenceScope: Scope): Scope = {
+    val result = referenceScope ++ this
 
-    assert(scope.subScopeOf(result))
-    assert(this.relativize(result).retainingUndeclarations.isEmpty)
+    assert(this.subScopeOf(result))
+    assert(referenceScope.relativize(result).retainingUndeclarations.isEmpty)
     result
   }
 
