@@ -3,6 +3,28 @@ CHANGELOG
 =========
 
 
+0.6.12
+======
+
+This version improves on the last "functional update/transformation" support, by restoring bulk updates (this time with a
+less inefficient implementation) and removing the transformation methods that need "context".
+
+* Added ``UpdatableElemApi`` bulk update methods ``updatedAtPathEntries`` and ``updatedAtPaths``
+
+  * Added ``updatedWithNodeSeqAtPathEntries`` and ``updatedWithNodeSeqAtPaths`` as well
+  * Also added update methods for Documents
+
+* Breaking API change: ``TransformableElemApi`` (overloaded) methods taking "context" have been removed
+* Breaking API change: removed (unnecessary) ``Scope`` methods ``notUndeclaring`` and ``notUndeclaringPrefixes``
+* Breaking API change: renamed ``Scope`` method ``minimized`` to ``minimize``
+* Breaking API change: ``YaidomToScalaXmlConversions`` methods ``convertNode`` and (overloaded) ``convertElem`` take extra NamespaceBinding parameter
+* Added collections methods ``filter``, ``filterKeys`` and ``keySet`` to ``Scope`` (for convenience)
+* Added ``Elem`` methods for getting QName-valued attribute values or text values as QNames or ENames (for convenience)
+* Clarified broken abstractions such as ``ElemApi`` when using Scala XML as backend
+* Bug fix: ``YaidomToScalaXmlConversions`` method ``convertElem`` tries to prevent duplicate namespace declarations
+* Added ``apply`` factory methods to Scala XML wrapper nodes and DOM wrapper nodes (for convenience)
+
+
 0.6.11
 ======
 

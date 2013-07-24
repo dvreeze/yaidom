@@ -201,6 +201,11 @@ object ScalaXmlText {
   def apply(wrappedNode: scala.xml.Text): ScalaXmlText = new ScalaXmlText(wrappedNode)
 }
 
+object ScalaXmlCData {
+
+  def apply(wrappedNode: scala.xml.PCData): ScalaXmlCData = new ScalaXmlCData(wrappedNode)
+}
+
 object ScalaXmlAtom {
 
   def apply(wrappedNode: scala.xml.Atom[_]): ScalaXmlAtom = new ScalaXmlAtom(wrappedNode)
