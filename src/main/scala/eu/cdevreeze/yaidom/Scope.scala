@@ -293,36 +293,6 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     result
   }
 
-  /**
-   * Returns the minimal superscope `sc` of this Scope such that `referenceScope.withoutDefaultNamespace.relativize(sc)`
-   * contains no namespace undeclarations. That is, returns `referenceScope.withoutDefaultNamespace ++ this`.
-   * In other words, returns `notUndeclaringNamespacesIn(referenceScope.withoutDefaultNamespace)`.
-   *
-   * Note that the following properties hold, for the return value `result`:
-   * {{{
-   * this.withoutDefaultNamespace.subScopeOf(result.withoutDefaultNamespace)
-   *
-   * this.defaultNamespaceOption == result.defaultNamespaceOption
-   * }}}
-   * Hence, each QName resolved by this Scope is resolved by the result Scope to exactly the same EName.
-   *
-   * This property is handy when adding child elements to a parent `Elem`. By invoking this method (recursively) for the descendant
-   * elements, against the document element `Scope`, we can create `Elem` trees without any unnecessary undeclarations
-   * (which are implicit, of course, because `Elem`s contain Scopes, not Declarations). There is indeed a corresponding method
-   * in class `Elem`, which does just that.
-   */
-  def notUndeclaringPrefixedNamespacesIn(referenceScope: Scope): Scope = {
-    val result = notUndeclaringNamespacesIn(referenceScope.withoutDefaultNamespace)
-
-    // Each QName resolved by this Scope has the same EName when resolved by the result Scope
-    assert(this.withoutDefaultNamespace.subScopeOf(result.withoutDefaultNamespace))
-    assert(this.defaultNamespaceOption == result.defaultNamespaceOption)
-
-    // There are no namespace undeclarations in referenceScope.withoutDefaultNamespace.relativize(result)
-    assert(referenceScope.withoutDefaultNamespace.relativize(result).retainingUndeclarations.isEmpty)
-    result
-  }
-
   /** Returns `Scope(this.map ++ scope.map)` */
   def ++(scope: Scope): Scope = Scope(this.map ++ scope.map)
 
@@ -334,18 +304,6 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
     val prefixScopeString = (map - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
-  }
-
-  /**
-   * Returns the minimal superscope `sc` of this Scope such that `referenceScope.relativize(sc)` contains no
-   * namespace undeclarations. That is, returns `referenceScope ++ this`.
-   */
-  def notUndeclaringNamespacesIn(referenceScope: Scope): Scope = {
-    val result = referenceScope ++ this
-
-    assert(this.subScopeOf(result))
-    assert(referenceScope.relativize(result).retainingUndeclarations.isEmpty)
-    result
   }
 
   /**

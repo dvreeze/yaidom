@@ -112,7 +112,7 @@ sealed trait Node extends Immutable with Serializable {
  *
  * Use the constructor with care, because it is easy to use incorrectly (regarding passed Scopes, causing implicit namespace
  * undeclarations). To construct `Elem`s by hand, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
- * If `Elem`s are still constructed manually (without using `ElemBuilder`s), consider calling method `notUndeclaringPrefixedNamespacesIn`
+ * If `Elem`s are still constructed manually (without using `ElemBuilder`s), consider calling method `notUndeclaringPrefixes`
  * afterwards, thus getting rid of unnecessary (implicit) namespace undeclarations. Typically, however, `Elem`s are constructed
  * by parsing an XML source.
  *
@@ -349,7 +349,7 @@ final class Elem(
    * anywhere in the tree. Note that XML 1.0 does not allow prefix undeclarations, and this method helps avoid them.
    */
   def notUndeclaringPrefixes(referenceScope: Scope): Elem = {
-    val newScope = this.scope.notUndeclaringPrefixedNamespacesIn(referenceScope)
+    val newScope = referenceScope.withoutDefaultNamespace ++ this.scope
     assert(this.scope.subScopeOf(newScope))
     assert(this.scope.defaultNamespaceOption == newScope.defaultNamespaceOption)
 
