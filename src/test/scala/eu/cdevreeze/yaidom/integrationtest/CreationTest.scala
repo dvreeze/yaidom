@@ -263,6 +263,71 @@ class CreationTest extends Suite {
     }
   }
 
+  @Test def testNotUndeclaringPrefixesAgain() {
+    val docParser = DocumentParserUsingDom.newInstance()
+
+    val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
+
+    val doc1: Document = docParser.parse(is)
+    val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
+
+    // First call notUndeclaringPrefixes with an empty Scope
+
+    val parentScope2 = Scope.Empty
+    val rootElem2 = doc1.documentElement.notUndeclaringPrefixes(parentScope2)
+
+    expectResult(resolvedRootElm1) {
+      resolved.Elem(rootElem2)
+    }
+
+    expectResult(Set(Declarations.Empty)) {
+      NodeBuilder.fromElem(rootElem2)(parentScope2).findAllElemsOrSelf.
+        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
+    }
+
+    // Now call notUndeclaringPrefixes with Scope.from("books" -> "http://bookstore", "names" -> "http://xyz")
+
+    val parentScope3 = Scope.from("books" -> "http://bookstore", "names" -> "http://xyz")
+    val rootElem3 = doc1.documentElement.notUndeclaringPrefixes(parentScope3)
+
+    expectResult(resolvedRootElm1) {
+      resolved.Elem(rootElem3)
+    }
+
+    expectResult(Set(Declarations.Empty)) {
+      NodeBuilder.fromElem(rootElem3)(parentScope3).findAllElemsOrSelf.
+        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
+    }
+
+    // Next call notUndeclaringPrefixes with Scope.from("abcde" -> "http://abcde")
+
+    val parentScope4 = Scope.from("abcde" -> "http://abcde")
+    val rootElem4 = doc1.documentElement.notUndeclaringPrefixes(parentScope4)
+
+    expectResult(resolvedRootElm1) {
+      resolved.Elem(rootElem4)
+    }
+
+    expectResult(Set(Declarations.Empty)) {
+      NodeBuilder.fromElem(rootElem4)(parentScope4).findAllElemsOrSelf.
+        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
+    }
+
+    // Finally call notUndeclaringPrefixes with Scope.from("books" -> "http://bookstore", "names" -> "http://xyz", "abcde" -> "http://abcde")
+
+    val parentScope5 = Scope.from("books" -> "http://bookstore", "names" -> "http://xyz", "abcde" -> "http://abcde")
+    val rootElem5 = doc1.documentElement.notUndeclaringPrefixes(parentScope5)
+
+    expectResult(resolvedRootElm1) {
+      resolved.Elem(rootElem5)
+    }
+
+    expectResult(Set(Declarations.Empty)) {
+      NodeBuilder.fromElem(rootElem5)(parentScope5).findAllElemsOrSelf.
+        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
+    }
+  }
+
   @Test def testInsertionWhileReusingPrefixes() {
     val booksElmBuilder: ElemBuilder =
       elem(

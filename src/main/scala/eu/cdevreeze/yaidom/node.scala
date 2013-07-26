@@ -347,20 +347,34 @@ final class Elem(
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
    * prefixed namespace undeclarations, given the passed parent Scope.
    *
-   * Note that XML 1.0 does not allow prefix undeclarations, and this method helps avoid them.
+   * This method could be defined by recursion as follows:
+   * {{{
+   * val newScope = parentScope.withoutDefaultNamespace ++ this.scope
+   * this.copy(scope = newScope) transformChildElems { e => e.notUndeclaringPrefixes(newScope) }
+   * }}}
+   *
+   * It can be proven by structural induction that for each `parentScope` the XML remains the "same":
+   * {{{
+   * resolved.Elem(this.notUndeclaringPrefixes(parentScope)) == resolved.Elem(this)
+   * }}}
+   * Moreover, there are no prefixed namespace undeclarations:
+   * {{{
+   * NodeBuilder.fromElem(this)(parentScope).findAllElemsOrSelf.
+   *   map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet ==
+   *     Set(Declarations.Empty)
+   * }}}
+   *
+   * Note that XML 1.0 does not allow prefix undeclarations, and this method helps avoid them, while preserving the "same" XML.
+   * So, when manipulating an Elem tree, calling `notUndeclaringPrefixes(Scope.Empty)` on the document element results in
+   * an equivalent Elem that has no prefixed namespace undeclarations anywhere in the tree.
    */
   def notUndeclaringPrefixes(parentScope: Scope): Elem = {
     val newScope = parentScope.withoutDefaultNamespace ++ this.scope
     assert(this.scope.subScopeOf(newScope))
     assert(this.scope.defaultNamespaceOption == newScope.defaultNamespaceOption)
 
-    // Recursive (non-tail-recursive) call
-    val newChildren = children map {
-      case e: Elem => e.notUndeclaringPrefixes(newScope)
-      case n => n
-    }
-
-    Elem(this.qname, this.attributes, newScope, newChildren)
+    // Recursive (non-tail-recursive) calls
+    this.copy(scope = newScope) transformChildElems { e => e.notUndeclaringPrefixes(newScope) }
   }
 
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
