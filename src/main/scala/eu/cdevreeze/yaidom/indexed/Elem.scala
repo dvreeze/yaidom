@@ -121,7 +121,7 @@ final class Elem private[indexed] (
     childElemPathEntries map { entry => new Elem(rootElem, elemPath.append(entry)) }
   }
 
-  override def resolvedName: EName = elem.resolvedName
+  override def resolvedName: EName = elemPath.elementNameOption.getOrElse(rootElem.resolvedName)
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
 

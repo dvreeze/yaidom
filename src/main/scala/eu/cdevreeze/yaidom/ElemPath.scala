@@ -51,6 +51,9 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   /** Returns true if this is the root `ElemPath`, so if it has no entries */
   def isRoot: Boolean = entries.isEmpty
 
+  /** Returns the element name (as EName) of the last path entry, if any, wrapped in an Option */
+  def elementNameOption: Option[EName] = lastEntryOption.map(_.elementName)
+
   /** Prepends a given `Entry` to this `ElemPath` */
   def prepend(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
 
