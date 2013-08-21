@@ -34,7 +34,7 @@ final class DocBuilder(
   val uriOption: Option[URI],
   val documentElement: ElemBuilder,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
-  val comments: immutable.IndexedSeq[CommentBuilder]) extends Immutable with Serializable { self =>
+  val comments: immutable.IndexedSeq[CommentBuilder]) extends DocumentApi[ElemBuilder] with Immutable with Serializable { self =>
 
   require(uriOption ne null)
   require(documentElement ne null)

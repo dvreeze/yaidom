@@ -33,7 +33,7 @@ final class Document(
   val uriOption: Option[URI],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  val comments: immutable.IndexedSeq[Comment]) extends Immutable {
+  val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable {
 
   require(uriOption ne null)
   require(documentElement ne null)
