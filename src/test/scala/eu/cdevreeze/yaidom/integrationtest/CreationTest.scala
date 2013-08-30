@@ -351,7 +351,7 @@ class CreationTest extends Suite {
 
     val booksElm: Elem = booksElmBuilder.build(Scope.Empty)
 
-    val prefixBooks = booksElm.scope.prefixOption("http://bookstore").getOrElse("bks")
+    val prefixBooks = booksElm.scope.prefixesForNamespace("http://bookstore").headOption.getOrElse("bks")
 
     expectResult("books") {
       prefixBooks

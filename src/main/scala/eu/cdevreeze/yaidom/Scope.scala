@@ -324,14 +324,21 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   }
 
   /**
-   * Returns a prefix mapping to the given namespace URI, if any, wrapped in an `Option`. If multiple prefixes map to
-   * the given namespace URI, it is undetermined which of the prefixes is returned.
+   * Returns the prefixes for the given namespace URI. The result includes the empty string for the default namespace, if
+   * the default namespace is indeed equal to the passed namespace URI. The result does not include "xml" for the
+   * implicit "xml" namespace (with namespace URI http://www.w3.org/XML/1998/namespace).
+   *
+   * The result is equivalent to:
+   * {{{
+   * this.inverse.getOrElse(namespaceUri, Set())
+   * }}}
    *
    * This method can be handy when "inserting" an "element" into a parent tree, if one wants to reuse prefixes of the
    * parent tree.
    */
-  def prefixOption(namespaceUri: String): Option[String] = {
-    this.map collectFirst { case (pref, ns) if (pref != DefaultNsPrefix) && (ns == namespaceUri) => pref }
+  def prefixesForNamespace(namespaceUri: String): Set[String] = {
+    val prefixes = this.map.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
+    prefixes.toSet
   }
 }
 

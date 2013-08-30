@@ -330,19 +330,21 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPrefixOption() {
+  @Test def testPrefixesForNamespace() {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
 
-    expectResult(Some("a")) {
-      scope.prefixOption("http://a")
+    expectResult(Set("a", "")) {
+      scope.prefixesForNamespace("http://a")
     }
-    expectResult(None) {
-      scope.prefixOption("http://abc")
+    expectResult(Set()) {
+      scope.prefixesForNamespace("http://abc")
     }
-    expectResult(Some("c")) {
-      scope.prefixOption("http://c")
+    expectResult(Set("c")) {
+      scope.prefixesForNamespace("http://c")
     }
-    assert(Set[Option[String]](Some("d"), Some("dd")).contains(scope.prefixOption("http://d")))
+    expectResult(Set("d", "dd")) {
+      scope.prefixesForNamespace("http://d")
+    }
   }
 }
