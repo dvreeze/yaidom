@@ -781,7 +781,7 @@ object JDomWrapperTest {
     }
 
     /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
-    def attributeScope: Scope = Scope(scope.map - "")
+    def attributeScope: Scope = Scope(scope.prefixNamespaceMap - "")
 
     def declarations: Declarations = {
       val m: Map[String, String] = {

@@ -134,7 +134,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
 
     if (scope.isEmpty) scala.xml.TopScope
     else {
-      val scopeAsSeq = scope.map.toSeq map {
+      val scopeAsSeq = scope.prefixNamespaceMap.toSeq map {
         case (pref, uri) => (editedPrefix(pref) -> uri)
       }
       assert(!scopeAsSeq.isEmpty)
@@ -163,7 +163,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
       // No way to re-use the immutable parent NamespaceBinding, so converting the scope without using the parent NamespaceBinding
       convertScope(scope)
     } else {
-      val nsBinding = decls.map.foldLeft(parentNamespaceBinding) {
+      val nsBinding = decls.prefixNamespaceMap.foldLeft(parentNamespaceBinding) {
         case (acc, (pref, uri)) =>
           val editedPrefix = if ((pref ne null) && (pref.isEmpty)) null.asInstanceOf[String] else pref
 

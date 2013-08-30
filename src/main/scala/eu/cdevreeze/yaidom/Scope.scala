@@ -36,7 +36,7 @@ import scala.collection.immutable
  * Method `resolve` resolves a `Declarations` against this Scope, returning a new Scope. It could be defined by the following equality:
  * {{{
  * scope.resolve(declarations) == {
- *   val m = (scope.map ++ declarations.withoutUndeclarations.map) -- declarations.retainingUndeclarations.map.keySet
+ *   val m = (scope.prefixNamespaceMap ++ declarations.withoutUndeclarations.prefixNamespaceMap) -- declarations.retainingUndeclarations.prefixNamespaceMap.keySet
  *   Scope(m)
  * }
  * }}}
@@ -45,8 +45,8 @@ import scala.collection.immutable
  * Method `relativize` relativizes a Scope against this Scope, returning a `Declarations`. It could be defined by the following equality:
  * {{{
  * scope1.relativize(scope2) == {
- *   val declared = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
- *   val undeclared = scope1.map.keySet -- scope2.map.keySet
+ *   val declared = scope2.prefixNamespaceMap filter { case (pref, ns) => scope1.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = scope1.prefixNamespaceMap.keySet -- scope2.prefixNamespaceMap.keySet
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
@@ -61,36 +61,36 @@ import scala.collection.immutable
  *
  * This property can be proven easily. After all, for arbitrary Declarations `decl`, we have:
  * {{{
- * scope1.resolve(decl).map == { (scope1.map ++ decl.withoutUndeclarations.map) -- decl.retainingUndeclarations.map.keySet }
+ * scope1.resolve(decl).prefixNamespaceMap == { (scope1.prefixNamespaceMap ++ decl.withoutUndeclarations.prefixNamespaceMap) -- decl.retainingUndeclarations.prefixNamespaceMap.keySet }
  * }}}
  * Here, `decl` stands for `scope1.relativize(scope2)`, so:
  * {{{
- * scope1.resolve(decl).map == {
- *   val properDeclarations = scope1.relativize(scope2).withoutUndeclarations.map
- *   val undeclared = scope1.relativize(scope2).retainingUndeclarations.map.keySet
- *   (scope1.map ++ properDeclarations) -- undeclared
+ * scope1.resolve(decl).prefixNamespaceMap == {
+ *   val properDeclarations = scope1.relativize(scope2).withoutUndeclarations.prefixNamespaceMap
+ *   val undeclared = scope1.relativize(scope2).retainingUndeclarations.prefixNamespaceMap.keySet
+ *   (scope1.prefixNamespaceMap ++ properDeclarations) -- undeclared
  * }
  * }}}
  * so:
  * {{{
- * scope1.resolve(decl).map == {
- *   val properDeclarations = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
- *   val undeclared = scope1.map.keySet -- scope2.map.keySet
+ * scope1.resolve(decl).prefixNamespaceMap == {
+ *   val properDeclarations = scope2.prefixNamespaceMap filter { case (pref, ns) => scope1.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = scope1.prefixNamespaceMap.keySet -- scope2.prefixNamespaceMap.keySet
  *
- *   assert((scope1.map ++ properDeclarations).keySet == scope1.map.keySet.union(scope2.map.keySet))
- *   (scope1.map ++ properDeclarations) -- undeclared
+ *   assert((scope1.prefixNamespaceMap ++ properDeclarations).keySet == scope1.prefixNamespaceMap.keySet.union(scope2.prefixNamespaceMap.keySet))
+ *   (scope1.prefixNamespaceMap ++ properDeclarations) -- undeclared
  * }
  * }}}
  * so (visualising with Venn diagrams for prefix sets):
  * {{{
- * scope1.resolve(decl).map == {
- *   val properDeclarations = scope2.map filter { case (pref, ns) => scope1.map.getOrElse(pref, "") != ns }
- *   (scope1.map ++ properDeclarations) filterKeys (scope2.map.keySet)
+ * scope1.resolve(decl).prefixNamespaceMap == {
+ *   val properDeclarations = scope2.prefixNamespaceMap filter { case (pref, ns) => scope1.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   (scope1.prefixNamespaceMap ++ properDeclarations) filterKeys (scope2.prefixNamespaceMap.keySet)
  * }
  * }}}
- * The RHS clearly has as keys the keys of `scope2.map` and the mapped values (per key) are also those found in `scope2.map`. Hence,
+ * The RHS clearly has as keys the keys of `scope2.prefixNamespaceMap` and the mapped values (per key) are also those found in `scope2.prefixNamespaceMap`. Hence,
  * {{{
- * scope1.resolve(scope1.relativize(scope2)).map == scope2.map
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap == scope2.prefixNamespaceMap
  * }}}
  * so:
  * {{{
@@ -106,8 +106,8 @@ import scala.collection.immutable
  * where `scope.minimize(declarations)` is defined by the following equality:
  * {{{
  * scope.minimize(declarations) == {
- *   val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
- *   val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(scope.map.keySet)
+ *   val declared = declarations.withoutUndeclarations.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = declarations.retainingUndeclarations.prefixNamespaceMap.keySet.intersect(scope.prefixNamespaceMap.keySet)
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
@@ -115,33 +115,33 @@ import scala.collection.immutable
  * Below follows a proof of this property. For arbitrary Scope `sc`, we have:
  * {{{
  * scope.relativize(sc) == {
- *   val declared = sc.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
- *   val undeclared = scope.map.keySet -- sc.map.keySet
+ *   val declared = sc.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = scope.prefixNamespaceMap.keySet -- sc.prefixNamespaceMap.keySet
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
  * Here, `sc` stands for `scope.resolve(declarations)`, so:
  * {{{
  * scope.relativize(sc) == {
- *   val declared = scope.resolve(declarations).map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
- *   val undeclared = scope.map.keySet -- scope.resolve(declarations).map.keySet
+ *   val declared = scope.resolve(declarations).prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = scope.prefixNamespaceMap.keySet -- scope.resolve(declarations).prefixNamespaceMap.keySet
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
  * so:
  * {{{
  * scope.relativize(sc) == {
- *   val newScope = Scope((scope.map ++ declarations.withoutUndeclarations.map) -- declarations.retainingUndeclarations.map.keySet)
- *   val declared = newScope.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
- *   val undeclared = scope.map.keySet -- newScope.map.keySet
+ *   val newScope = Scope((scope.prefixNamespaceMap ++ declarations.withoutUndeclarations.prefixNamespaceMap) -- declarations.retainingUndeclarations.prefixNamespaceMap.keySet)
+ *   val declared = newScope.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = scope.prefixNamespaceMap.keySet -- newScope.prefixNamespaceMap.keySet
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
  * so:
  * {{{
  * scope.relativize(sc) == {
- *   val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => scope.map.getOrElse(pref, "") != ns }
- *   val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(scope.map.keySet)
+ *   val declared = declarations.withoutUndeclarations.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
+ *   val undeclared = declarations.retainingUndeclarations.prefixNamespaceMap.keySet.intersect(scope.prefixNamespaceMap.keySet)
  *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
  * }
  * }}}
@@ -154,38 +154,38 @@ import scala.collection.immutable
  *
  * @author Chris de Vreeze
  */
-final case class Scope(map: Map[String, String]) extends Immutable {
+final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutable {
   import Scope._
 
-  require(map ne null)
+  require(prefixNamespaceMap ne null)
   require {
-    map.keySet forall { pref => pref ne null }
+    prefixNamespaceMap.keySet forall { pref => pref ne null }
   }
   require {
-    map.values forall { ns => (ns ne null) && (ns != "") && (ns != "http://www.w3.org/2000/xmlns/") }
+    prefixNamespaceMap.values forall { ns => (ns ne null) && (ns != "") && (ns != "http://www.w3.org/2000/xmlns/") }
   }
   require {
-    (map - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
+    (prefixNamespaceMap - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
-  require(!map.keySet.contains("xml"), "A Scope must not contain the prefix 'xml'")
+  require(!prefixNamespaceMap.keySet.contains("xml"), "A Scope must not contain the prefix 'xml'")
   require(
-    map.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
+    prefixNamespaceMap.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
     "A Scope must not contain namespace URI 'http://www.w3.org/XML/1998/namespace'")
 
   /** Returns true if this Scope is empty. Faster than comparing this Scope against the empty Scope. */
-  def isEmpty: Boolean = map.isEmpty
+  def isEmpty: Boolean = prefixNamespaceMap.isEmpty
 
   /** Returns the default namespace, if any, wrapped in an Option */
-  def defaultNamespaceOption: Option[String] = map.get(DefaultNsPrefix)
+  def defaultNamespaceOption: Option[String] = prefixNamespaceMap.get(DefaultNsPrefix)
 
   /** Returns an adapted copy of this Scope, but retaining only the default namespace, if any */
   def retainingDefaultNamespace: Scope = {
-    val m = map filter { case (pref, ns) => pref == DefaultNsPrefix }
+    val m = prefixNamespaceMap filter { case (pref, ns) => pref == DefaultNsPrefix }
     if (m.isEmpty) Scope.Empty else Scope(m)
   }
 
   /** Returns an adapted copy of this Scope, but without the default namespace, if any */
-  def withoutDefaultNamespace: Scope = if (defaultNamespaceOption.isEmpty) this else Scope(map - DefaultNsPrefix)
+  def withoutDefaultNamespace: Scope = if (defaultNamespaceOption.isEmpty) this else Scope(prefixNamespaceMap - DefaultNsPrefix)
 
   /**
    * Returns true if the inverse exists, that is, each namespace URI has a unique prefix
@@ -197,12 +197,12 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Only if there is such a one-to-one correspondence, the indexes in `ElemPath`s and `ElemPathBuilder`s are stable, when converting
    * between the two.
    */
-  def isInvertible: Boolean = map.keySet.size == map.values.toSet.size
+  def isInvertible: Boolean = prefixNamespaceMap.keySet.size == prefixNamespaceMap.values.toSet.size
 
   /** Returns true if this is a subscope of the given parameter `Scope`. A `Scope` is considered subscope of itself. */
   def subScopeOf(scope: Scope): Boolean = {
-    val thisMap = map
-    val otherMap = scope.map
+    val thisMap = prefixNamespaceMap
+    val otherMap = scope.prefixNamespaceMap
 
     thisMap.keySet.subsetOf(otherMap.keySet) && {
       thisMap.keySet forall { pref => thisMap(pref) == otherMap(pref) }
@@ -212,14 +212,14 @@ final case class Scope(map: Map[String, String]) extends Immutable {
   /** Returns true if this is a superscope of the given parameter `Scope`. A `Scope` is considered superscope of itself. */
   def superScopeOf(scope: Scope): Boolean = scope.subScopeOf(this)
 
-  /** Returns `Scope.from(this.map.filter(p))`. */
-  def filter(p: ((String, String)) => Boolean): Scope = Scope.from(this.map.filter(p))
+  /** Returns `Scope.from(this.prefixNamespaceMap.filter(p))`. */
+  def filter(p: ((String, String)) => Boolean): Scope = Scope.from(this.prefixNamespaceMap.filter(p))
 
-  /** Returns `Scope.from(this.map.filterKeys(p))`. */
-  def filterKeys(p: String => Boolean): Scope = Scope.from(this.map.filterKeys(p))
+  /** Returns `Scope.from(this.prefixNamespaceMap.filterKeys(p))`. */
+  def filterKeys(p: String => Boolean): Scope = Scope.from(this.prefixNamespaceMap.filterKeys(p))
 
-  /** Returns `this.map.keySet`. */
-  def keySet: Set[String] = this.map.keySet
+  /** Returns `this.prefixNamespaceMap.keySet`. */
+  def keySet: Set[String] = this.prefixNamespaceMap.keySet
 
   /**
    * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
@@ -237,7 +237,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
     case prefixedName: PrefixedName =>
       // The prefix scope (as Map), with the implicit "xml" namespace added
-      val completePrefixScopeMap: Map[String, String] = (map - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
+      val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
       completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => EName(nsUri, prefixedName.localPart) }
   }
 
@@ -251,8 +251,8 @@ final case class Scope(map: Map[String, String]) extends Immutable {
       val declared: Declarations = declarations.withoutUndeclarations
       val undeclarations: Declarations = declarations.retainingUndeclarations
 
-      assert(declared.map.keySet.intersect(undeclarations.map.keySet).isEmpty)
-      val m = (map ++ declared.map) -- undeclarations.map.keySet
+      assert(declared.prefixNamespaceMap.keySet.intersect(undeclarations.prefixNamespaceMap.keySet).isEmpty)
+      val m = (prefixNamespaceMap ++ declared.prefixNamespaceMap) -- undeclarations.prefixNamespaceMap.keySet
       Scope(m)
     }
   }
@@ -264,13 +264,13 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    */
   def relativize(scope: Scope): Declarations = {
     if (Scope.this == scope) Declarations.Empty else {
-      val newlyDeclared: Map[String, String] = scope.map filter {
+      val newlyDeclared: Map[String, String] = scope.prefixNamespaceMap filter {
         case (pref, ns) =>
           assert(ns.length > 0)
-          Scope.this.map.getOrElse(pref, "") != ns
+          Scope.this.prefixNamespaceMap.getOrElse(pref, "") != ns
       }
 
-      val removed: Set[String] = Scope.this.map.keySet -- scope.map.keySet
+      val removed: Set[String] = Scope.this.prefixNamespaceMap.keySet -- scope.prefixNamespaceMap.keySet
       val undeclarations: Map[String, String] = (removed map (pref => (pref -> ""))).toMap
 
       assert(newlyDeclared.keySet.intersect(removed).isEmpty)
@@ -284,8 +284,8 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * Returns the smallest sub-declarations `decl` of `declarations` such that `this.resolve(decl) == this.resolve(declarations)`
    */
   def minimize(declarations: Declarations): Declarations = {
-    val declared = declarations.withoutUndeclarations.map filter { case (pref, ns) => this.map.getOrElse(pref, "") != ns }
-    val undeclared = declarations.retainingUndeclarations.map.keySet.intersect(this.map.keySet)
+    val declared = declarations.withoutUndeclarations.prefixNamespaceMap filter { case (pref, ns) => this.prefixNamespaceMap.getOrElse(pref, "") != ns }
+    val undeclared = declarations.retainingUndeclarations.prefixNamespaceMap.keySet.intersect(this.prefixNamespaceMap.keySet)
 
     val result = Declarations(declared) ++ Declarations.undeclaring(undeclared)
 
@@ -293,16 +293,16 @@ final case class Scope(map: Map[String, String]) extends Immutable {
     result
   }
 
-  /** Returns `Scope(this.map ++ scope.map)` */
-  def ++(scope: Scope): Scope = Scope(this.map ++ scope.map)
+  /** Returns `Scope(this.prefixNamespaceMap ++ scope.prefixNamespaceMap)` */
+  def ++(scope: Scope): Scope = Scope(this.prefixNamespaceMap ++ scope.prefixNamespaceMap)
 
-  /** Returns `Scope(this.map -- prefixes)` */
-  def --(prefixes: Set[String]): Scope = Scope(this.map -- prefixes)
+  /** Returns `Scope(this.prefixNamespaceMap -- prefixes)` */
+  def --(prefixes: Set[String]): Scope = Scope(this.prefixNamespaceMap -- prefixes)
 
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
-    val prefixScopeString = (map - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
+    val prefixScopeString = (prefixNamespaceMap - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")
   }
 
@@ -311,7 +311,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * the empty String if this Scope has a default namespace.
    */
   def inverse: Map[String, Set[String]] = {
-    val nsPrefixPairs = this.map.toSeq map { case (prefix, ns) => (ns, prefix) }
+    val nsPrefixPairs = this.prefixNamespaceMap.toSeq map { case (prefix, ns) => (ns, prefix) }
     val nsPrefixPairsGroupedByNs = nsPrefixPairs groupBy { case (ns, prefix) => ns }
 
     val result = nsPrefixPairsGroupedByNs mapValues { xs =>
@@ -337,7 +337,7 @@ final case class Scope(map: Map[String, String]) extends Immutable {
    * parent tree.
    */
   def prefixesForNamespace(namespaceUri: String): Set[String] = {
-    val prefixes = this.map.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
+    val prefixes = this.prefixNamespaceMap.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
     prefixes.toSet
   }
 }

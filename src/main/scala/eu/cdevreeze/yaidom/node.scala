@@ -485,13 +485,13 @@ final class Elem(
     val declarations: Declarations = parentScope.relativize(self.scope)
 
     val namespacesLineSeqOption: Option[LineSeq] = {
-      if (declarations.map.isEmpty) None else {
+      if (declarations.prefixNamespaceMap.isEmpty) None else {
         def namespaceEntryString(prefix: String, nsUri: String): String = {
           toStringLiteral(prefix) + " -> " + toStringLiteral(nsUri)
         }
 
         val namespaceEntryStrings = {
-          val result = declarations.map map { kv => namespaceEntryString(kv._1, kv._2) }
+          val result = declarations.prefixNamespaceMap map { kv => namespaceEntryString(kv._1, kv._2) }
           result.mkString(", ")
         }
 

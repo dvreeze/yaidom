@@ -43,10 +43,10 @@ class ScopeTest extends Suite {
       Scope.from("a" -> "")
     }
     expectResult(Map("" -> "http://a")) {
-      Scope.from("" -> "http://a").map
+      Scope.from("" -> "http://a").prefixNamespaceMap
     }
     expectResult(Map("" -> "http://a", "b" -> "http://b")) {
-      Scope.from("" -> "http://a", "b" -> "http://b").map
+      Scope.from("" -> "http://a", "b" -> "http://b").prefixNamespaceMap
     }
     expectResult(Some("http://a")) {
       Scope.from("" -> "http://a", "b" -> "http://b").defaultNamespaceOption
@@ -55,7 +55,7 @@ class ScopeTest extends Suite {
       Scope.from("b" -> "http://b").defaultNamespaceOption
     }
     expectResult(Map("b" -> "http://b")) {
-      Scope.from("b" -> "http://b").withoutDefaultNamespace.map
+      Scope.from("b" -> "http://b").withoutDefaultNamespace.prefixNamespaceMap
     }
   }
 
@@ -68,28 +68,28 @@ class ScopeTest extends Suite {
       Declarations.from(prefix -> "a")
     }
     expectResult(Map("" -> "http://a")) {
-      Declarations.from("" -> "http://a").map
+      Declarations.from("" -> "http://a").prefixNamespaceMap
     }
     expectResult(Map()) {
-      Declarations.from("" -> "http://a").withoutDefaultNamespace.map
+      Declarations.from("" -> "http://a").withoutDefaultNamespace.prefixNamespaceMap
     }
     expectResult(Map("a" -> "")) {
-      Declarations.from("a" -> "").map
+      Declarations.from("a" -> "").prefixNamespaceMap
     }
     expectResult(Map()) {
-      Declarations.from("a" -> "").withoutUndeclarations.map
+      Declarations.from("a" -> "").withoutUndeclarations.prefixNamespaceMap
     }
     expectResult(Map("" -> "http://a")) {
-      Declarations.from("" -> "http://a").map
+      Declarations.from("" -> "http://a").prefixNamespaceMap
     }
     expectResult(Map("" -> "http://a", "b" -> "http://b")) {
-      Declarations.from("" -> "http://a", "b" -> "http://b").map
+      Declarations.from("" -> "http://a", "b" -> "http://b").prefixNamespaceMap
     }
-    expectResult(Scope.from("" -> "http://a", "b" -> "http://b").map) {
-      Declarations.from("" -> "http://a", "b" -> "http://b").withoutUndeclarations.map
+    expectResult(Scope.from("" -> "http://a", "b" -> "http://b").prefixNamespaceMap) {
+      Declarations.from("" -> "http://a", "b" -> "http://b").withoutUndeclarations.prefixNamespaceMap
     }
     expectResult(Map("b" -> "http://b")) {
-      Declarations.from("b" -> "http://b").map
+      Declarations.from("b" -> "http://b").prefixNamespaceMap
     }
 
     val decls1 = Declarations.from("" -> "http://a", "b" -> "http://b", "c" -> "")
@@ -106,7 +106,7 @@ class ScopeTest extends Suite {
     val scope1 = Scope.Empty
 
     expectResult(0) {
-      scope1.map.size
+      scope1.prefixNamespaceMap.size
     }
 
     val declarations2 = Declarations.from("" -> "http://a", "a" -> "http://a", "x" -> "")
@@ -116,7 +116,7 @@ class ScopeTest extends Suite {
       scope2.defaultNamespaceOption
     }
     expectResult(Map("a" -> "http://a")) {
-      scope2.withoutDefaultNamespace.map
+      scope2.withoutDefaultNamespace.prefixNamespaceMap
     }
     expectResult(Declarations.from("" -> "http://a", "a" -> "http://a")) {
       scope1.relativize(scope2)
@@ -134,7 +134,7 @@ class ScopeTest extends Suite {
       scope2.resolve(Declarations.from("" -> "")).resolve(Declarations.from("a" -> ""))
     }
     expectResult(scope2) {
-      Scope.from(declarations2.withoutUndeclarations.map)
+      Scope.from(declarations2.withoutUndeclarations.prefixNamespaceMap)
     }
     expectResult(scope2) {
       scope1.resolve(scope1.relativize(scope2))
@@ -150,7 +150,7 @@ class ScopeTest extends Suite {
     val scope3 = scope2.resolve(declarations3)
 
     expectResult(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
-      scope3.map
+      scope3.prefixNamespaceMap
     }
     expectResult(scope2.minimize(declarations3)) {
       scope2.relativize(scope3)
@@ -165,7 +165,7 @@ class ScopeTest extends Suite {
       scope3.resolve(Declarations.from("b" -> "", "c" -> ""))
     }
     expectResult(scope3) {
-      Scope.from((scope2.map ++ declarations3.withoutUndeclarations.map) -- declarations3.retainingUndeclarations.map.keySet)
+      Scope.from((scope2.prefixNamespaceMap ++ declarations3.withoutUndeclarations.prefixNamespaceMap) -- declarations3.retainingUndeclarations.prefixNamespaceMap.keySet)
     }
     expectResult(scope3) {
       scope2.resolve(scope2.relativize(scope3))
@@ -181,10 +181,10 @@ class ScopeTest extends Suite {
     val scope4 = scope3.resolve(declarations4)
 
     expectResult(Map("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
-      scope4.map
+      scope4.prefixNamespaceMap
     }
     expectResult(Map("a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")) {
-      scope4.withoutDefaultNamespace.map
+      scope4.withoutDefaultNamespace.prefixNamespaceMap
     }
     expectResult(declarations4) {
       scope3.relativize(scope4)
@@ -208,7 +208,7 @@ class ScopeTest extends Suite {
       scope4
     }
     expectResult(scope4) {
-      Scope.from((scope3.map ++ declarations4.withoutUndeclarations.map) -- declarations4.retainingUndeclarations.map.keySet)
+      Scope.from((scope3.prefixNamespaceMap ++ declarations4.withoutUndeclarations.prefixNamespaceMap) -- declarations4.retainingUndeclarations.prefixNamespaceMap.keySet)
     }
     expectResult(scope4) {
       scope3.resolve(scope3.relativize(scope4))

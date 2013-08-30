@@ -32,69 +32,69 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-final case class Declarations(map: Map[String, String]) extends Immutable {
+final case class Declarations(prefixNamespaceMap: Map[String, String]) extends Immutable {
   import Declarations._
 
-  require(map ne null)
+  require(prefixNamespaceMap ne null)
   require {
-    map.keySet forall { pref => pref ne null }
+    prefixNamespaceMap.keySet forall { pref => pref ne null }
   }
   require {
-    map.values forall { ns => (ns ne null) && (ns != "http://www.w3.org/2000/xmlns/") }
+    prefixNamespaceMap.values forall { ns => (ns ne null) && (ns != "http://www.w3.org/2000/xmlns/") }
   }
   require {
-    (map - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
+    (prefixNamespaceMap - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
   }
-  require(!map.keySet.contains("xml"), "A Declarations must not contain the prefix 'xml'")
+  require(!prefixNamespaceMap.keySet.contains("xml"), "A Declarations must not contain the prefix 'xml'")
   require(
-    map.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
+    prefixNamespaceMap.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
     "A Declarations must not contain namespace URI 'http://www.w3.org/XML/1998/namespace'")
 
   /** Returns true if this Declarations is empty. Faster than comparing this Declarations against the empty Declarations. */
-  def isEmpty: Boolean = map.isEmpty
+  def isEmpty: Boolean = prefixNamespaceMap.isEmpty
 
   /** Returns an adapted copy of this Declarations, but retaining only the undeclarations, if any */
   def retainingUndeclarations: Declarations = {
-    val m = map filter { case (pref, ns) => ns == "" }
+    val m = prefixNamespaceMap filter { case (pref, ns) => ns == "" }
     if (m.isEmpty) Declarations.Empty else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but without any undeclarations, if any */
   def withoutUndeclarations: Declarations = {
-    val m = map filter { case (pref, ns) => ns != "" }
-    if (m.size == map.size) this else Declarations(m)
+    val m = prefixNamespaceMap filter { case (pref, ns) => ns != "" }
+    if (m.size == prefixNamespaceMap.size) this else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but retaining only the default namespace, if any */
   def retainingDefaultNamespace: Declarations = {
-    val m = map filter { case (pref, ns) => pref == DefaultNsPrefix }
+    val m = prefixNamespaceMap filter { case (pref, ns) => pref == DefaultNsPrefix }
     if (m.isEmpty) Declarations.Empty else Declarations(m)
   }
 
   /** Returns an adapted copy of this Declarations, but without the default namespace, if any */
   def withoutDefaultNamespace: Declarations = {
-    if (!map.contains(DefaultNsPrefix)) this else Declarations(map - DefaultNsPrefix)
+    if (!prefixNamespaceMap.contains(DefaultNsPrefix)) this else Declarations(prefixNamespaceMap - DefaultNsPrefix)
   }
 
-  /** Returns `Declarations(this.map ++ declarations.map)` */
-  def ++(declarations: Declarations): Declarations = Declarations(this.map ++ declarations.map)
+  /** Returns `Declarations(this.prefixNamespaceMap ++ declarations.prefixNamespaceMap)` */
+  def ++(declarations: Declarations): Declarations = Declarations(this.prefixNamespaceMap ++ declarations.prefixNamespaceMap)
 
-  /** Returns `Declarations(this.map -- prefixes)` */
-  def --(prefixes: Set[String]): Declarations = Declarations(this.map -- prefixes)
+  /** Returns `Declarations(this.prefixNamespaceMap -- prefixes)` */
+  def --(prefixes: Set[String]): Declarations = Declarations(this.prefixNamespaceMap -- prefixes)
 
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml
-    val defaultNamespaceUndeclared: Boolean = map.get(DefaultNsPrefix) == Some("")
+    val defaultNamespaceUndeclared: Boolean = prefixNamespaceMap.get(DefaultNsPrefix) == Some("")
     val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
-    val undeclaredPrefixes: Set[String] = ((map - DefaultNsPrefix) filter (kv => kv._2 == "")).keySet
+    val undeclaredPrefixes: Set[String] = ((prefixNamespaceMap - DefaultNsPrefix) filter (kv => kv._2 == "")).keySet
     val undeclaredPrefixesString = undeclaredPrefixes map { pref => """xmlns:%s=""""".format(pref) } mkString (" ")
 
     List(declaredString, defaultNsUndeclaredString, undeclaredPrefixesString) filterNot { _ == "" } mkString (" ")
   }
 
   private def properDeclarationsToStringInXml: String = {
-    val declaredMap = map filter { case (pref, ns) => ns.length > 0 }
+    val declaredMap = prefixNamespaceMap filter { case (pref, ns) => ns.length > 0 }
     val defaultNsString = if (!declaredMap.contains(DefaultNsPrefix)) "" else """xmlns="%s"""".format(declaredMap(DefaultNsPrefix))
     val prefixScopeString = (declaredMap - DefaultNsPrefix) map { case (pref, ns) => """xmlns:%s="%s"""".format(pref, ns) } mkString (" ")
     List(defaultNsString, prefixScopeString) filterNot { _ == "" } mkString (" ")

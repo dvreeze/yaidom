@@ -214,9 +214,9 @@ object ElemPath {
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
           val nsUri: String = elementName.namespaceUriOption.get
-          require((scope.map - "").values.toSet.contains(nsUri), "Expected at least one prefix for namespace URI '%s'".format(nsUri))
+          require((scope.prefixNamespaceMap - "").values.toSet.contains(nsUri), "Expected at least one prefix for namespace URI '%s'".format(nsUri))
 
-          val result = (scope.map - "").toList collectFirst {
+          val result = (scope.prefixNamespaceMap - "").toList collectFirst {
             case pair if pair._2 == nsUri =>
               val prefix: String = pair._1
               val ns: String = pair._2

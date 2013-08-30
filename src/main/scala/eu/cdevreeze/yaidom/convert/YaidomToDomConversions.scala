@@ -142,7 +142,7 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
 
     val namespaceDeclarations: Declarations = parentScope.relativize(elm.scope)
 
-    for ((prefix, ns) <- namespaceDeclarations.map) {
+    for ((prefix, ns) <- namespaceDeclarations.prefixNamespaceMap) {
       if (prefix == "") {
         element.setAttribute("xmlns", ns)
       } else {

@@ -182,7 +182,7 @@ final class ElemBuilder(
   def canBuild(parentScope: Scope): Boolean = {
     val newScope = parentScope.resolve(namespaces)
 
-    val undeclaredPrefixesForThisElem = prefixesInElemNameAndAttributes diff (newScope.withoutDefaultNamespace.map.keySet)
+    val undeclaredPrefixesForThisElem = prefixesInElemNameAndAttributes diff (newScope.withoutDefaultNamespace.prefixNamespaceMap.keySet)
 
     // Recursive calls (not tail-recursive)
     undeclaredPrefixesForThisElem.isEmpty && {
@@ -197,7 +197,7 @@ final class ElemBuilder(
   def nonDeclaredPrefixes(parentScope: Scope): Set[String] = {
     val newScope = parentScope.resolve(namespaces)
 
-    val undeclaredPrefixesForThisElem = prefixesInElemNameAndAttributes diff (newScope.withoutDefaultNamespace.map.keySet)
+    val undeclaredPrefixesForThisElem = prefixesInElemNameAndAttributes diff (newScope.withoutDefaultNamespace.prefixNamespaceMap.keySet)
 
     // Recursive calls (not tail-recursive)
     val result = children.foldLeft(undeclaredPrefixesForThisElem) { (acc, child) =>

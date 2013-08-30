@@ -305,7 +305,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       }
       val undeclaredMap: Map[String, String] =
         (undeclaredOptionalPrefixes map (prefOption => if (prefOption.isEmpty) "" -> "" else prefOption.get -> "")).toMap
-      Declarations.from(declaredScope.map ++ undeclaredMap)
+      Declarations.from(declaredScope.prefixNamespaceMap ++ undeclaredMap)
     }
     val currScope = parentScope.resolve(declarations)
 
