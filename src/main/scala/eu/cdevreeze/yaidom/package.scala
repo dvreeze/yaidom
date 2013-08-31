@@ -17,215 +17,384 @@
 package eu.cdevreeze
 
 /**
- * ==Introduction==
- *
- * Yet another immutable DOM-like API. Hence the name <em>yaidom</em>. This is not an implementation of W3C DOM.
- * Instead, this is a Scala-ish DOM-like API. Foremost, that means that this API is centered around
- * Scala Collections of immutable nodes.
- *
- * By design, some characteristics of this API are:
+ * <em>Yaidom</em> is yet another Scala immutable DOM-like XML API. The other well-known Scala immutable DOM-like APIs are
+ * the standard scala.xml API and Anti-XML. The latter API is considered an improvement over the former, but both APIs:
  * <ul>
- * <li>The DOM-like trees of this API are (deeply) <em>immutable</em> and therefore <em>thread-safe</em>.
- * This facilitates safe multi-threaded <em>querying</em> of these trees, at the cost of a relatively high memory footprint.</li>
- * <li>This API leverages the highly <em>expressive</em> <em>Scala Collections API</em>, on the inside and from the outside.
- * Querying yaidom trees is easy to achieve using Scala <code>for</code> comprehensions,
- * manipulating immutable Scala collections. It should often even be attractive to use this API instead of
- * XPath, XSLT and/or XQuery, at the cost of somewhat more verbosity, loss of (schema) typing information, and loss of a standard
- * XML query language. Much of the attraction of yaidom for querying lies in its simplicity. That is, understanding the Scala
- * Collections API (from the perspective of a user) is almost all that is needed for understanding querying in yaidom. In
- * comparison, XSLT is known to be a hard language to master.</li>
- * <li>Yaidom is also Scala-ish in the use of `Option`s over nulls. It is clear from method and variable
- * names where `Option`s are used. Also, methods whose names start with "find" tend to return `Option`s.</li>
- * <li>This API explicitly models and distinguishes between <em>qualified names</em> and <em>expanded names</em>. The same holds for
- * <em>namespace declarations</em> and <em>namespace scopes</em>. See for example http://www.w3.org/TR/xml-names11/.
- * The clear distinction between qualified names and expanded names helps in making yaidom queries easy to understand.
- * Yaidom queries indeed have simple and precise semantics. Moreover, the four concepts (QNames, ENames, declarations and scopes) obey
- * some obvious properties, that help in keeping yaidom small and simple, both in API and implementation.</li>
- * <li><em>Namespaces</em> are first-class citizens in yaidom. DTDs are not (but DTDs do not understand namespaces anyway).
- * See for example http://docstore.mik.ua/orelly/xml/xmlnut/ch04_04.htm.</li>
- * <li>This API has good interop with standard Java XML APIs, that is, <em>JAXP</em>. Printing and parsing XML (and details of "escaping")
- * are delegated to JAXP, without taking away any control over JAXP configuration. By configuring JAXP objects (for parsing or
- * printing XML), we keep some control over the XML string representations of serialized yaidom elements.</li>
+ * <li>attempt to offer XPath-like querying, blurring the distinction between nodes and node collections</li>
+ * <li>lack first-class support for namespaces (and namespace URIs)</li>
+ * <li>have limited (functional) update support</li>
  * </ul>
  *
- * The yaidom API is most suitable for processing <em>"data-oriented"</em> XML, roughly having the following properties:
- * <ul>
- * <li>Tags and text are not mixed.</li>
- * <li>Inter-element whitespace is typically "ignorable", and only used for formatting.</li>
- * <li>The structure of the XML is known, and typically described in an XSD.</li>
- * <li>Namespaces are heavily used.</li>
- * <li>DTDs are not used.</li>
- * <li>The exact string representation is not important, such as short or long form of empty elements, the order of attributes,
- * including namespace declarations, even the exact namespace prefixes used, etc. (Yaidom elements do keep the order of
- * non-namespace-declaration attributes.) A "DOM-centric" view of XML may well suffice for processing such XML.</li>
- * </ul>
- * That is not to say that yaidom can only be used for processing such "data-oriented" XML.
+ * Yaidom takes a different approach, avoiding XPath-like query support, and offering good namespace and (functional) update
+ * support. Yaidom also values <em>mathematical precision</em> and clarity. Still, the API remains practical and
+ * pragmatic. In particular, the user has much configuration control over parsing and serialization, because yaidom exposes
+ * the underlying JAXP parsers and serializers.
  *
- * Yaidom is not a very ambitious API:
- * <ul>
- * <li>The API has no XPath(-like) support, and does not unify nodes with sequences of nodes.
- * That makes code using yaidom more verbose than XPath(-like) code found in APIs like Scala's XML library or
- * Anti-XML. On the other hand, code using yaidom is very easy to reason about, and yaidom is also easy to implement.</li>
- * <li>Yaidom does not simplify printing/parsing of XML. The upside is that yaidom has a very good power-to-weight ratio.</li>
- * <li>Yaidom only knows about XML, not about HTML. On the other hand, TagSoup can be used as SAX Parser.</li>
- * <li>Yaidom does not know about XML Schema types (or DTD types), for example types of attributes.</li>
- * <li>APIs such as JAXP, JDOM and XOM are more feature-rich, for example in support for base URIs.</li>
- * <li>The API does not try to define equality for XML trees, because that's a very vague notion for XML. At least that is
- * the short story. See "resolved" [[eu.cdevreeze.yaidom.resolved.Elem]] for "bare bones" elements that do obey some notion of
- * equality.</li>
- * </ul>
+ * Yaidom chose its battles. For example, knowing that DTDs do not know about namespaces, yaidom chose for good namespace
+ * support, but ignores DTDs entirely. Of course the underlying XML parser may still validate XML against a DTD, if so desired.
+ * As another example, yaidom tries to leave the handling of gory details of XML processing (such as whitespace handling)
+ * as much as possible to JAXP. As yet another example, yaidom knows nothing about (XML Schema) types of elements and attributes.
  *
- * Yaidom has been inspired by Anti-XML. The Anti-XML library tackles some weaknesses of Scala's standard XML API, w.r.t.
- * robustness, ease of use and performance. Yaidom tries to achieve the same (in a different way), but yaidom is less ambitious,
- * foremost in not offering any XPath(-like) support.
- *
- * ==Different element types in yaidom==
- *
- * Yaidom considers XML to be trees of nodes, rather than text strings obeying "XML rules". Think InfoSet and DOM, rather than
- * the XML spec. By considering XML to be node trees, round-tripping (from XML string to DOM-like tree, and back) cannot be lossless.
- * Again, if lossless round-tripping is important (like is the case for XML editors), yaidom (like DOM) may not be a good fit.
- *
- * Yet yaidom has more than just one type of (DOM-like) element. First of all, yaidom distinguishes between:
- * <ul>
- * <li>A <em>uniform querying API</em> for DOM-like elements, as traits [[eu.cdevreeze.yaidom.ParentElemLike]] and sub-traits.
- * These <em>partially abstract</em> traits are mixed in by concrete element classes, but can also be mixed in by
- * different element classes not offered by yaidom. In other words, these traits make yaidom <em>extensible</em>,
- * as well as <em>uniform</em> (as querying API). These traits implement a <em>rich</em> querying API in terms of only a few
- * abstract methods.</li>
- * <li><em>Concrete</em> element classes, like [[eu.cdevreeze.yaidom.Elem]], mixing in these traits. By implementing only
- * a few abstract methods required by the mixed-in traits, these concrete element classes get a rich element querying API
- * almost for free.</li>
- * </ul>
- *
- * Concrete element classes in yaidom that mix in trait [[eu.cdevreeze.yaidom.ParentElemLike]] (or sub-traits) are:
- * <ul>
- * <li>The "default" yaidom element type: [[eu.cdevreeze.yaidom.Elem]]. These elements are immutable and thread-safe.
- * They do not know about their parents, and do not keep namespace declarations, but they do know about in-scope namespaces.</li>
- * <li>The element builder type: [[eu.cdevreeze.yaidom.ElemBuilder]]. These objects are also immutable and thread-safe, but are builders of the above-mentioned
- * elements. Whereas `Elem`s know about in-scope namespaces but not about (own) namespace declarations, `ElemBuilder`s know
- * about (own) namespace declarations but not about in-scope namespaces.</li>
- * <li>The "stripped" element type: [[eu.cdevreeze.yaidom.resolved.Elem]]. These elements do not know about namespace prefixes,
- * but hold ("resolved") namespace URIs instead, and are therefore easy to compare for some (sensible) notion of equality.</li>
- * <li>The "indexed" element type: [[eu.cdevreeze.yaidom.indexed.Elem]]. Unlike "standard" yaidom elements, these elements
- * are a "top-down notion" of elements, that know about their ancestry. Still, these elements are immutable. (They are "views"
- * on "standard" yaidom elements, each as a pair of a root element and an element path.)</li>
- * <li>The wrapper type around DOM nodes: [[eu.cdevreeze.yaidom.dom.DomElem]]. They are `ParentElemLike` "views" backed by
- * `org.w3c.dom.Element` elements. These views are mutable and "volatile", so far less safe to use than the immutable
- * elements mentioned above.</li>
- * </ul>
- *
- * Often these different element types can be used well together. For example:
- * <ul>
- * <li>The "default" element type is useful for querying XML trees (without having to worry about mutable state and thread-safety)</li>
- * <li>The "element builders" are useful for constructing (parts of) such element trees</li>
- * <li>The "resolved" elements may be handy for equality comparisons and pattern matching on (parts of) XML trees</li>
- * <li>The "indexed" elements are useful for processing XML where context is important, such as XML schemas</li>
- * <li>The "DOM wrappers" may be handy for in-place updates</li>
- * </ul>
- *
- * In the spirit of the "DOM node wrappers", one could easily come up with similar wrappers around JDOM, XOM, etc.,
- * mixing in trait [[eu.cdevreeze.yaidom.ParentElemLike]] (or subtraits). Yaidom does not offer these wrappers, but some
- * test cases show that such wrappers are easy to develop.
- *
- * ==Examples==
- *
- * Below follow some examples. The first example queries for all book elements having a price below 90. It can be written as follows,
- * assuming a book store `Document` with the appropriate structure:
- * {{{
- * val bookstoreElm = doc.documentElement
- * require(bookstoreElm.localName == "Bookstore")
- *
- * val bookElms =
- *   for {
- *     bookElm <- bookstoreElm \ (_.localName == "Book")
- *     price <- bookElm \@ EName("Price")
- *     if price.toInt < 90
- *   } yield bookElm
- * }}}
- *
- * The <em>for</em>-comprehension is equivalent to:
- * {{{
- * val bookElms =
- *   for {
- *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
- *     price <- bookElm.attributeOption(EName("Price"))
- *     if price.toInt < 90
- *   } yield bookElm
- * }}}
- *
- * All books having (at least) Jeffrey Ullman as author can be found as follows:
- * {{{
- * val ullmanBookElms =
- *   for {
- *     bookElm <- bookstoreElm filterChildElems { _.localName == "Book" }
- *     if (bookElm \\ (_.localName == "Author")) exists { e =>
- *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
- *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
- *     }
- *   } yield bookElm
- * }}}
- *
- * An alternative way to write the same query, but using [[eu.cdevreeze.yaidom.ElemPath]] instances instead, is as follows:
- * {{{
- * val ullmanBookElms =
- *   for {
- *     authorPath <- bookstoreElm filterElemPaths { e =>
- *       (e.localName == "Author") &&
- *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
- *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
- *     }
- *     bookPath <- authorPath findAncestorPath { _.endsWithName(EName("Book")) }
- *   } yield bookstoreElm.getWithElemPath(bookPath)
- * }}}
- * This is conceptually similar to navigating in XPath to the grandparent nodes of the matching Author elements.
- *
- * Alternatively, using [[eu.cdevreeze.yaidom.indexed.Elem]] instances, we could write:
- * {{{
- * val ullmanBookElms =
- *   for {
- *     authorElm <- indexed.Elem(bookstoreElm) filterElems { e =>
- *       (e.localName == "Author") &&
- *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
- *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
- *     }
- *     bookElm <- authorElm findAncestor { _.resolvedName == EName("Book") }
- *   } yield bookElm
- * }}}
- *
- * ==What's in the API, and what are the dependencies?==
- *
- * This package contains the following parts, in order of dependencies (starting with the class without any dependencies):
+ * Yaidom, and in particular this package, contains the following layers:
  * <ol>
- * <li>Basic concepts such as [[eu.cdevreeze.yaidom.QName]], [[eu.cdevreeze.yaidom.EName]], [[eu.cdevreeze.yaidom.Declarations]] and
- * [[eu.cdevreeze.yaidom.Scope]]. At the same level is class [[eu.cdevreeze.yaidom.ElemPath]].</li>
- * <li>Trait [[eu.cdevreeze.yaidom.ParentElemLike]], which offers the core yaidom querying API. It is extended by trait
- * [[eu.cdevreeze.yaidom.ElemLike]], which is extended by trait [[eu.cdevreeze.yaidom.PathAwareElemLike]], which in turn is extended
- * by trait [[eu.cdevreeze.yaidom.UpdatableElemLike]]. At the same level is trait [[eu.cdevreeze.yaidom.HasText]]. All these APIs
- * turn small abstract APIs into rich APIs with implementations, and are mixed in by "element" classes.</li>
- * <li>The "node tree type hierarchy", as sealed trait [[eu.cdevreeze.yaidom.Node]] and its subtypes, such as
- * [[eu.cdevreeze.yaidom.Elem]] (which indeed mixes in the above-mentioned traits `UpdatableElemLike` and `HasText`).</li>
- * <li>Class [[eu.cdevreeze.yaidom.Document]] (a Document is not considered a Node itself by yaidom).</li>
- * <li>Trait [[eu.cdevreeze.yaidom.NodeBuilder]] and its subtypes, such as [[eu.cdevreeze.yaidom.ElemBuilder]].
- * Node builders can be used in a DSL-like fashion, for creation of Elems. Node builders postpone the choice of `Scope`s
- * (whereas the `Node`s that they create all must have a fixed `Scope`), so node builders are indeed intended to be handy for creation
- * of node trees. At the same level are [[eu.cdevreeze.yaidom.ConverterToElem]], [[eu.cdevreeze.yaidom.ElemConverter]], etc.</li>
- * <li>Class [[eu.cdevreeze.yaidom.DocBuilder]] (a DocBuilder is not considered a NodeBuilder itself by yaidom).</li>
+ * <li><em>basic concepts</em>, such as (qualified and expanded) names of elements and attributes</li>
+ * <li>the <em>uniform query API traits</em>, to query elements for descendant elements</li>
+ * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits</li>
  * </ol>
- * Dependencies are all uni-directional. All types in this package are (deeply) immutable.
- * That holds even for the [[eu.cdevreeze.yaidom.NodeBuilder]] instances.
  *
- * Parsing and printing of XML are not handled in this package. Even the `toString` methods for nodes
- * use the `NodeBuilder` DSL syntax rather than XML string syntax. Hence the complex details of character escaping,
- * "ignorable whitespace" etc. are not handled in this package. Parsing and printing of XML are offered by the
- * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] subpackages, which depend on the [[eu.cdevreeze.yaidom.convert]] subpackage.
- * Those subpackages depend on this package, and not the other way around. Put differently, they are in this namespace.
+ * It makes sense to read this documentation, because it helps in getting up-to-speed with yaidom.
  *
- * Yaidom also offers packages [[eu.cdevreeze.yaidom.resolved]], [[eu.cdevreeze.yaidom.indexed]] and [[eu.cdevreeze.yaidom.xlink]].
- * The `resolved` package offers "bare bones" elements, stripped down to "essentials" (replacing prefixes by namespace URIs,
- * removing comments, etc.), such that those elements can be compared for some notion of equality. The `indexed` package offers
- * immutable elements knowing their ancestry. The `xlink` package offers some basic XLink support.
+ * ==Basic concepts==
  *
- * There is also a package [[eu.cdevreeze.yaidom.dom]] for `ElemLike` wrappers around (mutable!) DOM elements.
+ * In real world XML, elements (and sometimes attributes) tend to have names within a certain namespace. There are 2 kinds of names
+ * at play here:
+ * <ul>
+ * <li><em>qualified names</em>, such as `fo:block`</li>
+ * <li><em>expanded names</em>, such as `{http://www.w3.org/1999/XSL/Format}block` (in James Clark notation)</li>
+ * </ul>
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.EName]], respectively.
+ *
+ * Qualified names occur in XML, whereas expanded names do not. Yet qualified names have no meaning on their own. They need
+ * to be resolved to expanded names, via the in-scope namespaces. Note that the term "qualified name" is often used for what
+ * yaidom (and the Namespaces specification) calls "expanded name", and that most XML APIs do not distinguish between the
+ * 2 kinds of names. Yaidom has to clearly make this distinction, in order to model namespaces correctly.
+ *
+ * To resolve qualified names to expanded names, yaidom distinguishes between:
+ * <ul>
+ * <li><em>namespace declarations</em></li>
+ * <li><em>in-scope namespaces</em></li>
+ * </ul>
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.Declarations]] and [[eu.cdevreeze.yaidom.Scope]], respectively.
+ *
+ * Namespace declarations occur in XML, whereas in-scope namespaces do not. The latter are the accumulated effect of the
+ * namespace declarations of the element itself, if any, and those in ancestor elements.
+ *
+ * To see the resolution of qualified names in action, consider the following sample XML (from http://xmlgraphics.apache.org/fop/quickstartguide.html):
+ *
+ * {{{
+ * <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+ *   <xsl:output method="xml" indent="yes"/>
+ *   <xsl:template match="/">
+ *     <fo:root>
+ *       <fo:layout-master-set>
+ *         <fo:simple-page-master master-name="A4-portrait" page-height="29.7cm" page-width="21.0cm" margin="2cm">
+ *           <fo:region-body/>
+ *         </fo:simple-page-master>
+ *       </fo:layout-master-set>
+ *       <fo:page-sequence master-reference="A4-portrait">
+ *         <fo:flow flow-name="xsl-region-body">
+ *           <fo:block>
+ *             Hello, <xsl:value-of select="name"/>!
+ *           </fo:block>
+ *         </fo:flow>
+ *       </fo:page-sequence>
+ *     </fo:root>
+ *   </xsl:template>
+ * </xsl:stylesheet>
+ * }}}
+ *
+ * Consider the element with qualified name `QName("fo:block")`. To resolve this qualified name as expanded name, we need to
+ * know the namespaces in scope at that element. To compute the in-scope namespaces, we need to accumulate the namespace
+ * declarations of the fo:block element and of its ancestor elements, from the outside in.
+ *
+ * That is, we start with `Scope.Empty`. Then, in the root element we find namespace declarations:
+ * {{{
+ * Declarations.from("fo" -> "http://www.w3.org/1999/XSL/Format", "xsl" -> "http://www.w3.org/1999/XSL/Transform")
+ * }}}
+ * This leads to the following namespaces in scope at the root element:
+ * {{{
+ * Scope.Empty.resolve(Declarations.from("fo" -> "http://www.w3.org/1999/XSL/Format", "xsl" -> "http://www.w3.org/1999/XSL/Transform"))
+ * }}}
+ * which is equal to:
+ * {{{
+ * Scope.from("fo" -> "http://www.w3.org/1999/XSL/Format", "xsl" -> "http://www.w3.org/1999/XSL/Transform")
+ * }}}
+ * We find no other namespace declarations in the ancestry of the block element, so the computed scope is also the scope
+ * of the block element.
+ *
+ * Then `QName("fo:block")` is resolved as follows:
+ * {{{
+ * Scope.from("fo" -> "http://www.w3.org/1999/XSL/Format", "xsl" -> "http://www.w3.org/1999/XSL/Transform").resolveQNameOption(QName("fo:block"))
+ * }}}
+ * which is equal to:
+ * {{{
+ * Some(EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * }}}
+ *
+ * This namespace support in yaidom has mathematical rigor. The immutable classes `QName`, `EName`, `Declarations` and `Scope` have
+ * precise definitions, reflected in their implementations, and obey some interesting properties. For example, if we define Scope
+ * operation `relativize` (along with `resolve`), we get:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)) == scope2
+ * }}}
+ *
+ * This may not sound like much, but by getting the basics right, yaidom succeeds in offering first-class support for XML
+ * namespaces, without the magic and namespace-related bugs often found in other XML libraries.
+ *
+ * There are 2 other basic concepts in this package, representing paths to elements:
+ * <ul>
+ * <li><em>element path builders</em></li>
+ * <li><em>element paths</em></li>
+ * </ul>
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.ElemPathBuilder]] and [[eu.cdevreeze.yaidom.ElemPath]], respectively.
+ *
+ * Element path builders are like canonical XPath expressions, yet they do not contain the root element itself, and indexing
+ * starts with 0 instead of 1.
+ *
+ * For example, the block element mentioned above has element path:
+ * {{{
+ * ElemPath.from(
+ *   EName("{http://www.w3.org/1999/XSL/Transform}template") -> 0,
+ *   EName("{http://www.w3.org/1999/XSL/Format}root") -> 0,
+ *   EName("{http://www.w3.org/1999/XSL/Format}page-sequence") -> 0,
+ *   EName("{http://www.w3.org/1999/XSL/Format}flow") -> 0,
+ *   EName("{http://www.w3.org/1999/XSL/Format}block") -> 0
+ * )
+ * }}}
+ *
+ * This path could be written as element path builder as follows:
+ * {{{
+ * ElemPathBuilder.from(
+ *   QName("xsl:template") -> 0, QName("fo:root") -> 0, QName("fo:page-sequence") -> 0, QName("fo:flow") -> 0, QName("fo:block") -> 0)
+ * }}}
+ *
+ * Using the Scope mentioned earlier, the latter element path builder resolves to the element path given before that, by
+ * invoking method `ElemPathBuilder.build(scope)`. In order for this to work, the Scope must be <em>invertible</em>. That is,
+ * there must be a one-to-one correspondence between prefixes ("" for the default namespace) and namespace URIs, because
+ * otherwise the index numbers may not match. Also note that the prefixes `xsl` and `fo` in the element path builder are
+ * arbitrary, and need not match with the prefixes used in the XML tree itself.
+ *
+ * ==Uniform query API traits==
+ *
+ * Yaidom provides a relatively small query API, to query an individual element for collections of <em>child elements</em>,
+ * <em>descendant elements</em> or <em>descendant-or-self elements</em>. The resulting collections are immutable Scala
+ * collections, that can further be manipulated using the Scala Collections API.
+ *
+ * This query API is <em>uniform</em>, in that different element implementations share (most of) the same query API. It is also
+ * <em>element-centric</em> (unlike standard Scala XML and Anti-XML).
+ *
+ * For example, consider the XML example given earlier, as a Scala XML literal named `xslt`. Then we can wrap this Scala
+ * XML Elem into a yaidom wrapper of type [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]], named `xsltElem`, and query for
+ * all descendant-or-self elements with resolved (or expanded) name `EName("{http://www.w3.org/1999/XSL/Format}block")` as follows:
+ * {{{
+ * xsltElem filterElemsOrSelf (elem => elem.resolvedName == EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * }}}
+ * The result would be an immutable IndexedSeq of `ScalaXmlElem` instances, holding precisely 1 element.
+ *
+ * We could have written:
+ * {{{
+ * xsltElem.filterElemsOrSelf(EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * }}}
+ * instead, with the same result.
+ *
+ * Instead of searching for appropriate descendant-or-self elements, we could have searched for descendant elements only,
+ * without altering the result in this case:
+ * {{{
+ * xsltElem filterElems (elem => elem.resolvedName == EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * }}}
+ * or:
+ * {{{
+ * xsltElem.filterElems(EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * }}}
+ *
+ * We could also find the same elements in a more defensive way, it our intent is to find such block elements only inside
+ * template elements:
+ * {{{
+ * for {
+ *   templateElem <- xsltElem.filterChildElems(EName("{http://www.w3.org/1999/XSL/Transform}template"))
+ *   blockElem <- templateElem.filterElems(EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * } yield blockElem
+ * }}}
+ * which is equivalent to:
+ * {{{
+ * for {
+ *   templateElem <- xsltElem filterChildElems (elem => elem.resolvedName == EName("{http://www.w3.org/1999/XSL/Transform}template"))
+ *   blockElem <- templateElem filterElems (elem => elem.resolvedName == EName("{http://www.w3.org/1999/XSL/Format}block"))
+ * } yield blockElem
+ * }}}
+ *
+ * We could even use operator notation, as follows:
+ * {{{
+ * for {
+ *   templateElem <- xsltElem \ EName("{http://www.w3.org/1999/XSL/Transform}template")
+ *   blockElem <- templateElem \\ EName("{http://www.w3.org/1999/XSL/Format}block")
+ * } yield blockElem
+ * }}}
+ *
+ * Now suppose the same XML is stored in a (org.w3c.dom) DOM tree, wrapped in a [[eu.cdevreeze.yaidom.dom.DomElem]] `xsltElem`.
+ * Then the same queries would use exactly the same code as above. The result would be a collection of `DomElem` instances
+ * instead of `ScalaXmlElem` instances, however. There are many more element implementations in yaidom, and they share
+ * (most of) the same query API. Therefore this query API is called a <em>uniform</em> query API.
+ *
+ * The last example, using operator notation, looks a bit more "XPath-like". Yet it is more verbose than queries in Scala XML,
+ * partly because in yaidom these operators cannot be chained. Yet this is with good reason. Yaidom does not blur the
+ * distinction between elements and element collections, and therefore does not offer an XPath experience. The small price
+ * paid in verbosity is made up for by precision. The yaidom query API traits have very precise definitions of their
+ * operations, as can be seen in the corresponding documentation.
+ *
+ * The uniform query API traits turn minimal APIs into richer APIs, where these richer APIs are defined very precisely in terms
+ * of the minimal API. The top-level query API trait is [[eu.cdevreeze.yaidom.ParentElemLike]]. It needs to be given a method
+ * to query for child elements (not child nodes in general, but just child elements!), and it offers methods to query
+ * for some or all child elements, descendant elements, and descendant-or-self elements. That is, the minimal API consists
+ * of abstract method `findAllChildElems`, and it offers methods such as `filterChildElems`, `filterElems` and `filterElemsOrSelf`.
+ * This trait has no knowledge about elements at all, other than the fact that elements can have child elements.
+ *
+ * Subtrait [[eu.cdevreeze.yaidom.ElemLike]] adds minimal knowledge about elements themselves, viz. that elements have a
+ * "resolved" (or expanded) name, and "resolved" attributes (mapping attribute expanded names to attribute values). That is,
+ * it needs to be given implementations of abstract methods `resolvedName` and `resolvedAttributes`, and then offers methods to
+ * query for attributes or child/descendant/descendant-or-self elements with a given expanded name. The trait is trivially defined
+ * in terms of its supertrait.
+ *
+ * It is important to note that yaidom does not consider namespace declarations to be attributes themselves. Thus, there are no
+ * circular dependencies between both concepts, because attributes with namespaces require in-scope namespaces and therefore
+ * namespace declarations for resolving the names of these attributes.
+ *
+ * Note that traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.ParentElemLike]] only know about elements, not
+ * about other kinds of nodes. Of course the actual element implementations mixing in this query API know about other node
+ * types. but that knowledge is outside the uniform query API. Note that the example queries above only use the minimal
+ * element knowledge that traits `ElemLike` and `ParentElemLike` have about elements. Therefore the query code can be used
+ * unchanged for different element implementations.
+ *
+ * The `ElemLike` trait has subtrait [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds knowledge about element paths. Element
+ * paths can be queried (in the same way that elements can be queried in trait `ParentElemLike`), and elements can be found
+ * given an element path.
+ *
+ * For example, to query for the element paths of the above-mentioned block element (relative to the root element), the following
+ * code can be used (if the used element implementation mixes in trait `PathAwareElemLike`):
+ * {{{
+ * for {
+ *   blockElemPath <- xsltElem filterElemOrSelfPaths (elem => elem.resolvedName == EName("{http://www.w3.org/1999/XSL/Format}block"))
+ *   if blockElemPath.containsName(EName("{http://www.w3.org/1999/XSL/Transform}template"))
+ * } yield blockElemPath
+ * }}}
+ *
+ * The `PathAwareElemLike` trait has subtrait [[eu.cdevreeze.yaidom.UpdatableElemLike]]. This trait offers functional updates
+ * at given element paths. Whereas the super-traits know only about elements, this trait knows that elements have some node
+ * supertype.
+ *
+ * Instead of functional updates at given element paths, elements can also be "transformed" functionally without specifying
+ * any element paths. This is offered by trait [[eu.cdevreeze.yaidom.TransformableElemLike]], which unlike the traits above
+ * has no supertraits. The Scala XML and DOM wrappers above do not mix in this trait.
+ *
+ * ==Some element implementations==
+ *
+ * The uniform query API traits, especially `ParentElemLike` and its subtrait `ElemLike` are mixed in by many element
+ * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.ElemBuilder]]
+ * and [[eu.cdevreeze.yaidom.Elem]].
+ *
+ * Class [[eu.cdevreeze.yaidom.Elem]] is the default element implementation of yaidom. It extends class [[eu.cdevreeze.yaidom.Node]].
+ * The latter also has subclasses for text nodes, comments, entity references and processing instructions. Class [[eu.cdevreeze.yaidom.Document]]
+ * contains a document `Elem`, but is not a `Node` subclass itself.
+ *
+ * The [[eu.cdevreeze.yaidom.Elem]] class has the following characteristics:
+ * <ul>
+ * <li>It is <em>immutable</em>, and thread-safe</li>
+ * <li>These elements therefore cannot be queried for their parent elements</li>
+ * <li>It mixes in both query API traits [[eu.cdevreeze.yaidom.UpdatableElemLike]] and [[eu.cdevreeze.yaidom.TransformableElemLike]]</li>
+ * <li>Therefore this element class offers almost all of the yaidom query API, except `HasParent`</li>
+ * <li>Besides the tag name, attributes and child nodes, it keeps a `Scope`, but no `Declarations`</li>
+ * <li>This makes it easy to compose these elements, as long as scopes are passed explicitly throughout the element tree</li>
+ * <li>Equality is reference equality, because it is hard to come up with a sensible equality for this element class</li>
+ * <li>Roundtripping cannot be entirely lossless, but this class does try to keep the attribute order (although irrelevant according to XML InfoSet)</li>
+ * <li>Sub-packages `parse` and `print` offer `DocumentParser` and `DocumentPrinter` classes for parsing/serializing these default `Elem` (and `Document`) instances</li>
+ * </ul>
+ *
+ * Creating such `Elem` trees by hand is a bit cumbersome, partly because scopes have to be passed to each `Elem` in the tree.
+ * The latter is not needed if we use class [[eu.cdevreeze.yaidom.ElemBuilder]] to create element trees by hand. When the tree
+ * has been fully created as `ElemBuilder`, invoke method `ElemBuilder.build(parentScope)` to turn it into an `Elem`.
+ *
+ * Classes `Elem` and `ElemBuilder`, like their superclasses `Node` and `NodeBuilder`, have very much in common. Both are immutable,
+ * easy to compose (`ElemBuilder` instances even more so), equality is reference equality, etc. The most important differences
+ * are as follows:
+ * <ul>
+ * <li>Instead of a `Scope`, an `ElemBuilder` contains a `Declarations`</li>
+ * <li>This makes an `ElemBuilder` easier to compose than an `Elem`, because no Scope needs to be passed around throughout the tree</li>
+ * <li>Class `ElemBuilder` uses a minimal query API, mixing in only traits `ParentElemLike` and `TransformableElemLike`</li>
+ * <li>After all, an `ElemBuilder` neither keeps nor knows about Scopes</li>
+ * </ul>
+ *
+ * The page-sequence element in the XML example above could have been written as `ElemBuilder` (without the inter-element whitespace) as follows:
+ * {{{
+ * import NodeBuilder._
+ *
+ * elem(
+ *   qname = QName("fo:page-sequence"),
+ *   attributes = Vector(QName("master-reference") -> "A4-portrait"),
+ *   children = Vector(
+ *     elem(
+ *       qname = QName("fo:flow"),
+ *       attributes = Vector(QName("flow-name") -> "xsl-region-body"),
+ *       children = Vector(
+ *         elem(
+ *           qname = QName("fo:block"),
+ *           children = Vector(
+ *             text("\n" +
+ *                  "            Hello, "),
+ *             elem(
+ *               qname = QName("xsl:value-of"),
+ *               attributes = Vector(QName("select") -> "name")
+ *             ),
+ *             text("!\n" +
+ *                  "          ")
+ *           )
+ *         )
+ *       )
+ *     )
+ *   )
+ * )
+ * }}}
+ *
+ * This `ElemBuilder` (say, `eb`) lacks namespace declarations for prefixes `fo` and `xslt`. So, the following returns `false`:
+ * {{{
+ * eb.canBuild(Scope.Empty)
+ * }}}
+ * while the following returns `true`:
+ * {{{
+ * eb.canBuild(Scope.from("fo" -> "http://www.w3.org/1999/XSL/Format", "xsl" -> "http://www.w3.org/1999/XSL/Transform"))
+ * }}}
+ * Indeed,
+ * {{{
+ * eb.build(Scope.from("fo" -> "http://www.w3.org/1999/XSL/Format", "xsl" -> "http://www.w3.org/1999/XSL/Transform"))
+ * }}}
+ * returns the element tree as `Elem`.
+ *
+ * Note that the distinction between `ElemBuilder` and `Elem` "solves" the mismatch that immutable ("functional") element trees are
+ * constructed in a bottom-up manner, while namespace scoping works in a top-down manner. (See also Anti-XML issue 78, in
+ * https://github.com/djspiewak/anti-xml/issues/78).
+ *
+ * There are many more element implementations in yaidom, most of them in sub-packages of this package. Yaidom is extensible
+ * in that new element implementations can be invented, for example elements that are better "roundtrippable" (at the expense of
+ * "composability"), or yaidom wrappers around other DOM-like APIs (such as XOM or JDOM2). The current element implementations
+ * in yaidom are:
+ * <ul>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.Elem]], the default (immutable) element implementation. See above.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.resolved.Elem]], which takes namespace prefixes out of the equation, and therefore
+ * makes useful (namespace-aware) equality comparisons feasible. It mixes in the same query API traits as the default
+ * element implementation.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.indexed.Elem]], which offers views on default Elems that know the ancestry of
+ * each element. It mixes in both the `ElemLike` and `HasParent` query APIs, despite being immutable! This element implementation
+ * is handy for querying XML schemas, for example, because in schemas the ancestry of queried elements typically matters.</li>
+ * <li>Class [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]], which wraps a Scala XML Elem. It mixes in the `ElemLike` query API.</li>
+ * <li>Class [[eu.cdevreeze.yaidom.dom.DomElem]], which wraps a (mutable!) DOM Element. It mixes in both the `ElemLike` and `HasParent`
+ * query APIs.</li>
+ * </ul>
+ * This illustrates that especially trait `ElemLike` is a uniform query API in yaidom.
+ *
+ * ==Packages and dependencies==
+ *
+ * Yaidom has the following packages, and layering between packages:
+ * <ol>
+ * <li>Package [[eu.cdevreeze.yaidom]], with the content described above. It depends on no other yaidom packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.convert]]. It contains conversions between yaidom and DOM, Scala XML, etc.
+ * This package depends on the yaidom root package.</li>
+ * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
+ * the packages mentioned above.</li>
+ * <li>The other packages: [[eu.cdevreeze.yaidom.dom]], [[eu.cdevreeze.yaidom.indexed]], [[eu.cdevreeze.yaidom.resolved]],
+ * [[eu.cdevreeze.yaidom.scalaxml]] and [[eu.cdevreeze.yaidom.xlink]]. They depend on (some of) the packages mentioned above,
+ * and not on each other.</li>
+ * </ol>
+ * Indeed, all yaidom package dependencies are uni-directional.
  *
  * @author Chris de Vreeze
  */
