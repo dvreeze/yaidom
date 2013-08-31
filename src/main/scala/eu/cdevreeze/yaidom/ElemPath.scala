@@ -170,7 +170,10 @@ object ElemPath {
   }
 
   /** Easy to use factory method for `ElemPath` instances */
-  def from(entries: ElemPath.Entry*): ElemPath = new ElemPath(Vector(entries: _*))
+  def from(entries: (EName, Int)*): ElemPath = {
+    val entrySeq: Seq[ElemPath.Entry] = entries map { p => Entry(p._1, p._2) }
+    new ElemPath(entrySeq.toIndexedSeq)
+  }
 
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath`. The passed scope must be invertible. */
   def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {

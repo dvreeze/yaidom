@@ -131,13 +131,13 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
 
   final def findAllChildElemPaths: immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }
+    findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath(Vector(pe)) }
 
   final def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => ElemPath.from(pe) }
+    findAllChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => ElemPath(Vector(pe)) }
 
   final def findChildElemPath(p: E => Boolean): Option[ElemPath] = {
-    findAllChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => ElemPath.from(pe) }
+    findAllChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => ElemPath(Vector(pe)) }
   }
 
   final def getChildElemPath(p: E => Boolean): ElemPath = {
