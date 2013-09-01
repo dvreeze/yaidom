@@ -3,6 +3,20 @@ CHANGELOG
 =========
 
 
+0.6.13
+======
+
+This version contains small breaking and non-breaking changes, and partly reworked documentation. Hopefully version 0.7.0
+will be the same, except for the documentation.
+
+* Reworked main package documentation, mainly to clarify usage of the API with examples
+* Breaking API change: renamed ``Scope`` and ``Declararations`` fields ``map`` to ``prefixNamespaceMap``
+* Breaking API change: removed ``Scope`` method ``prefixOption``, and added method ``prefixesForNamespace``
+* Breaking API change: altered signature of ``ElemPath`` object method ``from``, for consistency with ``ElemPathBuilder``
+* Added ``ElemPath`` method ``elementNameOption``
+* Added generic trait ``DocumentApi``
+
+
 0.6.12
 ======
 
