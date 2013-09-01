@@ -188,7 +188,7 @@ package eu.cdevreeze
  *
  * For example, consider the XML example given earlier, as a Scala XML literal named `bookstore`. We can wrap this Scala
  * XML Elem into a yaidom wrapper of type [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]], named `bookstoreElem`. Then we can query
- * for all books, that is, all descendant-or-self elements with resolved (or expanded) name `EName("{http://bookstore/book}Book")`,
+ * for all books, that is, all <em>descendant-or-self</em> elements with resolved (or expanded) name `EName("{http://bookstore/book}Book")`,
  * as follows:
  * {{{
  * bookstoreElem filterElemsOrSelf (elem => elem.resolvedName == EName("{http://bookstore/book}Book"))
@@ -201,7 +201,7 @@ package eu.cdevreeze
  * }}}
  * instead, with the same result.
  *
- * Instead of searching for appropriate descendant-or-self elements, we could have searched for descendant elements only,
+ * Instead of searching for appropriate descendant-or-self elements, we could have searched for <em>descendant</em> elements only,
  * without altering the result in this case:
  * {{{
  * bookstoreElem filterElems (elem => elem.resolvedName == EName("{http://bookstore/book}Book"))
@@ -211,7 +211,7 @@ package eu.cdevreeze
  * bookstoreElem.filterElems(EName("{http://bookstore/book}Book"))
  * }}}
  *
- * We could even have searched for appropriate child elements only, without altering the result in this case:
+ * We could even have searched for appropriate <em>child</em> elements only, without altering the result in this case:
  * {{{
  * bookstoreElem filterChildElems (elem => elem.resolvedName == EName("{http://bookstore/book}Book"))
  * }}}
@@ -281,7 +281,7 @@ package eu.cdevreeze
  *
  * Note that traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.ParentElemLike]] only know about elements, not
  * about other kinds of nodes. Of course the actual element implementations mixing in this query API know about other node
- * types. but that knowledge is outside the uniform query API. Note that the example queries above only use the minimal
+ * types, but that knowledge is outside the uniform query API. Note that the example queries above only use the minimal
  * element knowledge that traits `ElemLike` and `ParentElemLike` have about elements. Therefore the query code can be used
  * unchanged for different element implementations.
  *
@@ -351,7 +351,6 @@ package eu.cdevreeze
  * elem(
  *   qname = QName("book:Book"),
  *   attributes = Vector(QName("ISBN") -> "978-0321356680", QName("Price") -> "35", QName("Edition") -> "2"),
- *   namespaces = Declarations.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author"),
  *   children = Vector(
  *     elem(
  *       qname = QName("book:Title"),
