@@ -19,7 +19,26 @@ package eu.cdevreeze.yaidom
 /**
  * Namespace declarations (and undeclarations), typically at the level of one element.
  *
- * The Declarations is backed by a map from prefixes (or the empty string for the default namespace) to namespace URIs (or the empty string).
+ * For example, consider the following XML:
+ * {{{
+ * <book:Bookstore xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author">
+ *   <book:Book ISBN="978-0321356680" Price="35" Edition="2">
+ *     <book:Title>Effective Java (2nd Edition)</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Joshua</auth:First_Name>
+ *         <auth:Last_Name>Bloch</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * </book:Bookstore>
+ * }}}
+ * Then only the root element contains namespace declarations, viz.:
+ * {{{
+ * Declarations.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author")
+ * }}}
+ *
+ * The `Declarations` is backed by a map from prefixes (or the empty string for the default namespace) to namespace URIs (or the empty string).
  * If the mapped value is the empty string, it is an undeclaration.
  *
  * Prefix 'xml' is not allowed as key in this map. That prefix, mapping to namespace URI 'http://www.w3.org/XML/1998/namespace',

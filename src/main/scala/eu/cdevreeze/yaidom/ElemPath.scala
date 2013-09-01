@@ -23,6 +23,56 @@ import scala.annotation.tailrec
  * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It represents a unique path to an element, given
  * a root element, independent of other types of nodes, as if the XML tree only consists of elements.
  *
+ * For example, consider the following XML:
+ * {{{
+ * <book:Bookstore xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author">
+ *   <book:Book ISBN="978-0321356680" Price="35" Edition="2">
+ *     <book:Title>Effective Java (2nd Edition)</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Joshua</auth:First_Name>
+ *         <auth:Last_Name>Bloch</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ *   <book:Book ISBN="978-0981531649" Price="35" Edition="2">
+ *     <book:Title>Programming in Scala: A Comprehensive Step-by-Step Guide, 2nd Edition</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Martin</auth:First_Name>
+ *         <auth:Last_Name>Odersky</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Lex</auth:First_Name>
+ *         <auth:Last_Name>Spoon</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Bill</auth:First_Name>
+ *         <auth:Last_Name>Venners</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * </book:Bookstore>
+ * }}}
+ *
+ * Then the last name of the first author of the Scala book (viz. Odersky) has the following element path:
+ * {{{
+ * ElemPath.from(
+ *   EName("{http://bookstore/book}Book") -> 1,
+ *   EName("{http://bookstore/book}Authors") -> 0,
+ *   EName("{http://bookstore/author}Author") -> 0,
+ *   EName("{http://bookstore/author}Last_Name") -> 0
+ * )
+ * }}}
+ * or:
+ * {{{
+ * ElemPathBuilder.from(
+ *   QName("book:Book") -> 1,
+ *   QName("book:Authors") -> 0,
+ *   QName("auth:Author") -> 0,
+ *   QName("auth:Last_Name") -> 0).build(Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author"))
+ * }}}
+ *
  * `ElemPath` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemLike]]), and in "functional updates"
  * (see [[eu.cdevreeze.yaidom.UpdatableElemLike]]).
  *

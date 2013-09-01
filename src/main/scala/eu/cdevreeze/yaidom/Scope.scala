@@ -24,6 +24,53 @@ import scala.collection.immutable
  *
  * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.EName]]s.
  *
+ * For example, consider the following XML:
+ * {{{
+ * <book:Bookstore xmlns:book="http://bookstore/book">
+ *   <book:Book ISBN="978-0321356680" Price="35" Edition="2">
+ *     <book:Title>Effective Java (2nd Edition)</book:Title>
+ *     <book:Authors>
+ *       <auth:Author xmlns:auth="http://bookstore/author">
+ *         <auth:First_Name>Joshua</auth:First_Name>
+ *         <auth:Last_Name>Bloch</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * </book:Bookstore>
+ * }}}
+ * Then the (only) author element has the following scope:
+ * {{{
+ * Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author")
+ * }}}
+ *
+ * After all, the root element has the following scope:
+ * {{{
+ * Scope.Empty.resolve(Declarations.from("book" -> "http://bookstore/book"))
+ * }}}
+ * which is the same as:
+ * {{{
+ * Scope.from("book" -> "http://bookstore/book")
+ * }}}
+ *
+ * The (only) book element has no namespace declarations, so it has the same scope. That is also true for the authors element
+ * inside the book element. The (only) author element introduces a new namespace, and its scope is as follows:
+ * {{{
+ * Scope.from("book" -> "http://bookstore/book").resolve(Declarations.from("auth" -> "http://bookstore/author"))
+ * }}}
+ * which is indeed:
+ * {{{
+ * Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author")
+ * }}}
+ *
+ * The author element `QName("auth:Author")` has (optional) resolved name:
+ * {{{
+ * Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author").resolveQNameOption(QName("auth:Author"))
+ * }}}
+ * which is:
+ * {{{
+ * Some(EName("{http://bookstore/author}Author"))
+ * }}}
+ *
  * A `Scope` must not contain prefix "xmlns" and must not contain namespace URI "http://www.w3.org/2000/xmlns/".
  * Moreover, a `Scope` must not contain the XML namespace (prefix "xml", namespace URI "http://www.w3.org/XML/1998/namespace").
  *
