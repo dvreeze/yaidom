@@ -10,7 +10,7 @@
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
 	<artifactId>yaidom_${scala.binary.version}</artifactId>
-	<version>0.6.13-SNAPSHOT</version>
+	<version>0.6.13</version>
 	<packaging>jar</packaging>
 
 	<parent>
