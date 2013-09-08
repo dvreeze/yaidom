@@ -61,6 +61,14 @@ import scala.collection.immutable
  * XML data within its context. If they come from queries on the same explicitly created top-level indexed element "snapshot",
  * then they belong to that same (top-level) "immutable snapshot".
  *
+ * ==Implementation notes==
+ *
+ * The class stores the child elements as well, which is redundant. On the other hand, the implementation ensures that:
+ * {{{
+ * childElems.map(_.elem) == elem.findAllChildElems
+ * }}}
+ * This redundancy makes element creation expensive, but it makes querying as fast as possible.
+ *
  * ==Elem more formally==
  *
  * Let `indexedRootElem` be a root element, so `indexedRootElem.elemPath == ElemPath.Root`.
@@ -104,10 +112,16 @@ import scala.collection.immutable
  */
 final class Elem private[indexed] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
+  childElems: immutable.IndexedSeq[Elem],
   val elemPath: ElemPath) extends ElemLike[Elem] with HasParent[Elem] with HasText with Immutable {
 
-  def elem: eu.cdevreeze.yaidom.Elem =
+  /**
+   * The yaidom Elem itself, stored as a val
+   */
+  val elem: eu.cdevreeze.yaidom.Elem =
     rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
+
+  require(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
 
   /**
    * Returns all child elements, in the correct order.
@@ -115,13 +129,9 @@ final class Elem private[indexed] (
    * These child elements share the same rootElem with this element, but differ in the element paths, which have one more
    * "path entry".
    */
-  override def findAllChildElems: immutable.IndexedSeq[Elem] = {
-    // Remember: this function must be as fast as possible!
-    val childElemPathEntries = elem.findAllChildElemPathEntries
-    childElemPathEntries map { entry => new Elem(rootElem, elemPath.append(entry)) }
-  }
+  override def findAllChildElems: immutable.IndexedSeq[Elem] = childElems
 
-  override def resolvedName: EName = elemPath.elementNameOption.getOrElse(rootElem.resolvedName)
+  override def resolvedName: EName = elem.resolvedName
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
 
@@ -145,7 +155,7 @@ final class Elem private[indexed] (
    * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
    */
   final def namespaces: Declarations = {
-    val parentScope = this.parentOption map { e => e.elem.scope } getOrElse (Scope.Empty)
+    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getWithElemPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
   }
 
@@ -159,18 +169,30 @@ final class Elem private[indexed] (
   }
 
   /**
-   * Returns `this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }`
+   * Returns `this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }`. This is a very expensive method!
    */
   override def parentOption: Option[Elem] =
-    this.elemPath.parentPathOption map { path => new Elem(this.rootElem, path) }
+    this.elemPath.parentPathOption map { path => Elem.apply(this.rootElem, path) }
 }
 
 object Elem {
 
   /**
-   * Calls `new Elem(rootElem, ElemPath.Root)`
+   * Calls `apply(rootElem, ElemPath.Root)`
    */
   def apply(rootElem: eu.cdevreeze.yaidom.Elem): Elem = {
-    new Elem(rootElem, ElemPath.Root)
+    apply(rootElem, ElemPath.Root)
+  }
+
+  /**
+   * Expensive recursive factory method for "indexed elements".
+   */
+  def apply(rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
+    val elem = rootElem.getWithElemPath(elemPath)
+
+    // Recursive calls
+    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, elemPath.append(entry)))
+
+    new Elem(rootElem, childElems, elemPath)
   }
 }
