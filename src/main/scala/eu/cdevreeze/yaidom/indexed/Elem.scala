@@ -38,7 +38,9 @@ import scala.collection.immutable
  *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
  *     }
- *     bookElm <- authorElm findAncestor { _.resolvedName == EName("Book") }
+ *     bookElm <- authorElm.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { path =>
+ *       authorElm.rootElem.getWithElemPath(path)
+ *     }
  *   } yield bookElm
  * }}}
  *
@@ -67,7 +69,7 @@ import scala.collection.immutable
  * {{{
  * childElems.map(_.elem) == elem.findAllChildElems
  * }}}
- * This redundancy makes element creation expensive, but it makes querying as fast as possible.
+ * This redundancy makes "indexed element" creation expensive, but it makes querying as fast as possible.
  *
  * ==Elem more formally==
  *
@@ -113,7 +115,7 @@ import scala.collection.immutable
 final class Elem private[indexed] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
-  val elemPath: ElemPath) extends ElemLike[Elem] with HasParent[Elem] with HasText with Immutable {
+  val elemPath: ElemPath) extends ElemLike[Elem] with HasText with Immutable {
 
   /**
    * The yaidom Elem itself, stored as a val
@@ -167,12 +169,6 @@ final class Elem private[indexed] (
     val textStrings = elem.textChildren map { t => t.text }
     textStrings.mkString
   }
-
-  /**
-   * Returns `this.elemPath.parentPathOption map { path => Elem(this.rootElem, path) }`. This is a very expensive method!
-   */
-  override def parentOption: Option[Elem] =
-    this.elemPath.parentPathOption map { path => Elem.apply(this.rootElem, path) }
 }
 
 object Elem {

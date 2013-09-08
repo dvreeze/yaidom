@@ -48,7 +48,7 @@ class QueryTest extends Suite {
 
     expectResult(true) {
       elems forall { e =>
-        val parentScope = e.parentOption.map(_.scope).getOrElse(Scope.Empty)
+        val parentScope = e.elemPath.parentPathOption.map(p => e.rootElem.getWithElemPath(p).scope).getOrElse(Scope.Empty)
         parentScope.resolve(e.namespaces) == e.scope
       }
     }
@@ -105,7 +105,8 @@ class QueryTest extends Suite {
     val bookOrMagazineTitles2 =
       for {
         title <- indexedBookstore filterElems { _.resolvedName == EName("Title") }
-        if (title.parent.resolvedName == EName("Book")) || (title.parent.resolvedName == EName("Magazine"))
+        if (title.elemPath.parentPath.elementNameOption == Some(EName("Book"))) ||
+          (title.elemPath.parentPath.elementNameOption == Some(EName("Magazine")))
       } yield title
 
     expectResult(Set(
@@ -305,7 +306,7 @@ class QueryTest extends Suite {
 
     val titles3 = indexedBookstore.findAllElems filter { e =>
       (e.resolvedName == EName("Title")) && {
-        val parentElm = e.parent
+        val parentElm = e.rootElem.getWithElemPath(e.elemPath.parentPath)
         parentElm.localName == "Book" && parentElm.attribute(EName("Price")).toInt < 90
       }
     }
@@ -385,7 +386,9 @@ class QueryTest extends Suite {
         book <- indexedBookstore \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
+        authorLastName <- authors \ { _.localName == "Author" } flatMap { e =>
+          e \ (_.localName == "Last_Name")
+        } map { _.trimmedText }
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
@@ -399,7 +402,10 @@ class QueryTest extends Suite {
     val bookTitles2 =
       indexedBookstore findTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } flatMap { elm =>
         require(elm.resolvedName == EName("Last_Name"))
-        val bookOption = elm findAncestor { e => e.resolvedName == EName("Book") && e.attribute(EName("Price")).toInt < 90 }
+        val bookOption = elm.elemPath findAncestorPath { p =>
+          val e = elm.rootElem.getWithElemPath(p)
+          e.resolvedName == EName("Book") && e.attribute(EName("Price")).toInt < 90
+        } map { p => indexed.Elem(elm.rootElem, p) }
         val titleOption = bookOption flatMap { bookElm => bookElm findElem { e => e.resolvedName == EName("Title") } }
         titleOption
       }
@@ -422,9 +428,13 @@ class QueryTest extends Suite {
         book <- indexedBookstore \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
         authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
+        authorLastName <- authors \ { _.localName == "Author" } flatMap { e =>
+          e \ (_.localName == "Last_Name")
+        } map { _.trimmedText }
         if authorLastName == "Ullman"
-        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "First_Name") } map { _.trimmedText }
+        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e =>
+          e \ (_.localName == "First_Name")
+        } map { _.trimmedText }
         if authorFirstName == "Jeffrey"
       } yield book.getChildElem(EName("Title"))
 
@@ -445,7 +455,9 @@ class QueryTest extends Suite {
       for {
         authorElem <- indexedBookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
         if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
-        bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
+        bookElem <- authorElem.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
+          indexed.Elem(authorElem.rootElem, p)
+        }
         if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield bookElem.getChildElem(EName("Title"))
 
@@ -460,7 +472,9 @@ class QueryTest extends Suite {
       for {
         authorElem <- indexedBookstore \\ EName("Author")
         if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
-        bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
+        bookElem <- authorElem.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
+          indexed.Elem(authorElem.rootElem, p)
+        }
         if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield (bookElem \ EName("Title")).head
 
@@ -524,7 +538,8 @@ class QueryTest extends Suite {
             ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
             ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
         }
-        bookElm = authorElm.parent.parent
+        bookElmPath = authorElm.elemPath.parentPath.parentPath
+        bookElm = indexed.Elem(authorElm.rootElem, bookElmPath)
       } yield {
         require(bookElm.localName == "Book")
         bookElm
@@ -612,7 +627,7 @@ class QueryTest extends Suite {
     val elms =
       for {
         e <- indexedBookstore.findAllElems
-        parent = e.parent
+        parent = indexed.Elem(e.rootElem, e.elemPath.parentPath)
         if parent.elem.qname != QName("Bookstore") && parent.elem.qname != QName("Book")
       } yield e
 
