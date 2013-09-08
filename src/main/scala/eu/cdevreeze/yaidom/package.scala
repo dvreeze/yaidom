@@ -421,7 +421,7 @@ package eu.cdevreeze
  * makes useful (namespace-aware) equality comparisons feasible. It mixes in the same query API traits as the default
  * element implementation.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.indexed.Elem]], which offers views on default Elems that know the ancestry of
- * each element. It mixes in both the `ElemLike` and `HasParent` query APIs, despite being immutable! This element implementation
+ * each element. It mixes in the `ElemLike` query API, but knows its ancestry, despite being immutable! This element implementation
  * is handy for querying XML schemas, for example, because in schemas the ancestry of queried elements typically matters.</li>
  * <li>Class [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]], which wraps a Scala XML Elem. It mixes in the `ElemLike` query API.</li>
  * <li>Class [[eu.cdevreeze.yaidom.dom.DomElem]], which wraps a (mutable!) DOM Element. It mixes in both the `ElemLike` and `HasParent`
