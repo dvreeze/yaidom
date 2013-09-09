@@ -330,7 +330,7 @@ class NamespaceTest extends Suite {
       divElmOption.get.removeAllInterElementWhitespace.textChildren.size.min(3)
     }
     expectResult("from the authors.") {
-      divElmOption.get.removeAllInterElementWhitespace.textChildren.last.text.trim
+      divElmOption.get.removeAllInterElementWhitespace.textChildren.filterNot(_.text.trim.isEmpty).last.text.trim
     }
     expectResult(List(strongElmOption.get, emElmOption.get)) {
       divElmOption.get.findAllChildElems
@@ -340,7 +340,7 @@ class NamespaceTest extends Suite {
       divElmOption.get.removeAllInterElementWhitespace.children.size.min(5)
     }
     expectResult(resolved.Elem(emElmOption.get)) {
-      val child = divElmOption.get.removeAllInterElementWhitespace.children(3)
+      val child: Node = divElmOption.get.removeAllInterElementWhitespace.findChildElem(_.localName == "em").get
       resolved.Node(child)
     }
 
