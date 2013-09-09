@@ -311,7 +311,8 @@ class StaxInteropTest extends Suite {
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    xmlInputFactory.setXMLResolver(new DtdSuppressionResolver)
+    // With an IBM JRE, the DtdSuppressionResolver as implemented below does not work
+    xmlInputFactory.setXMLResolver(new EntityResolverUsingLocalDtds)
 
     val staxParser = new DocumentParserUsingStax(xmlInputFactory)
 
@@ -1101,6 +1102,21 @@ class StaxInteropTest extends Suite {
     override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
       logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
       new java.io.StringReader("")
+    }
+  }
+
+  class EntityResolverUsingLocalDtds extends XMLResolver {
+    override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
+      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+
+      if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
+        classOf[StaxInteropTest].getResourceAsStream("XMLSchema.dtd")
+      } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
+        classOf[StaxInteropTest].getResourceAsStream("datatypes.dtd")
+      } else {
+        // Default behaviour
+        null
+      }
     }
   }
 }
