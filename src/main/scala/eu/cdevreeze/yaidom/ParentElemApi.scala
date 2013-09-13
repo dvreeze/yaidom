@@ -19,12 +19,76 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * API for elements as containers of elements, as element nodes in a node tree. See [[eu.cdevreeze.yaidom.ParentElemLike]].
+ * This is the <em>foundation</em> of the yaidom <em>uniform query API</em>. Many DOM-like element implementations in
+ * yaidom mix in this trait (indirectly, because a sub-trait is mixed in), thus sharing this query API.
  *
- * This purely abstract query API trait leaves the implementation (but not the semantics) completely open. For example,
- * an implementation backed by an XML database would not use the ``ParentElemLike`` implementation, for reasons of efficiency.
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ParentElemLike]].
+ * That trait only knows about elements (and not about other nodes), and only knows that elements can <em>have child elements</em>
+ * (again not knowing about other child nodes). Using this minimal knowledge alone, it offers methods to query for
+ * <em>descendant</em> elements, <em>descendant-or-self</em> methods, or sub-collections thereof. It is this minimal knowledge that
+ * makes this API both uniform and mathematically precise.
  *
- * The basic operations of this trait are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
+ * This query API leverages the Scala Collections API. Query results can be manipulated using the Collections API, and the
+ * query API implementation (in ``ParentElemLike``) uses the Collections API internally.
+ *
+ * ==ParentElemApi examples==
+ *
+ * To illustrate usage of this API, consider the following example. Let's say we want to determine if some XML has its namespace
+ * declarations (if any) only at the root element level. We show the query code for several yaidom DOM-like element implementations.
+ *
+ * Note that it depends on the DOM-like element implementation how to query for namespace declarations, but the code to
+ * query for descendant or descendant-or-self elements remains the same. The method to retrieve all descendant elements
+ * is called ``findAllElems``, and the method to retrieve all descendant-or-self elements is called ``findAllElemsOrSelf``.
+ * The corresponding "filtering" methods are called ``filterElems`` and ``filterElemsOrSelf``, respectively. Knowing this,
+ * it is easy to guess the other API method names.
+ *
+ * Let's start with a yaidom DOM wrapper, named ``rootElem``, of type [[eu.cdevreeze.yaidom.dom.DomElem]]:
+ * {{{
+ * val offendingElems = rootElem filterElems { elem =>
+ *   val domAttrs = elem.wrappedNode.getAttributes
+ *   val decls = convert.DomConversions.extractNamespaceDeclarations(domAttrs)
+ *   !decls.isEmpty
+ * }
+ * }}}
+ * This returns all offending elements, that is, all descendant elements of the root element (excluding the root element itself)
+ * that have at least one namespace declaration.
+ *
+ * Now let's use an [[eu.cdevreeze.yaidom.ElemBuilder]], again named ``rootElem``:
+ * {{{
+ * val offendingElems = rootElem filterElems { elem =>
+ *   val decls = elem.namespaces
+ *   !decls.isEmpty
+ * }
+ * }}}
+ * The query is the same as the preceding one, except for the retrieval of namespace declarations of an element.
+ *
+ * Finally, let's use a ``rootElem`` of type [[eu.cdevreeze.yaidom.indexed.Elem]], which is immutable, but knows its ancestry:
+ * {{{
+ * val offendingElems = rootElem filterElems { elem =>
+ *   val decls = elem.namespaces
+ *   !decls.isEmpty
+ * }
+ * }}}
+ * This is exactly the same code as for ``ElemBuilder``, because namespace declarations happen to be retrieved in the same way.
+ *
+ * If we want to query all elements with namespace declarations, including the root element itself, we could write:
+ * {{{
+ * val elemsWithNSDeclarations = rootElem filterElemsOrSelf { elem =>
+ *   val decls = elem.namespaces
+ *   !decls.isEmpty
+ * }
+ * }}}
+ *
+ * In summary, the extremely simple ``ParentElemApi`` query API is indeed a uniform query API, offered by many different
+ * yaidom DOM-like element implementations. It should be noted that most of these element implementations offer the
+ * ``ElemApi`` query API, which extends the ``ParentElemApi`` query API.
+ *
+ * ==ParentElemApi more formally==
+ *
+ * The most fundamental method of this trait is ``findAllChildElems``. The semantics of the other methods can be defined
+ * directly or indirectly in terms of this method.
+ *
+ * The basic operations "above" that method are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
  * and ``\\!`` (alias for ``findTopmostElemsOrSelf``). Their semantics must be as if they had been defined as follows:
  * {{{
  * def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] =
@@ -38,7 +102,7 @@ import scala.collection.immutable
  *   else (this.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
  * }}}
  *
- * Similarly, we could have defined:
+ * Moreover, we could have defined:
  * {{{
  * def filterElems(p: E => Boolean): immutable.IndexedSeq[E] =
  *   this.findAllChildElems flatMap (_.filterElemsOrSelf(p))
@@ -84,7 +148,8 @@ import scala.collection.immutable
 trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
 
   /**
-   * Returns '''all child elements''', in the correct order. Other operations can be defined in terms of this one.
+   * '''Core method''' that returns '''all child elements''', in the correct order.
+   * Other operations can be defined in terms of this one.
    */
   def findAllChildElems: immutable.IndexedSeq[E]
 
@@ -101,7 +166,7 @@ trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
   def findAllElemsOrSelf: immutable.IndexedSeq[E]
 
   /**
-   * '''Core method''' that returns the child elements obeying the given predicate. This method could be defined as:
+   * Returns the child elements obeying the given predicate. This method could be defined as:
    * {{{
    * def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] =
    *   this.findAllChildElems.filter(p)
@@ -119,7 +184,7 @@ trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
   def filterElems(p: E => Boolean): immutable.IndexedSeq[E]
 
   /**
-   * '''Core method''' that returns the descendant-or-self elements obeying the given predicate. This method could be defined as:
+   * Returns the descendant-or-self elements obeying the given predicate. This method could be defined as:
    * {{{
    * def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] =
    *   Vector(this).filter(p) ++ (this.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
@@ -157,7 +222,7 @@ trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
   def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E]
 
   /**
-   * '''Core method''' that returns the descendant-or-self elements obeying the given predicate, such that no ancestor obeys the predicate.
+   * Returns the descendant-or-self elements obeying the given predicate, such that no ancestor obeys the predicate.
    * This method could be defined as:
    * {{{
    * def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] =
