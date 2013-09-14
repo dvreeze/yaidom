@@ -22,78 +22,12 @@ import scala.collection.{ immutable, mutable }
  * API and implementation trait for elements as containers of elements, each having a name and possible attributes.
  * This trait extends trait [[eu.cdevreeze.yaidom.ParentElemLike]], adding knowledge about names of elements and of attributes.
  *
- * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ * More precisely, this trait adds the following abstract methods to the abstract methods required by its supertrait:
+ * `resolvedName` and `resolvedAttributes`. Based on these abstract methods (and the supertrait), this trait offers a rich API
+ * for querying elements by (expanded) name, and for querying attributes.
  *
- * Example usage (where the `text` method is not offered by the `ElemLike` API itself, but by trait `HasText` instead):
- * {{{
- * val bookstoreElm = doc.documentElement
- * require(bookstoreElm.localName == "Bookstore")
- *
- * val cheapBookElms =
- *   for {
- *     bookElm <- bookstoreElm \ (_.localName == "Book")
- *     price = bookElm.attribute(EName("Price"))
- *     if price.toInt < 90
- *   } yield bookElm
- *
- * val cheapBookAuthors = {
- *   val result =
- *     for {
- *       cheapBookElm <- cheapBookElms
- *       authorElm <- cheapBookElm \\ (_.localName == "Author")
- *     } yield {
- *       val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
- *       val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
- *
- *       val firstName = firstNameElmOption.map(_.text).getOrElse("")
- *       val lastName = lastNameElmOption.map(_.text).getOrElse("")
- *       (firstName + " " + lastName).trim
- *     }
- *
- *   result.toSet
- * }
- * }}}
- *
- * Above, shorthand operator notation is used for querying child elements and descendant-or-self elements.
- * {{{
- * bookstoreElm \ (_.localName == "Book")
- * }}}
- * is equivalent to:
- * {{{
- * bookstoreElm filterChildElems { _.localName == "Book" }
- * }}}
- * Moreover:
- * {{{
- * cheapBookElm \\ (_.localName == "Author")
- * }}}
- * is equivalent to:
- * {{{
- * cheapBookElm filterElemsOrSelf { _.localName == "Author" }
- * }}}
- *
- * ==ElemLike methods==
- *
- * This trait adds the following abstract methods to the abstract methods required by its supertrait: `resolvedName` and `resolvedAttributes`.
- * Based on these abstract methods (and the supertrait), this trait offers a rich API for querying elements by (expanded) name, and for querying
- * attributes.
- *
- * This trait only knows about elements, not about nodes in general. Hence this trait has no knowledge about child nodes in
- * general. Hence the single type parameter, for the captured element type itself.
- *
- * The element query methods that need no knowledge about element names and attributes are implemented by supertrait
- * [[eu.cdevreeze.yaidom.ParentElemLike]].
- *
- * This trait adds the following groups of methods to the methods offered by the supertrait `ParentElemLike`:
- * <ul>
- * <li>Attribute query methods</li>
- * <li>Element query methods taking an `EName` or local name (which trivially correspond to method calls in the supertrait)</li>
- * <li>A method to get the local name of the element, without the namespace</li>
- * </ul>
- *
- * Obviously, this API does not offer much to the parent trait API. After all, the element query methods taking a local name or
- * expanded name are only syntactic sugar for specific calls to the corresponding `ParentElemLike` methods taking an element predicate.
- * Had we defined implicit conversions from local/expanded names to element predicates, most of this API would have been superfluous.
- * On the other hand, the current `ElemLike` API, which requires no implicits, is trivial to use.
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.ElemApi]]. See the documentation of that trait
+ * for examples of usage, and for a light formal treatment.
  *
  * @tparam E The captured element subtype
  *

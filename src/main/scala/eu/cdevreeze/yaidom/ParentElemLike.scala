@@ -23,42 +23,10 @@ import scala.collection.{ immutable, mutable }
  * about elements. It does not know about names, attributes, etc. All it knows about elements is that elements can have element children (other
  * node types are entirely out of scope in this trait).
  *
- * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
- *
- * Based on an abstract method returning the child elements, this trait offers query methods to find descendant-or-self elements,
- * topmost descendant-or-self elements obeying a predicate, and so on.
- *
- * Concrete element classes, such as [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]] (and even [[eu.cdevreeze.yaidom.ElemBuilder]]),
- * indeed mix in this trait (directly or indirectly), thus getting an API and implementation of many such query methods.
- *
- * Subtraits like [[eu.cdevreeze.yaidom.ElemLike]] implement many more methods on elements, based on more knowledge about elements, such
- * as element names and attributes. It is subtrait `UpdatableElemLike` that is typically mixed in by element classes. The distinction between
- * `ParentElemLike` and its subtraits is still useful, because this trait implements methods that only need knowledge about elements
- * as parent nodes of other elements. In an abstract sense, this trait could even be seen as an API that has nothing to do with
- * elements in particular, but that deals with trees (XML or not) in general (if we were to rename the trait, its methods and the type
- * parameter).
- *
- * The concrete element classes that mix in this trait (or a sub-trait) have knowledge about all child nodes of an element, whether
- * these child nodes are elements or not (such as text, comments etc.). Hence, this simple element-centric `ParentElemLike` API can be seen
- * as a good basis for querying arbitrary nodes and their values, even if this trait itself knows only about element nodes.
- *
- * For example, using class [[eu.cdevreeze.yaidom.Elem]], which also mixes in trait [[eu.cdevreeze.yaidom.HasText]],
- * all normalized text in a tree with document element `root` can be found as follows:
- * {{{
- * root.findAllElemsOrSelf map { e => e.normalizedText }
- * }}}
- * or:
- * {{{
- * root.findAllElemsOrSelf collect { case e: Elem => e.normalizedText }
- * }}}
- * As another example (also using the `HasText` trait as mixin), all text containing the string "query" can be found as follows:
- * {{{
- * root filterElemsOrSelf { e => e.text.contains("query") } map { _.text }
- * }}}
- * or:
- * {{{
- * root.findAllElemsOrSelf collect { case e: Elem if e.text.contains("query") => e.text }
- * }}}
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.ParentElemApi]]. See the documentation of that trait
+ * for examples of usage, and for a more formal treatment. Below follows an even more formal treatment, with proofs by induction
+ * of important properties obeyed by methods of this API. It shows the <em>mathematical</em> rigor of the yaidom query API.
+ * API users that are only interested in how to use the API can safely skip that formal treatment.
  *
  * ==ParentElemLike more formally==
  *

@@ -20,13 +20,13 @@ import scala.collection.immutable
 
 /**
  * This is the <em>foundation</em> of the yaidom <em>uniform query API</em>. Many DOM-like element implementations in
- * yaidom mix in this trait (indirectly, because a sub-trait is mixed in), thus sharing this query API.
+ * yaidom mix in this trait (indirectly, because some implementing sub-trait is mixed in), thus sharing this query API.
  *
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ParentElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows that elements can <em>have child elements</em>
  * (again not knowing about other child nodes). Using this minimal knowledge alone, it offers methods to query for
  * <em>descendant</em> elements, <em>descendant-or-self</em> methods, or sub-collections thereof. It is this minimal knowledge that
- * makes this API both uniform and mathematically precise.
+ * makes this API uniform.
  *
  * This query API leverages the Scala Collections API. Query results can be manipulated using the Collections API, and the
  * query API implementation (in ``ParentElemLike``) uses the Collections API internally.
@@ -42,41 +42,30 @@ import scala.collection.immutable
  * The corresponding "filtering" methods are called ``filterElems`` and ``filterElemsOrSelf``, respectively. Knowing this,
  * it is easy to guess the other API method names.
  *
- * Let's start with a yaidom DOM wrapper, named ``rootElem``, of type [[eu.cdevreeze.yaidom.dom.DomElem]]:
+ * Let's start with a yaidom DOM wrapper, named ``rootElem``, of type [[eu.cdevreeze.yaidom.dom.DomElem]], and query for the
+ * "offending" descendant elements:
  * {{{
- * val offendingElems = rootElem filterElems { elem =>
- *   val domAttrs = elem.wrappedNode.getAttributes
- *   val decls = convert.DomConversions.extractNamespaceDeclarations(domAttrs)
- *   !decls.isEmpty
- * }
+ * rootElem filterElems (elem => !convert.DomConversions.extractNamespaceDeclarations(elem.wrappedNode.getAttributes).isEmpty)
  * }}}
  * This returns all offending elements, that is, all descendant elements of the root element (excluding the root element itself)
  * that have at least one namespace declaration.
  *
  * Now let's use an [[eu.cdevreeze.yaidom.ElemBuilder]], again named ``rootElem``:
  * {{{
- * val offendingElems = rootElem filterElems { elem =>
- *   val decls = elem.namespaces
- *   !decls.isEmpty
- * }
+ * rootElem filterElems (elem => !elem.namespaces.isEmpty)
  * }}}
- * The query is the same as the preceding one, except for the retrieval of namespace declarations of an element.
+ * The query is the same as the preceding one, except for the retrieval of namespace declarations of an element. (It should be
+ * noted that class ``ElemBuilder`` already has a method ``allDeclarationsAreAtTopLevel``.)
  *
  * Finally, let's use a ``rootElem`` of type [[eu.cdevreeze.yaidom.indexed.Elem]], which is immutable, but knows its ancestry:
  * {{{
- * val offendingElems = rootElem filterElems { elem =>
- *   val decls = elem.namespaces
- *   !decls.isEmpty
- * }
+ * rootElem filterElems (elem => !elem.namespaces.isEmpty)
  * }}}
  * This is exactly the same code as for ``ElemBuilder``, because namespace declarations happen to be retrieved in the same way.
  *
- * If we want to query all elements with namespace declarations, including the root element itself, we could write:
+ * If we want to query for all elements with namespace declarations, including the root element itself, we could write:
  * {{{
- * val elemsWithNSDeclarations = rootElem filterElemsOrSelf { elem =>
- *   val decls = elem.namespaces
- *   !decls.isEmpty
- * }
+ * rootElem filterElemsOrSelf (elem => !elem.namespaces.isEmpty)
  * }}}
  *
  * In summary, the extremely simple ``ParentElemApi`` query API is indeed a uniform query API, offered by many different
@@ -85,10 +74,12 @@ import scala.collection.immutable
  *
  * ==ParentElemApi more formally==
  *
+ * The ``ParentElemApi`` can be understood in a precise <em>mathematical</em> sense, as shown below.
+ *
  * The most fundamental method of this trait is ``findAllChildElems``. The semantics of the other methods can be defined
  * directly or indirectly in terms of this method.
  *
- * The basic operations "above" that method are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
+ * The basic operations definable in terms of that method are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
  * and ``\\!`` (alias for ``findTopmostElemsOrSelf``). Their semantics must be as if they had been defined as follows:
  * {{{
  * def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] =
