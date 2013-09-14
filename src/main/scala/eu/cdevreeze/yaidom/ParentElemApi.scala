@@ -74,12 +74,12 @@ import scala.collection.immutable
  *
  * ==ParentElemApi more formally==
  *
- * The ``ParentElemApi`` can be understood in a precise <em>mathematical</em> sense, as shown below.
+ * The ``ParentElemApi`` trait can be understood in a precise <em>mathematical</em> sense, as shown below.
  *
- * The most fundamental method of this trait is ``findAllChildElems``. The semantics of the other methods can be defined
+ * The most <em>fundamental method</em> of this trait is ``findAllChildElems``. The semantics of the other methods can be defined
  * directly or indirectly in terms of this method.
  *
- * The basic operations definable in terms of that method are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
+ * The <em>basic operations</em> definable in terms of that method are ``\`` (alias for ``filterChildElems``), ``\\`` (alias for ``filterElemsOrSelf``)
  * and ``\\!`` (alias for ``findTopmostElemsOrSelf``). Their semantics must be as if they had been defined as follows:
  * {{{
  * def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] =

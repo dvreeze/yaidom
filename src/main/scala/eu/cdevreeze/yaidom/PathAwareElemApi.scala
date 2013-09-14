@@ -19,11 +19,160 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * API for elements as containers of elements, each having a name and possible attributes, as well as an "element path" from
- * the root element. See [[eu.cdevreeze.yaidom.PathAwareElemLike]].
+ * This is the <em>ElemPath-aware</em> part of the yaidom <em>uniform query API</em>. It is a sub-trait of trait
+ * [[eu.cdevreeze.yaidom.ElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
+ * because some implementing sub-trait is mixed in), thus sharing this query API.
  *
- * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
- * an XML database would not use the ``PathAwareElemLike`` implementation, for reasons of efficiency.
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.PathAwareElemLike]].
+ * That trait only knows about elements (and not about other nodes), and only knows the following about elements:
+ * <ul>
+ * <li>elements can <em>have child elements</em> (as promised by ancestor trait ``ParentElemLike``)</li>
+ * <li>elements have a so-called <em>"resolved name"</em> (as promised by parent trait ``ElemLike``)</li>
+ * <li>elements have zero or more <em>"resolved attributes"</em> (as promised by parent trait ``ElemLike``)</li>
+ * <li>elements have <em>element path entries</em> (as ``ElemPath.Entry`` objects) to their child elements,
+ * and child elements can be found by their element path entries</li>
+ * </ul>
+ * Using this minimal knowledge alone, that trait not only offers the methods of its parent trait, but also:
+ * <ul>
+ * <li>methods mirroring the ``ParentElemLike`` query methods, but returning ``ElemPath`` objects instead of elements</li>
+ * <li>a method to find an element given an ``ElemPath``</li>
+ * </ul>
+ * In other words, the ``PathAwareElemApi`` trait is quite a rich query API, considering the minimal knowledge it needs to
+ * have about elements.
+ *
+ * This query API leverages the Scala Collections API. Query results can be manipulated using the Collections API, and the
+ * query API implementation (in ``PathAwareElemLike``) uses the Collections API internally.
+ *
+ * ==PathAwareElemApi examples==
+ *
+ * To illustrate the use of this API, consider the following example XML:
+ * {{{
+ * <book:Bookstore xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author">
+ *   <book:Book ISBN="978-0321356680" Price="35" Edition="2">
+ *     <book:Title>Effective Java (2nd Edition)</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Joshua</auth:First_Name>
+ *         <auth:Last_Name>Bloch</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ *   <book:Book ISBN="978-0981531649" Price="35" Edition="2">
+ *     <book:Title>Programming in Scala: A Comprehensive Step-by-Step Guide, 2nd Edition</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Martin</auth:First_Name>
+ *         <auth:Last_Name>Odersky</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Lex</auth:First_Name>
+ *         <auth:Last_Name>Spoon</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Bill</auth:First_Name>
+ *         <auth:Last_Name>Venners</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * </book:Bookstore>
+ * }}}
+ *
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.Elem]] instance ``bookstoreElem``. Then we can perform the
+ * following query, using only the ``ElemApi`` query API:
+ * {{{
+ * val bookstoreNamespace = "http://bookstore/book"
+ * val authorNamespace = "http://bookstore/author"
+ * require(bookstoreElem.resolvedName == EName(bookstoreNamespace, "Bookstore"))
+ *
+ * val scalaBookElems =
+ *   for {
+ *     bookElem <- bookstoreElem \\ EName(bookstoreNamespace, "Book")
+ *     if (bookElem \ EName(bookstoreNamespace, "Title")).map(_.text).headOption.getOrElse("").contains("Scala")
+ *   } yield bookElem
+ * }}}
+ *
+ * This is a top-down approach for finding Scala books. A bottom-up approach, using the ``PathAwareElemApi`` query API,
+ * could be coded as follows:
+ * {{{
+ * val scalaBookElems =
+ *   for {
+ *     titleElemPath <- bookstoreElem filterElemPaths (e => e.resolvedName == EName(bookstoreNamespace, "Title"))
+ *     if bookstoreElem.getWithElemPath(titleElemPath).text.contains("Scala")
+ *     bookElemPath <- titleElemPath.findAncestorPath(_.endsWithName(EName(bookstoreNamespace, "Book")))
+ *   } yield bookstoreElem.getWithElemPath(bookElemPath)
+ * }}}
+ *
+ * A few remarks are in order:
+ * <ul>
+ * <li>Be careful to invoke ``getWithElemPath`` (or ``findWithElemPath``) on the correct element</li>
+ * <li>Invoking these methods many times in succession may harm performance</li>
+ * <li>Note that element paths are not stable, when (functionally) updating elements</li>
+ * <li>This API does not offer any query methods taking predicates on paths instead of on elements. In practice, this should
+ * not be a large issue, because one could always (further) filter paths using the Scala Collections API</li>
+ * </ul>
+ * Still, the methods specific to the ``PathAwareElemApi`` trait are a nice tool in the yaidom querying toolbox.
+ *
+ * ==PathAwareElemApi more formally==
+ *
+ * The ``PathAwareElemApi`` trait can be understood more formally, as shown below.
+ *
+ * Theoretically, ignoring performance, the most <em>fundamental method</em> of this trait is ``findAllChildElemPaths``.
+ * The semantics of the other methods can be defined directly or indirectly in terms of this method, and of the other
+ * fundamental method ``getWithElemPath``.
+ *
+ * The <em>basic operations</em> definable in terms of these methods are ``filterChildElemPaths``, ``filterElemOrSelfPaths``
+ * and ``findTopmostElemOrSelfPaths``, analogous to trait ``ParentElemApi``. Their semantics must be as if they had been
+ * defined as follows:
+ * {{{
+ * def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ *   this.findAllChildElemPaths.filter(path => p(getWithElemPath(path)))
+ *
+ * def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ *   (if (p(this)) Vector(ElemPath.Root) else Vector()) ++
+ *     (this.findAllChildElemPaths flatMap (path => getWithElemPath(path).filterElemOrSelfPaths(p)))
+ *
+ * def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ *   if (p(this)) Vector(ElemPath.Root)
+ *   else (this.findAllChildElemPaths flatMap (path => getWithElemPath(path).findTopmostElemOrSelfPaths(p)))
+ * }}}
+ *
+ * Moreover, we could have defined:
+ * {{{
+ * def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ *   this.findAllChildElemPaths flatMap (path => getWithElemPath(path).filterElemOrSelfPaths(p))
+ *
+ * def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ *   this.findAllChildElemPaths flatMap (path => getWithElemPath(path).findTopmostElemOrSelfPaths(p))
+ * }}}
+ * and:
+ * {{{
+ * def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath] = filterElemOrSelfPaths(e => true)
+ *
+ * def findAllElemPaths: immutable.IndexedSeq[ElemPath] = filterElemPaths(e => true)
+ * }}}
+ *
+ * Assuming that for ``resolved.Elem`` instance ``elem``, we have:
+ * {{{
+ * (elem.findAllChildElemPaths map (path => elem.getWithElemPath(path))) == elem.findAllChildElems
+ * }}}
+ * it follows that:
+ * {{{
+ * (elem.filterElemOrSelfPaths(p) map (path => elem.getWithElemPath(path))) == elem.filterElemsOrSelf(p)
+ *
+ * (elem.filterElemPaths(p) map (path => elem.getWithElemPath(path))) == elem.filterElems(p)
+ * }}}
+ * etc.
+ *
+ * Also, analogous to ``ParentElemApi``, we have:
+ * {{{
+ * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.getWithElemPath(path)))
+ *
+ * elem.filterElemOrSelfPaths(p) == elem.findAllElemOrSelfPaths.filter(path => p(elem.getWithElemPath(path)))
+ * }}}
+ * etc.
+ *
+ * No proofs are provided. Again, note that the formal treatment above helps in understanding the semantics, and no more
+ * than that. The implementations in trait ``PathAwareElemLike`` are quite different.
  *
  * @tparam E The captured element subtype
  *

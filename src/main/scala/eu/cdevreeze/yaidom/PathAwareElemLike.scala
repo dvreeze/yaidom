@@ -19,106 +19,16 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * API and implementation trait for elements as containers of elements, each having a name and possible attributes,
- * as well as an "element path" from the root element. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding knowledge
- * about "element paths" of elements with respect to a root element.
+ * API and implementation trait for elements as containers of elements, each having a name and possible attributes, as well
+ * as having awareness of element paths. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding knowledge about
+ * element paths.
  *
- * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
+ * `findAllChildElemsWithPathEntries` and `findWithElemPathEntry`. Based on these abstract methods (and the super-trait), this
+ * trait offers a rich API for querying elements and element paths.
  *
- * This trait to a large extent mirrors the `ParentElemLike` trait, with queries returning "element paths" instead of "elements".
- * As mentioned above, this trait knows more about elements than its supertraits, because it knows about "element paths". Still, it
- * knows only about element nodes, so other node types than elements are not known to this API.
- *
- * Based on its supertraits `ElemLike` and `ParentElemLike`, this trait offers a rich `ElemPath` query API. Two additional abstract methods
- * other than those required by the supertraits need to be implemented, viz. `findWithElemPathEntry` and `findAllChildElemsWithPathEntries`.
- *
- * This trait is extended by trait `UpdatableElemLike`, and therefore mixed in by [[eu.cdevreeze.yaidom.Elem]] and [[eu.cdevreeze.yaidom.resolved.Elem]].
- *
- * Example usage:
- * {{{
- * val bookstoreElm = doc.documentElement
- * require(bookstoreElm.localName == "Bookstore")
- *
- * val bookAuthorElms =
- *   for {
- *     authorPath <- bookstoreElm findTopmostElemPaths { _.localName == "Author" }
- *     if authorPath.containsName(EName("Book"))
- *   } yield bookstoreElm.getWithElemPath(authorPath)
- * }}}
- *
- * The above example shows how we can use the results of queries for `ElemPath`s, if we are interested in the ancestors of the
- * elements at those paths. Of course, using only the `ElemLike` API, this example could have been written simply as:
- * {{{
- * val bookstoreElm = doc.documentElement
- * require(bookstoreElm.localName == "Bookstore")
- *
- * val bookAuthorElms =
- *   for {
- *     bookElm <- bookstoreElm \\ EName("Book")
- *     authorElm <- bookElm findTopmostElems { _.localName == "Author" }
- *   } yield authorElm
- * }}}
- *
- * Indeed, the query methods of the `ParentElemLike` API (or `ElemLike` API) should often be preferred to those of this
- * `PathAwareElemLike` API. After all, `ElemPath`s are relative to one specific root element, they are "volatile" (in that
- * "functional updates" may render them useless), and they are rather slow indexes. Moreover, the `ParentElemLike` query methods
- * tend to be faster than those of this trait.
- *
- * On the other hand, it is often the combination of `ParentElemLike` API query methods and `PathAwareElemLike` API query methods
- * that offer interesting querying possibilities. After all, sometimes it is handy to formulate a query in such a way that ancestors
- * are retrieved in at least one of the intermediate steps.
- *
- * Another use for `ElemPath` queries is functional updates. See [[eu.cdevreeze.yaidom.UpdatableElemLike]] for the "update"
- * methods. Some `updated` methods take an `ElemPath`, and another `updated` method is implemented using an `ElemPath` query offered
- * by this API.
- *
- * Note that this API does not offer any query methods using a predicate on `ElemPath`s instead of on elements. Such queries
- * can always be rewritten to queries in which the Scala Collections API `filter` method is used for filtering on `ElemPath`s.
- *
- * ==PathAwareElemLike more formally==
- *
- * Analogously to the `ParentElemLike` API, there are 3 '''core''' element path retrieval methods:
- * <ul>
- * <li>Method `findAllChildElemPaths`, returning the paths (relative to this element) of all '''child''' elements</li>
- * <li>Method `findAllElemPaths`, finding the paths (relative to this element) of all '''descendant''' elements</li>
- * <li>Method `findAllElemOrSelfPaths`, finding the paths (relative to this element) of all '''descendant''' elements '''or self'''</li>
- * </ul>
- *
- * For example, instead of:
- * {{{
- * val titlePaths = elm filterElemOrSelfPaths { e => e.resolvedName == EName("Title") }
- * }}}
- * we could write (more verbosely):
- * {{{
- * val titlePaths = elm.findAllElemOrSelfPaths filter { path => elm.getWithElemPath(path).resolvedName == EName("Title") }
- * }}}
- * The second statement is far less efficient, due to repeated calls to method `getWithElemPath`. In this case, we could instead
- * have written:
- * {{{
- * val titlePaths = elm.findAllElemOrSelfPaths filter { path => path.endsWithName(EName("Title")) }
- * }}}
- *
- * Assuming correct implementations of the abstract methods, and using "resolved" (!) [[eu.cdevreeze.yaidom.resolved.Elem]] instances
- * (which have structural equality defined), this trait obeys some obvious properties, expressed using equality:
- * {{{
- * (elm.findAllElemOrSelfPaths map (path => elm.getWithElemPath(path))) == elm.findAllElemsOrSelf
- * (elm.findAllElemPaths map (path => elm.getWithElemPath(path))) == elm.findAllElems
- * (elm.findAllChildElemPaths map (path => elm.getWithElemPath(path))) == elm.findAllChildElems
- *
- * (elm.filterElemOrSelfPaths(p) map (path => elm.getWithElemPath(path))) == elm.filterElemsOrSelf(p)
- * (elm.filterElemPaths(p) map (path => elm.getWithElemPath(path))) == elm.filterElems(p)
- *
- * (elm.findTopmostElemOrSelfPaths(p) map (path => elm.getWithElemPath(path))) == elm.findTopmostElemsOrSelf(p)
- * (elm.findTopmostElemPaths(p) map (path => elm.getWithElemPath(path))) == elm.findTopmostElems(p)
- * }}}
- * etc.
- *
- * We offer no proofs of these properties.
- *
- * ==Implementation notes==
- *
- * Like trait `ParentElemLike`, some query methods use recursion in their implementations, but no tail recursion. See [[eu.cdevreeze.yaidom.ParentElemLike]]
- * for a motivation.
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.PathAwareElemApi]]. See the documentation of that trait
+ * for examples of usage, and for a more formal treatment.
  *
  * @tparam E The captured element subtype
  *
