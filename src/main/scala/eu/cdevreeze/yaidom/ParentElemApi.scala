@@ -101,6 +101,12 @@ import scala.collection.immutable
  * def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
  *   this.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))
  * }}}
+ * and:
+ * {{{
+ * def findAllElemsOrSelf: immutable.IndexedSeq[E] = filterElemsOrSelf(e => true)
+ *
+ * def findAllElems: immutable.IndexedSeq[E] = filterElems(e => true)
+ * }}}
  *
  * The following properties must hold (in the absence of side-effects), and can indeed be proven (given the documented
  * "definitions" of these operations):

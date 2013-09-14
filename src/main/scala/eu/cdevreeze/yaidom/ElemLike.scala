@@ -22,8 +22,8 @@ import scala.collection.{ immutable, mutable }
  * API and implementation trait for elements as containers of elements, each having a name and possible attributes.
  * This trait extends trait [[eu.cdevreeze.yaidom.ParentElemLike]], adding knowledge about names of elements and of attributes.
  *
- * More precisely, this trait adds the following abstract methods to the abstract methods required by its supertrait:
- * `resolvedName` and `resolvedAttributes`. Based on these abstract methods (and the supertrait), this trait offers a rich API
+ * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
+ * `resolvedName` and `resolvedAttributes`. Based on these abstract methods (and the super-trait), this trait offers a rich API
  * for querying elements by (expanded) name, and for querying attributes.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.ElemApi]]. See the documentation of that trait
