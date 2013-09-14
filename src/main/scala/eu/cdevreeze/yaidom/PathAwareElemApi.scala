@@ -128,21 +128,32 @@ import scala.collection.immutable
  *   this.findAllChildElemPaths.filter(path => p(getWithElemPath(path)))
  *
  * def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
- *   (if (p(this)) Vector(ElemPath.Root) else Vector()) ++
- *     (this.findAllChildElemPaths flatMap (path => getWithElemPath(path).filterElemOrSelfPaths(p)))
+ *   (if (p(this)) Vector(ElemPath.Root) else Vector()) ++ {
+ *     this.findAllChildElemPaths flatMap { path =>
+ *       getWithElemPath(path).filterElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *     }
+ *   }
  *
  * def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   if (p(this)) Vector(ElemPath.Root)
- *   else (this.findAllChildElemPaths flatMap (path => getWithElemPath(path).findTopmostElemOrSelfPaths(p)))
+ *   else {
+ *     this.findAllChildElemPaths flatMap { path =>
+ *       getWithElemPath(path).findTopmostElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *     }
+ *   }
  * }}}
  *
  * Moreover, we could have defined:
  * {{{
  * def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
- *   this.findAllChildElemPaths flatMap (path => getWithElemPath(path).filterElemOrSelfPaths(p))
+ *   this.findAllChildElemPaths flatMap { path =>
+ *     getWithElemPath(path).filterElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *   }
  *
  * def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
- *   this.findAllChildElemPaths flatMap (path => getWithElemPath(path).findTopmostElemOrSelfPaths(p))
+ *   this.findAllChildElemPaths flatMap { path =>
+ *     getWithElemPath(path).findTopmostElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *   }
  * }}}
  * and:
  * {{{
