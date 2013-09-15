@@ -116,29 +116,35 @@ import scala.collection.immutable
  *
  * The ``PathAwareElemApi`` trait can be understood more formally, as shown below.
  *
- * Theoretically, ignoring performance, the most <em>fundamental method</em> of this trait is ``findAllChildElemPaths``.
- * The semantics of the other methods can be defined directly or indirectly in terms of this method, and of the other
- * fundamental method ``getWithElemPath``.
+ * The most <em>fundamental methods</em> of this trait are ``findAllChildElemsWithPathEntries`` and ``findWithElemPathEntry``.
+ * The semantics of the other methods can be defined directly or indirectly in terms of method ``findAllChildElemsWithPathEntries``.
  *
- * The <em>basic operations</em> definable in terms of these methods are ``filterChildElemPaths``, ``filterElemOrSelfPaths``
- * and ``findTopmostElemOrSelfPaths``, analogous to trait ``ParentElemApi``. Their semantics must be as if they had been
- * defined as follows:
+ * The following must hold (for ``indexed.Elem``, which has structural equality defined):
+ * {{{
+ * elem.findAllChildElemsWithPathEntries.map(_._1) == elem.findAllChildElems
+ *
+ * elem.findAllChildElemsWithPathEntries forall { case (che, pe) => elem.findWithElemPathEntry(pe).get == che }
+ * }}}
+ *
+ * The <em>basic operations</em> definable in terms of method ``findAllChildElemsWithPathEntries`` are ``filterChildElemPaths``,
+ * ``filterElemOrSelfPaths`` and ``findTopmostElemOrSelfPaths``, analogous to trait ``ParentElemApi``. Their semantics must be
+ * as if they had been defined as follows:
  * {{{
  * def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
- *   this.findAllChildElemPaths.filter(path => p(getWithElemPath(path)))
+ *   this.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
  *
  * def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   (if (p(this)) Vector(ElemPath.Root) else Vector()) ++ {
- *     this.findAllChildElemPaths flatMap { path =>
- *       getWithElemPath(path).filterElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *     this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
+ *       che.filterElemOrSelfPaths(p).map(_.prepend(pe))
  *     }
  *   }
  *
  * def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   if (p(this)) Vector(ElemPath.Root)
  *   else {
- *     this.findAllChildElemPaths flatMap { path =>
- *       getWithElemPath(path).findTopmostElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *     this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
+ *       che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
  *     }
  *   }
  * }}}
@@ -146,13 +152,13 @@ import scala.collection.immutable
  * Moreover, we could have defined:
  * {{{
  * def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
- *   this.findAllChildElemPaths flatMap { path =>
- *     getWithElemPath(path).filterElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *   this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
+ *     che.filterElemOrSelfPaths(p).map(_.prepend(pe))
  *   }
  *
  * def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
- *   this.findAllChildElemPaths flatMap { path =>
- *     getWithElemPath(path).findTopmostElemOrSelfPaths(p).map(_.prepend(path.lastEntry))
+ *   this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
+ *     che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
  *   }
  * }}}
  * and:
@@ -162,28 +168,29 @@ import scala.collection.immutable
  * def findAllElemPaths: immutable.IndexedSeq[ElemPath] = filterElemPaths(e => true)
  * }}}
  *
- * Assuming that for ``resolved.Elem`` instance ``elem``, we have:
+ * Knowing that for ``resolved.Elem`` instance ``elem``, we have:
  * {{{
- * (elem.findAllChildElemPaths map (path => elem.getWithElemPath(path))) == elem.findAllChildElems
+ * (elem.findAllChildElemsWithPathEntries map (_._1)) == elem.findAllChildElems
  * }}}
  * it follows that:
  * {{{
- * (elem.filterElemOrSelfPaths(p) map (path => elem.getWithElemPath(path))) == elem.filterElemsOrSelf(p)
+ * (elem.filterChildElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterChildElems(p)
  *
- * (elem.filterElemPaths(p) map (path => elem.getWithElemPath(path))) == elem.filterElems(p)
+ * (elem.filterElemOrSelfPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElemsOrSelf(p)
+ *
+ * (elem.filterElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElems(p)
  * }}}
- * etc.
+ * etc., where ``findWithElemPath`` is defined recursively, using method ``findWithElemPathEntry``.
  *
  * Also, analogous to ``ParentElemApi``, we have:
  * {{{
- * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.getWithElemPath(path)))
+ * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.findWithElemPath(path).get))
  *
- * elem.filterElemOrSelfPaths(p) == elem.findAllElemOrSelfPaths.filter(path => p(elem.getWithElemPath(path)))
+ * elem.filterElemOrSelfPaths(p) == elem.findAllElemOrSelfPaths.filter(path => p(elem.findWithElemPath(path).get))
  * }}}
  * etc.
  *
- * No proofs are provided. Again, note that the formal treatment above helps in understanding the semantics, and no more
- * than that. The implementations in trait ``PathAwareElemLike`` are quite different.
+ * No proofs are provided. Note that the similarities with trait ``ParentElemLike`` are striking.
  *
  * @tparam E The captured element subtype
  *

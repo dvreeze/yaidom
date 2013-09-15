@@ -165,21 +165,42 @@ class PathAwareElemLikeTest extends Suite {
       rootElem.filterElemOrSelfPaths(p) map (path => rootElem.getWithElemPath(path)) map (e => resolved.Elem(e))
     }
 
+    expectResult(rootElem.filterElems(p).map(e => resolved.Elem(e))) {
+      rootElem.filterElemPaths(p) map (path => rootElem.getWithElemPath(path)) map (e => resolved.Elem(e))
+    }
+
+    expectResult(rootElem.filterChildElems(p).map(e => resolved.Elem(e))) {
+      rootElem.filterChildElemPaths(p) map (path => rootElem.getWithElemPath(path)) map (e => resolved.Elem(e))
+    }
+  }
+
+  @Test def testOtherEqualities() {
+    val p = { e: Elem => Set("item").contains(e.localName) }
+    val paths = rootElem.filterElemOrSelfPaths(p)
+
+    expectResult(rootElem.findAllElemOrSelfPaths.filter(path => p(rootElem.getWithElemPath(path)))) {
+      rootElem.filterElemOrSelfPaths(p)
+    }
+
     expectResult(rootElem.findAllElemPaths.filter(path => p(rootElem.getWithElemPath(path)))) {
       rootElem.filterElemPaths(p)
+    }
+
+    expectResult(rootElem.findAllChildElemPaths.filter(path => p(rootElem.getWithElemPath(path)))) {
+      rootElem.filterChildElemPaths(p)
     }
   }
 
   // Semantical definitions
 
   private def filterChildElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
-    elem.findAllChildElemPaths.filter(path => p(elem.getWithElemPath(path)))
+    elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
 
   private def filterElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
     (if (p(elem)) Vector(ElemPath.Root) else Vector()) ++ {
-      elem.findAllChildElemPaths flatMap { path =>
-        val ch = elem.getWithElemPath(path)
-        filterElemOrSelfPaths(ch, p).map(_.prepend(path.lastEntry))
+      elem.findAllChildElemsWithPathEntries flatMap {
+        case (che, pe) =>
+          filterElemOrSelfPaths(che, p).map(_.prepend(pe))
       }
     }
   }
@@ -187,21 +208,23 @@ class PathAwareElemLikeTest extends Suite {
   private def findTopmostElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
     if (p(elem)) Vector(ElemPath.Root)
     else {
-      elem.findAllChildElemPaths flatMap { path =>
-        val ch = elem.getWithElemPath(path)
-        findTopmostElemOrSelfPaths(ch, p).map(_.prepend(path.lastEntry))
+      elem.findAllChildElemsWithPathEntries flatMap {
+        case (che, pe) =>
+          findTopmostElemOrSelfPaths(che, p).map(_.prepend(pe))
       }
     }
   }
 
   private def filterElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
-    elem.findAllChildElemPaths flatMap { path =>
-      filterElemOrSelfPaths(elem.getWithElemPath(path), p).map(_.prepend(path.lastEntry))
+    elem.findAllChildElemsWithPathEntries flatMap {
+      case (che, pe) =>
+        filterElemOrSelfPaths(che, p).map(_.prepend(pe))
     }
 
   private def findTopmostElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
-    elem.findAllChildElemPaths flatMap { path =>
-      findTopmostElemOrSelfPaths(elem.getWithElemPath(path), p).map(_.prepend(path.lastEntry))
+    elem.findAllChildElemsWithPathEntries flatMap {
+      case (che, pe) =>
+        findTopmostElemOrSelfPaths(che, p).map(_.prepend(pe))
     }
 
   private def findAllElemOrSelfPaths(elem: Elem): immutable.IndexedSeq[ElemPath] = filterElemOrSelfPaths(elem, e => true)
