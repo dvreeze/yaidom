@@ -168,6 +168,14 @@ import scala.collection.immutable
  * def findAllElemPaths: immutable.IndexedSeq[ElemPath] = filterElemPaths(e => true)
  * }}}
  *
+ * Then, analogously to ``ParentElemApi``, the following properties hold:
+ * {{{
+ * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.findWithElemPath(path).get))
+ *
+ * elem.filterElemOrSelfPaths(p) == elem.findAllElemOrSelfPaths.filter(path => p(elem.findWithElemPath(path).get))
+ * }}}
+ * etc.
+ *
  * Knowing that for ``resolved.Elem`` instance ``elem``, we have:
  * {{{
  * (elem.findAllChildElemsWithPathEntries map (_._1)) == elem.findAllChildElems
@@ -181,14 +189,6 @@ import scala.collection.immutable
  * (elem.filterElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElems(p)
  * }}}
  * etc., where ``findWithElemPath`` is defined recursively, using method ``findWithElemPathEntry``.
- *
- * Also, analogous to ``ParentElemApi``, we have:
- * {{{
- * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.findWithElemPath(path).get))
- *
- * elem.filterElemOrSelfPaths(p) == elem.findAllElemOrSelfPaths.filter(path => p(elem.findWithElemPath(path).get))
- * }}}
- * etc.
  *
  * No proofs are provided. Note that the similarities with trait ``ParentElemLike`` are striking.
  *
