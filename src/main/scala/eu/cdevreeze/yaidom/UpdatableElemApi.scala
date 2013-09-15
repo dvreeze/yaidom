@@ -19,21 +19,165 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * "Updatable" element. It defines a contract for "functional updates". See [[eu.cdevreeze.yaidom.UpdatableElemLike]].
+ * This is the <em>functional update</em> part of the yaidom <em>uniform query API</em>. It is a sub-trait of trait
+ * [[eu.cdevreeze.yaidom.PathAwareElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
+ * because some implementing sub-trait is mixed in), thus sharing this query API.
+ *
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.UpdatableElemLike]].
+ * The trait has all the knowledge of its super-trait, but in addition to that knows the following:
+ * <ul>
+ * <li>An element has <em>child nodes</em>, which may or may not be elements. Hence the extra type parameter for nodes.</li>
+ * <li>An element knows the <em>child node indexes</em> of the path entries of the child elements.</li>
+ * </ul>
+ * Obviously methods ``children``, ``withChildren`` and ``childNodeIndexesByPathEntries`` must be consistent with
+ * methods such as ``findAllChildElems`` and ``findAllChildElemsWithPathEntries``.
+ *
+ * Using this minimal knowledge alone, trait ``UpdatableElemLike`` not only offers the methods of its parent trait, but also:
+ * <ul>
+ * <li>methods to <em>functionally update</em> an element by replacing, adding or deleting child nodes</li>
+ * <li>methods to <em>functionally update</em> an element by replacing descendant-or-self elements at specified element paths</li>
+ * </ul>
+ * In other words, the ``UpdatableElemApi`` trait is quite a rich query API, considering the minimal knowledge it needs to
+ * have about elements.
  *
  * For the conceptual difference with "transformable" elements, see trait [[eu.cdevreeze.yaidom.TransformableElemApi]].
  *
- * This purely abstract query API trait leaves the implementation completely open. For example, an implementation backed by
- * an XML database would not use the ``UpdatableElemLike`` implementation, for reasons of efficiency.
+ * This query API leverages the Scala Collections API. Query results can be manipulated using the Collections API, and the
+ * query API implementation (in ``UpdatableElemLike``) uses the Collections API internally.
  *
- * There are 2 groups of "functional update" methods that work with `ElemPath` instances:
- * <ul>
- * <li>Overloaded `updated` methods. They use an "update function" from elements to elements, and call it on the root element as well.</li>
- * <li>Overloaded `updatedWithNodeSeq` methods. They use an "update function" from elements to node sequences, and do not call it on the root element.</li>
- * </ul>
+ * ==UpdatableElemApi examples==
  *
- * The second group of "functional update" methods can be implemented in terms of the first group of methods. The second group of
- * methods allow for flexible "functional updates", because an element can be "replaced" by an arbitrary sequence of nodes.
+ * To illustrate the use of this API, consider the following example XML:
+ * {{{
+ * <book:Bookstore xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author">
+ *   <book:Book ISBN="978-0321356680" Price="35" Edition="2">
+ *     <book:Title>Effective Java (2nd Edition)</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Joshua</auth:First_Name>
+ *         <auth:Last_Name>Bloch</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ *   <book:Book ISBN="978-0981531649" Price="35" Edition="2">
+ *     <book:Title>Programming in Scala: A Comprehensive Step-by-Step Guide, 2nd Edition</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Martin</auth:First_Name>
+ *         <auth:Last_Name>Odersky</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Lex</auth:First_Name>
+ *         <auth:Last_Name>Spoon</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Bill</auth:First_Name>
+ *         <auth:Last_Name>Venners</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * </book:Bookstore>
+ * }}}
+ *
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.Elem]] variable named ``bookstoreElem``. Then we can add a book
+ * as follows, where we "forget" the 2nd author for the moment:
+ * {{{
+ * import convert.ScalaXmlConversions._
+ *
+ * val bookstoreNamespace = "http://bookstore/book"
+ * val authorNamespace = "http://bookstore/author"
+ *
+ * val fpBookXml =
+ *   <book:Book xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author" ISBN="978-1617290657" Price="33">
+ *     <book:Title>Functional Programming in Scala</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Paul</auth:First_Name>
+ *         <auth:Last_Name>Chiusano</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * val fpBookElem = convertToElem(fpBookXml)
+ *
+ * bookstoreElem = bookstoreElem.plusChild(fpBookElem)
+ * }}}
+ * Note that the namespace declarations for prefixes ``book`` and ``auth`` had to be repeated in the Scala XML literal
+ * for the added book, because otherwise the ``convertToElem`` method would throw an exception (since ``Elem`` instances
+ * cannot be created unless all element and attribute QNames can be resolved as ENames).
+ *
+ * The resulting bookstore seems ok, but if we print ``convertElem(bookstoreElem)``, the result does not look pretty.
+ * This can be fixed if the last assignment is replaced by:
+ * {{{
+ * bookstoreElem = bookstoreElem.plusChild(fpBookElem).prettify(2)
+ * }}}
+ * knowing that an indentation of 2 spaces has been used throughout the original XML. Method ``prettify`` is expensive, so it
+ * is best not to invoke it within a tight loop. As an alternative, formatting can be left to the ``DocumentPrinter``, of
+ * course.
+ *
+ * The assignment above is the same as the following one:
+ * {{{
+ * bookstoreElem = bookstoreElem.withChildren(bookstoreElem.children :+ fpBookElem).prettify(2)
+ * }}}
+ *
+ * There are several methods to functionally update the children of an element. For example, method ``plusChild`` is overloaded,
+ * and the other variant can insert a child at a given 0-based position. Other "children update" methods are ``minusChild``,
+ * ``withPatchedChildren`` and ``withUpdatedChildren``.
+ *
+ * Let's now turn to functional update methods that take ``ElemPath`` instances or collections thereof. In the example above
+ * the second author of the added book is missing. Let's fix that:
+ * {{{
+ * val secondAuthorXml =
+ *   <auth:Author xmlns:auth="http://bookstore/author">
+ *     <auth:First_Name>Runar</auth:First_Name>
+ *     <auth:Last_Name>Bjarnason</auth:Last_Name>
+ *   </auth:Author>
+ * val secondAuthorElem = convertToElem(secondAuthorXml)
+ *
+ * val fpBookAuthorsPaths =
+ *   for {
+ *     authorsPath <- bookstoreElem filterElemPaths { e => e.resolvedName == EName(bookstoreNamespace, "Authors") }
+ *     if authorsPath.findAncestorPath(path => path.endsWithName(EName(bookstoreNamespace, "Book")) &&
+ *       bookstoreElem.getWithElemPath(path).attribute(EName("ISBN")) == "978-1617290657").isDefined
+ *   } yield authorsPath
+ *
+ * require(fpBookAuthorsPaths.size == 1)
+ * val fpBookAuthorsPath = fpBookAuthorsPaths.head
+ *
+ * bookstoreElem = bookstoreElem.updated(fpBookAuthorsPath) { elem =>
+ *   require(elem.resolvedName == EName(bookstoreNamespace, "Authors"))
+ *   val rawResult = elem.plusChild(secondAuthorElem)
+ *   rawResult transformElemsOrSelf (e => e.copy(scope = elem.scope.withoutDefaultNamespace ++ e.scope))
+ * }
+ * bookstoreElem = bookstoreElem.prettify(2)
+ * }}}
+ *
+ * Clearly the resulting bookstore element is nicely formatted, but there was another possible issue that was taken into
+ * account. See the line of code transforming the "raw result". That line was added in order to prevent namespace undeclarations,
+ * which for XML version 1.0 are not allowed (with the exception of the default namespace). After all, the XML for the second
+ * author was created with only the ``auth`` namespace declared. Without the above-mentioned line of code, a namespace
+ * undeclaration for prefix ``book`` would have occurred in the resulting XML, thus leading to an invalid XML 1.0 element tree.
+ *
+ * To illustrate functional update methods taking collections of element paths, let's remove the added book from the book store.
+ * Here is one (somewhat inefficient) way to do that:
+ * {{{
+ * val bookPaths = bookstoreElem filterElemPaths (_.resolvedName == EName(bookstoreNamespace, "Book"))
+ *
+ * bookstoreElem = bookstoreElem.updatedWithNodeSeqAtPaths(bookPaths.toSet) { (elem, path) =>
+ *   if ((elem \@ EName("ISBN")) == Some("978-1617290657")) Vector() else Vector(elem)
+ * }
+ * bookstoreElem = bookstoreElem.prettify(2)
+ * }}}
+ * There are very many ways to write this functional update, using different functional update methods in trait ``UpdatableElemApi``,
+ * or even only using transformation methods in trait ``TransformableElemApi`` (thus not using element paths).
+ *
+ * The example code above is enough to get started using the ``UpdatableElemApi`` methods, but it makes sense to study the
+ * entire API, and practice with it. Always keep in mind that functional updates typically mess up formatting and/or namespace
+ * (un)declarations, unless these aspects are taken into account.
+ *
+ * ==UpdatableElemApi more formally==
+ *
+ * Currently no effort has been made to describe interesting properties obeyed by "updatable elements". See the documentation
+ * of the individual functional update methods for more formal definitions.
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
@@ -95,7 +239,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val newChildren = childNodeIndexesByPathEntries.filterKeys(pathEntries).foldLeft(children) {
+   * val newChildren = childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2).reverse.foldLeft(children) {
    *   case (acc, (pathEntry, idx)) =>
    *     acc.updated(idx, f(acc(idx).asInstanceOf[E], pathEntry))
    * }
@@ -186,7 +330,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val indexesByPathEntries = childNodeIndexesByPathEntries.filterKeys(pathEntries)
+   * val indexesByPathEntries = childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2).reverse
    * val newChildGroups =
    *   indexesByPathEntries.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
    *     case (acc, (pathEntry, idx)) =>

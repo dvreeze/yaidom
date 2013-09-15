@@ -19,25 +19,16 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * "Updatable" element. It defines a contract for "functional updates".
+ * API and implementation trait for functionally updatable elements. This trait extends trait [[eu.cdevreeze.yaidom.PathAwareElemLike]],
+ * adding knowledge about child nodes in general, and about the correspondence between child element path entries and child
+ * indexes.
  *
- * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
+ * `children`, `withChildren` and `childNodeIndexesByPathEntries`. Based on these abstract methods (and the super-trait), this
+ * trait offers a rich API for querying elements and element paths, and for functionally updating elements.
  *
- * This trait is a sub-trait of [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds a type parameter for (arbitrary) nodes.
- * It also requires concrete implementations for abstract methods `children`, `withChildren` and `childNodeIndex`.
- * Based on these 4 methods, and super-trait `PathAwareElemLike`, this trait offers a reasonably rich API for "functionally updating" elements.
- *
- * This trait adds the following groups of methods to the methods offered by the supertrait `PathAwareElemLike`:
- * <ul>
- * <li>Convenience methods for functional updates given a child node index (range)</li>
- * <li>Methods for functional updates given an `ElemPath`</li>
- * </ul>
- *
- * It is important that the abstract methods are mutually consistent in their implementations. For example, the following equality
- * must hold (for some concrete class `E` that mixes in this trait):
- * {{{
- * e.findAllChildElems == (e.children collect { case e: E => e })
- * }}}
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.UpdatableElemApi]]. See the documentation of that trait
+ * for examples of usage, and for a more formal treatment.
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
