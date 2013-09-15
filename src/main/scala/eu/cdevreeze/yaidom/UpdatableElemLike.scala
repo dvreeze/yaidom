@@ -80,12 +80,15 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
   final def updatedAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => E): E = {
     if (pathEntries.isEmpty) self
     else {
-      val indexesByPathEntries: Map[ElemPath.Entry, Int] = self.childNodeIndexesByPathEntries.filterKeys(pathEntries)
+      val indexesByPathEntries: Seq[(ElemPath.Entry, Int)] =
+        self.childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2)
       require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
 
-      val newChildren = indexesByPathEntries.foldLeft(self.children) {
+      // Updating in reverse order of indexes, in order not to invalidate the element path entries
+      val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
         case (acc, (pathEntry, idx)) =>
           val che = acc(idx).asInstanceOf[E]
+          assert(findWithElemPathEntry(pathEntry) == Some(che))
           val updatedChe = f(che, pathEntry)
           acc.updated(idx, updatedChe)
       }
@@ -160,15 +163,18 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
   final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => immutable.IndexedSeq[N]): E = {
     if (pathEntries.isEmpty) self
     else {
-      val indexesByPathEntries: Map[ElemPath.Entry, Int] = self.childNodeIndexesByPathEntries.filterKeys(pathEntries)
+      val indexesByPathEntries: Seq[(ElemPath.Entry, Int)] =
+        self.childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2)
       require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
 
+      // Updating in reverse order of indexes, in order not to invalidate the element path entries
       val newChildGroups: immutable.IndexedSeq[immutable.IndexedSeq[N]] =
-        indexesByPathEntries.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
+        indexesByPathEntries.reverse.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
           case (acc, (pathEntry, idx)) =>
             val nodesAtIdx = acc(idx)
             assert(nodesAtIdx.size == 1)
             val che = nodesAtIdx.head.asInstanceOf[E]
+            assert(findWithElemPathEntry(pathEntry) == Some(che))
             val newNodes = f(che, pathEntry)
             acc.updated(idx, newNodes)
         }
