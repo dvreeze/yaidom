@@ -105,12 +105,13 @@ import scala.collection.immutable
  * A few remarks are in order:
  * <ul>
  * <li>Be careful to invoke ``getWithElemPath`` (or ``findWithElemPath``) on the correct element</li>
- * <li>Invoking these methods many times in succession may harm performance</li>
+ * <li>Invoking these methods in tight loops may harm performance</li>
  * <li>Note that element paths are not stable, when (functionally) updating elements</li>
- * <li>This API does not offer any query methods taking predicates on paths instead of on elements. In practice, this should
- * not be a large issue, because one could always (further) filter paths using the Scala Collections API</li>
+ * <li>The "filtering" query methods specific to trait ``PathAwareElemApi`` take predicates on elements, and not on
+ * paths or element-path-combinations. Not much would have been gained from that, because typical queries for paths contain
+ * ``getWithElemPath`` calls anyway. After all, what else are element paths for?</li>
  * </ul>
- * Still, the methods specific to the ``PathAwareElemApi`` trait are a nice tool in the yaidom querying toolbox.
+ * In spite of these remarks, the methods specific to the ``PathAwareElemApi`` trait are a nice tool in the yaidom querying toolbox.
  *
  * ==PathAwareElemApi more formally==
  *
