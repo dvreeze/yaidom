@@ -274,7 +274,6 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E = {
    *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
    *   val resultWithoutSelf = self.updatedAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
-   *     val che = findWithElemPathEntry(pathEntry).get
    *     val newChe = che.updatedAtPaths(paths.map(_.withoutFirstEntry)) { (elem, relativePath) =>
    *       f(elem, relativePath.prepend(pathEntry))
    *     }
