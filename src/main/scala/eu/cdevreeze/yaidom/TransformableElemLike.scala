@@ -19,11 +19,13 @@ package eu.cdevreeze.yaidom
 import scala.collection.{ immutable, mutable }
 
 /**
- * Transformable element. It defines a contract for transformations of element trees.
+ * API and implementation trait for transformable elements.
  *
- * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
+ * More precisely, this trait has abstract methods `transformChildElems` and `transformChildElemsToNodeSeq`. Based on these
+ * abstract methods, this trait offers a rich API for transforming descendant elements or descendant-or-self elements.
  *
- * Based on abstract method `transformChildElems`, this trait offers a somewhat richer API for transforming elements.
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.TransformableElemApi]]. See the documentation of that trait
+ * for examples of usage.
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype

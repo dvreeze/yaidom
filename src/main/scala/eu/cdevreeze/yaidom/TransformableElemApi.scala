@@ -19,22 +19,87 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * "Transformable" element. It defines a contract for transformations, applying an element transforming function to some or all
- * elements in an element tree. See [[eu.cdevreeze.yaidom.TransformableElemLike]].
+ * This is the <em>element transformation</em> part of the yaidom query and update API. Only a few DOM-like element implementations
+ * in yaidom mix in this trait (indirectly, because some implementing sub-trait is mixed in), thus sharing this API.
+ *
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.TransformableElemLike]].
+ * That trait only knows how to transform child elements. Using this minimal knowledge, the trait offers methods to transform
+ * descendant elements and descendant-or-self elements. Indeed, the trait is similar to `ParentElemLike`, except that it
+ * transforms elements instead of querying for elements.
  *
  * The big conceptual difference with "updatable" elements (in trait `UpdatableElemLike[N, E]`) is that "transformations" are
- * about applying some transforming function to some or all descendant-or-self elements, while "(functional) updates" are about
- * "updates" at a given element path. So "transformations" are bulk updates, not using element paths, and "(functional) updates"
- * are single element updates, at a given element path.
+ * about applying some transforming function to an element tree, while "(functional) updates" are about "updates" at given
+ * element paths.
  *
- * In spite of these differences, "transformations" can be understood in terms of equivalent repeated "updates". Concerning
- * performance, it is best to avoid "updates" (`UpdatableElemApi`) if many element paths are involved. Those "updates" are
- * not meant for bulk updates, whereas "transformations" are.
+ * ==TransformableElemApi examples==
  *
- * This purely abstract API leaves the implementation completely open.
+ * To illustrate the use of this API, consider the following example XML:
+ * {{{
+ * <book:Bookstore xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author">
+ *   <book:Book ISBN="978-0321356680" Price="35" Edition="2">
+ *     <book:Title>Effective Java (2nd Edition)</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Joshua</auth:First_Name>
+ *         <auth:Last_Name>Bloch</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ *   <book:Book ISBN="978-0981531649" Price="35" Edition="2">
+ *     <book:Title>Programming in Scala: A Comprehensive Step-by-Step Guide, 2nd Edition</book:Title>
+ *     <book:Authors>
+ *       <auth:Author>
+ *         <auth:First_Name>Martin</auth:First_Name>
+ *         <auth:Last_Name>Odersky</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Lex</auth:First_Name>
+ *         <auth:Last_Name>Spoon</auth:Last_Name>
+ *       </auth:Author>
+ *       <auth:Author>
+ *         <auth:First_Name>Bill</auth:First_Name>
+ *         <auth:Last_Name>Venners</auth:Last_Name>
+ *       </auth:Author>
+ *     </book:Authors>
+ *   </book:Book>
+ * </book:Bookstore>
+ * }}}
  *
- * Note that in a way this API can be seen as the "update" counterpart of query API `ParentElemApi`, in that the 3 "axes"
- * of child elements, descendant elements, and descendant-or-self elements can be recognized.
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.Elem]] variable named ``bookstoreElem``. Then we can combine
+ * author first and last names as follows:
+ * {{{
+ * val authorNamespace = "http://bookstore/author"
+ *
+ * bookstoreElem = bookstoreElem transformElems {
+ *   case elem: Elem if elem.resolvedName == EName(authorNamespace, "Author") =>
+ *     val firstName = (elem \ (_.localName == "First_Name")).headOption.map(_.text).getOrElse("")
+ *     val lastName = (elem \ (_.localName == "Last_Name")).headOption.map(_.text).getOrElse("")
+ *     val name = (firstName + " " + lastName).trim
+ *     Node.textElem(QName("auth:Author"), elem.scope ++ Scope.from("auth" -> authorNamespace), name)
+ *   case elem: Elem => elem
+ * }
+ * bookstoreElem = bookstoreElem.prettify(2)
+ * }}}
+ *
+ * When using the `TransformableElemApi` API, keep the following in mind:
+ * <ul>
+ * <li>The `transformElems` and `transformElemsOrSelf` methods (and their Node sequence producing counterparts)
+ * may produce a lot of "garbage". If only a small portion of an element tree needs to be updated, the "update" methods in trait
+ * `UpdatableElemApi` may be a better fit.</li>
+ * <li>Transformations operate in a bottom-up manner. This implies that parent scopes cannot be used for transforming child
+ * elements. Hence, namespace undeclarations may result, which are not allowed in XML 1.0 (except for the default namespace).</li>
+ * </ul>
+ *
+ * Top-down transformations are still possible, by combining recursion with method `transformChildElems` (or
+ * `transformChildElemsToNodeSeq`). For example:
+ * {{{
+ * def pushUpPrefixedNamespaceDeclarations(elem: Elem): Elem = {
+ *   elem transformChildElems { e =>
+ *     val newE = e.copy(scope = elem.scope.withoutDefaultNamespace ++ e.scope)
+ *     pushUpPrefixedNamespaceDeclarations(newE)
+ *   }
+ * }
+ * }}}
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
