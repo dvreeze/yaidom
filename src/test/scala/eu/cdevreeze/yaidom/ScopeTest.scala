@@ -347,4 +347,144 @@ class ScopeTest extends Suite {
       scope.prefixesForNamespace("http://d")
     }
   }
+
+  @Test def testPropertyAboutMultipleScopes() {
+    val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "h" -> "http://h")
+    val scope2 = Scope.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d", "e" -> "http://e")
+
+    expectResult(scope2) {
+      scope1.resolve(scope1.relativize(scope2))
+    }
+
+    // Prefix has the same mappings in scope1 and scope2
+
+    testPropertyAboutMultipleScopes(scope1, scope2, "b")
+    testPropertyAboutMultipleScopes(scope1, scope2, "d")
+
+    expectResult(Some("http://b")) {
+      scope2.prefixNamespaceMap.get("b")
+    }
+
+    // Prefix has different mappings in scope1 and scope2
+
+    testPropertyAboutMultipleScopes(scope1, scope2, "c")
+
+    expectResult(Some("http://ccc")) {
+      scope2.prefixNamespaceMap.get("c")
+    }
+
+    // Prefix only belongs to scope1
+
+    testPropertyAboutMultipleScopes(scope1, scope2, "")
+    testPropertyAboutMultipleScopes(scope1, scope2, "h")
+
+    expectResult(None) {
+      scope2.prefixNamespaceMap.get("h")
+    }
+
+    // Prefix only belongs to scope2
+
+    testPropertyAboutMultipleScopes(scope1, scope2, "e")
+
+    expectResult(Some("http://e")) {
+      scope2.prefixNamespaceMap.get("e")
+    }
+
+    // Prefix belongs to neither scope
+
+    testPropertyAboutMultipleScopes(scope1, scope2, "k")
+
+    expectResult(None) {
+      scope2.prefixNamespaceMap.get("k")
+    }
+  }
+
+  @Test def testPropertyAboutScopeAndDeclaration() {
+    val scope = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "g" -> "http://g", "h" -> "http://h")
+    val decls = Declarations.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d", "g" -> "", "e" -> "http://e", "m" -> "")
+
+    expectResult(scope.minimize(decls)) {
+      scope.relativize(scope.resolve(decls))
+    }
+
+    expectResult(decls -- Set("b", "d", "m")) {
+      scope.minimize(decls)
+    }
+
+    // Prefix has the same mappings in scope and declarations (so no undeclaration)
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "b")
+    testPropertyAboutScopeAndDeclaration(scope, decls, "d")
+
+    expectResult(None) {
+      scope.minimize(decls).prefixNamespaceMap.get("b")
+    }
+    expectResult(None) {
+      scope.minimize(decls).prefixNamespaceMap.get("d")
+    }
+
+    // Prefix has different mappings in scope and declarations (but no undeclaration)
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "c")
+
+    expectResult(Some("http://ccc")) {
+      scope.minimize(decls).prefixNamespaceMap.get("c")
+    }
+
+    // Prefix belongs to scope and is undeclared in declarations
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "g")
+
+    expectResult(Some("")) {
+      scope.minimize(decls).prefixNamespaceMap.get("g")
+    }
+
+    // Prefix only belongs to scope, and does not occur in declarations
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "")
+    testPropertyAboutScopeAndDeclaration(scope, decls, "h")
+
+    expectResult(None) {
+      scope.minimize(decls).prefixNamespaceMap.get("")
+    }
+    expectResult(None) {
+      scope.minimize(decls).prefixNamespaceMap.get("h")
+    }
+
+    // Prefix only occurs in declarations, without being undeclared, and does not occur in scope
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "e")
+
+    expectResult(Some("http://e")) {
+      scope.minimize(decls).prefixNamespaceMap.get("e")
+    }
+
+    // Prefix only occurs in declarations, in an undeclaration, and does not occur in scope
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "m")
+
+    expectResult(None) {
+      scope.minimize(decls).prefixNamespaceMap.get("m")
+    }
+
+    // Prefix neither occurs in scope nor in declarations
+
+    testPropertyAboutScopeAndDeclaration(scope, decls, "x")
+
+    expectResult(None) {
+      scope.minimize(decls).prefixNamespaceMap.get("x")
+    }
+  }
+
+  private def testPropertyAboutMultipleScopes(scope1: Scope, scope2: Scope, prefix: String): Unit = {
+    expectResult(scope2.prefixNamespaceMap.get(prefix)) {
+      scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(prefix)
+    }
+  }
+
+  private def testPropertyAboutScopeAndDeclaration(scope: Scope, declarations: Declarations, prefix: String): Unit = {
+    expectResult(scope.minimize(declarations).prefixNamespaceMap.get(prefix)) {
+      scope.relativize(scope.resolve(declarations)).prefixNamespaceMap.get(prefix)
+    }
+  }
 }

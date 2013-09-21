@@ -99,52 +99,91 @@ import scala.collection.immutable
  * }}}
  * Again, the actual implementation may be more efficient than that, but it is consistent with this definition.
  *
- * ===1. Property about relativize and resolve, and its proof===
+ * ===1. Property about two Scopes, and its proof===
  *
  * Methods `relativize` and `resolve` obey the following equality:
  * {{{
  * scope1.resolve(scope1.relativize(scope2)) == scope2
  * }}}
  *
- * This property can be proven easily. After all, for arbitrary Declarations `decl`, we have:
+ * Below follows the proof. We distinguish among the following cases:
+ * <ul>
+ * <li>Prefix `p` has the same mappings in `scope1` and `scope2`</li>
+ * <li>Prefix `p` has different mappings in `scope1` and `scope2`</li>
+ * <li>Prefix `p` only belongs to `scope1`</li>
+ * <li>Prefix `p` only belongs to `scope2`</li>
+ * <li>Prefix `p` belongs to neither scope</li>
+ * </ul>
+ * Prefix `p` can be the empty string, for the default namespace. For each of these cases, we prove that:
  * {{{
- * scope1.resolve(decl).prefixNamespaceMap == { (scope1.prefixNamespaceMap ++ decl.withoutUndeclarations.prefixNamespaceMap) -- decl.retainingUndeclarations.prefixNamespaceMap.keySet }
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p)
  * }}}
- * Here, `decl` stands for `scope1.relativize(scope2)`, so:
+ * Since there are no other cases, that would complete the proof.
+ *
+ * If prefix `p` has the same mappings in both scopes, then:
  * {{{
- * scope1.resolve(decl).prefixNamespaceMap == {
- *   val properDeclarations = scope1.relativize(scope2).withoutUndeclarations.prefixNamespaceMap
- *   val undeclared = scope1.relativize(scope2).retainingUndeclarations.prefixNamespaceMap.keySet
- *   (scope1.prefixNamespaceMap ++ properDeclarations) -- undeclared
- * }
+ * scope1.relativize(scope2).prefixNamespaceMap.get(p).isEmpty
+ * }}}
+ * so the following equalities hold:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap(p)
+ * scope1.prefixNamespaceMap(p)
+ * scope2.prefixNamespaceMap(p)
  * }}}
  * so:
  * {{{
- * scope1.resolve(decl).prefixNamespaceMap == {
- *   val properDeclarations = scope2.prefixNamespaceMap filter { case (pref, ns) => scope1.prefixNamespaceMap.getOrElse(pref, "") != ns }
- *   val undeclared = scope1.prefixNamespaceMap.keySet -- scope2.prefixNamespaceMap.keySet
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p)
+ * }}}
  *
- *   assert((scope1.prefixNamespaceMap ++ properDeclarations).keySet == scope1.prefixNamespaceMap.keySet.union(scope2.prefixNamespaceMap.keySet))
- *   (scope1.prefixNamespaceMap ++ properDeclarations) -- undeclared
- * }
- * }}}
- * so (visualising with Venn diagrams for prefix sets):
+ * If prefix `p` has different mappings in both scopes, then:
  * {{{
- * scope1.resolve(decl).prefixNamespaceMap == {
- *   val properDeclarations = scope2.prefixNamespaceMap filter { case (pref, ns) => scope1.prefixNamespaceMap.getOrElse(pref, "") != ns }
- *   (scope1.prefixNamespaceMap ++ properDeclarations) filterKeys (scope2.prefixNamespaceMap.keySet)
- * }
- * }}}
- * The RHS clearly has as keys the keys of `scope2.prefixNamespaceMap` and the mapped values (per key) are also those found in `scope2.prefixNamespaceMap`. Hence,
- * {{{
- * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap == scope2.prefixNamespaceMap
+ * scope1.relativize(scope2).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
  * }}}
  * so:
  * {{{
- * scope1.resolve(scope1.relativize(scope2)) == scope2
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p)
  * }}}
  *
- * ===2. Another property about relativize and resolve, and its proof===
+ * If prefix `p` only belongs to `scope1`, then:
+ * {{{
+ * scope1.relativize(scope2).prefixNamespaceMap(p) == "" // undeclaration
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p).isEmpty
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p) // both empty
+ * }}}
+ *
+ * if prefix `p` only belongs to `scope2`, then:
+ * {{{
+ * scope1.relativize(scope2).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p)
+ * }}}
+ *
+ * if prefix `p` belongs to neither scope, then obviously:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p).isEmpty
+ * }}}
+ * so:
+ * {{{
+ * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p) // both empty
+ * }}}
+ *
+ * ===2. Property about Scope and Declarations===
  *
  * Methods `relativize` and `resolve` also obey the following equality:
  * {{{
@@ -159,43 +198,22 @@ import scala.collection.immutable
  * }
  * }}}
  *
- * Below follows a proof of this property. For arbitrary Scope `sc`, we have:
+ * It can be proven by distinguishing among the following cases:
+ * <ul>
+ * <li>Prefix `p` has the same mappings in `scope` and `declarations` (so no undeclaration)</li>
+ * <li>Prefix `p` has different mappings in `scope` and `declarations` (but no undeclaration)</li>
+ * <li>Prefix `p` belongs to `scope` and is undeclared in `declarations`</li>
+ * <li>Prefix `p` only belongs to `scope`, and does not occur in `declarations`</li>
+ * <li>Prefix `p` only occurs in `declarations`, without being undeclared, and does not occur in `scope`</li>
+ * <li>Prefix `p` only occurs in `declarations`,  in an undeclaration, and does not occur in `scope`</li>
+ * <li>Prefix `p` neither occurs in `scope` nor in `declarations`</li>
+ * </ul>
+ * Prefix `p` can be the empty string, for the default namespace. For each of these cases, it can be proven that:
  * {{{
- * scope.relativize(sc) == {
- *   val declared = sc.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
- *   val undeclared = scope.prefixNamespaceMap.keySet -- sc.prefixNamespaceMap.keySet
- *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
- * }
+ * scope.relativize(scope.resolve(declarations)).prefixNamespaceMap.get(p) == scope.minimize(declarations).prefixNamespaceMap.get(p)
  * }}}
- * Here, `sc` stands for `scope.resolve(declarations)`, so:
- * {{{
- * scope.relativize(sc) == {
- *   val declared = scope.resolve(declarations).prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
- *   val undeclared = scope.prefixNamespaceMap.keySet -- scope.resolve(declarations).prefixNamespaceMap.keySet
- *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
- * }
- * }}}
- * so:
- * {{{
- * scope.relativize(sc) == {
- *   val newScope = Scope((scope.prefixNamespaceMap ++ declarations.withoutUndeclarations.prefixNamespaceMap) -- declarations.retainingUndeclarations.prefixNamespaceMap.keySet)
- *   val declared = newScope.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
- *   val undeclared = scope.prefixNamespaceMap.keySet -- newScope.prefixNamespaceMap.keySet
- *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
- * }
- * }}}
- * so:
- * {{{
- * scope.relativize(sc) == {
- *   val declared = declarations.withoutUndeclarations.prefixNamespaceMap filter { case (pref, ns) => scope.prefixNamespaceMap.getOrElse(pref, "") != ns }
- *   val undeclared = declarations.retainingUndeclarations.prefixNamespaceMap.keySet.intersect(scope.prefixNamespaceMap.keySet)
- *   Declarations(declared) ++ Declarations.undeclaring(undeclared)
- * }
- * }}}
- * so, as a result:
- * {{{
- * scope.relativize(scope.resolve(declarations)) == scope.minimize(declarations)
- * }}}
+ * Since there are no other cases, that would complete the proof. The proof itself is left as an exercise for the reader, as
+ * they say.
  *
  * This and the preceding (proven) property are analogous to corresponding properties in the `URI` class.
  *
