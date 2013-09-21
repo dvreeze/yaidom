@@ -135,6 +135,7 @@ import scala.collection.{ immutable, mutable }
  * {{{
  * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // referred to below as property (c)
  * }}}
+ * This is also known as the "composition law for monads" (see http://james-iry.blogspot.nl/2007/10/monads-are-elephants-part-3.html).
  *
  * If `elm` does have child elements, and `p(elm)` holds, the LHS can be rewritten as:
  * {{{
@@ -181,28 +182,24 @@ import scala.collection.{ immutable, mutable }
  *
  * (xs flatMap (x => f(x) filter p)) == ((xs flatMap f) filter p) // property (b)
  *
+ * // Composition law for monads
  * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // if f and g have the same types; property (c)
  * }}}
  *
- * No proofs are offered here, but we could prove them ourselves. It would help to regard `xs` and `ys` above as `List` instances,
- * and use structural induction for Lists (!) as proof method. First we would need some defining clauses for `filter`, `++` and `flatMap`:
+ * Property (a) is obvious, and stated without proof. Property (c) is known as the "composition law for monads".
+ * Property (b) is proven below.
+ *
+ * To prove property (b), we use property (c), as well as the following property (d):
  * {{{
- * Nil.filter(p) == Nil
- * (x :: xs).filter(p) == if (p(x)) x :: xs.filter(p) else xs.filter(p)
- *
- * Nil ++ ys == ys
- * (x :: xs) ++ ys == x :: (xs ++ ys)
- *
- * Nil.flatMap(f) == Nil
- * (x :: xs).flatMap(f) == (f(x) ++ xs.flatMap(f))
+ * (xs filter p) == (xs flatMap (y => if (p(y)) List(y) else Nil)) // property (d)
  * }}}
- *
- * Property (a) could then be proven by structural induction (for lists), by using only defining clauses and no other proven properties.
- * Property (b) could then be proven by structural induction as well, but (possibly) requiring property (a) in its proof.
- * Property (c) could be proven by structural induction, if we would first prove the distribution law for `flatMap` over concatenation.
- * The proof by structural induction of the latter property would (possibly) depend on the property that concatenation is associative.
- * These proofs are all left as exercises for the reader, as they say. Yaidom considers these properties as theorems based on which "yaidom properties"
- * were proven above.
+ * Then property (b) can be proven as follows:
+ * {{{
+ * xs flatMap (x => f(x) filter p)
+ * xs flatMap (x => f(x) flatMap (y => if (p(y)) List(y) else Nil))
+ * (xs flatMap f) flatMap (y => if (p(y)) List(y) else Nil) // property (c)
+ * (xs flatMap f) filter p
+ * }}}
  *
  * ==Implementation notes==
  *
