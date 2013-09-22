@@ -22,8 +22,6 @@ import scala.annotation.tailrec
 /**
  * API and implementation trait for elements that can be asked for the ancestor elements, if any.
  *
- * '''Most users of the yaidom API do not use this trait directly, so may skip the documentation of this trait.'''
- *
  * This trait only knows about elements, not about documents as root element parents.
  *
  * Based on abstract method `parentOption` alone, this trait offers a rich API for querying the element ancestry of an element.
