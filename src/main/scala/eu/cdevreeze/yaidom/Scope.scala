@@ -138,48 +138,27 @@ import scala.collection.immutable
  * If prefix `p` has different mappings in both scopes, then:
  * {{{
  * scope1.relativize(scope2).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p)
  * }}}
  *
  * If prefix `p` only belongs to `scope1`, then:
  * {{{
  * scope1.relativize(scope2).prefixNamespaceMap(p) == "" // undeclaration
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p).isEmpty
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p) // both empty
  * }}}
  *
  * if prefix `p` only belongs to `scope2`, then:
  * {{{
  * scope1.relativize(scope2).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap(p) == scope2.prefixNamespaceMap(p)
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p)
  * }}}
  *
  * if prefix `p` belongs to neither scope, then obviously:
  * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p).isEmpty
- * }}}
- * so:
- * {{{
  * scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(p) == scope2.prefixNamespaceMap.get(p) // both empty
  * }}}
  *
