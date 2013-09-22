@@ -80,6 +80,9 @@ import scala.collection.immutable
  *
  * ==Scope more formally==
  *
+ * '''In order to get started using the class, this more formal section can safely be skipped. On the other hand, this section
+ * may provide a deeper understanding of the class.'''
+ *
  * Method `resolve` resolves a `Declarations` against this Scope, returning a new Scope. It could be defined by the following equality:
  * {{{
  * scope.resolve(declarations) == {

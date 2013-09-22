@@ -30,6 +30,9 @@ import scala.collection.{ immutable, mutable }
  *
  * ==ParentElemLike more formally==
  *
+ * '''In order to get started using the API, this more formal section can safely be skipped. On the other hand, this section
+ * may provide a deeper understanding of the API.'''
+ *
  * The only abstract method is `findAllChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
  * This is entirely consistent with the semantics defined in the `ParentElemApi` trait. Indeed, the implementation of the methods
  * follows the semantics defined there.

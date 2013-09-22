@@ -23,6 +23,9 @@ import scala.collection.immutable
  * [[eu.cdevreeze.yaidom.PathAwareElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
  * because some implementing sub-trait is mixed in), thus sharing this query API.
  *
+ * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
+ * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
+ *
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.UpdatableElemLike]].
  * The trait has all the knowledge of its super-trait, but in addition to that knows the following:
  * <ul>
@@ -173,11 +176,6 @@ import scala.collection.immutable
  * The example code above is enough to get started using the ``UpdatableElemApi`` methods, but it makes sense to study the
  * entire API, and practice with it. Always keep in mind that functional updates typically mess up formatting and/or namespace
  * (un)declarations, unless these aspects are taken into account.
- *
- * ==UpdatableElemApi more formally==
- *
- * Currently no effort has been made to describe interesting properties obeyed by "updatable elements". See the documentation
- * of the individual functional update methods for more formal definitions.
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype

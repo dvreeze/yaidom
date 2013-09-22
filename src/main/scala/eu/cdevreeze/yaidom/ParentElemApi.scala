@@ -22,6 +22,9 @@ import scala.collection.immutable
  * This is the <em>foundation</em> of the yaidom <em>uniform query API</em>. Many DOM-like element implementations in
  * yaidom mix in this trait (indirectly, because some implementing sub-trait is mixed in), thus sharing this query API.
  *
+ * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
+ * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
+ *
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ParentElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows that elements can <em>have child elements</em>
  * (again not knowing about other child nodes). Using this minimal knowledge alone, it offers methods to query for
@@ -73,6 +76,9 @@ import scala.collection.immutable
  * ``ElemApi`` query API, which extends the ``ParentElemApi`` query API.
  *
  * ==ParentElemApi more formally==
+ *
+ * '''In order to get started using the API, this more formal section can safely be skipped. On the other hand, this section
+ * may provide a deeper understanding of the API.'''
  *
  * The ``ParentElemApi`` trait can be understood in a precise <em>mathematical</em> sense, as shown below.
  *

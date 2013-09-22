@@ -23,6 +23,9 @@ import scala.collection.immutable
  * [[eu.cdevreeze.yaidom.ParentElemApi]]. Many DOM-like element implementations in yaidom mix in this trait (indirectly,
  * because some implementing sub-trait is mixed in), thus sharing this query API.
  *
+ * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
+ * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
+ *
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows the following about elements:
  * <ul>

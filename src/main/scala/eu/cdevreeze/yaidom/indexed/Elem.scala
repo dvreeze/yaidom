@@ -73,6 +73,9 @@ import scala.collection.immutable
  *
  * ==Elem more formally==
  *
+ * '''In order to get started using the class, this more formal section can safely be skipped. On the other hand, this section
+ * may provide a deeper understanding of the class.'''
+ *
  * Let `indexedRootElem` be a root element, so `indexedRootElem.elemPath == ElemPath.Root`.
  *
  * Then, first of all, we have:
