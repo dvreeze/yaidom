@@ -96,10 +96,10 @@ import scala.collection.immutable
  * Top-down transformations are still possible, by combining recursion with method `transformChildElems` (or
  * `transformChildElemsToNodeSeq`). For example:
  * {{{
- * def pushUpPrefixedNamespaceDeclarations(elem: Elem): Elem = {
+ * def removePrefixedNamespaceUndeclarations(elem: Elem): Elem = {
  *   elem transformChildElems { e =>
  *     val newE = e.copy(scope = elem.scope.withoutDefaultNamespace ++ e.scope)
- *     pushUpPrefixedNamespaceDeclarations(newE)
+ *     removePrefixedNamespaceUndeclarations(newE)
  *   }
  * }
  * }}}
