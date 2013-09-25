@@ -21,7 +21,7 @@ import java.net.URI
 /**
  * Minimal API for Documents, having a type parameter for the element type.
  *
- * This is a purely abstract API trait.
+ * This is a purely abstract API trait. It can be useful in generic code abstracting over multiple element implementations.
  *
  * @tparam E The element type
  *

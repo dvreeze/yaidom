@@ -23,29 +23,9 @@ import scala.collection.{ immutable, mutable }
 import PrettyPrinting._
 
 /**
- * Immutable XML node. The API is inspired by Anti-XML, but it is less ambitious,
- * and differs in some key respects. Like Anti-XML:
- * <ul>
- * <li>Nodes in this API are truly immutable, and thread-safe, backed by immutable Scala collections.</li>
- * <li>The immutable strictly evaluated nodes have no reference to their parent/ancestor nodes. Hence, for example, you cannot
- * ask a `Node` for its "owning" document. Yet these nodes can be re-used in several XML trees.</li>
- * </ul>
- * Unlike Anti-XML:
- * <ul>
- * <li>This is just a DOM-like API, around immutable nodes and immutable Scala Collections of nodes,
- * without any XPath(-like) support. Despite the absence of selectors like those in Anti-XML, this DOM-like API
- * is still quite expressive, be it somewhat more verbose.</li>
- * <li>This API distinguishes between [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.EName]], making both
- * first-class citizens in the API. Moreover, the concept of a [[eu.cdevreeze.yaidom.Scope]] is a first-class citizen as well.
- * By explicitly modeling `QName`s, `EName`s and `Scope`s, the user of the API is somewhat shielded from some XML quirks.</li>
- * <li>This API is less ambitious. Like said above, XPath(-like) support is absent. So is support for "updates" through
- * zippers. So is "true" equality based on the exact tree.</li>
- * </ul>
- *
- * Nodes are serializable. Serialized Node instances may well be an interesting storage format for parsed XML stored
- * in a database. Of course, this would be a non-standard format. Moreover, as far as queries are concerned, these columns
- * are mere BLOBs (unless using Java Stored Procedures written in Scala). Besides, serialized NodeBuilders tend to be smaller
- * than serialized Nodes.
+ * Immutable XML Node. It is the default XML node type in yaidom. There are subclasses for different types of nodes,
+ * such as elements, text nodes, comments, entity references and processing instructions. See [[eu.cdevreeze.yaidom.Elem]]
+ * for the default element type in yaidom.
  *
  * @author Chris de Vreeze
  */
@@ -85,54 +65,88 @@ sealed trait Node extends Immutable with Serializable {
 }
 
 /**
- * Element node. An [[eu.cdevreeze.yaidom.Elem]] contains:
- * <ol>
+ * Immutable, thread-safe element node. It is the default element implementation in yaidom. Being the default element
+ * implementation among several alternative element implementations, it tries to find a reasonable compromise between different
+ * desirable characteristics, such as support for lossless roundtripping, good composability of element trees, good querying
+ * support, etc.
+ *
+ * As the default element implementation, it is also directly supported by document parsers and printers in packages
+ * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], respectively.
+ *
+ * As for the querying support, class [[eu.cdevreeze.yaidom.Elem]] is among the most powerful element implementations offered
+ * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.UpdatableElemApi]] and [[eu.cdevreeze.yaidom.TransformableElemApi]]
+ * query APIs.
+ *
+ * The following example illustrates the use of the yaidom uniform query API in combination with some Elem-specific methods.
+ * In the example the namespace prefix "xsd" is replaced by prefix "xs", including those in QName-valued attributes. The trivial
+ * XML file of this example is the following XML Schema:
+ * {{{
+ * <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://book" elementFormDefault="qualified">
+ *   <xsd:element name="book">
+ *     <xsd:complexType>
+ *       <xsd:sequence>
+ *         <xsd:element name="isbn" type="xsd:string" />
+ *         <xsd:element name="title" type="xsd:string" />
+ *         <xsd:element name="authors" type="xsd:string" />
+ *       </xsd:sequence>
+ *     </xsd:complexType>
+ *   </xsd:element>
+ * </xsd:schema>
+ * }}}
+ *
+ * The edit action can be performed on this `schemaElem` as follows, starting with some checks:
+ * {{{
+ * require(schemaElem.findAllElemsOrSelf.map(_.scope).distinct == List(Scope.from("xsd" -> "http://www.w3.org/2001/XMLSchema")))
+ * require(schemaElem.findAllElemsOrSelf.map(_.qname.prefixOption).distinct == List(Some("xsd")))
+ * require(schemaElem.findAllElemsOrSelf.flatMap(_.attributes.toMap.keySet.map(_.prefixOption)).distinct == List(None))
+ *
+ * // Using Elem method attributeAsQName
+ * require(schemaElem.filterElemsOrSelf(e => (e \@ EName("type")).isDefined).forall(e => e.attributeAsQName(EName("type")).prefixOption == Some("xsd")))
+ *
+ * val editedSchemaElem = schemaElem transformElemsOrSelf { elem =>
+ *   val newScope = (elem.scope -- Set("xsd")) ++ Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")
+ *   val newQName = QName("xs", elem.qname.localPart)
+ *   // Using Elem method attributeAsQNameOption
+ *   val newTypeAttrOption = elem.attributeAsQNameOption(EName("type")).map(attr => QName("xs", attr.localPart).toString)
+ *
+ *   val newAttrs =
+ *     if (newTypeAttrOption.isEmpty) elem.attributes else elem.plusAttribute(QName("type"), newTypeAttrOption.get).attributes
+ *
+ *   Elem(newQName, newAttrs, newScope, elem.children)
+ * }
+ * }}}
+ *
+ * Class `Elem` is immutable, and (should be) thread-safe. Being immutable, Elems do not know about their parent element, if any.
+ *
+ * An Elem has the following state:
+ * <ul>
  * <li>the [[eu.cdevreeze.yaidom.QName]] of the element</li>
  * <li>the attributes of the element, mapping attribute [[eu.cdevreeze.yaidom.QName]]s to String values</li>
  * <li>a [[eu.cdevreeze.yaidom.Scope]] mapping prefixes to namespace URIs</li>
  * <li>an immutable collection of child nodes</li>
- * </ol>
+ * </ul>
+ * Note that namespace declarations are not considered to be attributes in `Elem`, just like in the rest of yaidom.
+ * Elem construction is unsuccessful if the element name and attribute names cannot be resolved using the `Scope` of the
+ * element (ignoring the default namespace, if any, for attributes). As can be seen from the above-mentioned state,
+ * namespaces are first-class citizens.
  *
- * The [[eu.cdevreeze.yaidom.Scope]] is absolute, typically containing a lot more than
- * the (implicit) [[eu.cdevreeze.yaidom.Declarations]] of this element.
+ * Elems can (relatively easily) be constructed manually in a bottom-up manner. Yet care must be taken to give the element and its
+ * descendants the correct `Scope`. Otherwise it is easy to introduce (prefixed) namespace undeclarations, which are not
+ * allowed in XML 1.0. The underlying issue is that functional Elem trees are created in a bottom-up manner, whereas namespace
+ * scoping works in a top-down manner. This is not a big issue in practice, since manual Elem creation is rather rare. When
+ * creating element trees by hand, there is always the alternative of doing so indirectly, via a manually created
+ * [[eu.cdevreeze.yaidom.ElemBuilder]]. Even when creating Elems manually, it is still possible to call method
+ * `notUndeclaringPrefixes` afterwards, thus getting rid of (prefixed) namespace declarations.
  *
- * Note that `Elem` instances are immutable, so they do not know about parent nodes. Moreover, `Elem`s must be building blocks
- * for larger (ancestor) `Elem`s, and at the same time they must contain enough context for resolving element and attribute
- * (un)qualified names. Therefore an `Elem` contains a `Scope`, and not a `Declarations` (whereas for `ElemBuilder` it is the
- * other way around). Once an `Elem` tree is complete, the (implicit) `Declarations` of the element are
- * `parentElm.scope.relativize(this.scope)`.
+ * Round-tripping (parsing and serializing) is not entirely lossless, but (in spite of the good composability and rather small
+ * state) not much is lost. Comments, processing instructions and entity references are retained. Attribute order is retained,
+ * although according to the XML InfoSet this order is irrelevant. Namespace declaration order is not necessarily the same,
+ * however. Superfluous namespace declarations are also lost. (That is because namespace declarations are not explicitly
+ * stored in Elems, but are implicit, viz. `parentElem.scope.relativize(this.scope)`). The short versus long form of an empty
+ * element is also not remembered.
  *
- * Namespace declarations (and undeclarations) are not considered attributes in this API.
- *
- * The API is geared towards data-oriented XML that uses namespaces, and that typically is described in schemas (so that the
- * user of this API knows the structure of the XML being processed). The methods that return an Option say so in their name.
- *
- * No notion of (value) equality has been defined. When thinking about it, it is very hard to come up with any useful
- * notion of equality for representations of XML elements. Think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
- *
- * Use the constructor with care, because it is easy to use incorrectly (regarding passed Scopes, causing implicit namespace
- * undeclarations). To construct `Elem`s by hand, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
- * If `Elem`s are still constructed manually (without using `ElemBuilder`s), consider calling method `notUndeclaringPrefixes`
- * afterwards, thus getting rid of unnecessary (implicit) namespace undeclarations. Typically, however, `Elem`s are constructed
- * by parsing an XML source.
- *
- * ==Example==
- *
- * Below follows an example. This example queries for all book elements having a price below 90. It can be written as follows,
- * assuming a book store `Document` with the appropriate structure:
- * {{{
- * val bookstoreElm = doc.documentElement
- * require(bookstoreElm.localName == "Bookstore")
- *
- * val bookElms =
- *   for {
- *     bookElm <- bookstoreElm \ (_.localName == "Book")
- *     price <- bookElm \@ EName("Price")
- *     if price.toInt < 90
- *   } yield bookElm
- * }}}
- *
- * For more examples, see the [[eu.cdevreeze.yaidom]] package documentation.
+ * Equality has not been defined for class `Elem` (that is, it is reference equality). There is no clear sensible notion of equality
+ * for XML trees at the abstraction level of `Elem`. For example, think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
  */
 @SerialVersionUID(1L)
 final class Elem(
