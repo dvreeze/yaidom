@@ -77,6 +77,8 @@ sealed trait Node extends Immutable with Serializable {
  * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.UpdatableElemApi]] and [[eu.cdevreeze.yaidom.TransformableElemApi]]
  * query APIs.
  *
+ * '''See the documentation of the mixed-in query API traits for more details on how to query these elements.'''
+ *
  * The following example illustrates the use of the yaidom uniform query API in combination with some Elem-specific methods.
  * In the example the namespace prefix "xsd" is replaced by prefix "xs", including those in QName-valued attributes. The trivial
  * XML file of this example is the following XML Schema:
