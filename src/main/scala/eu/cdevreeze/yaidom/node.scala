@@ -65,22 +65,21 @@ sealed trait Node extends Immutable with Serializable {
 }
 
 /**
- * Immutable, thread-safe element node. It is the default element implementation in yaidom. Being the default element
- * implementation among several alternative element implementations, it tries to find a reasonable compromise between different
- * desirable characteristics, such as support for lossless roundtripping, good composability of element trees, good querying
- * support, etc.
+ * <em>Immutable</em>, thread-safe <em>element node</em>. It is the <em>default</em> element implementation in yaidom. As the default
+ * element implementation among several alternative element implementations, it strikes a balance between loss-less roundtripping
+ * and composability.
  *
- * As the default element implementation, it is also directly supported by document parsers and printers in packages
- * [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], respectively.
+ * The parsers and serializers in packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] return and take
+ * these default elements (or the corresponding `Document` instances), respectively.
  *
- * As for the querying support, class [[eu.cdevreeze.yaidom.Elem]] is among the most powerful element implementations offered
+ * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.Elem]] is among the most powerful element implementations offered
  * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.UpdatableElemApi]] and [[eu.cdevreeze.yaidom.TransformableElemApi]]
  * query APIs.
  *
- * '''See the documentation of the mixed-in query API traits for more details on how to query these elements.'''
+ * '''See the documentation of the mixed-in query API traits for more details on the uniform query API offered by this class.'''
  *
  * The following example illustrates the use of the yaidom uniform query API in combination with some Elem-specific methods.
- * In the example the namespace prefix "xsd" is replaced by prefix "xs", including those in QName-valued attributes. The trivial
+ * In this XML scripting example the namespace prefix "xsd" is replaced by prefix "xs", including those in QName-valued attributes. The trivial
  * XML file of this example is the following XML Schema:
  * {{{
  * <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://book" elementFormDefault="qualified">
@@ -98,27 +97,31 @@ sealed trait Node extends Immutable with Serializable {
  *
  * The edit action can be performed on this `schemaElem` as follows, starting with some checks:
  * {{{
+ * // All descendant-or-self elements have the same Scope, mapping only prefix "xsd".
  * require(schemaElem.findAllElemsOrSelf.map(_.scope).distinct == List(Scope.from("xsd" -> "http://www.w3.org/2001/XMLSchema")))
+ *
+ * // All descendant-or-self elements have a QName with prefix "xsd".
  * require(schemaElem.findAllElemsOrSelf.map(_.qname.prefixOption).distinct == List(Some("xsd")))
+ *
+ * // All descendant-or-self elements have unprefixed attributes only.
  * require(schemaElem.findAllElemsOrSelf.flatMap(_.attributes.toMap.keySet.map(_.prefixOption)).distinct == List(None))
  *
- * // Using Elem method attributeAsQName
+ * // All descendant-or-self elements with "type" attributes contain only QNames with prefix "xsd" in the values of those attributes.
  * require(schemaElem.filterElemsOrSelf(e => (e \@ EName("type")).isDefined).forall(e => e.attributeAsQName(EName("type")).prefixOption == Some("xsd")))
  *
+ * // Replaces prefix "xsd" by "xs" throughout the element tree, including in "type" attributes.
  * val editedSchemaElem = schemaElem transformElemsOrSelf { elem =>
  *   val newScope = (elem.scope -- Set("xsd")) ++ Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")
  *   val newQName = QName("xs", elem.qname.localPart)
- *   // Using Elem method attributeAsQNameOption
  *   val newTypeAttrOption = elem.attributeAsQNameOption(EName("type")).map(attr => QName("xs", attr.localPart).toString)
  *
- *   val newAttrs =
- *     if (newTypeAttrOption.isEmpty) elem.attributes else elem.plusAttribute(QName("type"), newTypeAttrOption.get).attributes
- *
- *   Elem(newQName, newAttrs, newScope, elem.children)
+ *   elem.copy(qname = newQName, scope = newScope).plusAttributeOption(QName("type"), newTypeAttrOption)
  * }
  * }}}
+ * Note that besides the uniform query API, this example uses some `Elem`-specific methods, such as `attributeAsQName`, `copy` and
+ * `plusAttributeOption`.
  *
- * Class `Elem` is immutable, and (should be) thread-safe. Being immutable, Elems do not know about their parent element, if any.
+ * Class `Elem` is immutable, and (should be) thread-safe. Hence, Elems do not know about their parent element, if any.
  *
  * An Elem has the following state:
  * <ul>
@@ -128,26 +131,26 @@ sealed trait Node extends Immutable with Serializable {
  * <li>an immutable collection of child nodes</li>
  * </ul>
  * Note that namespace declarations are not considered to be attributes in `Elem`, just like in the rest of yaidom.
- * Elem construction is unsuccessful if the element name and attribute names cannot be resolved using the `Scope` of the
+ * Elem construction is unsuccessful if the element name and/or some attribute names cannot be resolved using the `Scope` of the
  * element (ignoring the default namespace, if any, for attributes). As can be seen from the above-mentioned state,
  * namespaces are first-class citizens.
  *
  * Elems can (relatively easily) be constructed manually in a bottom-up manner. Yet care must be taken to give the element and its
  * descendants the correct `Scope`. Otherwise it is easy to introduce (prefixed) namespace undeclarations, which are not
- * allowed in XML 1.0. The underlying issue is that functional Elem trees are created in a bottom-up manner, whereas namespace
- * scoping works in a top-down manner. This is not a big issue in practice, since manual Elem creation is rather rare. When
- * creating element trees by hand, there is always the alternative of doing so indirectly, via a manually created
- * [[eu.cdevreeze.yaidom.ElemBuilder]]. Even when creating Elems manually, it is still possible to call method
- * `notUndeclaringPrefixes` afterwards, thus getting rid of (prefixed) namespace declarations.
+ * allowed in XML 1.0. The underlying issue is that <em>functional</em> Elem trees are created in a <em>bottom-up</em> manner,
+ * whereas namespace scoping works in a <em>top-down</em> manner. This is not a big issue in practice, since manual Elem creation
+ * is rather rare, and it is always possible to call method `notUndeclaringPrefixes` afterwards. An alternative method to create
+ * element trees by hand uses class [[eu.cdevreeze.yaidom.ElemBuilder]]. A manually created `ElemBuilder` can be converted to
+ * an `Elem` by calling method `build`.
  *
- * Round-tripping (parsing and serializing) is not entirely lossless, but (in spite of the good composability and rather small
+ * <em>Round-tripping</em> (parsing and serializing) is not entirely loss-less, but (in spite of the good composability and rather small
  * state) not much is lost. Comments, processing instructions and entity references are retained. Attribute order is retained,
- * although according to the XML InfoSet this order is irrelevant. Namespace declaration order is not necessarily the same,
+ * although according to the XML InfoSet this order is irrelevant. Namespace declaration order is not necessarily retained,
  * however. Superfluous namespace declarations are also lost. (That is because namespace declarations are not explicitly
  * stored in Elems, but are implicit, viz. `parentElem.scope.relativize(this.scope)`). The short versus long form of an empty
  * element is also not remembered.
  *
- * Equality has not been defined for class `Elem` (that is, it is reference equality). There is no clear sensible notion of equality
+ * <em>Equality</em> has not been defined for class `Elem` (that is, it is reference equality). There is no clear sensible notion of equality
  * for XML trees at the abstraction level of `Elem`. For example, think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
  */
 @SerialVersionUID(1L)
