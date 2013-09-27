@@ -22,7 +22,7 @@ import scala.annotation.tailrec
 /**
  * Builder for `ElemPath` instances.
  *
- * Example:
+ * For example:
  * {{{
  * val elemPath: ElemPath = ElemPathBuilder.from(QName("parent") -> 0, QName("child") -> 2).build(Scope.Empty)
  * }}}

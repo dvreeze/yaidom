@@ -578,7 +578,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
 }
 
 /**
- * An entity reference. Example:
+ * An entity reference. For example:
  * {{{
  * &hello;
  * }}}
@@ -645,7 +645,7 @@ object Elem {
  * passed around. On the other hand, this Node DSL has the advantage that exceptions due to missing scope data are thrown immediately instead of
  * later (when calling the build method, in the case of the NodeBuilder DSL).
  *
- * Example:
+ * For example:
  * {{{
  * import Node._
  *

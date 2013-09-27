@@ -21,7 +21,7 @@ import scala.collection.immutable
 
 /**
  * DSL to build `Elem`s (or `Document`s) without having to pass parent `Scope`s around.
- * Example:
+ * For example:
  * {{{
  * import NodeBuilder._
  *
