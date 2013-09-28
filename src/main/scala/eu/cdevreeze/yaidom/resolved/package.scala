@@ -29,17 +29,22 @@ package eu.cdevreeze.yaidom
  *
  * Moreover, the only nodes in this package are element and text nodes.
  *
- * Do not do this:
+ * Below follows a simple example:
  * {{{
- * import eu.cdevreeze.yaidom.resolved._
- *
- * }}}
- * Better is the following:
- * {{{
+ * // Note the import of package resolved, and not of its members. That is indeed a best practice!
  * import eu.cdevreeze.yaidom.resolved
  *
- * val resolvedRootElm = resolved.Elem(rootElm)
+ * val resolvedBookstoreElem = resolved.Elem(bookstoreElem)
+ *
+ * val scalaBookAuthors =
+ *   for {
+ *     bookElem <- resolvedBookstoreElem \ EName("{http://bookstore/book}Book")
+ *     if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *     authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
+ *   } yield authorElem
  * }}}
+ * The query for Scala book authors would have been exactly the same if normal `Elem`s had been used instead of `resolved.Elem`s
+ * (replacing `resolvedBookstoreElem` by `bookstoreElem`)!
  *
  * @author Chris de Vreeze
  */

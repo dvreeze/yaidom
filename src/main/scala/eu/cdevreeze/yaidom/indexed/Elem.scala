@@ -23,6 +23,8 @@ import scala.collection.immutable
  * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.Elem]])
  * and an element path (from that root element) to this element.
  *
+ * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
+ *
  * ==Example==
  *
  * Below follows an example. This example queries for all book elements having at least Jeffrey Ullman as author. It can be written as follows,

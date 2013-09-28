@@ -67,6 +67,11 @@ final class DomDocument(
   def documentElement: DomElem = DomNode.wrapElement(wrappedNode.getDocumentElement)
 }
 
+/**
+ * Wrapper around `org.w3c.dom.Element`, conforming to the [[eu.cdevreeze.yaidom.ElemLike]] API.
+ *
+ * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
+ */
 final class DomElem(
   override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasParent[DomElem] with HasText { self =>
 

@@ -190,16 +190,22 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
    * The attributes as a mapping from `EName`s (instead of `QName`s) to values.
    *
    * The implementation must ensure that `resolvedAttributes.toMap.size == resolvedAttributes.size`.
+   *
+   * Namespace declarations are not considered attributes in yaidom, so are not included in the result.
    */
   def resolvedAttributes: immutable.Iterable[(EName, String)]
 
   /** The local name (or local part). Convenience method. */
   def localName: String
 
-  /** Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option` */
+  /**
+   * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
+   */
   def attributeOption(expandedName: EName): Option[String]
 
-  /** Returns the value of the attribute with the given expanded name, and throws an exception otherwise */
+  /**
+   * Returns the value of the attribute with the given expanded name, and throws an exception otherwise.
+   */
   def attribute(expandedName: EName): String
 
   /**

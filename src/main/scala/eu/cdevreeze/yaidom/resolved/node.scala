@@ -22,7 +22,7 @@ import scala.collection.{ immutable, mutable }
  * Immutable "resolved" Node. It is called "resolved" because the element trees in this package only contain resolved element and
  * attribute names. Qualified names (and therefore prefixes) are gone in this representation.
  *
- * "Resolved" nodes can be compared for equality. This notion of equality only considers elements and text nodes.
+ * "Resolved" nodes can be compared for <em>equality</em>. This notion of equality only considers elements and text nodes.
  * By removing qualified names and namespace declarations from this node representation, one source of complexity for equality
  * comparisons is gone.
  *
@@ -64,7 +64,52 @@ sealed trait Node extends Immutable
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
  * for XML trees and expanded names, where qualified names are absent.
  *
- * Namespace declarations (and undeclarations) are not considered attributes in this API.
+ * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
+ *
+ * Namespace declarations (and undeclarations) are not considered attributes in this API, just like in the rest of yaidom.
+ *
+ * To illustrate <em>equality</em> comparisons in action, consider the following example yaidom `Elem`, named `schemaElem1`:
+ * {{{
+ * <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://book" elementFormDefault="qualified">
+ *   <xsd:element name="book">
+ *     <xsd:complexType>
+ *       <xsd:sequence>
+ *         <xsd:element name="isbn" type="xsd:string" />
+ *         <xsd:element name="title" type="xsd:string" />
+ *         <xsd:element name="authors" type="xsd:string" />
+ *       </xsd:sequence>
+ *     </xsd:complexType>
+ *   </xsd:element>
+ * </xsd:schema>
+ * }}}
+ * Now consider the following equivalent yaidom `Elem`, named `schemaElem2`, differing only in namespace prefixes, and in
+ * indentation:
+ * {{{
+ * <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://book" elementFormDefault="qualified">
+ *     <xs:element name="book">
+ *         <xs:complexType>
+ *             <xs:sequence>
+ *                 <xs:element name="isbn" type="xs:string" />
+ *                 <xs:element name="title" type="xs:string" />
+ *                 <xs:element name="authors" type="xs:string" />
+ *             </xs:sequence>
+ *         </xs:complexType>
+ *     </xs:element>
+ * </xs:schema>
+ * }}}
+ *
+ * These 2 XML trees can be considered equal, if we take indentation and namespace prefixes out of the equation. Note that
+ * namespace prefixes also occur in the "type" attributes! The following equality comparison returns true:
+ * {{{
+ * def replaceTypeAttributes(elem: Elem): Elem = {
+ *   elem transformElemsOrSelf { e =>
+ *     e.plusAttributeOption(QName("type"), e.attributeAsResolvedQNameOption(EName("type")).map(_.toString))
+ *   }
+ * }
+ *
+ * resolved.Elem(replaceTypeAttributes(schemaElem1)).removeAllInterElementWhitespace ==
+ *   resolved.Elem(replaceTypeAttributes(schemaElem2)).removeAllInterElementWhitespace
+ * }}}
  */
 final case class Elem(
   override val resolvedName: EName,
@@ -154,6 +199,17 @@ final case class Elem(
   override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
+  }
+
+  /**
+   * Creates a copy, altered with the explicitly passed parameters (for resolved name, resolved attributes and children).
+   */
+  def copy(
+    resolvedName: EName = this.resolvedName,
+    resolvedAttributes: Map[EName, String] = this.resolvedAttributes,
+    children: immutable.IndexedSeq[Node] = this.children): Elem = {
+
+    new Elem(resolvedName, resolvedAttributes, children)
   }
 
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */

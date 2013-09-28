@@ -19,8 +19,7 @@ package eu.cdevreeze.yaidom
 /**
  * Wrapper around class `scala.xml.Elem`, adapting it to the [[eu.cdevreeze.yaidom.ElemLike]] API.
  *
- * This wrapper is useful for scenarios where Scala XML literals with parameters are used. Typical parameters are
- * Scala XML node sequences, and they can be built in a "yaidom way", using these wrappers.
+ * This wrapper brings the uniform yaidom query API to Scala XML literals (and Scala XML Elems in general).
  *
  * For some namespace-related pitfalls and peculiarities, see [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]].
  *

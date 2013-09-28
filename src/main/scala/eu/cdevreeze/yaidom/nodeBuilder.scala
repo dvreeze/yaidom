@@ -94,6 +94,8 @@ sealed trait NodeBuilder extends Immutable with Serializable {
 
 /**
  * Builder for elements. See [[eu.cdevreeze.yaidom.NodeBuilder]].
+ *
+ * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */
 @SerialVersionUID(1L)
 final class ElemBuilder(

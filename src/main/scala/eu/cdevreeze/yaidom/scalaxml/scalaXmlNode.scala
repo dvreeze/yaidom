@@ -48,7 +48,9 @@ sealed trait ScalaXmlNode {
 /**
  * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.ElemApi]] API.
  *
- * Keep in mind that the `ElemApi` specific part of the API is a broken abstraction. If the wrapped Scala XML element
+ * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
+ *
+ * Keep in mind that the `ElemApi` specific part of the API is a '''broken abstraction'''. If the wrapped Scala XML element
  * misses some namespace declarations for used element or attribute names, these element and/or attribute names
  * cannot be resolved, and exceptions are thrown when querying for them! The `ParentElemApi` part of the API does not
  * suffer from this broken abstraction, so is less dangerous to use.

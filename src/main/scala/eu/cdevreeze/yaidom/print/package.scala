@@ -21,7 +21,15 @@ package eu.cdevreeze.yaidom
  * trait, as well as several implementations. Most of those implementations use the `convert` package to convert yaidom `Document`s to
  * JAXP artifacts, and all use JAXP (DOM, SAX or StAX).
  *
- * Having these different fully configurable JAXP-based implementations shows that yaidom is pessimistic about the transparency of parsing and
+ * For example:
+ * {{{
+ * val docPrinter = DocumentPrinterUsingSax.newInstance()
+ *
+ * docPrinter.print(doc, "UTF-8", System.out)
+ * }}}
+ * This example chose a SAX-based implementation, and used the default configuration of that document printer.
+ *
+ * Having several different fully configurable JAXP-based implementations shows that yaidom is pessimistic about the transparency of parsing and
  * printing XML. It also shows that yaidom is optimistic about the available (heap) memory and processing power, because of the 2 separated
  * steps of JAXP parsing/printing and (in-memory) `convert` conversions. Using JAXP means that escaping of characters is something
  * that JAXP deals with, and that's definitely better than trying to do it yourself.
