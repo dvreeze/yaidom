@@ -201,17 +201,6 @@ final case class Elem(
     textStrings.mkString
   }
 
-  /**
-   * Creates a copy, altered with the explicitly passed parameters (for resolved name, resolved attributes and children).
-   */
-  def copy(
-    resolvedName: EName = this.resolvedName,
-    resolvedAttributes: Map[EName, String] = this.resolvedAttributes,
-    children: immutable.IndexedSeq[Node] = this.children): Elem = {
-
-    new Elem(resolvedName, resolvedAttributes, children)
-  }
-
   /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
