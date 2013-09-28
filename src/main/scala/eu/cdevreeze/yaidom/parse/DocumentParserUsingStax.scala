@@ -46,6 +46,7 @@ import convert.StaxConversions._
  * {{{
  * class MyXmlResolver extends XMLResolver {
  *   override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): Any = {
+ *     // This dirty hack may not work on IBM JVMs
  *     new java.io.StringReader("")
  *   }
  * }

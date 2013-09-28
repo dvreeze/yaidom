@@ -60,6 +60,7 @@ import org.xml.sax.ext.LexicalHandler
  * {{{
  * trait MyEntityResolver extends EntityResolver {
  *   override def resolveEntity(publicId: String, systemId: String): InputSource = {
+ *     // This dirty hack may not work on IBM JVMs
  *     new InputSource(new java.io.StringReader(""))
  *   }
  * }

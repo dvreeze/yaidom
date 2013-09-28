@@ -46,6 +46,7 @@ import convert.DomConversions._
  * class MyEntityResolver extends LSResourceResolver {
  *   override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
  *     val input = domImplLS.createLSInput()
+ *     // This dirty hack may not work on IBM JVMs
  *     input.setCharacterStream(new jio.StringReader(""))
  *     input
  *   }
