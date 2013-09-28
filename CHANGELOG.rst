@@ -3,6 +3,17 @@ CHANGELOG
 =========
 
 
+0.6.14
+======
+
+This version improves the Scaladoc documentation. This will probably become version 0.7.0.
+
+* Reworked the Scaladoc documentation (better showing how to use the API), and removed obsolete (non-Scaladoc) documentation.
+* Breaking API change: ``indexed.Elem`` no longer mixes in ``HasParent``, and is now more efficient when querying
+* Bug fixes in methods ``updatedAtPathEntries`` and ``updatedWithNodeSeqAtPathEntries``
+* Tested against IBM JDK (ibm-java-x86_64-60)
+
+
 0.6.13
 ======
 
