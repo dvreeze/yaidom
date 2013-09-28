@@ -635,15 +635,15 @@ object Elem {
  * This singleton object contains a DSL to easily create deeply nested Elems.
  * It looks a lot like the DSL for NodeBuilders, using the same method names (so a local import for Node singleton object members may be needed).
  *
- * There is a catch, though. When using this DSL, scopes must be passed throughout the tree. These Scopes had better be
+ * There is a catch, though. When using this DSL, scopes must be passed throughout the tree. These Scopes should typically be
  * the same (or parent element scopes should be subscopes of child element scopes), because otherwise the corresponding XML
  * may contain a lot of namespace undeclarations.
  *
  * Another thing to watch out for is that the "tree representations" conform to the NodeBuilder DSL, not to this one.
  *
- * Hence, choose your poison. The NodeBuilder DSL does have the advantage over this DSL that scopes do not have to be
- * passed around. On the other hand, this Node DSL has the advantage that exceptions due to missing scope data are thrown immediately instead of
- * later (when calling the build method, in the case of the NodeBuilder DSL).
+ * In summary, the NodeBuilder DSL does have the advantage over this DSL that scopes do not have to be
+ * passed around. On the other hand, this Node DSL has the advantage that exceptions due to missing scope data are thrown immediately
+ * instead of later (when calling the build method, in the case of the NodeBuilder DSL).
  *
  * For example:
  * {{{

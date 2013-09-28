@@ -63,10 +63,6 @@ import scala.collection.immutable
  * the `Document` not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the `Document`
  * to an XML string. See also the classes in package [[eu.cdevreeze.yaidom.print]].
  *
- * NodeBuilders are serializable. Serialized NodeBuilder instances may well be an interesting storage format for parsed XML stored
- * in a database. Of course, this would be a non-standard format. Moreover, as far as queries are concerned, these columns
- * are mere BLOBs (unless using Java Stored Procedures written in Scala).
- *
  * @author Chris de Vreeze
  */
 sealed trait NodeBuilder extends Immutable with Serializable {
