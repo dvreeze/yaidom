@@ -29,7 +29,7 @@ package eu.cdevreeze.yaidom
  *
  * Moreover, the only nodes in this package are element and text nodes.
  *
- * Below follows a simple example:
+ * Below follows a simple example query, using the uniform query API:
  * {{{
  * // Note the import of package resolved, and not of its members. That is indeed a best practice!
  * import eu.cdevreeze.yaidom.resolved

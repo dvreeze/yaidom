@@ -24,17 +24,22 @@ package eu.cdevreeze.yaidom
  * in an XML schema, we need context of the element definition to determine the target namespace, or to determine whether the
  * element definition is top level, etc.
  *
- * Do not do this:
+ * Below follows a simple example query, using the uniform query API:
  * {{{
- * import eu.cdevreeze.yaidom.indexed._
- *
- * }}}
- * Better is the following:
- * {{{
+ * // Note the import of package indexed, and not of its members. That is indeed a best practice!
  * import eu.cdevreeze.yaidom.indexed
  *
- * val indexedRootElm = indexed.Elem(rootElm)
+ * val indexedBookstoreElem = indexed.Elem(bookstoreElem)
+ *
+ * val scalaBookAuthors =
+ *   for {
+ *     bookElem <- indexedBookstoreElem \ EName("{http://bookstore/book}Book")
+ *     if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *     authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
+ *   } yield authorElem
  * }}}
+ * The query for Scala book authors would have been exactly the same if normal `Elem`s had been used instead of `indexed.Elem`s
+ * (replacing `indexedBookstoreElem` by `bookstoreElem`)!
  *
  * @author Chris de Vreeze
  */
