@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+0.7.0
+=====
+
+Version 0.7.0, finally. Starting with this version, API stability and proper deprecation will be considered important.
+
+* XLink support has been removed from core yaidom, and will live in its own project
+
+
 0.6.14
 ======
 
