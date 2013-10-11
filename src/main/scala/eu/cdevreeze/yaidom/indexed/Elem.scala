@@ -106,7 +106,7 @@ final class Elem private[indexed] (
   val elem: eu.cdevreeze.yaidom.Elem =
     rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
-  require(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
+  assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
 
   /**
    * Returns all child elements, in the correct order.
