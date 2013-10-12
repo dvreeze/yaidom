@@ -31,6 +31,7 @@ import NodeBuilder._
 import parse.DocumentParserUsingDom
 import print.DocumentPrinterUsingDom
 import convert.DomConversions._
+import ElemFunctions._
 
 /**
  * DOM interoperability test case.
@@ -1419,7 +1420,7 @@ class DomInteropTest extends Suite {
     val root: Elem = domParser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
     expectResult(4) {
-      (root \\! (_.localName == "Book")).size
+      (root \\! havingLocalName("Book")).size
     }
     expectResult(4) {
       (root \\! (_.localName == "Magazine")).size

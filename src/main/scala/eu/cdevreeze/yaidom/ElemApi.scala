@@ -220,27 +220,8 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
 }
 
 /**
- * This `ElemApi` companion object makes it easier to query for child elements, descendant elements and descendant-or-self
- * elements having specific resolved names.
- *
- * For example, using `ElemApi.havingEName`:
- * {{{
- * import ElemApi._
- *
- * val bookstoreNamespace = "http://bookstore/book"
- * val authorNamespace = "http://bookstore/author"
- * require(bookstoreElem.resolvedName == EName(bookstoreNamespace, "Bookstore"))
- *
- * val cheapBookElems =
- *   for {
- *     bookElem <- bookstoreElem \ havingEName(bookstoreNamespace, "Book")
- *     price <- bookElem \@ EName("Price")
- *     if price.toInt < 90
- *   } yield bookElem
- * }}}
- *
  * Using the implicit conversion `toPredicate` that turns ENames into predicates testing the resolved name against the given
- * EName, we could simply write:
+ * EName, we can write:
  * {{{
  * val cheapBookElems =
  *   for {
@@ -269,60 +250,10 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
  * namespace when querying. Another reason to use one of the overloaded `havingEName` methods is that we can prevent the creation
  * of many very short-lived EName objects (or at least do not have to rely on escape analysis to make such object creation
  * extremely cheap).
- * 
- * Many thanks to Johan Walters for discussing the `ElemApi` trait.
+ *
+ * Many thanks to Johan Walters for discussing (an older version of) the `ElemApi` trait.
  */
 object ElemApi {
-
-  /**
-   * Returns the equivalent of `{ elem => elem.resolvedName == ename }`.
-   */
-  def havingEName[E <: ElemApi[E]](ename: EName): (E => Boolean) = { elem =>
-    elem.resolvedName == ename
-  }
-
-  /**
-   * Returns the equivalent of `{ elem => elem.resolvedName == EName(namespaceUriOption, localPart) }`.
-   *
-   * The implementation prevents unnecessary EName object creation, however.
-   */
-  def havingEName[E <: ElemApi[E]](namespaceUriOption: Option[String], localPart: String): (E => Boolean) = { elem =>
-    (elem.resolvedName.namespaceUriOption == namespaceUriOption) && (elem.resolvedName.localPart == localPart)
-  }
-
-  /**
-   * Returns the equivalent of `{ elem => elem.resolvedName == EName(namespaceUri, localPart) }`.
-   *
-   * The implementation prevents unnecessary EName object creation, however.
-   */
-  def havingEName[E <: ElemApi[E]](namespaceUri: String, localPart: String): (E => Boolean) = { elem =>
-    (elem.resolvedName.namespaceUriOption == Some(namespaceUri)) && (elem.resolvedName.localPart == localPart)
-  }
-
-  /**
-   * Returns the equivalent of `{ elem => elem.resolvedName == EName(None, localPart) }`.
-   *
-   * The implementation prevents unnecessary EName object creation, however.
-   */
-  def havingEName[E <: ElemApi[E]](localPart: String): (E => Boolean) = { elem =>
-    (elem.resolvedName.namespaceUriOption.isEmpty) && (elem.resolvedName.localPart == localPart)
-  }
-
-  /**
-   * Returns the equivalent of `{ elem => elem.resolvedName == EName(enameRepr) }`.
-   *
-   * The implementation prevents unnecessary EName object creation, however.
-   */
-  def havingEncodedEName[E <: ElemApi[E]](enameRepr: String): (E => Boolean) = { elem =>
-    elem.resolvedName.toString == enameRepr
-  }
-
-  /**
-   * Returns the equivalent of `{ elem => elem.localName == localName }`.
-   */
-  def havingLocalName[E <: ElemApi[E]](localName: String): (E => Boolean) = { elem =>
-    elem.localName == localName
-  }
 
   /**
    * Implicitly turns an EName `ename` into a predicate `havingEName(ename)`, to extend the query API.
@@ -332,5 +263,5 @@ object ElemApi {
    * for (bookElem <- bookstoreElem \ EName("book")) yield bookElem
    * }}}
    */
-  implicit def toPredicate[E <: ElemApi[E]](ename: EName): (E => Boolean) = havingEName(ename)
+  implicit def toPredicate[E <: ElemApi[E]](ename: EName): (E => Boolean) = ElemFunctions.havingEName(ename)
 }
