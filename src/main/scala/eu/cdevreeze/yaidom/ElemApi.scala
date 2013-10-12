@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.yaidom
 
+// import scala.language.implicitConversions
 import scala.collection.immutable
 
 /**
@@ -216,40 +217,120 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
 
   /** Shorthand for `attributeOption(expandedName)` */
   def \@(expandedName: EName): Option[String]
+}
 
-  /** Returns the child elements with the given expanded name */
-  def filterChildElems(expandedName: EName): immutable.IndexedSeq[E]
+/**
+ * This `ElemApi` companion object makes it easier to query for child elements, descendant elements and descendant-or-self
+ * elements having specific resolved names.
+ *
+ * For example, using `ElemApi.havingEName`:
+ * {{{
+ * import ElemApi._
+ *
+ * val bookstoreNamespace = "http://bookstore/book"
+ * val authorNamespace = "http://bookstore/author"
+ * require(bookstoreElem.resolvedName == EName(bookstoreNamespace, "Bookstore"))
+ *
+ * val cheapBookElems =
+ *   for {
+ *     bookElem <- bookstoreElem \ havingEName(bookstoreNamespace, "Book")
+ *     price <- bookElem \@ EName("Price")
+ *     if price.toInt < 90
+ *   } yield bookElem
+ * }}}
+ *
+ * Using the implicit conversion `toPredicate` that turns ENames into predicates testing the resolved name against the given
+ * EName, we could simply write:
+ * {{{
+ * val cheapBookElems =
+ *   for {
+ *     bookElem <- bookstoreElem \ EName(bookstoreNamespace, "Book")
+ *     price <- bookElem \@ EName("Price")
+ *     if price.toInt < 90
+ *   } yield bookElem
+ * }}}
+ *
+ * The implicit conversion `toPredicate` effectively enhances the `ParentElemApi` with methods taking an EName instead of
+ * an element predicate. For example, the conversion expands the parent API trait with methods such as:
+ * {{{
+ * def filterChildElems(expandedName: EName): immutable.IndexedSeq[E]
+ *
+ * def filterElems(expandedName: EName): immutable.IndexedSeq[E]
+ *
+ * def filterElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E]
+ * }}}
+ *
+ * These methods are not explicit members of the `ElemApi` trait (not anymore, that is). Otherwise these methods would add a lot
+ * of cruft to the API. Moreover, it would not be a flexible solution. What if we wanted to add query methods taking just a
+ * local name instead of an EName? We would again have to add a lot of cruft.
+ *
+ * Yaidom users are encouraged to use predicate-creating methods like `havingEName` instead. These methods are also useful
+ * in sub-traits such as `PathAwareElemApi`. Moreover, we can use method `havingLocalName` if we do not want to consider the
+ * namespace when querying. Another reason to use one of the overloaded `havingEName` methods is that we can prevent the creation
+ * of many very short-lived EName objects (or at least do not have to rely on escape analysis to make such object creation
+ * extremely cheap).
+ * 
+ * Many thanks to Johan Walters for discussing the `ElemApi` trait.
+ */
+object ElemApi {
 
-  /** Shorthand for `filterChildElems(expandedName)`. */
-  def \(expandedName: EName): immutable.IndexedSeq[E]
+  /**
+   * Returns the equivalent of `{ elem => elem.resolvedName == ename }`.
+   */
+  def havingEName[E <: ElemApi[E]](ename: EName): (E => Boolean) = { elem =>
+    elem.resolvedName == ename
+  }
 
-  /** Returns the first found child element with the given expanded name, if any, wrapped in an `Option` */
-  def findChildElem(expandedName: EName): Option[E]
+  /**
+   * Returns the equivalent of `{ elem => elem.resolvedName == EName(namespaceUriOption, localPart) }`.
+   *
+   * The implementation prevents unnecessary EName object creation, however.
+   */
+  def havingEName[E <: ElemApi[E]](namespaceUriOption: Option[String], localPart: String): (E => Boolean) = { elem =>
+    (elem.resolvedName.namespaceUriOption == namespaceUriOption) && (elem.resolvedName.localPart == localPart)
+  }
 
-  /** Returns the single child element with the given expanded name, and throws an exception otherwise */
-  def getChildElem(expandedName: EName): E
+  /**
+   * Returns the equivalent of `{ elem => elem.resolvedName == EName(namespaceUri, localPart) }`.
+   *
+   * The implementation prevents unnecessary EName object creation, however.
+   */
+  def havingEName[E <: ElemApi[E]](namespaceUri: String, localPart: String): (E => Boolean) = { elem =>
+    (elem.resolvedName.namespaceUriOption == Some(namespaceUri)) && (elem.resolvedName.localPart == localPart)
+  }
 
-  /** Returns the descendant-or-self elements that have the given expanded name */
-  def filterElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E]
+  /**
+   * Returns the equivalent of `{ elem => elem.resolvedName == EName(None, localPart) }`.
+   *
+   * The implementation prevents unnecessary EName object creation, however.
+   */
+  def havingEName[E <: ElemApi[E]](localPart: String): (E => Boolean) = { elem =>
+    (elem.resolvedName.namespaceUriOption.isEmpty) && (elem.resolvedName.localPart == localPart)
+  }
 
-  /** Shorthand for `filterElemsOrSelf(expandedName)`. */
-  def \\(expandedName: EName): immutable.IndexedSeq[E]
+  /**
+   * Returns the equivalent of `{ elem => elem.resolvedName == EName(enameRepr) }`.
+   *
+   * The implementation prevents unnecessary EName object creation, however.
+   */
+  def havingEncodedEName[E <: ElemApi[E]](enameRepr: String): (E => Boolean) = { elem =>
+    elem.resolvedName.toString == enameRepr
+  }
 
-  /** Returns the descendant elements with the given expanded name */
-  def filterElems(expandedName: EName): immutable.IndexedSeq[E]
+  /**
+   * Returns the equivalent of `{ elem => elem.localName == localName }`.
+   */
+  def havingLocalName[E <: ElemApi[E]](localName: String): (E => Boolean) = { elem =>
+    elem.localName == localName
+  }
 
-  /** Returns the descendant-or-self elements with the given expanded name that have no ancestor with the same name */
-  def findTopmostElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E]
-
-  /** Shorthand for `findTopmostElemsOrSelf(expandedName)`. */
-  def \\!(expandedName: EName): immutable.IndexedSeq[E]
-
-  /** Returns the descendant elements with the given expanded name that have no ancestor with the same name */
-  def findTopmostElems(expandedName: EName): immutable.IndexedSeq[E]
-
-  /** Returns the first found (topmost) descendant-or-self element with the given expanded name, if any, wrapped in an `Option` */
-  def findElemOrSelf(expandedName: EName): Option[E]
-
-  /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
-  def findElem(expandedName: EName): Option[E]
+  /**
+   * Implicitly turns an EName `ename` into a predicate `havingEName(ename)`, to extend the query API.
+   *
+   * This implicit conversion makes code like the following possible:
+   * {{{
+   * for (bookElem <- bookstoreElem \ EName("book")) yield bookElem
+   * }}}
+   */
+  implicit def toPredicate[E <: ElemApi[E]](ename: EName): (E => Boolean) = havingEName(ename)
 }

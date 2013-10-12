@@ -52,38 +52,4 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] with ElemApi[E] { sel
   }
 
   final def \@(expandedName: EName): Option[String] = attributeOption(expandedName)
-
-  final def filterChildElems(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems { e => e.resolvedName == expandedName }
-
-  final def \(expandedName: EName): immutable.IndexedSeq[E] = filterChildElems(expandedName)
-
-  final def findChildElem(expandedName: EName): Option[E] = {
-    findChildElem { e => e.resolvedName == expandedName }
-  }
-
-  final def getChildElem(expandedName: EName): E = {
-    val result = filterChildElems(expandedName)
-    require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
-    result.head
-  }
-
-  final def filterElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf { e => e.resolvedName == expandedName }
-
-  final def \\(expandedName: EName): immutable.IndexedSeq[E] = filterElemsOrSelf(expandedName)
-
-  final def filterElems(expandedName: EName): immutable.IndexedSeq[E] = filterElems { e => e.resolvedName == expandedName }
-
-  final def findTopmostElemsOrSelf(expandedName: EName): immutable.IndexedSeq[E] =
-    findTopmostElemsOrSelf { e => e.resolvedName == expandedName }
-
-  final def \\!(expandedName: EName): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(expandedName)
-
-  final def findTopmostElems(expandedName: EName): immutable.IndexedSeq[E] =
-    findTopmostElems { e => e.resolvedName == expandedName }
-
-  final def findElemOrSelf(expandedName: EName): Option[E] =
-    findElemOrSelf { e => e.resolvedName == expandedName }
-
-  final def findElem(expandedName: EName): Option[E] =
-    findElem { e => e.resolvedName == expandedName }
 }
