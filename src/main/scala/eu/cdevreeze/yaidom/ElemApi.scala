@@ -220,7 +220,9 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
 }
 
 /**
- * Using the implicit conversion `toPredicate` that turns ENames into predicates testing the resolved name against the given
+ * This companion object offers an implicit conversion method from ENames to element predicates.
+ *
+ * Using this implicit conversion `toPredicate` that turns ENames into predicates testing the resolved name against the given
  * EName, we can write:
  * {{{
  * val cheapBookElems =
@@ -245,10 +247,10 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
  * of cruft to the API. Moreover, it would not be a flexible solution. What if we wanted to add query methods taking just a
  * local name instead of an EName? We would again have to add a lot of cruft.
  *
- * Yaidom users are encouraged to use predicate-creating methods like `havingEName` instead. These methods are also useful
- * in sub-traits such as `PathAwareElemApi`. Moreover, we can use method `havingLocalName` if we do not want to consider the
+ * Yaidom users are encouraged to use predicate-creating methods like `ElemFunctions.havingEName` instead. These methods are also useful
+ * in sub-traits such as `PathAwareElemApi`. Moreover, we can use method `ElemFunctions.havingLocalName` if we do not want to consider the
  * namespace when querying. Another reason to use one of the overloaded `havingEName` methods is that we can prevent the creation
- * of many very short-lived EName objects (or at least do not have to rely on escape analysis to make such object creation
+ * of many very short-lived EName objects (or at least do not have to rely on JVM optimizations that make such object creation
  * extremely cheap).
  *
  * Many thanks to Johan Walters for discussing (an older version of) the `ElemApi` trait.

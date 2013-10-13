@@ -19,10 +19,9 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * This `ElemFunctions` singleton object makes it easier to query for child elements, descendant elements and descendant-or-self
- * elements having specific resolved names.
+ * This `ElemFunctions` singleton object makes it easy to query for elements having specific resolved names, among other things.
  *
- * For example, using `ElemFunctions.havingEName`:
+ * For example, using method `havingEName`:
  * {{{
  * import ElemFunctions._
  *
@@ -38,13 +37,11 @@ import scala.collection.immutable
  *   } yield bookElem
  * }}}
  *
- * Yaidom users are encouraged to use predicate-creating methods like `havingEName` instead. These methods are also useful
- * in sub-traits such as `PathAwareElemApi`. Moreover, we can use method `havingLocalName` if we do not want to consider the
- * namespace when querying. Another reason to use one of the overloaded `havingEName` methods is that we can prevent the creation
- * of many very short-lived EName objects (or at least do not have to rely on escape analysis to make such object creation
+ * Yaidom users are encouraged to use predicate-creating methods like `havingEName`. These methods are useful in queries such as
+ * those offered by `ElemApi` and `PathAwareElemApi`. Moreover, we can use method `havingLocalName` if we do not want to consider
+ * the namespace when querying. Another reason to use one of the overloaded `havingEName` methods is that we can prevent the creation
+ * of many very short-lived EName objects (or at least do not have to rely on JVM optimizations that make such object creation
  * extremely cheap).
- *
- * Many thanks to Johan Walters for discussing (an older version of) the `ElemApi` trait.
  */
 object ElemFunctions {
 
