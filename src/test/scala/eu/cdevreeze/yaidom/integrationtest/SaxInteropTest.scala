@@ -30,7 +30,6 @@ import org.scalatest.junit.JUnitRunner
 import org.ccil.cowan.tagsoup.jaxp.{ SAXFactoryImpl => TagSoupSAXFactoryImpl }
 import parse.{ DocumentParserUsingSax, DefaultElemProducingSaxHandler, SaxHandlerWithLocator }
 import print.DocumentPrinterUsingSax
-import ElemFunctions._
 
 /**
  * SAX interoperability test case.
@@ -1133,7 +1132,7 @@ class SaxInteropTest extends Suite {
     val root: Elem = saxParser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
     expectResult(4) {
-      (root \\! havingLocalName("Book")).size
+      (root \\! (_.localName == "Book")).size
     }
     expectResult(4) {
       (root \\! (_.localName == "Magazine")).size

@@ -30,7 +30,6 @@ import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingStax
 import print.DocumentPrinterUsingStax
 import convert.StaxConversions._
-import ElemFunctions._
 
 /**
  * StAX interoperability test case.
@@ -1081,7 +1080,7 @@ class StaxInteropTest extends Suite {
     val root: Elem = staxParser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
     expectResult(4) {
-      (root \\! havingLocalName("Book")).size
+      (root \\! (_.localName == "Book")).size
     }
     expectResult(4) {
       (root \\! (_.localName == "Magazine")).size

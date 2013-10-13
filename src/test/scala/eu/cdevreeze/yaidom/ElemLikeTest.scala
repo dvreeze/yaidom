@@ -22,7 +22,6 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import ElemFunctions._
 
 /**
  * ElemLike test case.
@@ -43,7 +42,7 @@ class ElemLikeTest extends Suite {
 
     val bookstoreChildElms = bookstore.findAllChildElems
     val magazineElms = bookstore \ (_.localName == "Magazine")
-    val bookElms = bookstore \ havingLocalName("Book")
+    val bookElms = bookstore \ (_.localName == "Book")
     val cheapBookElms =
       bookstore filterChildElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
 
