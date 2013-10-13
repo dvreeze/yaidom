@@ -42,6 +42,8 @@ import scala.collection.immutable
  * the namespace when querying. Another reason to use one of the overloaded `havingEName` methods is that we can prevent the creation
  * of many very short-lived EName objects (or at least do not have to rely on JVM optimizations that make such object creation
  * extremely cheap).
+ *
+ * @author Chris de Vreeze
  */
 object ElemFunctions {
 
