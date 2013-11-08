@@ -38,21 +38,21 @@ class ScopePropTest extends Suite with Checkers {
   import Arbitrary.arbitrary
 
   @Test def testResolveProperty(): Unit = {
-    check { (scope1: Scope, scope2: Scope) =>
+    check({ (scope1: Scope, scope2: Scope) =>
       scope1.resolve(scope1.relativize(scope2)) == scope2
-    }
+    }, minSuccessful(500))
   }
 
   @Test def testRelativizeProperty(): Unit = {
-    check { (scope: Scope, decls: Declarations) =>
+    check({ (scope: Scope, decls: Declarations) =>
       scope.relativize(scope.resolve(decls)) == scope.minimize(decls)
-    }
+    }, minSuccessful(500))
   }
 
   @Test def testMinimizeProperty(): Unit = {
-    check { (scope: Scope, decls: Declarations) =>
+    check({ (scope: Scope, decls: Declarations) =>
       scope.resolve(scope.minimize(decls)) == scope.resolve(decls)
-    }
+    }, minSuccessful(500))
   }
 
   // The generators are chosen in such a way, that Scope-pairs and (Scope, Declaration)-pairs are not unlikely to overlap.
