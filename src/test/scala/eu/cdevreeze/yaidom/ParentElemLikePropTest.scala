@@ -146,7 +146,6 @@ class ParentElemLikePropTest extends Suite with Checkers {
       "books.xml",
       "books-with-strange-namespaces.xml",
       "trivialXmlWithEuro.xml",
-      "sample-xbrl-instance.xml",
       "airportsGermany.xml",
       "trivialXmlWithPI.xml") map { s =>
         classOf[ParentElemLikePropTest].getResource("/eu/cdevreeze/yaidom/integrationtest/" + s).toURI
