@@ -63,7 +63,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     // Indexed Elems can be queried for the parent element!
 
-    val bookOrMagazineTitles2 =
+    val bookOrMagazineTitles =
       for {
         title <- bookstore filterElems { _.resolvedName == EName("Title") }
         if (title.elemPath.parentPath.elementNameOption == Some(EName("Book"))) ||
@@ -77,7 +77,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = bookOrMagazineTitles2 map { _.trimmedText }
+      val result = bookOrMagazineTitles map { _.trimmedText }
       result.toSet
     }
   }

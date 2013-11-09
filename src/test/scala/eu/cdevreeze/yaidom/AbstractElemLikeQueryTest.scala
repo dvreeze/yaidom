@@ -132,7 +132,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
     val childrenAlsoIncluded =
       elements forall { e =>
-        e.findAllChildElems forall { ch => elements.contains(ch) }
+        e.findAllChildElems forall { ch => elements.map(che => toResolvedElem(che)).contains(toResolvedElem(ch)) }
       }
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
   }
@@ -439,7 +439,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         otherBooksAndMagazines = {
           val result = bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-          result.toSet -- Set(bookOrMagazine)
+          result filter (e => toResolvedElem(e) != toResolvedElem(bookOrMagazine))
         }
         titles = otherBooksAndMagazines map { e => e getChildElem { _.localName == "Title" } }
         titleStrings = {
@@ -464,7 +464,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       for {
         bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
         titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        otherBooks = bookstore.filterChildElems(EName("Book")).toSet -- Set(bookOrMagazine)
+        otherBooks = bookstore.filterChildElems(EName("Book")) filter (e => toResolvedElem(e) != toResolvedElem(bookOrMagazine))
         titles = otherBooks map { e => e getChildElem { _.localName == "Title" } }
         if titles.map(_.trimmedText).contains(titleString)
       } yield bookOrMagazine
@@ -778,4 +778,6 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
   protected def book4: E =
     bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN") == Some("ISBN-9-88-777777-6")).get
+
+  protected def toResolvedElem(elem: E): resolved.Elem
 }

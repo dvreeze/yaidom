@@ -262,6 +262,4 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       result.toSet
     }
   }
-
-  protected def toResolvedElem(elem: E): resolved.Elem
 }
