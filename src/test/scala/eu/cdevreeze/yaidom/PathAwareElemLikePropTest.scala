@@ -138,10 +138,52 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
       }
     }, minSuccessful(100))
   }
-  
+
   // TODO findTopmostElemOrSelfPaths etc.
-  
-  // TODO Check (elem.filterChildElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterChildElems(p), etc.
+
+  // Knowing that (elem.findAllChildElemsWithPathEntries map (_._1)) == elem.findAllChildElems, the following follows:
+
+  @Test def testFilterChildElemPathsMapProperty(): Unit = {
+    check({ (elem: Elem, p: Elem => Boolean) =>
+      (elem.filterChildElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterChildElems(p)
+    }, minSuccessful(100))
+  }
+
+  @Test def testFilterElemOrSelfPathsMapProperty(): Unit = {
+    check({ (elem: Elem, p: Elem => Boolean) =>
+      (elem.filterElemOrSelfPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElemsOrSelf(p)
+    }, minSuccessful(100))
+  }
+
+  @Test def testFilterElemPathsMapProperty(): Unit = {
+    check({ (elem: Elem, p: Elem => Boolean) =>
+      (elem.filterElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElems(p)
+    }, minSuccessful(100))
+  }
+
+  @Test def testFindTopmostElemOrSelfPathsMapProperty(): Unit = {
+    check({ (elem: Elem, p: Elem => Boolean) =>
+      (elem.findTopmostElemOrSelfPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.findTopmostElemsOrSelf(p)
+    }, minSuccessful(100))
+  }
+
+  @Test def testFindTopmostElemPathsMapProperty(): Unit = {
+    check({ (elem: Elem, p: Elem => Boolean) =>
+      (elem.findTopmostElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.findTopmostElems(p)
+    }, minSuccessful(100))
+  }
+
+  @Test def testFindAllElemOrSelfPathsMapProperty(): Unit = {
+    check({ (elem: Elem) =>
+      (elem.findAllElemOrSelfPaths map (path => elem.findWithElemPath(path).get)) == elem.findAllElemsOrSelf
+    }, minSuccessful(100))
+  }
+
+  @Test def testFindAllElemPathsMapProperty(): Unit = {
+    check({ (elem: Elem) =>
+      (elem.findAllElemPaths map (path => elem.findWithElemPath(path).get)) == elem.findAllElems
+    }, minSuccessful(100))
+  }
 
   // Generators of test data
 
