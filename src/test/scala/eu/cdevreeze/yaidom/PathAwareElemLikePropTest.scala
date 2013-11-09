@@ -26,117 +26,122 @@ import org.scalatest.prop.Checkers
 import org.scalatest.junit.JUnitRunner
 
 /**
- * ParentElemLike properties test case.
+ * PathAwareElemLike properties test case.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ParentElemLikePropTest extends Suite with Checkers {
+class PathAwareElemLikePropTest extends Suite with Checkers {
 
   import Prop._
   import Gen._
   import Arbitrary.arbitrary
 
+  // Consistency of findAllChildElemsWithPathEntries
+
+  @Test def testFindAllChildElemsWithPathEntriesProperty(): Unit = {
+    check({ (elem: Elem) =>
+      elem.findAllChildElemsWithPathEntries.map(_._1) == elem.findAllChildElems
+    }, minSuccessful(100))
+  }
+
+  @Test def testFindAllChildElemsWithPathEntriesConsistencyProperty(): Unit = {
+    check({ (elem: Elem) =>
+      elem.findAllChildElemsWithPathEntries forall { case (che, pe) => elem.findWithElemPathEntry(pe).get == che }
+    }, minSuccessful(100))
+  }
+
   // Simple "definitions"
 
-  @Test def testFilterChildElemsDefinition(): Unit = {
+  @Test def testFilterChildElemPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterChildElems(p) == elem.findAllChildElems.filter(p)
-    }, minSuccessful(100))
-  }
-
-  @Test def testFilterElemsOrSelfDefinition(): Unit = {
-    check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElemsOrSelf(p) == {
-        Vector(elem).filter(p) ++ (elem.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
+      elem.filterChildElemPaths(p) == {
+        elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
       }
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsOrSelfDefinition(): Unit = {
+  @Test def testFilterElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.findTopmostElemsOrSelf(p) == {
-        if (p(elem)) Vector(elem)
-        else (elem.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+      elem.filterElemOrSelfPaths(p) == {
+        (if (p(elem)) Vector(ElemPath.Root) else Vector()) ++ {
+          elem.findAllChildElemsWithPathEntries flatMap {
+            case (che, pe) =>
+              che.filterElemOrSelfPaths(p).map(_.prepend(pe))
+          }
+        }
       }
     }, minSuccessful(100))
   }
 
-  @Test def testFilterElemsDefinition(): Unit = {
+  @Test def testFindTopmostElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElems(p) == {
-        (elem.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
+      elem.findTopmostElemOrSelfPaths(p) == {
+        if (p(elem)) Vector(ElemPath.Root)
+        else
+          elem.findAllChildElemsWithPathEntries flatMap {
+            case (che, pe) =>
+              che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
+          }
       }
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsDefinition(): Unit = {
+  @Test def testFilterElemPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.findTopmostElems(p) == {
-        (elem.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
+      elem.filterElemPaths(p) == {
+        elem.findAllChildElemsWithPathEntries flatMap {
+          case (che, pe) =>
+            che.filterElemOrSelfPaths(p).map(_.prepend(pe))
+        }
       }
     }, minSuccessful(100))
   }
 
-  @Test def testFindAllElemsOrSelfDefinition(): Unit = {
+  @Test def testFindTopmostElemPathsDefinition(): Unit = {
+    check({ (elem: Elem, p: Elem => Boolean) =>
+      elem.findTopmostElemPaths(p) == {
+        elem.findAllChildElemsWithPathEntries flatMap {
+          case (che, pe) =>
+            che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
+        }
+      }
+    }, minSuccessful(100))
+  }
+
+  @Test def testFindAllElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem) =>
-      elem.findAllElemsOrSelf == elem.filterElemsOrSelf(_ => true)
+      elem.findAllElemOrSelfPaths == elem.filterElemOrSelfPaths(_ => true)
     }, minSuccessful(100))
   }
 
-  @Test def testFindAllElemsDefinition(): Unit = {
+  @Test def testFindAllElemPathsDefinition(): Unit = {
     check({ (elem: Elem) =>
-      elem.findAllElems == elem.filterElems(_ => true)
+      elem.findAllElemPaths == elem.filterElemPaths(_ => true)
     }, minSuccessful(100))
   }
 
   // Simple theorems
 
-  @Test def testFilterElemsOrSelfProperty(): Unit = {
+  @Test def testFilterElemOrSelfPathsProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElemsOrSelf(p) == elem.findAllElemsOrSelf.filter(p)
-    }, minSuccessful(100))
-  }
-
-  @Test def testFilterElemsProperty(): Unit = {
-    check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElems(p) == elem.findAllElems.filter(p)
-    }, minSuccessful(100))
-  }
-
-  @Test def testFindTopmostElemsOrSelfProperty(): Unit = {
-    check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == elem.filterElemsOrSelf(p)
-    }, minSuccessful(100))
-  }
-
-  @Test def testFindTopmostElemsProperty(): Unit = {
-    check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == elem.filterElems(p)
-    }, minSuccessful(100))
-  }
-
-  @Test def testFindTopmostElemsOrSelfAlternativeDefinition(): Unit = {
-    check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.findTopmostElemsOrSelf(p) == {
-        elem.filterElemsOrSelf(p) filter { e =>
-          val hasNoMatchingAncestor = elem.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
-          hasNoMatchingAncestor
-        }
+      elem.filterElemOrSelfPaths(p) == {
+        elem.findAllElemOrSelfPaths.filter(path => p(elem.findWithElemPath(path).get))
       }
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsAlternativeDefinition(): Unit = {
+  @Test def testFilterElemPathsProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.findTopmostElems(p) == {
-        elem.filterElems(p) filter { e =>
-          val hasNoMatchingAncestor = elem.filterElems(p) forall { _.findElem(_ == e).isEmpty }
-          hasNoMatchingAncestor
-        }
+      elem.filterElemPaths(p) == {
+        elem.findAllElemPaths.filter(path => p(elem.findWithElemPath(path).get))
       }
     }, minSuccessful(100))
   }
+  
+  // TODO findTopmostElemOrSelfPaths etc.
+  
+  // TODO Check (elem.filterChildElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterChildElems(p), etc.
 
   // Generators of test data
 
@@ -150,7 +155,7 @@ class ParentElemLikePropTest extends Suite with Checkers {
       "trivialXmlWithEuro.xml",
       "airportsGermany.xml",
       "trivialXmlWithPI.xml") map { s =>
-        classOf[ParentElemLikePropTest].getResource("/eu/cdevreeze/yaidom/integrationtest/" + s).toURI
+        classOf[PathAwareElemLikePropTest].getResource("/eu/cdevreeze/yaidom/integrationtest/" + s).toURI
       }
 
     val docs = uris.map(uri => docParser.parse(uri))
