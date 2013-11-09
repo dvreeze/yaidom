@@ -25,22 +25,19 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 
 /**
- * Query test case. This test case is much like the "original" QueryTest, yet taking indexed Elems instead of standard yaidom
- * Elems.
- *
- * Acknowledgments: The sample XML and original XPath and XQuery queries are part of the online course
- * "Introduction to Databases", by professor Widom at Stanford University. Many thanks for letting me use
- * this material.
+ * Query test case for indexed Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class QueryTest extends Suite {
+class QueryTest extends AbstractElemLikeQueryTest {
+
+  final type E = Elem
 
   @Test def testQueryAll() {
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
-    val elems = indexedBookstore.findAllElemsOrSelf
+    val elems = bookstore.findAllElemsOrSelf
 
     expectResult(true) {
       !elems.isEmpty
@@ -53,58 +50,21 @@ class QueryTest extends Suite {
       }
     }
 
-    expectResult(indexedBookstore.elem.findAllElemsOrSelf) {
+    expectResult(bookstore.elem.findAllElemsOrSelf) {
       elems map { e => e.elem }
     }
   }
 
-  @Test def testQueryBookTitles() {
-    // XPath: doc("bookstore.xml")/Bookstore/Book/Title
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val bookTitles =
-      (indexedBookstore \ (_.localName == "Book")) map { e => e getChildElem (_.localName == "Title") }
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBookOrMagazineTitles() {
+  @Test def testQueryBookOrMagazineTitlesUsingParent() {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
-    require(indexedBookstore.localName == "Bookstore")
-
-    // Using only the ParentElemLike API (except for method localName)...
-
-    val bookOrMagazineTitles =
-      for {
-        bookOrMagazine <- indexedBookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
-        title <- bookOrMagazine findChildElem { _.localName == "Title" }
-      } yield title
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints",
-      "National Geographic",
-      "Newsweek")) {
-      val result = bookOrMagazineTitles map { _.trimmedText }
-      result.toSet
-    }
+    require(bookstore.localName == "Bookstore")
 
     // Indexed Elems can be queried for the parent element!
 
     val bookOrMagazineTitles2 =
       for {
-        title <- indexedBookstore filterElems { _.resolvedName == EName("Title") }
+        title <- bookstore filterElems { _.resolvedName == EName("Title") }
         if (title.elemPath.parentPath.elementNameOption == Some(EName("Book"))) ||
           (title.elemPath.parentPath.elementNameOption == Some(EName("Magazine")))
       } yield title
@@ -121,28 +81,14 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitles() {
+  @Test def testQueryTitlesUsingElemPaths() {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val titles =
-      for (ch <- indexedBookstore.findAllChildElems) yield ch.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints",
-      "National Geographic",
-      "Newsweek")) {
-      val result = titles map { _.trimmedText }
-      result.toSet
-    }
-
-    val titles2 =
       for {
-        title <- indexedBookstore findTopmostElems { _.resolvedName == EName("Title") }
+        title <- bookstore findTopmostElems { _.resolvedName == EName("Title") }
         if title.elemPath.entries.size == 2
       } yield title
 
@@ -153,254 +99,18 @@ class QueryTest extends Suite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = titles2 map { e => indexedBookstore.elem.getWithElemPath(e.elemPath).trimmedText }
+      val result = titles map { e => bookstore.elem.getWithElemPath(e.elemPath).trimmedText }
       result.toSet
     }
   }
 
-  @Test def testQueryAllTitles() {
-    // XPath: doc("bookstore.xml")//Title
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val titles =
-      for (title <- indexedBookstore filterElems (_.localName == "Title")) yield title
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints",
-      "National Geographic",
-      "Newsweek")) {
-      val result = titles map { _.trimmedText }
-      result.toSet
-    }
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints",
-      "National Geographic",
-      "Newsweek")) {
-      val result = titles map { e => indexedBookstore.elem.getWithElemPath(e.elemPath).trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryAllElements() {
-    // XPath: doc("bookstore.xml")//*
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val elements = indexedBookstore.findAllElemsOrSelf
-
-    assert(elements.contains(indexedBookstore), "Expected element 'Bookstore', among others")
-    assert(elements.size > 10, "Expected more than 10 elements")
-
-    val childrenAlsoIncluded =
-      elements forall { e =>
-        e.findAllChildElems forall { ch => elements.contains(ch) }
-      }
-    assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
-
-    val paths = indexedBookstore.elem.findAllElemOrSelfPaths
-
-    expectResult(elements.size) {
-      paths.size
-    }
-
-    expectResult(elements map (e => resolved.Elem(e.elem))) {
-      paths map { path => indexedBookstore.elem.getWithElemPath(path) } map { e => resolved.Elem(e) }
-    }
-  }
-
-  @Test def testQueryBookIsbns() {
-    // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    // Using only the ParentElemLike API (except for method localName)...
-
-    val isbns =
-      for (book <- indexedBookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
-
-    expectResult(Set(
-      "ISBN-0-13-713526-2",
-      "ISBN-0-13-815504-6",
-      "ISBN-0-11-222222-3",
-      "ISBN-9-88-777777-6")) {
-      isbns.toSet
-    }
-  }
-
-  @Test def testQueryCheapBooks() {
-    // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val books =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        price <- book \@ EName("Price")
-        if price.toInt < 90
-      } yield book
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book =>
-        book.elem findElemPath (e => e.resolvedName == EName("Title")) map
-          { path => book.elem.getWithElemPath(path).trimmedText }
-      }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryCheapBookTitles() {
-    // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val titles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        price <- book \@ EName("Price")
-        if price.toInt < 90
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints")) {
-      val result = titles map { _.trimmedText }
-      result.toSet
-    }
-
-    // Now the verbose way, using the ParentElemLike API and no operator notation...
-
-    val titles2 =
-      for {
-        book <- indexedBookstore filterChildElems { _.localName == "Book" }
-        price <- book.attributeOption(EName("Price"))
-        if price.toInt < 90
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints")) {
-      val result = titles2 map { _.trimmedText }
-      result.toSet
-    }
-
-    val titles3 = indexedBookstore.findAllElems filter { e =>
-      (e.resolvedName == EName("Title")) && {
-        val parentElm = e.rootElem.getWithElemPath(e.elemPath.parentPath)
-        parentElm.localName == "Book" && parentElm.attribute(EName("Price")).toInt < 90
-      }
-    }
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints",
-      "Jennifer's Economical Database Hints")) {
-      val result = titles3 map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryCheapBookAuthors() {
-    // Own example..
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val cheapBookElms =
-      for {
-        bookElm <- indexedBookstore \ (_.localName == "Book")
-        price <- bookElm \@ EName("Price")
-        if price.toInt < 90
-      } yield bookElm
-
-    val cheapBookAuthors = {
-      val result =
-        for {
-          cheapBookElm <- cheapBookElms
-          authorElm <- cheapBookElm \\ (_.localName == "Author")
-        } yield {
-          val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
-          val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
-
-          val firstName = firstNameElmOption.map(_.text).getOrElse("")
-          val lastName = lastNameElmOption.map(_.text).getOrElse("")
-          (firstName + " " + lastName).trim
-        }
-
-      result.toSet
-    }
-
-    expectResult(Set(
-      "Jeffrey Ullman",
-      "Jennifer Widom",
-      "Hector Garcia-Molina")) {
-      cheapBookAuthors
-    }
-  }
-
-  @Test def testQueryTitlesOfBooksWithRemarks() {
-    // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val bookTitles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        if !book.filterChildElems(EName("Remark")).isEmpty
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryTitlesOfCheapBooksByUllman() {
+  @Test def testQueryTitlesOfCheapBooksByUllmanUsingParent() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val bookTitles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        if book.attribute(EName("Price")).toInt < 90
-        authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e =>
-          e \ (_.localName == "Last_Name")
-        } map { _.trimmedText }
-        if authorLastName == "Ullman"
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
-      result.toSet
-    }
-
-    val bookTitles2 =
-      indexedBookstore findTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } flatMap { elm =>
+      bookstore findTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } flatMap { elm =>
         require(elm.resolvedName == EName("Last_Name"))
         val bookOption = elm.elemPath findAncestorPath { p =>
           val e = elm.rootElem.getWithElemPath(p)
@@ -413,37 +123,15 @@ class QueryTest extends Suite {
     expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles2 map { _.trimmedText }
+      val result = bookTitles map { _.trimmedText }
       result.toSet
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByJeffreyUllman() {
+  @Test def testQueryTitlesOfCheapBooksByJeffreyUllmanUsingParent() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
-    require(indexedBookstore.localName == "Bookstore")
-
-    val bookTitles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        if book.attribute(EName("Price")).toInt < 90
-        authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e =>
-          e \ (_.localName == "Last_Name")
-        } map { _.trimmedText }
-        if authorLastName == "Ullman"
-        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e =>
-          e \ (_.localName == "First_Name")
-        } map { _.trimmedText }
-        if authorFirstName == "Jeffrey"
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
-      result.toSet
-    }
+    require(bookstore.localName == "Bookstore")
 
     def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.Elem): (String, String) = {
       val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
@@ -453,7 +141,7 @@ class QueryTest extends Suite {
 
     val bookTitles2 =
       for {
-        authorElem <- indexedBookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
+        authorElem <- bookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
         if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
         bookElem <- authorElem.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
           indexed.Elem(authorElem.rootElem, p)
@@ -470,7 +158,7 @@ class QueryTest extends Suite {
 
     val bookTitles3 =
       for {
-        authorElem <- indexedBookstore \\ EName("Author")
+        authorElem <- bookstore \\ EName("Author")
         if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
         bookElem <- authorElem.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
           indexed.Elem(authorElem.rootElem, p)
@@ -486,54 +174,14 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfBooksByJeffreyUllmanButNotWidom() {
-    // XPath: doc("bookstore.xml")/Bookstore/Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]/Title
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val bookTitles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        authors = book.getChildElem(EName("Authors"))
-        lastNameStrings = for {
-          author <- authors \ (_.localName == "Author")
-          lastNameString = author.getChildElem(EName("Last_Name")).trimmedText
-        } yield lastNameString
-        if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksByJeffreyUllman() {
+  @Test def testQueryBooksByJeffreyUllmanUsingParent() {
     // Own example
 
-    require(indexedBookstore.localName == "Bookstore")
-
-    val bookElms =
-      for {
-        bookElm <- indexedBookstore filterChildElems { _.localName == "Book" }
-        if (bookElm \\ (_.localName == "Author")) exists { e =>
-          ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
-            ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
-        }
-      } yield bookElm
-
-    expectResult(Set(
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book",
-      "Hector and Jeff's Database Hints")) {
-      val result = bookElms map { e => e.getChildElem(_.localName == "Title").text }
-      result.toSet
-    }
+    require(bookstore.localName == "Bookstore")
 
     val ullmanBookElms =
       for {
-        authorElm <- indexedBookstore filterElems { e =>
+        authorElm <- bookstore filterElems { e =>
           (e.localName == "Author") &&
             ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
             ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
@@ -554,79 +202,14 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQuerySecondAuthors() {
-    // XPath: doc("bookstore.xml")//Authors/Author[2]
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val secondAuthors =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        authors = book.getChildElem(EName("Authors"))
-        authorColl = authors \ (_.localName == "Author")
-        if authorColl.size >= 2
-        secondAuthor <- authorColl.drop(1).headOption
-      } yield secondAuthor
-
-    val secondAuthorLastNames = secondAuthors map { e => e getChildElem { _.localName == "Last_Name" } }
-    expectResult(Set(
-      "Widom",
-      "Ullman",
-      "Garcia-Molina")) {
-      val result = secondAuthorLastNames map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryGreatBooks() {
-    // XPath: doc("bookstore.xml")//Book[contains(Remark, "great")]/Title
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val titles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        remark <- book \ (_.localName == "Remark")
-        if remark.trimmedText.indexOf("great") >= 0
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set("Database Systems: The Complete Book")) {
-      val result = titles map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryMagazinesWithSameNameAsBook() {
-    // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val magazines =
-      for {
-        magazine <- indexedBookstore \ (_.localName == "Magazine")
-        magazineTitle = magazine.getChildElem(EName("Title")).trimmedText
-        booksWithSameName = for {
-          book <- indexedBookstore \ (_.localName == "Book")
-          bookTitle = book.getChildElem(EName("Title")).trimmedText
-          if magazineTitle == bookTitle
-        } yield book
-        if !booksWithSameName.isEmpty
-      } yield magazine
-
-    expectResult(Set("Hector and Jeff's Database Hints")) {
-      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-  }
-
   @Test def testQueryElementsWithParentNotBookOrBookstore() {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     val elms =
       for {
-        e <- indexedBookstore.findAllElems
+        e <- bookstore.findAllElems
         parent = indexed.Elem(e.rootElem, e.elemPath.parentPath)
         if parent.elem.qname != QName("Bookstore") && parent.elem.qname != QName("Book")
       } yield e
@@ -635,105 +218,6 @@ class QueryTest extends Suite {
 
     expectResult(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       val result = elms map { e => e.elem.qname }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitles() {
-    // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val booksAndMagazines =
-      for {
-        bookOrMagazine <- indexedBookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-        titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        otherBooksAndMagazines = {
-          val result = indexedBookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-          result.toSet -- Set(bookOrMagazine)
-        }
-        titles = otherBooksAndMagazines map { e => e getChildElem { _.localName == "Title" } }
-        if titles.map(_.trimmedText).contains(titleString)
-      } yield bookOrMagazine
-
-    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBook() {
-    // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val booksAndMagazines =
-      for {
-        bookOrMagazine <- indexedBookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-        titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        otherBooks = indexedBookstore.filterChildElems(EName("Book")).toSet -- Set(bookOrMagazine)
-        titles = otherBooks map { e => e getChildElem { _.localName == "Title" } }
-        if titles.map(_.trimmedText).contains(titleString)
-      } yield bookOrMagazine
-
-    expectResult(Set("Hector and Jeff's Database Hints")) {
-      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
-   * for $b in doc("bookstore.xml")/Bookstore/Book
-   * where every $fn in $b/Authors/Author/First_Name satisfies contains($fn, "J")
-   * return $b
-   * </pre>
-   * or XPath:
-   * }}}
-   * doc("bookstore.xml")//Book[count(Authors/Author[contains(First_Name, "J"]) = count(Authors/Author/First_Name)]
-   * </pre>
-   */
-  @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ() {
-    require(indexedBookstore.localName == "Bookstore")
-
-    val books =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        authorNames = {
-          val result = for {
-            author <- book.filterElems(EName("Author"))
-            firstName = author.getChildElem(EName("First_Name"))
-          } yield firstName.trimmedText
-          result.toSet
-        }
-        if authorNames forall { name => name.indexOf("J") >= 0 }
-      } yield book
-
-    expectResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksFromUllmanButNotWidom() {
-    // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val titles =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        authorNames = {
-          val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("Last_Name")).trimmedText }
-          result.toSet
-        }
-        if authorNames.contains("Ullman") && !authorNames.contains("Widom")
-      } yield book.getChildElem(EName("Title"))
-
-    expectResult(Set(
-      "Hector and Jeff's Database Hints")) {
-      val result = titles map { _.trimmedText }
       result.toSet
     }
   }
@@ -750,13 +234,13 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBooksWithAuthorInTitle() {
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
     val titleAndFirstNames =
       for {
-        book <- indexedBookstore \ (_.localName == "Book")
+        book <- bookstore \ (_.localName == "Book")
         title = book.getChildElem(EName("Title"))
         authorFirstNames = {
           val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("First_Name")).trimmedText }
@@ -783,33 +267,6 @@ class QueryTest extends Suite {
   /**
    * The equivalent of XQuery:
    * {{{
-   * &lt;Average&gt;
-   * { let $plist := doc("bookstore.xml")/Bookstore/Book/@Price
-   *   return avg($plist) }
-   * &lt;/Average&gt;
-   * }}}
-   */
-  @Test def testQueryAverageBookPrice() {
-    require(indexedBookstore.localName == "Bookstore")
-
-    import NodeBuilder._
-
-    val prices: immutable.IndexedSeq[Double] =
-      for {
-        book <- indexedBookstore \ (_.localName == "Book")
-        price <- book \@ EName("Price")
-      } yield price.toDouble
-    val averagePrice =
-      textElem(QName("Average"), (prices.sum.toDouble / prices.size).toString).build()
-
-    expectResult(65) {
-      averagePrice.trimmedText.toDouble.intValue
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
    * let $a := avg(doc("bookstore.xml")/Bookstore/Book/@Price)
    * for $b in doc("bookstore.xml")/Bookstore/Book
    * where $b/@Price < $a
@@ -820,13 +277,13 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBooksPricedBelowAverage() {
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
     val prices: immutable.IndexedSeq[Double] =
       for {
-        book <- indexedBookstore \ (_.localName == "Book")
+        book <- bookstore \ (_.localName == "Book")
         price = book.attribute(EName("Price")).toDouble
       } yield price
 
@@ -834,7 +291,7 @@ class QueryTest extends Suite {
 
     val cheapBooks =
       for {
-        book <- indexedBookstore \ (_.localName == "Book")
+        book <- bookstore \ (_.localName == "Book")
         price = book.attribute(EName("Price")).toDouble
         if price < avg
       } yield elem(
@@ -868,7 +325,7 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryBooksOrderedByPrice() {
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
@@ -880,7 +337,7 @@ class QueryTest extends Suite {
 
     val books = {
       for {
-        book <- indexedBookstore \ (_.localName == "Book") sortWith { cheaper _ }
+        book <- bookstore \ (_.localName == "Book") sortWith { cheaper _ }
         price = book.attribute(EName("Price")).toDouble
       } yield elem(
         qname = QName("Book"),
@@ -907,98 +364,6 @@ class QueryTest extends Suite {
   /**
    * The equivalent of XQuery:
    * {{{
-   * for $n in distinct-values(doc("bookstore.xml")//Last_Name)
-   * return &lt;Last_Name&gt;
-   *          { $n }
-   *        &lt;/Last_Name&gt;
-   * }}}
-   */
-  @Test def testQueryLastNames() {
-    require(indexedBookstore.localName == "Bookstore")
-
-    val lastNameValues: immutable.IndexedSeq[String] =
-      for {
-        lastName <- (indexedBookstore.filterElems(EName("Last_Name")) map (e => e.trimmedText)).distinct
-      } yield lastName
-
-    expectResult(Set(
-      "Ullman",
-      "Widom",
-      "Garcia-Molina")) {
-      lastNameValues.toSet
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
-   * for $b1 in doc("bookstore.xml")/Bookstore/Book
-   * for $b2 in doc("bookstore.xml")/Bookstore/Book
-   * where $b1/Authors/Author/Last_Name = $b2/Authors/Author/Last_Name
-   * and $b1/Title < $b2/Title
-   * return &lt;BookPair&gt;
-   *          &lt;Title1&gt;{ data($b1/Title) }&lt;/Title1&gt;
-   *          &lt;Title2&gt;{ data($b2/Title) }&lt;/Title2&gt;
-   *        &lt;/BookPair&gt;
-   * }}}
-   */
-  @Test def testQueryBookPairsFromSameAuthor() {
-    require(indexedBookstore.localName == "Bookstore")
-
-    import NodeBuilder._
-
-    def bookAuthorLastNames(book: Elem): Set[String] = {
-      val authors = book.getChildElem(EName("Authors"))
-      val result = for {
-        author <- authors \ (_.localName == "Author")
-        lastName = author getChildElem { _.localName == "Last_Name" }
-        lastNameValue: String = lastName.trimmedText
-      } yield lastNameValue
-      result.toSet
-    }
-
-    def bookTitle(book: eu.cdevreeze.yaidom.Elem): String = book.getChildElem(EName("Title")).trimmedText
-
-    val pairs =
-      for {
-        book1 <- indexedBookstore \ (_.localName == "Book")
-        book2 <- indexedBookstore \ (_.localName == "Book")
-        if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
-        if bookTitle(book1.elem) < bookTitle(book2.elem)
-      } yield elem(
-        qname = QName("BookPair"),
-        children = Vector(
-          textElem(QName("Title1"), bookTitle(book1.elem)),
-          textElem(QName("Title2"), bookTitle(book2.elem)))).build()
-
-    expectResult(5) {
-      pairs.size
-    }
-    expectResult(3) {
-      pairs.filter(pair =>
-        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book1.build()) ||
-          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book1.build())).size
-    }
-    expectResult(3) {
-      pairs.filter(pair =>
-        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book2.build()) ||
-          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book2.build())).size
-    }
-    expectResult(2) {
-      pairs.filter(pair =>
-        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book3.build()) ||
-          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book3.build())).size
-    }
-    expectResult(2) {
-      pairs.filter(pair =>
-        pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book4.build()) ||
-          pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book4.build())).size
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
    * &lt;InvertedBookstore&gt;
    * {
    *   for $ln in distinct-values(doc("bookstore.xml")//Author/Last_Name)
@@ -1014,13 +379,13 @@ class QueryTest extends Suite {
    * }}}
    */
   @Test def testQueryInvertedBookstore() {
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
 
     def books(authorLastName: String) =
       for {
-        book <- indexedBookstore \ (_.localName == "Book")
+        book <- bookstore \ (_.localName == "Book")
         author <- book.filterElems(EName("Author"))
         if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
@@ -1037,13 +402,13 @@ class QueryTest extends Suite {
     val authorsWithBooks =
       for {
         lastNameValue <- {
-          val result = indexedBookstore.filterElems(EName("Author")) map { e => e.getChildElem(EName("Last_Name")).trimmedText }
+          val result = bookstore.filterElems(EName("Author")) map { e => e.getChildElem(EName("Last_Name")).trimmedText }
           result.distinct
         }
       } yield {
         val author: Elem = {
           val result = for {
-            author <- indexedBookstore.filterElems(EName("Author"))
+            author <- bookstore.filterElems(EName("Author"))
             if author.getChildElem(EName("Last_Name")).trimmedText == lastNameValue
           } yield author
           result.head
@@ -1068,32 +433,6 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookAndMagazineTitlesRelabeled() {
-    // Taken from the XSLT demo
-    require(indexedBookstore.localName == "Bookstore")
-
-    import NodeBuilder._
-
-    val bookOrMagazineTitles =
-      for {
-        bookOrMagazine <- indexedBookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
-      } yield {
-        val titleString = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-
-        if (bookOrMagazine.resolvedName == EName("Book")) {
-          textElem(QName("BookTitle"), titleString).build()
-        } else {
-          textElem(QName("MagazineTitle"), titleString).build()
-        }
-      }
-
-    expectResult(Set(EName("BookTitle"), EName("MagazineTitle"))) {
-      bookOrMagazineTitles.map(e => e.resolvedName).toSet
-    }
-    val ngCount = bookOrMagazineTitles count { e => e.trimmedText == "National Geographic" }
-    assert(ngCount == 2, "Expected 'National Geographic' twice")
-  }
-
   @Test def testTransformLeavingOutPrices() {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
@@ -1101,7 +440,7 @@ class QueryTest extends Suite {
 
     // Transforms the XML tree, leaving out book prices
 
-    require(indexedBookstore.localName == "Bookstore")
+    require(bookstore.localName == "Bookstore")
 
     def removePrice(book: eu.cdevreeze.yaidom.Elem): eu.cdevreeze.yaidom.Elem = {
       require(book.resolvedName == EName("Book"))
@@ -1117,18 +456,18 @@ class QueryTest extends Suite {
         case e: eu.cdevreeze.yaidom.Elem if e.resolvedName == EName("Book") => removePrice(e)
         case e: eu.cdevreeze.yaidom.Elem => e
       }
-      val result = indexedBookstore.elem.transformElemsOrSelf(f)
+      val result = bookstore.elem.transformElemsOrSelf(f)
       Elem(result)
     }
 
     expectResult(4) {
-      indexedBookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
+      bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     expectResult(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     expectResult(4) {
-      val elms = indexedBookstore findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val elms = bookstore findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       elms.size
     }
     expectResult(0) {
@@ -1137,96 +476,7 @@ class QueryTest extends Suite {
     }
   }
 
-  @Test def testDepthFirst() {
-    require(indexedBookstore.localName == "Bookstore")
-
-    // Returns descendant-or-self elements in depth-first order, that is, in document order
-    val elms = indexedBookstore.findAllElemsOrSelf
-
-    val depthFirstElmNames = List(
-      EName("Bookstore"),
-      EName("Book"),
-      EName("Title"),
-      EName("Authors"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Book"),
-      EName("Title"),
-      EName("Authors"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Remark"),
-      EName("Book"),
-      EName("Title"),
-      EName("Authors"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Remark"),
-      EName("Book"),
-      EName("Title"),
-      EName("Authors"),
-      EName("Author"),
-      EName("First_Name"),
-      EName("Last_Name"),
-      EName("Magazine"),
-      EName("Title"),
-      EName("Magazine"),
-      EName("Title"),
-      EName("Magazine"),
-      EName("Title"),
-      EName("Magazine"),
-      EName("Title"))
-
-    expectResult(depthFirstElmNames) {
-      elms map { _.resolvedName }
-    }
-  }
-
-  @Test def testQueryBookWithGivenIsbn() {
-    // See http://kousenit.wordpress.com/2008/03/12/nothing-makes-you-want-groovy-more-than-xml/,
-    // but taking "our" bookstore as input XML. Somewhat more verbose than the Groovy example, but also more
-    // explicit (about elements, expanded names, etc.).
-
-    require(indexedBookstore.localName == "Bookstore")
-
-    val isbn = "ISBN-0-11-222222-3"
-
-    val bookElmOption = indexedBookstore findElem { e => e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn) }
-    val bookElm = bookElmOption.getOrElse(sys.error("Expected Book with ISBN %s".format(isbn)))
-
-    val title = bookElm.getChildElem(_.localName == "Title").text
-
-    val authorLastNames =
-      for {
-        authorsElm <- bookElm \ (_.localName == "Authors")
-        lastNameElm <- authorsElm \\ (_.localName == "Last_Name")
-      } yield lastNameElm.text
-    val firstAuthorLastName = authorLastNames.head
-
-    expectResult("Hector and Jeff's Database Hints") {
-      title
-    }
-    expectResult("Ullman") {
-      firstAuthorLastName
-    }
-  }
-
-  private val book1: ElemBuilder = {
+  private val book1Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1249,7 +499,7 @@ class QueryTest extends Suite {
                 textElem(QName("Last_Name"), "Widom")))))))
   }
 
-  private val book2: ElemBuilder = {
+  private val book2Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1278,7 +528,7 @@ class QueryTest extends Suite {
         textElem(QName("Remark"), "Buy this book bundled with \"A First Course\" - a great deal!")))
   }
 
-  private val book3: ElemBuilder = {
+  private val book3Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1302,7 +552,7 @@ class QueryTest extends Suite {
         textElem(QName("Remark"), "An indispensable companion to your textbook")))
   }
 
-  private val book4: ElemBuilder = {
+  private val book4Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1320,7 +570,7 @@ class QueryTest extends Suite {
                 textElem(QName("Last_Name"), "Widom")))))))
   }
 
-  private val magazine1: ElemBuilder = {
+  private val magazine1Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1330,7 +580,7 @@ class QueryTest extends Suite {
         textElem(QName("Title"), "National Geographic")))
   }
 
-  private val magazine2: ElemBuilder = {
+  private val magazine2Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1340,7 +590,7 @@ class QueryTest extends Suite {
         textElem(QName("Title"), "National Geographic")))
   }
 
-  private val magazine3: ElemBuilder = {
+  private val magazine3Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1350,7 +600,7 @@ class QueryTest extends Suite {
         textElem(QName("Title"), "Newsweek")))
   }
 
-  private val magazine4: ElemBuilder = {
+  private val magazine4Builder: ElemBuilder = {
     import NodeBuilder._
 
     elem(
@@ -1360,14 +610,17 @@ class QueryTest extends Suite {
         textElem(QName("Title"), "Hector and Jeff's Database Hints")))
   }
 
-  private val indexedBookstore: Elem = {
+  protected final val bookstore: Elem = {
     import NodeBuilder._
 
     val result =
       elem(
         qname = QName("Bookstore"),
         children = Vector(
-          book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
+          book1Builder, book2Builder, book3Builder, book4Builder,
+          magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
     indexed.Elem(result)
   }
+
+  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
 }
