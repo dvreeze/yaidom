@@ -130,7 +130,8 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
       result += xmlEventReader.nextEvent()
     }
 
-    result.toVector
+    // ArrayBuffer.toVector not working on Scala 2.9.X ...
+    Vector(result.toIndexedSeq: _*)
   }
 
   private def trimContactEvents(events: Vector[XMLEvent]): Vector[XMLEvent] = {
