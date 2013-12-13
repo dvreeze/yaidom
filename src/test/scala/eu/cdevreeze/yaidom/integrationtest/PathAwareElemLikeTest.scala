@@ -74,160 +74,160 @@ class PathAwareElemLikeTest extends Suite {
 
   @Test def testFilterChildElemPaths() {
     val p = { e: Elem => Set("shipTo", "billTo").contains(e.localName) }
-    val toPaths = rootElem.filterChildElemPaths(p)
+    val toPaths = rootElem.filterPathsOfChildElems(p)
 
     expectResult(2) {
       toPaths.size
     }
 
-    expectResult(filterChildElemPaths(rootElem, p)) {
-      rootElem.filterChildElemPaths(p)
+    expectResult(filterPathsOfChildElems(rootElem, p)) {
+      rootElem.filterPathsOfChildElems(p)
     }
 
-    expectResult(filterChildElemPaths(rootElem, (e => true))) {
-      rootElem.filterChildElemPaths(e => true)
+    expectResult(filterPathsOfChildElems(rootElem, (e => true))) {
+      rootElem.filterPathsOfChildElems(e => true)
     }
   }
 
   @Test def testFilterElemOrSelfPaths() {
     val p = { e: Elem => !Set("comment").contains(e.localName) }
-    val paths = rootElem.filterElemOrSelfPaths(p)
+    val paths = rootElem.filterPathsOfElemsOrSelf(p)
 
     expectResult(rootElem.findAllElemsOrSelf.size - 2) {
       paths.size
     }
 
-    expectResult(filterElemOrSelfPaths(rootElem, p)) {
-      rootElem.filterElemOrSelfPaths(p)
+    expectResult(filterPathsOfElemsOrSelf(rootElem, p)) {
+      rootElem.filterPathsOfElemsOrSelf(p)
     }
 
-    expectResult(filterElemOrSelfPaths(rootElem, (e => true))) {
-      rootElem.filterElemOrSelfPaths(e => true)
+    expectResult(filterPathsOfElemsOrSelf(rootElem, (e => true))) {
+      rootElem.filterPathsOfElemsOrSelf(e => true)
     }
   }
 
   @Test def testFindTopmostElemOrSelfPaths() {
     val p = { e: Elem => Set("item").contains(e.localName) }
-    val paths = rootElem.findTopmostElemOrSelfPaths(p)
+    val paths = rootElem.findPathsOfTopmostElemsOrSelf(p)
 
     expectResult(2) {
       paths.size
     }
 
-    expectResult(findTopmostElemOrSelfPaths(rootElem, p)) {
-      rootElem.findTopmostElemOrSelfPaths(p)
+    expectResult(findPathsOfTopmostElemsOrSelf(rootElem, p)) {
+      rootElem.findPathsOfTopmostElemsOrSelf(p)
     }
 
-    expectResult(findTopmostElemOrSelfPaths(rootElem, (e => true))) {
-      rootElem.findTopmostElemOrSelfPaths(e => true)
+    expectResult(findPathsOfTopmostElemsOrSelf(rootElem, (e => true))) {
+      rootElem.findPathsOfTopmostElemsOrSelf(e => true)
     }
   }
 
   @Test def testFilterElemPaths() {
     val p = { e: Elem => !Set("comment").contains(e.localName) }
-    val paths = rootElem.filterElemPaths(p)
+    val paths = rootElem.filterPathsOfElems(p)
 
     expectResult(rootElem.findAllElems.size - 2) {
       paths.size
     }
 
-    expectResult(filterElemPaths(rootElem, p)) {
-      rootElem.filterElemPaths(p)
+    expectResult(filterPathsOfElems(rootElem, p)) {
+      rootElem.filterPathsOfElems(p)
     }
 
-    expectResult(filterElemPaths(rootElem, (e => true))) {
-      rootElem.filterElemPaths(e => true)
+    expectResult(filterPathsOfElems(rootElem, (e => true))) {
+      rootElem.filterPathsOfElems(e => true)
     }
   }
 
   @Test def testFindTopmostElemPaths() {
     val p = { e: Elem => Set("item").contains(e.localName) }
-    val paths = rootElem.findTopmostElemPaths(p)
+    val paths = rootElem.findPathsOfTopmostElems(p)
 
     expectResult(2) {
       paths.size
     }
 
-    expectResult(findTopmostElemPaths(rootElem, p)) {
-      rootElem.findTopmostElemPaths(p)
+    expectResult(findPathsOfTopmostElems(rootElem, p)) {
+      rootElem.findPathsOfTopmostElems(p)
     }
 
-    expectResult(findTopmostElemPaths(rootElem, (e => true))) {
-      rootElem.findTopmostElemPaths(e => true)
+    expectResult(findPathsOfTopmostElems(rootElem, (e => true))) {
+      rootElem.findPathsOfTopmostElems(e => true)
     }
   }
 
   @Test def testEqualities() {
     val p = { e: Elem => Set("item").contains(e.localName) }
-    val paths = rootElem.filterElemOrSelfPaths(p)
+    val paths = rootElem.filterPathsOfElemsOrSelf(p)
 
     expectResult(rootElem.filterElemsOrSelf(p).map(e => resolved.Elem(e))) {
-      rootElem.filterElemOrSelfPaths(p) map (path => rootElem.getWithElemPath(path)) map (e => resolved.Elem(e))
+      rootElem.filterPathsOfElemsOrSelf(p) map (path => rootElem.getElemOrSelfByPath(path)) map (e => resolved.Elem(e))
     }
 
     expectResult(rootElem.filterElems(p).map(e => resolved.Elem(e))) {
-      rootElem.filterElemPaths(p) map (path => rootElem.getWithElemPath(path)) map (e => resolved.Elem(e))
+      rootElem.filterPathsOfElems(p) map (path => rootElem.getElemOrSelfByPath(path)) map (e => resolved.Elem(e))
     }
 
     expectResult(rootElem.filterChildElems(p).map(e => resolved.Elem(e))) {
-      rootElem.filterChildElemPaths(p) map (path => rootElem.getWithElemPath(path)) map (e => resolved.Elem(e))
+      rootElem.filterPathsOfChildElems(p) map (path => rootElem.getElemOrSelfByPath(path)) map (e => resolved.Elem(e))
     }
   }
 
   @Test def testOtherEqualities() {
     val p = { e: Elem => Set("item").contains(e.localName) }
-    val paths = rootElem.filterElemOrSelfPaths(p)
+    val paths = rootElem.filterPathsOfElemsOrSelf(p)
 
-    expectResult(rootElem.findAllElemOrSelfPaths.filter(path => p(rootElem.getWithElemPath(path)))) {
-      rootElem.filterElemOrSelfPaths(p)
+    expectResult(rootElem.findAllPathsOfElemsOrSelf.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
+      rootElem.filterPathsOfElemsOrSelf(p)
     }
 
-    expectResult(rootElem.findAllElemPaths.filter(path => p(rootElem.getWithElemPath(path)))) {
-      rootElem.filterElemPaths(p)
+    expectResult(rootElem.findAllPathsOfElems.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
+      rootElem.filterPathsOfElems(p)
     }
 
-    expectResult(rootElem.findAllChildElemPaths.filter(path => p(rootElem.getWithElemPath(path)))) {
-      rootElem.filterChildElemPaths(p)
+    expectResult(rootElem.findAllPathsOfChildElems.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
+      rootElem.filterPathsOfChildElems(p)
     }
   }
 
   // Semantical definitions
 
-  private def filterChildElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
+  private def filterPathsOfChildElems(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
     elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
 
-  private def filterElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
+  private def filterPathsOfElemsOrSelf(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
     (if (p(elem)) Vector(ElemPath.Root) else Vector()) ++ {
       elem.findAllChildElemsWithPathEntries flatMap {
         case (che, pe) =>
-          filterElemOrSelfPaths(che, p).map(_.prepend(pe))
+          filterPathsOfElemsOrSelf(che, p).map(_.prepend(pe))
       }
     }
   }
 
-  private def findTopmostElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
+  private def findPathsOfTopmostElemsOrSelf(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
     if (p(elem)) Vector(ElemPath.Root)
     else {
       elem.findAllChildElemsWithPathEntries flatMap {
         case (che, pe) =>
-          findTopmostElemOrSelfPaths(che, p).map(_.prepend(pe))
+          findPathsOfTopmostElemsOrSelf(che, p).map(_.prepend(pe))
       }
     }
   }
 
-  private def filterElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
+  private def filterPathsOfElems(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
     elem.findAllChildElemsWithPathEntries flatMap {
       case (che, pe) =>
-        filterElemOrSelfPaths(che, p).map(_.prepend(pe))
+        filterPathsOfElemsOrSelf(che, p).map(_.prepend(pe))
     }
 
-  private def findTopmostElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
+  private def findPathsOfTopmostElems(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
     elem.findAllChildElemsWithPathEntries flatMap {
       case (che, pe) =>
-        findTopmostElemOrSelfPaths(che, p).map(_.prepend(pe))
+        findPathsOfTopmostElemsOrSelf(che, p).map(_.prepend(pe))
     }
 
-  private def findAllElemOrSelfPaths(elem: Elem): immutable.IndexedSeq[ElemPath] = filterElemOrSelfPaths(elem, e => true)
+  private def findAllPathsOfElemsOrSelf(elem: Elem): immutable.IndexedSeq[ElemPath] = filterPathsOfElemsOrSelf(elem, e => true)
 
-  private def findAllElemPaths(elem: Elem): immutable.IndexedSeq[ElemPath] = filterElemPaths(elem, e => true)
+  private def findAllPathsOfElems(elem: Elem): immutable.IndexedSeq[ElemPath] = filterPathsOfElems(elem, e => true)
 }

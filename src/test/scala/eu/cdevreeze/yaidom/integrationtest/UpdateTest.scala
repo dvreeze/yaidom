@@ -328,24 +328,24 @@ class UpdateTest extends Suite {
   }
 
   private def turnBookAttributeIntoElem[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
-    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
+    val matchingPaths = rootElm filterPathsOfElems { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
 
     matchingPaths.reverse.foldLeft(rootElm) { (acc, path) =>
-      require(rootElm.findWithElemPath(path).isDefined)
+      require(rootElm.findElemOrSelfByPath(path).isDefined)
 
       acc.updated(path) { case e => upd(e, attrName) }
     }
   }
 
   private def turnBookAttributeIntoElemUsingPathSet[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
-    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
+    val matchingPaths = rootElm filterPathsOfElems { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
 
     rootElm.updatedAtPaths(matchingPaths.toSet) { (elem, path) =>
-      require(rootElm.findWithElemPath(path).isDefined)
+      require(rootElm.findElemOrSelfByPath(path).isDefined)
       upd(elem, attrName)
     }
   }

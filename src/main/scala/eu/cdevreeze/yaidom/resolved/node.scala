@@ -166,7 +166,7 @@ final case class Elem(
     new Elem(resolvedName, resolvedAttributes, newChildren)
   }
 
-  override def findWithElemPathEntry(entry: ElemPath.Entry): Option[Elem] = {
+  override def findChildElemByPathEntry(entry: ElemPath.Entry): Option[Elem] = {
     val idx = childNodeIndex(entry)
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }

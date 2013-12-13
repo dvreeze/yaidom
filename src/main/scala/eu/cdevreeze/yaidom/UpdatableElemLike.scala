@@ -79,7 +79,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
       val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
         case (acc, (pathEntry, idx)) =>
           val che = acc(idx).asInstanceOf[E]
-          assert(findWithElemPathEntry(pathEntry) == Some(che))
+          assert(findChildElemByPathEntry(pathEntry) == Some(che))
           val updatedChe = f(che, pathEntry)
           acc.updated(idx, updatedChe)
       }
@@ -107,7 +107,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
       val resultsByPathEntries: Map[ElemPath.Entry, E] =
         pathsByPathEntries map {
           case (pathEntry, paths) =>
-            val che = self.findWithElemPathEntry(pathEntry).getOrElse(sys.error("Incorrect path entry %s".format(pathEntry)))
+            val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error("Incorrect path entry %s".format(pathEntry)))
 
             val relativePaths = paths.map(_.withoutFirstEntry)
 
@@ -134,13 +134,13 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     else {
       assert(path.parentPathOption.isDefined)
       val parentPath = path.parentPath
-      val parentElem = findWithElemPath(parentPath).getOrElse(sys.error("Incorrect parent path %s".format(parentPath)))
+      val parentElem = findElemOrSelfByPath(parentPath).getOrElse(sys.error("Incorrect parent path %s".format(parentPath)))
 
       val lastEntry = path.lastEntry
       val childNodeIndex = parentElem.childNodeIndex(lastEntry)
       require(childNodeIndex >= 0, "Incorrect path entry %s".format(lastEntry))
 
-      val childElemOption = parentElem.findWithElemPathEntry(lastEntry)
+      val childElemOption = parentElem.findChildElemByPathEntry(lastEntry)
       assert(childElemOption.isDefined)
       val childElem = childElemOption.get
 
@@ -165,7 +165,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
             val nodesAtIdx = acc(idx)
             assert(nodesAtIdx.size == 1)
             val che = nodesAtIdx.head.asInstanceOf[E]
-            assert(findWithElemPathEntry(pathEntry) == Some(che))
+            assert(findChildElemByPathEntry(pathEntry) == Some(che))
             val newNodes = f(che, pathEntry)
             acc.updated(idx, newNodes)
         }

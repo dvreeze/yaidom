@@ -66,7 +66,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths(): Unit = {
-    val paths = bookstore.findAllElemOrSelfPaths.toSet
+    val paths = bookstore.findAllPathsOfElemsOrSelf.toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       elem match {
@@ -83,7 +83,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths(): Unit = {
-    val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
+    val paths = bookstore.filterPathsOfElems(e => e.localName == "Authors").toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       elem match {
@@ -100,7 +100,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedAtPaths(): Unit = {
-    val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
+    val paths = bookstore.filterPathsOfElems(e => e.localName == "Authors").toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       require(elem.localName == "Authors")
@@ -114,7 +114,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths(): Unit = {
-    val paths = bookstore.filterElemPaths(e => e.localName == "Author").toSet
+    val paths = bookstore.filterPathsOfElems(e => e.localName == "Author").toSet
 
     val updatedElem = bookstore.updatedWithNodeSeqAtPaths(paths) { (elem, path) =>
       require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")
@@ -153,7 +153,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testUpdatedAtPathsInternally(): Unit = {
-    val paths = bookstore.findAllElemOrSelfPaths.toSet
+    val paths = bookstore.findAllPathsOfElemsOrSelf.toSet
 
     var foundPaths = Vector[ElemPath]()
     var foundElemsWithoutChildren = Vector[Elem]()
@@ -183,7 +183,7 @@ class AlternativeUpdatesTest extends Suite {
     expectResult(true) {
       foundPaths.zip(foundElemsWithoutChildren) forall {
         case (path, elem) =>
-          resolved.Elem(bookstore.getWithElemPath(path).withChildren(Vector())) == resolved.Elem(elem)
+          resolved.Elem(bookstore.getElemOrSelfByPath(path).withChildren(Vector())) == resolved.Elem(elem)
       }
     }
   }

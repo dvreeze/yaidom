@@ -37,7 +37,7 @@ final class Elem private[docaware] (
    * The yaidom Elem itself, stored as a val
    */
   val elem: eu.cdevreeze.yaidom.Elem =
-    rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
+    rootElem.findElemOrSelfByPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
   assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
   assert(childElems.forall(_.docUri eq this.docUri), "Corrupt element!")
@@ -75,7 +75,7 @@ final class Elem private[docaware] (
    * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
    */
   final def namespaces: Declarations = {
-    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getWithElemPath(path).scope } getOrElse (Scope.Empty)
+    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
   }
 
@@ -102,10 +102,10 @@ object Elem {
    * Expensive recursive factory method for "docaware elements".
    */
   def apply(docUri: URI, rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
-    val elem = rootElem.getWithElemPath(elemPath)
+    val elem = rootElem.getElemOrSelfByPath(elemPath)
 
     // Recursive calls
-    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(docUri, rootElem, elemPath.append(entry)))
+    val childElems = elem.findAllPathEntriesOfChildElems.map(entry => apply(docUri, rootElem, elemPath.append(entry)))
 
     new Elem(docUri, rootElem, childElems, elemPath)
   }

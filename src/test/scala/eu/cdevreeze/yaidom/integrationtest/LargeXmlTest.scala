@@ -87,7 +87,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val resolvedRoot = resolved.Elem(doc.documentElement)
     doTest(resolvedRoot)
 
-    val emailPaths = resolvedRoot findTopmostElemPaths { e => e.localName == "email" } take (10)
+    val emailPaths = resolvedRoot findPathsOfTopmostElems { e => e.localName == "email" } take (10)
     val emailElms = resolvedRoot findTopmostElems { e => e.localName == "email" } take (10)
 
     expectResult(10) {
@@ -97,7 +97,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       emailElms.size
     }
     expectResult(emailElms) {
-      emailPaths map { path => resolvedRoot.getWithElemPath(path) }
+      emailPaths map { path => resolvedRoot.getElemOrSelfByPath(path) }
     }
   }
 
@@ -366,7 +366,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(false) {
       oldPhoneElm.text == newPhone
@@ -381,7 +381,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val end2Ms = System.currentTimeMillis()
     logger.info("Updating an element in the document took %d ms".format(end2Ms - start2Ms))
 
-    val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(true) {
       newPhoneElm.text == newPhone
@@ -428,7 +428,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(false) {
       oldPhoneElm.text == newPhone
@@ -444,7 +444,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val end2Ms = System.currentTimeMillis()
     logger.info("Updating an element in the document (using paths) took %d ms".format(end2Ms - start2Ms))
 
-    val newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(true) {
       newPhoneElm.text == newPhone
@@ -490,7 +490,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(false) {
       oldPhoneElm.text == newPhone
@@ -511,7 +511,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val end2Ms = System.currentTimeMillis()
     logger.info("Transforming an element in the document (using method transformElemsOrSelf) took %d ms".format(end2Ms - start2Ms))
 
-    var newPhoneElm: Elem = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    var newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(newPhone) {
       newPhoneElm.text
@@ -524,7 +524,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val end3Ms = System.currentTimeMillis()
     logger.info("Transforming an element in the document (using method transformElemsToNodeSeq) took %d ms".format(end3Ms - start3Ms))
 
-    newPhoneElm = updatedDoc.documentElement.findWithElemPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    newPhoneElm = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     expectResult(newPhone) {
       newPhoneElm.text

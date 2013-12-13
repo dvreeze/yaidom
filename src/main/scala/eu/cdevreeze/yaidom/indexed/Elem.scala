@@ -46,7 +46,7 @@ import scala.collection.immutable
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
  *     }
  *     bookElm <- authorElm.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { path =>
- *       authorElm.rootElem.getWithElemPath(path)
+ *       authorElm.rootElem.getElemOrSelfByPath(path)
  *     }
  *   } yield bookElm
  * }}}
@@ -66,7 +66,7 @@ import scala.collection.immutable
  * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
- * val elemPaths = indexedRootElem.elem.findAllElemOrSelfPaths
+ * val elemPaths = indexedRootElem.elem.findAllPathsOfElemsOrSelf
  * }}}
  * the following (rather obvious) properties hold for indexed elements:
  * {{{
@@ -74,7 +74,7 @@ import scala.collection.immutable
  *
  * (elems map (_.elemPath)) == elemPaths
  *
- * elems forall { e => e.rootElem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => e.rootElem.findElemOrSelfByPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * Analogous remarks apply to the other query methods. For example, given:
@@ -82,7 +82,7 @@ import scala.collection.immutable
  * // Let p be a predicate of type (yaidom.Elem => Boolean)
  *
  * val elems = indexedRootElem filterElems { e => p(e.elem) }
- * val elemPaths = indexedRootElem.elem filterElemPaths p
+ * val elemPaths = indexedRootElem.elem filterPathsOfElems p
  * }}}
  * we have:
  * {{{
@@ -90,7 +90,7 @@ import scala.collection.immutable
  *
  * (elems map (_.elemPath)) == elemPaths
  *
- * elems forall { e => e.rootElem.findWithElemPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => e.rootElem.findElemOrSelfByPath(e.elemPath) == Some(e.elem) }
  * }}}
  *
  * @author Chris de Vreeze
@@ -104,7 +104,7 @@ final class Elem private[indexed] (
    * The yaidom Elem itself, stored as a val
    */
   val elem: eu.cdevreeze.yaidom.Elem =
-    rootElem.findWithElemPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
+    rootElem.findElemOrSelfByPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
 
   assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
 
@@ -140,7 +140,7 @@ final class Elem private[indexed] (
    * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
    */
   final def namespaces: Declarations = {
-    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getWithElemPath(path).scope } getOrElse (Scope.Empty)
+    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
   }
 
@@ -167,10 +167,10 @@ object Elem {
    * Expensive recursive factory method for "indexed elements".
    */
   def apply(rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
-    val elem = rootElem.getWithElemPath(elemPath)
+    val elem = rootElem.getElemOrSelfByPath(elemPath)
 
     // Recursive calls
-    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, elemPath.append(entry)))
+    val childElems = elem.findAllPathEntriesOfChildElems.map(entry => apply(rootElem, elemPath.append(entry)))
 
     new Elem(rootElem, childElems, elemPath)
   }

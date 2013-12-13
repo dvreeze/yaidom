@@ -47,7 +47,7 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFindAllChildElemsWithPathEntriesConsistencyProperty(): Unit = {
     check({ (elem: Elem) =>
-      elem.findAllChildElemsWithPathEntries forall { case (che, pe) => elem.findWithElemPathEntry(pe).get == che }
+      elem.findAllChildElemsWithPathEntries forall { case (che, pe) => elem.findChildElemByPathEntry(pe).get == che }
     }, minSuccessful(100))
   }
 
@@ -55,7 +55,7 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFilterChildElemPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterChildElemPaths(p) == {
+      elem.filterPathsOfChildElems(p) == {
         elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
       }
     }, minSuccessful(100))
@@ -63,11 +63,11 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFilterElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElemOrSelfPaths(p) == {
+      elem.filterPathsOfElemsOrSelf(p) == {
         (if (p(elem)) Vector(ElemPath.Root) else Vector()) ++ {
           elem.findAllChildElemsWithPathEntries flatMap {
             case (che, pe) =>
-              che.filterElemOrSelfPaths(p).map(_.prepend(pe))
+              che.filterPathsOfElemsOrSelf(p).map(_.prepend(pe))
           }
         }
       }
@@ -76,12 +76,12 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFindTopmostElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.findTopmostElemOrSelfPaths(p) == {
+      elem.findPathsOfTopmostElemsOrSelf(p) == {
         if (p(elem)) Vector(ElemPath.Root)
         else
           elem.findAllChildElemsWithPathEntries flatMap {
             case (che, pe) =>
-              che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
+              che.findPathsOfTopmostElemsOrSelf(p).map(_.prepend(pe))
           }
       }
     }, minSuccessful(100))
@@ -89,10 +89,10 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFilterElemPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElemPaths(p) == {
+      elem.filterPathsOfElems(p) == {
         elem.findAllChildElemsWithPathEntries flatMap {
           case (che, pe) =>
-            che.filterElemOrSelfPaths(p).map(_.prepend(pe))
+            che.filterPathsOfElemsOrSelf(p).map(_.prepend(pe))
         }
       }
     }, minSuccessful(100))
@@ -100,10 +100,10 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFindTopmostElemPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.findTopmostElemPaths(p) == {
+      elem.findPathsOfTopmostElems(p) == {
         elem.findAllChildElemsWithPathEntries flatMap {
           case (che, pe) =>
-            che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
+            che.findPathsOfTopmostElemsOrSelf(p).map(_.prepend(pe))
         }
       }
     }, minSuccessful(100))
@@ -111,13 +111,13 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFindAllElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem) =>
-      elem.findAllElemOrSelfPaths == elem.filterElemOrSelfPaths(_ => true)
+      elem.findAllPathsOfElemsOrSelf == elem.filterPathsOfElemsOrSelf(_ => true)
     }, minSuccessful(100))
   }
 
   @Test def testFindAllElemPathsDefinition(): Unit = {
     check({ (elem: Elem) =>
-      elem.findAllElemPaths == elem.filterElemPaths(_ => true)
+      elem.findAllPathsOfElems == elem.filterPathsOfElems(_ => true)
     }, minSuccessful(100))
   }
 
@@ -125,63 +125,63 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
 
   @Test def testFilterElemOrSelfPathsProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElemOrSelfPaths(p) == {
-        elem.findAllElemOrSelfPaths.filter(path => p(elem.findWithElemPath(path).get))
+      elem.filterPathsOfElemsOrSelf(p) == {
+        elem.findAllPathsOfElemsOrSelf.filter(path => p(elem.findElemOrSelfByPath(path).get))
       }
     }, minSuccessful(100))
   }
 
   @Test def testFilterElemPathsProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      elem.filterElemPaths(p) == {
-        elem.findAllElemPaths.filter(path => p(elem.findWithElemPath(path).get))
+      elem.filterPathsOfElems(p) == {
+        elem.findAllPathsOfElems.filter(path => p(elem.findElemOrSelfByPath(path).get))
       }
     }, minSuccessful(100))
   }
 
-  // TODO findTopmostElemOrSelfPaths etc.
+  // TODO findPathsOfTopmostElemsOrSelf etc.
 
   // Knowing that (elem.findAllChildElemsWithPathEntries map (_._1)) == elem.findAllChildElems, the following follows:
 
   @Test def testFilterChildElemPathsMapProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.filterChildElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterChildElems(p)
+      (elem.filterPathsOfChildElems(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterChildElems(p)
     }, minSuccessful(100))
   }
 
   @Test def testFilterElemOrSelfPathsMapProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.filterElemOrSelfPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElemsOrSelf(p)
+      (elem.filterPathsOfElemsOrSelf(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterElemsOrSelf(p)
     }, minSuccessful(100))
   }
 
   @Test def testFilterElemPathsMapProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.filterElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.filterElems(p)
+      (elem.filterPathsOfElems(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterElems(p)
     }, minSuccessful(100))
   }
 
   @Test def testFindTopmostElemOrSelfPathsMapProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.findTopmostElemOrSelfPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.findTopmostElemsOrSelf(p)
+      (elem.findPathsOfTopmostElemsOrSelf(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.findTopmostElemsOrSelf(p)
     }, minSuccessful(100))
   }
 
   @Test def testFindTopmostElemPathsMapProperty(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
-      (elem.findTopmostElemPaths(p) map (path => elem.findWithElemPath(path).get)) == elem.findTopmostElems(p)
+      (elem.findPathsOfTopmostElems(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.findTopmostElems(p)
     }, minSuccessful(100))
   }
 
   @Test def testFindAllElemOrSelfPathsMapProperty(): Unit = {
     check({ (elem: Elem) =>
-      (elem.findAllElemOrSelfPaths map (path => elem.findWithElemPath(path).get)) == elem.findAllElemsOrSelf
+      (elem.findAllPathsOfElemsOrSelf map (path => elem.findElemOrSelfByPath(path).get)) == elem.findAllElemsOrSelf
     }, minSuccessful(100))
   }
 
   @Test def testFindAllElemPathsMapProperty(): Unit = {
     check({ (elem: Elem) =>
-      (elem.findAllElemPaths map (path => elem.findWithElemPath(path).get)) == elem.findAllElems
+      (elem.findAllPathsOfElems map (path => elem.findElemOrSelfByPath(path).get)) == elem.findAllElems
     }, minSuccessful(100))
   }
 

@@ -46,7 +46,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     expectResult(true) {
       elems forall { e =>
-        val parentScope = e.elemPath.parentPathOption.map(p => e.rootElem.getWithElemPath(p).scope).getOrElse(Scope.Empty)
+        val parentScope = e.elemPath.parentPathOption.map(p => e.rootElem.getElemOrSelfByPath(p).scope).getOrElse(Scope.Empty)
         parentScope.resolve(e.namespaces) == e.scope
       }
     }
@@ -100,7 +100,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = titles map { e => bookstore.elem.getWithElemPath(e.elemPath).trimmedText }
+      val result = titles map { e => bookstore.elem.getElemOrSelfByPath(e.elemPath).trimmedText }
       result.toSet
     }
   }
@@ -114,7 +114,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       bookstore findTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } flatMap { elm =>
         require(elm.resolvedName == EName("Last_Name"))
         val bookOption = elm.elemPath findAncestorPath { p =>
-          val e = elm.rootElem.getWithElemPath(p)
+          val e = elm.rootElem.getElemOrSelfByPath(p)
           e.resolvedName == EName("Book") && e.attribute(EName("Price")).toInt < 90
         } map { p => docaware.Elem(bookstore.docUri, elm.rootElem, p) }
         val titleOption = bookOption flatMap { bookElm => bookElm findElem { e => e.resolvedName == EName("Title") } }

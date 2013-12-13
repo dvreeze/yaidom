@@ -69,7 +69,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       for {
         desc <- bookStoreWithPaths.findAllElems
         path = ElemPath.fromCanonicalXPath(desc.attribute(EName("elemPath")))(Scope.Empty)
-        parent <- bookstore.findWithElemPath(path.parentPath)
+        parent <- bookstore.findElemOrSelfByPath(path.parentPath)
         if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
       } yield desc
 
@@ -86,16 +86,16 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     val paths =
       for {
-        path <- bookstore.findAllElemPaths
+        path <- bookstore.findAllPathsOfElems
         parentPath = path.parentPath
-        parent = bookstore.getWithElemPath(parentPath)
+        parent = bookstore.getElemOrSelfByPath(parentPath)
         if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
       } yield path
 
     assert(paths.size > 10, "Expected more than 10 matching element paths")
 
     expectResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
-      val result = paths map { path => bookstore.getWithElemPath(path).resolvedName }
+      val result = paths map { path => bookstore.getElemOrSelfByPath(path).resolvedName }
       result.toSet
     }
   }
@@ -107,8 +107,8 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
-        bookOrMagazine = bookstore.getWithElemPath(bookOrMagazinePath)
+        bookOrMagazinePath <- bookstore filterPathsOfChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
         nextChildren = bookstore.children.drop(nodeIndex + 1)
@@ -125,7 +125,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       } yield bookOrMagazinePath
 
     expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
+      val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
@@ -137,8 +137,8 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
-        bookOrMagazine = bookstore.getWithElemPath(bookOrMagazinePath)
+        bookOrMagazinePath <- bookstore filterPathsOfChildElems { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
         nextChildren = bookstore.children.drop(nodeIndex + 1)
@@ -155,7 +155,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       } yield bookOrMagazinePath
 
     expectResult(Set("Hector and Jeff's Database Hints")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getWithElemPath(path).findElem(EName("Title")) map { _.trimmedText } }
+      val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
   }
@@ -395,11 +395,11 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     expectResult(4) {
-      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val paths = bookstore findPathsOfTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
     expectResult(0) {
-      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val paths = bookstoreWithoutPrices findPathsOfTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
   }

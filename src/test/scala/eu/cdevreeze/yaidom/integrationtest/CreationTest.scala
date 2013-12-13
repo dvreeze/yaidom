@@ -383,7 +383,7 @@ class CreationTest extends Suite {
 
     // Let's functionally insert the author
 
-    val authorsPath = booksElm.findElemPath(_.resolvedName == EName("{http://bookstore}Authors")).
+    val authorsPath = booksElm.findPathOfElem(_.resolvedName == EName("{http://bookstore}Authors")).
       getOrElse(sys.error("No 'Authors' element found"))
 
     val updatedBooksElm: Elem = booksElm.updated(authorsPath) {
@@ -391,7 +391,7 @@ class CreationTest extends Suite {
     }
 
     expectResult(Some(authorsPath)) {
-      updatedBooksElm findElemOrSelfPath { e => e.localName == "Author" } flatMap { path => path.parentPathOption }
+      updatedBooksElm findPathOfElemOrSelf { e => e.localName == "Author" } flatMap { path => path.parentPathOption }
     }
     expectResult(true) {
       updatedBooksElm.findAllElemsOrSelf forall { e => e.scope == Scope.from("books" -> "http://bookstore") }

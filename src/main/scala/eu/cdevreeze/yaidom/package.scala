@@ -302,9 +302,9 @@ package eu.cdevreeze
  * implementation mixes in trait `PathAwareElemLike`, which is not the case for the Scala XML and DOM wrappers above):
  * {{{
  * for {
- *   authorElemPath <- bookstoreElem filterElemOrSelfPaths (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
+ *   authorElemPath <- bookstoreElem filterPathsOfElemsOrSelf (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
  *   if authorElemPath.entries.contains(ElemPath.Entry(EName("{http://bookstore/book}Book"), 1))
- * } yield bookstoreElem.getWithElemPath(authorElemPath)
+ * } yield bookstoreElem.getElemOrSelfByPath(authorElemPath)
  * }}}
  *
  * The `PathAwareElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.UpdatableElemLike]]. This trait offers <em>functional updates</em>

@@ -107,15 +107,15 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val lastBookPath: ElemPath = doc.documentElement.filterPathsOfChildElems(_.localName == "Book").last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").last
-    val newLastBook: Elem = docWithScalaBook.documentElement.getWithElemPath(newLastBookPath)
+    val newLastBookPath: ElemPath = docWithScalaBook.documentElement.filterPathsOfChildElems(_.localName == "Book").last
+    val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
     expectResult("Programming in Scala") {
       (newLastBook \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
@@ -135,7 +135,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val insertBook: Elem => immutable.IndexedSeq[Node] = {
-      case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(e, newBook)
+      case e: Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(e, newBook)
       case e: Elem => Vector(e)
     }
 
@@ -144,7 +144,7 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
 
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
-      case e: resolved.Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(e, resolved.Elem(newBook))
+      case e: resolved.Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(e, resolved.Elem(newBook))
       case e: resolved.Elem => Vector(e)
     })
   }
@@ -177,15 +177,15 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val lastBookPath: ElemPath = doc.documentElement.filterPathsOfChildElems(_.localName == "Book").last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPathButOne: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
-    val newLastBookButOne: Elem = docWithScalaBook.documentElement.getWithElemPath(newLastBookPathButOne)
+    val newLastBookPathButOne: ElemPath = docWithScalaBook.documentElement.filterPathsOfChildElems(_.localName == "Book").init.last
+    val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
     expectResult("Programming in Scala") {
       (newLastBookButOne \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
@@ -205,7 +205,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val insertBook: Elem => immutable.IndexedSeq[Node] = {
-      case e: Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(newBook, e)
+      case e: Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(newBook, e)
       case e: Elem => Vector(e)
     }
 
@@ -214,7 +214,7 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
 
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
-      case e: resolved.Elem if e == doc.documentElement.findWithElemPath(lastBookPath).get => Vector(resolved.Elem(newBook), e)
+      case e: resolved.Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(resolved.Elem(newBook), e)
       case e: resolved.Elem => Vector(e)
     })
   }
@@ -257,8 +257,8 @@ class AnotherUpdateTest extends Suite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newFirstBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
-    val newFirstBook: Elem = docWithScalaBook.documentElement.getWithElemPath(newFirstBookPath)
+    val newFirstBookPath: ElemPath = docWithScalaBook.documentElement.filterPathsOfChildElems(_.localName == "Book").head
+    val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
     expectResult("Programming in Scala") {
       (newFirstBook \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
@@ -336,7 +336,7 @@ class AnotherUpdateTest extends Suite {
       else {
         e.withPatchedChildren(
           e.childNodeIndex(path.lastEntry),
-          f(e.findWithElemPathEntry(path.lastEntry).get),
+          f(e.findChildElemByPathEntry(path.lastEntry).get),
           1)
       }
     }
@@ -349,7 +349,7 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformChildElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllChildElemPaths.reverse.foldLeft(elem) { (acc, path) =>
+    val expectedResult = elem.findAllPathsOfChildElems.reverse.foldLeft(elem) { (acc, path) =>
       acc.updated(path)(f)
     }
 
@@ -357,7 +357,7 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(elem.transformChildElems(f))
     }
 
-    val expectedResult2 = elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) =>
+    val expectedResult2 = elem.findAllPathEntriesOfChildElems.reverse.foldLeft(elem) { (acc, pathEntry) =>
       acc.updated(pathEntry)(f)
     }
 
@@ -367,7 +367,7 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) =>
+    val expectedResult = elem.findAllPathsOfElemsOrSelf.reverse.foldLeft(elem) { (acc, path) =>
       acc.updated(path)(f)
     }
 
@@ -377,7 +377,7 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) =>
+    val expectedResult = elem.findAllPathsOfElems.reverse.foldLeft(elem) { (acc, path) =>
       acc.updated(path)(f)
     }
 

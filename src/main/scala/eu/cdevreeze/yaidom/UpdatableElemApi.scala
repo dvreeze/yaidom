@@ -138,9 +138,9 @@ import scala.collection.immutable
  *
  * val fpBookAuthorsPaths =
  *   for {
- *     authorsPath <- bookstoreElem filterElemPaths { e => e.resolvedName == EName(bookstoreNamespace, "Authors") }
+ *     authorsPath <- bookstoreElem filterPathsOfElems { e => e.resolvedName == EName(bookstoreNamespace, "Authors") }
  *     if authorsPath.findAncestorPath(path => path.endsWithName(EName(bookstoreNamespace, "Book")) &&
- *       bookstoreElem.getWithElemPath(path).attribute(EName("ISBN")) == "978-1617290657").isDefined
+ *       bookstoreElem.getElemOrSelfByPath(path).attribute(EName("ISBN")) == "978-1617290657").isDefined
  *   } yield authorsPath
  *
  * require(fpBookAuthorsPaths.size == 1)
@@ -163,7 +163,7 @@ import scala.collection.immutable
  * To illustrate functional update methods taking collections of element paths, let's remove the added book from the book store.
  * Here is one (somewhat inefficient) way to do that:
  * {{{
- * val bookPaths = bookstoreElem filterElemPaths (_.resolvedName == EName(bookstoreNamespace, "Book"))
+ * val bookPaths = bookstoreElem filterPathsOfElems (_.resolvedName == EName(bookstoreNamespace, "Book"))
  *
  * bookstoreElem = bookstoreElem.updatedWithNodeSeqAtPaths(bookPaths.toSet) { (elem, path) =>
  *   if ((elem \@ EName("ISBN")) == Some("978-1617290657")) Vector() else Vector(elem)
@@ -283,7 +283,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * It is also equivalent to:
    * {{{
-   * val pathsReversed = findAllElemOrSelfPaths.filter(p => paths.contains(p)).reverse
+   * val pathsReversed = findAllPathsOfElemsOrSelf.filter(p => paths.contains(p)).reverse
    * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path) { e => f(e, path) } }
    * }}}
    */
@@ -303,7 +303,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *   else {
    *     e.withPatchedChildren(
    *       e.childNodeIndex(path.lastEntry),
-   *       f(e.findWithElemPathEntry(path.lastEntry).get),
+   *       f(e.findChildElemByPathEntry(path.lastEntry).get),
    *       1)
    *   }
    * }

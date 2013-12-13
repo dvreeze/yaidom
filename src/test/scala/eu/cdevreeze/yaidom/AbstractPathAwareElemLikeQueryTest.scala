@@ -38,14 +38,14 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     require(bookstore.localName == "Bookstore")
 
     val bookTitlePaths =
-      bookstore findTopmostElemPaths { _.localName == "Title" } filter { path => path.containsName(EName("Book")) }
+      bookstore findPathsOfTopmostElems { _.localName == "Title" } filter { path => path.containsName(EName("Book")) }
 
     expectResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = bookTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      val result = bookTitlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
       result.toSet
     }
   }
@@ -57,7 +57,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     val bookOrMagazineTitlePaths =
       for {
-        titlePath <- bookstore filterElemPaths { _.resolvedName == EName("Title") }
+        titlePath <- bookstore filterPathsOfElems { _.resolvedName == EName("Title") }
         if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
       } yield titlePath
 
@@ -68,7 +68,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = bookOrMagazineTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      val result = bookOrMagazineTitlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
       result.toSet
     }
   }
@@ -80,7 +80,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     val titlePaths =
       for {
-        titlePath <- bookstore findTopmostElemPaths { _.resolvedName == EName("Title") }
+        titlePath <- bookstore findPathsOfTopmostElems { _.resolvedName == EName("Title") }
         if titlePath.entries.size == 2
       } yield titlePath
 
@@ -91,7 +91,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = titlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      val result = titlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
       result.toSet
     }
   }
@@ -103,7 +103,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     val titlePaths =
       for {
-        titlePath <- bookstore filterElemPaths { _.localName == "Title" }
+        titlePath <- bookstore filterPathsOfElems { _.localName == "Title" }
       } yield titlePath
 
     expectResult(Set(
@@ -113,7 +113,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = titlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      val result = titlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
       result.toSet
     }
   }
@@ -134,14 +134,14 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       }
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
 
-    val paths = bookstore.findAllElemOrSelfPaths
+    val paths = bookstore.findAllPathsOfElemsOrSelf
 
     expectResult(elements.size) {
       paths.size
     }
 
     expectResult(elements map (e => toResolvedElem(e))) {
-      paths map { path => bookstore.getWithElemPath(path) } map { e => toResolvedElem(e) }
+      paths map { path => bookstore.getElemOrSelfByPath(path) } map { e => toResolvedElem(e) }
     }
   }
 
@@ -156,7 +156,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "ISBN-0-11-222222-3",
       "ISBN-9-88-777777-6")) {
       val result =
-        for (bookPath <- bookstore filterChildElemPaths (e => e.localName == "Book")) yield bookstore.getWithElemPath(bookPath).attribute(EName("ISBN"))
+        for (bookPath <- bookstore filterPathsOfChildElems (e => e.localName == "Book")) yield bookstore.getElemOrSelfByPath(bookPath).attribute(EName("ISBN"))
       result.toSet
     }
   }
@@ -178,8 +178,8 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
       val result = books flatMap { book =>
-        book findElemPath (e => e.resolvedName == EName("Title")) map
-          { path => book.getWithElemPath(path).trimmedText }
+        book findPathOfElem (e => e.resolvedName == EName("Title")) map
+          { path => book.getElemOrSelfByPath(path).trimmedText }
       }
       result.toSet
     }
@@ -190,9 +190,9 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     require(bookstore.localName == "Bookstore")
 
-    val titlePaths = bookstore.findAllElemPaths filter { path =>
+    val titlePaths = bookstore.findAllPathsOfElems filter { path =>
       path.endsWithName(EName("Title")) && {
-        val parentElm = bookstore.getWithElemPath(path.parentPath)
+        val parentElm = bookstore.getElemOrSelfByPath(path.parentPath)
         parentElm.localName == "Book" && parentElm.attribute(EName("Price")).toInt < 90
       }
     }
@@ -201,7 +201,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = titlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      val result = titlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
       result.toSet
     }
   }
@@ -212,18 +212,18 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     require(bookstore.localName == "Bookstore")
 
     val bookTitlePaths =
-      bookstore findTopmostElemPaths { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } filter { path =>
+      bookstore findPathsOfTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } filter { path =>
         require(path.endsWithName(EName("Last_Name")))
         path.containsName(EName("Book")) && {
           val bookPath = path.ancestorPaths.filter(_.endsWithName(EName("Book"))).head
-          val bookElm = bookstore.getWithElemPath(bookPath)
+          val bookElm = bookstore.getElemOrSelfByPath(bookPath)
           bookElm.attribute(EName("Price")).toInt < 90
         }
       } flatMap { path =>
         require(path.endsWithName(EName("Last_Name")))
         val bookPath = path.ancestorPaths.filter(_.endsWithName(EName("Book"))).head
-        val bookElm = bookstore.getWithElemPath(bookPath)
-        val titlePathOption = bookElm findElemPath { e => e.resolvedName == EName("Title") } map
+        val bookElm = bookstore.getElemOrSelfByPath(bookPath)
+        val titlePathOption = bookElm findPathOfElem { e => e.resolvedName == EName("Title") } map
           { relativeTitlePath => bookPath ++ relativeTitlePath }
         titlePathOption
       }
@@ -231,7 +231,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     expectResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitlePaths map { path => bookstore.getWithElemPath(path).trimmedText }
+      val result = bookTitlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
       result.toSet
     }
   }
@@ -243,7 +243,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     val ullmanBookElms =
       for {
-        authorPath <- bookstore filterElemPaths { e =>
+        authorPath <- bookstore filterPathsOfElems { e =>
           (e.localName == "Author") &&
             ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
             ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
@@ -251,7 +251,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         bookPath = authorPath.parentPath.parentPath
       } yield {
         require(bookPath.lastEntry.elementName.localPart == "Book")
-        bookstore.getWithElemPath(bookPath)
+        bookstore.getElemOrSelfByPath(bookPath)
       }
 
     expectResult(Set(
