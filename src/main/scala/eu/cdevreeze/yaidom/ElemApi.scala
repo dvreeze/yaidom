@@ -253,3 +253,59 @@ trait ElemApi[E <: ElemApi[E]] extends ParentElemApi[E] { self: E =>
   /** Returns the first found (topmost) descendant element with the given expanded name, if any, wrapped in an `Option` */
   def findElem(expandedName: EName): Option[E]
 }
+
+/**
+ * This companion object offers some convenience factory methods for "element predicates", that can be used in yaidom queries.
+ * These factory objects turn ENames and local names into "element predicates".
+ *
+ * For example:
+ * {{{
+ * elem \\ EName(xsNamespace, "element")
+ * }}}
+ * can also be written as:
+ * {{{
+ * elem \\ withEName(xsNamespace, "element")
+ * }}}
+ * (thus avoiding EName instance construction, whether or not this makes any difference in practice).
+ *
+ * If the namespace is "obvious", and more friendly local-name-based querying is desired, the following could be written:
+ * {{{
+ * elem \\ withLocalName("element")
+ * }}}
+ */
+object ElemApi {
+
+  /**
+   * Returns the equivalent of `{ _.resolvedName == ename }`
+   */
+  def withEName(ename: EName): (ElemApi[_] => Boolean) = { elem =>
+    elem.resolvedName == ename
+  }
+
+  /**
+   * Returns the equivalent of `{ _.resolvedName == EName(namespaceOption, localPart) }`, but without creating any EName instance.
+   */
+  def withEName(namespaceOption: Option[String], localPart: String): (ElemApi[_] => Boolean) = { elem =>
+    val resolvedName = elem.resolvedName
+    (resolvedName.namespaceUriOption == namespaceOption) && (resolvedName.localPart == localPart)
+  }
+
+  /**
+   * Returns the equivalent of `withEName(Some(namespace), localPart)`
+   */
+  def withEName(namespace: String, localPart: String): (ElemApi[_] => Boolean) =
+    withEName(Some(namespace), localPart)
+
+  /**
+   * Returns the equivalent of `withEName(None, localPart)`
+   */
+  def withNoNsEName(localPart: String): (ElemApi[_] => Boolean) =
+    withEName(None, localPart)
+
+  /**
+   * Returns the equivalent of `{ _.localName == localName }`
+   */
+  def withLocalName(localName: String): (ElemApi[_] => Boolean) = { elem =>
+    elem.localName == localName
+  }
+}

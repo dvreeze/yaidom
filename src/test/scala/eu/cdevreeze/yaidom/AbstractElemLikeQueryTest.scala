@@ -22,6 +22,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import ElemApi._
 
 /**
  * ElemLike-based query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat
@@ -44,6 +45,25 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
     val bookTitles =
       (bookstore \ (_.localName == "Book")) map { e => e getChildElem (_.localName == "Title") }
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryBookTitlesAgain() {
+    // XPath: doc("bookstore.xml")/Bookstore/Book/Title
+    // This time using the ElemApi companion object
+
+    require(bookstore.localName == "Bookstore")
+
+    val bookTitles =
+      (bookstore \ withLocalName("Book")) map { e => e getChildElem (withLocalName("Title")) }
 
     expectResult(Set(
       "A First Course in Database Systems",
@@ -235,6 +255,44 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         } yield {
           val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
           val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
+
+          val firstName = firstNameElmOption.map(_.text).getOrElse("")
+          val lastName = lastNameElmOption.map(_.text).getOrElse("")
+          (firstName + " " + lastName).trim
+        }
+
+      result.toSet
+    }
+
+    expectResult(Set(
+      "Jeffrey Ullman",
+      "Jennifer Widom",
+      "Hector Garcia-Molina")) {
+      cheapBookAuthors
+    }
+  }
+
+  @Test def testQueryCheapBookAuthorsAgain() {
+    // Own example..
+    // This time using the ElemApi companion object
+
+    require(bookstore.localName == "Bookstore")
+
+    val cheapBookElms =
+      for {
+        bookElm <- bookstore \ withLocalName("Book")
+        price <- bookElm \@ EName("Price")
+        if price.toInt < 90
+      } yield bookElm
+
+    val cheapBookAuthors = {
+      val result =
+        for {
+          cheapBookElm <- cheapBookElms
+          authorElm <- cheapBookElm \\ withLocalName("Author")
+        } yield {
+          val firstNameElmOption = authorElm.findChildElem(withLocalName("First_Name"))
+          val lastNameElmOption = authorElm.findChildElem(withLocalName("Last_Name"))
 
           val firstName = firstNameElmOption.map(_.text).getOrElse("")
           val lastName = lastNameElmOption.map(_.text).getOrElse("")

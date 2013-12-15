@@ -22,6 +22,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import ElemApi._
 
 /**
  * PathAwareElemLike-based query test case, extending AbstractElemLikeQueryTest.
@@ -50,6 +51,25 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
+  @Test def testQueryBookTitlesUsingPathsAgain() {
+    // XPath: doc("bookstore.xml")/Bookstore/Book/Title
+    // This time using the ElemApi companion object
+
+    require(bookstore.localName == "Bookstore")
+
+    val bookTitlePaths =
+      bookstore findPathsOfTopmostElems withLocalName("Title") filter { path => path.containsName(EName("Book")) }
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = bookTitlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
+      result.toSet
+    }
+  }
+
   @Test def testQueryBookOrMagazineTitlesUsingPaths() {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
@@ -58,6 +78,30 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     val bookOrMagazineTitlePaths =
       for {
         titlePath <- bookstore filterPathsOfElems { _.resolvedName == EName("Title") }
+        if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
+      } yield titlePath
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints",
+      "National Geographic",
+      "Newsweek")) {
+      val result = bookOrMagazineTitlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryBookOrMagazineTitlesUsingPathsAgain() {
+    // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
+    // This time using the ElemApi companion object
+
+    require(bookstore.localName == "Bookstore")
+
+    val bookOrMagazineTitlePaths =
+      for {
+        titlePath <- bookstore filterPathsOfElems withNoNsEName("Title")
         if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
       } yield titlePath
 
@@ -185,6 +229,31 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
+  @Test def testQueryCheapBooksUsingPathsAgain() {
+    // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
+    // This time using the ElemApi companion object
+
+    require(bookstore.localName == "Bookstore")
+
+    val books =
+      for {
+        book <- bookstore \ withLocalName("Book")
+        price <- book \@ EName("Price")
+        if price.toInt < 90
+      } yield book
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = books flatMap { book =>
+        book findPathOfElem withNoNsEName("Title") map
+          { path => book.getElemOrSelfByPath(path).trimmedText }
+      }
+      result.toSet
+    }
+  }
+
   @Test def testQueryCheapBookTitlesUsingPaths() {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
@@ -259,6 +328,34 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
       val result = ullmanBookElms map { e => e.getChildElem(_.localName == "Title").text }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryBooksByJeffreyUllmanUsingPathsAgain() {
+    // Own example
+    // This time using the ElemApi companion object
+
+    require(bookstore.localName == "Bookstore")
+
+    val ullmanBookElms =
+      for {
+        authorPath <- bookstore filterPathsOfElems { e =>
+          (e.localName == "Author") &&
+            (e.getChildElem(withLocalName("First_Name")).text == "Jeffrey") &&
+            (e.getChildElem(withLocalName("Last_Name")).text == "Ullman")
+        }
+        bookPath = authorPath.parentPath.parentPath
+      } yield {
+        require(bookPath.lastEntry.elementName.localPart == "Book")
+        bookstore.getElemOrSelfByPath(bookPath)
+      }
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints")) {
+      val result = ullmanBookElms map { e => e.getChildElem(withLocalName("Title")).text }
       result.toSet
     }
   }
