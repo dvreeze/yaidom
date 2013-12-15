@@ -186,7 +186,7 @@ import scala.collection.{ immutable, mutable }
  * (xs flatMap (x => f(x) filter p)) == ((xs flatMap f) filter p) // property (b)
  *
  * // Associativity law for monads
- * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // if f and g have the same types; property (c)
+ * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // property (c)
  * }}}
  *
  * Property (a) is obvious, and stated without proof. Property (c) is known as the "associativity law for monads".
