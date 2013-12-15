@@ -138,7 +138,7 @@ import scala.collection.{ immutable, mutable }
  * {{{
  * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // referred to below as property (c)
  * }}}
- * This is also known as the "composition law for monads" (see http://james-iry.blogspot.nl/2007/10/monads-are-elephants-part-3.html).
+ * This is also known as the "associativity law for monads". (Monadic types obey 3 laws: associativity, left unit and right unit.)
  *
  * If `elm` does have child elements, and `p(elm)` holds, the LHS can be rewritten as:
  * {{{
@@ -185,11 +185,11 @@ import scala.collection.{ immutable, mutable }
  *
  * (xs flatMap (x => f(x) filter p)) == ((xs flatMap f) filter p) // property (b)
  *
- * // Composition law for monads
+ * // Associativity law for monads
  * ((xs flatMap f) flatMap g) == (xs flatMap (x => f(x) flatMap g)) // if f and g have the same types; property (c)
  * }}}
  *
- * Property (a) is obvious, and stated without proof. Property (c) is known as the "composition law for monads".
+ * Property (a) is obvious, and stated without proof. Property (c) is known as the "associativity law for monads".
  * Property (b) is proven below.
  *
  * To prove property (b), we use property (c), as well as the following property (d):
