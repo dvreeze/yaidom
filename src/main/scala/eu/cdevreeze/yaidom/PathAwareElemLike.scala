@@ -43,6 +43,9 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   @deprecated(message = "Use findChildElemByPathEntry instead", since = "0.7.1")
   final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = findChildElemByPathEntry(entry)
 
+  final def getChildElemByPathEntry(entry: ElemPath.Entry): E =
+    findChildElemByPathEntry(entry).getOrElse(sys.error("Expected existing path entry %s from root %s".format(entry, self)))
+
   final def findAllPathsOfChildElems: immutable.IndexedSeq[ElemPath] =
     findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath(Vector(pe)) }
 

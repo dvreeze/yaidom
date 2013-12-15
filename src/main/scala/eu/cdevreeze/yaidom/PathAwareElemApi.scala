@@ -222,6 +222,9 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
   @deprecated(message = "Use findChildElemByPathEntry instead", since = "0.7.1")
   def findWithElemPathEntry(entry: ElemPath.Entry): Option[E]
 
+  /** Returns (the equivalent of) `findChildElemByPathEntry(entry).get` */
+  def getChildElemByPathEntry(entry: ElemPath.Entry): E
+
   /**
    * Returns all child elements with their `ElemPath` entries, in the correct order. This method should be very efficient.
    *
