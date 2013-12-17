@@ -71,14 +71,14 @@ class XbrlSchemaTest extends Suite {
 
     // Check equivalence of different ways to get the same concepts
 
-    val elemPaths = xbrlSchema.elem.findAllPathsOfElemsOrSelf
+    val elemPaths = xbrlSchema.elem.findAllElemOrSelfPaths
 
     expectResult(elemPaths) {
       xbrlSchema.findAllElemsOrSelf map { _.elemPath }
     }
 
     val elemsContainingPlus = xbrlSchema filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
-    val pathsOfElemsContainingPlus = xbrlSchema.elem filterPathsOfElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+    val pathsOfElemsContainingPlus = xbrlSchema.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
 
     expectResult(pathsOfElemsContainingPlus) {
       elemsContainingPlus map (_.elemPath)

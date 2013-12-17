@@ -107,14 +107,14 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: ElemPath = doc.documentElement.filterPathsOfChildElems(_.localName == "Book").last
+    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPath: ElemPath = docWithScalaBook.documentElement.filterPathsOfChildElems(_.localName == "Book").last
+    val newLastBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").last
     val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
     expectResult("Programming in Scala") {
@@ -177,14 +177,14 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: ElemPath = doc.documentElement.filterPathsOfChildElems(_.localName == "Book").last
+    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPathButOne: ElemPath = docWithScalaBook.documentElement.filterPathsOfChildElems(_.localName == "Book").init.last
+    val newLastBookPathButOne: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
     val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
     expectResult("Programming in Scala") {
@@ -257,7 +257,7 @@ class AnotherUpdateTest extends Suite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newFirstBookPath: ElemPath = docWithScalaBook.documentElement.filterPathsOfChildElems(_.localName == "Book").head
+    val newFirstBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
     val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
     expectResult("Programming in Scala") {
@@ -349,7 +349,7 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformChildElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllPathsOfChildElems.reverse.foldLeft(elem) { (acc, path) =>
+    val expectedResult = elem.findAllChildElemPaths.reverse.foldLeft(elem) { (acc, path) =>
       acc.updated(path)(f)
     }
 
@@ -357,7 +357,7 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(elem.transformChildElems(f))
     }
 
-    val expectedResult2 = elem.findAllPathEntriesOfChildElems.reverse.foldLeft(elem) { (acc, pathEntry) =>
+    val expectedResult2 = elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) =>
       acc.updated(pathEntry)(f)
     }
 
@@ -367,7 +367,7 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllPathsOfElemsOrSelf.reverse.foldLeft(elem) { (acc, path) =>
+    val expectedResult = elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) =>
       acc.updated(path)(f)
     }
 
@@ -377,7 +377,7 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllPathsOfElems.reverse.foldLeft(elem) { (acc, path) =>
+    val expectedResult = elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) =>
       acc.updated(path)(f)
     }
 

@@ -328,7 +328,7 @@ class UpdateTest extends Suite {
   }
 
   private def turnBookAttributeIntoElem[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
-    val matchingPaths = rootElm filterPathsOfElems { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
+    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
 
@@ -340,7 +340,7 @@ class UpdateTest extends Suite {
   }
 
   private def turnBookAttributeIntoElemUsingPathSet[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
-    val matchingPaths = rootElm filterPathsOfElems { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
+    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
 

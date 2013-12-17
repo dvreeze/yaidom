@@ -105,7 +105,7 @@ object Elem {
     val elem = rootElem.getElemOrSelfByPath(elemPath)
 
     // Recursive calls
-    val childElems = elem.findAllPathEntriesOfChildElems.map(entry => apply(docUri, rootElem, elemPath.append(entry)))
+    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(docUri, rootElem, elemPath.append(entry)))
 
     new Elem(docUri, rootElem, childElems, elemPath)
   }

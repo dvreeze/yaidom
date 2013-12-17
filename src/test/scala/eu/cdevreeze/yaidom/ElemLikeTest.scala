@@ -433,7 +433,7 @@ class ElemLikeTest extends Suite {
     val bookElms = bookstore filterElems { _.localName == "Book" }
 
     expectResult(Set(bookstore)) {
-      val paths = bookstore.findAllPathsOfElemsOrSelf filter { path => bookElms.contains(bookstore.getElemOrSelfByPath(path)) }
+      val paths = bookstore.findAllElemOrSelfPaths filter { path => bookElms.contains(bookstore.getElemOrSelfByPath(path)) }
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => bookstore.getElemOrSelfByPath(path) }
       result
@@ -442,7 +442,7 @@ class ElemLikeTest extends Suite {
     val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
     expectResult(Set(EName(ns, "Author"))) {
-      val paths = bookstore.findAllPathsOfElemsOrSelf filter { path => lastNameElms.contains(bookstore.getElemOrSelfByPath(path)) }
+      val paths = bookstore.findAllElemOrSelfPaths filter { path => lastNameElms.contains(bookstore.getElemOrSelfByPath(path)) }
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => bookstore.getElemOrSelfByPath(path) }
       result map { e => e.resolvedName }
@@ -455,7 +455,7 @@ class ElemLikeTest extends Suite {
 
     expectResult(cheapBookAuthorElms.toSet) {
       // Taking cheapBookElm as root! Finding parents of lastNameElms.
-      val paths = cheapBookElm.findAllPathsOfElemsOrSelf filter { path => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(path)) }
+      val paths = cheapBookElm.findAllElemOrSelfPaths filter { path => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(path)) }
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => cheapBookElm.getElemOrSelfByPath(path) }
       result
@@ -501,7 +501,7 @@ class ElemLikeTest extends Suite {
       bookstore.findElemOrSelfByPath(path) map { _.trimmedText }
     }
 
-    val bookstoreChildIndexes = bookstore.findAllPathEntriesOfChildElems
+    val bookstoreChildIndexes = bookstore.findAllChildElemPathEntries
 
     expectResult(8) {
       bookstoreChildIndexes.size

@@ -99,7 +99,7 @@ import scala.collection.immutable
  * {{{
  * val scalaBookElems =
  *   for {
- *     titleElemPath <- bookstoreElem filterPathsOfElems (e => e.resolvedName == EName(bookstoreNamespace, "Title"))
+ *     titleElemPath <- bookstoreElem filterElemPaths (e => e.resolvedName == EName(bookstoreNamespace, "Title"))
  *     if bookstoreElem.getElemOrSelfByPath(titleElemPath).text.contains("Scala")
  *     bookElemPath <- titleElemPath.findAncestorPath(_.endsWithName(EName(bookstoreNamespace, "Book")))
  *   } yield bookstoreElem.getElemOrSelfByPath(bookElemPath)
@@ -133,53 +133,53 @@ import scala.collection.immutable
  * elem.findAllChildElemsWithPathEntries forall { case (che, pe) => elem.findChildElemByPathEntry(pe).get == che }
  * }}}
  *
- * The <em>basic operations</em> definable in terms of method ``findAllChildElemsWithPathEntries`` are ``filterPathsOfChildElems``,
- * ``filterPathsOfElemsOrSelf`` and ``findPathsOfTopmostElemsOrSelf``, analogous to trait ``ParentElemApi``. Their semantics must be
+ * The <em>basic operations</em> definable in terms of method ``findAllChildElemsWithPathEntries`` are ``filterChildElemPaths``,
+ * ``filterElemOrSelfPaths`` and ``findTopmostElemOrSelfPaths``, analogous to trait ``ParentElemApi``. Their semantics must be
  * as if they had been defined as follows:
  * {{{
- * def filterPathsOfChildElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ * def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   this.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
  *
- * def filterPathsOfElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ * def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   (if (p(this)) Vector(ElemPath.Root) else Vector()) ++ {
  *     this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
- *       che.filterPathsOfElemsOrSelf(p).map(_.prepend(pe))
+ *       che.filterElemOrSelfPaths(p).map(_.prepend(pe))
  *     }
  *   }
  *
- * def findPathsOfTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ * def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   if (p(this)) Vector(ElemPath.Root)
  *   else {
  *     this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
- *       che.findPathsOfTopmostElemsOrSelf(p).map(_.prepend(pe))
+ *       che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
  *     }
  *   }
  * }}}
  *
  * Moreover, we could have defined:
  * {{{
- * def filterPathsOfElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ * def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
- *     che.filterPathsOfElemsOrSelf(p).map(_.prepend(pe))
+ *     che.filterElemOrSelfPaths(p).map(_.prepend(pe))
  *   }
  *
- * def findPathsOfTopmostElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+ * def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
  *   this.findAllChildElemsWithPathEntries flatMap { case (che, pe) =>
- *     che.findPathsOfTopmostElemsOrSelf(p).map(_.prepend(pe))
+ *     che.findTopmostElemOrSelfPaths(p).map(_.prepend(pe))
  *   }
  * }}}
  * and:
  * {{{
- * def findAllPathsOfElemsOrSelf: immutable.IndexedSeq[ElemPath] = filterPathsOfElemsOrSelf(e => true)
+ * def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath] = filterElemOrSelfPaths(e => true)
  *
- * def findAllPathsOfElems: immutable.IndexedSeq[ElemPath] = filterPathsOfElems(e => true)
+ * def findAllElemPaths: immutable.IndexedSeq[ElemPath] = filterElemPaths(e => true)
  * }}}
  *
  * Then, analogously to ``ParentElemApi``, the following properties hold:
  * {{{
- * elem.filterPathsOfElems(p) == elem.findAllPathsOfElems.filter(path => p(elem.findElemOrSelfByPath(path).get))
+ * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.findElemOrSelfByPath(path).get))
  *
- * elem.filterPathsOfElemsOrSelf(p) == elem.findAllPathsOfElemsOrSelf.filter(path => p(elem.findElemOrSelfByPath(path).get))
+ * elem.filterElemOrSelfPaths(p) == elem.findAllElemOrSelfPaths.filter(path => p(elem.findElemOrSelfByPath(path).get))
  * }}}
  * etc.
  *
@@ -189,11 +189,11 @@ import scala.collection.immutable
  * }}}
  * it follows that:
  * {{{
- * (elem.filterPathsOfChildElems(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterChildElems(p)
+ * (elem.filterChildElemPaths(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterChildElems(p)
  *
- * (elem.filterPathsOfElemsOrSelf(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterElemsOrSelf(p)
+ * (elem.filterElemOrSelfPaths(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterElemsOrSelf(p)
  *
- * (elem.filterPathsOfElems(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterElems(p)
+ * (elem.filterElemPaths(p) map (path => elem.findElemOrSelfByPath(path).get)) == elem.filterElems(p)
  * }}}
  * etc., where ``findElemOrSelfByPath`` is defined recursively, using method ``findChildElemByPathEntry``.
  *
@@ -233,97 +233,44 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
 
   /** Returns `findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
-  def findAllPathsOfChildElems: immutable.IndexedSeq[ElemPath]
-
-  /** Returns `findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath.from(pe) }` */
-  @deprecated(message = "Use findAllPathsOfChildElems instead", since = "0.7.1")
   def findAllChildElemPaths: immutable.IndexedSeq[ElemPath]
 
   /** Returns the paths of child elements obeying the given predicate */
-  def filterPathsOfChildElems(p: E => Boolean): immutable.IndexedSeq[ElemPath]
-
-  /** Returns the paths of child elements obeying the given predicate */
-  @deprecated(message = "Use filterPathsOfChildElems instead", since = "0.7.1")
   def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath]
 
   /** Returns the path of the first found child element obeying the given predicate, if any, wrapped in an `Option` */
-  def findPathOfChildElem(p: E => Boolean): Option[ElemPath]
-
-  /** Returns the path of the first found child element obeying the given predicate, if any, wrapped in an `Option` */
-  @deprecated(message = "Use findPathOfChildElem instead", since = "0.7.1")
   def findChildElemPath(p: E => Boolean): Option[ElemPath]
 
   /** Returns the path of the single child element obeying the given predicate, and throws an exception otherwise */
-  def getPathOfChildElem(p: E => Boolean): ElemPath
-
-  /** Returns the path of the single child element obeying the given predicate, and throws an exception otherwise */
-  @deprecated(message = "Use getPathOfChildElem instead", since = "0.7.1")
   def getChildElemPath(p: E => Boolean): ElemPath
 
   /** Returns the path of this element followed by the paths of all descendant elements (that is, the descendant-or-self elements) */
-  def findAllPathsOfElemsOrSelf: immutable.IndexedSeq[ElemPath]
-
-  /** Returns the path of this element followed by the paths of all descendant elements (that is, the descendant-or-self elements) */
-  @deprecated(message = "Use findAllPathsOfElemsOrSelf instead", since = "0.7.1")
   def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath]
 
   /**
    * Returns the paths of descendant-or-self elements that obey the given predicate.
    * That is, the result is equivalent to the paths of `findAllElemsOrSelf filter p`.
    */
-  def filterPathsOfElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath]
-
-  /**
-   * Returns the paths of descendant-or-self elements that obey the given predicate.
-   * That is, the result is equivalent to the paths of `findAllElemsOrSelf filter p`.
-   */
-  @deprecated(message = "Use filterPathsOfElemsOrSelf instead", since = "0.7.1")
   def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath]
 
-  /** Returns the paths of all descendant elements (not including this element). Equivalent to `findAllPathsOfElemsOrSelf.drop(1)` */
-  def findAllPathsOfElems: immutable.IndexedSeq[ElemPath]
-
-  /** Returns the paths of all descendant elements (not including this element). Equivalent to `findAllPathsOfElemsOrSelf.drop(1)` */
-  @deprecated(message = "Use findAllPathsOfElems instead", since = "0.7.1")
+  /** Returns the paths of all descendant elements (not including this element). Equivalent to `findAllElemOrSelfPaths.drop(1)` */
   def findAllElemPaths: immutable.IndexedSeq[ElemPath]
 
   /** Returns the paths of descendant elements obeying the given predicate, that is, the paths of `findAllElems filter p` */
-  def filterPathsOfElems(p: E => Boolean): immutable.IndexedSeq[ElemPath]
-
-  /** Returns the paths of descendant elements obeying the given predicate, that is, the paths of `findAllElems filter p` */
-  @deprecated(message = "Use filterPathsOfElems instead", since = "0.7.1")
   def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath]
 
   /**
    * Returns the paths of the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
    */
-  def findPathsOfTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath]
-
-  /**
-   * Returns the paths of the descendant-or-self elements that obey the given predicate, such that no ancestor obeys the predicate.
-   */
-  @deprecated(message = "Use findPathsOfTopmostElemsOrSelf instead", since = "0.7.1")
   def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath]
 
   /** Returns the paths of the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  def findPathsOfTopmostElems(p: E => Boolean): immutable.IndexedSeq[ElemPath]
-
-  /** Returns the paths of the descendant elements obeying the given predicate that have no ancestor obeying the predicate */
-  @deprecated(message = "Use findPathsOfTopmostElems instead", since = "0.7.1")
   def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath]
 
   /** Returns the path of the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
-  def findPathOfElemOrSelf(p: E => Boolean): Option[ElemPath]
-
-  /** Returns the path of the first found (topmost) descendant-or-self element obeying the given predicate, if any, wrapped in an `Option` */
-  @deprecated(message = "Use findPathOfElemOrSelf instead", since = "0.7.1")
   def findElemOrSelfPath(p: E => Boolean): Option[ElemPath]
 
   /** Returns the path of the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
-  def findPathOfElem(p: E => Boolean): Option[ElemPath]
-
-  /** Returns the path of the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
-  @deprecated(message = "Use findPathOfElem instead", since = "0.7.1")
   def findElemPath(p: E => Boolean): Option[ElemPath]
 
   /**
@@ -348,12 +295,5 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
    * Returns the `ElemPath` entries of all child elements, in the correct order.
    * Equivalent to `findAllChildElemsWithPathEntries map { _._2 }`.
    */
-  def findAllPathEntriesOfChildElems: immutable.IndexedSeq[ElemPath.Entry]
-
-  /**
-   * Returns the `ElemPath` entries of all child elements, in the correct order.
-   * Equivalent to `findAllChildElemsWithPathEntries map { _._2 }`.
-   */
-  @deprecated(message = "Use findAllPathEntriesOfChildElems instead", since = "0.7.1")
   def findAllChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry]
 }

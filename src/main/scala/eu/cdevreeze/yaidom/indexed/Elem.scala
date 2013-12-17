@@ -66,7 +66,7 @@ import scala.collection.immutable
  * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
- * val elemPaths = indexedRootElem.elem.findAllPathsOfElemsOrSelf
+ * val elemPaths = indexedRootElem.elem.findAllElemOrSelfPaths
  * }}}
  * the following (rather obvious) properties hold for indexed elements:
  * {{{
@@ -82,7 +82,7 @@ import scala.collection.immutable
  * // Let p be a predicate of type (yaidom.Elem => Boolean)
  *
  * val elems = indexedRootElem filterElems { e => p(e.elem) }
- * val elemPaths = indexedRootElem.elem filterPathsOfElems p
+ * val elemPaths = indexedRootElem.elem filterElemPaths p
  * }}}
  * we have:
  * {{{
@@ -170,7 +170,7 @@ object Elem {
     val elem = rootElem.getElemOrSelfByPath(elemPath)
 
     // Recursive calls
-    val childElems = elem.findAllPathEntriesOfChildElems.map(entry => apply(rootElem, elemPath.append(entry)))
+    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, elemPath.append(entry)))
 
     new Elem(rootElem, childElems, elemPath)
   }

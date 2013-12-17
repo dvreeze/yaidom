@@ -138,7 +138,7 @@ import scala.collection.immutable
  *
  * val fpBookAuthorsPaths =
  *   for {
- *     authorsPath <- bookstoreElem filterPathsOfElems { e => e.resolvedName == EName(bookstoreNamespace, "Authors") }
+ *     authorsPath <- bookstoreElem filterElemPaths { e => e.resolvedName == EName(bookstoreNamespace, "Authors") }
  *     if authorsPath.findAncestorPath(path => path.endsWithName(EName(bookstoreNamespace, "Book")) &&
  *       bookstoreElem.getElemOrSelfByPath(path).attribute(EName("ISBN")) == "978-1617290657").isDefined
  *   } yield authorsPath
@@ -163,7 +163,7 @@ import scala.collection.immutable
  * To illustrate functional update methods taking collections of element paths, let's remove the added book from the book store.
  * Here is one (somewhat inefficient) way to do that:
  * {{{
- * val bookPaths = bookstoreElem filterPathsOfElems (_.resolvedName == EName(bookstoreNamespace, "Book"))
+ * val bookPaths = bookstoreElem filterElemPaths (_.resolvedName == EName(bookstoreNamespace, "Book"))
  *
  * bookstoreElem = bookstoreElem.updatedWithNodeSeqAtPaths(bookPaths.toSet) { (elem, path) =>
  *   if ((elem \@ EName("ISBN")) == Some("978-1617290657")) Vector() else Vector(elem)
@@ -283,7 +283,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * It is also equivalent to:
    * {{{
-   * val pathsReversed = findAllPathsOfElemsOrSelf.filter(p => paths.contains(p)).reverse
+   * val pathsReversed = findAllElemOrSelfPaths.filter(p => paths.contains(p)).reverse
    * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path) { e => f(e, path) } }
    * }}}
    */

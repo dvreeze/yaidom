@@ -46,106 +46,68 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   final def getChildElemByPathEntry(entry: ElemPath.Entry): E =
     findChildElemByPathEntry(entry).getOrElse(sys.error("Expected existing path entry %s from root %s".format(entry, self)))
 
-  final def findAllPathsOfChildElems: immutable.IndexedSeq[ElemPath] =
+  final def findAllChildElemPaths: immutable.IndexedSeq[ElemPath] =
     findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath(Vector(pe)) }
 
-  @deprecated(message = "Use findAllPathsOfChildElems instead", since = "0.7.1")
-  final def findAllChildElemPaths: immutable.IndexedSeq[ElemPath] = findAllPathsOfChildElems
-
-  final def filterPathsOfChildElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+  final def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
     findAllChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => ElemPath(Vector(pe)) }
 
-  @deprecated(message = "Use filterPathsOfChildElems instead", since = "0.7.1")
-  final def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = filterPathsOfChildElems(p)
-
-  final def findPathOfChildElem(p: E => Boolean): Option[ElemPath] = {
+  final def findChildElemPath(p: E => Boolean): Option[ElemPath] = {
     findAllChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => ElemPath(Vector(pe)) }
   }
 
-  @deprecated(message = "Use findPathOfChildElem instead", since = "0.7.1")
-  final def findChildElemPath(p: E => Boolean): Option[ElemPath] = findPathOfChildElem(p)
-
-  final def getPathOfChildElem(p: E => Boolean): ElemPath = {
-    val result = filterPathsOfChildElems(p)
+  final def getChildElemPath(p: E => Boolean): ElemPath = {
+    val result = filterChildElemPaths(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
     result.head
   }
 
-  @deprecated(message = "Use getPathOfChildElem instead", since = "0.7.1")
-  final def getChildElemPath(p: E => Boolean): ElemPath = getPathOfChildElem(p)
-
-  final def findAllPathsOfElemsOrSelf: immutable.IndexedSeq[ElemPath] = {
+  final def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath] = {
     // Not tail-recursive, but the depth should typically be limited
     val remainder = findAllChildElemsWithPathEntries flatMap {
-      case (e, pe) => e.findAllPathsOfElemsOrSelf map { path => path.prepend(pe) }
+      case (e, pe) => e.findAllElemOrSelfPaths map { path => path.prepend(pe) }
     }
 
     ElemPath.Root +: remainder
   }
 
-  @deprecated(message = "Use findAllPathsOfElemsOrSelf instead", since = "0.7.1")
-  final def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath] = findAllPathsOfElemsOrSelf
-
-  final def filterPathsOfElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
+  final def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
     // Not tail-recursive, but the depth should typically be limited
     val remainder = findAllChildElemsWithPathEntries flatMap {
-      case (e, pe) => e.filterPathsOfElemsOrSelf(p) map { path => path.prepend(pe) }
+      case (e, pe) => e.filterElemOrSelfPaths(p) map { path => path.prepend(pe) }
     }
 
     if (p(self)) (ElemPath.Root +: remainder) else remainder
   }
 
-  @deprecated(message = "Use filterPathsOfElemsOrSelf instead", since = "0.7.1")
-  final def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = filterPathsOfElemsOrSelf(p)
+  final def findAllElemPaths: immutable.IndexedSeq[ElemPath] =
+    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findAllElemOrSelfPaths map { path => path.prepend(pe) } }
 
-  final def findAllPathsOfElems: immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findAllPathsOfElemsOrSelf map { path => path.prepend(pe) } }
+  final def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.filterElemOrSelfPaths(p) map { path => path.prepend(pe) } }
 
-  @deprecated(message = "Use findAllPathsOfElems instead", since = "0.7.1")
-  final def findAllElemPaths: immutable.IndexedSeq[ElemPath] = findAllPathsOfElems
-
-  final def filterPathsOfElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.filterPathsOfElemsOrSelf(p) map { path => path.prepend(pe) } }
-
-  @deprecated(message = "Use filterPathsOfElems instead", since = "0.7.1")
-  final def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = filterPathsOfElems(p)
-
-  final def findPathsOfTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
+  final def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
     if (p(self)) immutable.IndexedSeq(ElemPath.Root) else {
       // Not tail-recursive, but the depth should typically be limited
       val result = findAllChildElemsWithPathEntries flatMap {
-        case (e, pe) => e.findPathsOfTopmostElemsOrSelf(p) map { path => path.prepend(pe) }
+        case (e, pe) => e.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) }
       }
       result
     }
   }
 
-  @deprecated(message = "Use findPathsOfTopmostElemsOrSelf instead", since = "0.7.1")
-  final def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    findPathsOfTopmostElemsOrSelf(p)
-
-  final def findPathsOfTopmostElems(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findPathsOfTopmostElemsOrSelf(p) map { path => path.prepend(pe) } }
-
-  @deprecated(message = "Use findPathsOfTopmostElems instead", since = "0.7.1")
   final def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    findPathsOfTopmostElems(p)
+    findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) } }
 
-  final def findPathOfElemOrSelf(p: E => Boolean): Option[ElemPath] = {
+  final def findElemOrSelfPath(p: E => Boolean): Option[ElemPath] = {
     // Not efficient
-    filterPathsOfElemsOrSelf(p).headOption
+    filterElemOrSelfPaths(p).headOption
   }
 
-  @deprecated(message = "Use findPathOfElemOrSelf instead", since = "0.7.1")
-  final def findElemOrSelfPath(p: E => Boolean): Option[ElemPath] = findPathOfElemOrSelf(p)
-
-  final def findPathOfElem(p: E => Boolean): Option[ElemPath] = {
-    val elms = self.findAllChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findPathOfElemOrSelf(p) map { path => path.prepend(pe) } }
+  final def findElemPath(p: E => Boolean): Option[ElemPath] = {
+    val elms = self.findAllChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findElemOrSelfPath(p) map { path => path.prepend(pe) } }
     elms.headOption
   }
-
-  @deprecated(message = "Use findPathOfElem instead", since = "0.7.1")
-  final def findElemPath(p: E => Boolean): Option[ElemPath] = findPathOfElem(p)
 
   /**
    * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
@@ -182,10 +144,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   @deprecated(message = "Use getElemOrSelfByPath instead", since = "0.7.1")
   final def getWithElemPath(path: ElemPath): E = getElemOrSelfByPath(path)
 
-  final def findAllPathEntriesOfChildElems: immutable.IndexedSeq[ElemPath.Entry] = {
+  final def findAllChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
     findAllChildElemsWithPathEntries map { _._2 }
   }
-
-  @deprecated(message = "Use findAllPathEntriesOfChildElems instead", since = "0.7.1")
-  final def findAllChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = findAllPathEntriesOfChildElems
 }
