@@ -155,7 +155,7 @@ class AlternativeUpdatesTest extends Suite {
   @Test def testUpdatedAtPathsInternally(): Unit = {
     val paths = bookstore.findAllElemOrSelfPaths.toSet
 
-    var foundPaths = Vector[ElemPath]()
+    var foundPaths = Vector[Path]()
     var foundElemsWithoutChildren = Vector[Elem]()
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>

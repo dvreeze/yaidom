@@ -68,7 +68,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesUsingElemPaths() {
+  @Test def testQueryTitlesUsingPaths() {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.localName == "Bookstore")

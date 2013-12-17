@@ -38,7 +38,7 @@ import scala.collection.immutable
  * Using this minimal knowledge alone, trait ``UpdatableElemLike`` not only offers the methods of its parent trait, but also:
  * <ul>
  * <li>methods to <em>functionally update</em> an element by replacing, adding or deleting child nodes</li>
- * <li>methods to <em>functionally update</em> an element by replacing descendant-or-self elements at specified element paths</li>
+ * <li>methods to <em>functionally update</em> an element by replacing descendant-or-self elements at specified paths</li>
  * </ul>
  * In other words, the ``UpdatableElemApi`` trait is quite a rich query API, considering the minimal knowledge it needs to
  * have about elements.
@@ -126,7 +126,7 @@ import scala.collection.immutable
  * and the other variant can insert a child at a given 0-based position. Other "children update" methods are ``minusChild``,
  * ``withPatchedChildren`` and ``withUpdatedChildren``.
  *
- * Let's now turn to functional update methods that take ``ElemPath`` instances or collections thereof. In the example above
+ * Let's now turn to functional update methods that take ``Path`` instances or collections thereof. In the example above
  * the second author of the added book is missing. Let's fix that:
  * {{{
  * val secondAuthorXml =
@@ -160,7 +160,7 @@ import scala.collection.immutable
  * author was created with only the ``auth`` namespace declared. Without the above-mentioned line of code, a namespace
  * undeclaration for prefix ``book`` would have occurred in the resulting XML, thus leading to an invalid XML 1.0 element tree.
  *
- * To illustrate functional update methods taking collections of element paths, let's remove the added book from the book store.
+ * To illustrate functional update methods taking collections of paths, let's remove the added book from the book store.
  * Here is one (somewhat inefficient) way to do that:
  * {{{
  * val bookPaths = bookstoreElem filterElemPaths (_.resolvedName == EName(bookstoreNamespace, "Book"))
@@ -171,7 +171,7 @@ import scala.collection.immutable
  * bookstoreElem = bookstoreElem.prettify(2)
  * }}}
  * There are very many ways to write this functional update, using different functional update methods in trait ``UpdatableElemApi``,
- * or even only using transformation methods in trait ``TransformableElemApi`` (thus not using element paths).
+ * or even only using transformation methods in trait ``TransformableElemApi`` (thus not using paths).
  *
  * The example code above is enough to get started using the ``UpdatableElemApi`` methods, but it makes sense to study the
  * entire API, and practice with it. Always keep in mind that functional updates typically mess up formatting and/or namespace
@@ -194,13 +194,13 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * Returns a Map from path entries (with respect to this element as parent element) to child node indexes.
    * The faster this method is, the better.
    */
-  def childNodeIndexesByPathEntries: Map[ElemPath.Entry, Int]
+  def childNodeIndexesByPathEntries: Map[Path.Entry, Int]
 
   /**
    * Shorthand for `childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)`.
    * The faster this method is, the better.
    */
-  def childNodeIndex(childPathEntry: ElemPath.Entry): Int
+  def childNodeIndex(childPathEntry: Path.Entry): Int
 
   /** Shorthand for `withChildren(children.updated(index, newChild))` */
   def withUpdatedChildren(index: Int, newChild: N): E
@@ -219,7 +219,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
 
   /**
    * '''Core method''' that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to the element that has the given [[eu.cdevreeze.yaidom.ElemPath.Entry]] (compared to this element as root).
+   * to the element that has the given [[eu.cdevreeze.yaidom.Path.Entry]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path entry.
    *
@@ -229,7 +229,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
    * }}}
    */
-  def updated(pathEntry: ElemPath.Entry)(f: E => E): E
+  def updated(pathEntry: Path.Entry)(f: E => E): E
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
@@ -244,24 +244,24 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * withChildren(newChildren)
    * }}}
    */
-  def updatedAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => E): E
+  def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to the element that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root).
+   * to the element that has the given [[eu.cdevreeze.yaidom.Path]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path.
    *
    * It can be defined (recursively) as follows:
    * {{{
-   * if (path == ElemPath.Root) f(self)
+   * if (path == Path.Root) f(self)
    * else updated(path.firstEntry) { e => e.updated(path.withoutFirstEntry)(f) }
    * }}}
    */
-  def updated(path: ElemPath)(f: E => E): E
+  def updated(path: Path)(f: E => E): E
 
   /** Returns `updated(path) { e => newElem }` */
-  def updated(path: ElemPath, newElem: E): E
+  def updated(path: Path, newElem: E): E
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
@@ -269,7 +269,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * It can be defined (recursively) as follows (ignoring exceptions):
    * {{{
-   * def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E = {
+   * def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
    *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
    *   val resultWithoutSelf = self.updatedAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
    *     val newChe = che.updatedAtPaths(paths.map(_.withoutFirstEntry)) { (elem, relativePath) =>
@@ -277,7 +277,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *     }
    *     newChe
    *   }
-   *   if (paths.contains(ElemPath.Root)) f(resultWithoutSelf, ElemPath.Root) else resultWithoutSelf
+   *   if (paths.contains(Path.Root)) f(resultWithoutSelf, Path.Root) else resultWithoutSelf
    * }
    * }}}
    *
@@ -287,11 +287,11 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path) { e => f(e, path) } }
    * }}}
    */
-  def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E
+  def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
 
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.ElemPath]] (compared to this element as root). If the given path is the
+   * that has the given [[eu.cdevreeze.yaidom.Path]] (compared to this element as root). If the given path is the
    * root path, this element itself is returned unchanged.
    *
    * This function could be defined as follows:
@@ -299,7 +299,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * // First define function g as follows:
    *
    * def g(e: Elem): Elem = {
-   *   if (path == ElemPath.Root) e
+   *   if (path == Path.Root) e
    *   else {
    *     e.withPatchedChildren(
    *       e.childNodeIndex(path.lastEntry),
@@ -310,16 +310,16 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    *
    * // Then the function updatedWithNodeSeq(path)(f) could be defined as:
    *
-   * updated(path.parentPathOption.getOrElse(ElemPath.Root))(g)
+   * updated(path.parentPathOption.getOrElse(Path.Root))(g)
    * }}}
    * After all, this is just a functional update that replaces the parent element, if it exists.
    *
    * The method throws an exception if no element is found with the given path.
    */
-  def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E
+  def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
 
   /** Returns `updatedWithNodeSeq(path) { e => newNodes }` */
-  def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E
+  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
@@ -336,7 +336,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * withChildren(newChildGroups.flatten)
    * }}}
    */
-  def updatedWithNodeSeqAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => immutable.IndexedSeq[N]): E
+  def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
@@ -353,5 +353,5 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareE
    * }
    * }}}
    */
-  def updatedWithNodeSeqAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => immutable.IndexedSeq[N]): E
+  def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 }

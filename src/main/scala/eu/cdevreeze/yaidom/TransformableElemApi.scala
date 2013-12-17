@@ -31,8 +31,7 @@ import scala.collection.immutable
  * transforms elements instead of querying for elements.
  *
  * The big conceptual difference with "updatable" elements (in trait `UpdatableElemLike[N, E]`) is that "transformations" are
- * about applying some transforming function to an element tree, while "(functional) updates" are about "updates" at given
- * element paths.
+ * about applying some transforming function to an element tree, while "(functional) updates" are about "updates" at given paths.
  *
  * ==TransformableElemApi examples==
  *

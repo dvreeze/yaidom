@@ -55,9 +55,9 @@ import scala.annotation.tailrec
  * </book:Bookstore>
  * }}}
  *
- * Then the last name of the first author of the Scala book (viz. Odersky) has the following element path:
+ * Then the last name of the first author of the Scala book (viz. Odersky) has the following path:
  * {{{
- * ElemPath.from(
+ * Path.from(
  *   EName("{http://bookstore/book}Book") -> 1,
  *   EName("{http://bookstore/book}Authors") -> 0,
  *   EName("{http://bookstore/author}Author") -> 0,
@@ -66,113 +66,112 @@ import scala.annotation.tailrec
  * }}}
  * or:
  * {{{
- * ElemPathBuilder.from(
+ * PathBuilder.from(
  *   QName("book:Book") -> 1,
  *   QName("book:Authors") -> 0,
  *   QName("auth:Author") -> 0,
  *   QName("auth:Last_Name") -> 0).build(Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author"))
  * }}}
  *
- * `ElemPath` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemLike]]), and in "functional updates"
+ * `Path` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemLike]]), and in "functional updates"
  * (see [[eu.cdevreeze.yaidom.UpdatableElemLike]]).
  *
- * An [[eu.cdevreeze.yaidom.ElemPath]] corresponds to one and only one canonical path of the element (modulo prefix names),
+ * An [[eu.cdevreeze.yaidom.Path]] corresponds to one and only one canonical path of the element (modulo prefix names),
  * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
- * There is one catch, though. The `ElemPath` does not know the root element name, so that is not a part of the corresponding
+ * There is one catch, though. The `Path` does not know the root element name, so that is not a part of the corresponding
  * canonical XPath expression. See the documentation of method `toCanonicalXPath`.
  *
- * The `ElemPath` contains an `IndexedSeq` of path entries for a specific child element, grandchild element etc.,
+ * The `Path` contains an `IndexedSeq` of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
  *
- * As an alternative to class `ElemPath`, each element in a tree could be uniquely identified by "path entries" that only contained
+ * As an alternative to class `Path`, each element in a tree could be uniquely identified by "path entries" that only contained
  * a child index instead of an element name plus element child index (of element children with the given name). Yet that would
- * be far less easy to use. Hence `ElemPath.Entry` instances each contain an element name plus index.
+ * be far less easy to use. Hence `Path.Entry` instances each contain an element name plus index.
  *
- * '''Warning: indexing using ElemPaths can be slow, especially in large XML trees.''' Hence, it is advisable to use class `ElemPath`
+ * '''Warning: indexing using Paths can be slow, especially in large XML trees.''' Hence, it is advisable to use class `Path`
  * wisely in queries and "functional updates". Most queries for elements can be written without them (using the methods in trait
  * `ParentElemLike`, instead of those added by subtrait `PathAwareElemLike`).
  *
  * @author Chris de Vreeze
  */
-@deprecated(message = "Use Path instead", since = "0.7.1")
-final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends Immutable { self =>
+final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutable { self =>
 
   require(entries ne null)
 
-  /** Returns true if this is the root `ElemPath`, so if it has no entries */
+  /** Returns true if this is the root `Path`, so if it has no entries */
   def isRoot: Boolean = entries.isEmpty
 
   /** Returns the element name (as EName) of the last path entry, if any, wrapped in an Option */
   def elementNameOption: Option[EName] = lastEntryOption.map(_.elementName)
 
-  /** Prepends a given `Entry` to this `ElemPath` */
-  def prepend(entry: ElemPath.Entry): ElemPath = ElemPath(entry +: self.entries)
+  /** Prepends a given `Entry` to this `Path` */
+  def prepend(entry: Path.Entry): Path = Path(entry +: self.entries)
 
-  /** Returns the `ElemPath` with the first path entry (if any) removed, wrapped in an `Option`. */
-  def withoutFirstEntryOption: Option[ElemPath] = entries match {
+  /** Returns the `Path` with the first path entry (if any) removed, wrapped in an `Option`. */
+  def withoutFirstEntryOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
-    case _ => Some(ElemPath(entries.tail))
+    case _ => Some(Path(entries.tail))
   }
 
   /** Like `withoutFirstEntryOption`, but unwrapping the result (or throwing an exception otherwise) */
-  def withoutFirstEntry: ElemPath = withoutFirstEntryOption.getOrElse(sys.error("The root path has no first entry to remove"))
+  def withoutFirstEntry: Path = withoutFirstEntryOption.getOrElse(sys.error("The root path has no first entry to remove"))
 
-  /** Appends a given `Entry` to this `ElemPath` */
-  def append(entry: ElemPath.Entry): ElemPath = ElemPath(self.entries :+ entry)
+  /** Appends a given `Entry` to this `Path` */
+  def append(entry: Path.Entry): Path = Path(self.entries :+ entry)
 
-  /** Appends a given relative `ElemPath` to this `ElemPath` */
-  def ++(other: ElemPath): ElemPath = ElemPath(this.entries ++ other.entries)
+  /** Appends a given relative `Path` to this `Path` */
+  def ++(other: Path): Path = Path(this.entries ++ other.entries)
 
   /**
    * Gets the parent path (if any, because the root path has no parent) wrapped in an `Option`.
    *
-   * This method shows much of the reason why class `ElemPath` exists. If we know an element's `ElemPath`, and therefore its
-   * parent `ElemPath` (using this method), then we can obtain the parent element by following the parent path from the
+   * This method shows much of the reason why class `Path` exists. If we know an element's `Path`, and therefore its
+   * parent `Path` (using this method), then we can obtain the parent element by following the parent path from the
    * root of the tree.
    */
-  def parentPathOption: Option[ElemPath] = entries match {
+  def parentPathOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
-    case _ => Some(ElemPath(entries.dropRight(1)))
+    case _ => Some(Path(entries.dropRight(1)))
   }
 
   /** Like `parentPathOption`, but unwrapping the result (or throwing an exception otherwise) */
-  def parentPath: ElemPath = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
+  def parentPath: Path = parentPathOption.getOrElse(sys.error("The root path has no parent path"))
 
   /** Returns the ancestor-or-self paths, starting with this path, then the parent (if any), and ending with the root path */
-  def ancestorOrSelfPaths: immutable.IndexedSeq[ElemPath] = {
+  def ancestorOrSelfPaths: immutable.IndexedSeq[Path] = {
     @tailrec
-    def accumulate(path: ElemPath, acc: mutable.ArrayBuffer[ElemPath]): mutable.ArrayBuffer[ElemPath] = {
+    def accumulate(path: Path, acc: mutable.ArrayBuffer[Path]): mutable.ArrayBuffer[Path] = {
       acc += path
       if (path.isRoot) acc else accumulate(path.parentPath, acc)
     }
 
-    accumulate(self, mutable.ArrayBuffer[ElemPath]()).toIndexedSeq
+    accumulate(self, mutable.ArrayBuffer[Path]()).toIndexedSeq
   }
 
   /** Returns the ancestor paths, starting with the parent path (if any), and ending with the root path */
-  def ancestorPaths: immutable.IndexedSeq[ElemPath] = ancestorOrSelfPaths.drop(1)
+  def ancestorPaths: immutable.IndexedSeq[Path] = ancestorOrSelfPaths.drop(1)
 
   /** Returns `ancestorOrSelfPaths find { path => p(path) }` */
-  def findAncestorOrSelfPath(p: ElemPath => Boolean): Option[ElemPath] = {
+  def findAncestorOrSelfPath(p: Path => Boolean): Option[Path] = {
     ancestorOrSelfPaths find { path => p(path) }
   }
 
   /** Returns `ancestorPaths find { path => p(path) }` */
-  def findAncestorPath(p: ElemPath => Boolean): Option[ElemPath] = {
+  def findAncestorPath(p: Path => Boolean): Option[Path] = {
     ancestorPaths find { path => p(path) }
   }
 
   /** Returns the first entry, if any, wrapped in an `Option` */
-  def firstEntryOption: Option[ElemPath.Entry] = entries.headOption
+  def firstEntryOption: Option[Path.Entry] = entries.headOption
 
   /** Returns the first entry, if any, and throws an exception otherwise */
-  def firstEntry: ElemPath.Entry = firstEntryOption.getOrElse(sys.error("There are no entries"))
+  def firstEntry: Path.Entry = firstEntryOption.getOrElse(sys.error("There are no entries"))
 
   /** Returns the last entry, if any, wrapped in an `Option` */
-  def lastEntryOption: Option[ElemPath.Entry] = entries.takeRight(1).headOption
+  def lastEntryOption: Option[Path.Entry] = entries.takeRight(1).headOption
 
   /** Returns the last entry, if any, and throws an exception otherwise */
-  def lastEntry: ElemPath.Entry = lastEntryOption.getOrElse(sys.error("There are no entries"))
+  def lastEntry: Path.Entry = lastEntryOption.getOrElse(sys.error("There are no entries"))
 
   /** Convenience method returning true if the first entry (if any) has the given element name */
   def startsWithName(ename: EName): Boolean = firstEntryOption exists { entry => entry.elementName == ename }
@@ -184,17 +183,17 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   def containsName(ename: EName): Boolean = entries exists { entry => entry.elementName == ename }
 
   override def equals(obj: Any): Boolean = obj match {
-    case other: ElemPath =>
+    case other: Path =>
       if (hashCode != other.hashCode) false else entries == other.entries
     case _ => false
   }
 
   override def hashCode: Int = entries.hashCode
 
-  override def toString: String = "ElemPath(%s)".format(entries.toString)
+  override def toString: String = "Path(%s)".format(entries.toString)
 
   /**
-   * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `ElemPath`).
+   * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `Path`).
    * The modification is that the root element is written as a slash followed by an asterisk.
    *
    * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
@@ -207,27 +206,27 @@ final class ElemPath(val entries: immutable.IndexedSeq[ElemPath.Entry]) extends 
   }
 }
 
-object ElemPath {
+object Path {
 
-  val Root: ElemPath = ElemPath(immutable.IndexedSeq())
+  val Root: Path = Path(immutable.IndexedSeq())
 
-  def apply(entries: immutable.IndexedSeq[ElemPath.Entry]): ElemPath = new ElemPath(entries)
+  def apply(entries: immutable.IndexedSeq[Path.Entry]): Path = new Path(entries)
 
   /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
-  def apply(s: String)(scope: Scope): ElemPath = {
+  def apply(s: String)(scope: Scope): Path = {
     require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
     fromCanonicalXPath(s)(scope)
   }
 
-  /** Easy to use factory method for `ElemPath` instances */
-  def from(entries: (EName, Int)*): ElemPath = {
-    val entrySeq: Seq[ElemPath.Entry] = entries map { p => Entry(p._1, p._2) }
-    new ElemPath(entrySeq.toIndexedSeq)
+  /** Easy to use factory method for `Path` instances */
+  def from(entries: (EName, Int)*): Path = {
+    val entrySeq: Seq[Path.Entry] = entries map { p => Entry(p._1, p._2) }
+    new Path(entrySeq.toIndexedSeq)
   }
 
-  /** Parses a String, which must be in the `toCanonicalXPath` format, into an `ElemPath`. The passed scope must be invertible. */
-  def fromCanonicalXPath(s: String)(scope: Scope): ElemPath = {
+  /** Parses a String, which must be in the `toCanonicalXPath` format, into an `Path`. The passed scope must be invertible. */
+  def fromCanonicalXPath(s: String)(scope: Scope): Path = {
     require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
@@ -249,11 +248,11 @@ object ElemPath {
     }
 
     val entryStrings = getEntryStrings(remainder).toIndexedSeq
-    val entries = entryStrings map { entryString => ElemPath.Entry.fromCanonicalXPath(entryString)(scope) }
-    ElemPath(entries)
+    val entries = entryStrings map { entryString => Path.Entry.fromCanonicalXPath(entryString)(scope) }
+    Path(entries)
   }
 
-  /** An entry in an `ElemPath`, as an expanded element name plus zero-based index of the elem as child element (with that name) of the parent. */
+  /** An entry in an `Path`, as an expanded element name plus zero-based index of the elem as child element (with that name) of the parent. */
   final case class Entry(elementName: EName, index: Int) extends Immutable {
     require(elementName ne null)
     require(index >= 0)
@@ -296,7 +295,7 @@ object ElemPath {
       fromCanonicalXPath(s)(scope)
     }
 
-    /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `ElemPath.Entry`, given an invertible `Scope` */
+    /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `Path.Entry`, given an invertible `Scope` */
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
       require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 

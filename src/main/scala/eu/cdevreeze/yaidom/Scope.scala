@@ -240,8 +240,8 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    *
    * In other words, returns true if the inverse of `toMap` is also a mathematical function, mapping namespace URIs to unique prefixes.
    *
-   * Invertible scopes offer a one-to-one correspondence between QNames and ENames. This is needed, for example, for `ElemPath`s.
-   * Only if there is such a one-to-one correspondence, the indexes in `ElemPath`s and `ElemPathBuilder`s are stable, when converting
+   * Invertible scopes offer a one-to-one correspondence between QNames and ENames. This is needed, for example, for `Path`s.
+   * Only if there is such a one-to-one correspondence, the indexes in `Path`s and `PathBuilder`s are stable, when converting
    * between the two.
    */
   def isInvertible: Boolean = prefixNamespaceMap.keySet.size == prefixNamespaceMap.values.toSet.size

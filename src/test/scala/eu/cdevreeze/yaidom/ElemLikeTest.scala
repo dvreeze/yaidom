@@ -435,7 +435,7 @@ class ElemLikeTest extends Suite {
     expectResult(Set(bookstore)) {
       val paths = bookstore.findAllElemOrSelfPaths filter { path => bookElms.contains(bookstore.getElemOrSelfByPath(path)) }
       val parentPaths = paths flatMap { _.parentPathOption }
-      val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => bookstore.getElemOrSelfByPath(path) }
+      val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result
     }
 
@@ -444,7 +444,7 @@ class ElemLikeTest extends Suite {
     expectResult(Set(EName(ns, "Author"))) {
       val paths = bookstore.findAllElemOrSelfPaths filter { path => lastNameElms.contains(bookstore.getElemOrSelfByPath(path)) }
       val parentPaths = paths flatMap { _.parentPathOption }
-      val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => bookstore.getElemOrSelfByPath(path) }
+      val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result map { e => e.resolvedName }
     }
 
@@ -457,7 +457,7 @@ class ElemLikeTest extends Suite {
       // Taking cheapBookElm as root! Finding parents of lastNameElms.
       val paths = cheapBookElm.findAllElemOrSelfPaths filter { path => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(path)) }
       val parentPaths = paths flatMap { _.parentPathOption }
-      val result: Set[Elem] = parentPaths.toSet map { (path: ElemPath) => cheapBookElm.getElemOrSelfByPath(path) }
+      val result: Set[Elem] = parentPaths.toSet map { (path: Path) => cheapBookElm.getElemOrSelfByPath(path) }
       result
     }
   }
@@ -483,21 +483,21 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFindByElemPath() {
+  @Test def testFindByPath() {
     require(bookstore.localName == "Bookstore")
 
     expectResult(Some(bookstore)) {
-      bookstore.findElemOrSelfByPath(ElemPath.Root)
+      bookstore.findElemOrSelfByPath(Path.Root)
     }
 
     val scope = Scope.from(Map("b" -> ns.toString))
 
     expectResult(Some(QName("Last_Name"))) {
-      val path = ElemPathBuilder.from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0).build(scope)
+      val path = PathBuilder.from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0).build(scope)
       bookstore.findElemOrSelfByPath(path) map { _.qname }
     }
     expectResult(Some("Ullman")) {
-      val path = ElemPathBuilder.from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0).build(scope)
+      val path = PathBuilder.from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0).build(scope)
       bookstore.findElemOrSelfByPath(path) map { _.trimmedText }
     }
 
@@ -517,11 +517,11 @@ class ElemLikeTest extends Suite {
 
     for (idx <- bookstoreChildIndexes) {
       expectResult(true) {
-        bookstore.findElemOrSelfByPath(ElemPath(immutable.IndexedSeq(idx))).isDefined
+        bookstore.findElemOrSelfByPath(Path(immutable.IndexedSeq(idx))).isDefined
       }
     }
     expectResult(None) {
-      val path = ElemPathBuilder.from(QName("b:Book") -> 2, QName("b:Title") -> 2).build(scope)
+      val path = PathBuilder.from(QName("b:Book") -> 2, QName("b:Title") -> 2).build(scope)
       bookstore.findElemOrSelfByPath(path)
     }
   }

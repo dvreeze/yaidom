@@ -20,12 +20,12 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * API and implementation trait for functionally updatable elements. This trait extends trait [[eu.cdevreeze.yaidom.PathAwareElemLike]],
- * adding knowledge about child nodes in general, and about the correspondence between child element path entries and child
+ * adding knowledge about child nodes in general, and about the correspondence between child path entries and child
  * indexes.
  *
  * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
  * `children`, `withChildren` and `childNodeIndexesByPathEntries`. Based on these abstract methods (and the super-trait), this
- * trait offers a rich API for querying elements and element paths, and for functionally updating elements.
+ * trait offers a rich API for querying elements and paths, and for functionally updating elements.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.UpdatableElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment.
@@ -43,9 +43,9 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
-  def childNodeIndexesByPathEntries: Map[ElemPath.Entry, Int]
+  def childNodeIndexesByPathEntries: Map[Path.Entry, Int]
 
-  final def childNodeIndex(childPathEntry: ElemPath.Entry): Int = {
+  final def childNodeIndex(childPathEntry: Path.Entry): Int = {
     childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)
   }
 
@@ -61,21 +61,21 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
 
   final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
 
-  final def updated(pathEntry: ElemPath.Entry)(f: E => E): E = {
+  final def updated(pathEntry: Path.Entry)(f: E => E): E = {
     val idx = self.childNodeIndex(pathEntry)
     require(idx >= 0, "Expected non-negative child node index")
 
     self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
   }
 
-  final def updatedAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => E): E = {
+  final def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
     if (pathEntries.isEmpty) self
     else {
-      val indexesByPathEntries: Seq[(ElemPath.Entry, Int)] =
+      val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         self.childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2)
       require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
 
-      // Updating in reverse order of indexes, in order not to invalidate the element path entries
+      // Updating in reverse order of indexes, in order not to invalidate the path entries
       val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
         case (acc, (pathEntry, idx)) =>
           val che = acc(idx).asInstanceOf[E]
@@ -87,8 +87,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     }
   }
 
-  final def updated(path: ElemPath)(f: E => E): E = {
-    if (path == ElemPath.Root) f(self)
+  final def updated(path: Path)(f: E => E): E = {
+    if (path == Path.Root) f(self)
     else {
       // Recursive, but not tail-recursive
 
@@ -96,15 +96,15 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     }
   }
 
-  final def updated(path: ElemPath, newElem: E): E = updated(path) { e => newElem }
+  final def updated(path: Path, newElem: E): E = updated(path) { e => newElem }
 
-  final def updatedAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => E): E = {
+  final def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
     if (paths.isEmpty) self
     else {
-      val pathsByPathEntries: Map[ElemPath.Entry, Set[ElemPath]] =
+      val pathsByPathEntries: Map[Path.Entry, Set[Path]] =
         paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
 
-      val resultsByPathEntries: Map[ElemPath.Entry, E] =
+      val resultsByPathEntries: Map[Path.Entry, E] =
         pathsByPathEntries map {
           case (pathEntry, paths) =>
             val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error("Incorrect path entry %s".format(pathEntry)))
@@ -125,12 +125,12 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
         resultsByPathEntries(pathEntry)
       }
 
-      if (paths.contains(ElemPath.Root)) f(resultWithoutSelf, ElemPath.Root) else resultWithoutSelf
+      if (paths.contains(Path.Root)) f(resultWithoutSelf, Path.Root) else resultWithoutSelf
     }
   }
 
-  final def updatedWithNodeSeq(path: ElemPath)(f: E => immutable.IndexedSeq[N]): E = {
-    if (path == ElemPath.Root) self
+  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
+    if (path == Path.Root) self
     else {
       assert(path.parentPathOption.isDefined)
       val parentPath = path.parentPath
@@ -148,17 +148,17 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     }
   }
 
-  final def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[N]): E =
+  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E =
     updatedWithNodeSeq(path) { e => newNodes }
 
-  final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[ElemPath.Entry])(f: (E, ElemPath.Entry) => immutable.IndexedSeq[N]): E = {
+  final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {
     if (pathEntries.isEmpty) self
     else {
-      val indexesByPathEntries: Seq[(ElemPath.Entry, Int)] =
+      val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         self.childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2)
       require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
 
-      // Updating in reverse order of indexes, in order not to invalidate the element path entries
+      // Updating in reverse order of indexes, in order not to invalidate the path entries
       val newChildGroups: immutable.IndexedSeq[immutable.IndexedSeq[N]] =
         indexesByPathEntries.reverse.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
           case (acc, (pathEntry, idx)) =>
@@ -173,10 +173,10 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     }
   }
 
-  final def updatedWithNodeSeqAtPaths(paths: Set[ElemPath])(f: (E, ElemPath) => immutable.IndexedSeq[N]): E = {
+  final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
     if (paths.isEmpty) self
     else {
-      val pathsByParentPaths: Map[ElemPath, Set[ElemPath]] =
+      val pathsByParentPaths: Map[Path, Set[Path]] =
         paths.filter(path => !path.isRoot).groupBy(path => path.parentPath)
 
       self.updatedAtPaths(pathsByParentPaths.keySet) { (elem, path) =>

@@ -89,21 +89,21 @@ final class Document(
     comments = this.comments)
 
   /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
-  def updated(path: ElemPath)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
+  def updated(path: Path)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
 
   /** Returns `updated(path) { e => newElem }` */
-  def updated(path: ElemPath, newElem: Elem): Document = updated(path) { e => newElem }
+  def updated(path: Path, newElem: Elem): Document = updated(path) { e => newElem }
 
   /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(path)(f))` */
-  def updatedWithNodeSeq(path: ElemPath)(f: Elem => immutable.IndexedSeq[Node]): Document =
+  def updatedWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updatedWithNodeSeq(path)(f))
 
   /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))` */
-  def updatedWithNodeSeq(path: ElemPath, newNodes: immutable.IndexedSeq[Node]): Document =
+  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updatedWithNodeSeq(path, newNodes))
 
   /** Returns `withDocumentElement(this.documentElement.updatedAtPaths(paths)(f))` */
-  def updatedAtPaths(paths: Set[ElemPath])(f: (Elem, ElemPath) => Elem): Document =
+  def updatedAtPaths(paths: Set[Path])(f: (Elem, Path) => Elem): Document =
     withDocumentElement(this.documentElement.updatedAtPaths(paths)(f))
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */

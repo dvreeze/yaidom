@@ -31,13 +31,13 @@ final class Elem private[docaware] (
   val docUri: URI,
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
-  val elemPath: ElemPath) extends ElemLike[Elem] with HasText with Immutable {
+  val path: Path) extends ElemLike[Elem] with HasText with Immutable {
 
   /**
    * The yaidom Elem itself, stored as a val
    */
   val elem: eu.cdevreeze.yaidom.Elem =
-    rootElem.findElemOrSelfByPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
+    rootElem.findElemOrSelfByPath(path).getOrElse(sys.error("Path %s must exist".format(path)))
 
   assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
   assert(childElems.forall(_.docUri eq this.docUri), "Corrupt element!")
@@ -45,7 +45,7 @@ final class Elem private[docaware] (
   /**
    * Returns all child elements, in the correct order.
    *
-   * These child elements share the same rootElem with this element, but differ in the element paths, which have one more
+   * These child elements share the same rootElem with this element, but differ in the paths, which have one more
    * "path entry".
    */
   override def findAllChildElems: immutable.IndexedSeq[Elem] = childElems
@@ -56,11 +56,11 @@ final class Elem private[docaware] (
 
   override def equals(obj: Any): Boolean = obj match {
     case other: Elem =>
-      (other.docUri == this.docUri) && (other.rootElem == this.rootElem) && (other.elemPath == this.elemPath)
+      (other.docUri == this.docUri) && (other.rootElem == this.rootElem) && (other.path == this.path)
     case _ => false
   }
 
-  override def hashCode: Int = (docUri, rootElem, elemPath).hashCode
+  override def hashCode: Int = (docUri, rootElem, path).hashCode
 
   /**
    * Returns `this.elem.scope`
@@ -75,7 +75,7 @@ final class Elem private[docaware] (
    * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
    */
   final def namespaces: Declarations = {
-    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
+    val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
   }
 
@@ -92,21 +92,21 @@ final class Elem private[docaware] (
 object Elem {
 
   /**
-   * Calls `apply(docUri, rootElem, ElemPath.Root)`
+   * Calls `apply(docUri, rootElem, Path.Root)`
    */
   def apply(docUri: URI, rootElem: eu.cdevreeze.yaidom.Elem): Elem = {
-    apply(docUri, rootElem, ElemPath.Root)
+    apply(docUri, rootElem, Path.Root)
   }
 
   /**
    * Expensive recursive factory method for "docaware elements".
    */
-  def apply(docUri: URI, rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
-    val elem = rootElem.getElemOrSelfByPath(elemPath)
+  def apply(docUri: URI, rootElem: eu.cdevreeze.yaidom.Elem, path: Path): Elem = {
+    val elem = rootElem.getElemOrSelfByPath(path)
 
     // Recursive calls
-    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(docUri, rootElem, elemPath.append(entry)))
+    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(docUri, rootElem, path.append(entry)))
 
-    new Elem(docUri, rootElem, childElems, elemPath)
+    new Elem(docUri, rootElem, childElems, path)
   }
 }

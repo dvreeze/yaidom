@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom
 
 /**
  * This package contains element representations that contain the "context" of the element. That is, the elements
- * in this package are pairs of a root element and an element path (to the actual element itself).
+ * in this package are pairs of a root element and a path (to the actual element itself).
  *
  * An example of where such a representation can be useful is XML Schema. After all, to interpret an element definition
  * in an XML schema, we need context of the element definition to determine the target namespace, or to determine whether the

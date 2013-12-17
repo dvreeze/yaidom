@@ -256,7 +256,7 @@ class EqualityTest extends Suite {
 
     val scope = Scope.from(Map("foobar" -> "urn:foo:bar"))
 
-    val path = ElemPathBuilder.from(QName("foobar:child") -> 0).build(scope)
+    val path = PathBuilder.from(QName("foobar:child") -> 0).build(scope)
 
     val root3 = root2.updated(path) {
       e =>

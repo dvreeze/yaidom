@@ -193,11 +193,11 @@ class PathAwareElemLikeTest extends Suite {
 
   // Semantical definitions
 
-  private def filterChildElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
-    elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
+  private def filterChildElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[Path] =
+    elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => Path(Vector(pe)) }
 
-  private def filterElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
-    (if (p(elem)) Vector(ElemPath.Root) else Vector()) ++ {
+  private def filterElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[Path] = {
+    (if (p(elem)) Vector(Path.Root) else Vector()) ++ {
       elem.findAllChildElemsWithPathEntries flatMap {
         case (che, pe) =>
           filterElemOrSelfPaths(che, p).map(_.prepend(pe))
@@ -205,8 +205,8 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  private def findTopmostElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] = {
-    if (p(elem)) Vector(ElemPath.Root)
+  private def findTopmostElemOrSelfPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[Path] = {
+    if (p(elem)) Vector(Path.Root)
     else {
       elem.findAllChildElemsWithPathEntries flatMap {
         case (che, pe) =>
@@ -215,19 +215,19 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  private def filterElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
+  private def filterElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[Path] =
     elem.findAllChildElemsWithPathEntries flatMap {
       case (che, pe) =>
         filterElemOrSelfPaths(che, p).map(_.prepend(pe))
     }
 
-  private def findTopmostElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[ElemPath] =
+  private def findTopmostElemPaths(elem: Elem, p: Elem => Boolean): immutable.IndexedSeq[Path] =
     elem.findAllChildElemsWithPathEntries flatMap {
       case (che, pe) =>
         findTopmostElemOrSelfPaths(che, p).map(_.prepend(pe))
     }
 
-  private def findAllElemOrSelfPaths(elem: Elem): immutable.IndexedSeq[ElemPath] = filterElemOrSelfPaths(elem, e => true)
+  private def findAllElemOrSelfPaths(elem: Elem): immutable.IndexedSeq[Path] = filterElemOrSelfPaths(elem, e => true)
 
-  private def findAllElemPaths(elem: Elem): immutable.IndexedSeq[ElemPath] = filterElemPaths(elem, e => true)
+  private def findAllElemPaths(elem: Elem): immutable.IndexedSeq[Path] = filterElemPaths(elem, e => true)
 }

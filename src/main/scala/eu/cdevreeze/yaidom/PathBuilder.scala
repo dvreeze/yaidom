@@ -20,11 +20,11 @@ import scala.collection.{ immutable, mutable }
 import scala.annotation.tailrec
 
 /**
- * Builder for `ElemPath` instances.
+ * Builder for `Path` instances.
  *
  * For example:
  * {{{
- * val path: ElemPath = ElemPathBuilder.from(QName("parent") -> 0, QName("child") -> 2).build(Scope.Empty)
+ * val path: Path = PathBuilder.from(QName("parent") -> 0, QName("child") -> 2).build(Scope.Empty)
  * }}}
  *
  * Note that the indexes are 0-based. Also note that the Scope passed to the `build` method must be invertible.
@@ -32,29 +32,28 @@ import scala.annotation.tailrec
  *
  * @author Chris de Vreeze
  */
-@deprecated(message = "Use PathBuilder instead", since = "0.7.1")
-final class ElemPathBuilder(val entries: immutable.IndexedSeq[ElemPathBuilder.Entry]) extends Immutable { self =>
+final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) extends Immutable { self =>
   require(entries ne null)
 
-  /** Returns true if this is the root `ElemPath`, so if it has no entries */
+  /** Returns true if this is the root `Path`, so if it has no entries */
   def isRoot: Boolean = entries.isEmpty
 
-  /** Prepends a given `Entry` to this `ElemPathBuilder` */
-  def prepend(entry: ElemPathBuilder.Entry): ElemPathBuilder = ElemPathBuilder(entry +: self.entries)
+  /** Prepends a given `Entry` to this `PathBuilder` */
+  def prepend(entry: PathBuilder.Entry): PathBuilder = PathBuilder(entry +: self.entries)
 
-  /** Appends a given `Entry` to this `ElemPathBuilder` */
-  def append(entry: ElemPathBuilder.Entry): ElemPathBuilder = ElemPathBuilder(self.entries :+ entry)
+  /** Appends a given `Entry` to this `PathBuilder` */
+  def append(entry: PathBuilder.Entry): PathBuilder = PathBuilder(self.entries :+ entry)
 
-  /** Builds the `ElemPath`, using the passed `Scope`, which must be invertible */
-  def build(scope: Scope): ElemPath = {
+  /** Builds the `Path`, using the passed `Scope`, which must be invertible */
+  def build(scope: Scope): Path = {
     require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
-    val resolvedEntries: immutable.IndexedSeq[ElemPath.Entry] = entries map { _.build(scope) }
-    ElemPath(resolvedEntries)
+    val resolvedEntries: immutable.IndexedSeq[Path.Entry] = entries map { _.build(scope) }
+    Path(resolvedEntries)
   }
 
   override def equals(obj: Any): Boolean = obj match {
-    case other: ElemPathBuilder =>
+    case other: PathBuilder =>
       if (hashCode != other.hashCode) false else entries == other.entries
     case _ => false
   }
@@ -64,29 +63,29 @@ final class ElemPathBuilder(val entries: immutable.IndexedSeq[ElemPathBuilder.En
   override def toString: String = entries.toString
 }
 
-object ElemPathBuilder {
+object PathBuilder {
 
-  val Root: ElemPathBuilder = ElemPathBuilder(immutable.IndexedSeq())
+  val Root: PathBuilder = PathBuilder(immutable.IndexedSeq())
 
-  def apply(entries: immutable.IndexedSeq[ElemPathBuilder.Entry]): ElemPathBuilder = new ElemPathBuilder(entries)
+  def apply(entries: immutable.IndexedSeq[PathBuilder.Entry]): PathBuilder = new PathBuilder(entries)
 
-  /** Easy to use factory method for `ElemPathBuilder` instances */
-  def from(entries: (QName, Int)*): ElemPathBuilder = {
-    val entrySeq: Seq[ElemPathBuilder.Entry] = entries map { p => Entry(p._1, p._2) }
-    new ElemPathBuilder(entrySeq.toIndexedSeq)
+  /** Easy to use factory method for `PathBuilder` instances */
+  def from(entries: (QName, Int)*): PathBuilder = {
+    val entrySeq: Seq[PathBuilder.Entry] = entries map { p => Entry(p._1, p._2) }
+    new PathBuilder(entrySeq.toIndexedSeq)
   }
 
-  /** An entry in an `ElemPathBuilder`, as an qname plus zero-based index of the elem as child (with that name) of the parent. */
+  /** An entry in an `PathBuilder`, as an qname plus zero-based index of the elem as child (with that name) of the parent. */
   final case class Entry(qname: QName, index: Int) extends Immutable {
     require(qname ne null)
     require(index >= 0)
 
-    /** Builds the `ElemPath.Entry`, using the passed `Scope`, which must be invertible */
-    def build(scope: Scope): ElemPath.Entry = {
+    /** Builds the `Path.Entry`, using the passed `Scope`, which must be invertible */
+    def build(scope: Scope): Path.Entry = {
       require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
 
       val ename: EName = scope.resolveQNameOption(qname).getOrElse(sys.error("Could not resolve qname '%s' in scope %s".format(qname, scope)))
-      ElemPath.Entry(ename, index)
+      Path.Entry(ename, index)
     }
 
     def localName: String = qname.localPart

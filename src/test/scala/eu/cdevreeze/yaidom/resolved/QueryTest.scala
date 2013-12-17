@@ -39,17 +39,17 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
-    def addElemPaths(e: Elem, path: ElemPath, scope: Scope): Elem = {
-      def getChildPathEntry(e: Elem, nodeIdx: Int): ElemPath.Entry = {
+    def addElemPaths(e: Elem, path: Path, scope: Scope): Elem = {
+      def getChildPathEntry(e: Elem, nodeIdx: Int): Path.Entry = {
         val includedChildren = e.children.take(nodeIdx + 1)
         val ename = includedChildren.last.asInstanceOf[Elem].resolvedName
         val childElmsWithSameName = includedChildren collect { case che: Elem if che.resolvedName == ename => che }
-        ElemPath.Entry(ename, childElmsWithSameName.size - 1)
+        Path.Entry(ename, childElmsWithSameName.size - 1)
       }
 
       Elem(
         resolvedName = e.resolvedName,
-        resolvedAttributes = e.resolvedAttributes + (EName("elemPath") -> path.toCanonicalXPath(scope)),
+        resolvedAttributes = e.resolvedAttributes + (EName("path") -> path.toCanonicalXPath(scope)),
         children = e.children.zipWithIndex map {
           case (ch, idx) =>
             ch match {
@@ -63,12 +63,12 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
 
     // Not using method Elem.updated here
-    val bookStoreWithPaths = addElemPaths(bookstore, ElemPath.Root, Scope.Empty)
+    val bookStoreWithPaths = addElemPaths(bookstore, Path.Root, Scope.Empty)
 
     val elms =
       for {
         desc <- bookStoreWithPaths.findAllElems
-        path = ElemPath.fromCanonicalXPath(desc.attribute(EName("elemPath")))(Scope.Empty)
+        path = Path.fromCanonicalXPath(desc.attribute(EName("path")))(Scope.Empty)
         parent <- bookstore.findElemOrSelfByPath(path.parentPath)
         if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
       } yield desc
@@ -92,7 +92,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
       } yield path
 
-    assert(paths.size > 10, "Expected more than 10 matching element paths")
+    assert(paths.size > 10, "Expected more than 10 matching paths")
 
     expectResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
       val result = paths map { path => bookstore.getElemOrSelfByPath(path).resolvedName }

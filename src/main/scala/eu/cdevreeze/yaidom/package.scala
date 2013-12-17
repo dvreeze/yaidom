@@ -149,17 +149,17 @@ package eu.cdevreeze
  *
  * There are 2 other basic concepts in this package, representing paths to elements:
  * <ul>
- * <li><em>element path builders</em></li>
- * <li><em>element paths</em></li>
+ * <li><em>path builders</em></li>
+ * <li><em>paths</em></li>
  * </ul>
- * They are represented by immutable classes [[eu.cdevreeze.yaidom.ElemPathBuilder]] and [[eu.cdevreeze.yaidom.ElemPath]], respectively.
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.PathBuilder]] and [[eu.cdevreeze.yaidom.Path]], respectively.
  *
- * Element path builders are like canonical XPath expressions, yet they do not contain the root element itself, and indexing
+ * Path builders are like canonical XPath expressions, yet they do not contain the root element itself, and indexing
  * starts with 0 instead of 1.
  *
- * For example, the last name of the first author of the last book element has element path:
+ * For example, the last name of the first author of the last book element has path:
  * {{{
- * ElemPath.from(
+ * Path.from(
  *   EName("{http://bookstore/book}Book") -> 1,
  *   EName("{http://bookstore/book}Authors") -> 0,
  *   EName("{http://bookstore/author}Author") -> 0,
@@ -167,15 +167,15 @@ package eu.cdevreeze
  * )
  * }}}
  *
- * This path could be written as element path builder as follows:
+ * This path could be written as path builder as follows:
  * {{{
- * ElemPathBuilder.from(QName("book:Book") -> 1, QName("book:Authors") -> 0, QName("auth:Author") -> 0, QName("auth:Last_Name") -> 0)
+ * PathBuilder.from(QName("book:Book") -> 1, QName("book:Authors") -> 0, QName("auth:Author") -> 0, QName("auth:Last_Name") -> 0)
  * }}}
  *
- * Using the Scope mentioned earlier, the latter element path builder resolves to the element path given before that, by
- * invoking method `ElemPathBuilder.build(scope)`. In order for this to work, the Scope must be <em>invertible</em>. That is,
+ * Using the Scope mentioned earlier, the latter path builder resolves to the path given before that, by
+ * invoking method `PathBuilder.build(scope)`. In order for this to work, the Scope must be <em>invertible</em>. That is,
  * there must be a one-to-one correspondence between prefixes ("" for the default namespace) and namespace URIs, because
- * otherwise the index numbers may differ. Also note that the prefixes `book` and `auth` in the element path builder are
+ * otherwise the index numbers may differ. Also note that the prefixes `book` and `auth` in the path builder are
  * arbitrary, and need not match with the prefixes used in the XML tree itself.
  *
  * ==Uniform query API traits==
@@ -294,25 +294,25 @@ package eu.cdevreeze
  * element knowledge that traits `ElemLike` and `ParentElemLike` have about elements. Therefore the query code can be used
  * unchanged for different element implementations.
  *
- * The `ElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds knowledge about <em>element paths</em>. Element
- * paths can be queried (in the same way that elements can be queried in trait `ParentElemLike`), and elements can be found
- * given an element path.
+ * The `ElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds knowledge about <em>paths</em>.
+ * Paths can be queried (in the same way that elements can be queried in trait `ParentElemLike`), and elements can be found
+ * given a path.
  *
  * For example, to query for the Scala book authors, the following alternative code can be used (if the used element
  * implementation mixes in trait `PathAwareElemLike`, which is not the case for the Scala XML and DOM wrappers above):
  * {{{
  * for {
- *   authorElemPath <- bookstoreElem filterElemOrSelfPaths (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
- *   if authorElemPath.entries.contains(ElemPath.Entry(EName("{http://bookstore/book}Book"), 1))
- * } yield bookstoreElem.getElemOrSelfByPath(authorElemPath)
+ *   authorPath <- bookstoreElem filterElemOrSelfPaths (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
+ *   if authorPath.entries.contains(Path.Entry(EName("{http://bookstore/book}Book"), 1))
+ * } yield bookstoreElem.getElemOrSelfByPath(authorPath)
  * }}}
  *
  * The `PathAwareElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.UpdatableElemLike]]. This trait offers <em>functional updates</em>
- * at given element paths. Whereas the super-traits know only about elements, this trait knows that elements have some node
+ * at given paths. Whereas the super-traits know only about elements, this trait knows that elements have some node
  * super-type.
  *
- * Instead of functional updates at given element paths, elements can also be "transformed" functionally without specifying
- * any element paths. This is offered by trait [[eu.cdevreeze.yaidom.TransformableElemLike]], which unlike the traits above
+ * Instead of functional updates at given paths, elements can also be "transformed" functionally without specifying
+ * any paths. This is offered by trait [[eu.cdevreeze.yaidom.TransformableElemLike]], which unlike the traits above
  * has no super-traits. The Scala XML and DOM wrappers above do not mix in this trait.
  *
  * ==Some element implementations==

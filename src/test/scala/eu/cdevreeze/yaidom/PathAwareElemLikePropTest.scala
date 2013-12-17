@@ -56,7 +56,7 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
   @Test def testFilterChildElemPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterChildElemPaths(p) == {
-        elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => ElemPath(Vector(pe)) }
+        elem.findAllChildElemsWithPathEntries collect { case (che, pe) if p(che) => Path(Vector(pe)) }
       }
     }, minSuccessful(100))
   }
@@ -64,7 +64,7 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
   @Test def testFilterElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterElemOrSelfPaths(p) == {
-        (if (p(elem)) Vector(ElemPath.Root) else Vector()) ++ {
+        (if (p(elem)) Vector(Path.Root) else Vector()) ++ {
           elem.findAllChildElemsWithPathEntries flatMap {
             case (che, pe) =>
               che.filterElemOrSelfPaths(p).map(_.prepend(pe))
@@ -77,7 +77,7 @@ class PathAwareElemLikePropTest extends Suite with Checkers {
   @Test def testFindTopmostElemOrSelfPathsDefinition(): Unit = {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElemOrSelfPaths(p) == {
-        if (p(elem)) Vector(ElemPath.Root)
+        if (p(elem)) Vector(Path.Root)
         else
           elem.findAllChildElemsWithPathEntries flatMap {
             case (che, pe) =>

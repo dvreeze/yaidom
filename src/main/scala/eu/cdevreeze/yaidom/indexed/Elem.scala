@@ -21,7 +21,7 @@ import scala.collection.immutable
 
 /**
  * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.Elem]])
- * and an element path (from that root element) to this element.
+ * and a path (from that root element) to this element.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
@@ -45,7 +45,7 @@ import scala.collection.immutable
  *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
  *     }
- *     bookElm <- authorElm.elemPath findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { path =>
+ *     bookElm <- authorElm.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { path =>
  *       authorElm.rootElem.getElemOrSelfByPath(path)
  *     }
  *   } yield bookElm
@@ -56,7 +56,7 @@ import scala.collection.immutable
  * '''In order to get started using the class, this more formal section can safely be skipped. On the other hand, this section
  * may provide a deeper understanding of the class.'''
  *
- * Let `indexedRootElem` be a root element, so `indexedRootElem.elemPath == ElemPath.Root`.
+ * Let `indexedRootElem` be a root element, so `indexedRootElem.path == Path.Root`.
  *
  * Then, first of all, we have:
  * {{{
@@ -66,15 +66,15 @@ import scala.collection.immutable
  * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
- * val elemPaths = indexedRootElem.elem.findAllElemOrSelfPaths
+ * val paths = indexedRootElem.elem.findAllElemOrSelfPaths
  * }}}
  * the following (rather obvious) properties hold for indexed elements:
  * {{{
  * elems forall (e => e.rootElem == indexedRootElem.rootElem)
  *
- * (elems map (_.elemPath)) == elemPaths
+ * (elems map (_.path)) == paths
  *
- * elems forall { e => e.rootElem.findElemOrSelfByPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
  * }}}
  *
  * Analogous remarks apply to the other query methods. For example, given:
@@ -82,15 +82,15 @@ import scala.collection.immutable
  * // Let p be a predicate of type (yaidom.Elem => Boolean)
  *
  * val elems = indexedRootElem filterElems { e => p(e.elem) }
- * val elemPaths = indexedRootElem.elem filterElemPaths p
+ * val paths = indexedRootElem.elem filterElemPaths p
  * }}}
  * we have:
  * {{{
  * elems forall (e => e.rootElem == indexedRootElem.rootElem)
  *
- * (elems map (_.elemPath)) == elemPaths
+ * (elems map (_.path)) == paths
  *
- * elems forall { e => e.rootElem.findElemOrSelfByPath(e.elemPath) == Some(e.elem) }
+ * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
  * }}}
  *
  * @author Chris de Vreeze
@@ -98,20 +98,20 @@ import scala.collection.immutable
 final class Elem private[indexed] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
-  val elemPath: ElemPath) extends ElemLike[Elem] with HasText with Immutable {
+  val path: Path) extends ElemLike[Elem] with HasText with Immutable {
 
   /**
    * The yaidom Elem itself, stored as a val
    */
   val elem: eu.cdevreeze.yaidom.Elem =
-    rootElem.findElemOrSelfByPath(elemPath).getOrElse(sys.error("Path %s must exist".format(elemPath)))
+    rootElem.findElemOrSelfByPath(path).getOrElse(sys.error("Path %s must exist".format(path)))
 
   assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
 
   /**
    * Returns all child elements, in the correct order.
    *
-   * These child elements share the same rootElem with this element, but differ in the element paths, which have one more
+   * These child elements share the same rootElem with this element, but differ in the paths, which have one more
    * "path entry".
    */
   override def findAllChildElems: immutable.IndexedSeq[Elem] = childElems
@@ -121,11 +121,11 @@ final class Elem private[indexed] (
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
 
   override def equals(obj: Any): Boolean = obj match {
-    case other: Elem => (other.rootElem == this.rootElem) && (other.elemPath == this.elemPath)
+    case other: Elem => (other.rootElem == this.rootElem) && (other.path == this.path)
     case _ => false
   }
 
-  override def hashCode: Int = (rootElem, elemPath).hashCode
+  override def hashCode: Int = (rootElem, path).hashCode
 
   /**
    * Returns `this.elem.scope`
@@ -140,7 +140,7 @@ final class Elem private[indexed] (
    * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
    */
   final def namespaces: Declarations = {
-    val parentScope = this.elemPath.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
+    val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
   }
 
@@ -157,21 +157,21 @@ final class Elem private[indexed] (
 object Elem {
 
   /**
-   * Calls `apply(rootElem, ElemPath.Root)`
+   * Calls `apply(rootElem, Path.Root)`
    */
   def apply(rootElem: eu.cdevreeze.yaidom.Elem): Elem = {
-    apply(rootElem, ElemPath.Root)
+    apply(rootElem, Path.Root)
   }
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply(rootElem: eu.cdevreeze.yaidom.Elem, elemPath: ElemPath): Elem = {
-    val elem = rootElem.getElemOrSelfByPath(elemPath)
+  def apply(rootElem: eu.cdevreeze.yaidom.Elem, path: Path): Elem = {
+    val elem = rootElem.getElemOrSelfByPath(path)
 
     // Recursive calls
-    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, elemPath.append(entry)))
+    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, path.append(entry)))
 
-    new Elem(rootElem, childElems, elemPath)
+    new Elem(rootElem, childElems, path)
   }
 }

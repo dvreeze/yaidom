@@ -20,12 +20,11 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * API and implementation trait for elements as containers of elements, each having a name and possible attributes, as well
- * as having awareness of element paths. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding knowledge about
- * element paths.
+ * as having awareness of paths. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding knowledge about paths.
  *
  * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
  * `findAllChildElemsWithPathEntries` and `findChildElemByPathEntry`. Based on these abstract methods (and the super-trait), this
- * trait offers a rich API for querying elements and element paths.
+ * trait offers a rich API for querying elements and paths.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.PathAwareElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment.
@@ -36,58 +35,58 @@ import scala.collection.{ immutable, mutable }
  */
 trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with PathAwareElemApi[E] { self: E =>
 
-  def findChildElemByPathEntry(entry: ElemPath.Entry): Option[E]
+  def findChildElemByPathEntry(entry: Path.Entry): Option[E]
 
-  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, ElemPath.Entry)]
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
   @deprecated(message = "Use findChildElemByPathEntry instead", since = "0.7.1")
-  final def findWithElemPathEntry(entry: ElemPath.Entry): Option[E] = findChildElemByPathEntry(entry)
+  final def findWithElemPathEntry(entry: Path.Entry): Option[E] = findChildElemByPathEntry(entry)
 
-  final def getChildElemByPathEntry(entry: ElemPath.Entry): E =
+  final def getChildElemByPathEntry(entry: Path.Entry): E =
     findChildElemByPathEntry(entry).getOrElse(sys.error("Expected existing path entry %s from root %s".format(entry, self)))
 
-  final def findAllChildElemPaths: immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries map { case (e, pe) => ElemPath(Vector(pe)) }
+  final def findAllChildElemPaths: immutable.IndexedSeq[Path] =
+    findAllChildElemsWithPathEntries map { case (e, pe) => Path(Vector(pe)) }
 
-  final def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
-    findAllChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => ElemPath(Vector(pe)) }
+  final def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[Path] =
+    findAllChildElemsWithPathEntries filter { case (e, pe) => p(e) } map { case (e, pe) => Path(Vector(pe)) }
 
-  final def findChildElemPath(p: E => Boolean): Option[ElemPath] = {
-    findAllChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => ElemPath(Vector(pe)) }
+  final def findChildElemPath(p: E => Boolean): Option[Path] = {
+    findAllChildElemsWithPathEntries find { case (e, pe) => p(e) } map { case (e, pe) => Path(Vector(pe)) }
   }
 
-  final def getChildElemPath(p: E => Boolean): ElemPath = {
+  final def getChildElemPath(p: E => Boolean): Path = {
     val result = filterChildElemPaths(p)
     require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
     result.head
   }
 
-  final def findAllElemOrSelfPaths: immutable.IndexedSeq[ElemPath] = {
+  final def findAllElemOrSelfPaths: immutable.IndexedSeq[Path] = {
     // Not tail-recursive, but the depth should typically be limited
     val remainder = findAllChildElemsWithPathEntries flatMap {
       case (e, pe) => e.findAllElemOrSelfPaths map { path => path.prepend(pe) }
     }
 
-    ElemPath.Root +: remainder
+    Path.Root +: remainder
   }
 
-  final def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
+  final def filterElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[Path] = {
     // Not tail-recursive, but the depth should typically be limited
     val remainder = findAllChildElemsWithPathEntries flatMap {
       case (e, pe) => e.filterElemOrSelfPaths(p) map { path => path.prepend(pe) }
     }
 
-    if (p(self)) (ElemPath.Root +: remainder) else remainder
+    if (p(self)) (Path.Root +: remainder) else remainder
   }
 
-  final def findAllElemPaths: immutable.IndexedSeq[ElemPath] =
+  final def findAllElemPaths: immutable.IndexedSeq[Path] =
     findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findAllElemOrSelfPaths map { path => path.prepend(pe) } }
 
-  final def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+  final def filterElemPaths(p: E => Boolean): immutable.IndexedSeq[Path] =
     findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.filterElemOrSelfPaths(p) map { path => path.prepend(pe) } }
 
-  final def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] = {
-    if (p(self)) immutable.IndexedSeq(ElemPath.Root) else {
+  final def findTopmostElemOrSelfPaths(p: E => Boolean): immutable.IndexedSeq[Path] = {
+    if (p(self)) immutable.IndexedSeq(Path.Root) else {
       // Not tail-recursive, but the depth should typically be limited
       val result = findAllChildElemsWithPathEntries flatMap {
         case (e, pe) => e.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) }
@@ -96,24 +95,24 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
     }
   }
 
-  final def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[ElemPath] =
+  final def findTopmostElemPaths(p: E => Boolean): immutable.IndexedSeq[Path] =
     findAllChildElemsWithPathEntries flatMap { case (ch, pe) => ch.findTopmostElemOrSelfPaths(p) map { path => path.prepend(pe) } }
 
-  final def findElemOrSelfPath(p: E => Boolean): Option[ElemPath] = {
+  final def findElemOrSelfPath(p: E => Boolean): Option[Path] = {
     // Not efficient
     filterElemOrSelfPaths(p).headOption
   }
 
-  final def findElemPath(p: E => Boolean): Option[ElemPath] = {
+  final def findElemPath(p: E => Boolean): Option[Path] = {
     val elms = self.findAllChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findElemOrSelfPath(p) map { path => path.prepend(pe) } }
     elms.headOption
   }
 
   /**
-   * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
+   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
    * This method must be very efficient, which depends on the efficiency of method `findChildElemByPathEntry`.
    */
-  final def findElemOrSelfByPath(path: ElemPath): Option[E] = {
+  final def findElemOrSelfByPath(path: Path): Option[E] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
 
     val entryCount = path.entries.size
@@ -132,19 +131,19 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   }
 
   /**
-   * Finds the element with the given `ElemPath` (where this element is the root), if any, wrapped in an `Option`.
+   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
    * This method must be very efficient, which depends on the efficiency of method `findChildElemByPathEntry`.
    */
   @deprecated(message = "Use findElemOrSelfByPath instead", since = "0.7.1")
-  final def findWithElemPath(path: ElemPath): Option[E] = findElemOrSelfByPath(path)
+  final def findWithElemPath(path: Path): Option[E] = findElemOrSelfByPath(path)
 
-  final def getElemOrSelfByPath(path: ElemPath): E =
+  final def getElemOrSelfByPath(path: Path): E =
     findElemOrSelfByPath(path).getOrElse(sys.error("Expected existing path %s from root %s".format(path, self)))
 
   @deprecated(message = "Use getElemOrSelfByPath instead", since = "0.7.1")
-  final def getWithElemPath(path: ElemPath): E = getElemOrSelfByPath(path)
+  final def getWithElemPath(path: Path): E = getElemOrSelfByPath(path)
 
-  final def findAllChildElemPathEntries: immutable.IndexedSeq[ElemPath.Entry] = {
+  final def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
     findAllChildElemsWithPathEntries map { _._2 }
   }
 }

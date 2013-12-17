@@ -46,7 +46,7 @@ import scala.collection.{ immutable, mutable }
  * </ul>
  * Note that a validating parser knows the content model, so knows precisely which whitespace is "ignorable", for example, but once the parsed
  * XML is turned into untyped yaidom nodes, this information is lost. (Of course in principle PSVI data could be added to `Elem`s,
- * indexed by "element paths", but that is beyond the scope of yaidom.)
+ * indexed by "paths", but that is beyond the scope of yaidom.)
  *
  * As mentioned above, QNames in text or attribute values depend on in-scope namespaces for resolution. Yet "resolved" nodes do
  * not keep track of in-scope namespaces, because QNames do not exist for "resolved" nodes. So, be extra careful when comparing
@@ -123,19 +123,19 @@ final case class Elem(
   @throws(classOf[java.io.ObjectStreamException])
   private[resolved] def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
 
-  /** Cache for speeding up child element lookups by element path */
-  override val childNodeIndexesByPathEntries: Map[ElemPath.Entry, Int] = {
+  /** Cache for speeding up child element lookups by path */
+  override val childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
     val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(ElemPath.Entry, Int)]()
+    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
 
     for ((node, idx) <- self.children.zipWithIndex) {
       node match {
         case elm: Elem =>
           val ename = elm.resolvedName
           val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = ElemPath.Entry(ename, countForName)
+          val entry = Path.Entry(ename, countForName)
           elementNameCounts.update(ename, countForName + 1)
           acc += ((entry, idx))
         case _ => ()
@@ -150,11 +150,11 @@ final case class Elem(
   override def findAllChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   /**
-   * Returns all child elements with their `ElemPath` entries, in the correct order.
+   * Returns all child elements with their `Path` entries, in the correct order.
    *
    * The implementation must be such that the following holds: `(findAllChildElemsWithPathEntries map (_._1)) == findAllChildElems`
    */
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, ElemPath.Entry)] = {
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
     val childElms = findAllChildElems
     val entries = childNodeIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
     assert(childElms.size == entries.size)
@@ -166,7 +166,7 @@ final case class Elem(
     new Elem(resolvedName, resolvedAttributes, newChildren)
   }
 
-  override def findChildElemByPathEntry(entry: ElemPath.Entry): Option[Elem] = {
+  override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
     val idx = childNodeIndex(entry)
     if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
   }

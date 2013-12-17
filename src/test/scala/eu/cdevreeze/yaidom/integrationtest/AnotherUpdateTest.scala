@@ -107,14 +107,14 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val lastBookPath: Path = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val newLastBookPath: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").last
     val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
     expectResult("Programming in Scala") {
@@ -177,14 +177,14 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: ElemPath = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val lastBookPath: Path = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPathButOne: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
+    val newLastBookPathButOne: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
     val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
     expectResult("Programming in Scala") {
@@ -257,7 +257,7 @@ class AnotherUpdateTest extends Suite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newFirstBookPath: ElemPath = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
+    val newFirstBookPath: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
     val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
     expectResult("Programming in Scala") {
@@ -330,9 +330,9 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, { e => Vector(updateMag(e)) })
   }
 
-  private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: ElemPath, f: Elem => immutable.IndexedSeq[Node]): Unit = {
+  private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: Path, f: Elem => immutable.IndexedSeq[Node]): Unit = {
     def g(e: Elem): Elem = {
-      if (path == ElemPath.Root) e
+      if (path == Path.Root) e
       else {
         e.withPatchedChildren(
           e.childNodeIndex(path.lastEntry),
@@ -341,7 +341,7 @@ class AnotherUpdateTest extends Suite {
       }
     }
 
-    val updatedElem = elem.updated(path.parentPathOption.getOrElse(ElemPath.Root))(g)
+    val updatedElem = elem.updated(path.parentPathOption.getOrElse(Path.Root))(g)
 
     expectResult(resolved.Elem(updatedElem)) {
       resolved.Elem(elem.updatedWithNodeSeq(path)(f))
