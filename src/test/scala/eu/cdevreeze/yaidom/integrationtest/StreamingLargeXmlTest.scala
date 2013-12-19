@@ -91,6 +91,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
       val bos = new jio.ByteArrayOutputStream()
       val xmlEventWriter = outputFactory.createXMLEventWriter(bos, "UTF-8")
       events foreach (ev => xmlEventWriter.add(ev))
+      xmlEventWriter.flush() // Needed on IBM JDK
       val contactBytes = bos.toByteArray
 
       val contactElem = docParser.parse(new jio.ByteArrayInputStream(contactBytes)).documentElement
