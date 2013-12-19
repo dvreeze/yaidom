@@ -3,6 +3,32 @@ CHANGELOG
 =========
 
 
+0.7.1
+=====
+
+Version 0.7.1 has one big API change: renaming ElemPath to Path (and ElemPathBuilder to PathBuilder), deprecating the old names.
+This change makes the query API (in particular PathAwareElemApi) more clear: it is now more obvious what methods like
+``findAllElemPaths`` mean, given the yaidom convention that in query methods "Elems" means "descendant elements", and "ElemsOrSelf"
+means "descendant-or-self elements". The idea of renaming ElemPath to Path came from Nick Evans.
+
+In spite of the API changes, this version should be a drop-in replacement for version 0.7.0, except that the changed parts
+of the API now lead to deprecation warnings. It is advisable to adapt code using yaidom in such a way that those deprecation warnings
+disappear. It is likely that version 0.8.0 (which may or may not be the next version) will no longer contain the deprecated classes
+and methods.
+
+The changes in this version are:
+
+* Renaming ``ElemPath`` (and ``ElemPathBuilder``) to ``Path`` (and ``PathBuilder``), deprecating the old names
+
+  * Also renamed ``elemPath`` in "indexed" and "docaware" Elems to ``path``, deprecating the old name
+  * the idea is to talk consistently about "paths", not about "element paths" (or "elem paths")
+
+* Added "docaware" elements (mixing in trait ElemApi), which are like "indexed" elements, but also keeping the document URI
+* Renamed ``findWithElemPath`` to ``findElemOrSelfByPath`` (deprecating the old name). Also renamed ``findWithElemPathEntry`` and ``getWithElemPath``.
+* Added convenience methods for creating "element predicates", for example to make it slightly easier to query using local names
+* Many more tests
+
+
 0.7.0
 =====
 
