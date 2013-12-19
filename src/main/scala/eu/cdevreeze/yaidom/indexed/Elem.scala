@@ -100,6 +100,9 @@ final class Elem private[indexed] (
   childElems: immutable.IndexedSeq[Elem],
   val path: Path) extends ElemLike[Elem] with HasText with Immutable {
 
+  @deprecated(message = "Use path instead", since = "0.7.1")
+  def elemPath: Path = path
+
   /**
    * The yaidom Elem itself, stored as a val
    */
