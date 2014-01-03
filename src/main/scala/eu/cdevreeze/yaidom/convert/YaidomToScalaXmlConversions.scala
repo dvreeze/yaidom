@@ -75,8 +75,8 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
 
     val children: immutable.IndexedSeq[scala.xml.Node] = elm.children.map(ch => convertNode(ch, nsBinding))
 
-    // Note that this constructor has been deprecated since Scala 2.10 (but it was the only constructor in older Scala versions)
-    new scala.xml.Elem(prefix, label, attributes, nsBinding, children: _*)
+    val minimizeEmpty = children.isEmpty
+    new scala.xml.Elem(prefix, label, attributes, nsBinding, minimizeEmpty, children: _*)
   }
 
   /**

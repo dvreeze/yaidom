@@ -9,24 +9,20 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "0.7.2-SNAPSHOT"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.1"
 
-crossScalaVersions := Seq("2.10.0", "2.9.2", "2.9.1", "2.9.0-1", "2.9.0")
+crossScalaVersions := Seq("2.10.1")
 
-scalacOptions ++= Seq("-unchecked", "-deprecation")
-
-scalacOptions <++= scalaBinaryVersion map { version =>
-  if (version.contains("2.10")) Seq("-feature") else Seq()
-}
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 (unmanagedSourceDirectories in Compile) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq()
-  if (version.contains("2.10")) newSourceDirs else Seq()
+  val newSourceDirs = Seq() // Not yet used
+  if (version.contains("2.11")) newSourceDirs else Seq()
 }
 
 (unmanagedSourceDirectories in Test) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq()
-  if (version.contains("2.10")) newSourceDirs else Seq()
+  val newSourceDirs = Seq() // Not yet used
+  if (version.contains("2.11")) newSourceDirs else Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
