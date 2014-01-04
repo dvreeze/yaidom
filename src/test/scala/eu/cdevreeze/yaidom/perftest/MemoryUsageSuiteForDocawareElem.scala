@@ -15,38 +15,33 @@
  */
 
 package eu.cdevreeze.yaidom
-package console
+package perftest
 
 import java.io._
 import java.net.URI
 import scala.util.Try
-import eu.cdevreeze.yaidom._
 import eu.cdevreeze.yaidom.parse._
 
 /**
- * ShowMemoryUsage "script" using indexed.Elem instances.
+ * Concrete AbstractMemoryUsageSuite sub-class using "docaware" yaidom Elems.
+ *
+ * See the documentation of the super-class for the advice to run this suite in isolation only!
+ *
+ * @author Chris de Vreeze
  */
-private[yaidom] final class ShowMemoryUsageForIndexedElem(val rootDir: File) extends ShowMemoryUsage[indexed.Elem] {
+class MemoryUsageSuiteForDocawareElem extends AbstractMemoryUsageSuite {
 
-  def parseXmlFiles(files: Vector[File]): Vector[Try[indexed.Elem]] = {
+  type E = docaware.Elem
+
+  protected def parseXmlFiles(files: Vector[File]): Vector[Try[docaware.Elem]] = {
     val docParser = DocumentParserUsingSax.newInstance
-    files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => indexed.Elem(e)) }
+    files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => docaware.Elem(f.toURI, e)) }
   }
 
-  def createCommonRootParent(rootElems: Vector[indexed.Elem]): indexed.Elem = {
+  protected def createCommonRootParent(rootElems: Vector[docaware.Elem]): docaware.Elem = {
     val result = Node.elem(qname = QName("root"), scope = Scope.Empty, children = rootElems.map(_.elem))
-    indexed.Elem(result)
+    docaware.Elem(new URI("file:///newRoot"), result)
   }
-}
 
-private[yaidom] object ShowMemoryUsageForIndexedElem {
-
-  def main(args: Array[String]): Unit = {
-    require(args.size == 1, "Usage: ShowMemoryUsageForIndexedElem <root dir>")
-
-    val rootDir = new File(args(0))
-    val script = new ShowMemoryUsageForIndexedElem(rootDir)
-
-    script.run()
-  }
+  protected def maxMemoryToFileLengthRatio: Int = 15
 }

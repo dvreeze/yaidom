@@ -15,37 +15,32 @@
  */
 
 package eu.cdevreeze.yaidom
-package console
+package perftest
 
 import java.io._
 import java.net.URI
 import scala.util.Try
-import eu.cdevreeze.yaidom._
 import eu.cdevreeze.yaidom.parse._
 
 /**
- * ShowMemoryUsage "script" using resolved.Elem instances.
+ * Concrete AbstractMemoryUsageSuite sub-class using "resolved" yaidom Elems.
+ *
+ * See the documentation of the super-class for the advice to run this suite in isolation only!
+ *
+ * @author Chris de Vreeze
  */
-private[yaidom] final class ShowMemoryUsageForResolvedElem(val rootDir: File) extends ShowMemoryUsage[resolved.Elem] {
+class MemoryUsageSuiteForResolvedElem extends AbstractMemoryUsageSuite {
 
-  def parseXmlFiles(files: Vector[File]): Vector[Try[resolved.Elem]] = {
+  type E = resolved.Elem
+
+  protected def parseXmlFiles(files: Vector[File]): Vector[Try[resolved.Elem]] = {
     val docParser = DocumentParserUsingSax.newInstance
     files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => resolved.Elem(e)) }
   }
 
-  def createCommonRootParent(rootElems: Vector[resolved.Elem]): resolved.Elem = {
+  protected def createCommonRootParent(rootElems: Vector[resolved.Elem]): resolved.Elem = {
     resolved.Elem(EName("root"), Map(), rootElems)
   }
-}
 
-private[yaidom] object ShowMemoryUsageForResolvedElem {
-
-  def main(args: Array[String]): Unit = {
-    require(args.size == 1, "Usage: ShowMemoryUsageForResolvedElem <root dir>")
-
-    val rootDir = new File(args(0))
-    val script = new ShowMemoryUsageForResolvedElem(rootDir)
-
-    script.run()
-  }
+  protected def maxMemoryToFileLengthRatio: Int = 7
 }

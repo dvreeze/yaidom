@@ -15,27 +15,32 @@
  */
 
 package eu.cdevreeze.yaidom
-package console
+package perftest
 
 import java.io._
 import java.net.URI
 import javax.xml.parsers._
 import scala.util.Try
-import eu.cdevreeze.yaidom._
 
 /**
- * ShowMemoryUsage "script" using DOM wrapper elements.
+ * Concrete AbstractMemoryUsageSuite sub-class using DOM wrapper elements.
+ *
+ * See the documentation of the super-class for the advice to run this suite in isolation only!
+ *
+ * @author Chris de Vreeze
  */
-private[yaidom] final class ShowMemoryUsageForDomElem(val rootDir: File) extends ShowMemoryUsage[dom.DomElem] {
+class MemoryUsageSuiteForDomElem extends AbstractMemoryUsageSuite {
 
-  def parseXmlFiles(files: Vector[File]): Vector[Try[dom.DomElem]] = {
+  type E = dom.DomElem
+
+  protected def parseXmlFiles(files: Vector[File]): Vector[Try[dom.DomElem]] = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
 
     files map { f => Try(db.parse(f)).map(_.getDocumentElement).map(e => dom.DomElem(e)) }
   }
 
-  def createCommonRootParent(rootElems: Vector[dom.DomElem]): dom.DomElem = {
+  protected def createCommonRootParent(rootElems: Vector[dom.DomElem]): dom.DomElem = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val d = db.newDocument
@@ -48,16 +53,6 @@ private[yaidom] final class ShowMemoryUsageForDomElem(val rootDir: File) extends
     }
     dom.DomElem(newRoot)
   }
-}
 
-private[yaidom] object ShowMemoryUsageForDomElem {
-
-  def main(args: Array[String]): Unit = {
-    require(args.size == 1, "Usage: ShowMemoryUsageForDomElem <root dir>")
-
-    val rootDir = new File(args(0))
-    val script = new ShowMemoryUsageForDomElem(rootDir)
-
-    script.run()
-  }
+  protected def maxMemoryToFileLengthRatio: Int = 6
 }
