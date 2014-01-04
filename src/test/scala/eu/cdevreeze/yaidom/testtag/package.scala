@@ -23,10 +23,14 @@ import org.scalatest.Tag
  * build, and which require some environment to be set up (such as a root directory under which XML test data files can be
  * found).
  *
- * To exclude performance tests tagged PerformanceTest, while in an sbt session, enter the following:
+ * To exclude performance tests tagged PerformanceTest, while in an sbt session, with performance tests on the test classpath,
+ * enter the following:
  * {{{
  * test-only * -- -l eu.cdevreeze.yaidom.testtag.PerformanceTest
  * }}}
+ *
+ * On the other hand, the performance tests are in their own source tree, which by default is not added to the test classpath,
+ * so these tests are not run by default.
  *
  * @author Chris de Vreeze
  */

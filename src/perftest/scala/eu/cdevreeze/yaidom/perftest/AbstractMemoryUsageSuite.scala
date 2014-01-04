@@ -27,7 +27,7 @@ import testtag.PerformanceTest
 /**
  * Abstract memory usage suite super-class, for different yaidom element types.
  *
- * It requires sbt to run with "-Dperftest.rootDir=/path/to/rootdir". All files under that rootDir that are regarded XML files
+ * It requires sbt to run with "-Dperftest.rootDir=/path/to/rootdir". All files under that rootDir that are regarded to be XML files
  * (due to the extension in the file name, such as ".xml", ".xsd", etc.) are parsed.
  *
  * In order to get some useful logging output, and in order for the test to check reasonable assertions, make sure to run each

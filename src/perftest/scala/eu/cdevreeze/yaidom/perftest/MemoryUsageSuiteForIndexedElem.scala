@@ -20,6 +20,8 @@ package perftest
 import java.io._
 import java.net.URI
 import scala.util.Try
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.parse._
 
 /**
@@ -29,6 +31,7 @@ import eu.cdevreeze.yaidom.parse._
  *
  * @author Chris de Vreeze
  */
+@RunWith(classOf[JUnitRunner])
 class MemoryUsageSuiteForIndexedElem extends AbstractMemoryUsageSuite {
 
   type E = indexed.Elem

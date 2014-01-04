@@ -21,6 +21,8 @@ import java.io._
 import java.net.URI
 import javax.xml.parsers._
 import scala.util.Try
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 /**
  * Concrete AbstractMemoryUsageSuite sub-class using DOM wrapper elements.
@@ -29,6 +31,7 @@ import scala.util.Try
  *
  * @author Chris de Vreeze
  */
+@RunWith(classOf[JUnitRunner])
 class MemoryUsageSuiteForDomElem extends AbstractMemoryUsageSuite {
 
   type E = dom.DomElem
