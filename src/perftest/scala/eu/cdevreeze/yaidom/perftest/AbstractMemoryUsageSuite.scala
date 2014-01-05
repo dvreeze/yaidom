@@ -52,6 +52,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
   test("On querying, memory usage should be within reasonable bounds", PerformanceTest) {
     require(rootDir.isDirectory, s"Expected directory $rootDir, but this is not an existing directory")
 
+    logger.info(s"Entering test. Test class: ${this.getClass.getName}")
+
     val memBean = ManagementFactory.getMemoryMXBean
 
     def getUsedHeapMemoryInMiB(): Long = convertByteCountToMiB(memBean.getHeapMemoryUsage.getUsed)
@@ -106,6 +108,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
 
     memBean.gc()
     logger.info(s"Heap memory usage after these queries on the large combined XML: ${getUsedHeapMemoryInMiB} MiB")
+
+    logger.info(s"Leaving test. Test class: ${this.getClass.getName}")
   }
 
   private def findFiles(dir: File): Vector[File] = {
