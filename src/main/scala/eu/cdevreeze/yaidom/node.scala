@@ -176,7 +176,10 @@ final class Elem private[yaidom] (
 
   require(scope.areMatching(qname, resolvedName), "QName %s and EName %s do not match in scope %s".format(qname, resolvedName, scope))
   require(
-    attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attributeScope.areMatching(qn, en) && (v1 == v2) },
+    {
+      val attrScope = attributeScope
+      attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attrScope.areMatching(qn, en) && (v1 == v2) }
+    },
     "Mismatch between attributes %s and resolved attributes %s".format(attributes, resolvedAttributes))
 
   // Consistency childNodeIndexesByPathEntries not checked!
