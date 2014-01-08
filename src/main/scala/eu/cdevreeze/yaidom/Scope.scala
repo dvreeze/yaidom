@@ -289,6 +289,20 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   }
 
   /**
+   * Returns true if `this.resolveQNameOption(qname) == Some(ename)`, without the EName object creation
+   */
+  def areMatching(qname: QName, ename: EName): Boolean = {
+    (qname.localPart == ename.localPart) && {
+      qname.prefixOption match {
+        case Some("xml") => ename.namespaceUriOption == Some("http://www.w3.org/XML/1998/namespace")
+        case Some(prefix) => ename.namespaceUriOption == prefixNamespaceMap.get(prefix)
+        case None if defaultNamespaceOption.isEmpty => ename.namespaceUriOption.isEmpty
+        case None => ename.namespaceUriOption == prefixNamespaceMap.get("")
+      }
+    }
+  }
+
+  /**
    * Resolves the given declarations against this `Scope`, returning an "updated" `Scope`.
    *
    * Inspired by `java.net.URI`, which has a similar method for URIs.

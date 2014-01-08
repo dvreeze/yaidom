@@ -154,60 +154,51 @@ sealed trait Node extends Immutable with Serializable {
  * for XML trees at the abstraction level of `Elem`. For example, think about prefixes, "ignorable whitespace", DTDs and XSDs, etc.
  */
 @SerialVersionUID(1L)
-final class Elem(
+final class Elem private[yaidom] (
   val qname: QName,
+  override val resolvedName: EName,
   val attributes: immutable.IndexedSeq[(QName, String)],
+  override val resolvedAttributes: immutable.IndexedSeq[(EName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node],
+  override val childNodeIndexesByPathEntries: Map[Path.Entry, Int]) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
 
   require(qname ne null)
+  require(resolvedName ne null)
   require(attributes ne null)
+  require(resolvedAttributes ne null)
   require(scope ne null)
   require(children ne null)
+  require(childNodeIndexesByPathEntries ne null)
 
   require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
+  require(attributes.size == resolvedAttributes.size)
+
+  require(scope.areMatching(qname, resolvedName), "QName %s and EName %s do not match in scope %s".format(qname, resolvedName, scope))
+  require(
+    attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attributeScope.areMatching(qn, en) && (v1 == v2) },
+    "Mismatch between attributes %s and resolved attributes %s".format(attributes, resolvedAttributes))
+
+  // Consistency childNodeIndexesByPathEntries not checked!
+
+  def this(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)],
+    scope: Scope,
+    children: immutable.IndexedSeq[Node]) = {
+
+    this(
+      qname = qname,
+      resolvedName = Elem.getResolvedName(scope, qname),
+      attributes = attributes,
+      resolvedAttributes = Elem.getResolvedAttributes(attributes, scope.withoutDefaultNamespace),
+      scope = scope,
+      children = children,
+      childNodeIndexesByPathEntries = Elem.getChildNodeIndexesByPathEntries(children))
+  }
 
   @throws(classOf[java.io.ObjectStreamException])
   private[yaidom] def writeReplace(): Any = new Elem.ElemSerializationProxy(qname, attributes, scope, children)
-
-  /** The `Elem` name as `EName`, obtained by resolving the element `QName` against the `Scope` */
-  override val resolvedName: EName =
-    scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
-
-  /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
-  override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
-    val attrScope = attributeScope
-
-    attributes map { kv =>
-      val attName = kv._1
-      val attValue = kv._2
-      val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attrScope)))
-      (expandedName -> attValue)
-    }
-  }
-
-  /** Cache for speeding up child element lookups by path */
-  override val childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-    for ((node, idx) <- self.children.zipWithIndex) {
-      node match {
-        case elm: Elem =>
-          val ename = elm.resolvedName
-          val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = Path.Entry(ename, countForName)
-          elementNameCounts.update(ename, countForName + 1)
-          acc += ((entry, idx))
-        case _ => ()
-      }
-    }
-
-    val result = acc.toMap
-    result
-  }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   def attributeScope: Scope = scope.withoutDefaultNamespace
@@ -629,6 +620,44 @@ object Elem {
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
+
+  private[yaidom] def getResolvedName(scope: Scope, qname: QName): EName =
+    scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+
+  private[yaidom] def getResolvedAttributes(
+    attributes: immutable.IndexedSeq[(QName, String)],
+    attributeScope: Scope): immutable.IndexedSeq[(EName, String)] = {
+    require(attributeScope.defaultNamespaceOption.isEmpty)
+
+    attributes map { kv =>
+      val attName = kv._1
+      val attValue = kv._2
+      val expandedName = attributeScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
+      (expandedName -> attValue)
+    }
+  }
+
+  private[yaidom] def getChildNodeIndexesByPathEntries(children: immutable.IndexedSeq[Node]): Map[Path.Entry, Int] = {
+    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
+
+    val elementNameCounts = mutable.Map[EName, Int]()
+    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
+
+    for ((node, idx) <- children.zipWithIndex) {
+      node match {
+        case elm: Elem =>
+          val ename = elm.resolvedName
+          val countForName = elementNameCounts.getOrElse(ename, 0)
+          val entry = Path.Entry(ename, countForName)
+          elementNameCounts.update(ename, countForName + 1)
+          acc += ((entry, idx))
+        case _ => ()
+      }
+    }
+
+    val result = acc.toMap
+    result
+  }
 }
 
 /**
