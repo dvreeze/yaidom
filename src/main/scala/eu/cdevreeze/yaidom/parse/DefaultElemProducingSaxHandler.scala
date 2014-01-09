@@ -24,7 +24,6 @@ import scala.collection.{ immutable, mutable }
 import net.jcip.annotations.NotThreadSafe
 import eu.cdevreeze.yaidom._
 import NodeBuilder._
-import DefaultElemProducingSaxHandler._
 
 /**
  * Default [[eu.cdevreeze.yaidom.parse.ElemProducingSaxHandler]] implementation.
@@ -53,6 +52,10 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private var currentElem: InternalElemNode = _
 
   private var currentlyInCData: Boolean = false
+
+  private var enameCache = mutable.HashMap[EName, EName]()
+
+  private var qnameCache = mutable.HashMap[String, QName]()
 
   final override def startDocument() = ()
 
@@ -170,7 +173,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     require(localName ne null)
     require(qName ne null)
 
-    val elmQName: QName = if (qName != "") QName.parse(qName) else QName.parse(localName)
+    val elmQName: QName = if (qName != "") parseQName(qName) else parseQName(localName)
 
     val nsDecls = extractDeclarations(atts)
     val attrSeq = extractAttributeMap(atts)
@@ -188,7 +191,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private def extractDeclarations(atts: Attributes): Declarations = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if isNamespaceDeclaration(qn) =>
-        val key = QName.parse(qn)
+        val key = parseQName(qn)
         val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
         val nsUri = v
         (prefix -> nsUri)
@@ -199,7 +202,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private def extractAttributeMap(atts: Attributes): immutable.IndexedSeq[(QName, String)] = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if !isNamespaceDeclaration(qn) =>
-        val qname = QName.parse(qn)
+        val qname = parseQName(qn)
         val attValue = v
         (qname -> attValue)
     }
@@ -218,9 +221,33 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     val result = arr(0) == "xmlns"
     result
   }
-}
 
-object DefaultElemProducingSaxHandler {
+  /**
+   * Caching version of `QName.parse`, to reduce memory footprint by preventing duplicate QName instances.
+   */
+  private def parseQName(s: String): QName = {
+    val cachedQNameOption = qnameCache.get(s)
+
+    if (cachedQNameOption.isDefined) cachedQNameOption.get
+    else {
+      val qname = QName.parse(s)
+      qnameCache += (s -> qname)
+      qname
+    }
+  }
+
+  /**
+   * Replaces the EName by the cached equivalent instance, if possible, to reduce memory footprint of the resulting Elem tree.
+   */
+  private def getENameFromCacheIfPossible(ename: EName): EName = {
+    val cachedENameOption = enameCache.get(ename)
+
+    if (cachedENameOption.isDefined) cachedENameOption.get
+    else {
+      enameCache += (ename -> ename)
+      ename
+    }
+  }
 
   private[parse] trait InternalNode {
     type NodeType <: Node
@@ -243,12 +270,37 @@ object DefaultElemProducingSaxHandler {
     type NodeType = Elem
 
     def toNode: Elem = {
+      val resolvedName: EName = {
+        val ename = scope.resolveQNameOption(qname).getOrElse(
+          sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+        getENameFromCacheIfPossible(ename)
+      }
+
+      val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
+        val resolvedAttrs = Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace)
+        resolvedAttrs map { case (ename, v) => (getENameFromCacheIfPossible(ename) -> v) }
+      }
+
       // Recursive (not tail-recursive)
-      Elem(
-        qname,
-        attributes,
-        scope,
-        (children map { ch => ch.toNode }).toIndexedSeq)
+      val childSeq = (children map { ch => ch.toNode }).toVector
+
+      val childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
+        val result: Map[Path.Entry, Int] = Elem.getChildNodeIndexesByPathEntries(childSeq)
+        result map {
+          case (entry, idx) =>
+            val newEntry = Path.Entry(getENameFromCacheIfPossible(entry.elementName), entry.index)
+            (newEntry -> idx)
+        }
+      }
+
+      new Elem(
+        qname = qname,
+        resolvedName = resolvedName,
+        attributes = attributes,
+        resolvedAttributes = resolvedAttributes,
+        scope = scope,
+        children = childSeq,
+        childNodeIndexesByPathEntries = childNodeIndexesByPathEntries)
     }
   }
 
