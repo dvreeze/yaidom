@@ -289,13 +289,14 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   }
 
   /**
-   * Returns true if `this.resolveQNameOption(qname) == Some(ename)`, without the EName object creation
+   * Returns true if `this.resolveQNameOption(qname) == Some(ename)`. This is checked without creating any new EName instance.
    */
-  def areMatching(qname: QName, ename: EName): Boolean = {
+  def resolvesQNameTo(qname: QName, ename: EName): Boolean = {
     (qname.localPart == ename.localPart) && {
       qname.prefixOption match {
         case Some("xml") => ename.namespaceUriOption == Some("http://www.w3.org/XML/1998/namespace")
-        case Some(prefix) => ename.namespaceUriOption == prefixNamespaceMap.get(prefix)
+        case Some(prefix) if prefixNamespaceMap.contains(prefix) => ename.namespaceUriOption == prefixNamespaceMap.get(prefix)
+        case Some(prefix) => false
         case None if defaultNamespaceOption.isEmpty => ename.namespaceUriOption.isEmpty
         case None => ename.namespaceUriOption == prefixNamespaceMap.get("")
       }

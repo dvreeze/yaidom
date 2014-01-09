@@ -227,8 +227,15 @@ class ScopeTest extends Suite {
     expectResult(Some(EName("book"))) {
       scope1.resolveQNameOption(QName("book"))
     }
+    expectResult(true) {
+      scope1.resolvesQNameTo(QName("book"), EName("book"))
+    }
+
     expectResult(None) {
       scope1.resolveQNameOption(QName("book:book"))
+    }
+    expectResult(false) {
+      scope1.resolvesQNameTo(QName("book:book"), EName("book"))
     }
 
     val scope2 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
@@ -236,17 +243,48 @@ class ScopeTest extends Suite {
     expectResult(Some(EName("{http://a}book"))) {
       scope2.resolveQNameOption(QName("book"))
     }
+    expectResult(true) {
+      scope2.resolvesQNameTo(QName("book"), EName("{http://a}book"))
+    }
+    expectResult(false) {
+      scope2.resolvesQNameTo(QName("book"), EName("book"))
+    }
+
     expectResult(None) {
       scope2.resolveQNameOption(QName("book:book"))
     }
+    expectResult(false) {
+      scope2.resolvesQNameTo(QName("book:book"), EName("book"))
+    }
+
     expectResult(Some(EName("{http://a}book"))) {
       scope2.resolveQNameOption(QName("a:book"))
     }
+    expectResult(true) {
+      scope2.resolvesQNameTo(QName("a:book"), EName("{http://a}book"))
+    }
+    expectResult(false) {
+      scope2.resolvesQNameTo(QName("a:book"), EName("book"))
+    }
+
     expectResult(Some(EName("{http://ccc}bookstore"))) {
       scope2.resolveQNameOption(QName("c:bookstore"))
     }
+    expectResult(true) {
+      scope2.resolvesQNameTo(QName("c:bookstore"), EName("{http://ccc}bookstore"))
+    }
+    expectResult(false) {
+      scope2.resolvesQNameTo(QName("c:bookstore"), EName("{http://ddd}bookstore"))
+    }
+
     expectResult(Some(EName("{http://www.w3.org/XML/1998/namespace}lang"))) {
       scope2.resolveQNameOption(QName("xml:lang"))
+    }
+    expectResult(true) {
+      scope2.resolvesQNameTo(QName("xml:lang"), EName("{http://www.w3.org/XML/1998/namespace}lang"))
+    }
+    expectResult(false) {
+      scope2.resolvesQNameTo(QName("xml:lang"), EName("lang"))
     }
   }
 

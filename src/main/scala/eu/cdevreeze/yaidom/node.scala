@@ -174,11 +174,11 @@ final class Elem private[yaidom] (
   require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
   require(attributes.size == resolvedAttributes.size)
 
-  require(scope.areMatching(qname, resolvedName), "QName %s and EName %s do not match in scope %s".format(qname, resolvedName, scope))
+  require(scope.resolvesQNameTo(qname, resolvedName), "QName %s and EName %s do not match in scope %s".format(qname, resolvedName, scope))
   require(
     {
       val attrScope = attributeScope
-      attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attrScope.areMatching(qn, en) && (v1 == v2) }
+      attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attrScope.resolvesQNameTo(qn, en) && (v1 == v2) }
     },
     "Mismatch between attributes %s and resolved attributes %s".format(attributes, resolvedAttributes))
 
@@ -192,9 +192,11 @@ final class Elem private[yaidom] (
 
     this(
       qname = qname,
-      resolvedName = Elem.getResolvedName(scope, qname),
+      resolvedName = {
+        scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+      },
       attributes = attributes,
-      resolvedAttributes = Elem.getResolvedAttributes(attributes, scope.withoutDefaultNamespace),
+      resolvedAttributes = Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace),
       scope = scope,
       children = children,
       childNodeIndexesByPathEntries = Elem.getChildNodeIndexesByPathEntries(children))
@@ -624,12 +626,7 @@ object Elem {
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 
-  private[yaidom] def getResolvedName(scope: Scope, qname: QName): EName =
-    scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
-
-  private[yaidom] def getResolvedAttributes(
-    attributes: immutable.IndexedSeq[(QName, String)],
-    attributeScope: Scope): immutable.IndexedSeq[(EName, String)] = {
+  private[yaidom] def resolveAttributes(attributes: immutable.IndexedSeq[(QName, String)], attributeScope: Scope): immutable.IndexedSeq[(EName, String)] = {
     require(attributeScope.defaultNamespaceOption.isEmpty)
 
     attributes map { kv =>
