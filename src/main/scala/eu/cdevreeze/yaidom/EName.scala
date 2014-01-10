@@ -73,7 +73,10 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
   }
 
   /** The `String` representation, in the format of the `javax.xml.namespace.QName.toString` method */
-  override def toString: String = toJavaQName(None).toString
+  override def toString: String = namespaceUriOption match {
+    case None => localPart
+    case Some(nsUri) => "{" + nsUri + "}" + localPart
+  }
 }
 
 object EName {
