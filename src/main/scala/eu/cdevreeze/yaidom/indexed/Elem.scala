@@ -98,16 +98,13 @@ import scala.collection.immutable
 final class Elem private[indexed] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
-  val path: Path) extends ElemLike[Elem] with HasText with Immutable {
+  val path: Path,
+  val elem: eu.cdevreeze.yaidom.Elem) extends ElemLike[Elem] with HasText with Immutable {
 
   @deprecated(message = "Use path instead", since = "0.7.1")
   def elemPath: Path = path
 
-  /**
-   * The yaidom Elem itself, stored as a val
-   */
-  val elem: eu.cdevreeze.yaidom.Elem =
-    rootElem.findElemOrSelfByPath(path).getOrElse(sys.error("Path %s must exist".format(path)))
+  // The elem must be the same as rootElem.findElemOrSelfByPath(path).get, which is not checked here
 
   assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
 
@@ -175,6 +172,6 @@ object Elem {
     // Recursive calls
     val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, path.append(entry)))
 
-    new Elem(rootElem, childElems, path)
+    new Elem(rootElem, childElems, path, elem)
   }
 }
