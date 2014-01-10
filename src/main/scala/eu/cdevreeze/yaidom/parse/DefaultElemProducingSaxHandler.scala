@@ -272,7 +272,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     def toNode: Elem = {
       val resolvedName: EName = {
         val ename = scope.resolveQNameOption(qname).getOrElse(
-          sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+          sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
         getENameFromCacheIfPossible(ename)
       }
 

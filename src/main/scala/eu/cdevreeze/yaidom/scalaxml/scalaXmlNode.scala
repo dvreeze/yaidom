@@ -73,7 +73,7 @@ final class ScalaXmlElem(
   override def resolvedName: EName = {
     val qname = toQName(wrappedNode)
     scope.resolveQNameOption(qname).getOrElse(
-      sys.error("Could not resolve QName from prefix %s and label %s".format(Option(wrappedNode.prefix).getOrElse(""), wrappedNode.label)))
+      sys.error(s"Could not resolve QName from prefix ${Option(wrappedNode.prefix).getOrElse("")} and label ${wrappedNode.label}"))
   }
 
   /**
@@ -84,7 +84,7 @@ final class ScalaXmlElem(
     attributes map {
       case (attrName, attrValue) =>
         val ename = attrScope.resolveQNameOption(attrName).getOrElse(
-          sys.error("Could not resolve attribute name %s".format(attrName)))
+          sys.error(s"Could not resolve attribute name $attrName"))
         (ename, attrValue)
     }
   }

@@ -58,7 +58,7 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
     namespaceUriOption forall { ns => (ns ne null) && (ns.length > 0) }
   }
   require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name")
 
   /** Given an optional prefix, creates a `QName` from this `EName` */
   def toQName(prefixOption: Option[String]): QName = {

@@ -109,7 +109,7 @@ final class ElemBuilder(
   require(namespaces ne null)
   require(children ne null)
 
-  require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
+  require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
 
   type NodeType = Elem
 

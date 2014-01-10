@@ -171,16 +171,16 @@ final class Elem private[yaidom] (
   require(children ne null)
   require(childNodeIndexesByPathEntries ne null)
 
-  require(attributes.toMap.size == attributes.size, "There are duplicate attribute names: %s".format(attributes))
+  require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
   require(attributes.size == resolvedAttributes.size)
 
-  require(scope.resolvesQNameTo(qname, resolvedName), "QName %s and EName %s do not match in scope %s".format(qname, resolvedName, scope))
+  require(scope.resolvesQNameTo(qname, resolvedName), s"QName $qname and EName $resolvedName do not match in scope $scope")
   require(
     {
       val attrScope = attributeScope
       attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attrScope.resolvesQNameTo(qn, en) && (v1 == v2) }
     },
-    "Mismatch between attributes %s and resolved attributes %s".format(attributes, resolvedAttributes))
+    s"Mismatch between attributes $attributes and resolved attributes $resolvedAttributes")
 
   // Consistency childNodeIndexesByPathEntries not checked!
 
@@ -193,7 +193,7 @@ final class Elem private[yaidom] (
     this(
       qname = qname,
       resolvedName = {
-        scope.resolveQNameOption(qname).getOrElse(sys.error("Element name '%s' should resolve to an EName in scope [%s]".format(qname, scope)))
+        scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
       },
       attributes = attributes,
       resolvedAttributes = Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace),
@@ -329,7 +329,7 @@ final class Elem private[yaidom] (
   /** Returns the QName value of the attribute with the given expanded name, and throws an exception otherwise */
   def attributeAsQName(expandedName: EName): QName =
     attributeAsQNameOption(expandedName).getOrElse(
-      sys.error("Missing QName-valued attribute %s".format(expandedName)))
+      sys.error(s"Missing QName-valued attribute $expandedName"))
 
   /**
    * Returns the resolved QName value (as EName) of the attribute with the given expanded name, if any, wrapped in an `Option`.
@@ -339,7 +339,7 @@ final class Elem private[yaidom] (
   def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
     attributeAsQNameOption(expandedName) map { qname =>
       scope.resolveQNameOption(qname).getOrElse(
-        sys.error("Could not resolve QName-valued attribute value %s, given scope [%s]".format(qname, scope)))
+        sys.error(s"Could not resolve QName-valued attribute value $qname, given scope [${scope}]"))
     }
   }
 
@@ -348,7 +348,7 @@ final class Elem private[yaidom] (
    */
   def attributeAsResolvedQName(expandedName: EName): EName =
     attributeAsResolvedQNameOption(expandedName).getOrElse(
-      sys.error("Missing QName-valued attribute %s".format(expandedName)))
+      sys.error(s"Missing QName-valued attribute $expandedName"))
 
   /** Returns `QName(text.trim)` */
   def textAsQName: QName = QName(text.trim)
@@ -356,7 +356,7 @@ final class Elem private[yaidom] (
   /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
   def textAsResolvedQName: EName =
     scope.resolveQNameOption(textAsQName).getOrElse(
-      sys.error("Could not resolve QName-valued element text %s, given scope [%s]".format(qname, scope)))
+      sys.error(s"Could not resolve QName-valued element text $qname, given scope [${scope}]"))
 
   /**
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
@@ -632,7 +632,7 @@ object Elem {
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attributeScope.resolveQNameOption(attName).getOrElse(sys.error("Attribute name '%s' should resolve to an EName in scope [%s]".format(attName, attributeScope)))
+      val expandedName = attributeScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attributeScope}]"))
       (expandedName -> attValue)
     }
   }

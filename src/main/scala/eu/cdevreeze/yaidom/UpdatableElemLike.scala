@@ -107,7 +107,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
       val resultsByPathEntries: Map[Path.Entry, E] =
         pathsByPathEntries map {
           case (pathEntry, paths) =>
-            val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error("Incorrect path entry %s".format(pathEntry)))
+            val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error(s"Incorrect path entry $pathEntry"))
 
             val relativePaths = paths.map(_.withoutFirstEntry)
 
@@ -134,11 +134,11 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwar
     else {
       assert(path.parentPathOption.isDefined)
       val parentPath = path.parentPath
-      val parentElem = findElemOrSelfByPath(parentPath).getOrElse(sys.error("Incorrect parent path %s".format(parentPath)))
+      val parentElem = findElemOrSelfByPath(parentPath).getOrElse(sys.error(s"Incorrect parent path $parentPath"))
 
       val lastEntry = path.lastEntry
       val childNodeIndex = parentElem.childNodeIndex(lastEntry)
-      require(childNodeIndex >= 0, "Incorrect path entry %s".format(lastEntry))
+      require(childNodeIndex >= 0, s"Incorrect path entry $lastEntry")
 
       val childElemOption = parentElem.findChildElemByPathEntry(lastEntry)
       assert(childElemOption.isDefined)

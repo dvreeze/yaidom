@@ -61,7 +61,7 @@ sealed trait QName extends Immutable with Serializable {
 
 final case class UnprefixedName(override val localPart: String) extends QName {
   require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name")
 
   override def prefixOption: Option[String] = None
 
@@ -71,9 +71,9 @@ final case class UnprefixedName(override val localPart: String) extends QName {
 
 final case class PrefixedName(prefix: String, override val localPart: String) extends QName {
   require(prefix ne null)
-  require(XmlStringUtils.isAllowedPrefix(prefix), "'%s' is not an allowed prefix name".format(prefix))
+  require(XmlStringUtils.isAllowedPrefix(prefix), s"'${prefix}' is not an allowed prefix name")
   require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), "'%s' is not an allowed name".format(localPart))
+  require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name")
 
   override def prefixOption: Option[String] = Some(prefix)
 
@@ -96,12 +96,12 @@ object QName {
   /** Parses a `String` into a `QName`. The `String` must conform to the `toString` format of a `PrefixedName` or `UnprefixedName` */
   def parse(s: String): QName = {
     val arr = s.split(':')
-    require(arr.size <= 2, "Expected at most 1 colon in QName '%s'".format(s))
+    require(arr.size <= 2, s"Expected at most 1 colon in QName '${s}'")
 
     arr.size match {
       case 1 => UnprefixedName(s)
       case 2 => PrefixedName(arr(0), arr(1))
-      case _ => sys.error("Did not expect more than 1 colon in QName '%s'".format(s))
+      case _ => sys.error(s"Did not expect more than 1 colon in QName '${s}'")
     }
   }
 }

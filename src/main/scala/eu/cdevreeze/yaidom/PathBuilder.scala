@@ -46,7 +46,7 @@ final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) ex
 
   /** Builds the `Path`, using the passed `Scope`, which must be invertible */
   def build(scope: Scope): Path = {
-    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
     val resolvedEntries: immutable.IndexedSeq[Path.Entry] = entries map { _.build(scope) }
     Path(resolvedEntries)
@@ -82,9 +82,9 @@ object PathBuilder {
 
     /** Builds the `Path.Entry`, using the passed `Scope`, which must be invertible */
     def build(scope: Scope): Path.Entry = {
-      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
-      val ename: EName = scope.resolveQNameOption(qname).getOrElse(sys.error("Could not resolve qname '%s' in scope %s".format(qname, scope)))
+      val ename: EName = scope.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve qname '${qname}' in scope $scope"))
       Path.Entry(ename, index)
     }
 

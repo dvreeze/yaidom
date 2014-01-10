@@ -43,7 +43,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   final def findWithElemPathEntry(entry: Path.Entry): Option[E] = findChildElemByPathEntry(entry)
 
   final def getChildElemByPathEntry(entry: Path.Entry): E =
-    findChildElemByPathEntry(entry).getOrElse(sys.error("Expected existing path entry %s from root %s".format(entry, self)))
+    findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $self"))
 
   final def findAllChildElemPaths: immutable.IndexedSeq[Path] =
     findAllChildElemsWithPathEntries map { case (e, pe) => Path(Vector(pe)) }
@@ -57,7 +57,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
 
   final def getChildElemPath(p: E => Boolean): Path = {
     val result = filterChildElemPaths(p)
-    require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
+    require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
     result.head
   }
 
@@ -138,7 +138,7 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
   final def findWithElemPath(path: Path): Option[E] = findElemOrSelfByPath(path)
 
   final def getElemOrSelfByPath(path: Path): E =
-    findElemOrSelfByPath(path).getOrElse(sys.error("Expected existing path %s from root %s".format(path, self)))
+    findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
 
   @deprecated(message = "Use getElemOrSelfByPath instead", since = "0.7.1")
   final def getWithElemPath(path: Path): E = getElemOrSelfByPath(path)

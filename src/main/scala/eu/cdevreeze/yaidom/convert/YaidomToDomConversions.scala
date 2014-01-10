@@ -146,7 +146,7 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
       if (prefix == "") {
         element.setAttribute("xmlns", ns)
       } else {
-        element.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:%s".format(prefix), ns)
+        element.setAttributeNS("http://www.w3.org/2000/xmlns/", s"xmlns:$prefix", ns)
       }
     }
 
@@ -157,7 +157,7 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
         element.setAttribute(attrQName.localPart, attrValue)
       } else {
         val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
-          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, attrScope)))
+          s"Attribute name '${attrQName}' should resolve to an EName in scope [${attrScope}]"))
         val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
         element.setAttributeNS(attrJavaQName.getNamespaceURI, attrQName.toString, attrValue)
       }

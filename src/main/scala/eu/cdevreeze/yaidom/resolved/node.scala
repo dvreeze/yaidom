@@ -359,7 +359,7 @@ object Node {
   def apply(n: eu.cdevreeze.yaidom.Node): Node = n match {
     case e: eu.cdevreeze.yaidom.Elem => Elem(e)
     case t: eu.cdevreeze.yaidom.Text => Text(t)
-    case n => sys.error("Not an element or text node: %s".format(n))
+    case n => sys.error(s"Not an element or text node: $n")
   }
 }
 

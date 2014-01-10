@@ -44,7 +44,7 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] with ElemApi[E] { sel
   final def attributeOption(expandedName: EName): Option[String] = resolvedAttributes.toMap.get(expandedName)
 
   final def attribute(expandedName: EName): String =
-    attributeOption(expandedName).getOrElse(sys.error("Missing attribute %s".format(expandedName)))
+    attributeOption(expandedName).getOrElse(sys.error(s"Missing attribute $expandedName"))
 
   final def findAttributeByLocalName(localName: String): Option[String] = {
     val matchingAttrs = resolvedAttributes filter { case (en, v) => en.localPart == localName }
@@ -63,7 +63,7 @@ trait ElemLike[E <: ElemLike[E]] extends ParentElemLike[E] with ElemApi[E] { sel
 
   final def getChildElem(expandedName: EName): E = {
     val result = filterChildElems(expandedName)
-    require(result.size == 1, "Expected exactly 1 child element %s, but found %d of them".format(expandedName, result.size))
+    require(result.size == 1, s"Expected exactly 1 child element $expandedName, but found ${result.size} of them")
     result.head
   }
 

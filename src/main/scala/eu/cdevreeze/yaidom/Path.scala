@@ -199,7 +199,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
    * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
    */
   def toCanonicalXPath(scope: Scope): String = {
-    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
     val entryXPaths = entries map { entry => entry.toCanonicalXPath(scope) }
     "/" + "*" + entryXPaths.mkString
@@ -214,7 +214,7 @@ object Path {
 
   /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
   def apply(s: String)(scope: Scope): Path = {
-    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
     fromCanonicalXPath(s)(scope)
   }
@@ -227,7 +227,7 @@ object Path {
 
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `Path`. The passed scope must be invertible. */
   def fromCanonicalXPath(s: String)(scope: Scope): Path = {
-    require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
     // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
 
@@ -262,12 +262,12 @@ object Path {
 
     /** Given an invertible `Scope`, returns the corresponding canonical XPath */
     def toCanonicalXPath(scope: Scope): String = {
-      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
           val nsUri: String = elementName.namespaceUriOption.get
-          require((scope.prefixNamespaceMap - "").values.toSet.contains(nsUri), "Expected at least one prefix for namespace URI '%s'".format(nsUri))
+          require((scope.prefixNamespaceMap - "").values.toSet.contains(nsUri), s"Expected at least one prefix for namespace URI '${nsUri}'")
 
           val result = (scope.prefixNamespaceMap - "").toList collectFirst {
             case pair if pair._2 == nsUri =>
@@ -290,14 +290,14 @@ object Path {
 
     /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
     def apply(s: String)(scope: Scope): Entry = {
-      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
       fromCanonicalXPath(s)(scope)
     }
 
     /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `Path.Entry`, given an invertible `Scope` */
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
-      require(scope.isInvertible, "Scope '%s' is not invertible".format(scope))
+      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
       // We use the fact that "/", "[" and "]" are never part of qualified names!
 
@@ -310,7 +310,7 @@ object Path {
       require(positionString.endsWith("]"), "The canonical XPath for the 'entry' must have a position ending with ']', such as [1]")
 
       val qname = QName.parse(qnameString)
-      val elementName = scope.resolveQNameOption(qname).getOrElse(sys.error("Could not resolve QName '%s'".format(qname)))
+      val elementName = scope.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve QName '${qname}'"))
       val position = positionString.drop(1).dropRight(1).toInt
 
       Entry(elementName, position - 1)

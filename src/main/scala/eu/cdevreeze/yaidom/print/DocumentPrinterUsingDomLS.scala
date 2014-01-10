@@ -66,8 +66,7 @@ final class DocumentPrinterUsingDomLS(
       output.setByteStream(outputStream)
 
       val ok = serializer.write(domDocument, output)
-      require(ok, "Expected successful serialization of Document %s".format(
-        doc.documentElement.withChildren(Vector(Text(" ... ", false))).toString))
+      require(ok, s"Expected successful serialization of Document ${doc.documentElement.withChildren(Vector(Text(" ... ", false)))}")
     } finally {
       outputStream.close()
     }
@@ -85,8 +84,7 @@ final class DocumentPrinterUsingDomLS(
     output.setCharacterStream(sw)
 
     val ok = serializer.write(domDocument, output)
-    require(ok, "Expected successful serialization of Document %s".format(
-      doc.documentElement.withChildren(Vector(Text(" ... ", false))).toString))
+    require(ok, s"Expected successful serialization of Document ${doc.documentElement.withChildren(Vector(Text(" ... ", false)))}")
 
     val result = sw.toString
     result

@@ -166,7 +166,7 @@ final class DocumentPrinterUsingSax(
     val attrScope = elm.attributeScope
 
     for ((attQName, attValue) <- elm.attributes) {
-      val attEName = attrScope.resolveQNameOption(attQName).getOrElse(sys.error("Corrupt non-resolvable attribute: %s".format(attQName)))
+      val attEName = attrScope.resolveQNameOption(attQName).getOrElse(sys.error(s"Corrupt non-resolvable attribute: $attQName"))
       val uri = attEName.namespaceUriOption.getOrElse("")
       val localName = attQName.localPart // Correct?
       val qname = attQName.toString
@@ -186,7 +186,7 @@ final class DocumentPrinterUsingSax(
       if (prefix == "") {
         attrs.addAttribute("", "xmlns", "xmlns", tpe, nsUri)
       } else {
-        val qname = "xmlns:%s".format(prefix)
+        val qname = s"xmlns:$prefix"
         attrs.addAttribute("", prefix, qname, tpe, nsUri)
       }
     }
@@ -200,7 +200,7 @@ object DocumentPrinterUsingSax {
   /** Returns `newInstance(TransformerFactory.newInstance().asInstanceOf[SAXTransformerFactory])` */
   def newInstance(): DocumentPrinterUsingSax = {
     val tf = TransformerFactory.newInstance()
-    assert(tf.getFeature(SAXTransformerFactory.FEATURE), "The TransformerFactory %s is not a SAXTransformerFactory".format(tf.getClass))
+    assert(tf.getFeature(SAXTransformerFactory.FEATURE), s"The TransformerFactory ${tf.getClass} is not a SAXTransformerFactory")
     val stf = tf.asInstanceOf[SAXTransformerFactory]
 
     newInstance(stf)

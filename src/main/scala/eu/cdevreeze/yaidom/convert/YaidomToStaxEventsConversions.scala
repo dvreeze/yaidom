@@ -145,7 +145,7 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
         val attrQName = kv._1
         val value = kv._2
         val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
-          "Attribute name '%s' should resolve to an EName in scope [%s]".format(attrQName, attrScope)))
+          s"Attribute name '${attrQName}' should resolve to an EName in scope [${attrScope}]"))
         val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
 
         xmlEventFactory.createAttribute(attrJavaQName, value)

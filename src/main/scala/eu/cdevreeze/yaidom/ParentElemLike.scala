@@ -232,7 +232,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
 
   final def getChildElem(p: E => Boolean): E = {
     val result = filterChildElems(p)
-    require(result.size == 1, "Expected exactly 1 matching child element, but found %d of them".format(result.size))
+    require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
     result.head
   }
 
