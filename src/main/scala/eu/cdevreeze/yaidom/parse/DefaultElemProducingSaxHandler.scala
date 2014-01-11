@@ -53,9 +53,9 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   private var currentlyInCData: Boolean = false
 
-  private val enameProvider = ENameProvider.simpleCachingInstance
+  private val enameProvider = ENameProvider.newSimpleCachingInstance
 
-  private val qnameProvider = QNameProvider.simpleCachingInstance
+  private val qnameProvider = QNameProvider.newSimpleCachingInstance
 
   final override def startDocument(): Unit = ()
 

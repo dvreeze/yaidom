@@ -93,5 +93,5 @@ object ENameProvider {
     }
   }
 
-  val simpleCachingInstance = new SimpleCachingENameProvider
+  def newSimpleCachingInstance: ENameProvider = new SimpleCachingENameProvider
 }

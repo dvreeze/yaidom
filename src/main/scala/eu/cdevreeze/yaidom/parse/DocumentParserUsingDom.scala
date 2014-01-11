@@ -101,7 +101,7 @@ final class DocumentParserUsingDom(
       val inputSource = new InputSource(inputStream)
       val domDoc: org.w3c.dom.Document = db.parse(inputSource)
 
-      val domConversions = new DomConversions(ENameProvider.simpleCachingInstance, QNameProvider.simpleCachingInstance)
+      val domConversions = new DomConversions(ENameProvider.newSimpleCachingInstance, QNameProvider.newSimpleCachingInstance)
       domConversions.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()

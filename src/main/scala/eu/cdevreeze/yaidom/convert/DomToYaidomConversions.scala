@@ -47,12 +47,6 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
 
   /**
-   * Overridable method to get a (possibly cached) EName instance, given an equivalent EName instance.
-   * Can be overridden to get EName instances from a cache, thus reducing memory usage in the resulting element tree.
-   */
-  protected def getEName(ename: EName): EName = ename
-
-  /**
    * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.Document]].
    */
   final def convertToDocument(v: org.w3c.dom.Document): Document = {

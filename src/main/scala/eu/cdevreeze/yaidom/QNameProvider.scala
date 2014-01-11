@@ -93,5 +93,5 @@ object QNameProvider {
     }
   }
 
-  val simpleCachingInstance = new SimpleCachingQNameProvider
+  def newSimpleCachingInstance: QNameProvider = new SimpleCachingQNameProvider
 }

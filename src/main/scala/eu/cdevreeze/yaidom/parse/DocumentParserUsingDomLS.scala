@@ -88,7 +88,7 @@ final class DocumentParserUsingDomLS(
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
 
-      val domConversions = new DomConversions(ENameProvider.simpleCachingInstance, QNameProvider.simpleCachingInstance)
+      val domConversions = new DomConversions(ENameProvider.newSimpleCachingInstance, QNameProvider.newSimpleCachingInstance)
       domConversions.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
