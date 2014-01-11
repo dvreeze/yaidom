@@ -240,7 +240,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     val result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E) {
+    def accumulate(elm: E): Unit = {
       result += elm
       elm.findAllChildElems foreach { e => accumulate(e) }
     }
@@ -253,7 +253,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     val result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E) {
+    def accumulate(elm: E): Unit = {
       if (p(elm)) result += elm
       elm.findAllChildElems foreach { e => accumulate(e) }
     }
@@ -272,7 +272,7 @@ trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E 
     val result = mutable.ArrayBuffer[E]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E) {
+    def accumulate(elm: E): Unit = {
       if (p(elm)) result += elm else {
         elm.findAllChildElems foreach { e => accumulate(e) }
       }

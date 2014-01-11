@@ -235,7 +235,7 @@ final case class Elem(
 
     // Recursive, but not tail-recursive
 
-    def accumulate(childNodes: Seq[Node]) {
+    def accumulate(childNodes: Seq[Node]): Unit = {
       if (!childNodes.isEmpty) {
         val head = childNodes.head
 
@@ -299,7 +299,7 @@ final case class Elem(
 
     // Recursive, but not tail-recursive
 
-    def accumulate(childNodes: Seq[Node]) {
+    def accumulate(childNodes: Seq[Node]): Unit = {
       if (!childNodes.isEmpty) {
         val head = childNodes.head
 

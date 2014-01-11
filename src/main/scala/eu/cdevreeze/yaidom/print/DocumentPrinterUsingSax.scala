@@ -85,7 +85,7 @@ final class DocumentPrinterUsingSax(
       newTransformerHandlerCreator)
   }
 
-  private def generateEventsForDocument(doc: Document, handler: TransformerHandler) {
+  private def generateEventsForDocument(doc: Document, handler: TransformerHandler): Unit = {
     handler.startDocument()
 
     for (pi <- doc.processingInstructions) generateEventsForProcessingInstruction(pi, handler)
@@ -95,7 +95,7 @@ final class DocumentPrinterUsingSax(
     handler.endDocument()
   }
 
-  private def generateEventsForElem(elm: Elem, parentScope: Scope, handler: TransformerHandler) {
+  private def generateEventsForElem(elm: Elem, parentScope: Scope, handler: TransformerHandler): Unit = {
     val namespaces: Declarations = parentScope.relativize(elm.scope)
     val namespacesMap = namespaces.prefixNamespaceMap
 
@@ -114,7 +114,7 @@ final class DocumentPrinterUsingSax(
     for ((prefix, nsUri) <- namespacesMap) handler.endPrefixMapping(prefix)
   }
 
-  private def generateEventsForNode(node: Node, parentScope: Scope, handler: TransformerHandler) {
+  private def generateEventsForNode(node: Node, parentScope: Scope, handler: TransformerHandler): Unit = {
     node match {
       case elm: Elem => generateEventsForElem(elm, parentScope, handler)
       case text: Text => generateEventsForText(text, handler)
@@ -124,7 +124,7 @@ final class DocumentPrinterUsingSax(
     }
   }
 
-  private def generateEventsForText(text: Text, handler: TransformerHandler) {
+  private def generateEventsForText(text: Text, handler: TransformerHandler): Unit = {
     if (text.isCData) handler.startCDATA()
 
     handler.characters(text.text.toCharArray, 0, text.text.length)
@@ -132,15 +132,15 @@ final class DocumentPrinterUsingSax(
     if (text.isCData) handler.endCDATA()
   }
 
-  private def generateEventsForProcessingInstruction(processingInstruction: ProcessingInstruction, handler: TransformerHandler) {
+  private def generateEventsForProcessingInstruction(processingInstruction: ProcessingInstruction, handler: TransformerHandler): Unit = {
     handler.processingInstruction(processingInstruction.target, processingInstruction.data)
   }
 
-  private def generateEventsForComment(comment: Comment, handler: TransformerHandler) {
+  private def generateEventsForComment(comment: Comment, handler: TransformerHandler): Unit = {
     handler.comment(comment.text.toCharArray, 0, comment.text.length)
   }
 
-  private def generateStartElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler) {
+  private def generateStartElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler): Unit = {
     val uri = elm.resolvedName.namespaceUriOption.getOrElse("")
     val localName = elm.localName // Correct?
     val qname = elm.qname.toString
@@ -150,7 +150,7 @@ final class DocumentPrinterUsingSax(
     handler.startElement(uri, localName, qname, attrs)
   }
 
-  private def generateEndElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler) {
+  private def generateEndElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler): Unit = {
     val uri = elm.resolvedName.namespaceUriOption.getOrElse("")
     val localName = elm.localName // Correct?
     val qname = elm.qname.toString

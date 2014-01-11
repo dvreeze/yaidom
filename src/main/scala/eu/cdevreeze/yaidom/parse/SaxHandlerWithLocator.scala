@@ -33,7 +33,7 @@ trait SaxHandlerWithLocator extends DefaultHandler {
 
   var locator: Locator = _
 
-  final override def setDocumentLocator(locator: Locator) {
+  final override def setDocumentLocator(locator: Locator): Unit = {
     this.locator = locator
   }
 }

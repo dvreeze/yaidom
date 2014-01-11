@@ -59,7 +59,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   final override def startDocument(): Unit = ()
 
-  final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
+  final override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
     val parentScope = if (currentElem eq null) Scope.Empty else currentElem.scope
     val elm: InternalElemNode = startElementToInternalElemNode(uri, localName, qName, atts, parentScope)
 
@@ -77,14 +77,14 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     }
   }
 
-  final override def endElement(uri: String, localName: String, qName: String) {
+  final override def endElement(uri: String, localName: String, qName: String): Unit = {
     require(currentRoot ne null)
     require(currentElem ne null)
 
     currentElem = currentElem.parentOption collect { case e: InternalElemNode => e } getOrElse null
   }
 
-  final override def characters(ch: Array[Char], start: Int, length: Int) {
+  final override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
     val isCData = this.currentlyInCData
     val txt: InternalTextNode = new InternalTextNode(new String(ch, start, length), isCData)
 
@@ -98,7 +98,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     }
   }
 
-  final override def processingInstruction(target: String, data: String) {
+  final override def processingInstruction(target: String, data: String): Unit = {
     val pi = new InternalProcessingInstructionNode(target, data)
 
     if (currentRoot eq null) {
@@ -113,24 +113,24 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     }
   }
 
-  final override def endDocument() = ()
+  final override def endDocument(): Unit = ()
 
-  final override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int) {
+  final override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int): Unit = {
     // Self call. If ignorable whitespace makes it until here, we store it in the result tree.
     characters(ch, start, length)
   }
 
   // ContentHandler methods startPrefixMapping, endPrefixMapping, skippedEntity, setDocumentLocator not overridden
 
-  final override def startCDATA() {
+  final override def startCDATA(): Unit = {
     this.currentlyInCData = true
   }
 
-  final override def endCDATA() {
+  final override def endCDATA(): Unit = {
     this.currentlyInCData = false
   }
 
-  final override def comment(ch: Array[Char], start: Int, length: Int) {
+  final override def comment(ch: Array[Char], start: Int, length: Int): Unit = {
     val comment = new InternalCommentNode(new String(ch, start, length))
 
     if (currentRoot eq null) {
@@ -145,13 +145,13 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     }
   }
 
-  final override def startEntity(name: String) = ()
+  final override def startEntity(name: String): Unit = ()
 
-  final override def endEntity(name: String) = ()
+  final override def endEntity(name: String): Unit = ()
 
-  final override def startDTD(name: String, publicId: String, systemId: String) = ()
+  final override def startDTD(name: String, publicId: String, systemId: String): Unit = ()
 
-  final override def endDTD() = ()
+  final override def endDTD(): Unit = ()
 
   final def resultingElem: Elem = {
     require(currentRoot ne null, "When parsing is ready, the current root must not be null")

@@ -103,12 +103,12 @@ private[yaidom] object PrettyPrinting {
 
   private val commonWhitespace = Set('\r', '\n', ' ', '\t')
 
-  private def appendEscapedJava(sb: StringBuilder, s: String) {
+  private def appendEscapedJava(sb: StringBuilder, s: String): Unit = {
     if (s forall (c => java.lang.Character.isLetterOrDigit(c) || commonWhitespace.contains(c))) appendNaivelyEscapedJava(sb, s)
     else sb.append(StringEscapeUtils.escapeJava(s))
   }
 
-  private def appendNaivelyEscapedJava(sb: StringBuilder, s: String) {
+  private def appendNaivelyEscapedJava(sb: StringBuilder, s: String): Unit = {
     // Expecting only letters, digits or "common" whitespace
     for (c <- s) {
       if (c == '\r') sb ++= "\\r"
