@@ -173,22 +173,9 @@ final class Elem private[yaidom] (
 
   require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
 
-  // Rather expensive checks
-
-  require(attributes.size == resolvedAttributes.size)
-
-  require(scope.resolvesQNameTo(qname, resolvedName), s"QName $qname and EName $resolvedName do not match in scope $scope")
-  require(
-    {
-      val attrScope = attributeScope
-      attributes.zip(resolvedAttributes) forall { case ((qn, v1), (en, v2)) => attrScope.resolvesQNameTo(qn, en) && (v1 == v2) }
-    },
-    s"Mismatch between attributes $attributes and resolved attributes $resolvedAttributes")
-
-  // Partial consistency check for childNodeIndexesByPathEntries
-  require(
-    childNodeIndexesByPathEntries forall { case (entry, idx) => children(idx).asInstanceOf[Elem].resolvedName == entry.elementName },
-    s"Mismatch between attributes $attributes and resolved attributes $resolvedAttributes")
+  // Consistency between resolvedName and qname, between resolvedAttributes and attributes, and between childNodeIndexesByPathEntries
+  // and children are not checked here, for performance reasons. Yaidom is trusted to use this yaidom-private Elem primary
+  // constructor correctly.
 
   def this(
     qname: QName,
