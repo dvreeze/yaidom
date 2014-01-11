@@ -37,6 +37,22 @@ import scala.collection.{ immutable, mutable }
 trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
 
   /**
+   * Overridable method returning an ENameProvider
+   */
+  protected def enameProvider: ENameProvider = ENameProvider.defaultInstance
+
+  /**
+   * Overridable method returning a QNameProvider
+   */
+  protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
+
+  /**
+   * Overridable method to get a (possibly cached) EName instance, given an equivalent EName instance.
+   * Can be overridden to get EName instances from a cache, thus reducing memory usage in the resulting element tree.
+   */
+  protected def getEName(ename: EName): EName = ename
+
+  /**
    * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.Document]].
    */
   final def convertToDocument(v: org.w3c.dom.Document): Document = {
@@ -69,11 +85,27 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.getAttributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
 
-    Elem(
+    val resolvedName: EName =
+      newScope.resolveQNameOption(qname, enameProvider).getOrElse(
+        sys.error(s"Element name '${qname}' should resolve to an EName in scope [${newScope}]"))
+
+    val resolvedAttributes: immutable.IndexedSeq[(EName, String)] =
+      Elem.resolveAttributes(attributes, newScope.withoutDefaultNamespace, enameProvider)
+
+    // Recursive (not tail-recursive)
+    val childSeq = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) }
+
+    val childNodeIndexesByPathEntries: Map[Path.Entry, Int] =
+      Elem.getChildNodeIndexesByPathEntries(childSeq)
+
+    new Elem(
       qname = qname,
+      resolvedName = resolvedName,
       attributes = attributes,
+      resolvedAttributes = resolvedAttributes,
       scope = newScope,
-      children = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) })
+      children = childSeq,
+      childNodeIndexesByPathEntries = childNodeIndexesByPathEntries)
   }
 
   /**
@@ -152,7 +184,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val name: String = v.getTagName
     val arr = name.split(':')
     assert(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
+    if (arr.length == 1) qnameProvider.getUnprefixedQName(arr(0)) else qnameProvider.getQName(arr(0), arr(1))
   }
 
   /** Extracts the `QName` of an `org.w3c.dom.Attr`. If the `Attr` is a namespace declaration, an exception is thrown. */
@@ -161,7 +193,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val name: String = v.getName
     val arr = name.split(':')
     assert(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) UnprefixedName(arr(0)) else PrefixedName(arr(0), arr(1))
+    if (arr.length == 1) qnameProvider.getUnprefixedQName(arr(0)) else qnameProvider.getQName(arr(0), arr(1))
   }
 
   /** Returns true if the `org.w3c.dom.Attr` is a namespace declaration */

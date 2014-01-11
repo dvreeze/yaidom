@@ -21,7 +21,7 @@ import java.{ io => jio }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import org.w3c.dom.Element
 import org.xml.sax.InputSource
-import convert.DomConversions._
+import eu.cdevreeze.yaidom.convert.DomConversions
 
 /**
  * DOM-based `Document` parser.
@@ -101,7 +101,8 @@ final class DocumentParserUsingDom(
       val inputSource = new InputSource(inputStream)
       val domDoc: org.w3c.dom.Document = db.parse(inputSource)
 
-      convertToDocument(domDoc)
+      val domConversions = new DomConversions(ENameProvider.simpleCachingInstance, QNameProvider.simpleCachingInstance)
+      domConversions.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
     }

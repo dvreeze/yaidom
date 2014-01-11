@@ -21,7 +21,7 @@ import java.{ io => jio }
 import org.w3c.dom.Element
 import org.w3c.dom.ls.{ DOMImplementationLS, LSParser, LSInput }
 import org.w3c.dom.bootstrap.DOMImplementationRegistry
-import convert.DomConversions._
+import eu.cdevreeze.yaidom.convert.DomConversions
 
 /**
  * DOM-LS-based `Document` parser.
@@ -88,7 +88,8 @@ final class DocumentParserUsingDomLS(
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
 
-      convertToDocument(domDoc)
+      val domConversions = new DomConversions(ENameProvider.simpleCachingInstance, QNameProvider.simpleCachingInstance)
+      domConversions.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
     }

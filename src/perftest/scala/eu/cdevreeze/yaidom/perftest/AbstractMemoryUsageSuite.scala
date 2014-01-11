@@ -122,6 +122,14 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
 
   protected def parseXmlFiles(files: Vector[File]): Vector[Try[E]]
 
+  protected def getDocumentParser: parse.DocumentParser = {
+    val parserClass =
+      Class.forName(System.getProperty("perftest.documentParser", "eu.cdevreeze.yaidom.parse.DocumentParserUsingSax")).asInstanceOf[Class[parse.DocumentParser]]
+
+    val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance")
+    parserFactoryMethod.invoke(null).asInstanceOf[parse.DocumentParser]
+  }
+
   protected def createCommonRootParent(rootElems: Vector[E]): E
 
   protected def maxMemoryToFileLengthRatio: Int

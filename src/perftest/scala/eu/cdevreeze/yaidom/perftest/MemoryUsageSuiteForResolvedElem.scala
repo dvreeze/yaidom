@@ -37,7 +37,7 @@ class MemoryUsageSuiteForResolvedElem extends AbstractMemoryUsageSuite {
   type E = resolved.Elem
 
   protected def parseXmlFiles(files: Vector[File]): Vector[Try[resolved.Elem]] = {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = getDocumentParser
     files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => resolved.Elem(e)) }
   }
 

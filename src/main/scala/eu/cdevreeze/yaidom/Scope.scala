@@ -279,14 +279,33 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * scope1.withoutDefaultNamespace.resolveQNameOption(qname) == scope2.withoutDefaultNamespace.resolveQNameOption(qname)
    * }}}
    */
-  def resolveQNameOption(qname: QName): Option[EName] = qname match {
-    case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(EName(unprefixedName.localPart))
-    case unprefixedName: UnprefixedName => Some(EName(defaultNamespaceOption.get, unprefixedName.localPart))
-    case prefixedName: PrefixedName =>
-      // The prefix scope (as Map), with the implicit "xml" namespace added
-      val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
-      completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => EName(nsUri, prefixedName.localPart) }
+  def resolveQNameOption(qname: QName, enameProvider: ENameProvider): Option[EName] = {
+    import enameProvider._
+
+    qname match {
+      case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(getNoNsEName(unprefixedName.localPart))
+      case unprefixedName: UnprefixedName => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
+      case prefixedName: PrefixedName =>
+        // The prefix scope (as Map), with the implicit "xml" namespace added
+        val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
+        completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => getEName(nsUri, prefixedName.localPart) }
+    }
   }
+
+  /**
+   * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
+   * to this `Scope`.
+   *
+   * More precisely, returns `resolveQNameOption(qname, ENameProvider.defaultInstance)`.
+   *
+   * Note that the `subScopeOf` relation keeps the `resolveQNameOption` result the same, provided there is no default namespace.
+   * That is, if `scope1.withoutDefaultNamespace.subScopeOf(scope2.withoutDefaultNamespace)`, then for each QName `qname`
+   * such that `scope1.withoutDefaultNamespace.resolveQNameOption(qname).isDefined`, we have:
+   * {{{
+   * scope1.withoutDefaultNamespace.resolveQNameOption(qname) == scope2.withoutDefaultNamespace.resolveQNameOption(qname)
+   * }}}
+   */
+  def resolveQNameOption(qname: QName): Option[EName] = resolveQNameOption(qname, ENameProvider.defaultInstance)
 
   /**
    * Returns true if `this.resolveQNameOption(qname) == Some(ename)`. This is checked without creating any new EName instance.

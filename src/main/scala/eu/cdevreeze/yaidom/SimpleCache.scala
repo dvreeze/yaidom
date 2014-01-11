@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom
 import java.util.{ concurrent => juc }
 
 /**
- * Simple cache, backed by a java.util.concurrent.ConcurrentMap. It is not meant as a real cache, because it can only
+ * Simple cache, backed by a java.util.concurrent.ConcurrentHashMap. It is not meant as a real cache, because it can only
  * grow. Therefore it can be used to cache ENames etc. within yaidom while parsing one XML document, but it should not be used as
  * a cache with application scope.
  *

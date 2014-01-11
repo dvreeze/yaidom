@@ -41,6 +41,16 @@ import scala.collection.{ immutable, mutable }
 trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document] with ConverterToElem[scala.xml.Elem] {
 
   /**
+   * Overridable method returning an ENameProvider
+   */
+  protected def enameProvider: ENameProvider = ENameProvider.defaultInstance
+
+  /**
+   * Overridable method returning a QNameProvider
+   */
+  protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
+
+  /**
    * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.Document]]. The resulting yaidom Document has no document URI.
    *
    * If the input Scala XML Document is not namespace-valid, an exception will be thrown.
@@ -69,11 +79,27 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     val attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(v.attributes)
     val scope: Scope = extractScope(v.scope)
 
-    Elem(
+    val resolvedName: EName =
+      scope.resolveQNameOption(qname, enameProvider).getOrElse(
+        sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
+
+    val resolvedAttributes: immutable.IndexedSeq[(EName, String)] =
+      Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace, enameProvider)
+
+    // Recursive (not tail-recursive)
+    val childSeq = v.child.toIndexedSeq flatMap { n: scala.xml.Node => convertToNodeOption(n) }
+
+    val childNodeIndexesByPathEntries: Map[Path.Entry, Int] =
+      Elem.getChildNodeIndexesByPathEntries(childSeq)
+
+    new Elem(
       qname = qname,
+      resolvedName = resolvedName,
       attributes = attributes,
+      resolvedAttributes = resolvedAttributes,
       scope = scope,
-      children = v.child.toIndexedSeq flatMap { n: scala.xml.Node => convertToNodeOption(n) })
+      children = childSeq,
+      childNodeIndexesByPathEntries = childNodeIndexesByPathEntries)
   }
 
   /**
@@ -148,11 +174,11 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
 
   /** Extracts the `QName` of an `scala.xml.Elem` */
   final def toQName(v: scala.xml.Elem): QName = {
-    if (v.prefix eq null) UnprefixedName(v.label) else PrefixedName(v.prefix, v.label)
+    if (v.prefix eq null) qnameProvider.getUnprefixedQName(v.label) else qnameProvider.getQName(v.prefix, v.label)
   }
 
   /** Extracts the `QName` of an attribute as `scala.xml.MetaData`. */
   final def toQName(v: scala.xml.MetaData): QName = {
-    if (v.isPrefixed) QName(v.prefixedKey) else QName(v.key)
+    if (v.isPrefixed) qnameProvider.parseQName(v.prefixedKey) else qnameProvider.parseQName(v.key)
   }
 }

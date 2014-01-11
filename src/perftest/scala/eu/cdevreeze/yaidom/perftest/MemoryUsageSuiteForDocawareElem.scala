@@ -37,7 +37,7 @@ class MemoryUsageSuiteForDocawareElem extends AbstractMemoryUsageSuite {
   type E = docaware.Elem
 
   protected def parseXmlFiles(files: Vector[File]): Vector[Try[docaware.Elem]] = {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = getDocumentParser
     files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => docaware.Elem(f.toURI, e)) }
   }
 

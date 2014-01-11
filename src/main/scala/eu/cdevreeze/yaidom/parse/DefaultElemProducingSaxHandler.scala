@@ -53,20 +53,11 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   private var currentlyInCData: Boolean = false
 
-  private val enameCache = new SimpleCache[EName, EName] {
+  private val enameProvider = ENameProvider.simpleCachingInstance
 
-    protected def convertKeyToValue(key: EName): EName = key
-  }
+  private val qnameProvider = QNameProvider.simpleCachingInstance
 
-  private val qnameCache = new SimpleCache[String, QName] {
-
-    protected def convertKeyToValue(key: String): QName = QName.parse(key)
-  }
-
-  final override def startDocument(): Unit = {
-    enameCache.clear()
-    qnameCache.clear()
-  }
+  final override def startDocument(): Unit = ()
 
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes) {
     val parentScope = if (currentElem eq null) Scope.Empty else currentElem.scope
@@ -182,7 +173,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     require(localName ne null)
     require(qName ne null)
 
-    val elmQName: QName = if (qName != "") qnameCache.putIfAbsentAndGet(qName) else qnameCache.putIfAbsentAndGet(localName)
+    val elmQName: QName = if (qName != "") qnameProvider.parseQName(qName) else qnameProvider.getUnprefixedQName(localName)
 
     val nsDecls = extractDeclarations(atts)
     val attrSeq = extractAttributeMap(atts)
@@ -200,7 +191,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private def extractDeclarations(atts: Attributes): Declarations = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if isNamespaceDeclaration(qn) =>
-        val key = qnameCache.putIfAbsentAndGet(qn)
+        val key = qnameProvider.parseQName(qn)
         val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
         val nsUri = v
         (prefix -> nsUri)
@@ -211,7 +202,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private def extractAttributeMap(atts: Attributes): immutable.IndexedSeq[(QName, String)] = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if !isNamespaceDeclaration(qn) =>
-        val qname = qnameCache.putIfAbsentAndGet(qn)
+        val qname = qnameProvider.parseQName(qn)
         val attValue = v
         (qname -> attValue)
     }
@@ -252,28 +243,18 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     type NodeType = Elem
 
     def toNode: Elem = {
-      val resolvedName: EName = {
-        val ename = scope.resolveQNameOption(qname).getOrElse(
+      val resolvedName: EName =
+        scope.resolveQNameOption(qname, enameProvider).getOrElse(
           sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
-        enameCache.putIfAbsentAndGet(ename)
-      }
 
-      val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
-        val resolvedAttrs = Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace)
-        resolvedAttrs map { case (ename, v) => (enameCache.putIfAbsentAndGet(ename) -> v) }
-      }
+      val resolvedAttributes: immutable.IndexedSeq[(EName, String)] =
+        Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace, enameProvider)
 
       // Recursive (not tail-recursive)
       val childSeq = (children map { ch => ch.toNode }).toVector
 
-      val childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-        val result: Map[Path.Entry, Int] = Elem.getChildNodeIndexesByPathEntries(childSeq)
-        result map {
-          case (entry, idx) =>
-            val newEntry = Path.Entry(enameCache.putIfAbsentAndGet(entry.elementName), entry.index)
-            (newEntry -> idx)
-        }
-      }
+      val childNodeIndexesByPathEntries: Map[Path.Entry, Int] =
+        Elem.getChildNodeIndexesByPathEntries(childSeq)
 
       new Elem(
         qname = qname,

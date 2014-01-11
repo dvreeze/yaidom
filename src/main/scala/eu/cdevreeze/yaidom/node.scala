@@ -172,6 +172,9 @@ final class Elem private[yaidom] (
   require(childNodeIndexesByPathEntries ne null)
 
   require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
+
+  // Rather expensive checks
+
   require(attributes.size == resolvedAttributes.size)
 
   require(scope.resolvesQNameTo(qname, resolvedName), s"QName $qname and EName $resolvedName do not match in scope $scope")
@@ -182,7 +185,10 @@ final class Elem private[yaidom] (
     },
     s"Mismatch between attributes $attributes and resolved attributes $resolvedAttributes")
 
-  // Consistency childNodeIndexesByPathEntries not checked!
+  // Partial consistency check for childNodeIndexesByPathEntries
+  require(
+    childNodeIndexesByPathEntries forall { case (entry, idx) => children(idx).asInstanceOf[Elem].resolvedName == entry.elementName },
+    s"Mismatch between attributes $attributes and resolved attributes $resolvedAttributes")
 
   def this(
     qname: QName,
@@ -196,7 +202,7 @@ final class Elem private[yaidom] (
         scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
       },
       attributes = attributes,
-      resolvedAttributes = Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace),
+      resolvedAttributes = Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace, ENameProvider.defaultInstance),
       scope = scope,
       children = children,
       childNodeIndexesByPathEntries = Elem.getChildNodeIndexesByPathEntries(children))
@@ -626,13 +632,18 @@ object Elem {
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 
-  private[yaidom] def resolveAttributes(attributes: immutable.IndexedSeq[(QName, String)], attributeScope: Scope): immutable.IndexedSeq[(EName, String)] = {
+  private[yaidom] def resolveAttributes(
+    attributes: immutable.IndexedSeq[(QName, String)],
+    attributeScope: Scope,
+    enameProvider: ENameProvider): immutable.IndexedSeq[(EName, String)] = {
+
     require(attributeScope.defaultNamespaceOption.isEmpty)
 
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attributeScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attributeScope}]"))
+      val expandedName =
+        attributeScope.resolveQNameOption(attName, enameProvider).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attributeScope}]"))
       (expandedName -> attValue)
     }
   }
