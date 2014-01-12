@@ -63,7 +63,7 @@ object ENameProvider {
     def parseEName(s: String): EName = EName.parse(s)
   }
 
-  val defaultInstance = new DefaultENameProvider
+  implicit val defaultInstance = new DefaultENameProvider
 
   /**
    * Simple caching EName provider. The underlying cache is based on a java.util.concurrent.ConcurrentHashMap, so the cache

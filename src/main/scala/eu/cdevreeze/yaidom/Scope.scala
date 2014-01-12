@@ -279,7 +279,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * scope1.withoutDefaultNamespace.resolveQNameOption(qname) == scope2.withoutDefaultNamespace.resolveQNameOption(qname)
    * }}}
    */
-  def resolveQNameOption(qname: QName, enameProvider: ENameProvider): Option[EName] = {
+  def resolveQNameOption(qname: QName)(implicit enameProvider: ENameProvider): Option[EName] = {
     import enameProvider._
 
     qname match {
@@ -289,36 +289,6 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
         // The prefix scope (as Map), with the implicit "xml" namespace added
         val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
         completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => getEName(nsUri, prefixedName.localPart) }
-    }
-  }
-
-  /**
-   * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
-   * to this `Scope`.
-   *
-   * More precisely, returns `resolveQNameOption(qname, ENameProvider.defaultInstance)`.
-   *
-   * Note that the `subScopeOf` relation keeps the `resolveQNameOption` result the same, provided there is no default namespace.
-   * That is, if `scope1.withoutDefaultNamespace.subScopeOf(scope2.withoutDefaultNamespace)`, then for each QName `qname`
-   * such that `scope1.withoutDefaultNamespace.resolveQNameOption(qname).isDefined`, we have:
-   * {{{
-   * scope1.withoutDefaultNamespace.resolveQNameOption(qname) == scope2.withoutDefaultNamespace.resolveQNameOption(qname)
-   * }}}
-   */
-  def resolveQNameOption(qname: QName): Option[EName] = resolveQNameOption(qname, ENameProvider.defaultInstance)
-
-  /**
-   * Returns true if `this.resolveQNameOption(qname) == Some(ename)`. This is checked without creating any new EName instance.
-   */
-  def resolvesQNameTo(qname: QName, ename: EName): Boolean = {
-    (qname.localPart == ename.localPart) && {
-      qname.prefixOption match {
-        case Some("xml") => ename.namespaceUriOption == Some("http://www.w3.org/XML/1998/namespace")
-        case Some(prefix) if prefixNamespaceMap.contains(prefix) => ename.namespaceUriOption == prefixNamespaceMap.get(prefix)
-        case Some(prefix) => false
-        case None if defaultNamespaceOption.isEmpty => ename.namespaceUriOption.isEmpty
-        case None => ename.namespaceUriOption == prefixNamespaceMap.get("")
-      }
     }
   }
 

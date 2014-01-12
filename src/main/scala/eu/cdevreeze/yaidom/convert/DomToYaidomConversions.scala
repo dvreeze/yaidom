@@ -79,27 +79,14 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.getAttributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
 
-    val resolvedName: EName =
-      newScope.resolveQNameOption(qname, enameProvider).getOrElse(
-        sys.error(s"Element name '${qname}' should resolve to an EName in scope [${newScope}]"))
-
-    val resolvedAttributes: immutable.IndexedSeq[(EName, String)] =
-      Elem.resolveAttributes(attributes, newScope.withoutDefaultNamespace, enameProvider)
-
     // Recursive (not tail-recursive)
     val childSeq = nodeListToIndexedSeq(v.getChildNodes) flatMap { n => convertToNodeOption(n, newScope) }
 
-    val childNodeIndexesByPathEntries: Map[Path.Entry, Int] =
-      Elem.getChildNodeIndexesByPathEntries(childSeq)
-
     new Elem(
       qname = qname,
-      resolvedName = resolvedName,
       attributes = attributes,
-      resolvedAttributes = resolvedAttributes,
       scope = newScope,
-      children = childSeq,
-      childNodeIndexesByPathEntries = childNodeIndexesByPathEntries)
+      children = childSeq)(enameProvider)
   }
 
   /**

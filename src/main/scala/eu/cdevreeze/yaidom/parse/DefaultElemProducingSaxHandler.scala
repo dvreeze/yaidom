@@ -243,27 +243,14 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     type NodeType = Elem
 
     def toNode: Elem = {
-      val resolvedName: EName =
-        scope.resolveQNameOption(qname, enameProvider).getOrElse(
-          sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
-
-      val resolvedAttributes: immutable.IndexedSeq[(EName, String)] =
-        Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace, enameProvider)
-
       // Recursive (not tail-recursive)
       val childSeq = (children map { ch => ch.toNode }).toVector
 
-      val childNodeIndexesByPathEntries: Map[Path.Entry, Int] =
-        Elem.getChildNodeIndexesByPathEntries(childSeq)
-
       new Elem(
         qname = qname,
-        resolvedName = resolvedName,
         attributes = attributes,
-        resolvedAttributes = resolvedAttributes,
         scope = scope,
-        children = childSeq,
-        childNodeIndexesByPathEntries = childNodeIndexesByPathEntries)
+        children = childSeq)(enameProvider)
     }
   }
 

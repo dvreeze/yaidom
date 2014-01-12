@@ -79,27 +79,14 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     val attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(v.attributes)
     val scope: Scope = extractScope(v.scope)
 
-    val resolvedName: EName =
-      scope.resolveQNameOption(qname, enameProvider).getOrElse(
-        sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
-
-    val resolvedAttributes: immutable.IndexedSeq[(EName, String)] =
-      Elem.resolveAttributes(attributes, scope.withoutDefaultNamespace, enameProvider)
-
     // Recursive (not tail-recursive)
     val childSeq = v.child.toIndexedSeq flatMap { n: scala.xml.Node => convertToNodeOption(n) }
 
-    val childNodeIndexesByPathEntries: Map[Path.Entry, Int] =
-      Elem.getChildNodeIndexesByPathEntries(childSeq)
-
     new Elem(
       qname = qname,
-      resolvedName = resolvedName,
       attributes = attributes,
-      resolvedAttributes = resolvedAttributes,
       scope = scope,
-      children = childSeq,
-      childNodeIndexesByPathEntries = childNodeIndexesByPathEntries)
+      children = childSeq)(enameProvider)
   }
 
   /**
