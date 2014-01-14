@@ -126,8 +126,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     val parserClass =
       Class.forName(System.getProperty("perftest.documentParser", "eu.cdevreeze.yaidom.parse.DocumentParserUsingSax")).asInstanceOf[Class[parse.DocumentParser]]
 
-    val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance")
-    parserFactoryMethod.invoke(null).asInstanceOf[parse.DocumentParser]
+    val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance", classOf[ENameProvider], classOf[QNameProvider])
+    parserFactoryMethod.invoke(null, ENameProvider.newSimpleCachingInstance, QNameProvider.newSimpleCachingInstance).asInstanceOf[parse.DocumentParser]
   }
 
   protected def createCommonRootParent(rootElems: Vector[E]): E

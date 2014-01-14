@@ -63,7 +63,7 @@ object QNameProvider {
     def parseQName(s: String): QName = QName.parse(s)
   }
 
-  val defaultInstance = new DefaultQNameProvider
+  implicit val defaultInstance = new DefaultQNameProvider
 
   /**
    * Simple caching QName provider. The underlying cache is based on a java.util.concurrent.ConcurrentHashMap, so the cache

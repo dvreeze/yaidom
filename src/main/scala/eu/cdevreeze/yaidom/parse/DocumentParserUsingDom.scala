@@ -90,7 +90,7 @@ import eu.cdevreeze.yaidom.convert.DomConversions
  */
 final class DocumentParserUsingDom(
   val docBuilderFactory: DocumentBuilderFactory,
-  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends AbstractDocumentParser {
+  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider) extends AbstractDocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
@@ -101,7 +101,7 @@ final class DocumentParserUsingDom(
       val inputSource = new InputSource(inputStream)
       val domDoc: org.w3c.dom.Document = db.parse(inputSource)
 
-      val domConversions = new DomConversions(ENameProvider.newSimpleCachingInstance, QNameProvider.newSimpleCachingInstance)
+      val domConversions = new DomConversions(enameProvider, qnameProvider)
       domConversions.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
@@ -112,19 +112,19 @@ final class DocumentParserUsingDom(
 object DocumentParserUsingDom {
 
   /** Returns `newInstance(DocumentBuilderFactory.newInstance)`, except that namespace awareness is set to true */
-  def newInstance(): DocumentParserUsingDom = {
+  def newInstance()(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingDom = {
     val dbf = DocumentBuilderFactory.newInstance()
     dbf.setNamespaceAware(true)
-    newInstance(dbf)
+    newInstance(dbf)(enameProvider, qnameProvider)
   }
 
   /**
    * Returns a new instance, using the given `DocumentBuilderFactory`, without any further configuration.
    * Do not forget to set namespace awareness to true on the `DocumentBuilderFactory`!
    */
-  def newInstance(docBuilderFactory: DocumentBuilderFactory): DocumentParserUsingDom = {
+  def newInstance(docBuilderFactory: DocumentBuilderFactory)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingDom = {
     val dbc = (dbf: DocumentBuilderFactory) => dbf.newDocumentBuilder()
-    newInstance(docBuilderFactory, dbc)
+    newInstance(docBuilderFactory, dbc)(enameProvider, qnameProvider)
   }
 
   /**
@@ -133,8 +133,8 @@ object DocumentParserUsingDom {
    */
   def newInstance(
     docBuilderFactory: DocumentBuilderFactory,
-    docBuilderCreator: DocumentBuilderFactory => DocumentBuilder): DocumentParserUsingDom = {
+    docBuilderCreator: DocumentBuilderFactory => DocumentBuilder)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingDom = {
 
-    new DocumentParserUsingDom(docBuilderFactory, docBuilderCreator)
+    new DocumentParserUsingDom(docBuilderFactory, docBuilderCreator)(enameProvider, qnameProvider)
   }
 }

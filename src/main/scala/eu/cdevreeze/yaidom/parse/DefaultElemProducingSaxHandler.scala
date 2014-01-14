@@ -35,6 +35,16 @@ import NodeBuilder._
 @NotThreadSafe
 trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {
 
+  /**
+   * Overridable ENameProvider
+   */
+  protected def enameProvider: ENameProvider = ENameProvider.defaultInstance
+
+  /**
+   * Overridable QNameProvider
+   */
+  protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
+
   // This content handler has a relatively simple state space, so is rather easy to reason about.
 
   // I very much like immutability, but sometimes mutable is better, like in this case.
@@ -52,10 +62,6 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private var currentElem: InternalElemNode = _
 
   private var currentlyInCData: Boolean = false
-
-  private val enameProvider = ENameProvider.newSimpleCachingInstance
-
-  private val qnameProvider = QNameProvider.newSimpleCachingInstance
 
   final override def startDocument(): Unit = ()
 
