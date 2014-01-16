@@ -93,15 +93,21 @@ object QNameProvider {
    * can only grow. Therefore this QName provider is not meant to be a "global" cache with application scope, but it should
    * be rather short-lived.
    */
-  final class SimpleCachingQNameProvider extends QNameProvider {
+  final class SimpleCachingQNameProvider(val cacheFilter: (Option[String], String) => Boolean) extends QNameProvider {
+
+    def this() = this((prefixOption, localPart) => true)
 
     private val cache = new SimpleCache[(Option[String], String), QName] {
 
       protected def convertKeyToValue(key: (Option[String], String)): QName = QName(key._1, key._2)
     }
 
-    def getQName(prefixOption: Option[String], localPart: String): QName =
-      cache.putIfAbsentAndGet((prefixOption, localPart))
+    def getQName(prefixOption: Option[String], localPart: String): QName = {
+      if (cacheFilter(prefixOption, localPart))
+        cache.putIfAbsentAndGet((prefixOption, localPart))
+      else
+        QName(prefixOption, localPart)
+    }
 
     def getQName(prefix: String, localPart: String): QName =
       getQName(Some(prefix), localPart)

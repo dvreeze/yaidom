@@ -93,15 +93,21 @@ object ENameProvider {
    * can only grow. Therefore this EName provider is not meant to be a "global" cache with application scope, but it should
    * be rather short-lived.
    */
-  final class SimpleCachingENameProvider extends ENameProvider {
+  final class SimpleCachingENameProvider(val cacheFilter: (Option[String], String) => Boolean) extends ENameProvider {
+
+    def this() = this((namespaceUriOption, localPart) => true)
 
     private val cache = new SimpleCache[(Option[String], String), EName] {
 
       protected def convertKeyToValue(key: (Option[String], String)): EName = EName(key._1, key._2)
     }
 
-    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
-      cache.putIfAbsentAndGet((namespaceUriOption, localPart))
+    def getEName(namespaceUriOption: Option[String], localPart: String): EName = {
+      if (cacheFilter(namespaceUriOption, localPart))
+        cache.putIfAbsentAndGet((namespaceUriOption, localPart))
+      else
+        EName(namespaceUriOption, localPart)
+    }
 
     def getEName(namespaceUri: String, localPart: String): EName =
       getEName(Some(namespaceUri), localPart)
