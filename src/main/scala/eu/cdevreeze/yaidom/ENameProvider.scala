@@ -66,10 +66,32 @@ object ENameProvider {
   implicit val defaultInstance = new DefaultENameProvider
 
   /**
+   * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.
+   */
+  final class ENameProviderUsingImmutableMap(val enames: Set[EName]) extends ENameProvider {
+
+    val cache: Map[(Option[String], String), EName] =
+      enames.map(ename => (ename.namespaceUriOption, ename.localPart) -> ename).toMap
+
+    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
+      cache.getOrElse((namespaceUriOption, localPart), EName(namespaceUriOption, localPart))
+
+    def getEName(namespaceUri: String, localPart: String): EName =
+      getEName(Some(namespaceUri), localPart)
+
+    def getNoNsEName(localPart: String): EName = getEName(None, localPart)
+
+    def parseEName(s: String): EName = {
+      // First creates a very short-lived EName instance
+      val ename = EName.parse(s)
+      getEName(ename.namespaceUriOption, ename.localPart)
+    }
+  }
+
+  /**
    * Simple caching EName provider. The underlying cache is based on a java.util.concurrent.ConcurrentHashMap, so the cache
    * can only grow. Therefore this EName provider is not meant to be a "global" cache with application scope, but it should
-   * be rather short-lived. Yaidom uses this provider internally to parse element trees without creating too many (equivalent)
-   * EName instances.
+   * be rather short-lived.
    */
   final class SimpleCachingENameProvider extends ENameProvider {
 

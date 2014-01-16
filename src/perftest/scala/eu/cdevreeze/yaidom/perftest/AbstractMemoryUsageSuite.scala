@@ -126,8 +126,29 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     val parserClass =
       Class.forName(System.getProperty("perftest.documentParser", "eu.cdevreeze.yaidom.parse.DocumentParserUsingSax")).asInstanceOf[Class[parse.DocumentParser]]
 
+    val thisClass = classOf[AbstractMemoryUsageSuite]
+    val enameFiles =
+      List(
+        new File(thisClass.getResource("/eu/cdevreeze/yaidom/enames-xs.txt").toURI),
+        new File(thisClass.getResource("/eu/cdevreeze/yaidom/enames-xlink.txt").toURI),
+        new File(thisClass.getResource("/eu/cdevreeze/yaidom/enames-link.txt").toURI))
+    val enameCache =
+      enameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => EName.parse(s) }
+    val enameProvider =
+      new ENameProvider.ENameProviderUsingImmutableMap(enameCache.toSet + EName("{http://www.xbrl.org/2003/instance}periodType"))
+
+    val qnameFiles =
+      List(
+        new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-xs.txt").toURI),
+        new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-xlink.txt").toURI),
+        new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-link.txt").toURI))
+    val qnameCache =
+      qnameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => QName.parse(s) }
+    val qnameProvider =
+      new QNameProvider.QNameProviderUsingImmutableMap(qnameCache.toSet + QName("xbrli:periodType"))
+
     val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance", classOf[ENameProvider], classOf[QNameProvider])
-    parserFactoryMethod.invoke(null, ENameProvider.newSimpleCachingInstance, QNameProvider.newSimpleCachingInstance).asInstanceOf[parse.DocumentParser]
+    parserFactoryMethod.invoke(null, enameProvider, qnameProvider).asInstanceOf[parse.DocumentParser]
   }
 
   protected def createCommonRootParent(rootElems: Vector[E]): E

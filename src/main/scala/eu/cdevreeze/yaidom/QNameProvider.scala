@@ -66,10 +66,32 @@ object QNameProvider {
   implicit val defaultInstance = new DefaultQNameProvider
 
   /**
+   * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.
+   */
+  final class QNameProviderUsingImmutableMap(val qnames: Set[QName]) extends QNameProvider {
+
+    val cache: Map[(Option[String], String), QName] =
+      qnames.map(qname => (qname.prefixOption, qname.localPart) -> qname).toMap
+
+    def getQName(prefixOption: Option[String], localPart: String): QName =
+      cache.getOrElse((prefixOption, localPart), QName(prefixOption, localPart))
+
+    def getQName(prefix: String, localPart: String): QName =
+      getQName(Some(prefix), localPart)
+
+    def getUnprefixedQName(localPart: String): QName = getQName(None, localPart)
+
+    def parseQName(s: String): QName = {
+      // First creates a very short-lived QName instance
+      val qname = QName.parse(s)
+      getQName(qname.prefixOption, qname.localPart)
+    }
+  }
+
+  /**
    * Simple caching QName provider. The underlying cache is based on a java.util.concurrent.ConcurrentHashMap, so the cache
    * can only grow. Therefore this QName provider is not meant to be a "global" cache with application scope, but it should
-   * be rather short-lived. Yaidom uses this provider internally to parse element trees without creating too many (equivalent)
-   * QName instances.
+   * be rather short-lived.
    */
   final class SimpleCachingQNameProvider extends QNameProvider {
 
