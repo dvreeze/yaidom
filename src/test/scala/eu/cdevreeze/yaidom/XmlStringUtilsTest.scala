@@ -33,7 +33,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class XmlStringUtilsTest extends Suite {
 
-  @Test def testNameValidity() {
+  @Test def testNameValidity(): Unit = {
     import XmlStringUtils._
 
     expectResult(true) {
@@ -89,7 +89,7 @@ class XmlStringUtilsTest extends Suite {
     }
   }
 
-  @Test def testXPathNotValidName() {
+  @Test def testXPathNotValidName(): Unit = {
     import XmlStringUtils._
 
     // To parse simple XPath expressions, we want to establish that "/", "*", "[" and "]" are never themselves

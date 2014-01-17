@@ -53,7 +53,7 @@ class DomInteropTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse() {
+  @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -286,7 +286,7 @@ class DomInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
-  @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -346,7 +346,7 @@ class DomInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testParseDefaultNamespaceXml() {
+  @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -456,7 +456,7 @@ class DomInteropTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd() {
+  @Test def testParseSchemaXsd(): Unit = {
     // 1. Parse XML file into Elem
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -736,7 +736,7 @@ class DomInteropTest extends Suite {
     checkFieldPattern(root4)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef() {
+  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -820,7 +820,7 @@ class DomInteropTest extends Suite {
     checkChildText(root4)
   }
 
-  @Test def testParseXmlWithNonExpandedEntityRef() {
+  @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -914,7 +914,7 @@ class DomInteropTest extends Suite {
     checkChildTextAndEntityRef(root4)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -975,7 +975,7 @@ class DomInteropTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars() {
+  @Test def testParseXmlWithEscapedChars(): Unit = {
     // 1. Parse XML file into Elem
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -1071,7 +1071,7 @@ class DomInteropTest extends Suite {
     doChecks(root4)
   }
 
-  @Test def testParseXmlWithSpecialChars() {
+  @Test def testParseXmlWithSpecialChars(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -1157,7 +1157,7 @@ class DomInteropTest extends Suite {
       "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
   }
 
-  @Test def testParseGeneratedHtml() {
+  @Test def testParseGeneratedHtml(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -1285,18 +1285,18 @@ class DomInteropTest extends Suite {
     }
   }
 
-  @Test def testParseBrokenXml() {
+  @Test def testParseBrokenXml(): Unit = {
     var errorCount = 0
     var fatalErrorCount = 0
     var warningCount = 0
 
     class MyErrorHandler extends ErrorHandler {
 
-      override def error(exc: SAXParseException) { errorCount += 1 }
+      override def error(exc: SAXParseException): Unit = { errorCount += 1 }
 
-      override def fatalError(exc: SAXParseException) { fatalErrorCount += 1 }
+      override def fatalError(exc: SAXParseException): Unit = { fatalErrorCount += 1 }
 
-      override def warning(exc: SAXParseException) { warningCount += 1 }
+      override def warning(exc: SAXParseException): Unit = { warningCount += 1 }
     }
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -1332,7 +1332,7 @@ class DomInteropTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample() {
+  @Test def testParseGroovyXmlExample(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val doc = parser.parse(classOf[DomInteropTest].getResourceAsStream("cars.xml"))
@@ -1405,7 +1405,7 @@ class DomInteropTest extends Suite {
     }
   }
 
-  @Test def testParseFileWithUtf8Bom() {
+  @Test def testParseFileWithUtf8Bom(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDom.newInstance

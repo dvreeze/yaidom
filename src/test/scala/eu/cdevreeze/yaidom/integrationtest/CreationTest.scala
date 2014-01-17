@@ -39,7 +39,7 @@ class CreationTest extends Suite {
 
   private val nsBookstore = "http://bookstore"
 
-  @Test def testCreation() {
+  @Test def testCreation(): Unit = {
     // 1. Parse XML file into Elem
 
     val docParser = DocumentParserUsingDom.newInstance()
@@ -204,7 +204,7 @@ class CreationTest extends Suite {
     }
   }
 
-  @Test def testNotUndeclaringPrefixes() {
+  @Test def testNotUndeclaringPrefixes(): Unit = {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
@@ -263,7 +263,7 @@ class CreationTest extends Suite {
     }
   }
 
-  @Test def testNotUndeclaringPrefixesAgain() {
+  @Test def testNotUndeclaringPrefixesAgain(): Unit = {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
@@ -328,7 +328,7 @@ class CreationTest extends Suite {
     }
   }
 
-  @Test def testInsertionWhileReusingPrefixes() {
+  @Test def testInsertionWhileReusingPrefixes(): Unit = {
     val booksElmBuilder: ElemBuilder =
       elem(
         qname = QName("books:Book"),

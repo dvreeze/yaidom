@@ -31,7 +31,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class ScopeTest extends Suite {
 
-  @Test def testCreateScope() {
+  @Test def testCreateScope(): Unit = {
     intercept[Exception] {
       Scope.from("" -> null)
     }
@@ -59,7 +59,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testCreateDeclarations() {
+  @Test def testCreateDeclarations(): Unit = {
     intercept[Exception] {
       Declarations.from("" -> null)
     }
@@ -102,7 +102,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveDeclarations() {
+  @Test def testResolveDeclarations(): Unit = {
     val scope1 = Scope.Empty
 
     expectResult(0) {
@@ -221,7 +221,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQName() {
+  @Test def testResolveQName(): Unit = {
     val scope1 = Scope.from()
 
     expectResult(Some(EName("book"))) {
@@ -255,7 +255,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQNameNotUndeclaringPrefixes() {
+  @Test def testResolveQNameNotUndeclaringPrefixes(): Unit = {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
     val scope2 = Scope.from("" -> "http://e", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
@@ -283,7 +283,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQNameNotUndeclaringNamespaces() {
+  @Test def testResolveQNameNotUndeclaringNamespaces(): Unit = {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
     val scope2 = Scope.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
@@ -318,7 +318,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testInverse() {
+  @Test def testInverse(): Unit = {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
 
@@ -335,7 +335,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPrefixesForNamespace() {
+  @Test def testPrefixesForNamespace(): Unit = {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
 
@@ -353,7 +353,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPropertyAboutMultipleScopes() {
+  @Test def testPropertyAboutMultipleScopes(): Unit = {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "h" -> "http://h")
     val scope2 = Scope.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d", "e" -> "http://e")
 
@@ -404,7 +404,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPropertyAboutScopeAndDeclaration() {
+  @Test def testPropertyAboutScopeAndDeclaration(): Unit = {
     val scope = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "g" -> "http://g", "h" -> "http://h")
     val decls = Declarations.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d", "g" -> "", "e" -> "http://e", "m" -> "")
 

@@ -69,9 +69,9 @@ import org.xml.sax.ext.LexicalHandler
  * For completeness, a custom `ErrorHandler` trait that simply prints parse exceptions to standard output:
  * {{{
  * trait MyErrorHandler extends ErrorHandler {
- *   override def warning(exc: SAXParseException) { println(exc) }
- *   override def error(exc: SAXParseException) { println(exc) }
- *   override def fatalError(exc: SAXParseException) { println(exc) }
+ *   override def warning(exc: SAXParseException): Unit = { println(exc) }
+ *   override def error(exc: SAXParseException): Unit = { println(exc) }
+ *   override def fatalError(exc: SAXParseException): Unit = { println(exc) }
  * }
  * }}}
  *

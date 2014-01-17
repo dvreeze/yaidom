@@ -31,7 +31,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class QNameTest extends Suite {
 
-  @Test def testUnprefixedName() {
+  @Test def testUnprefixedName(): Unit = {
     val qname = UnprefixedName("Bookstore")
 
     expectResult("Bookstore") {
@@ -118,7 +118,7 @@ class QNameTest extends Suite {
     }
   }
 
-  @Test def testPrefixedName() {
+  @Test def testPrefixedName(): Unit = {
     val qname = PrefixedName("books", "Bookstore")
 
     expectResult("Bookstore") {

@@ -34,7 +34,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
   final type E = Elem
 
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths() {
+  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths(): Unit = {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     require(bookstore.localName == "Bookstore")
@@ -100,7 +100,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitlesUsingPaths() {
+  @Test def testQueryBooksOrMagazinesWithNonUniqueTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
     require(bookstore.localName == "Bookstore")
@@ -130,7 +130,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBookUsingPaths() {
+  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBookUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
     require(bookstore.localName == "Bookstore")
@@ -171,7 +171,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksWithAuthorInTitle() {
+  @Test def testQueryBooksWithAuthorInTitle(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val titleAndFirstNames =
@@ -213,7 +213,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksPricedBelowAverage() {
+  @Test def testQueryBooksPricedBelowAverage(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val prices: immutable.IndexedSeq[Double] =
@@ -260,7 +260,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksOrderedByPrice() {
+  @Test def testQueryBooksOrderedByPrice(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     def cheaper(book1: Elem, book2: Elem): Boolean = {
@@ -313,7 +313,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
    * &lt;/InvertedBookstore&gt;
    * }}}
    */
-  @Test def testQueryInvertedBookstore() {
+  @Test def testQueryInvertedBookstore(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     def books(authorLastName: String) =
@@ -365,7 +365,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformLeavingOutPrices() {
+  @Test def testTransformLeavingOutPrices(): Unit = {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -404,7 +404,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformCombiningFirstAndLastName() {
+  @Test def testTransformCombiningFirstAndLastName(): Unit = {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -439,7 +439,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformAuthors() {
+  @Test def testTransformAuthors(): Unit = {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.

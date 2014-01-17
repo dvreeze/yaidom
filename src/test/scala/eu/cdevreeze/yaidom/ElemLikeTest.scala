@@ -37,7 +37,7 @@ class ElemLikeTest extends Suite {
 
   private val ns = "http://bookstore"
 
-  @Test def testChildElems() {
+  @Test def testChildElems(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms = bookstore.findAllChildElems
@@ -98,7 +98,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testCollectFromChildElems() {
+  @Test def testCollectFromChildElems(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms = bookstore.findAllChildElems
@@ -142,7 +142,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
-  @Test def testElems() {
+  @Test def testElems(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
@@ -203,7 +203,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testCollectFromElems() {
+  @Test def testCollectFromElems(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
@@ -241,7 +241,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
-  @Test def testElemsOrSelf() {
+  @Test def testElemsOrSelf(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElemsOrSelf
@@ -306,7 +306,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testCollectFromElemsOrSelf() {
+  @Test def testCollectFromElemsOrSelf(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElemsOrSelf
@@ -348,7 +348,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
-  @Test def testTopmostElems() {
+  @Test def testTopmostElems(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
@@ -425,7 +425,7 @@ class ElemLikeTest extends Suite {
     assert(firstUllmanAncestors.toSet.subsetOf(ullmanAncestors.toSet))
   }
 
-  @Test def testFindParentInTree() {
+  @Test def testFindParentInTree(): Unit = {
     // Actually a test of sub-trait PathAwareElemLike...
 
     require(bookstore.localName == "Bookstore")
@@ -462,7 +462,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testGetIndex() {
+  @Test def testGetIndex(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val index: Map[EName, immutable.IndexedSeq[Elem]] = bookstore.findAllElemsOrSelf groupBy { _.resolvedName }
@@ -483,7 +483,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFindByPath() {
+  @Test def testFindByPath(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     expectResult(Some(bookstore)) {
@@ -526,7 +526,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testEqualities() {
+  @Test def testEqualities(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val allElms = bookstore.findAllElemsOrSelf

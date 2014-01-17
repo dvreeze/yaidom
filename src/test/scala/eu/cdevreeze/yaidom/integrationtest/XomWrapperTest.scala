@@ -49,7 +49,7 @@ class XomWrapperTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse() {
+  @Test def testParse(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -75,7 +75,7 @@ class XomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -91,7 +91,7 @@ class XomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseDefaultNamespaceXml() {
+  @Test def testParseDefaultNamespaceXml(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -115,7 +115,7 @@ class XomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd() {
+  @Test def testParseSchemaXsd(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
 
@@ -321,7 +321,7 @@ class XomWrapperTest extends Suite {
     checkFieldPattern(root)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef() {
+  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -356,7 +356,7 @@ class XomWrapperTest extends Suite {
     checkChildText(root)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -374,7 +374,7 @@ class XomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars() {
+  @Test def testParseXmlWithEscapedChars(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     dbf.setCoalescing(true)
@@ -420,7 +420,7 @@ class XomWrapperTest extends Suite {
     doChecks(root)
   }
 
-  @Test def testParseXmlWithSpecialChars() {
+  @Test def testParseXmlWithSpecialChars(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -454,7 +454,7 @@ class XomWrapperTest extends Suite {
     doChecks(root)
   }
 
-  @Test def testParseGeneratedHtml() {
+  @Test def testParseGeneratedHtml(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -548,7 +548,7 @@ class XomWrapperTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample() {
+  @Test def testParseGroovyXmlExample(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -613,7 +613,7 @@ class XomWrapperTest extends Suite {
   /**
    * Example of finding elements and their ancestors.
    */
-  @Test def testParseSchemaExample() {
+  @Test def testParseSchemaExample(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder

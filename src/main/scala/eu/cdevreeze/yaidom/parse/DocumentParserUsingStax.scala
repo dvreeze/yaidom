@@ -55,7 +55,7 @@ import convert.StaxConversions._
  * A trivial `XMLReporter` could look like this:
  * {{{
  * class MyXmlReporter extends XMLReporter {
- *   override def report(message: String, errorType: String, relatedInformation: AnyRef, location: Location) {
+ *   override def report(message: String, errorType: String, relatedInformation: AnyRef, location: Location): Unit = {
  *     println("Location: %s. Error type: %s. Message: %s.".format(location, errorType, message))
  *   }
  * }

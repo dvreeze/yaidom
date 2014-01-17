@@ -97,7 +97,7 @@ class ValidationTest extends Suite {
 
   // The tests themselves
 
-  @Test def testValidateAddress() {
+  @Test def testValidateAddress(): Unit = {
     val elmBuilder =
       elem(
         qname = QName("Address"),
@@ -133,7 +133,7 @@ class ValidationTest extends Suite {
     }
   }
 
-  @Test def testValidatePurchaseOrder() {
+  @Test def testValidatePurchaseOrder(): Unit = {
     val docParser = DocumentParserUsingSax.newInstance
     val is = classOf[ValidationTest].getResourceAsStream("po.xml")
     val doc = docParser.parse(is)

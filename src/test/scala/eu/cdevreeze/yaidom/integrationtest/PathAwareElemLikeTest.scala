@@ -72,7 +72,7 @@ class PathAwareElemLikeTest extends Suite {
     convertToElem(xml)
   }
 
-  @Test def testFilterChildElemPaths() {
+  @Test def testFilterChildElemPaths(): Unit = {
     val p = { e: Elem => Set("shipTo", "billTo").contains(e.localName) }
     val toPaths = rootElem.filterChildElemPaths(p)
 
@@ -89,7 +89,7 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFilterElemOrSelfPaths() {
+  @Test def testFilterElemOrSelfPaths(): Unit = {
     val p = { e: Elem => !Set("comment").contains(e.localName) }
     val paths = rootElem.filterElemOrSelfPaths(p)
 
@@ -106,7 +106,7 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFindTopmostElemOrSelfPaths() {
+  @Test def testFindTopmostElemOrSelfPaths(): Unit = {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.findTopmostElemOrSelfPaths(p)
 
@@ -123,7 +123,7 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFilterElemPaths() {
+  @Test def testFilterElemPaths(): Unit = {
     val p = { e: Elem => !Set("comment").contains(e.localName) }
     val paths = rootElem.filterElemPaths(p)
 
@@ -140,7 +140,7 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFindTopmostElemPaths() {
+  @Test def testFindTopmostElemPaths(): Unit = {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.findTopmostElemPaths(p)
 
@@ -157,7 +157,7 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  @Test def testEqualities() {
+  @Test def testEqualities(): Unit = {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.filterElemOrSelfPaths(p)
 
@@ -174,7 +174,7 @@ class PathAwareElemLikeTest extends Suite {
     }
   }
 
-  @Test def testOtherEqualities() {
+  @Test def testOtherEqualities(): Unit = {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.filterElemOrSelfPaths(p)
 

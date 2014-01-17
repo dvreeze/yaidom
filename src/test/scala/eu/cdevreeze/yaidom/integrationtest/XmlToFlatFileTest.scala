@@ -33,7 +33,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class XmlToFlatFileTest extends Suite {
 
-  @Test def testConvertXmlToFlatFile() {
+  @Test def testConvertXmlToFlatFile(): Unit = {
     val docParser = parse.DocumentParserUsingStax.newInstance
 
     val xmlData = """<?xml version="1.0"?>

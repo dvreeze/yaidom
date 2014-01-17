@@ -45,7 +45,7 @@ class ScalaXmlInteropTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testConvert() {
+  @Test def testConvert(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(bookstore)
@@ -115,7 +115,7 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  @Test def testConvertStrangeXml() {
+  @Test def testConvertStrangeXml(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(strangeXml)
@@ -166,7 +166,7 @@ class ScalaXmlInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testConvertDefaultNamespaceXml() {
+  @Test def testConvertDefaultNamespaceXml(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXml)
@@ -239,7 +239,7 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  @Test def testConvertXmlWithNonExpandedEntityRef() {
+  @Test def testConvertXmlWithNonExpandedEntityRef(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithEntityRef)
@@ -316,7 +316,7 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  @Test def testConvertXmlWithNamespaceUndeclarations() {
+  @Test def testConvertXmlWithNamespaceUndeclarations(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithNSUndeclarations)
@@ -368,7 +368,7 @@ class ScalaXmlInteropTest extends Suite {
    * Currently this test is ignored because of bug: SI 3368: Preserve CDATA sections, don't convert them to generic Text nodes.
    * (see https://issues.scala-lang.org/browse/SI-3368).
    */
-  @Ignore @Test def testConvertXmlWithEscapedChars() {
+  @Ignore @Test def testConvertXmlWithEscapedChars(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithEscapedChars)
@@ -439,7 +439,7 @@ class ScalaXmlInteropTest extends Suite {
     doChecks(root4)
   }
 
-  @Test def testConvertXmlWithSpecialChars() {
+  @Test def testConvertXmlWithSpecialChars(): Unit = {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithEuro)
@@ -511,7 +511,7 @@ class ScalaXmlInteropTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testConvertGroovyXmlExample() {
+  @Test def testConvertGroovyXmlExample(): Unit = {
     val doc = Document(convertToElem(cars))
 
     expectResult("records") {

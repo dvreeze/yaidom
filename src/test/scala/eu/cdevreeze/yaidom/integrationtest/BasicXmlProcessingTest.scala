@@ -48,7 +48,7 @@ class BasicXmlProcessingTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testBasicQuerying() {
+  @Test def testBasicQuerying(): Unit = {
     // No XML literals for yaidom, but making the structure of the XML explicit, using NodeBuilders
     // Should we make it easy to convert Scala XML literals to yaidom Elems?
 
@@ -157,7 +157,7 @@ class BasicXmlProcessingTest extends Suite {
     }
   }
 
-  @Test def testConversions() {
+  @Test def testConversions(): Unit = {
     val docParser = DocumentParserUsingSax.newInstance
     val musicElm: Elem = docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
 

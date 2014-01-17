@@ -52,7 +52,7 @@ class SaxInteropTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse() {
+  @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -184,7 +184,7 @@ class SaxInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
-  @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -230,7 +230,7 @@ class SaxInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testParseDefaultNamespaceXml() {
+  @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -314,7 +314,7 @@ class SaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd() {
+  @Test def testParseSchemaXsd(): Unit = {
     // 1. Parse XML file into Elem
 
     val spf = SAXParserFactory.newInstance
@@ -563,7 +563,7 @@ class SaxInteropTest extends Suite {
     checkFieldPattern(root3)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef() {
+  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -627,7 +627,7 @@ class SaxInteropTest extends Suite {
     checkChildText(root3)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -674,7 +674,7 @@ class SaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars() {
+  @Test def testParseXmlWithEscapedChars(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -751,7 +751,7 @@ class SaxInteropTest extends Suite {
     doChecks(root3)
   }
 
-  @Test def testParseXmlWithSpecialChars() {
+  @Test def testParseXmlWithSpecialChars(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -819,7 +819,7 @@ class SaxInteropTest extends Suite {
       "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
   }
 
-  @Test def testParseGeneratedHtml() {
+  @Test def testParseGeneratedHtml(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance(
@@ -913,7 +913,7 @@ class SaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseBrokenXml() {
+  @Test def testParseBrokenXml(): Unit = {
     var errorCount = 0
     var fatalErrorCount = 0
     var warningCount = 0
@@ -922,19 +922,19 @@ class SaxInteropTest extends Suite {
 
     trait MyErrorHandler extends ErrorHandler { self: SaxHandlerWithLocator =>
 
-      override def error(exc: SAXParseException) {
+      override def error(exc: SAXParseException): Unit = {
         errorCount += 1
         lineNumber = locator.getLineNumber
         columnNumber = locator.getColumnNumber
       }
 
-      override def fatalError(exc: SAXParseException) {
+      override def fatalError(exc: SAXParseException): Unit = {
         fatalErrorCount += 1
         lineNumber = locator.getLineNumber
         columnNumber = locator.getColumnNumber
       }
 
-      override def warning(exc: SAXParseException) {
+      override def warning(exc: SAXParseException): Unit = {
         warningCount += 1
         lineNumber = locator.getLineNumber
         columnNumber = locator.getColumnNumber
@@ -973,7 +973,7 @@ class SaxInteropTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample() {
+  @Test def testParseGroovyXmlExample(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[SaxInteropTest].getResourceAsStream("cars.xml"))
@@ -1046,7 +1046,7 @@ class SaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseHtmlUsingTagSoup() {
+  @Test def testParseHtmlUsingTagSoup(): Unit = {
     // 1. Parse HTML using TagSoup
 
     val saxParser = DocumentParserUsingSax.newInstance(new TagSoupSAXFactoryImpl)
@@ -1118,7 +1118,7 @@ class SaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseFileWithUtf8Bom() {
+  @Test def testParseFileWithUtf8Bom(): Unit = {
     // 1. Parse XML file into Elem
 
     val saxParser = DocumentParserUsingSax.newInstance

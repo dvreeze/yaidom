@@ -48,7 +48,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testQueryArtistElems() {
+  @Test def testQueryArtistElems(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
@@ -82,7 +82,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryArtistAsText() {
+  @Test def testQueryArtistAsText(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
@@ -130,7 +130,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryPrice() {
+  @Test def testQueryPrice(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))

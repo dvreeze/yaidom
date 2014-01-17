@@ -53,7 +53,7 @@ class ScalaXmlWrapperTest extends Suite {
 
   private val preserveWS = true
 
-  @Test def testParse() {
+  @Test def testParse(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("books.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -91,7 +91,7 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("strangeXml.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -123,7 +123,7 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseDefaultNamespaceXml() {
+  @Test def testParseDefaultNamespaceXml(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXml.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -159,7 +159,7 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd() {
+  @Test def testParseSchemaXsd(): Unit = {
     // See http://richard.dallaway.com/2013-02-06
 
     val resolvingXmlLoader = new scala.xml.factory.XMLLoader[scala.xml.Elem] {
@@ -372,7 +372,7 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithExpandedEntityRef() {
+  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -416,7 +416,7 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -450,7 +450,7 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithSpecialChars() {
+  @Test def testParseXmlWithSpecialChars(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -500,7 +500,7 @@ class ScalaXmlWrapperTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample() {
+  @Test def testParseGroovyXmlExample(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("cars.xml")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document
@@ -577,7 +577,7 @@ class ScalaXmlWrapperTest extends Suite {
   /**
    * Example of finding elements and their ancestors.
    */
-  @Test def testParseSchemaExample() {
+  @Test def testParseSchemaExample(): Unit = {
     val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("gaap.xsd")
     val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
     val doc = parser.document

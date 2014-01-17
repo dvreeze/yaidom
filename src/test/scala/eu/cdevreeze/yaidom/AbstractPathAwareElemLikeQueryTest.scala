@@ -33,7 +33,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
   override type E <: PathAwareElemLike[E] with HasText
 
-  @Test def testQueryBookTitlesUsingPaths() {
+  @Test def testQueryBookTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
     require(bookstore.localName == "Bookstore")
@@ -51,7 +51,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryBookTitlesUsingPathsAgain() {
+  @Test def testQueryBookTitlesUsingPathsAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
     // This time using the ElemApi companion object
 
@@ -70,7 +70,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryBookOrMagazineTitlesUsingPaths() {
+  @Test def testQueryBookOrMagazineTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
     require(bookstore.localName == "Bookstore")
@@ -93,7 +93,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryBookOrMagazineTitlesUsingPathsAgain() {
+  @Test def testQueryBookOrMagazineTitlesUsingPathsAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
     // This time using the ElemApi companion object
 
@@ -117,7 +117,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryTitlesUsingPaths() {
+  @Test def testQueryTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.localName == "Bookstore")
@@ -140,7 +140,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryAllTitlesUsingPaths() {
+  @Test def testQueryAllTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")//Title
 
     require(bookstore.localName == "Bookstore")
@@ -162,7 +162,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryAllElementsUsingPaths() {
+  @Test def testQueryAllElementsUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")//*
 
     require(bookstore.localName == "Bookstore")
@@ -189,7 +189,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryBookIsbnsUsingPaths() {
+  @Test def testQueryBookIsbnsUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
     require(bookstore.localName == "Bookstore")
@@ -205,7 +205,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryCheapBooksUsingPaths() {
+  @Test def testQueryCheapBooksUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
     require(bookstore.localName == "Bookstore")
@@ -229,7 +229,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryCheapBooksUsingPathsAgain() {
+  @Test def testQueryCheapBooksUsingPathsAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
     // This time using the ElemApi companion object
 
@@ -254,7 +254,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryCheapBookTitlesUsingPaths() {
+  @Test def testQueryCheapBookTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -275,7 +275,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByUllmanUsingPaths() {
+  @Test def testQueryTitlesOfCheapBooksByUllmanUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -305,7 +305,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryBooksByJeffreyUllmanUsingPaths() {
+  @Test def testQueryBooksByJeffreyUllmanUsingPaths(): Unit = {
     // Own example
 
     require(bookstore.localName == "Bookstore")
@@ -332,7 +332,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     }
   }
 
-  @Test def testQueryBooksByJeffreyUllmanUsingPathsAgain() {
+  @Test def testQueryBooksByJeffreyUllmanUsingPathsAgain(): Unit = {
     // Own example
     // This time using the ElemApi companion object
 

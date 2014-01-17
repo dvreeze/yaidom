@@ -44,7 +44,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   @volatile private var xmlBytes: Array[Byte] = _
 
-  override def beforeAll(configMap: Map[String, Any]) {
+  override def beforeAll(configMap: Map[String, Any]): Unit = {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 
@@ -65,7 +65,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     this.xmlBytes = bos.toByteArray
   }
 
-  @Test def testProcessLargeXmlUsingSax() {
+  @Test def testProcessLargeXmlUsingSax(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -76,7 +76,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlIntoResolvedElemUsingSax() {
+  @Test def testProcessLargeXmlIntoResolvedElemUsingSax(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -102,7 +102,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testParseLargeXmlRepeatedly() {
+  @Ignore @Test def testParseLargeXmlRepeatedly(): Unit = {
     val FirstNameEName = EName("firstName")
     val LastNameEName = EName("lastName")
     val ContactEName = EName("contact")
@@ -139,7 +139,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testProcessLargeXmlUsingStax() {
+  @Test def testProcessLargeXmlUsingStax(): Unit = {
     val parser = DocumentParserUsingStax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -150,7 +150,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlUsingDom() {
+  @Test def testProcessLargeXmlUsingDom(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -161,7 +161,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlIntoIndexedElem() {
+  @Test def testProcessLargeXmlIntoIndexedElem(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -175,7 +175,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testProcessLargeTreeRepr() {
+  @Ignore @Test def testProcessLargeTreeRepr(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -205,7 +205,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Ignore @Test def testSerializeLargeNodeBuilder() {
+  @Ignore @Test def testSerializeLargeNodeBuilder(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -240,7 +240,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Ignore @Test def testSerializeLargeNode() {
+  @Ignore @Test def testSerializeLargeNode(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs1 = System.currentTimeMillis()
@@ -273,7 +273,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doTest(doc2.documentElement)
   }
 
-  @Test def testFind() {
+  @Test def testFind(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -350,7 +350,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
   }
 
-  @Test def testUpdate() {
+  @Test def testUpdate(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -410,7 +410,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testUpdateUsingPaths() {
+  @Test def testUpdateUsingPaths(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -474,7 +474,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testTransform() {
+  @Test def testTransform(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -531,7 +531,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  private def doTest[E <: ElemLike[E] with HasText](elm: E) {
+  private def doTest[E <: ElemLike[E] with HasText](elm: E): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")

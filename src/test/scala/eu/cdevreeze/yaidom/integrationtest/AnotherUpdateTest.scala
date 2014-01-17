@@ -41,7 +41,7 @@ class AnotherUpdateTest extends Suite {
 
   private val docParser = DocumentParserUsingDom.newInstance()
 
-  @Test def testDeleteMagazines() {
+  @Test def testDeleteMagazines(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -79,7 +79,7 @@ class AnotherUpdateTest extends Suite {
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags, deleteMagsResolved)
   }
 
-  @Test def testInsertAfter() {
+  @Test def testInsertAfter(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -149,7 +149,7 @@ class AnotherUpdateTest extends Suite {
     })
   }
 
-  @Test def testInsertBefore() {
+  @Test def testInsertBefore(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -219,7 +219,7 @@ class AnotherUpdateTest extends Suite {
     })
   }
 
-  @Test def testInsertAsFirstInto() {
+  @Test def testInsertAsFirstInto(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -280,7 +280,7 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, { e => Vector(insertBook(e)) })
   }
 
-  @Test def testUpdate() {
+  @Test def testUpdate(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)

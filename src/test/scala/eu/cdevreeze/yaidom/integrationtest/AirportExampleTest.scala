@@ -46,7 +46,7 @@ class AirportExampleTest extends Suite {
 
   private val nsWebServiceX = "http://www.webserviceX.NET"
 
-  @Test def testDocumentStructure() {
+  @Test def testDocumentStructure(): Unit = {
     // 1. Parse XML files into Documents
 
     val saxParser = DocumentParserUsingSax.newInstance
@@ -73,7 +73,7 @@ class AirportExampleTest extends Suite {
     rootElms foreach { root => validateDocumentStructure(root) }
   }
 
-  @Test def testShortDocumentQueries() {
+  @Test def testShortDocumentQueries(): Unit = {
     // 1. Parse XML files into Documents
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -209,7 +209,7 @@ class AirportExampleTest extends Suite {
     assert(!deAirportCodesCloseToArnhem.contains("FRA"))
   }
 
-  @Test def testDocumentTransformations() {
+  @Test def testDocumentTransformations(): Unit = {
     // 1. Parse XML files into Documents
 
     val staxParser = DocumentParserUsingStax.newInstance
@@ -368,7 +368,7 @@ class AirportExampleTest extends Suite {
     assert(distanceFrankfurtBrussels > 300 && distanceFrankfurtBrussels < 320)
   }
 
-  private def validateDocumentStructure(root: Elem) {
+  private def validateDocumentStructure(root: Elem): Unit = {
     val enameNewDataSet = EName(nsWebServiceX, "NewDataSet")
     val enameTable = EName(nsWebServiceX, "Table")
 

@@ -35,7 +35,7 @@ import XbrlSchemaTest._
 @RunWith(classOf[JUnitRunner])
 class XbrlSchemaTest extends Suite {
 
-  def testQueryXbrlSchema() {
+  def testQueryXbrlSchema(): Unit = {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
 

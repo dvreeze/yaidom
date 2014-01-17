@@ -42,7 +42,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
 
   @volatile private var xmlBytes: Array[Byte] = _
 
-  override def beforeAll(configMap: Map[String, Any]) {
+  override def beforeAll(configMap: Map[String, Any]): Unit = {
     val zipFileUrl = classOf[StreamingLargeXmlTest].getResource("bigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 
@@ -69,7 +69,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
    *
    * This test example is simple, and does not use any namespaces.
    */
-  @Test def testProcessLargeXmlUsingStreaming() {
+  @Test def testProcessLargeXmlUsingStreaming(): Unit = {
     val inputFactory = XMLInputFactory.newInstance
 
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))

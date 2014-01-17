@@ -34,7 +34,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = ScalaXmlElem
 
-  @Test def testQueryAll() {
+  @Test def testQueryAll(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     val elems = bookstore.findAllElemsOrSelf
@@ -55,7 +55,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksWithAuthorInTitle() {
+  @Test def testQueryBooksWithAuthorInTitle(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -102,7 +102,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksPricedBelowAverage() {
+  @Test def testQueryBooksPricedBelowAverage(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -155,7 +155,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksOrderedByPrice() {
+  @Test def testQueryBooksOrderedByPrice(): Unit = {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._

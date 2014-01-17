@@ -46,7 +46,7 @@ class FriendFeedTest extends Suite {
 
   private val StatsScope = Scope.from("" -> NsFriendFeedStats)
 
-  @Test def testFilterFeedProcessing() {
+  @Test def testFilterFeedProcessing(): Unit = {
     // Note the functional expression-oriented programming style, with many small expressions assigned to val variables.
     // Also note the abundant use of suffix "Elm" in variable names for Elems and ElemBuilders.
 

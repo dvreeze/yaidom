@@ -50,7 +50,7 @@ class DomWrapperTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse() {
+  @Test def testParse(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
@@ -73,7 +73,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("strangeXml.xml")
@@ -87,7 +87,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseDefaultNamespaceXml() {
+  @Test def testParseDefaultNamespaceXml(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXml.xml")
@@ -109,7 +109,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd() {
+  @Test def testParseSchemaXsd(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
@@ -313,7 +313,7 @@ class DomWrapperTest extends Suite {
     checkFieldPattern(root)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef() {
+  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
@@ -346,7 +346,7 @@ class DomWrapperTest extends Suite {
     checkChildText(root)
   }
 
-  @Test def testParseXmlWithNonExpandedEntityRef() {
+  @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setExpandEntityReferences(false)
     val db = dbf.newDocumentBuilder
@@ -388,7 +388,7 @@ class DomWrapperTest extends Suite {
     checkChildTextAndEntityRef(root)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
@@ -404,7 +404,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars() {
+  @Test def testParseXmlWithEscapedChars(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setCoalescing(true)
     val db = dbf.newDocumentBuilder
@@ -448,7 +448,7 @@ class DomWrapperTest extends Suite {
     doChecks(root)
   }
 
-  @Test def testParseXmlWithSpecialChars() {
+  @Test def testParseXmlWithSpecialChars(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
@@ -480,7 +480,7 @@ class DomWrapperTest extends Suite {
     doChecks(root)
   }
 
-  @Test def testParseGeneratedHtml() {
+  @Test def testParseGeneratedHtml(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
@@ -566,18 +566,18 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseBrokenXml() {
+  @Test def testParseBrokenXml(): Unit = {
     var errorCount = 0
     var fatalErrorCount = 0
     var warningCount = 0
 
     class MyErrorHandler extends ErrorHandler {
 
-      override def error(exc: SAXParseException) { errorCount += 1 }
+      override def error(exc: SAXParseException): Unit = { errorCount += 1 }
 
-      override def fatalError(exc: SAXParseException) { fatalErrorCount += 1 }
+      override def fatalError(exc: SAXParseException): Unit = { fatalErrorCount += 1 }
 
-      override def warning(exc: SAXParseException) { warningCount += 1 }
+      override def warning(exc: SAXParseException): Unit = { warningCount += 1 }
     }
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -612,7 +612,7 @@ class DomWrapperTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample() {
+  @Test def testParseGroovyXmlExample(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("cars.xml")
@@ -673,7 +673,7 @@ class DomWrapperTest extends Suite {
   /**
    * Example of finding elements and their ancestors.
    */
-  @Test def testParseSchemaExample() {
+  @Test def testParseSchemaExample(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("gaap.xsd")

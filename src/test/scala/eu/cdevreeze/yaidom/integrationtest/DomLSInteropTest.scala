@@ -55,7 +55,7 @@ class DomLSInteropTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse() {
+  @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDomLS.newInstance
@@ -288,7 +288,7 @@ class DomLSInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
-  @Test def testParseStrangeXml() {
+  @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDomLS.newInstance
@@ -349,7 +349,7 @@ class DomLSInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testParseDefaultNamespaceXml() {
+  @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDomLS.newInstance
@@ -460,7 +460,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd() {
+  @Test def testParseSchemaXsd(): Unit = {
     // 1. Parse XML file into Elem
 
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
@@ -746,7 +746,7 @@ class DomLSInteropTest extends Suite {
     checkFieldPattern(root4)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef() {
+  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDomLS.newInstance
@@ -831,7 +831,7 @@ class DomLSInteropTest extends Suite {
     checkChildText(root4)
   }
 
-  @Test def testParseXmlWithNonExpandedEntityRef() {
+  @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
@@ -930,7 +930,7 @@ class DomLSInteropTest extends Suite {
     checkChildTextAndEntityRef(root4)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations() {
+  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDomLS.newInstance
@@ -992,7 +992,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars() {
+  @Test def testParseXmlWithEscapedChars(): Unit = {
     // 1. Parse XML file into Elem
 
     // We do not need to explicitly set coalescing to true
@@ -1088,7 +1088,7 @@ class DomLSInteropTest extends Suite {
     doChecks(root4)
   }
 
-  @Test def testParseXmlWithSpecialChars() {
+  @Test def testParseXmlWithSpecialChars(): Unit = {
     // 1. Parse XML file into Elem
 
     val domParser = DocumentParserUsingDomLS.newInstance
@@ -1180,7 +1180,7 @@ class DomLSInteropTest extends Suite {
       "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
   }
 
-  @Test def testParseBrokenXml() {
+  @Test def testParseBrokenXml(): Unit = {
     var errorCount = 0
 
     class MyErrorHandler extends DOMErrorHandler {
@@ -1215,7 +1215,7 @@ class DomLSInteropTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample() {
+  @Test def testParseGroovyXmlExample(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val doc = parser.parse(classOf[DomLSInteropTest].getResourceAsStream("cars.xml"))
@@ -1288,7 +1288,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testNoAdjacentTextNodes() {
+  @Test def testNoAdjacentTextNodes(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val xmlString = """<root><a> a <![CDATA[b]]> c </a></root>"""
@@ -1310,7 +1310,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testNoEmptyTextNodes() {
+  @Test def testNoEmptyTextNodes(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val xmlString = """<root><a></a><b><![CDATA[]]></b><c/></root>"""
@@ -1331,7 +1331,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testKeepCData() {
+  @Test def testKeepCData(): Unit = {
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
     val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
@@ -1384,7 +1384,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testKeepComments() {
+  @Test def testKeepComments(): Unit = {
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
     val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
@@ -1440,7 +1440,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testElementContentWhitespace() {
+  @Test def testElementContentWhitespace(): Unit = {
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
     val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
@@ -1493,7 +1493,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testValidate() {
+  @Test def testValidate(): Unit = {
     class MyErrorHandler extends DOMErrorHandler {
 
       override def handleError(exc: DOMError): Boolean = {
@@ -1542,7 +1542,7 @@ class DomLSInteropTest extends Suite {
     }
   }
 
-  @Test def testPrettyPrint() {
+  @Test def testPrettyPrint(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance()
 
     val xmlString =
@@ -1594,7 +1594,7 @@ class DomLSInteropTest extends Suite {
     assert(text1.size < text2.size)
   }
 
-  @Test def testPrettyPrintAgain() {
+  @Test def testPrettyPrintAgain(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance()
 
     val xmlString =
@@ -1642,7 +1642,7 @@ class DomLSInteropTest extends Suite {
     assert(text1.size < text2.size)
   }
 
-  @Test def testSuppressDtdResolution() {
+  @Test def testSuppressDtdResolution(): Unit = {
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       val resourceResolver = new LSResourceResolver {
@@ -1667,7 +1667,7 @@ class DomLSInteropTest extends Suite {
     assert(root.findAllElemsOrSelf.size >= 100)
   }
 
-  @Test def testParseFileWithUtf8Bom() {
+  @Test def testParseFileWithUtf8Bom(): Unit = {
     // 1. Parse XML file into Elem
 
     val parser = DocumentParserUsingDomLS.newInstance

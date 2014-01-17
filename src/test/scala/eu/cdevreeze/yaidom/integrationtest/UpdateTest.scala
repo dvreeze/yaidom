@@ -57,7 +57,7 @@ class UpdateTest extends Suite {
     DocumentPrinterUsingDom.newInstance(dbf, tf)
   }
 
-  @Test def testUpdateUsingPaths() {
+  @Test def testUpdateUsingPaths(): Unit = {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -98,7 +98,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  @Test def testUpdateUsingPathSet() {
+  @Test def testUpdateUsingPathSet(): Unit = {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -139,7 +139,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  @Test def testUpdateUsingTransform() {
+  @Test def testUpdateUsingTransform(): Unit = {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -181,7 +181,7 @@ class UpdateTest extends Suite {
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom functional updates */
-  @Test def testAnotherUpdate() {
+  @Test def testAnotherUpdate(): Unit = {
     val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
 
     val doc: Document = docParser.parse(is)
@@ -248,7 +248,7 @@ class UpdateTest extends Suite {
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom function topmostUpdated */
-  @Test def testAnotherUpdateUsingTransformTopmost() {
+  @Test def testAnotherUpdateUsingTransformTopmost(): Unit = {
     val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
 
     val doc: Document = docParser.parse(is)
