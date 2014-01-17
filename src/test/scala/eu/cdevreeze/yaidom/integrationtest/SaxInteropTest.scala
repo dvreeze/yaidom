@@ -322,7 +322,7 @@ class SaxInteropTest extends Suite {
     // One possible EntityResolver, namely one that tries to find the needed DTDs locally
     trait EntityResolverUsingLocalDtds extends EntityResolver {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
-        logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+        logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
         if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
           new InputSource(classOf[SaxInteropTest].getResourceAsStream("XMLSchema.dtd"))
@@ -338,7 +338,7 @@ class SaxInteropTest extends Suite {
     // Another possible EntityResolver, namely one that suppresses DTD resolution
     trait SuppressingEntityResolver extends EntityResolver {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
-        logger.info("Trying to resolve entity (but suppressing it). Public ID: %s. System ID: %s".format(publicId, systemId))
+        logger.info(s"Trying to resolve entity (but suppressing it). Public ID: $publicId. System ID: $systemId")
 
         // See http://stuartsierra.com/2008/05/08/stop-your-java-sax-parser-from-downloading-dtds
         new InputSource(new jio.StringReader(""))
@@ -1143,7 +1143,7 @@ class SaxInteropTest extends Suite {
 
   trait LoggingEntityResolver extends EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
-      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
       // Default behaviour
       null
     }

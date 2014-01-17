@@ -165,7 +165,7 @@ class ScalaXmlWrapperTest extends Suite {
     val resolvingXmlLoader = new scala.xml.factory.XMLLoader[scala.xml.Elem] {
       override def adapter: scala.xml.parsing.FactoryAdapter = new scala.xml.parsing.NoBindingFactoryAdapter() {
         override def resolveEntity(publicId: String, systemId: String): org.xml.sax.InputSource = {
-          logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+          logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
             new InputSource(classOf[ScalaXmlInteropTest].getResourceAsStream("XMLSchema.dtd"))

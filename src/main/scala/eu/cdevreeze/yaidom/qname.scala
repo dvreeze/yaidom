@@ -78,7 +78,7 @@ final case class PrefixedName(prefix: String, override val localPart: String) ex
   override def prefixOption: Option[String] = Some(prefix)
 
   /** The `String` representation as it appears in XML. For example, <code>xs:schema</code> */
-  override def toString: String = "%s:%s".format(prefix, localPart)
+  override def toString: String = s"${prefix}:${localPart}"
 }
 
 object QName {

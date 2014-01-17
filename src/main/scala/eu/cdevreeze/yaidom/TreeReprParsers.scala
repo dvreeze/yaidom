@@ -172,7 +172,7 @@ object TreeReprParsers extends JavaTokenParsers {
 
   private def unwrapStringLiteral(literal: String): String = {
     require(literal.startsWith("\"") && literal.endsWith("\""),
-      "Expected string literal, enclosed by a pair of double quotes, but found '%s'".format(literal))
+      s"Expected string literal, enclosed by a pair of double quotes, but found '${literal}'")
 
     val content = literal.drop(1).dropRight(1)
     StringEscapeUtils.unescapeJava(content)

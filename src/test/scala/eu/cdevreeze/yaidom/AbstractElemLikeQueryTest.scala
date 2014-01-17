@@ -804,7 +804,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val isbn = "ISBN-0-11-222222-3"
 
     val bookElmOption = bookstore findElem { e => e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn) }
-    val bookElm = bookElmOption.getOrElse(sys.error("Expected Book with ISBN %s".format(isbn)))
+    val bookElm = bookElmOption.getOrElse(sys.error(s"Expected Book with ISBN $isbn"))
 
     val title = bookElm.getChildElem(_.localName == "Title").text
 

@@ -1091,7 +1091,7 @@ class StaxInteropTest extends Suite {
 
   class LoggingResolver extends XMLResolver {
     override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
-      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
       // Default behaviour
       val is: jio.InputStream = null
       is
@@ -1100,14 +1100,14 @@ class StaxInteropTest extends Suite {
 
   class DtdSuppressionResolver extends XMLResolver {
     override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
-      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
       new java.io.StringReader("")
     }
   }
 
   class EntityResolverUsingLocalDtds extends XMLResolver {
     override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
-      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
       if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
         classOf[StaxInteropTest].getResourceAsStream("XMLSchema.dtd")

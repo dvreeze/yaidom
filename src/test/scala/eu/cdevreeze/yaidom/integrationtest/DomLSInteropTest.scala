@@ -467,7 +467,7 @@ class DomLSInteropTest extends Suite {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       val resourceResolver = new LSResourceResolver {
         override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
-          logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+          logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
             val is = classOf[DomLSInteropTest].getResourceAsStream("XMLSchema.dtd")
@@ -1647,7 +1647,7 @@ class DomLSInteropTest extends Suite {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       val resourceResolver = new LSResourceResolver {
         override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
-          logger.info("Suppressing DTD resolution! Public ID: %s. System ID: %s".format(publicId, systemId))
+          logger.info(s"Suppressing DTD resolution! Public ID: $publicId. System ID: $systemId")
 
           val input = domImplLS.createLSInput()
           input.setCharacterStream(new jio.StringReader(""))

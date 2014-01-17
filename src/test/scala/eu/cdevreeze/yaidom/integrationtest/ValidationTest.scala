@@ -192,12 +192,13 @@ object ValidationTest {
 
   def hasName(ename: EName): ElemValidator = { elm: Elem =>
     val success = elm.resolvedName == ename
-    if (success) ValidationResult.ok else ValidationResult.notOk("Expected name %s but found name %s instead".format(ename, elm.resolvedName))
+    if (success) ValidationResult.ok
+    else ValidationResult.notOk(s"Expected name $ename but found name ${elm.resolvedName} instead")
   }
 
   def hasAttribute(ename: EName): ElemValidator = { elm: Elem =>
     val success = elm.attributeOption(ename).isDefined
-    if (success) ValidationResult.ok else ValidationResult.notOk("Attribute %s not found".format(ename))
+    if (success) ValidationResult.ok else ValidationResult.notOk(s"Attribute $ename not found")
   }
 
   def sequence(nameOccsWithValidators: NameOccurrencesWithValidator*): ElemValidator = { elm: Elem =>
@@ -211,7 +212,7 @@ object ValidationTest {
         if (matchingChildElms.size < nameOccsWithValidator.nameOccurrences.minOccurs ||
           nameOccsWithValidator.nameOccurrences.maxOccursOption.getOrElse(java.lang.Integer.MAX_VALUE) < matchingChildElms.size) {
 
-          lastValidationResult = ValidationResult.notOk("Too few or too many %s elements".format(nameOccsWithValidator.nameOccurrences.name))
+          lastValidationResult = ValidationResult.notOk(s"Too few or too many ${nameOccsWithValidator.nameOccurrences.name} elements")
         } else {
           for (elm <- matchingChildElms) {
             if (lastValidationResult.success) {
@@ -241,6 +242,6 @@ object ValidationTest {
 
   def validateStringElem(elm: Elem): ValidationResult = {
     val ok = elm.findAllChildElems.isEmpty
-    if (ok) ValidationResult.ok else ValidationResult.notOk("%s is not a string element".format(elm.resolvedName))
+    if (ok) ValidationResult.ok else ValidationResult.notOk(s"${elm.resolvedName} is not a string element")
   }
 }

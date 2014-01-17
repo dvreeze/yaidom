@@ -131,7 +131,7 @@ final class Document(
         val line = "uriOption = None"
         LineSeq(line)
       } else {
-        val line = "uriOption = Some(%s)".format(toStringLiteral(this.uriOption.get.toString))
+        val line = s"uriOption = Some(${toStringLiteral(this.uriOption.get.toString)})"
         LineSeq(line)
       }
 

@@ -465,7 +465,7 @@ class DomInteropTest extends Suite {
       val db = documentBuilderFactory.newDocumentBuilder()
       db.setEntityResolver(new EntityResolver {
         def resolveEntity(publicId: String, systemId: String): InputSource = {
-          logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+          logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
             new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
@@ -1430,7 +1430,7 @@ class DomInteropTest extends Suite {
 
   class LoggingEntityResolver extends EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
-      logger.info("Trying to resolve entity. Public ID: %s. System ID: %s".format(publicId, systemId))
+      logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
       // Default behaviour
       null
     }

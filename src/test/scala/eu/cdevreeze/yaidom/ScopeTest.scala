@@ -272,13 +272,13 @@ class ScopeTest extends Suite {
     val expectedENames = List(EName("http://e", "x"), EName("http://b", "y"), EName("http://ccc", "z"), EName("http://d", "z"))
 
     expectResult(expectedENames) {
-      qnames map { qname => scope2.resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+      qnames map { qname => scope2.resolveQNameOption(qname).getOrElse(sys.error(s"QName $qname not resolved")) }
     }
 
     expectResult(expectedENames) {
       qnames map { qname =>
         (scope1.withoutDefaultNamespace ++ scope2).resolveQNameOption(qname).getOrElse(
-          sys.error("QName %s not resolved".format(qname)))
+          sys.error(s"QName $qname not resolved"))
       }
     }
   }
@@ -308,12 +308,12 @@ class ScopeTest extends Suite {
     val expectedENames = List(EName("http://b", "y"), EName("http://ccc", "z"), EName("http://d", "z"))
 
     expectResult(expectedENames) {
-      qnames map { qname => scope2.resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname))) }
+      qnames map { qname => scope2.resolveQNameOption(qname).getOrElse(sys.error(s"QName $qname not resolved")) }
     }
 
     expectResult(expectedENames) {
       qnames map { qname =>
-        (scope1 ++ scope2).resolveQNameOption(qname).getOrElse(sys.error("QName %s not resolved".format(qname)))
+        (scope1 ++ scope2).resolveQNameOption(qname).getOrElse(sys.error(s"QName $qname not resolved"))
       }
     }
   }

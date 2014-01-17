@@ -71,7 +71,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testProcessLargeXmlUsingSax] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testProcessLargeXmlUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doTest(doc.documentElement)
   }
@@ -82,7 +82,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testProcessLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testProcessLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val resolvedRoot = resolved.Elem(doc.documentElement)
     doTest(resolvedRoot)
@@ -112,18 +112,18 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       val parser = DocumentParserUsingSax.newInstance
 
       val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-      logger.info("Parsed Document (%d) in thread %s".format(i + 1, Thread.currentThread.getName))
+      logger.info(s"Parsed Document (${i + 1}) in thread ${Thread.currentThread.getName}")
 
       (i % 5) match {
         case 0 =>
           val firstNameElms = doc.documentElement.filterElems(FirstNameEName)
-          logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
+          logger.info(s"Number of first names: ${firstNameElms.size}. Thread ${Thread.currentThread.getName}")
         case 1 =>
           val lastNameElms = doc.documentElement.filterElems(LastNameEName)
-          logger.info("Number of last names: %d. Thread %s".format(lastNameElms.size, Thread.currentThread.getName))
+          logger.info(s"Number of last names: ${lastNameElms.size}. Thread ${Thread.currentThread.getName}")
         case 2 =>
           val contactElms = doc.documentElement \\ ContactEName
-          logger.info("Number of contacts: %d. Thread %s".format(contactElms.size, Thread.currentThread.getName))
+          logger.info(s"Number of contacts: ${contactElms.size}. Thread ${Thread.currentThread.getName}")
         case 3 =>
           val emails = {
             val result = doc.documentElement.findAllElemsOrSelf collect {
@@ -131,10 +131,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
             }
             result.toSet
           }
-          logger.info("Different e-mails (%d): %s. Thread %s".format(emails.size, emails, Thread.currentThread.getName))
+          logger.info(s"Different e-mails (${emails.size}): %s. Thread ${Thread.currentThread.getName}")
         case 4 =>
           val firstNameElms = doc.documentElement \\ FirstNameEName
-          logger.info("Number of first names: %d. Thread %s".format(firstNameElms.size, Thread.currentThread.getName))
+          logger.info(s"Number of first names: ${firstNameElms.size}. Thread ${Thread.currentThread.getName}")
       }
     }
   }
@@ -145,7 +145,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testProcessLargeXmlUsingStax] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testProcessLargeXmlUsingStax] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doTest(doc.documentElement)
   }
@@ -156,7 +156,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testProcessLargeXmlUsingDom] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testProcessLargeXmlUsingDom] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doTest(doc.documentElement)
   }
@@ -167,7 +167,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testProcessLargeXmlIntoIndexedElem] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testProcessLargeXmlIntoIndexedElem] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val indexedDoc = indexed.Document(doc)
 
@@ -181,12 +181,12 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs1 = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs1 = System.currentTimeMillis()
-    logger.info("[testProcessLargeTreeRepr] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
+    logger.info(s"[testProcessLargeTreeRepr] Parsing (into a Document) took ${endMs1 - startMs1} ms")
 
     val startMs2 = System.currentTimeMillis()
     val treeRepr: String = doc.toString
     val endMs2 = System.currentTimeMillis()
-    logger.info("[testProcessLargeTreeRepr] Calling toString took %d ms".format(endMs2 - startMs2))
+    logger.info(s"[testProcessLargeTreeRepr] Calling toString took ${endMs2 - startMs2} ms")
 
     expectResult("document(") {
       treeRepr.take("document(".length)
@@ -200,7 +200,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       parseResult.get.build()
     }
     val endMs3 = System.currentTimeMillis()
-    logger.info("[testProcessLargeTreeRepr] Parsing the tree representation took %d ms".format(endMs3 - startMs3))
+    logger.info(s"[testProcessLargeTreeRepr] Parsing the tree representation took ${endMs3 - startMs3} ms")
 
     doTest(doc2.documentElement)
   }
@@ -211,7 +211,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs1 = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs1 = System.currentTimeMillis()
-    logger.info("[testSerializeLargeNodeBuilder] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
+    logger.info(s"[testSerializeLargeNodeBuilder] Parsing (into a Document) took ${endMs1 - startMs1} ms")
 
     val startMs2 = System.currentTimeMillis()
 
@@ -224,7 +224,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val objectBytes = bos.toByteArray
 
     val endMs2 = System.currentTimeMillis()
-    logger.info("[testSerializeLargeNodeBuilder] Serializing took %d ms".format(endMs2 - startMs2))
+    logger.info(s"[testSerializeLargeNodeBuilder] Serializing took ${endMs2 - startMs2} ms")
 
     val startMs3 = System.currentTimeMillis()
 
@@ -235,7 +235,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val doc2 = doc2Builder.build()
 
     val endMs3 = System.currentTimeMillis()
-    logger.info("[testSerializeLargeNodeBuilder] Deserializing took %d ms".format(endMs3 - startMs3))
+    logger.info(s"[testSerializeLargeNodeBuilder] Deserializing took ${endMs3 - startMs3} ms")
 
     doTest(doc2.documentElement)
   }
@@ -246,7 +246,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs1 = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs1 = System.currentTimeMillis()
-    logger.info("[testSerializeLargeNode] Parsing (into a Document) took %d ms".format(endMs1 - startMs1))
+    logger.info(s"[testSerializeLargeNode] Parsing (into a Document) took ${endMs1 - startMs1} ms")
 
     val startMs2 = System.currentTimeMillis()
 
@@ -258,7 +258,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val objectBytes = bos.toByteArray
 
     val endMs2 = System.currentTimeMillis()
-    logger.info("[testSerializeLargeNode] Serializing took %d ms".format(endMs2 - startMs2))
+    logger.info(s"[testSerializeLargeNode] Serializing took ${endMs2 - startMs2} ms")
 
     val startMs3 = System.currentTimeMillis()
 
@@ -268,7 +268,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val doc2 = ois.readObject().asInstanceOf[Document]
 
     val endMs3 = System.currentTimeMillis()
-    logger.info("[testSerializeLargeNode] Deserializing took %d ms".format(endMs3 - startMs3))
+    logger.info(s"[testSerializeLargeNode] Deserializing took ${endMs3 - startMs3} ms")
 
     doTest(doc2.documentElement)
   }
@@ -279,7 +279,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testFind] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testFind] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
@@ -308,46 +308,46 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val start2Ms = System.currentTimeMillis()
     val foundElm2 = {
       val result = rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+      result.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
     val end2Ms = System.currentTimeMillis()
-    logger.info("Finding an element the fast way (using findElemOrSelf) took %d ms".format(end2Ms - start2Ms))
+    logger.info(s"Finding an element the fast way (using findElemOrSelf) took ${end2Ms - start2Ms} ms")
 
     // Finding the fast way (again)
     val start3Ms = System.currentTimeMillis()
     val foundElm3 = {
       val result = rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+      result.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
     val end3Ms = System.currentTimeMillis()
-    logger.info("Finding an element the fast way (using findElem) took %d ms".format(end3Ms - start3Ms))
+    logger.info(s"Finding an element the fast way (using findElem) took ${end3Ms - start3Ms} ms")
 
     // Finding the slower way
     val start4Ms = System.currentTimeMillis()
     val foundElm4 = {
       val result = rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
     val end4Ms = System.currentTimeMillis()
-    logger.info("Finding an element the slower way (using findTopmostElemsOrSelf) took %d ms".format(end4Ms - start4Ms))
+    logger.info(s"Finding an element the slower way (using findTopmostElemsOrSelf) took ${end4Ms - start4Ms} ms")
 
     // Finding the still slower way (in theory)
     val start5Ms = System.currentTimeMillis()
     val foundElm5 = {
       val result = rootElm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
     val end5Ms = System.currentTimeMillis()
-    logger.info("Finding an element the (theoretically) still slower way (using filterElemsOrSelf) took %d ms".format(end5Ms - start5Ms))
+    logger.info(s"Finding an element the (theoretically) still slower way (using filterElemsOrSelf) took ${end5Ms - start5Ms} ms")
 
     // Finding the slowest way (in theory)
     val start6Ms = System.currentTimeMillis()
     val foundElm6 = {
       val result = rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.headOption.getOrElse(sys.error("Expected at least one phone element with text value '%s'".format(s)))
+      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
     val end6Ms = System.currentTimeMillis()
-    logger.info("Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took %d ms".format(end6Ms - start6Ms))
+    logger.info(s"Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took ${end6Ms - start6Ms} ms")
   }
 
   @Test def testUpdate(): Unit = {
@@ -356,7 +356,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testUpdate] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testUpdate] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
@@ -379,7 +379,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       e.withChildren(Vector(Text(newPhone, false)))
     }
     val end2Ms = System.currentTimeMillis()
-    logger.info("Updating an element in the document took %d ms".format(end2Ms - start2Ms))
+    logger.info(s"Updating an element in the document took ${end2Ms - start2Ms} ms")
 
     val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
@@ -416,7 +416,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testUpdateUsingPaths] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testUpdateUsingPaths] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
@@ -442,7 +442,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       else e
     }
     val end2Ms = System.currentTimeMillis()
-    logger.info("Updating an element in the document (using paths) took %d ms".format(end2Ms - start2Ms))
+    logger.info(s"Updating an element in the document (using paths) took ${end2Ms - start2Ms} ms")
 
     val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
@@ -480,7 +480,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info("[testTransform] Parsing (into a Document) took %d ms".format(endMs - startMs))
+    logger.info(s"[testTransform] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
@@ -509,7 +509,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     var updatedDoc: Document = doc.transformElemsOrSelf(doUpdate _)
 
     val end2Ms = System.currentTimeMillis()
-    logger.info("Transforming an element in the document (using method transformElemsOrSelf) took %d ms".format(end2Ms - start2Ms))
+    logger.info(s"Transforming an element in the document (using method transformElemsOrSelf) took ${end2Ms - start2Ms} ms")
 
     var newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
@@ -522,7 +522,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     updatedDoc = doc.transformElemsToNodeSeq(e => Vector(doUpdate(e)))
 
     val end3Ms = System.currentTimeMillis()
-    logger.info("Transforming an element in the document (using method transformElemsToNodeSeq) took %d ms".format(end3Ms - start3Ms))
+    logger.info(s"Transforming an element in the document (using method transformElemsToNodeSeq) took ${end3Ms - start3Ms} ms")
 
     newPhoneElm = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
@@ -543,9 +543,9 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val s = "b" * (2000 + 46)
     val elms1 = elm \\ { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-    assert(elms1.size >= 1, "Expected at least one phone element with text value '%s'".format(s))
+    assert(elms1.size >= 1, s"Expected at least one phone element with text value '${s}'")
 
     val endMs = System.currentTimeMillis()
-    logger.info("The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took %d ms".format(endMs - startMs))
+    logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms")
   }
 }

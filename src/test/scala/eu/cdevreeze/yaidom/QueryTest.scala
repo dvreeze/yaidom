@@ -426,7 +426,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
       val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
       val lastNameValue: String = author.getChildElem(EName("Last_Name")).trimmedText
-      val nameValue: String = "%s %s".format(firstNameValue, lastNameValue)
+      val nameValue: String = s"$firstNameValue $lastNameValue"
       val name: ElemBuilder = textElem(QName("Name"), nameValue)
 
       elem(

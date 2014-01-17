@@ -483,14 +483,14 @@ final class Elem(
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val qnameLineSeq: LineSeq = {
-      val line = "qname = QName(%s)".format(toStringLiteral(this.qname.toString))
+      val line = s"qname = QName(${toStringLiteral(this.qname.toString)})"
       LineSeq(line)
     }
 
     val attributesLineSeqOption: Option[LineSeq] =
       if (this.attributes.isEmpty) None else {
         def attributeEntryString(qname: QName, attrValue: String): String = {
-          "QName(%s) -> %s".format(toStringLiteral(qname.toString), toStringLiteral(attrValue))
+          s"QName(${toStringLiteral(qname.toString)}) -> ${toStringLiteral(attrValue)}"
         }
 
         val attributeEntryStrings = {
@@ -498,7 +498,7 @@ final class Elem(
           result.mkString(", ")
         }
 
-        val line = "attributes = Vector(%s)".format(attributeEntryStrings)
+        val line = s"attributes = Vector(${attributeEntryStrings})"
         Some(LineSeq(line))
       }
 
@@ -515,7 +515,7 @@ final class Elem(
           result.mkString(", ")
         }
 
-        val line = "namespaces = Declarations.from(%s)".format(namespaceEntryStrings)
+        val line = s"namespaces = Declarations.from(${namespaceEntryStrings})"
         Some(LineSeq(line))
       }
     }
@@ -574,7 +574,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val targetStringLiteral = toStringLiteral(target)
     val dataStringLiteral = toStringLiteral(data)
-    LineSeq("processingInstruction(%s, %s)".format(targetStringLiteral, dataStringLiteral)).shift(indent)
+    LineSeq(s"processingInstruction(${targetStringLiteral}, ${dataStringLiteral})").shift(indent)
   }
 }
 
@@ -594,7 +594,7 @@ final case class EntityRef(entity: String) extends Node {
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val entityStringLiteral = toStringLiteral(entity)
-    LineSeq("entityRef(%s)".format(entityStringLiteral)).shift(indent)
+    LineSeq(s"entityRef(${entityStringLiteral})").shift(indent)
   }
 }
 

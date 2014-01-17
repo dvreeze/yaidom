@@ -259,7 +259,7 @@ class AirportExampleTest extends Suite {
       val result = airportCodes map { airport =>
         val airportElm: Elem = {
           val result: Option[Elem] = airportElms find { e => airportCode(e) == airport }
-          result.getOrElse(sys.error("Airport %s must exist".format(airport)))
+          result.getOrElse(sys.error(s"Airport $airport must exist"))
         }
 
         val lat = airportLatitude(airportElm)

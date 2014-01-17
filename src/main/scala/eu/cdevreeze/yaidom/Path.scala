@@ -190,7 +190,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
 
   override def hashCode: Int = entries.hashCode
 
-  override def toString: String = "Path(%s)".format(entries.toString)
+  override def toString: String = s"Path(${entries.toString})"
 
   /**
    * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `Path`).
@@ -280,7 +280,7 @@ object Path {
         }
       }
 
-      "%s%s[%d]".format("/", elementName.toQName(prefixOption).toString, position)
+      s"/${elementName.toQName(prefixOption).toString}[${position}]"
     }
 
     def localName: String = elementName.localPart
