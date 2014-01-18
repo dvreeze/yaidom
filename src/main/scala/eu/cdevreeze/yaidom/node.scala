@@ -37,7 +37,7 @@ sealed trait Node extends Immutable with Serializable {
    *
    * There are a couple of advantages of this method compared to some "toXmlString" method which returns the XML string:
    * <ul>
-   * <li>The parsed XML tree is made explicit, which makes debugging far easier, especially since method toString delegates to this method</li>
+   * <li>The parsed XML tree is made explicit, which makes debugging far easier, especially since method toString invokes this method</li>
    * <li>The output of method `toTreeRepr` clearly corresponds to a `NodeBuilder`, and can indeed be parsed into one</li>
    * <li>That `toTreeRepr` output is even valid Scala code</li>
    * <li>When parsing the string into a `NodeBuilder`, the following is out of scope: character escaping (for XML), entity resolving, "ignorable" whitespace handling, etc.</li>

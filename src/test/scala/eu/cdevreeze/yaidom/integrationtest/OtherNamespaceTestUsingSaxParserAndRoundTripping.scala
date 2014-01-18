@@ -40,10 +40,10 @@ class OtherNamespaceTestUsingSaxParserAndRoundTripping extends AbstractOtherName
 
   val documentParser: DocumentParser = new AbstractDocumentParser {
 
-    private val delegate: DocumentParser = DocumentParserUsingSax.newInstance
+    private val wrappedDocumentParser: DocumentParser = DocumentParserUsingSax.newInstance
 
     override def parse(inputStream: InputStream): Document = {
-      val doc = delegate.parse(inputStream)
+      val doc = wrappedDocumentParser.parse(inputStream)
 
       val result = doc.withDocumentElement(convertToElem(convertElem(doc.documentElement)))
 
@@ -57,10 +57,10 @@ class OtherNamespaceTestUsingSaxParserAndRoundTripping extends AbstractOtherName
 
   val documentParserForXml11: DocumentParser = new AbstractDocumentParser {
 
-    private val delegate: DocumentParser = DocumentParserUsingSax.newInstance
+    private val wrappedDocumentParser: DocumentParser = DocumentParserUsingSax.newInstance
 
     override def parse(inputStream: InputStream): Document = {
-      val doc = delegate.parse(inputStream)
+      val doc = wrappedDocumentParser.parse(inputStream)
 
       val result = doc.withDocumentElement(convertToElem(convertElem(doc.documentElement)))
 
