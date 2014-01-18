@@ -43,11 +43,35 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testParallelismUsingDom(): Unit = {
+  @Test def testParallelExecutionUsingDom(): Unit = {
+    doTestParallelExecution(
+      { () => DocumentParserUsingDom.newInstance },
+      { () => DocumentPrinterUsingDom.newInstance })
+  }
+
+  @Test def testParallelExecutionUsingDomLS(): Unit = {
+    doTestParallelExecution(
+      { () => DocumentParserUsingDomLS.newInstance },
+      { () => DocumentPrinterUsingDomLS.newInstance })
+  }
+
+  @Test def testParallelExecutionUsingSax(): Unit = {
+    doTestParallelExecution(
+      { () => DocumentParserUsingSax.newInstance },
+      { () => DocumentPrinterUsingSax.newInstance })
+  }
+
+  @Test def testParallelExecutionUsingStax(): Unit = {
+    doTestParallelExecution(
+      { () => DocumentParserUsingStax.newInstance },
+      { () => DocumentPrinterUsingStax.newInstance })
+  }
+
+  private def doTestParallelExecution(parserCreator: () => DocumentParser, printerCreator: () => DocumentPrinter): Unit = {
     val resolvedRootElem = resolved.Elem(rootElem)
 
-    val docParser = new ThreadLocalDocumentParser({ () => DocumentParserUsingDom.newInstance })
-    val docPrinter = new ThreadLocalDocumentPrinter({ () => DocumentPrinterUsingDom.newInstance })
+    val docParser = new ThreadLocalDocumentParser(parserCreator)
+    val docPrinter = new ThreadLocalDocumentPrinter(printerCreator)
 
     implicit val execContext = ExecutionContext.fromExecutor(juc.Executors.newFixedThreadPool(10))
 
@@ -90,7 +114,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
       }
     }
 
-    for (f <- futures) { Await.ready(f, 5 seconds) }
+    for (f <- futures) { Await.ready(f, 5.seconds) }
     expectResult(true) {
       futures forall (f => f.isCompleted)
     }
