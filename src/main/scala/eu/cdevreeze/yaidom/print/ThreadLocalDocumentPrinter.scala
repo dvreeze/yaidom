@@ -61,8 +61,8 @@ final class ThreadLocalDocumentPrinter(val docPrinterCreator: () => DocumentPrin
     documentPrinterOfCurrentThread.print(doc)
 
   /**
-   * Returns the DocumentPrinter instance omitting the XML declaration, attached to the current thread.
+   * Returns a new ThreadLocalDocumentPrinter instance, but omitting the XML declaration.
    */
   def omittingXmlDeclaration: DocumentPrinter =
-    threadLocalDocPrinterOmittingXmlDeclaration.get
+    new ThreadLocalDocumentPrinter({ () => docPrinterCreator().omittingXmlDeclaration })
 }
