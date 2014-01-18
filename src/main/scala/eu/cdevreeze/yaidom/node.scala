@@ -265,7 +265,7 @@ final class Elem(
     scope: Scope = this.scope,
     children: immutable.IndexedSeq[Node] = this.children): Elem = {
 
-    new Elem(qname, attributes, scope, children)
+    new Elem(qname, attributes, scope, children)(enameProvider)
   }
 
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
@@ -343,7 +343,7 @@ final class Elem(
    */
   def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
     attributeAsQNameOption(expandedName) map { qname =>
-      scope.resolveQNameOption(qname).getOrElse(
+      scope.resolveQNameOption(qname)(enameProvider).getOrElse(
         sys.error(s"Could not resolve QName-valued attribute value $qname, given scope [${scope}]"))
     }
   }
@@ -360,7 +360,7 @@ final class Elem(
 
   /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
   def textAsResolvedQName: EName =
-    scope.resolveQNameOption(textAsQName).getOrElse(
+    scope.resolveQNameOption(textAsQName)(enameProvider).getOrElse(
       sys.error(s"Could not resolve QName-valued element text $qname, given scope [${scope}]"))
 
   /**
