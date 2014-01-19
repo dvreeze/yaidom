@@ -16,11 +16,25 @@
 
 package eu.cdevreeze.yaidom
 
+import scala.util.Try
+
 /**
  * Provider of QNames, possibly from a cache of QNames. Typical implementations cache QName instances, to prevent any explosion
  * of equal QName instances, thus unnecessarily increasing the memory footprint.
  *
- * Yaidom itself internally uses this trait to reduce the memory footprint of parsed elements.
+ * The implicit default QNameProvider is a QNameProvider.ConfigurableQNameProvider. By updating its wrapped QNameProvider,
+ * the globally used QNameProvider is set.
+ *
+ * ==Implementation notes==
+ *
+ * The chosen implementation strategy for (globally) setting the QNameProvider is as follows:
+ * <ul>
+ * <li>The public API remains backward compatible as much as possible, and possibly implicit parameters are introduced for
+ * implicit QName providers.</li>
+ * <li>Still, implicit parameters are used in moderation, and not in many places throughout the API. This reduces the risk
+ * of polluting the API, and of many future deprecation warnings.</li>
+ * <li>There is one implicit QNameProvider, that can be updated as the globally used QNameProvider.</li>
+ * </ul>
  *
  * @author Chris de Vreeze
  */
@@ -50,9 +64,9 @@ trait QNameProvider {
 object QNameProvider {
 
   /**
-   * Default, non-caching, QName provider.
+   * Trivial, non-caching, QName provider.
    */
-  final class DefaultQNameProvider extends QNameProvider {
+  final class TrivialQNameProvider extends QNameProvider {
 
     def getQName(prefixOption: Option[String], localPart: String): QName = QName(prefixOption, localPart)
 
@@ -63,7 +77,30 @@ object QNameProvider {
     def parseQName(s: String): QName = QName.parse(s)
   }
 
-  implicit val defaultInstance = new DefaultQNameProvider
+  /**
+   * Configurable QName provider. The wrapped QNameProvider is used, and it can be updated. The default wrapped QNameProvider
+   * is a TrivialQNameProvider.
+   */
+  final class ConfigurableQNameProvider extends QNameProvider {
+
+    @volatile var wrappedProvider: QNameProvider = new TrivialQNameProvider
+
+    def getQName(prefixOption: Option[String], localPart: String): QName =
+      wrappedProvider.getQName(prefixOption, localPart)
+
+    def getQName(prefix: String, localPart: String): QName =
+      wrappedProvider.getQName(prefix, localPart)
+
+    def getUnprefixedQName(localPart: String): QName =
+      wrappedProvider.getUnprefixedQName(localPart)
+
+    def parseQName(s: String): QName = wrappedProvider.parseQName(s)
+  }
+
+  /**
+   * The implicit default QNameProvider is a configurable QNameProvider.
+   */
+  implicit val defaultInstance: ConfigurableQNameProvider = new ConfigurableQNameProvider
 
   /**
    * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.

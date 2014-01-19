@@ -76,7 +76,7 @@ import eu.cdevreeze.yaidom.convert.DomConversions
  */
 final class DocumentParserUsingDomLS(
   val domImplementation: DOMImplementationLS,
-  val parserCreator: DOMImplementationLS => LSParser)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider) extends AbstractDocumentParser {
+  val parserCreator: DOMImplementationLS => LSParser) extends AbstractDocumentParser {
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
@@ -88,22 +88,21 @@ final class DocumentParserUsingDomLS(
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
 
-      val domConversions = new DomConversions(enameProvider, qnameProvider)
-      domConversions.convertToDocument(domDoc)
+      DomConversions.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
     }
   }
 
   def withParserCreator(newParserCreator: DOMImplementationLS => LSParser): DocumentParserUsingDomLS = {
-    new DocumentParserUsingDomLS(domImplementation, newParserCreator)(enameProvider, qnameProvider)
+    new DocumentParserUsingDomLS(domImplementation, newParserCreator)
   }
 }
 
 object DocumentParserUsingDomLS {
 
   /** Returns `newInstance(domImplLS)` for an appropriate `DOMImplementationLS` */
-  def newInstance()(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingDomLS = {
+  def newInstance(): DocumentParserUsingDomLS = {
     val registry = DOMImplementationRegistry.newInstance
     val domImpl = registry.getDOMImplementation("LS 3.0")
     require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'")
@@ -111,15 +110,15 @@ object DocumentParserUsingDomLS {
     require(domImpl.isInstanceOf[DOMImplementationLS], "Expected DOM Implementation of type DOMImplementationLS")
     val domImplLS = domImpl.asInstanceOf[DOMImplementationLS]
 
-    newInstance(domImplLS)(enameProvider, qnameProvider)
+    newInstance(domImplLS)
   }
 
   /**
    * Returns a new instance, using the given `DOMImplementationLS`, without any further configuration.
    */
-  def newInstance(domImplementation: DOMImplementationLS)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingDomLS = {
+  def newInstance(domImplementation: DOMImplementationLS): DocumentParserUsingDomLS = {
     val parserCreator = (domImpl: DOMImplementationLS) => domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
-    newInstance(domImplementation, parserCreator)(enameProvider, qnameProvider)
+    newInstance(domImplementation, parserCreator)
   }
 
   /**
@@ -127,8 +126,8 @@ object DocumentParserUsingDomLS {
    */
   def newInstance(
     domImplementation: DOMImplementationLS,
-    parserCreator: DOMImplementationLS => LSParser)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingDomLS = {
+    parserCreator: DOMImplementationLS => LSParser): DocumentParserUsingDomLS = {
 
-    new DocumentParserUsingDomLS(domImplementation, parserCreator)(enameProvider, qnameProvider)
+    new DocumentParserUsingDomLS(domImplementation, parserCreator)
   }
 }

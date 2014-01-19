@@ -139,25 +139,19 @@ object DocumentParserUsingSax {
    * Calling the `setNamespaceAware` method instead does not suffice, and is not needed.
    * See http://www.cafeconleche.org/slides/xmlone/london2002/namespaces/36.html.
    */
-  def newInstance()(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingSax = {
+  def newInstance(): DocumentParserUsingSax = {
     val spf = SAXParserFactory.newInstance
     spf.setFeature("http://xml.org/sax/features/namespaces", true)
     spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
-    newInstance(spf)(enameProvider, qnameProvider)
+    newInstance(spf)
   }
 
   /**
    * Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`.
    * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
    */
-  def newInstance(parserFactory: SAXParserFactory)(implicit enameProvider: ENameProvider, qnameProvider: QNameProvider): DocumentParserUsingSax = {
-    val enProvider = enameProvider
-    val qnProvider = qnameProvider
-
-    newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {
-      protected override val enameProvider: ENameProvider = enProvider
-      protected override val qnameProvider: QNameProvider = qnProvider
-    })
+  def newInstance(parserFactory: SAXParserFactory): DocumentParserUsingSax = {
+    newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {})
   }
 
   /**

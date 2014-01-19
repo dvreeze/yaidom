@@ -36,9 +36,4 @@ package convert
  *
  * @author Chris de Vreeze
  */
-final class ScalaXmlConversions(
-  override val enameProvider: ENameProvider,
-  override val qnameProvider: QNameProvider) extends YaidomToScalaXmlConversions with ScalaXmlToYaidomConversions {
-}
-
 object ScalaXmlConversions extends YaidomToScalaXmlConversions with ScalaXmlToYaidomConversions

@@ -37,16 +37,6 @@ import scala.collection.{ immutable, mutable }
 trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
 
   /**
-   * Overridable method returning an ENameProvider
-   */
-  protected def enameProvider: ENameProvider = ENameProvider.defaultInstance
-
-  /**
-   * Overridable method returning a QNameProvider
-   */
-  protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
-
-  /**
    * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.Document]].
    */
   final def convertToDocument(v: org.w3c.dom.Document): Document = {
@@ -86,7 +76,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
       qname = qname,
       attributes = attributes,
       scope = newScope,
-      children = childSeq)(enameProvider)
+      children = childSeq)
   }
 
   /**
@@ -161,7 +151,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /** Extracts the `QName` of an `org.w3c.dom.Element` */
-  final def toQName(v: org.w3c.dom.Element): QName = {
+  final def toQName(v: org.w3c.dom.Element)(implicit qnameProvider: QNameProvider): QName = {
     val name: String = v.getTagName
     val arr = name.split(':')
     assert(arr.length >= 1 && arr.length <= 2)
@@ -169,7 +159,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /** Extracts the `QName` of an `org.w3c.dom.Attr`. If the `Attr` is a namespace declaration, an exception is thrown. */
-  final def toQName(v: org.w3c.dom.Attr): QName = {
+  final def toQName(v: org.w3c.dom.Attr)(implicit qnameProvider: QNameProvider): QName = {
     require(!isNamespaceDeclaration(v), "Namespace declaration not allowed")
     val name: String = v.getName
     val arr = name.split(':')

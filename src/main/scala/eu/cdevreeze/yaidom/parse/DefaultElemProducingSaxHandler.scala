@@ -35,16 +35,6 @@ import NodeBuilder._
 @NotThreadSafe
 trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {
 
-  /**
-   * Overridable ENameProvider
-   */
-  protected def enameProvider: ENameProvider = ENameProvider.defaultInstance
-
-  /**
-   * Overridable QNameProvider
-   */
-  protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
-
   // This content handler has a relatively simple state space, so is rather easy to reason about.
 
   // I very much like immutability, but sometimes mutable is better, like in this case.
@@ -174,7 +164,8 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     new Document(None, docElem, pis, comments)
   }
 
-  private def startElementToInternalElemNode(uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope): InternalElemNode = {
+  private def startElementToInternalElemNode(
+    uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope)(implicit qnameProvider: QNameProvider): InternalElemNode = {
     require(uri ne null)
     require(localName ne null)
     require(qName ne null)
@@ -194,7 +185,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
       children = mutable.IndexedSeq())
   }
 
-  private def extractDeclarations(atts: Attributes): Declarations = {
+  private def extractDeclarations(atts: Attributes)(implicit qnameProvider: QNameProvider): Declarations = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if isNamespaceDeclaration(qn) =>
         val key = qnameProvider.parseQName(qn)
@@ -205,7 +196,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     Declarations.from(result.toMap)
   }
 
-  private def extractAttributeMap(atts: Attributes): immutable.IndexedSeq[(QName, String)] = {
+  private def extractAttributeMap(atts: Attributes)(implicit qnameProvider: QNameProvider): immutable.IndexedSeq[(QName, String)] = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if !isNamespaceDeclaration(qn) =>
         val qname = qnameProvider.parseQName(qn)
@@ -256,7 +247,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
         qname = qname,
         attributes = attributes,
         scope = scope,
-        children = childSeq)(enameProvider)
+        children = childSeq)
     }
   }
 

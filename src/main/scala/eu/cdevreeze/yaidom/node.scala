@@ -158,7 +158,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node])(implicit enameProvider: ENameProvider) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -172,7 +172,7 @@ final class Elem(
 
   /** The `Elem` name as `EName`, obtained by resolving the element `QName` against the `Scope` */
   override val resolvedName: EName =
-    scope.resolveQNameOption(qname)(enameProvider).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
+    scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
 
   /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
   override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
@@ -182,7 +182,7 @@ final class Elem(
       val attName = kv._1
       val attValue = kv._2
       val expandedName =
-        attrScope.resolveQNameOption(attName)(enameProvider).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
+        attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
       (expandedName -> attValue)
     }
   }
@@ -265,7 +265,7 @@ final class Elem(
     scope: Scope = this.scope,
     children: immutable.IndexedSeq[Node] = this.children): Elem = {
 
-    new Elem(qname, attributes, scope, children)(enameProvider)
+    new Elem(qname, attributes, scope, children)
   }
 
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
@@ -343,7 +343,7 @@ final class Elem(
    */
   def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
     attributeAsQNameOption(expandedName) map { qname =>
-      scope.resolveQNameOption(qname)(enameProvider).getOrElse(
+      scope.resolveQNameOption(qname).getOrElse(
         sys.error(s"Could not resolve QName-valued attribute value $qname, given scope [${scope}]"))
     }
   }
@@ -360,7 +360,7 @@ final class Elem(
 
   /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
   def textAsResolvedQName: EName =
-    scope.resolveQNameOption(textAsQName)(enameProvider).getOrElse(
+    scope.resolveQNameOption(textAsQName).getOrElse(
       sys.error(s"Could not resolve QName-valued element text $qname, given scope [${scope}]"))
 
   /**

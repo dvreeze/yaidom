@@ -69,12 +69,12 @@ sealed trait NodeBuilder extends Immutable with Serializable {
 
   type NodeType <: Node
 
-  def build(parentScope: Scope)(implicit enameProvider: ENameProvider): NodeType
+  def build(parentScope: Scope): NodeType
 
   /**
    * Returns `build(Scope.Empty)`
    */
-  final def build()(implicit enameProvider: ENameProvider): NodeType = build(Scope.Empty)(enameProvider)
+  final def build(): NodeType = build(Scope.Empty)
 
   /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
   final def toTreeRepr(parentScope: Scope): String = build(parentScope).toTreeRepr(parentScope)
@@ -140,7 +140,7 @@ final class ElemBuilder(
    * The `Scope` of the created (root) element is the passed parent scope, altered by the namespace declarations
    * in this element builder, if any.
    */
-  def build(parentScope: Scope)(implicit enameProvider: ENameProvider): Elem = {
+  def build(parentScope: Scope): Elem = {
     val newScope = parentScope.resolve(namespaces)
 
     // Recursive, but not tail-recursive, calls to the same method
@@ -148,7 +148,7 @@ final class ElemBuilder(
       qname,
       attributes,
       newScope,
-      children map { ch => ch.build(newScope)(enameProvider) })(enameProvider)
+      children map { ch => ch.build(newScope) })
   }
 
   /**
@@ -230,7 +230,7 @@ final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder
 
   type NodeType = Text
 
-  def build(parentScope: Scope)(implicit enameProvider: ENameProvider): Text = Text(text, isCData)
+  def build(parentScope: Scope): Text = Text(text, isCData)
 }
 
 @SerialVersionUID(1L)
@@ -240,7 +240,7 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
 
   type NodeType = ProcessingInstruction
 
-  def build(parentScope: Scope)(implicit enameProvider: ENameProvider): ProcessingInstruction =
+  def build(parentScope: Scope): ProcessingInstruction =
     ProcessingInstruction(target, data)
 }
 
@@ -250,7 +250,7 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
 
   type NodeType = EntityRef
 
-  def build(parentScope: Scope)(implicit enameProvider: ENameProvider): EntityRef = EntityRef(entity)
+  def build(parentScope: Scope): EntityRef = EntityRef(entity)
 }
 
 @SerialVersionUID(1L)
@@ -259,7 +259,7 @@ final case class CommentBuilder(text: String) extends NodeBuilder {
 
   type NodeType = Comment
 
-  def build(parentScope: Scope)(implicit enameProvider: ENameProvider): Comment = Comment(text)
+  def build(parentScope: Scope): Comment = Comment(text)
 }
 
 object NodeBuilder {

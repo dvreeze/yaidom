@@ -16,11 +16,25 @@
 
 package eu.cdevreeze.yaidom
 
+import scala.util.Try
+
 /**
  * Provider of ENames, possibly from a cache of ENames. Typical implementations cache EName instances, to prevent any explosion
  * of equal EName instances, thus unnecessarily increasing the memory footprint.
  *
- * Yaidom itself internally uses this trait to reduce the memory footprint of parsed elements.
+ * The implicit default ENameProvider is a ENameProvider.ConfigurableENameProvider. By updating its wrapped ENameProvider,
+ * the globally used ENameProvider is set.
+ *
+ * ==Implementation notes==
+ *
+ * The chosen implementation strategy for (globally) setting the ENameProvider is as follows:
+ * <ul>
+ * <li>The public API remains backward compatible as much as possible, and possibly implicit parameters are introduced for
+ * implicit EName providers.</li>
+ * <li>Still, implicit parameters are used in moderation, and not in many places throughout the API. This reduces the risk
+ * of polluting the API, and of many future deprecation warnings.</li>
+ * <li>There is one implicit ENameProvider, that can be updated as the globally used ENameProvider.</li>
+ * </ul>
  *
  * @author Chris de Vreeze
  */
@@ -50,9 +64,9 @@ trait ENameProvider {
 object ENameProvider {
 
   /**
-   * Default, non-caching, EName provider.
+   * Trivial, non-caching, EName provider.
    */
-  final class DefaultENameProvider extends ENameProvider {
+  final class TrivialENameProvider extends ENameProvider {
 
     def getEName(namespaceUriOption: Option[String], localPart: String): EName = EName(namespaceUriOption, localPart)
 
@@ -63,7 +77,30 @@ object ENameProvider {
     def parseEName(s: String): EName = EName.parse(s)
   }
 
-  implicit val defaultInstance = new DefaultENameProvider
+  /**
+   * Configurable EName provider. The wrapped ENameProvider is used, and it can be updated. The default wrapped ENameProvider
+   * is a TrivialENameProvider.
+   */
+  final class ConfigurableENameProvider extends ENameProvider {
+
+    @volatile var wrappedProvider: ENameProvider = new TrivialENameProvider
+
+    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
+      wrappedProvider.getEName(namespaceUriOption, localPart)
+
+    def getEName(namespaceUri: String, localPart: String): EName =
+      wrappedProvider.getEName(namespaceUri, localPart)
+
+    def getNoNsEName(localPart: String): EName =
+      wrappedProvider.getNoNsEName(localPart)
+
+    def parseEName(s: String): EName = wrappedProvider.parseEName(s)
+  }
+
+  /**
+   * The implicit default ENameProvider is a configurable ENameProvider.
+   */
+  implicit val defaultInstance: ConfigurableENameProvider = new ConfigurableENameProvider
 
   /**
    * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.

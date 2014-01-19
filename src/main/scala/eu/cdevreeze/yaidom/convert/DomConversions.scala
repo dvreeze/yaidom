@@ -36,9 +36,4 @@ package convert
  *
  * @author Chris de Vreeze
  */
-final class DomConversions(
-  override val enameProvider: ENameProvider,
-  override val qnameProvider: QNameProvider) extends YaidomToDomConversions with DomToYaidomConversions {
-}
-
 object DomConversions extends YaidomToDomConversions with DomToYaidomConversions

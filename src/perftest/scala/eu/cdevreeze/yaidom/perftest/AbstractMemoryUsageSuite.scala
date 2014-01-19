@@ -23,6 +23,7 @@ import java.lang.management.ManagementFactory
 import scala.util.Try
 import org.scalatest.FunSuite
 import testtag.PerformanceTest
+import AbstractMemoryUsageSuite._
 
 /**
  * Abstract memory usage suite super-class, for different yaidom element types.
@@ -126,6 +127,21 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     val parserClass =
       Class.forName(System.getProperty("perftest.documentParser", "eu.cdevreeze.yaidom.parse.DocumentParserUsingSax")).asInstanceOf[Class[parse.DocumentParser]]
 
+    ENameProvider.defaultInstance.wrappedProvider = AbstractMemoryUsageSuite.defaultENameProvider
+    QNameProvider.defaultInstance.wrappedProvider = AbstractMemoryUsageSuite.defaultQNameProvider
+
+    val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance")
+    parserFactoryMethod.invoke(null).asInstanceOf[parse.DocumentParser]
+  }
+
+  protected def createCommonRootParent(rootElems: Vector[E]): E
+
+  protected def maxMemoryToFileLengthRatio: Int
+}
+
+object AbstractMemoryUsageSuite {
+
+  val defaultENameProvider: ENameProvider = {
     val thisClass = classOf[AbstractMemoryUsageSuite]
     val enameFiles =
       List(
@@ -134,9 +150,12 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/enames-link.txt").toURI))
     val enameCache =
       enameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => EName.parse(s) }
-    val enameProvider =
-      new ENameProvider.ENameProviderUsingImmutableMap(enameCache.toSet + EName("{http://www.xbrl.org/2003/instance}periodType"))
 
+    new ENameProvider.ENameProviderUsingImmutableMap(enameCache.toSet + EName("{http://www.xbrl.org/2003/instance}periodType"))
+  }
+
+  val defaultQNameProvider: QNameProvider = {
+    val thisClass = classOf[AbstractMemoryUsageSuite]
     val qnameFiles =
       List(
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-xs.txt").toURI),
@@ -144,14 +163,7 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-link.txt").toURI))
     val qnameCache =
       qnameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => QName.parse(s) }
-    val qnameProvider =
-      new QNameProvider.QNameProviderUsingImmutableMap(qnameCache.toSet + QName("xbrli:periodType"))
 
-    val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance", classOf[ENameProvider], classOf[QNameProvider])
-    parserFactoryMethod.invoke(null, enameProvider, qnameProvider).asInstanceOf[parse.DocumentParser]
+    new QNameProvider.QNameProviderUsingImmutableMap(qnameCache.toSet + QName("xbrli:periodType"))
   }
-
-  protected def createCommonRootParent(rootElems: Vector[E]): E
-
-  protected def maxMemoryToFileLengthRatio: Int
 }

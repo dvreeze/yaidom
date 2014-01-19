@@ -41,16 +41,6 @@ import scala.collection.{ immutable, mutable }
 trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document] with ConverterToElem[scala.xml.Elem] {
 
   /**
-   * Overridable method returning an ENameProvider
-   */
-  protected def enameProvider: ENameProvider = ENameProvider.defaultInstance
-
-  /**
-   * Overridable method returning a QNameProvider
-   */
-  protected def qnameProvider: QNameProvider = QNameProvider.defaultInstance
-
-  /**
    * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.Document]]. The resulting yaidom Document has no document URI.
    *
    * If the input Scala XML Document is not namespace-valid, an exception will be thrown.
@@ -86,7 +76,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
       qname = qname,
       attributes = attributes,
       scope = scope,
-      children = childSeq)(enameProvider)
+      children = childSeq)
   }
 
   /**
@@ -160,12 +150,12 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   }
 
   /** Extracts the `QName` of an `scala.xml.Elem` */
-  final def toQName(v: scala.xml.Elem): QName = {
+  final def toQName(v: scala.xml.Elem)(implicit qnameProvider: QNameProvider): QName = {
     if (v.prefix eq null) qnameProvider.getUnprefixedQName(v.label) else qnameProvider.getQName(v.prefix, v.label)
   }
 
   /** Extracts the `QName` of an attribute as `scala.xml.MetaData`. */
-  final def toQName(v: scala.xml.MetaData): QName = {
+  final def toQName(v: scala.xml.MetaData)(implicit qnameProvider: QNameProvider): QName = {
     if (v.isPrefixed) qnameProvider.parseQName(v.prefixedKey) else qnameProvider.parseQName(v.key)
   }
 }
