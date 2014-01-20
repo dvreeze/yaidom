@@ -78,29 +78,9 @@ object ENameProvider {
   }
 
   /**
-   * Configurable EName provider. The wrapped ENameProvider is used, and it can be updated. The default wrapped ENameProvider
-   * is a TrivialENameProvider.
+   * The implicit default ENameProvider is a "trivial" ENameProvider, but can be updated.
    */
-  final class ConfigurableENameProvider extends ENameProvider {
-
-    @volatile var wrappedProvider: ENameProvider = new TrivialENameProvider
-
-    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
-      wrappedProvider.getEName(namespaceUriOption, localPart)
-
-    def getEName(namespaceUri: String, localPart: String): EName =
-      wrappedProvider.getEName(namespaceUri, localPart)
-
-    def getNoNsEName(localPart: String): EName =
-      wrappedProvider.getNoNsEName(localPart)
-
-    def parseEName(s: String): EName = wrappedProvider.parseEName(s)
-  }
-
-  /**
-   * The implicit default ENameProvider is a configurable ENameProvider.
-   */
-  implicit val defaultInstance: ConfigurableENameProvider = new ConfigurableENameProvider
+  implicit var defaultInstance: ENameProvider = new TrivialENameProvider
 
   /**
    * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.

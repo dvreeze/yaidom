@@ -78,29 +78,9 @@ object QNameProvider {
   }
 
   /**
-   * Configurable QName provider. The wrapped QNameProvider is used, and it can be updated. The default wrapped QNameProvider
-   * is a TrivialQNameProvider.
+   * The implicit default QNameProvider is a "trivial" QNameProvider, but can be updated.
    */
-  final class ConfigurableQNameProvider extends QNameProvider {
-
-    @volatile var wrappedProvider: QNameProvider = new TrivialQNameProvider
-
-    def getQName(prefixOption: Option[String], localPart: String): QName =
-      wrappedProvider.getQName(prefixOption, localPart)
-
-    def getQName(prefix: String, localPart: String): QName =
-      wrappedProvider.getQName(prefix, localPart)
-
-    def getUnprefixedQName(localPart: String): QName =
-      wrappedProvider.getUnprefixedQName(localPart)
-
-    def parseQName(s: String): QName = wrappedProvider.parseQName(s)
-  }
-
-  /**
-   * The implicit default QNameProvider is a configurable QNameProvider.
-   */
-  implicit val defaultInstance: ConfigurableQNameProvider = new ConfigurableQNameProvider
+  implicit var defaultInstance: QNameProvider = new TrivialQNameProvider
 
   /**
    * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.
