@@ -80,7 +80,7 @@ object ENameProvider {
   /**
    * The implicit default ENameProvider is a "trivial" ENameProvider, but can be updated.
    */
-  implicit var defaultInstance: ENameProvider = new TrivialENameProvider
+  @volatile implicit var defaultInstance: ENameProvider = new TrivialENameProvider
 
   /**
    * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.

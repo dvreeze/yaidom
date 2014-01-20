@@ -80,7 +80,7 @@ object QNameProvider {
   /**
    * The implicit default QNameProvider is a "trivial" QNameProvider, but can be updated.
    */
-  implicit var defaultInstance: QNameProvider = new TrivialQNameProvider
+  @volatile implicit var defaultInstance: QNameProvider = new TrivialQNameProvider
 
   /**
    * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.
