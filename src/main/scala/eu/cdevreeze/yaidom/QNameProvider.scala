@@ -32,7 +32,8 @@ import scala.util.Try
  * <li>The public API remains backward compatible as much as possible, and possibly implicit parameters are introduced for
  * implicit QName providers.</li>
  * <li>Still, implicit parameters are used in moderation, and not in many places throughout the API. This reduces the risk
- * of polluting the API, and of many future deprecation warnings.</li>
+ * of polluting the API, and of many future deprecation warnings. Moreover, QNameProviders are implementation details.</li>
+ * <li>The query API should be stable, and therefore unaffected by (possibly implicit) QNameProviders.</li>
  * <li>There is one implicit QNameProvider, that can be updated as the globally used QNameProvider.</li>
  * </ul>
  *
