@@ -22,9 +22,6 @@ import scala.util.Try
  * Provider of QNames, possibly from a cache of QNames. Typical implementations cache QName instances, to prevent any explosion
  * of equal QName instances, thus unnecessarily increasing the memory footprint.
  *
- * The implicit default QNameProvider is a QNameProvider.ConfigurableQNameProvider. By updating its wrapped QNameProvider,
- * the globally used QNameProvider is set.
- *
  * ==Implementation notes==
  *
  * The chosen implementation strategy for (globally) setting the QNameProvider is as follows:

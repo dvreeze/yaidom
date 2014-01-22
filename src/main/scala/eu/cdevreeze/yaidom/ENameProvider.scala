@@ -22,9 +22,6 @@ import scala.util.Try
  * Provider of ENames, possibly from a cache of ENames. Typical implementations cache EName instances, to prevent any explosion
  * of equal EName instances, thus unnecessarily increasing the memory footprint.
  *
- * The implicit default ENameProvider is a ENameProvider.ConfigurableENameProvider. By updating its wrapped ENameProvider,
- * the globally used ENameProvider is set.
- *
  * ==Implementation notes==
  *
  * The chosen implementation strategy for (globally) setting the ENameProvider is as follows:
