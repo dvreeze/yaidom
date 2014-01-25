@@ -32,7 +32,7 @@ final class Elem private[docaware] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: eu.cdevreeze.yaidom.Elem) extends ElemLike[Elem] with HasText with Immutable {
+  val elem: eu.cdevreeze.yaidom.Elem) extends ElemLike[Elem] with HasQName with HasText with Immutable {
 
   @deprecated(message = "Use path instead", since = "0.7.1")
   def elemPath: Path = path
@@ -53,6 +53,10 @@ final class Elem private[docaware] (
   override def resolvedName: EName = elem.resolvedName
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
+
+  override def qname: QName = elem.qname
+
+  override def attributes: immutable.IndexedSeq[(QName, String)] = elem.attributes
 
   override def equals(obj: Any): Boolean = obj match {
     case other: Elem =>
