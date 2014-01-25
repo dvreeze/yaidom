@@ -34,9 +34,6 @@ final class Elem private[docaware] (
   val path: Path,
   val elem: eu.cdevreeze.yaidom.Elem) extends ElemLike[Elem] with HasQName with HasText with Immutable {
 
-  @deprecated(message = "Use path instead", since = "0.7.1")
-  def elemPath: Path = path
-
   // The elem must be the same as rootElem.findElemOrSelfByPath(path).get, which is not checked here
 
   assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")

@@ -39,9 +39,6 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
-  @deprecated(message = "Use findChildElemByPathEntry instead", since = "0.7.1")
-  final def findWithElemPathEntry(entry: Path.Entry): Option[E] = findChildElemByPathEntry(entry)
-
   final def getChildElemByPathEntry(entry: Path.Entry): E =
     findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $self"))
 
@@ -130,18 +127,8 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
     findElemOrSelfByPath(self, 0)
   }
 
-  /**
-   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
-   * This method must be very efficient, which depends on the efficiency of method `findChildElemByPathEntry`.
-   */
-  @deprecated(message = "Use findElemOrSelfByPath instead", since = "0.7.1")
-  final def findWithElemPath(path: Path): Option[E] = findElemOrSelfByPath(path)
-
   final def getElemOrSelfByPath(path: Path): E =
     findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
-
-  @deprecated(message = "Use getElemOrSelfByPath instead", since = "0.7.1")
-  final def getWithElemPath(path: Path): E = getElemOrSelfByPath(path)
 
   final def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
     findAllChildElemsWithPathEntries map { _._2 }

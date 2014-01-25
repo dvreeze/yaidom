@@ -447,17 +447,4 @@ package eu.cdevreeze
  *
  * @author Chris de Vreeze
  */
-package object yaidom {
-
-  @deprecated(message = "Use Path instead", since = "0.7.1")
-  type ElemPath = Path
-
-  @deprecated(message = "Use Path instead", since = "0.7.1")
-  val ElemPath = Path
-
-  @deprecated(message = "Use PathBuilder instead", since = "0.7.1")
-  type ElemPathBuilder = PathBuilder
-
-  @deprecated(message = "Use PathBuilder instead", since = "0.7.1")
-  val ElemPathBuilder = PathBuilder
-}
+package object yaidom

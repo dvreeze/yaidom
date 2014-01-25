@@ -213,15 +213,6 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
    */
   def findChildElemByPathEntry(entry: Path.Entry): Option[E]
 
-  /**
-   * Returns the equivalent of `findElemOrSelfByPath(Path(immutable.IndexedSeq(entry)))`, but it should be very efficient.
-   *
-   * Indeed, it is function `findElemOrSelfByPath` that is defined in terms of this function, `findChildElemByPathEntry`, and not
-   * the other way around.
-   */
-  @deprecated(message = "Use findChildElemByPathEntry instead", since = "0.7.1")
-  def findWithElemPathEntry(entry: Path.Entry): Option[E]
-
   /** Returns (the equivalent of) `findChildElemByPathEntry(entry).get` */
   def getChildElemByPathEntry(entry: Path.Entry): E
 
@@ -278,18 +269,8 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
    */
   def findElemOrSelfByPath(path: Path): Option[E]
 
-  /**
-   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
-   */
-  @deprecated(message = "Use findElemOrSelfByPath instead", since = "0.7.1")
-  def findWithElemPath(path: Path): Option[E]
-
   /** Returns (the equivalent of) `findElemOrSelfByPath(path).get` */
   def getElemOrSelfByPath(path: Path): E
-
-  /** Returns (the equivalent of) `findElemOrSelfByPath(path).get` */
-  @deprecated(message = "Use getElemOrSelfByPath instead", since = "0.7.1")
-  def getWithElemPath(path: Path): E
 
   /**
    * Returns the `Path` entries of all child elements, in the correct order.
