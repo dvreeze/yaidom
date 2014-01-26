@@ -14,18 +14,20 @@ The changes in this version are:
 
   * From now on, string interpolation is used in yaidom
   * Modularized language features also help, because the compiler performs more QA
-  * Futures and promises is used in test code where concurrency is involved
+  * Futures and promises are used in test code where concurrency is involved
   * Implicit (value!) classes can also be used
+  * Value classes for ENames and QNames did not work out, and using them for "wrapper elements" would require query API traits to be "universal"
+  * It can be risky to have non-local dependencies on restrictions imposed by value classes and universal traits, so no value classes have been introduced
 
 * Deprecated code was removed
 * First round of (potential) performance improvements:
 
   * Large scale duplication of equal EName and QName objects (in yaidom DOM-like trees) causes a large memory footprint
-  * Using ``ENameProvider`` and ``QNameProvider`` instances, introduced in this version, memory usage can be decreased too a large extent
+  * Using ``ENameProvider`` and ``QNameProvider`` instances, introduced in this version, memory usage can be decreased to a large extent
   * Yet it was not desirable to destabilize the API by introducing implicit parameters (with implementation details) all over the place
   * So in the end (newly introduced) implicit parameters are rare and they are used only deep in the implementation
   * And ENameProvider and QNameProvider strategies can only be chosen at a global level
-  * Some out of the box implementations have been provided
+  * Some ENameProvider and QNameProvider implementations have been provided
 
 * Added "thread-local" DocumentParser and DocumentPrinter classes, for use in an "enterprise" application
 * Added ``HasQName`` trait, to enable abstraction over elements that expose QNames
