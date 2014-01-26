@@ -106,7 +106,7 @@ object ENameProvider {
   }
 
   /**
-   * Simple caching EName provider. The underlying cache is based on a java.util.concurrent.ConcurrentHashMap, so the cache
+   * Simple caching EName provider. The underlying cache is based on a normal Map implementation, so the cache
    * can only grow. Therefore this EName provider is not meant to be a "global" cache with application scope, but it should
    * be rather short-lived.
    */
