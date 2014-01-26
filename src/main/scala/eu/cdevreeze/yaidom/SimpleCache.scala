@@ -16,35 +16,39 @@
 
 package eu.cdevreeze.yaidom
 
-import java.util.{ concurrent => juc }
+import scala.collection.mutable
 
 /**
- * Simple cache, backed by a java.util.concurrent.ConcurrentHashMap. It is not meant as a real cache, because it can only
- * grow. Therefore it can be used to cache ENames etc. within yaidom while parsing one XML document, but it should not be used as
- * a cache with application scope.
+ * Simple cache, backed by a mutable Map. It is not meant as a real cache, because it can only grow. Therefore
+ * it can be used to cache ENames etc. within yaidom while parsing one XML document, but it should not be used as a cache
+ * with application scope.
  *
  * This class is mainly used to reduce memory footprint of parsed XML, by preventing the storage of many equivalent QName
  * or EName instances in the resulting yaidom element tree.
+ *
+ * This simple cache is not efficient, but it is safe to use in a multi-threaded environment.
  *
  * @author Chris de Vreeze
  */
 private[yaidom] abstract class SimpleCache[K, V] {
 
-  private val cache = new juc.ConcurrentHashMap[K, V]()
+  private var cache = mutable.Map[K, V]()
 
   protected def convertKeyToValue(key: K): V
 
   /**
    * Retrieves a value from the cache, if possible, and otherwise creates a new value instance and adds it to the cache.
    */
-  def putIfAbsentAndGet(key: K): V = {
-    val cachedValue = cache.get(key)
+  def get(key: K): V = {
+    cache.synchronized {
+      val cachedValueOption = cache.get(key)
 
-    if (cachedValue != null) cachedValue
-    else {
-      val newValue = convertKeyToValue(key)
-      cache.putIfAbsent(key, newValue)
-      newValue
+      if (cachedValueOption.isDefined) cachedValueOption.get
+      else {
+        val newValue = convertKeyToValue(key)
+        cache += (key -> newValue)
+        newValue
+      }
     }
   }
 
@@ -52,6 +56,8 @@ private[yaidom] abstract class SimpleCache[K, V] {
    * Makes the cache empty
    */
   def clear(): Unit = {
-    cache.clear()
+    cache.synchronized {
+      cache.clear()
+    }
   }
 }

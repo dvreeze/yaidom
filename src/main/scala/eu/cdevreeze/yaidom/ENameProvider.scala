@@ -75,10 +75,12 @@ object ENameProvider {
     def parseEName(s: String): EName = EName.parse(s)
   }
 
+  val defaultInstance: ENameProvider = new TrivialENameProvider
+
   /**
-   * The implicit default ENameProvider is a "trivial" ENameProvider, but can be updated.
+   * The implicit global ENameProvider is by default a "trivial" ENameProvider, but can be updated.
    */
-  @volatile implicit var defaultInstance: ENameProvider = new TrivialENameProvider
+  @volatile implicit var globalMutableInstance: ENameProvider = defaultInstance
 
   /**
    * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.
@@ -119,7 +121,7 @@ object ENameProvider {
 
     def getEName(namespaceUriOption: Option[String], localPart: String): EName = {
       if (cacheFilter(namespaceUriOption, localPart))
-        cache.putIfAbsentAndGet((namespaceUriOption, localPart))
+        cache.get((namespaceUriOption, localPart))
       else
         EName(namespaceUriOption, localPart)
     }
@@ -137,4 +139,46 @@ object ENameProvider {
   }
 
   def newSimpleCachingInstance: ENameProvider = new SimpleCachingENameProvider
+
+  /**
+   * Thread-local ENameProvider. This class exists because there is precisely one globally used ENameProvider, and by using
+   * this thread-local ENameProvider it is possible to make the global ENameProvider configurable per thread again. Also note
+   * that the ENameProviders bound to a thread are local to that thread, so they do not suffer from any thread-safety issues
+   * (unless a non-thread-safe EName provider instance is shared).
+   *
+   * Note that each ThreadLocalENameProvider instance (!) has its own thread-local EName provider. Typically it makes no sense
+   * to have more than one ThreadLocalENameProvider instance in one application. In a Spring application, for example, a single
+   * instance of a ThreadLocalENameProvider can be configured.
+   */
+  final class ThreadLocalENameProvider(val enameProviderCreator: () => ENameProvider) extends ENameProvider {
+
+    private val threadLocalENameProvider: ThreadLocal[ENameProvider] = new ThreadLocal[ENameProvider] {
+
+      protected override def initialValue(): ENameProvider = enameProviderCreator()
+    }
+
+    /**
+     * Returns the ENameProvider instance attached to the current thread.
+     */
+    def enameProviderOfCurrentThread: ENameProvider = threadLocalENameProvider.get
+
+    /**
+     * Updates the ENameProvider instance attached to the current thread.
+     */
+    def setENameProviderOfCurrentThread(enameProvider: ENameProvider): Unit = {
+      threadLocalENameProvider.set(enameProvider)
+    }
+
+    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
+      enameProviderOfCurrentThread.getEName(namespaceUriOption, localPart)
+
+    def getEName(namespaceUri: String, localPart: String): EName =
+      enameProviderOfCurrentThread.getEName(namespaceUri, localPart)
+
+    def getNoNsEName(localPart: String): EName =
+      enameProviderOfCurrentThread.getNoNsEName(localPart)
+
+    def parseEName(s: String): EName =
+      enameProviderOfCurrentThread.parseEName(s)
+  }
 }

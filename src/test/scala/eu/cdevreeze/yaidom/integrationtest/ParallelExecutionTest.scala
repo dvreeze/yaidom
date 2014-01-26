@@ -19,7 +19,7 @@ package integrationtest
 
 import java.{ util => jutil, io => jio }
 import java.util.{ concurrent => juc }
-import scala.collection.immutable
+import scala.collection.{ immutable, mutable }
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.{ Try, Success, Failure }
@@ -42,6 +42,8 @@ import print._
 class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
+
+  private val threadPool = juc.Executors.newFixedThreadPool(10)
 
   @Test def testParallelExecutionUsingDom(): Unit = {
     doTestParallelExecution(
@@ -67,13 +69,46 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
       { () => DocumentPrinterUsingStax.newInstance })
   }
 
+  @Test def testNumberOrRefEqualENamesUsingDefaultENameProvider(): Unit = {
+    val enameProvider = new ENameProvider.TrivialENameProvider
+    val refEqualGrandChildENameCount = 1
+
+    // No grandChild element ENames are reference-equal
+    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+  }
+
+  @Test def testNumberOrRefEqualENamesUsingCachingENameProvider(): Unit = {
+    val enameProvider = ENameProvider.newSimpleCachingInstance
+    val refEqualGrandChildENameCount = 250
+
+    // All grandChild element ENames are reference-equal
+    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+  }
+
+  @Test def testNumberOrRefEqualENamesUsingThreadLocalENameProvider(): Unit = {
+    val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => ENameProvider.newSimpleCachingInstance })
+    val refEqualGrandChildENameCount = 25
+
+    // Per thread, all grandChild element ENames are reference-equal
+    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+  }
+
+  @Test def testNumberOrRefEqualENamesUsingSharedCachingENameProvider(): Unit = {
+    val sharedENameProvider = ENameProvider.newSimpleCachingInstance
+    val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => sharedENameProvider })
+    val refEqualGrandChildENameCount = 250
+
+    // All grandChild element ENames are reference-equal
+    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+  }
+
   private def doTestParallelExecution(parserCreator: () => DocumentParser, printerCreator: () => DocumentPrinter): Unit = {
     val resolvedRootElem = resolved.Elem(rootElem)
 
     val docParser = new ThreadLocalDocumentParser(parserCreator)
     val docPrinter = new ThreadLocalDocumentPrinter(printerCreator)
 
-    implicit val execContext = ExecutionContext.fromExecutor(juc.Executors.newFixedThreadPool(10))
+    implicit val execContext = ExecutionContext.fromExecutor(threadPool)
 
     val encoding = "UTF-8"
 
@@ -117,6 +152,57 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     for (f <- futures) { Await.ready(f, 5.seconds) }
     expectResult(true) {
       futures forall (f => f.isCompleted)
+    }
+  }
+
+  private def doTestNumberOrRefEqualENames(enameProvider: ENameProvider, numberOfRefEqualGrandChildENames: Int): Unit = {
+    ENameProvider.globalMutableInstance = enameProvider
+
+    val docParser = new ThreadLocalDocumentParser(DocumentParserUsingSax.newInstance)
+    val docPrinter = new ThreadLocalDocumentPrinter(DocumentPrinterUsingSax.newInstance)
+
+    // No re-use (or pooling) of threads!
+    implicit val execContext = ExecutionContext.fromExecutor(new juc.Executor {
+      def execute(command: Runnable): Unit = {
+        (new Thread(command)).start()
+      }
+    })
+
+    val encoding = "UTF-8"
+
+    val futures: Vector[Future[Document]] =
+      (1 to 10).toVector map { i =>
+        future {
+          val xmlString = docPrinter.print(rootElem)
+          val doc = docParser.parse(new jio.ByteArrayInputStream(xmlString.getBytes(encoding)))
+          doc
+        }
+      }
+
+    for (f <- futures) { Await.ready(f, 5.seconds) }
+    expectResult(true) {
+      futures forall (f => f.isCompleted)
+    }
+
+    val docs = futures.flatMap(f => f.value.get.toOption)
+
+    val firstGrandChildEName = docs.head.documentElement.findElem(_.localName == "grandChild").get.resolvedName
+
+    val refEqualGrandChildENameCount = {
+      val refEqualGrandChildElems =
+        docs flatMap { doc =>
+          doc.documentElement.filterElemsOrSelf(e => e.resolvedName eq firstGrandChildEName)
+        }
+
+      refEqualGrandChildElems.size
+    }
+
+    ENameProvider.globalMutableInstance = ENameProvider.defaultInstance
+
+    logger.info(s"Found $refEqualGrandChildENameCount 'grandChild' elements with the same reference-equal resolved name as the first one (expected $numberOfRefEqualGrandChildENames)")
+
+    expectResult(numberOfRefEqualGrandChildENames) {
+      refEqualGrandChildENameCount
     }
   }
 

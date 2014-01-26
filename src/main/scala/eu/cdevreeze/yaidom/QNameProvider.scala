@@ -75,10 +75,12 @@ object QNameProvider {
     def parseQName(s: String): QName = QName.parse(s)
   }
 
+  val defaultInstance: QNameProvider = new TrivialQNameProvider
+
   /**
-   * The implicit default QNameProvider is a "trivial" QNameProvider, but can be updated.
+   * The implicit global QNameProvider is by default a "trivial" QNameProvider, but can be updated.
    */
-  @volatile implicit var defaultInstance: QNameProvider = new TrivialQNameProvider
+  @volatile implicit var globalMutableInstance: QNameProvider = defaultInstance
 
   /**
    * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.
@@ -119,7 +121,7 @@ object QNameProvider {
 
     def getQName(prefixOption: Option[String], localPart: String): QName = {
       if (cacheFilter(prefixOption, localPart))
-        cache.putIfAbsentAndGet((prefixOption, localPart))
+        cache.get((prefixOption, localPart))
       else
         QName(prefixOption, localPart)
     }
@@ -137,4 +139,45 @@ object QNameProvider {
   }
 
   def newSimpleCachingInstance: QNameProvider = new SimpleCachingQNameProvider
+
+  /**
+   * Thread-local QNameProvider. This class exists because there is precisely one globally used QNameProvider, and by using
+   * this thread-local QNameProvider it is possible to make the global QNameProvider configurable per thread again. Also note
+   * that the QNameProviders bound to a thread are local to that thread, so they do not suffer from any thread-safety issues
+   * (unless a non-thread-safe QName provider instance is shared).
+   *
+   * Note that each ThreadLocalQNameProvider instance (!) has its own thread-local QName provider. Typically it makes no sense
+   * to have more than one ThreadLocalQNameProvider instance in one application. In a Spring application, for example, a single
+   * instance of a ThreadLocalQNameProvider can be configured.
+   */
+  final class ThreadLocalQNameProvider(val qnameProviderCreator: () => QNameProvider) extends QNameProvider {
+
+    private val threadLocalQNameProvider: ThreadLocal[QNameProvider] = new ThreadLocal[QNameProvider] {
+
+      protected override def initialValue(): QNameProvider = qnameProviderCreator()
+    }
+
+    /**
+     * Returns the QNameProvider instance attached to the current thread.
+     */
+    def qnameProviderOfCurrentThread: QNameProvider = threadLocalQNameProvider.get
+
+    /**
+     * Updates the QNameProvider instance attached to the current thread.
+     */
+    def setQNameProviderOfCurrentThread(qnameProvider: QNameProvider): Unit = {
+      threadLocalQNameProvider.set(qnameProvider)
+    }
+
+    def getQName(prefixOption: Option[String], localPart: String): QName =
+      qnameProviderOfCurrentThread.getQName(prefixOption, localPart)
+
+    def getQName(prefix: String, localPart: String): QName =
+      qnameProviderOfCurrentThread.getQName(prefix, localPart)
+
+    def getUnprefixedQName(localPart: String): QName =
+      qnameProviderOfCurrentThread.getUnprefixedQName(localPart)
+
+    def parseQName(s: String): QName = qnameProviderOfCurrentThread.parseQName(s)
+  }
 }

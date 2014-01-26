@@ -127,8 +127,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     val parserClass =
       Class.forName(System.getProperty("perftest.documentParser", "eu.cdevreeze.yaidom.parse.DocumentParserUsingSax")).asInstanceOf[Class[parse.DocumentParser]]
 
-    ENameProvider.defaultInstance = AbstractMemoryUsageSuite.defaultENameProvider
-    QNameProvider.defaultInstance = AbstractMemoryUsageSuite.defaultQNameProvider
+    ENameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultENameProvider
+    QNameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultQNameProvider
 
     val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance")
     parserFactoryMethod.invoke(null).asInstanceOf[parse.DocumentParser]
