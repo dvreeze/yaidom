@@ -78,7 +78,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNumberOrRefEqualENamesUsingCachingENameProvider(): Unit = {
-    val enameProvider = ENameProvider.newSimpleCachingInstance
+    val enameProvider = new ENameProvider.SimpleCachingENameProvider
     val refEqualGrandChildENameCount = 250
 
     // All grandChild element ENames are reference-equal
@@ -86,7 +86,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNumberOrRefEqualENamesUsingThreadLocalENameProvider(): Unit = {
-    val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => ENameProvider.newSimpleCachingInstance })
+    val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => new ENameProvider.SimpleCachingENameProvider })
     val refEqualGrandChildENameCount = 25
 
     // Per thread, all grandChild element ENames are reference-equal
@@ -94,7 +94,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNumberOrRefEqualENamesUsingSharedCachingENameProvider(): Unit = {
-    val sharedENameProvider = ENameProvider.newSimpleCachingInstance
+    val sharedENameProvider = new ENameProvider.SimpleCachingENameProvider
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => sharedENameProvider })
     val refEqualGrandChildENameCount = 250
 

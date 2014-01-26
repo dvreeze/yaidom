@@ -138,8 +138,6 @@ object QNameProvider {
     }
   }
 
-  def newSimpleCachingInstance: QNameProvider = new SimpleCachingQNameProvider
-
   /**
    * Thread-local QNameProvider. This class exists because there is precisely one globally used QNameProvider, and by using
    * this thread-local QNameProvider it is possible to make the global QNameProvider configurable per thread again. Also note

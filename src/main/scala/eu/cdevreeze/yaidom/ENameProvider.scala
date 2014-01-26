@@ -138,8 +138,6 @@ object ENameProvider {
     }
   }
 
-  def newSimpleCachingInstance: ENameProvider = new SimpleCachingENameProvider
-
   /**
    * Thread-local ENameProvider. This class exists because there is precisely one globally used ENameProvider, and by using
    * this thread-local ENameProvider it is possible to make the global ENameProvider configurable per thread again. Also note
