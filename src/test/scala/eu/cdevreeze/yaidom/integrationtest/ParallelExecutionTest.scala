@@ -69,40 +69,40 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
       { () => DocumentPrinterUsingStax.newInstance })
   }
 
-  @Test def testNumberOrRefEqualENamesUsingDefaultENameProvider(): Unit = {
+  @Test def testNumberOfRefEqualENamesUsingDefaultENameProvider(): Unit = {
     val enameProvider = new ENameProvider.TrivialENameProvider
     val refEqualGrandChildENameCount = 1
 
     // No grandChild element ENames are reference-equal
-    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+    doTestNumberOfRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
-  @Test def testNumberOrRefEqualENamesUsingCachingENameProvider(): Unit = {
+  @Test def testNumberOfRefEqualENamesUsingCachingENameProvider(): Unit = {
     val enameProvider = new ENameProvider.SimpleCachingENameProvider
     val refEqualGrandChildENameCount = 250
 
     // All grandChild element ENames are reference-equal
-    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+    doTestNumberOfRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
-  @Test def testNumberOrRefEqualENamesUsingThreadLocalENameProvider(): Unit = {
+  @Test def testNumberOfRefEqualENamesUsingThreadLocalENameProvider(): Unit = {
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => new ENameProvider.SimpleCachingENameProvider })
     val refEqualGrandChildENameCount = 25
 
     // Per thread, all grandChild element ENames are reference-equal
-    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+    doTestNumberOfRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
-  @Test def testNumberOrRefEqualENamesUsingSharedCachingENameProvider(): Unit = {
+  @Test def testNumberOfRefEqualENamesUsingSharedCachingENameProvider(): Unit = {
     val sharedENameProvider = new ENameProvider.SimpleCachingENameProvider
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => sharedENameProvider })
     val refEqualGrandChildENameCount = 250
 
     // All grandChild element ENames are reference-equal
-    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+    doTestNumberOfRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
-  @Test def testNumberOrRefEqualENamesUsingDifferentThreadBoundENameProviders(): Unit = {
+  @Test def testNumberOfRefEqualENamesUsingDifferentThreadBoundENameProviders(): Unit = {
     val sharedENameProvider = new ENameProvider.SimpleCachingENameProvider
 
     @volatile var i = 0
@@ -120,7 +120,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     val refEqualGrandChildENameCount = 225
 
     // All but 25 of the grandChild element ENames are reference-equal to the first one
-    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+    doTestNumberOfRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
   private def doTestParallelExecution(parserCreator: () => DocumentParser, printerCreator: () => DocumentPrinter): Unit = {
@@ -176,7 +176,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  private def doTestNumberOrRefEqualENames(enameProvider: ENameProvider, numberOfRefEqualGrandChildENames: Int): Unit = {
+  private def doTestNumberOfRefEqualENames(enameProvider: ENameProvider, numberOfRefEqualGrandChildENames: Int): Unit = {
     ENameProvider.globalMutableInstance = enameProvider
 
     val docParser = new ThreadLocalDocumentParser(DocumentParserUsingSax.newInstance)
