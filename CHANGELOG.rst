@@ -3,6 +3,36 @@ CHANGELOG
 =========
 
 
+0.8.0
+=====
+
+Version 0.8.0 is much like version 0.7.1, but it drops support for Scala 2.9.X, and prunes deprecated code.
+
+The changes in this version are:
+
+* Scala 2.9.X is no longer supported, and Scala 2.10 features can be used:
+
+  * From now on, string interpolation is used in yaidom
+  * Modularized language features also help, because the compiler performs more QA
+  * Futures and promises is used in test code where concurrency is involved
+  * Implicit (value!) classes can also be used
+
+* Deprecated code was removed
+* First round of (potential) performance improvements:
+
+  * Large scale duplication of equal EName and QName objects (in yaidom DOM-like trees) causes a large memory footprint
+  * Using ``ENameProvider`` and ``QNameProvider`` instances, introduced in this version, memory usage can be decreased too a large extent
+  * Yet it was not desirable to destabilize the API by introducing implicit parameters (with implementation details) all over the place
+  * So in the end (newly introduced) implicit parameters are rare and they are used only deep in the implementation
+  * And ENameProvider and QNameProvider strategies can only be chosen at a global level
+  * Some out of the box implementations have been provided
+
+* Added "thread-local" DocumentParser and DocumentPrinter classes, for use in an "enterprise" application
+* Added ``HasQName`` trait, to enable abstraction over elements that expose QNames
+* Removed (soon to be deprecated?) procedure syntax
+* More tests
+
+
 0.7.1
 =====
 
