@@ -102,6 +102,27 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
+  @Test def testNumberOrRefEqualENamesUsingDifferentThreadBoundENameProviders(): Unit = {
+    val sharedENameProvider = new ENameProvider.SimpleCachingENameProvider
+
+    @volatile var i = 0
+    val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () =>
+      ParallelExecutionTest.this.synchronized {
+        val provider = {
+          if (i == 9) ENameProvider.defaultInstance
+          else sharedENameProvider
+        }
+        i += 1
+        provider
+      }
+    })
+
+    val refEqualGrandChildENameCount = 225
+
+    // All but 25 of the grandChild element ENames are reference-equal to the first one
+    doTestNumberOrRefEqualENames(enameProvider, refEqualGrandChildENameCount)
+  }
+
   private def doTestParallelExecution(parserCreator: () => DocumentParser, printerCreator: () => DocumentPrinter): Unit = {
     val resolvedRootElem = resolved.Elem(rootElem)
 

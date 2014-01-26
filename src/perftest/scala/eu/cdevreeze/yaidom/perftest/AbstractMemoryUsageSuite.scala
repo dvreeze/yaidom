@@ -51,6 +51,9 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
   }
 
   test("On querying, memory usage should be within reasonable bounds", PerformanceTest) {
+    ENameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultENameProvider
+    QNameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultQNameProvider
+
     require(rootDir.isDirectory, s"Expected directory $rootDir, but this is not an existing directory")
 
     logger.info(s"Entering test. Test class: ${this.getClass.getName}")
@@ -110,6 +113,9 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     memBean.gc()
     logger.info(s"Heap memory usage after these queries on the large combined XML: ${getUsedHeapMemoryInMiB} MiB")
 
+    ENameProvider.globalMutableInstance = ENameProvider.defaultInstance
+    QNameProvider.globalMutableInstance = QNameProvider.defaultInstance
+
     logger.info(s"Leaving test. Test class: ${this.getClass.getName}")
   }
 
@@ -126,9 +132,6 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
   protected def getDocumentParser: parse.DocumentParser = {
     val parserClass =
       Class.forName(System.getProperty("perftest.documentParser", "eu.cdevreeze.yaidom.parse.DocumentParserUsingSax")).asInstanceOf[Class[parse.DocumentParser]]
-
-    ENameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultENameProvider
-    QNameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultQNameProvider
 
     val parserFactoryMethod = parserClass.getDeclaredMethod("newInstance")
     parserFactoryMethod.invoke(null).asInstanceOf[parse.DocumentParser]
