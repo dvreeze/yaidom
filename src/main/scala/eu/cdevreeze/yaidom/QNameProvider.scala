@@ -24,15 +24,10 @@ import scala.util.Try
  *
  * ==Implementation notes==
  *
- * The chosen implementation strategy for (globally) setting the QNameProvider is as follows:
- * <ul>
- * <li>The public API remains backward compatible as much as possible, and possibly implicit parameters are introduced for
- * implicit QName providers.</li>
- * <li>Still, implicit parameters are used in moderation, and not in many places throughout the API. This reduces the risk
- * of polluting the API, and of many future deprecation warnings. Moreover, QNameProviders are implementation details.</li>
- * <li>The query API should be stable, and therefore unaffected by (possibly implicit) QNameProviders.</li>
- * <li>There is one implicit QNameProvider, that can be updated as the globally used QNameProvider.</li>
- * </ul>
+ * It may seem rather lame that only the global QNameProvider variable can be updated. On the other hand, implicit QNameProvider
+ * parameters in many places in the API would change the API quite a bit. These implicit parameters would be implementation
+ * details leaking into the API. It was therefore decided not to introduce those implicit parameters, with the exception of only
+ * a few places inside implementation code in the library.
  *
  * @author Chris de Vreeze
  */
@@ -79,6 +74,10 @@ object QNameProvider {
 
   /**
    * The implicit global QNameProvider is by default a "trivial" QNameProvider, but can be updated.
+   *
+   * Be careful: this global instance should be updated only during the "startup phase" of the application.
+   * Also be careful to choose an instance that is thread-safe and designed for a "long life" (unlike caching providers
+   * that can only grow a lot).
    */
   @volatile implicit var globalMutableInstance: QNameProvider = defaultInstance
 

@@ -445,6 +445,44 @@ package eu.cdevreeze
  * </ol>
  * Indeed, all yaidom package dependencies are uni-directional.
  *
+ * ==Notes on performance==
+ *
+ * Yaidom can be quite memory-hungry. One particular cause of that is the possible creation of very many duplicate EName and
+ * QName instances. This can be the case while parsing XML into yaidom documents, or while querying yaidom element trees.
+ *
+ * The user of the library can reduce memory consumption to a large extent, and yaidom facilitates that.
+ *
+ * As for querying, prefer:
+ * {{{
+ * import ElemApi._
+ *
+ * bookstoreElem filterElemsOrSelf withEName("{http://bookstore/book}", "Book")
+ * }}}
+ * to:
+ * {{{
+ * bookstoreElem.filterElemsOrSelf(EName("{http://bookstore/book}", "Book"))
+ * }}}
+ * to avoid unnecessary (large scale) EName object creation.
+ *
+ * To reduce the memory footprint of parsed XML trees, see [[eu.cdevreeze.yaidom.ENameProvider]] and [[eu.cdevreeze.yaidom.QNameProvider]].
+ *
+ * For example, during the startup phase of an application, we could set the global ENameProvider as follows:
+ * {{{
+ * ENameProvider.globalMutableInstance = new ENameProvider.ENameProviderUsingImmutableMap(knownENames)
+ * }}}
+ *
+ * Note that the global ENameProvider or QNameProvider can typically be configured rather late during development, but the
+ * memory cost savings can be substantial. Also note that the global ENameProvider or QNameProvider can be used implicitly in
+ * application code, by writing:
+ * {{{
+ * bookstoreElem filterElemsOrSelf getEName("{http://bookstore/book}", "Book")
+ * }}}
+ * using an implicit ENameProvider, whose members are in scope. Still, for querying the first alternative using `withEName` is
+ * better, but there are likely many scenarios in yaidom client code where an implicit ENameProvider or QNameProvider makes sense.
+ *
+ * The bottom line is that yaidom can be configured to be far less memory-hungry, and that yaidom client code can also take
+ * some responsibility in reducing memory usage.
+ *
  * @author Chris de Vreeze
  */
 package object yaidom
