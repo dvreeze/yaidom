@@ -269,7 +269,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     new ElemResult(elemWithChildren, it)
   }
 
-  private def eventToElem(startElement: StartElement, parentScope: Scope): Elem = {
+  private def eventToElem(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): Elem = {
     val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
@@ -309,22 +309,22 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     }
     val currScope = parentScope.resolve(declarations)
 
-    val elemEName = EName.fromJavaQName(startElement.getName)
     val elemPrefixOption: Option[String] = prefixOptionFromJavaQName(startElement.getName)
+    val elemQName = qnameProvider.getQName(elemPrefixOption, startElement.getName.getLocalPart)
 
     val currAttrs: immutable.IndexedSeq[(QName, String)] = {
       val attributes: List[Attribute] = startElement.getAttributes.asScala.toList collect { case a: Attribute => a }
       val result = attributes map { a =>
         val prefixOption: Option[String] = prefixOptionFromJavaQName(a.getName)
-        val name = EName.fromJavaQName(a.getName).toQName(prefixOption)
-        (name -> a.getValue)
+        val qname = qnameProvider.getQName(prefixOption, a.getName.getLocalPart)
+        (qname -> a.getValue)
       }
       result.toIndexedSeq
     }
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here
 
-    Elem(elemEName.toQName(elemPrefixOption), currAttrs, currScope, immutable.IndexedSeq())
+    Elem(elemQName, currAttrs, currScope, immutable.IndexedSeq())
   }
 
   /** Gets an optional prefix from a `javax.xml.namespace.QName` */
