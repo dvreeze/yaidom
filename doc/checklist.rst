@@ -47,6 +47,7 @@ Other checks (w.r.t. documentation and bookkeeping) are:
 * Issue tracking.
 * Test coverage.
 * Builds against different JDKs, including at least one IBM JDK.
+* Scala code can be used relatively easily from Java.
 * All sources contain the license info, and there is a license file.
 * All sources contain documentation, including the author.
 * Change log up-to-date.
