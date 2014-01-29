@@ -37,6 +37,8 @@ import print._
 @RunWith(classOf[JUnitRunner])
 class HtmlTest extends Suite with BeforeAndAfterAll {
 
+  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
+
   @Test def testParseHtml(): Unit = {
     val docParser = DocumentParserUsingSax.newInstance(new SAXFactoryImpl)
 
@@ -75,7 +77,7 @@ class HtmlTest extends Suite with BeforeAndAfterAll {
 
     val htmlString = docPrinter.print(doc)
 
-    println(htmlString)
+    logger.info(s"HTML after parsing and printing:\n$htmlString")
 
     val doc2 = docParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("UTF-8")))
 
