@@ -78,10 +78,10 @@ import scala.collection.immutable
  *
  * This class depends on Declarations, but not the other way around.
  *
- * ==Supporting concise querying through QNames converted to ENames==
+ * ==Concise querying using QNames which are converted to ENames==
  *
- * EName-based querying is more robust than QName-based querying, but Names are more verbose than QNames. We can get the
- * best of both ENames and QNames by using QNames, and a Scope converting them to ENames.
+ * EName-based querying is more robust than QName-based querying, but ENames are more verbose than QNames. We can get the
+ * best of both ENames and QNames by querying using (concise) QNames, and by using a Scope converting them to (stable) ENames.
  *
  * For example:
  * {{{
@@ -412,10 +412,13 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
     prefixes.toSet
   }
 
+  /**
+   * Implicit class extending QNames with easy conversions to ENames, using this Scope.
+   */
   implicit class ToEName(val qname: QName) {
 
     /**
-     * Expands (or resolves) the QName, using this Scope. The function name `e` could be read as "expanded" or "ename".
+     * Expands (or resolves) the QName, using this Scope. The function `e` could be read as "expanded" or "ename".
      */
     def e: EName = Scope.this.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve $qname with scope ${Scope.this}"))
   }

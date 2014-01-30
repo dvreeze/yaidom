@@ -74,4 +74,52 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
       bookElems2.map(e => resolved.Elem(e))
     }
   }
+
+  @Test def testQueryBookAuthors(): Unit = {
+    val docParser = DocumentParserUsingSax.newInstance()
+
+    val doc = docParser.parse(classOf[ScopedQueryTest].getResourceAsStream("books-with-strange-namespaces.xml"))
+
+    val scope = Scope.from("books" -> "http://bookstore")
+
+    val authorElems = {
+      import scope._
+
+      for {
+        bookElem <- doc.documentElement \\ (QName("books", "Book").e)
+        authorElem <- bookElem \\ (QName("books", "Author").e)
+        lastNameElem <- authorElem \ (QName("books", "Last_Name").e)
+      } yield lastNameElem
+    }
+
+    val authors = authorElems.map(_.text).toSet
+
+    expectResult(Set("Ullman", "Widom", "Garcia-Molina")) {
+      authors
+    }
+  }
+
+  @Test def testQueryBookAuthorsAgain(): Unit = {
+    val docParser = DocumentParserUsingSax.newInstance()
+
+    val doc = docParser.parse(classOf[ScopedQueryTest].getResourceAsStream("books-with-strange-namespaces.xml"))
+
+    val scope = Scope.from("" -> "http://bookstore")
+
+    val authorElems = {
+      import scope._
+
+      for {
+        bookElem <- doc.documentElement \\ (QName("Book").e)
+        authorElem <- bookElem \\ (QName("Author").e)
+        lastNameElem <- authorElem \ (QName("Last_Name").e)
+      } yield lastNameElem
+    }
+
+    val authors = authorElems.map(_.text).toSet
+
+    expectResult(Set("Ullman", "Widom", "Garcia-Molina")) {
+      authors
+    }
+  }
 }

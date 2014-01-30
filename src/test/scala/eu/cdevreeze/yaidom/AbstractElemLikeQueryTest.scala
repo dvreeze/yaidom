@@ -535,6 +535,32 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
+  @Test def testQueryMagazinesWithSameNameAsBookUsingQNames(): Unit = {
+    // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
+
+    require(bookstore.localName == "Bookstore")
+
+    val scope = Scope.Empty
+    import scope._
+
+    val magazines =
+      for {
+        magazine <- bookstore \ (QName("Magazine").e)
+        magazineTitle = magazine.getChildElem(QName("Title").e).trimmedText
+        booksWithSameName = for {
+          book <- bookstore \ (QName("Book").e)
+          bookTitle = book.getChildElem(QName("Title").e).trimmedText
+          if magazineTitle == bookTitle
+        } yield book
+        if !booksWithSameName.isEmpty
+      } yield magazine
+
+    expectResult(Set("Hector and Jeff's Database Hints")) {
+      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      result.toSet
+    }
+  }
+
   @Test def testQueryBooksOrMagazinesWithNonUniqueTitles(): Unit = {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
