@@ -41,10 +41,8 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
 
     val doc = docParser.parse(classOf[ScopedQueryTest].getResourceAsStream("books-with-strange-namespaces.xml"))
 
-    val usedScope = Scope.from("books" -> "http://bookstore")
-
-    val scoped = Scoped(usedScope)
-    import scoped._
+    val scope = Scope.from("books" -> "http://bookstore")
+    import scope._
 
     val bookElems = doc.documentElement \\ withEName(QName("books", "Book").e)
 
@@ -58,12 +56,10 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
       bookElems.map(e => resolved.Elem(e))
     }
 
-    val usedScope2 = Scope.from("books" -> "http://books")
-
-    val scoped2 = Scoped(usedScope2)
+    val scope2 = Scope.from("books" -> "http://books")
 
     val bookElems2 = {
-      import scoped2._
+      import scope2._
 
       doc.documentElement \\ withEName(QName("books", "Book").e)
     }

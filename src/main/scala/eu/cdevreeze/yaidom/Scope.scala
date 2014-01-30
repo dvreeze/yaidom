@@ -78,6 +78,26 @@ import scala.collection.immutable
  *
  * This class depends on Declarations, but not the other way around.
  *
+ * ==Supporting concise querying through QNames converted to ENames==
+ *
+ * EName-based querying is more robust than QName-based querying, but Names are more verbose than QNames. We can get the
+ * best of both ENames and QNames by using QNames, and a Scope converting them to ENames.
+ *
+ * For example:
+ * {{{
+ * val scope = Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")
+ * import scope._
+ *
+ * val elemDecls = schemaElem \\ withEName(QName("xs", "element").e)
+ * }}}
+ *
+ * This is exactly equivalent to the following query:
+ * {{{
+ * import ElemApi._
+ *
+ * val elemDecls = schemaElem \\ withEName("http://www.w3.org/2001/XMLSchema", "element")
+ * }}}
+ *
  * ==Scope more formally==
  *
  * '''In order to get started using the class, this more formal section can safely be skipped. On the other hand, this section
@@ -390,6 +410,14 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   def prefixesForNamespace(namespaceUri: String): Set[String] = {
     val prefixes = this.prefixNamespaceMap.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
     prefixes.toSet
+  }
+
+  implicit class ToEName(val qname: QName) {
+
+    /**
+     * Expands (or resolves) the QName, using this Scope. The function name `e` could be read as "expanded" or "ename".
+     */
+    def e: EName = Scope.this.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve $qname with scope ${Scope.this}"))
   }
 }
 

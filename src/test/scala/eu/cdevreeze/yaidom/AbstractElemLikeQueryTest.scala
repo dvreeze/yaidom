@@ -56,6 +56,29 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
+  @Test def testQueryBookTitlesUsingQNames(): Unit = {
+    // XPath: doc("bookstore.xml")/Bookstore/Book/Title
+
+    require(bookstore.localName == "Bookstore")
+
+    val scope = Scope.Empty
+
+    val bookTitles = {
+      import scope._
+
+      (bookstore \ (QName("Book").e)) map { e => e getChildElem (QName("Title").e) }
+    }
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
+    }
+  }
+
   @Test def testQueryBookTitlesAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
     // This time using the ElemApi companion object
@@ -187,6 +210,32 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         price <- book \@ EName("Price")
         if price.toInt < 90
       } yield book
+
+    expectResult(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints")) {
+      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryCheapBooksUsingQNames(): Unit = {
+    // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
+
+    require(bookstore.localName == "Bookstore")
+
+    val scope = Scope.Empty
+
+    val books = {
+      import scope._
+
+      for {
+        book <- bookstore \ (QName("Book").e)
+        price <- book \@ (QName("Price").e)
+        if price.toInt < 90
+      } yield book
+    }
 
     expectResult(Set(
       "A First Course in Database Systems",
