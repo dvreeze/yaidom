@@ -19,9 +19,7 @@ package eu.cdevreeze.yaidom
 import scala.collection.immutable
 
 /**
- * Class that supports robust QName-based querying within an explicitly given Scope. QName-based querying is more concise
- * than EName-based querying, and by explicitly declaring a Scope for those QNames, the semantics are the same as for the
- * equivalent EName-based queries.
+ * Class that supports EName-based querying through the use of QNames and a given scope.
  *
  * For example:
  * {{{
@@ -30,7 +28,7 @@ import scala.collection.immutable
  *
  * import scoped._
  *
- * val elemDecls = schemaElem \\ withQNameInScope("xs", "element")
+ * val elemDecls = schemaElem \\ withEName(QName("xs", "element").e)
  * }}}
  *
  * This is exactly equivalent to the following query:
@@ -44,33 +42,12 @@ import scala.collection.immutable
  */
 final class Scoped(val usedScope: Scope) {
 
-  /**
-   * Returns the equivalent of `{ e => usedScope.resolveQNameOption(qname) == Some(e.resolvedName) }`
-   */
-  def withQNameInScope(qname: QName): (ElemApi[_] => Boolean) = { elem =>
-    val enameOption = usedScope.resolveQNameOption(qname)
-    enameOption == Some(elem.resolvedName)
-  }
+  implicit class ToEName(val qname: QName) {
 
-  /**
-   * Returns the equivalent of `withQNameInScope(qnameProvider.getQName(prefixOption, localPart))`
-   */
-  def withQNameInScope(prefixOption: Option[String], localPart: String)(implicit qnameProvider: QNameProvider): (ElemApi[_] => Boolean) = {
-    withQNameInScope(qnameProvider.getQName(prefixOption, localPart))
-  }
-
-  /**
-   * Returns the equivalent of `withQNameInScope(qnameProvider.getQName(prefix, localPart))`
-   */
-  def withQNameInScope(prefix: String, localPart: String)(implicit qnameProvider: QNameProvider): (ElemApi[_] => Boolean) = {
-    withQNameInScope(qnameProvider.getQName(prefix, localPart))
-  }
-
-  /**
-   * Returns the equivalent of `withQNameInScope(qnameProvider.getQName(None, localPart))`
-   */
-  def withUnprefixedQNameInScope(localPart: String)(implicit qnameProvider: QNameProvider): (ElemApi[_] => Boolean) = {
-    withQNameInScope(qnameProvider.getQName(None, localPart))
+    /**
+     * Expands (or resolves) the QName, using the "usedScope".
+     */
+    def e: EName = usedScope.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve $qname with scope $usedScope"))
   }
 }
 

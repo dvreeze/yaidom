@@ -46,7 +46,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
     val scoped = Scoped(usedScope)
     import scoped._
 
-    val bookElems = doc.documentElement \\ withQNameInScope("books", "Book")
+    val bookElems = doc.documentElement \\ withEName(QName("books", "Book").e)
 
     expectResult(2) {
       bookElems.size
@@ -62,7 +62,11 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
 
     val scoped2 = Scoped(usedScope2)
 
-    val bookElems2 = doc.documentElement \\ scoped2.withQNameInScope("books", "Book")
+    val bookElems2 = {
+      import scoped2._
+
+      doc.documentElement \\ withEName(QName("books", "Book").e)
+    }
 
     expectResult(1) {
       bookElems2.size
