@@ -161,7 +161,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
         case Success(elem) =>
           logger.info(s"Chain $idx successful (thread: ${Thread.currentThread}). Going to check the result ...")
 
-          expectResult(resolvedRootElem) {
+          assertResult(resolvedRootElem) {
             resolved.Elem(elem)
           }
         case Failure(t) =>
@@ -171,7 +171,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     }
 
     for (f <- futures) { Await.ready(f, 5.seconds) }
-    expectResult(true) {
+    assertResult(true) {
       futures forall (f => f.isCompleted)
     }
   }
@@ -201,7 +201,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
       }
 
     for (f <- futures) { Await.ready(f, 5.seconds) }
-    expectResult(true) {
+    assertResult(true) {
       futures forall (f => f.isCompleted)
     }
 
@@ -222,7 +222,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
     logger.info(s"Found $refEqualGrandChildENameCount 'grandChild' elements with the same reference-equal resolved name as the first one (expected $numberOfRefEqualGrandChildENames)")
 
-    expectResult(numberOfRefEqualGrandChildENames) {
+    assertResult(numberOfRefEqualGrandChildENames) {
       refEqualGrandChildENameCount
     }
   }

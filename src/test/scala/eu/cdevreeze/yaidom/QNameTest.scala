@@ -34,70 +34,70 @@ class QNameTest extends Suite {
   @Test def testUnprefixedName(): Unit = {
     val qname = UnprefixedName("Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname.localPart
     }
-    expectResult(None) {
+    assertResult(None) {
       qname.prefixOption
     }
 
     val qname2 = QName("Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname2.localPart
     }
-    expectResult(None) {
+    assertResult(None) {
       qname2.prefixOption
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname2
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname2.hashCode
     }
 
     val qname3 = QName(None, "Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname3.localPart
     }
-    expectResult(None) {
+    assertResult(None) {
       qname3.prefixOption
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname3
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname3.hashCode
     }
 
     val qname4 = QName("Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname4.localPart
     }
-    expectResult(None) {
+    assertResult(None) {
       qname4.prefixOption
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname4
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname4.hashCode
     }
 
     val qname5 = QName("Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname5.localPart
     }
-    expectResult(None) {
+    assertResult(None) {
       qname5.prefixOption
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname5
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname5.hashCode
     }
 
@@ -121,85 +121,85 @@ class QNameTest extends Suite {
   @Test def testPrefixedName(): Unit = {
     val qname = PrefixedName("books", "Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname.localPart
     }
-    expectResult(Some("books")) {
+    assertResult(Some("books")) {
       qname.prefixOption
     }
-    expectResult("books") {
+    assertResult("books") {
       qname.prefix
     }
 
     val qname2: PrefixedName = PrefixedName("books", "Bookstore")
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname2.localPart
     }
-    expectResult(Some("books")) {
+    assertResult(Some("books")) {
       qname2.prefixOption
     }
-    expectResult("books") {
+    assertResult("books") {
       qname2.prefix
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname2
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname2.hashCode
     }
 
     val qname3: PrefixedName = QName(Some("books"), "Bookstore").asInstanceOf[PrefixedName]
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname3.localPart
     }
-    expectResult(Some("books")) {
+    assertResult(Some("books")) {
       qname3.prefixOption
     }
-    expectResult("books") {
+    assertResult("books") {
       qname3.prefix
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname3
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname3.hashCode
     }
 
     val qname4 = QName("books:Bookstore").asInstanceOf[PrefixedName]
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname4.localPart
     }
-    expectResult(Some("books")) {
+    assertResult(Some("books")) {
       qname4.prefixOption
     }
-    expectResult("books") {
+    assertResult("books") {
       qname4.prefix
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname4
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname4.hashCode
     }
 
     val qname5 = QName("books:Bookstore").asInstanceOf[PrefixedName]
 
-    expectResult("Bookstore") {
+    assertResult("Bookstore") {
       qname5.localPart
     }
-    expectResult(Some("books")) {
+    assertResult(Some("books")) {
       qname5.prefixOption
     }
-    expectResult("books") {
+    assertResult("books") {
       qname5.prefix
     }
-    expectResult(qname) {
+    assertResult(qname) {
       qname5
     }
-    expectResult(qname.hashCode) {
+    assertResult(qname.hashCode) {
       qname5.hashCode
     }
 

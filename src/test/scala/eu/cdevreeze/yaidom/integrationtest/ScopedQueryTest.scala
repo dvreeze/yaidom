@@ -46,13 +46,13 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
 
     val bookElems = doc.documentElement \\ withEName(QName("books", "Book").e)
 
-    expectResult(2) {
+    assertResult(2) {
       bookElems.size
     }
 
     val expectedBookElems = doc.documentElement \\ withEName("http://bookstore", "Book")
 
-    expectResult(expectedBookElems.map(e => resolved.Elem(e))) {
+    assertResult(expectedBookElems.map(e => resolved.Elem(e))) {
       bookElems.map(e => resolved.Elem(e))
     }
 
@@ -64,13 +64,13 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
       doc.documentElement \\ withEName(QName("books", "Book").e)
     }
 
-    expectResult(1) {
+    assertResult(1) {
       bookElems2.size
     }
 
     val expectedBookElems2 = doc.documentElement \\ withEName("http://books", "Book")
 
-    expectResult(expectedBookElems2.map(e => resolved.Elem(e))) {
+    assertResult(expectedBookElems2.map(e => resolved.Elem(e))) {
       bookElems2.map(e => resolved.Elem(e))
     }
   }
@@ -94,7 +94,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
 
     val authors = authorElems.map(_.text).toSet
 
-    expectResult(Set("Ullman", "Widom", "Garcia-Molina")) {
+    assertResult(Set("Ullman", "Widom", "Garcia-Molina")) {
       authors
     }
   }
@@ -118,7 +118,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
 
     val authors = authorElems.map(_.text).toSet
 
-    expectResult(Set("Ullman", "Widom", "Garcia-Molina")) {
+    assertResult(Set("Ullman", "Widom", "Garcia-Molina")) {
       authors
     }
   }

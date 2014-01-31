@@ -55,7 +55,7 @@ class NonYaidomQueryTest extends Suite {
         result.get
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -77,7 +77,7 @@ class NonYaidomQueryTest extends Suite {
         title <- bookOrMagazine.findAllChildElems find { _.name == "Title" }
       } yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -100,7 +100,7 @@ class NonYaidomQueryTest extends Suite {
         result.get
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -120,7 +120,7 @@ class NonYaidomQueryTest extends Suite {
     val titles =
       for (title <- bookstore.findAllElemsOrSelf if title.name == "Title") yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -157,7 +157,7 @@ class NonYaidomQueryTest extends Suite {
     val isbns =
       for (book <- bookstore.findAllChildElems if book.name == "Book") yield book.attributes("ISBN")
 
-    expectResult(Set(
+    assertResult(Set(
       "ISBN-0-13-713526-2",
       "ISBN-0-13-815504-6",
       "ISBN-0-11-222222-3",
@@ -178,7 +178,7 @@ class NonYaidomQueryTest extends Suite {
         if price.toInt < 90
       } yield book
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -199,7 +199,7 @@ class NonYaidomQueryTest extends Suite {
         title <- book.findAllChildElems find { _.name == "Title" }
       } yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -237,7 +237,7 @@ class NonYaidomQueryTest extends Suite {
       result.toSet
     }
 
-    expectResult(Set(
+    assertResult(Set(
       "Jeffrey Ullman",
       "Jennifer Widom",
       "Hector Garcia-Molina")) {
@@ -256,7 +256,7 @@ class NonYaidomQueryTest extends Suite {
         if !book.findAllChildElems.filter(_.name == "Remark").isEmpty
       } yield book.findAllChildElems.filter(_.name == "Title").head
 
-    expectResult(Set(
+    assertResult(Set(
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
@@ -279,7 +279,7 @@ class NonYaidomQueryTest extends Suite {
         if authorLastName == "Ullman"
       } yield book.findAllChildElems.find(_.name == "Title").get
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
@@ -310,7 +310,7 @@ class NonYaidomQueryTest extends Suite {
           (book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey")))
       } yield book.findAllChildElems.find(_.name == "Title").get
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
@@ -334,7 +334,7 @@ class NonYaidomQueryTest extends Suite {
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
       } yield book.findAllChildElems.find(_.name == "Title").get
 
-    expectResult(Set(
+    assertResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.text.trim }
       result.toSet
@@ -356,7 +356,7 @@ class NonYaidomQueryTest extends Suite {
       } yield secondAuthor
 
     val secondAuthorLastNames = secondAuthors map { e => e.findAllChildElems.find(_.name == "Last_Name").get }
-    expectResult(Set(
+    assertResult(Set(
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
@@ -377,7 +377,7 @@ class NonYaidomQueryTest extends Suite {
         if remark.text.trim.indexOf("great") >= 0
       } yield book.findAllChildElems.find(_.name == "Title").get
 
-    expectResult(Set("Database Systems: The Complete Book")) {
+    assertResult(Set("Database Systems: The Complete Book")) {
       val result = titles map { _.text.trim }
       result.toSet
     }
@@ -400,7 +400,7 @@ class NonYaidomQueryTest extends Suite {
         if !booksWithSameName.isEmpty
       } yield magazine
 
-    expectResult(Set("Hector and Jeff's Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints")) {
       val result = magazines flatMap { mag => mag.findAllElemsOrSelf find (_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -427,7 +427,7 @@ class NonYaidomQueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
       val result = booksAndMagazines flatMap { mag => mag.findAllElemsOrSelf find (_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -451,7 +451,7 @@ class NonYaidomQueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expectResult(Set("Hector and Jeff's Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints")) {
       val result = booksAndMagazines flatMap { mag => mag.findAllElemsOrSelf find (_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -485,7 +485,7 @@ class NonYaidomQueryTest extends Suite {
         if authorNames forall { name => name.indexOf("J") >= 0 }
       } yield book
 
-    expectResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
       val result = books flatMap { book => book.findAllElemsOrSelf.find(_.name == "Title") map { _.text.trim } }
       result.toSet
     }
@@ -513,7 +513,7 @@ class NonYaidomQueryTest extends Suite {
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
       } yield book.findAllChildElems.find(_.name == "Title").get
 
-    expectResult(Set(
+    assertResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = titles map { _.text.trim }
       result.toSet
@@ -550,10 +550,10 @@ class NonYaidomQueryTest extends Suite {
           title,
           textElem("First_Name", searchedForFirstNames.head)))
 
-    expectResult(2) {
+    assertResult(2) {
       titleAndFirstNames.size
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val titleElms = titleAndFirstNames map { e => e.findAllElemsOrSelf filter { _.name == "Title" } }
       val result = titleElms.flatten map { e => e.text.trim }
       result.toSet
@@ -580,7 +580,7 @@ class NonYaidomQueryTest extends Suite {
     val averagePrice =
       textElem("Average", (prices.sum.toDouble / prices.size).toString)
 
-    expectResult(65) {
+    assertResult(65) {
       averagePrice.text.trim.toDouble.intValue
     }
   }
@@ -619,14 +619,14 @@ class NonYaidomQueryTest extends Suite {
           book.findAllChildElems.find(_.name == "Title").get,
           textElem("Price", price.toString)))
 
-    expectResult(2) {
+    assertResult(2) {
       cheapBooks.size
     }
-    expectResult(Set(50, 25)) {
+    assertResult(Set(50, 25)) {
       val result = cheapBooks flatMap { e => e.findAllElemsOrSelf filter { _.name == "Price" } } map { e => e.text.trim.toDouble.intValue }
       result.toSet
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val result = cheapBooks flatMap { e => e.findAllElemsOrSelf filter { _.name == "Title" } } map { e => e.text.trim }
       result.toSet
     }
@@ -663,13 +663,13 @@ class NonYaidomQueryTest extends Suite {
           textElem("Price", price.toString)))
     }
 
-    expectResult(4) {
+    assertResult(4) {
       books.size
     }
-    expectResult(List(25, 50, 85, 100)) {
+    assertResult(List(25, 50, 85, 100)) {
       books flatMap { e => e.findAllElemsOrSelf filter { _.name == "Price" } } map { e => e.text.trim.toDouble.intValue }
     }
-    expectResult(List(
+    assertResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
@@ -695,7 +695,7 @@ class NonYaidomQueryTest extends Suite {
         lastName <- (bookstore.findAllElemsOrSelf filter { _.name == "Last_Name" } map (e => e.text.trim)).distinct
       } yield lastName
 
-    expectResult(Set(
+    assertResult(Set(
       "Ullman",
       "Widom",
       "Garcia-Molina")) {
@@ -743,25 +743,25 @@ class NonYaidomQueryTest extends Suite {
           textElem("Title1", bookTitle(book1)),
           textElem("Title2", bookTitle(book2))))
 
-    expectResult(5) {
+    assertResult(5) {
       pairs.size
     }
-    expectResult(3) {
+    assertResult(3) {
       pairs.filter(pair =>
         pair.findAllChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book1) ||
           pair.findAllChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book1)).size
     }
-    expectResult(3) {
+    assertResult(3) {
       pairs.filter(pair =>
         pair.findAllChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book2) ||
           pair.findAllChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book2)).size
     }
-    expectResult(2) {
+    assertResult(2) {
       pairs.filter(pair =>
         pair.findAllChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book3) ||
           pair.findAllChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book3)).size
     }
-    expectResult(2) {
+    assertResult(2) {
       pairs.filter(pair =>
         pair.findAllChildElems.filter(_.name == "Title1").head.text.trim == bookTitle(book4) ||
           pair.findAllChildElems.filter(_.name == "Title2").head.text.trim == bookTitle(book4)).size
@@ -828,7 +828,7 @@ class NonYaidomQueryTest extends Suite {
 
     val invertedBookstore: Elem = new Elem(name = "InvertedBookstore", children = authorsWithBooks)
 
-    expectResult(3) {
+    assertResult(3) {
       invertedBookstore.findAllChildElems.size
     }
   }
@@ -850,7 +850,7 @@ class NonYaidomQueryTest extends Suite {
         }
       }
 
-    expectResult(Set("BookTitle", "MagazineTitle")) {
+    assertResult(Set("BookTitle", "MagazineTitle")) {
       bookOrMagazineTitles.map(e => e.name).toSet
     }
     val ngCount = bookOrMagazineTitles count { e => e.text.trim == "National Geographic" }

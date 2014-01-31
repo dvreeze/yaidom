@@ -53,15 +53,15 @@ class AnotherUpdateTest extends Suite {
 
     val docWithoutMags: Document = doc.transformElemsToNodeSeq(deleteMags)
 
-    expectResult(doc.documentElement.findAllChildElems.size - 4) {
+    assertResult(doc.documentElement.findAllChildElems.size - 4) {
       docWithoutMags.documentElement.findAllChildElems.size
     }
 
-    expectResult(doc.documentElement.filterElemsOrSelf(_.localName == "Book").size) {
+    assertResult(doc.documentElement.filterElemsOrSelf(_.localName == "Book").size) {
       docWithoutMags.documentElement.filterElemsOrSelf(_.localName == "Book").size
     }
 
-    expectResult(0) {
+    assertResult(0) {
       docWithoutMags.documentElement.filterElemsOrSelf(_.localName == "Magazine").size
     }
 
@@ -70,7 +70,7 @@ class AnotherUpdateTest extends Suite {
       case elem: resolved.Elem => Vector(elem)
     }
 
-    expectResult(resolved.Elem(docWithoutMags.documentElement)) {
+    assertResult(resolved.Elem(docWithoutMags.documentElement)) {
       resolved.Elem(doc.documentElement).transformElemsToNodeSeq(deleteMagsResolved)
     }
 
@@ -117,7 +117,7 @@ class AnotherUpdateTest extends Suite {
     val newLastBookPath: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").last
     val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
-    expectResult("Programming in Scala") {
+    assertResult("Programming in Scala") {
       (newLastBook \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
     }
 
@@ -130,7 +130,7 @@ class AnotherUpdateTest extends Suite {
       docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
-    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
@@ -187,7 +187,7 @@ class AnotherUpdateTest extends Suite {
     val newLastBookPathButOne: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
     val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
-    expectResult("Programming in Scala") {
+    assertResult("Programming in Scala") {
       (newLastBookButOne \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
     }
 
@@ -200,7 +200,7 @@ class AnotherUpdateTest extends Suite {
       docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
-    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
@@ -260,7 +260,7 @@ class AnotherUpdateTest extends Suite {
     val newFirstBookPath: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
     val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
-    expectResult("Programming in Scala") {
+    assertResult("Programming in Scala") {
       (newFirstBook \ (_.localName == "Title")).head.text.take("Programming in Scala".length)
     }
 
@@ -273,7 +273,7 @@ class AnotherUpdateTest extends Suite {
       docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
-    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
       resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
@@ -306,7 +306,7 @@ class AnotherUpdateTest extends Suite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    expectResult(resolved.Elem(updatedDoc.documentElement)) {
+    assertResult(resolved.Elem(updatedDoc.documentElement)) {
       resolved.Elem(updatedDoc2.documentElement)
     }
 
@@ -317,7 +317,7 @@ class AnotherUpdateTest extends Suite {
       results.head
     }
 
-    expectResult("2010") {
+    assertResult("2010") {
       (newMag \@ EName("Year")).getOrElse("")
     }
 
@@ -343,7 +343,7 @@ class AnotherUpdateTest extends Suite {
 
     val updatedElem = elem.updated(path.parentPathOption.getOrElse(Path.Root))(g)
 
-    expectResult(resolved.Elem(updatedElem)) {
+    assertResult(resolved.Elem(updatedElem)) {
       resolved.Elem(elem.updatedWithNodeSeq(path)(f))
     }
   }
@@ -353,7 +353,7 @@ class AnotherUpdateTest extends Suite {
       acc.updated(path)(f)
     }
 
-    expectResult(resolved.Elem(expectedResult)) {
+    assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformChildElems(f))
     }
 
@@ -361,7 +361,7 @@ class AnotherUpdateTest extends Suite {
       acc.updated(pathEntry)(f)
     }
 
-    expectResult(resolved.Elem(expectedResult2)) {
+    assertResult(resolved.Elem(expectedResult2)) {
       resolved.Elem(elem.transformChildElems(f))
     }
   }
@@ -371,7 +371,7 @@ class AnotherUpdateTest extends Suite {
       acc.updated(path)(f)
     }
 
-    expectResult(resolved.Elem(expectedResult)) {
+    assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElemsOrSelf(f))
     }
   }
@@ -381,7 +381,7 @@ class AnotherUpdateTest extends Suite {
       acc.updated(path)(f)
     }
 
-    expectResult(resolved.Elem(expectedResult)) {
+    assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElems(f))
     }
   }
@@ -391,7 +391,7 @@ class AnotherUpdateTest extends Suite {
 
     val expectedResult = elem.transformElemsOrSelf(g)
 
-    expectResult(resolved.Elem(expectedResult)) {
+    assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElemsToNodeSeq(f))
     }
   }
@@ -401,7 +401,7 @@ class AnotherUpdateTest extends Suite {
     f: Elem => immutable.IndexedSeq[Node],
     g: resolved.Elem => immutable.IndexedSeq[resolved.Node]): Unit = {
 
-    expectResult(resolved.Elem(elem).transformElemsToNodeSeq(g)) {
+    assertResult(resolved.Elem(elem).transformElemsToNodeSeq(g)) {
       resolved.Elem(elem.transformElemsToNodeSeq(f))
     }
   }

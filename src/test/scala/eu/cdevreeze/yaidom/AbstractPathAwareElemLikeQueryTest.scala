@@ -41,7 +41,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     val bookTitlePaths =
       bookstore findTopmostElemPaths { _.localName == "Title" } filter { path => path.containsName(EName("Book")) }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -60,7 +60,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
     val bookTitlePaths =
       bookstore findTopmostElemPaths withLocalName("Title") filter { path => path.containsName(EName("Book")) }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -81,7 +81,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
       } yield titlePath
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -105,7 +105,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         if titlePath.parentPath.endsWithName(EName("Book")) || titlePath.parentPath.endsWithName(EName("Magazine"))
       } yield titlePath
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -128,7 +128,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         if titlePath.entries.size == 2
       } yield titlePath
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -150,7 +150,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         titlePath <- bookstore filterElemPaths { _.localName == "Title" }
       } yield titlePath
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -180,11 +180,11 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     val paths = bookstore.findAllElemOrSelfPaths
 
-    expectResult(elements.size) {
+    assertResult(elements.size) {
       paths.size
     }
 
-    expectResult(elements map (e => toResolvedElem(e))) {
+    assertResult(elements map (e => toResolvedElem(e))) {
       paths map { path => bookstore.getElemOrSelfByPath(path) } map { e => toResolvedElem(e) }
     }
   }
@@ -194,7 +194,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
     require(bookstore.localName == "Bookstore")
 
-    expectResult(Set(
+    assertResult(Set(
       "ISBN-0-13-713526-2",
       "ISBN-0-13-815504-6",
       "ISBN-0-11-222222-3",
@@ -217,7 +217,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         if price.toInt < 90
       } yield book
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -242,7 +242,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         if price.toInt < 90
       } yield book
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -266,7 +266,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
       }
     }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -297,7 +297,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         titlePathOption
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitlePaths map { path => bookstore.getElemOrSelfByPath(path).trimmedText }
@@ -323,7 +323,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         bookstore.getElemOrSelfByPath(bookPath)
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
@@ -351,7 +351,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
         bookstore.getElemOrSelfByPath(bookPath)
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {

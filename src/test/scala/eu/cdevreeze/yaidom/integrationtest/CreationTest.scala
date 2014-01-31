@@ -78,7 +78,7 @@ class CreationTest extends Suite {
                     Vector(Text("Widom")))))))))
     }
 
-    expectResult(Some(expectedResolvedBookElm)) {
+    assertResult(Some(expectedResolvedBookElm)) {
       resolvedRootElm1.removeAllInterElementWhitespace findChildElem { e =>
         e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some("ISBN-9-88-777777-6")
       }
@@ -105,16 +105,16 @@ class CreationTest extends Suite {
     val elm2: Elem = elm2Builder.build()
     val resolvedElm2 = resolved.Elem(elm2)
 
-    expectResult(expectedResolvedBookElm) {
+    assertResult(expectedResolvedBookElm) {
       resolvedElm2
     }
 
-    expectResult(Set()) {
+    assertResult(Set()) {
       elm2Builder.nonDeclaredPrefixes(Scope.Empty)
     }
     assert(elm2Builder.canBuild(Scope.Empty))
 
-    expectResult(false) {
+    assertResult(false) {
       elm2Builder.allDeclarationsAreAtTopLevel
     }
 
@@ -143,27 +143,27 @@ class CreationTest extends Suite {
       }
     }
 
-    expectResult(Set("books", "names")) {
+    assertResult(Set("books", "names")) {
       prefixesUsed
     }
 
-    expectResult(Set("books")) {
+    assertResult(Set("books")) {
       elm3Builder.nonDeclaredPrefixes(Scope.Empty)
     }
-    expectResult(Set()) {
+    assertResult(Set()) {
       elm3Builder.nonDeclaredPrefixes(Scope.from("books" -> "http://bookstore"))
     }
     assert(!elm3Builder.canBuild(Scope.Empty))
     assert(elm3Builder.canBuild(Scope.from("books" -> "http://bookstore")))
 
-    expectResult(false) {
+    assertResult(false) {
       elm3Builder.allDeclarationsAreAtTopLevel
     }
 
     val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
     val resolvedElm3 = resolved.Elem(elm3)
 
-    expectResult(expectedResolvedBookElm) {
+    assertResult(expectedResolvedBookElm) {
       resolvedElm3
     }
 
@@ -199,7 +199,7 @@ class CreationTest extends Suite {
 
     val resolvedElm4 = resolved.Elem(elm4)
 
-    expectResult(expectedResolvedBookElm) {
+    assertResult(expectedResolvedBookElm) {
       resolvedElm4
     }
   }
@@ -232,33 +232,33 @@ class CreationTest extends Suite {
       e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm4 = bookElm4.getChildElem(_.localName == "Authors")
 
-    expectResult((bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) -- Set("books")) {
+    assertResult((bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) -- Set("books")) {
       authorsElm1.scope
     }
 
-    expectResult(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
+    assertResult(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
       authorsElm2.scope
     }
 
-    expectResult(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
+    assertResult(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
       authorsElm3.scope
     }
 
-    expectResult(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
+    assertResult(bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) {
       authorsElm4.scope
     }
 
     val resolvedRoot = resolved.Elem(doc1.documentElement)
 
-    expectResult(resolvedRoot) {
+    assertResult(resolvedRoot) {
       resolved.Elem(doc2.documentElement)
     }
 
-    expectResult(resolvedRoot) {
+    assertResult(resolvedRoot) {
       resolved.Elem(doc3.documentElement)
     }
 
-    expectResult(resolvedRoot) {
+    assertResult(resolvedRoot) {
       resolved.Elem(doc4.documentElement)
     }
   }
@@ -276,11 +276,11 @@ class CreationTest extends Suite {
     val parentScope2 = Scope.Empty
     val rootElem2 = doc1.documentElement.notUndeclaringPrefixes(parentScope2)
 
-    expectResult(resolvedRootElm1) {
+    assertResult(resolvedRootElm1) {
       resolved.Elem(rootElem2)
     }
 
-    expectResult(Set(Declarations.Empty)) {
+    assertResult(Set(Declarations.Empty)) {
       NodeBuilder.fromElem(rootElem2)(parentScope2).findAllElemsOrSelf.
         map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
     }
@@ -290,11 +290,11 @@ class CreationTest extends Suite {
     val parentScope3 = Scope.from("books" -> "http://bookstore", "names" -> "http://xyz")
     val rootElem3 = doc1.documentElement.notUndeclaringPrefixes(parentScope3)
 
-    expectResult(resolvedRootElm1) {
+    assertResult(resolvedRootElm1) {
       resolved.Elem(rootElem3)
     }
 
-    expectResult(Set(Declarations.Empty)) {
+    assertResult(Set(Declarations.Empty)) {
       NodeBuilder.fromElem(rootElem3)(parentScope3).findAllElemsOrSelf.
         map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
     }
@@ -304,11 +304,11 @@ class CreationTest extends Suite {
     val parentScope4 = Scope.from("abcde" -> "http://abcde")
     val rootElem4 = doc1.documentElement.notUndeclaringPrefixes(parentScope4)
 
-    expectResult(resolvedRootElm1) {
+    assertResult(resolvedRootElm1) {
       resolved.Elem(rootElem4)
     }
 
-    expectResult(Set(Declarations.Empty)) {
+    assertResult(Set(Declarations.Empty)) {
       NodeBuilder.fromElem(rootElem4)(parentScope4).findAllElemsOrSelf.
         map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
     }
@@ -318,11 +318,11 @@ class CreationTest extends Suite {
     val parentScope5 = Scope.from("books" -> "http://bookstore", "names" -> "http://xyz", "abcde" -> "http://abcde")
     val rootElem5 = doc1.documentElement.notUndeclaringPrefixes(parentScope5)
 
-    expectResult(resolvedRootElm1) {
+    assertResult(resolvedRootElm1) {
       resolved.Elem(rootElem5)
     }
 
-    expectResult(Set(Declarations.Empty)) {
+    assertResult(Set(Declarations.Empty)) {
       NodeBuilder.fromElem(rootElem5)(parentScope5).findAllElemsOrSelf.
         map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
     }
@@ -339,13 +339,13 @@ class CreationTest extends Suite {
           elem(
             qname = QName("books:Authors"))))
 
-    expectResult(true) {
+    assertResult(true) {
       booksElmBuilder.canBuild(Scope.Empty)
     }
-    expectResult(true) {
+    assertResult(true) {
       booksElmBuilder.findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined)
     }
-    expectResult(true) {
+    assertResult(true) {
       booksElmBuilder.allDeclarationsAreAtTopLevel
     }
 
@@ -353,7 +353,7 @@ class CreationTest extends Suite {
 
     val prefixBooks = booksElm.scope.prefixesForNamespace("http://bookstore").headOption.getOrElse("bks")
 
-    expectResult("books") {
+    assertResult("books") {
       prefixBooks
     }
 
@@ -369,13 +369,13 @@ class CreationTest extends Suite {
           textElem(QName(prefixBooks, "First_Name"), "Jennifer"),
           textElem(QName(prefixBooks, "Last_Name"), "Widom")))
 
-    expectResult(true) {
+    assertResult(true) {
       authorElmBuilder.canBuild(Scope.Empty)
     }
-    expectResult(true) {
+    assertResult(true) {
       authorElmBuilder.findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined)
     }
-    expectResult(true) {
+    assertResult(true) {
       authorElmBuilder.allDeclarationsAreAtTopLevel
     }
 
@@ -390,17 +390,17 @@ class CreationTest extends Suite {
       e => e.plusChild(authorElm)
     }
 
-    expectResult(Some(authorsPath)) {
+    assertResult(Some(authorsPath)) {
       updatedBooksElm findElemOrSelfPath { e => e.localName == "Author" } flatMap { path => path.parentPathOption }
     }
-    expectResult(true) {
+    assertResult(true) {
       updatedBooksElm.findAllElemsOrSelf forall { e => e.scope == Scope.from("books" -> "http://bookstore") }
     }
 
     // Although the "inserted" tree had its own namespace declarations, they are superfluous within the parent tree,
     // and are lost when converting the parent tree back to an ElemBuilder.
 
-    expectResult(true) {
+    assertResult(true) {
       NodeBuilder.fromElem(updatedBooksElm)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
   }

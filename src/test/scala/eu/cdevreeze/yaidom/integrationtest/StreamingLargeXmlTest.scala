@@ -25,7 +25,7 @@ import javax.xml.transform.stream.{ StreamSource, StreamResult }
 import scala.collection.{ immutable, mutable }
 import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore, ConfigMap }
 import org.scalatest.junit.JUnitRunner
 import parse._
 import print._
@@ -42,7 +42,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
 
   @volatile private var xmlBytes: Array[Byte] = _
 
-  override def beforeAll(configMap: Map[String, Any]): Unit = {
+  override def beforeAll(configMap: ConfigMap): Unit = {
     val zipFileUrl = classOf[StreamingLargeXmlTest].getResource("bigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 
@@ -100,15 +100,15 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
       contactCount += 1
       elemCount += contactElem.findAllElemsOrSelf.size
 
-      expectResult(true) {
+      assertResult(true) {
         Set("firstName", "lastName").subsetOf(contactElem.findAllElems.map(_.localName).toSet)
       }
     }
 
-    expectResult(true) {
+    assertResult(true) {
       contactCount >= 1000
     }
-    expectResult(true) {
+    assertResult(true) {
       elemCount >= 10000
     }
   }

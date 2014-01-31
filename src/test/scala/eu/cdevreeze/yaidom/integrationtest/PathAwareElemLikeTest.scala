@@ -76,15 +76,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => Set("shipTo", "billTo").contains(e.localName) }
     val toPaths = rootElem.filterChildElemPaths(p)
 
-    expectResult(2) {
+    assertResult(2) {
       toPaths.size
     }
 
-    expectResult(filterChildElemPaths(rootElem, p)) {
+    assertResult(filterChildElemPaths(rootElem, p)) {
       rootElem.filterChildElemPaths(p)
     }
 
-    expectResult(filterChildElemPaths(rootElem, (e => true))) {
+    assertResult(filterChildElemPaths(rootElem, (e => true))) {
       rootElem.filterChildElemPaths(e => true)
     }
   }
@@ -93,15 +93,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => !Set("comment").contains(e.localName) }
     val paths = rootElem.filterElemOrSelfPaths(p)
 
-    expectResult(rootElem.findAllElemsOrSelf.size - 2) {
+    assertResult(rootElem.findAllElemsOrSelf.size - 2) {
       paths.size
     }
 
-    expectResult(filterElemOrSelfPaths(rootElem, p)) {
+    assertResult(filterElemOrSelfPaths(rootElem, p)) {
       rootElem.filterElemOrSelfPaths(p)
     }
 
-    expectResult(filterElemOrSelfPaths(rootElem, (e => true))) {
+    assertResult(filterElemOrSelfPaths(rootElem, (e => true))) {
       rootElem.filterElemOrSelfPaths(e => true)
     }
   }
@@ -110,15 +110,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.findTopmostElemOrSelfPaths(p)
 
-    expectResult(2) {
+    assertResult(2) {
       paths.size
     }
 
-    expectResult(findTopmostElemOrSelfPaths(rootElem, p)) {
+    assertResult(findTopmostElemOrSelfPaths(rootElem, p)) {
       rootElem.findTopmostElemOrSelfPaths(p)
     }
 
-    expectResult(findTopmostElemOrSelfPaths(rootElem, (e => true))) {
+    assertResult(findTopmostElemOrSelfPaths(rootElem, (e => true))) {
       rootElem.findTopmostElemOrSelfPaths(e => true)
     }
   }
@@ -127,15 +127,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => !Set("comment").contains(e.localName) }
     val paths = rootElem.filterElemPaths(p)
 
-    expectResult(rootElem.findAllElems.size - 2) {
+    assertResult(rootElem.findAllElems.size - 2) {
       paths.size
     }
 
-    expectResult(filterElemPaths(rootElem, p)) {
+    assertResult(filterElemPaths(rootElem, p)) {
       rootElem.filterElemPaths(p)
     }
 
-    expectResult(filterElemPaths(rootElem, (e => true))) {
+    assertResult(filterElemPaths(rootElem, (e => true))) {
       rootElem.filterElemPaths(e => true)
     }
   }
@@ -144,15 +144,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.findTopmostElemPaths(p)
 
-    expectResult(2) {
+    assertResult(2) {
       paths.size
     }
 
-    expectResult(findTopmostElemPaths(rootElem, p)) {
+    assertResult(findTopmostElemPaths(rootElem, p)) {
       rootElem.findTopmostElemPaths(p)
     }
 
-    expectResult(findTopmostElemPaths(rootElem, (e => true))) {
+    assertResult(findTopmostElemPaths(rootElem, (e => true))) {
       rootElem.findTopmostElemPaths(e => true)
     }
   }
@@ -161,15 +161,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.filterElemOrSelfPaths(p)
 
-    expectResult(rootElem.filterElemsOrSelf(p).map(e => resolved.Elem(e))) {
+    assertResult(rootElem.filterElemsOrSelf(p).map(e => resolved.Elem(e))) {
       rootElem.filterElemOrSelfPaths(p) map (path => rootElem.getElemOrSelfByPath(path)) map (e => resolved.Elem(e))
     }
 
-    expectResult(rootElem.filterElems(p).map(e => resolved.Elem(e))) {
+    assertResult(rootElem.filterElems(p).map(e => resolved.Elem(e))) {
       rootElem.filterElemPaths(p) map (path => rootElem.getElemOrSelfByPath(path)) map (e => resolved.Elem(e))
     }
 
-    expectResult(rootElem.filterChildElems(p).map(e => resolved.Elem(e))) {
+    assertResult(rootElem.filterChildElems(p).map(e => resolved.Elem(e))) {
       rootElem.filterChildElemPaths(p) map (path => rootElem.getElemOrSelfByPath(path)) map (e => resolved.Elem(e))
     }
   }
@@ -178,15 +178,15 @@ class PathAwareElemLikeTest extends Suite {
     val p = { e: Elem => Set("item").contains(e.localName) }
     val paths = rootElem.filterElemOrSelfPaths(p)
 
-    expectResult(rootElem.findAllElemOrSelfPaths.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
+    assertResult(rootElem.findAllElemOrSelfPaths.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
       rootElem.filterElemOrSelfPaths(p)
     }
 
-    expectResult(rootElem.findAllElemPaths.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
+    assertResult(rootElem.findAllElemPaths.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
       rootElem.filterElemPaths(p)
     }
 
-    expectResult(rootElem.findAllChildElemPaths.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
+    assertResult(rootElem.findAllChildElemPaths.filter(path => p(rootElem.getElemOrSelfByPath(path)))) {
       rootElem.filterChildElemPaths(p)
     }
   }

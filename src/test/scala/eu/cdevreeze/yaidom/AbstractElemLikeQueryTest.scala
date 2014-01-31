@@ -46,7 +46,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val bookTitles =
       (bookstore \ (_.localName == "Book")) map { e => e getChildElem (_.localName == "Title") }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -69,7 +69,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       (bookstore \ (QName("Book").e)) map { e => e getChildElem (QName("Title").e) }
     }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -88,7 +88,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val bookTitles =
       (bookstore \ withLocalName("Book")) map { e => e getChildElem (withLocalName("Title")) }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -111,7 +111,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         title <- bookOrMagazine findChildElem { _.localName == "Title" }
       } yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -131,7 +131,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val titles =
       for (ch <- bookstore.findAllChildElems) yield ch.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -151,7 +151,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val titles =
       for (title <- bookstore filterElems (_.localName == "Title")) yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -190,7 +190,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val isbns =
       for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
 
-    expectResult(Set(
+    assertResult(Set(
       "ISBN-0-13-713526-2",
       "ISBN-0-13-815504-6",
       "ISBN-0-11-222222-3",
@@ -211,7 +211,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if price.toInt < 90
       } yield book
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -237,7 +237,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       } yield book
     }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -258,7 +258,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -275,7 +275,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
@@ -313,7 +313,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       result.toSet
     }
 
-    expectResult(Set(
+    assertResult(Set(
       "Jeffrey Ullman",
       "Jennifer Widom",
       "Hector Garcia-Molina")) {
@@ -351,7 +351,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       result.toSet
     }
 
-    expectResult(Set(
+    assertResult(Set(
       "Jeffrey Ullman",
       "Jennifer Widom",
       "Hector Garcia-Molina")) {
@@ -370,7 +370,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if !book.filterChildElems(EName("Remark")).isEmpty
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -392,7 +392,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -416,7 +416,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if authorFirstName == "Jeffrey"
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -440,7 +440,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
       result.toSet
@@ -461,7 +461,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         }
       } yield bookElm
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
@@ -485,7 +485,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       } yield secondAuthor
 
     val secondAuthorLastNames = secondAuthors map { e => e getChildElem { _.localName == "Last_Name" } }
-    expectResult(Set(
+    assertResult(Set(
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
@@ -506,7 +506,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if remark.trimmedText.indexOf("great") >= 0
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set("Database Systems: The Complete Book")) {
+    assertResult(Set("Database Systems: The Complete Book")) {
       val result = titles map { _.trimmedText }
       result.toSet
     }
@@ -529,7 +529,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if !booksWithSameName.isEmpty
       } yield magazine
 
-    expectResult(Set("Hector and Jeff's Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints")) {
       val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -555,7 +555,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if !booksWithSameName.isEmpty
       } yield magazine
 
-    expectResult(Set("Hector and Jeff's Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints")) {
       val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -582,7 +582,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
-    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
       val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -602,7 +602,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if titles.map(_.trimmedText).contains(titleString)
       } yield bookOrMagazine
 
-    expectResult(Set("Hector and Jeff's Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints")) {
       val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -636,7 +636,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if authorNames forall { name => name.indexOf("J") >= 0 }
       } yield book
 
-    expectResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
       val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -657,7 +657,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
       } yield book.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "Hector and Jeff's Database Hints")) {
       val result = titles map { _.trimmedText }
       result.toSet
@@ -686,7 +686,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val averagePrice =
       textElem(QName("Average"), (prices.sum.toDouble / prices.size).toString).build()
 
-    expectResult(65) {
+    assertResult(65) {
       averagePrice.trimmedText.toDouble.intValue
     }
   }
@@ -708,7 +708,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         lastName <- (bookstore.filterElems(EName("Last_Name")) map (e => e.trimmedText)).distinct
       } yield lastName
 
-    expectResult(Set(
+    assertResult(Set(
       "Ullman",
       "Widom",
       "Garcia-Molina")) {
@@ -758,25 +758,25 @@ abstract class AbstractElemLikeQueryTest extends Suite {
           textElem(QName("Title1"), bookTitle(book1)),
           textElem(QName("Title2"), bookTitle(book2)))).build()
 
-    expectResult(5) {
+    assertResult(5) {
       pairs.size
     }
-    expectResult(3) {
+    assertResult(3) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book1) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book1)).size
     }
-    expectResult(3) {
+    assertResult(3) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book2) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book2)).size
     }
-    expectResult(2) {
+    assertResult(2) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book3) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book3)).size
     }
-    expectResult(2) {
+    assertResult(2) {
       pairs.filter(pair =>
         pair.getChildElem(EName("Title1")).trimmedText == bookTitle(book4) ||
           pair.getChildElem(EName("Title2")).trimmedText == bookTitle(book4)).size
@@ -802,7 +802,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
         }
       }
 
-    expectResult(Set(EName("BookTitle"), EName("MagazineTitle"))) {
+    assertResult(Set(EName("BookTitle"), EName("MagazineTitle"))) {
       bookOrMagazineTitles.map(e => e.resolvedName).toSet
     }
     val ngCount = bookOrMagazineTitles count { e => e.trimmedText == "National Geographic" }
@@ -864,7 +864,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       EName("Magazine"),
       EName("Title"))
 
-    expectResult(depthFirstElmNames) {
+    assertResult(depthFirstElmNames) {
       elms map { _.resolvedName }
     }
   }
@@ -890,10 +890,10 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       } yield lastNameElm.text
     val firstAuthorLastName = authorLastNames.head
 
-    expectResult("Hector and Jeff's Database Hints") {
+    assertResult("Hector and Jeff's Database Hints") {
       title
     }
-    expectResult("Ullman") {
+    assertResult("Ullman") {
       firstAuthorLastName
     }
   }

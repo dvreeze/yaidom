@@ -79,7 +79,7 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     val heapMemAfterParsingInMiB = getUsedHeapMemoryInMiB
     logger.info(s"Heap memory usage after parsing ${docElems.size} XML files: ${heapMemAfterParsingInMiB} MiB")
 
-    expectResult(
+    assertResult(
       true,
       s"Parsed XML should not need more than $maxMemoryToFileLengthRatio times the memory that their combined byte count") {
         (heapMemAfterParsingInMiB - heapMemBeforeParsingInMiB) <= maxMemoryToFileLengthRatio.toLong * totalXmlFileLengthInMiB

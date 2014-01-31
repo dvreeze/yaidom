@@ -63,16 +63,16 @@ class DomLSInteropTest extends Suite {
 
     val root: Elem = domParser.parse(is).documentElement
 
-    expectResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
     }
-    expectResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(8) {
+    assertResult(8) {
       root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult(3) {
+    assertResult(3) {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
@@ -92,16 +92,16 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root2.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root2.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root2.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -113,16 +113,16 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root3.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root3.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root3.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -145,16 +145,16 @@ class DomLSInteropTest extends Suite {
 
     val root4 = doc2.documentElement
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root4.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root4.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root4.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -166,16 +166,16 @@ class DomLSInteropTest extends Suite {
 
     val root5: resolved.Elem = resolved.Elem(doc.documentElement)
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root5.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root5.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root5.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -198,16 +198,16 @@ class DomLSInteropTest extends Suite {
 
     val root6 = doc6.documentElement
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root6.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root6.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root6.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -234,16 +234,16 @@ class DomLSInteropTest extends Suite {
     val doc7 = rootDocBuilder2.build()
     val root7 = doc7.documentElement
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root7.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root7.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root7.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -269,16 +269,16 @@ class DomLSInteropTest extends Suite {
     val doc8 = ois3.readObject().asInstanceOf[Document]
     val root8 = doc8.documentElement
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root8.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root8.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root8.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -296,7 +296,7 @@ class DomLSInteropTest extends Suite {
 
     val root: Elem = domParser.parse(is).documentElement
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -315,7 +315,7 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -324,7 +324,7 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -342,7 +342,7 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -358,19 +358,19 @@ class DomLSInteropTest extends Suite {
     val document: Document = domParser.parse(is)
     val root: Elem = document.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("This is trivial XML") {
+    assertResult("This is trivial XML") {
       val result = document.comments map { com => com.text.trim }
       result.mkString
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -388,19 +388,19 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("This is trivial XML") {
+    assertResult("This is trivial XML") {
       val result = document2.comments map { com => com.text.trim }
       result.mkString
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root2.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -410,19 +410,19 @@ class DomLSInteropTest extends Suite {
     val document3: eu.cdevreeze.yaidom.Document = DocBuilder.fromDocument(document2).build()
     val root3: Elem = document3.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("This is trivial XML") {
+    assertResult("This is trivial XML") {
       val result = document3.comments map { com => com.text.trim }
       result.mkString
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root3.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -442,19 +442,19 @@ class DomLSInteropTest extends Suite {
 
     val root4 = document4.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("This is trivial XML") {
+    assertResult("This is trivial XML") {
       val result = document4.comments map { com => com.text.trim }
       result.mkString
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root4.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -510,11 +510,11 @@ class DomLSInteropTest extends Suite {
         EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
         EName(ns, "notation"))
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(0, 1)) {
+    assertResult(Set(0, 1)) {
       val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -525,14 +525,14 @@ class DomLSInteropTest extends Suite {
         result.headOption
       }
 
-      expectResult(true) {
+      assertResult(true) {
         forChoiceDefOption.isDefined
       }
 
       val forChoiceDefDocumentation: String =
         forChoiceDefOption.get.filterElems(EName(ns, "documentation")) flatMap { e => e.trimmedText } mkString ""
 
-      expectResult("A utility type, not for public use") {
+      assertResult("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
       }
     }
@@ -549,7 +549,7 @@ class DomLSInteropTest extends Suite {
       val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
 
       // The XML string contains "&lt;", but the parsed text should contain an unescaped "<" instead
-      expectResult(true) {
+      assertResult(true) {
         documentationText.containsSlice("""XML Schema language.  The documentation (within <documentation> elements)""")
       }
     }
@@ -570,17 +570,17 @@ class DomLSInteropTest extends Suite {
           }
         } yield idConstraintElm
 
-      expectResult(1) {
+      assertResult(1) {
         identityConstraintElms.size
       }
 
       val selectorElms = identityConstraintElms.head \ EName(ns, "selector")
 
-      expectResult(1) {
+      assertResult(1) {
         selectorElms.size
       }
 
-      expectResult(""".//xs:key|.//xs:unique|.//xs:keyref""") {
+      assertResult(""".//xs:key|.//xs:unique|.//xs:keyref""") {
         selectorElms.head.attributeOption(EName("xpath")).getOrElse("")
       }
     }
@@ -595,7 +595,7 @@ class DomLSInteropTest extends Suite {
             e.attributeOption(EName("abstract")) == Some("true")
         }
 
-      expectResult(1) {
+      assertResult(1) {
         complexTypeElms.size
       }
 
@@ -607,41 +607,41 @@ class DomLSInteropTest extends Suite {
       val attributeElms = complexTypeElms.head.filterElems(EName(ns, "attribute"))
       val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
-      expectResult(Set(EName("base"))) {
+      assertResult(Set(EName("base"))) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
-      expectResult(Set("xs:annotated")) {
+      assertResult(Set("xs:annotated")) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.values }
         result.toSet
       }
 
-      expectResult(Set()) {
+      assertResult(Set()) {
         val result = sequenceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("minOccurs"))) {
+      assertResult(Set(EName("minOccurs"))) {
         val result = choiceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("name"), EName("type"))) {
+      assertResult(Set(EName("name"), EName("type"))) {
         val result = elementElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
+      assertResult(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
         val result = groupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
+      assertResult(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
         val result = attributeElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("ref"))) {
+      assertResult(Set(EName("ref"))) {
         val result = attributeGroupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
@@ -658,11 +658,11 @@ class DomLSInteropTest extends Suite {
 
       val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
 
-      expectResult(1) {
+      assertResult(1) {
         patternElms.size
       }
 
-      expectResult("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
+      assertResult("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
         patternElms.head.attributeOption(EName("value")).getOrElse("")
       }
     }
@@ -683,11 +683,11 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = root2 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(0, 1)) {
+    assertResult(Set(0, 1)) {
       val result = root2 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -702,11 +702,11 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = root3 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(0, 1)) {
+    assertResult(Set(0, 1)) {
       val result = root3 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -730,11 +730,11 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = root4 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(0, 1)) {
+    assertResult(Set(0, 1)) {
       val result = root4 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -756,21 +756,21 @@ class DomLSInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildText(rootElm: Elem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expectResult(true) {
+      assertResult(true) {
         childOption.isDefined
       }
-      expectResult(1) {
+      assertResult(1) {
         childOption.get.textChildren.size
       }
       val text = "This text contains an entity reference, viz. hi"
-      expectResult(text) {
+      assertResult(text) {
         val txt = childOption.get.trimmedText
         txt.take(text.length)
       }
@@ -792,7 +792,7 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -803,7 +803,7 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -823,7 +823,7 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -847,30 +847,30 @@ class DomLSInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildTextAndEntityRef(rootElm: Elem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expectResult(true) {
+      assertResult(true) {
         childOption.isDefined
       }
-      expectResult(2) {
+      assertResult(2) {
         childOption.get.textChildren.size
       }
-      expectResult(1) {
+      assertResult(1) {
         val result = childOption.get.children collect { case er: EntityRef => er }
         result.size
       }
-      expectResult(EntityRef("hello")) {
+      assertResult(EntityRef("hello")) {
         val entityRefs = childOption.get.children collect { case er: EntityRef => er }
         val entityRef: EntityRef = entityRefs.head
         entityRef
       }
       val s = "This text contains an entity reference, viz."
-      expectResult(s) {
+      assertResult(s) {
         childOption.get.trimmedText.take(s.length)
       }
     }
@@ -891,7 +891,7 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -902,7 +902,7 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -922,7 +922,7 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -940,7 +940,7 @@ class DomLSInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -959,7 +959,7 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -968,7 +968,7 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -986,7 +986,7 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -1003,31 +1003,31 @@ class DomLSInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expectResult(2) {
+      assertResult(2) {
         childElms.size
       }
 
       val text = "Jansen & co"
 
       // Remember: we set the parser to coalescing!
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.attributeOption(EName("about")).getOrElse("Missing text") }
         result.toSet
       }
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = rootElm.commentChildren map { c => c.text.trim }
         result.toSet
       }
@@ -1049,7 +1049,7 @@ class DomLSInteropTest extends Suite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -1060,7 +1060,7 @@ class DomLSInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -1080,7 +1080,7 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -1099,20 +1099,20 @@ class DomLSInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expectResult(2) {
+      assertResult(2) {
         childElms.size
       }
 
       val text = "\u20AC 200"
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
@@ -1124,7 +1124,7 @@ class DomLSInteropTest extends Suite {
 
     val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -1144,7 +1144,7 @@ class DomLSInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -1206,7 +1206,7 @@ class DomLSInteropTest extends Suite {
     intercept[LSException] {
       domParser.parse(is).documentElement
     }
-    expectResult(1) {
+    assertResult(1) {
       errorCount
     }
   }
@@ -1220,41 +1220,41 @@ class DomLSInteropTest extends Suite {
 
     val doc = parser.parse(classOf[DomLSInteropTest].getResourceAsStream("cars.xml"))
 
-    expectResult("records") {
+    assertResult("records") {
       doc.documentElement.localName
     }
 
     val recordsElm = doc.documentElement
 
-    expectResult(3) {
+    assertResult(3) {
       (recordsElm \ (_.localName == "car")).size
     }
 
-    expectResult(10) {
+    assertResult(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
     val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
-    expectResult("car") {
+    assertResult("car") {
       firstRecordElm.localName
     }
 
-    expectResult("Holden") {
+    assertResult("Holden") {
       firstRecordElm.attribute(EName("make"))
     }
 
-    expectResult("Australia") {
+    assertResult("Australia") {
       firstRecordElm.getChildElem(_.localName == "country").trimmedText
     }
 
-    expectResult(2) {
+    assertResult(2) {
       val carElms = recordsElm \ (_.localName == "car")
       val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
       result.size
     }
 
-    expectResult(Set("Holden", "Peel")) {
+    assertResult(Set("Holden", "Peel")) {
       val carElms = recordsElm \ (_.localName == "car")
       val pattern = ".*s.*a.*".r.pattern
 
@@ -1266,7 +1266,7 @@ class DomLSInteropTest extends Suite {
       (resultElms map (e => e.attribute(EName("make")))).toSet
     }
 
-    expectResult(Set("speed", "size", "price")) {
+    assertResult(Set("speed", "size", "price")) {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
@@ -1277,11 +1277,11 @@ class DomLSInteropTest extends Suite {
     val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
-    expectResult("New Zealand") {
+    assertResult("New Zealand") {
       updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).getChildElem(_.localName == "country").trimmedText
     }
 
-    expectResult(List("Royale", "P50", "HSV Maloo")) {
+    assertResult(List("Royale", "P50", "HSV Maloo")) {
       val carElms = recordsElm \ (_.localName == "car")
       val resultElms = carElms sortBy { e => e.attributeOption(EName("year")).getOrElse("0").toInt }
       resultElms map { e => e.attribute(EName("name")) }
@@ -1296,16 +1296,16 @@ class DomLSInteropTest extends Suite {
 
     val aElm = doc.documentElement.getChildElem(_.localName == "a")
 
-    expectResult(1) {
+    assertResult(1) {
       aElm.children.size
     }
-    expectResult(1) {
+    assertResult(1) {
       aElm.textChildren.size
     }
-    expectResult(" a b c ") {
+    assertResult(" a b c ") {
       aElm.textChildren(0).text
     }
-    expectResult(" a b c ") {
+    assertResult(" a b c ") {
       aElm.text
     }
   }
@@ -1320,13 +1320,13 @@ class DomLSInteropTest extends Suite {
     val bElm = doc.documentElement.getChildElem(_.localName == "b")
     val cElm = doc.documentElement.getChildElem(_.localName == "c")
 
-    expectResult(0) {
+    assertResult(0) {
       aElm.children.size
     }
-    expectResult(0) {
+    assertResult(0) {
       bElm.children.size
     }
-    expectResult(0) {
+    assertResult(0) {
       cElm.children.size
     }
   }
@@ -1356,30 +1356,30 @@ class DomLSInteropTest extends Suite {
     val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
     val aElm3 = doc3.documentElement.getChildElem(_.localName == "a")
 
-    expectResult(1) {
+    assertResult(1) {
       aElm1.textChildren.size
     }
-    expectResult(1) {
+    assertResult(1) {
       aElm2.textChildren.size
     }
-    expectResult(1) {
+    assertResult(1) {
       aElm3.textChildren.size
     }
 
-    expectResult("abc def") {
+    assertResult("abc def") {
       aElm1.text
     }
-    expectResult("abc def") {
+    assertResult("abc def") {
       aElm2.text
     }
-    expectResult("abc def") {
+    assertResult("abc def") {
       aElm3.text
     }
 
-    expectResult(true) {
+    assertResult(true) {
       aElm2.textChildren(0).isCData
     }
-    expectResult(false) {
+    assertResult(false) {
       aElm3.textChildren(0).isCData
     }
   }
@@ -1409,33 +1409,33 @@ class DomLSInteropTest extends Suite {
     val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
     val aElm3 = doc3.documentElement.getChildElem(_.localName == "a")
 
-    expectResult(1) {
+    assertResult(1) {
       doc1.allComments.size
     }
-    expectResult(1) {
+    assertResult(1) {
       doc2.allComments.size
     }
-    expectResult(0) {
+    assertResult(0) {
       doc3.allComments.size
     }
 
-    expectResult("abc  def") {
+    assertResult("abc  def") {
       aElm1.text
     }
-    expectResult("abc  def") {
+    assertResult("abc  def") {
       aElm2.text
     }
-    expectResult("abc  def") {
+    assertResult("abc  def") {
       aElm3.text
     }
 
-    expectResult(" abc def ") {
+    assertResult(" abc def ") {
       aElm1.commentChildren.headOption.map(_.text).getOrElse("")
     }
-    expectResult(" abc def ") {
+    assertResult(" abc def ") {
       aElm2.commentChildren.headOption.map(_.text).getOrElse("")
     }
-    expectResult("XXX") {
+    assertResult("XXX") {
       aElm3.commentChildren.headOption.map(_.text).getOrElse("XXX")
     }
   }
@@ -1472,23 +1472,23 @@ class DomLSInteropTest extends Suite {
     val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
     val aElm3 = doc3.documentElement.getChildElem(_.localName == "a")
 
-    expectResult(1) {
+    assertResult(1) {
       aElm1.textChildren.size
     }
-    expectResult(1) {
+    assertResult(1) {
       aElm2.textChildren.size
     }
-    expectResult(0) {
+    assertResult(0) {
       aElm3.textChildren.size
     }
 
-    expectResult("   ") {
+    assertResult("   ") {
       aElm1.text
     }
-    expectResult("   ") {
+    assertResult("   ") {
       aElm2.text
     }
-    expectResult("") {
+    assertResult("") {
       aElm3.text
     }
   }
@@ -1534,10 +1534,10 @@ class DomLSInteropTest extends Suite {
 
     val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
 
-    expectResult(3) {
+    assertResult(3) {
       doc1.documentElement.findAllElemsOrSelf.size
     }
-    expectResult(3) {
+    assertResult(3) {
       doc3.documentElement.findAllElemsOrSelf.size
     }
   }
@@ -1556,7 +1556,7 @@ class DomLSInteropTest extends Suite {
 
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
 
-    expectResult("") {
+    assertResult("") {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
     }
 
@@ -1604,7 +1604,7 @@ class DomLSInteropTest extends Suite {
 
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
 
-    expectResult("") {
+    assertResult("") {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
     }
 
@@ -1680,10 +1680,10 @@ class DomLSInteropTest extends Suite {
 
     val root: Elem = parser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement
 
-    expectResult(4) {
+    assertResult(4) {
       (root \\! (_.localName == "Book")).size
     }
-    expectResult(4) {
+    assertResult(4) {
       (root \\! (_.localName == "Magazine")).size
     }
   }

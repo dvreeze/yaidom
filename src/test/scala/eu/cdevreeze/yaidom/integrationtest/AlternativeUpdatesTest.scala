@@ -47,7 +47,7 @@ class AlternativeUpdatesTest extends Suite {
       case e: Elem => e
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -60,7 +60,7 @@ class AlternativeUpdatesTest extends Suite {
       case e: Elem => e
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -77,7 +77,7 @@ class AlternativeUpdatesTest extends Suite {
       }
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -94,7 +94,7 @@ class AlternativeUpdatesTest extends Suite {
       }
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -108,7 +108,7 @@ class AlternativeUpdatesTest extends Suite {
       elem.withChildren(authors.take(1))
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -121,7 +121,7 @@ class AlternativeUpdatesTest extends Suite {
       if (path.lastEntry.index == 0) Vector(elem) else Vector()
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -147,7 +147,7 @@ class AlternativeUpdatesTest extends Suite {
     // The state of bookstoreWrapper is its wrapped DOM element, which has been updated
     val updatedElem = convert.DomConversions.convertToElem(bookstoreWrapper.wrappedNode, Scope.Empty)
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
   }
@@ -170,17 +170,17 @@ class AlternativeUpdatesTest extends Suite {
       }
     }
 
-    expectResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
       resolved.Elem(updatedElem.prettify(2))
     }
 
-    expectResult(paths) {
+    assertResult(paths) {
       foundPaths.toSet
     }
-    expectResult(foundPaths.size) {
+    assertResult(foundPaths.size) {
       foundElemsWithoutChildren.size
     }
-    expectResult(true) {
+    assertResult(true) {
       foundPaths.zip(foundElemsWithoutChildren) forall {
         case (path, elem) =>
           resolved.Elem(bookstore.getElemOrSelfByPath(path).withChildren(Vector())) == resolved.Elem(elem)

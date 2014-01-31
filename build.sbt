@@ -9,9 +9,9 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "0.7.2-SNAPSHOT"
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.3"
 
-crossScalaVersions := Seq("2.10.1")
+crossScalaVersions := Seq("2.10.3")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -27,11 +27,11 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
-libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.1"
+libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.2.1"
 
-libraryDependencies += "junit" % "junit" % "4.10" % "test"
+libraryDependencies += "junit" % "junit" % "4.11" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
 

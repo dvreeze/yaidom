@@ -90,7 +90,7 @@ class XmlToFlatFileTest extends Suite {
         "bk102Ralls          Kim       " + separator +
         "bk103Corets         Eva       " + separator
 
-    expectResult(expected) {
+    assertResult(expected) {
       rows.mkString
     }
   }

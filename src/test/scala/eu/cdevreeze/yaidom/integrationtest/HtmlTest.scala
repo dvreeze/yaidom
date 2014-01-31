@@ -44,13 +44,13 @@ class HtmlTest extends Suite with BeforeAndAfterAll {
 
     val doc = docParser.parse(classOf[HtmlTest].getResourceAsStream("badHtmlExample.html"))
 
-    expectResult(4) {
+    assertResult(4) {
       (doc.documentElement \\! withNoNsEName("li")).size
     }
 
     val firstLiOption = (doc.documentElement \\! withNoNsEName("li")).headOption
 
-    expectResult(true) {
+    assertResult(true) {
       firstLiOption.isDefined
     }
 
@@ -63,7 +63,7 @@ class HtmlTest extends Suite with BeforeAndAfterAll {
       }
     }
 
-    expectResult(resolved.Elem(expectedLi).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(expectedLi).removeAllInterElementWhitespace) {
       resolved.Elem(keepHref(firstLiOption.get)).removeAllInterElementWhitespace
     }
   }
@@ -81,11 +81,11 @@ class HtmlTest extends Suite with BeforeAndAfterAll {
 
     val doc2 = docParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("UTF-8")))
 
-    expectResult(4) {
+    assertResult(4) {
       (doc2.documentElement \\! withNoNsEName("li")).size
     }
 
-    expectResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))) {
+    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))) {
       resolved.Elem(doc2.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))
     }
   }

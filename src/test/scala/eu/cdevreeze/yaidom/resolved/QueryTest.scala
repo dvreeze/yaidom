@@ -78,7 +78,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       val result = elms map { _.resolvedName }
       result.toSet
     }
-    expectResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
+    assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
       enames
     }
 
@@ -94,7 +94,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     assert(paths.size > 10, "Expected more than 10 matching paths")
 
-    expectResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
+    assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
       val result = paths map { path => bookstore.getElemOrSelfByPath(path).resolvedName }
       result.toSet
     }
@@ -124,7 +124,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         if (nextOption.isDefined || prevOption.isDefined)
       } yield bookOrMagazinePath
 
-    expectResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
       val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -154,7 +154,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         if (nextBookOption.isDefined || prevBookOption.isDefined)
       } yield bookOrMagazinePath
 
-    expectResult(Set("Hector and Jeff's Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints")) {
       val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
       result.toSet
     }
@@ -191,10 +191,10 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
           title,
           Elem(EName("First_Name"), Map(), Vector(Text(searchedForFirstNames.head)))))
 
-    expectResult(2) {
+    assertResult(2) {
       titleAndFirstNames.size
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
       val result = titleElms.flatten map { e => e.trimmedText }
       result.toSet
@@ -236,14 +236,14 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
           book.getChildElem(EName("Title")),
           Elem(EName("Price"), Map(), Vector(Text(price.toString)))))
 
-    expectResult(2) {
+    assertResult(2) {
       cheapBooks.size
     }
-    expectResult(Set(50, 25)) {
+    assertResult(Set(50, 25)) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
       result.toSet
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
       result.toSet
     }
@@ -281,13 +281,13 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
           Elem(EName("Price"), Map(), Vector(Text(price.toString)))))
     }
 
-    expectResult(4) {
+    assertResult(4) {
       books.size
     }
-    expectResult(List(25, 50, 85, 100)) {
+    assertResult(List(25, 50, 85, 100)) {
       books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
     }
-    expectResult(List(
+    assertResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
@@ -360,7 +360,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     val invertedBookstore: Elem = Elem(resolvedName = EName("InvertedBookstore"), resolvedAttributes = Map(), children = authorsWithBooks)
 
-    expectResult(3) {
+    assertResult(3) {
       invertedBookstore.findAllChildElems.size
     }
   }
@@ -388,17 +388,17 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         case e => e
       }
 
-    expectResult(4) {
+    assertResult(4) {
       bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    expectResult(0) {
+    assertResult(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    expectResult(4) {
+    assertResult(4) {
       val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
-    expectResult(0) {
+    assertResult(0) {
       val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       paths.size
     }
@@ -433,7 +433,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         case e => e
       }
 
-    expectResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
+    assertResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
       val result = bookstoreWithCombinedNames.filterElems(EName("Name")) map { _.trimmedText }
       result.toSet
     }
@@ -458,7 +458,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     // Only the Author elements are functionally changed!
 
-    expectResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
+    assertResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
       EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {
 
       val result = updatedBookstoreElm.findAllElemsOrSelf map { _.resolvedName }

@@ -99,7 +99,7 @@ class AirportExampleTest extends Suite {
       val result = beAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "Country" => e.trimmedText }
       result.toSet
     }
-    expectResult(Set("Belgium")) {
+    assertResult(Set("Belgium")) {
       beAirportCountries
     }
 
@@ -107,7 +107,7 @@ class AirportExampleTest extends Suite {
       val result = nlAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "CountryCode" => e.trimmedText }
       result.toSet
     }
-    expectResult(Set("461")) {
+    assertResult(Set("461")) {
       nlAirportCountryCodes
     }
 
@@ -115,7 +115,7 @@ class AirportExampleTest extends Suite {
       val result = deAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "CountryAbbrviation" => e.trimmedText }
       result.toSet
     }
-    expectResult(Set("DE")) {
+    assertResult(Set("DE")) {
       deAirportCountryAbbrevs
     }
 
@@ -139,19 +139,19 @@ class AirportExampleTest extends Suite {
     }
 
     // The highest German airport is Oberpfaffenhofen (Munich)
-    expectResult("OBF") {
+    assertResult("OBF") {
       airportCode(highestDeAirport)
     }
     assert(airportElevationInFeet(highestDeAirport) > 1800)
     assert(airportElevationInFeet(highestDeAirport) < 2000)
 
     // The highest Belgian airport is Liege
-    expectResult("LGG") {
+    assertResult("LGG") {
       airportCode(highestBeAirport)
     }
 
     // The highest Dutch airport is Maastricht
-    expectResult("MST") {
+    assertResult("MST") {
       airportCode(highestNlAirport)
     }
 
@@ -239,7 +239,7 @@ class AirportExampleTest extends Suite {
         scope = scope,
         children = deAirportsDoc.documentElement.findAllChildElems ++ beAirportsDoc.documentElement.findAllChildElems ++ nlAirportsDoc.documentElement.findAllChildElems)
 
-    expectResult(deAirportsDoc.documentElement.findAllChildElems.size + beAirportsDoc.documentElement.findAllChildElems.size + nlAirportsDoc.documentElement.findAllChildElems.size) {
+    assertResult(deAirportsDoc.documentElement.findAllChildElems.size + beAirportsDoc.documentElement.findAllChildElems.size + nlAirportsDoc.documentElement.findAllChildElems.size) {
       airportRootElm.findAllChildElems.size
     }
 
@@ -373,14 +373,14 @@ class AirportExampleTest extends Suite {
     val enameTable = EName(nsWebServiceX, "Table")
 
     // The root element must be named NewDataSet
-    expectResult(enameNewDataSet) {
+    assertResult(enameNewDataSet) {
       root.resolvedName
     }
 
     val tableElms = root.findAllChildElems
 
     // The root child elements must all be named Table
-    expectResult(Set(enameTable)) {
+    assertResult(Set(enameTable)) {
       val elmNames = tableElms map { _.resolvedName }
       elmNames.toSet
     }
@@ -406,13 +406,13 @@ class AirportExampleTest extends Suite {
       EName(nsWebServiceX, "LongitudeEperW"))
 
     // The root grandchild elements must all have names mentioned above (in Set propertyENames)
-    expectResult(propertyENames) {
+    assertResult(propertyENames) {
       val elmNames = tablePropertyElms map { _.resolvedName }
       elmNames.toSet
     }
 
     // The root grandchild elements must have no child elements themselves
-    expectResult(0) {
+    assertResult(0) {
       val elms = tablePropertyElms flatMap { _.findAllChildElems }
       elms.size
     }

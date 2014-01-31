@@ -55,7 +55,7 @@ class EqualityTest extends Suite {
     val doc1: Document = parser.parse(is1)
     val root1 = doc1.documentElement
 
-    expectResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root1.findAllElemsOrSelf map (e => e.localName)).toSet
     }
 
@@ -63,7 +63,7 @@ class EqualityTest extends Suite {
 
     val root2 = root1.removeAllInterElementWhitespace
 
-    expectResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root2.findAllElemsOrSelf map (e => e.localName)).toSet
     }
 
@@ -71,7 +71,7 @@ class EqualityTest extends Suite {
 
     assert(root1.children.size > root2.children.size)
     assert(root1.textChildren.size > root2.textChildren.size)
-    expectResult(root1.findAllChildElems.size) {
+    assertResult(root1.findAllChildElems.size) {
       root2.findAllChildElems.size
     }
 
@@ -82,17 +82,17 @@ class EqualityTest extends Suite {
 
     assert(resolvedRoot1.children.size > resolvedRoot2.children.size)
     assert(resolvedRoot1.textChildren.size > resolvedRoot2.textChildren.size)
-    expectResult(resolvedRoot1.findAllChildElems.size) {
+    assertResult(resolvedRoot1.findAllChildElems.size) {
       resolvedRoot2.findAllChildElems.size
     }
 
     val adaptedResolvedRoot1 = resolvedRoot1.removeAllInterElementWhitespace
 
-    expectResult(adaptedResolvedRoot1) {
+    assertResult(adaptedResolvedRoot1) {
       resolvedRoot2
     }
 
-    expectResult(adaptedResolvedRoot1) {
+    assertResult(adaptedResolvedRoot1) {
       resolvedRoot1.removeAllInterElementWhitespace
     }
   }
@@ -107,7 +107,7 @@ class EqualityTest extends Suite {
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -116,7 +116,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = resolved.Elem(root)
 
-    expectResult(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
+    assertResult(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { _.resolvedName }
       result.toSet
     }
@@ -132,7 +132,7 @@ class EqualityTest extends Suite {
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -141,7 +141,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = resolved.Elem(root)
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -193,7 +193,7 @@ class EqualityTest extends Suite {
         EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
         EName(ns, "notation"))
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
@@ -202,7 +202,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = resolved.Elem(root)
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = resolvedRoot \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
@@ -219,7 +219,7 @@ class EqualityTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -232,7 +232,7 @@ class EqualityTest extends Suite {
     val doc2: Document = parser2.parse(is2)
     val root2 = doc2.documentElement
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -241,7 +241,7 @@ class EqualityTest extends Suite {
       val result = root2.findAllElemsOrSelf flatMap { e => e.children collect { case er: EntityRef => er } }
       result
     }
-    expectResult(1) {
+    assertResult(1) {
       entityRefs.size
     }
 
@@ -250,7 +250,7 @@ class EqualityTest extends Suite {
     val resolvedRoot1 = resolved.Elem(root1)
     val resolvedRoot2 = resolved.Elem(root2)
 
-    expectResult(false) {
+    assertResult(false) {
       resolvedRoot1 == resolvedRoot2
     }
 
@@ -279,7 +279,7 @@ class EqualityTest extends Suite {
     assert(adaptedResolvedRoot1.getChildElem(_.localName == "child").text.contains(" hi."))
     assert(adaptedResolvedRoot3.getChildElem(_.localName == "child").text.contains(" hi."))
 
-    expectResult(adaptedResolvedRoot1) {
+    assertResult(adaptedResolvedRoot1) {
       adaptedResolvedRoot3
     }
   }
@@ -295,7 +295,7 @@ class EqualityTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -304,7 +304,7 @@ class EqualityTest extends Suite {
 
     val resolvedRoot = resolved.Elem(root)
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -321,7 +321,7 @@ class EqualityTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -344,11 +344,11 @@ class EqualityTest extends Suite {
 
     // Check equalities
 
-    expectResult(false) {
+    assertResult(false) {
       resolved.Elem(root1) == resolved.Elem(root2)
     }
 
-    expectResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+    assertResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
@@ -364,7 +364,7 @@ class EqualityTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -382,15 +382,15 @@ class EqualityTest extends Suite {
 
     // Check equalities
 
-    expectResult(false) {
+    assertResult(false) {
       resolved.Elem(root1) == resolved.Elem(root2)
     }
 
-    expectResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+    assertResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
 
-    expectResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+    assertResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAllAdjacentText.normalizeAllText
     }
   }

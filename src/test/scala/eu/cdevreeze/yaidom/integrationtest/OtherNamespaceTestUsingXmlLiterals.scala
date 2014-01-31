@@ -48,35 +48,35 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
+    assertResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
     }
 
     val ns = "http://datypic.com/prod"
 
-    expectResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
+    assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("10") {
+    assertResult("10") {
       val sizeElemOption = (doc.documentElement \\ EName(ns, "size")).headOption
       sizeElemOption.map(_.text).getOrElse("")
     }
@@ -96,7 +96,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("ord", "order"),
         QName("ord", "number"),
@@ -110,7 +110,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -121,30 +121,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -164,7 +164,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("order"),
         QName("number"),
@@ -178,7 +178,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -189,30 +189,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -236,7 +236,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -247,11 +247,11 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
       resolvedElem.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(resolvedEquivalentElem) {
+    assertResult(resolvedEquivalentElem) {
       resolvedElem
     }
   }
@@ -270,7 +270,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("order"),
         QName("number"),
@@ -284,7 +284,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -295,30 +295,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -342,7 +342,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -353,11 +353,11 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
       resolvedElem.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(resolvedEquivalentElem) {
+    assertResult(resolvedEquivalentElem) {
       resolvedElem
     }
   }
@@ -403,7 +403,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("order"),
         QName("number"),
@@ -418,7 +418,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsProd = "http://datypic.com/prod"
     val nsProd2 = "http://datypic.com/prod2"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -429,30 +429,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prod2NumberElemOption = (doc.documentElement \\ EName(nsProd2, "number")).headOption
       prod2NumberElemOption.map(_.text).getOrElse("").trim
     }
@@ -486,7 +486,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -497,11 +497,11 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
       resolvedElem.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(resolvedEquivalentElem) {
+    assertResult(resolvedEquivalentElem) {
       resolvedElem
     }
   }
@@ -520,7 +520,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("order"),
         QName("number"),
@@ -534,7 +534,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -545,30 +545,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -592,7 +592,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -603,11 +603,11 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
       resolvedElem.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(resolvedEquivalentElem) {
+    assertResult(resolvedEquivalentElem) {
       resolvedElem
     }
   }
@@ -626,7 +626,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("order"),
         QName("number"),
@@ -639,7 +639,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val nsOrd = "http://datypic.com/ord"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -650,30 +650,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName("number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -696,7 +696,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("ord", "order"),
         QName("ord", "number"),
@@ -710,7 +710,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -721,30 +721,30 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -768,7 +768,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
-    expectResult(
+    assertResult(
       List(
         EName(nsOrd, "order"),
         EName(nsOrd, "number"),
@@ -779,11 +779,11 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
       resolvedElem.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(resolvedEquivalentElem) {
+    assertResult(resolvedEquivalentElem) {
       resolvedElem
     }
   }
@@ -797,36 +797,36 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(List(QName("product"), QName("number"), QName("size"))) {
+    assertResult(List(QName("product"), QName("number"), QName("size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
     }
 
     val ns = "http://datypic.com/prod"
     val nsApp = "http://datypic.com/app"
 
-    expectResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
+    assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS", QName("app", "system") -> "R32")) {
+    assertResult(Map(QName("system") -> "US-DRESS", QName("app", "system") -> "R32")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS", EName(nsApp, "system") -> "R32")) {
+    assertResult(Map(EName("system") -> "US-DRESS", EName(nsApp, "system") -> "R32")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("10") {
+    assertResult("10") {
       val sizeElemOption = (doc.documentElement \\ EName(ns, "size")).headOption
       sizeElemOption.map(_.text).getOrElse("")
     }
@@ -841,35 +841,35 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(List(QName("product"), QName("number"), QName("size"))) {
+    assertResult(List(QName("product"), QName("number"), QName("size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
     }
 
     val ns = "http://datypic.com/prod"
 
-    expectResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
+    assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS", QName("prod", "system") -> "R32")) {
+    assertResult(Map(QName("system") -> "US-DRESS", QName("prod", "system") -> "R32")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS", EName(ns, "system") -> "R32")) {
+    assertResult(Map(EName("system") -> "US-DRESS", EName(ns, "system") -> "R32")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("10") {
+    assertResult("10") {
       val sizeElemOption = (doc.documentElement \\ EName(ns, "size")).headOption
       sizeElemOption.map(_.text).getOrElse("")
     }
@@ -906,7 +906,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val doc = Document(convertToElem(xml))
 
-    expectResult(
+    assertResult(
       List(
         QName("envelope"),
         QName("order"),
@@ -924,7 +924,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     val nsProd = "http://datypic.com/prod"
     val nsProd2 = "http://datypic.com/prod2"
 
-    expectResult(
+    assertResult(
       List(
         EName("envelope"),
         EName(nsOrd, "order"),
@@ -938,45 +938,45 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.attributes
     }
 
-    expectResult(Nil) {
+    assertResult(Nil) {
       doc.documentElement.resolvedAttributes
     }
 
-    expectResult(Map(EName(nsProd, "id") -> "prod557")) {
+    assertResult(Map(EName(nsProd, "id") -> "prod557")) {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(QName("system") -> "US-DRESS")) {
+    assertResult(Map(QName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.attributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName("system") -> "US-DRESS")) {
+    assertResult(Map(EName("system") -> "US-DRESS")) {
       val sizeElemOption = (doc.documentElement \\ (_.localName == "size")).headOption
       sizeElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map()) {
+    assertResult(Map()) {
       val nameElemOption = (doc.documentElement \\ (_.localName == "name")).headOption
       nameElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult(Map(EName(nsProd2, "value") -> "blue")) {
+    assertResult(Map(EName(nsProd2, "value") -> "blue")) {
       val colorElemOption = (doc.documentElement \\ (_.localName == "color")).headOption
       colorElemOption.map(_.resolvedAttributes.toMap).getOrElse(Map())
     }
 
-    expectResult("123ABBCC123") {
+    assertResult("123ABBCC123") {
       val ordNumberElemOption = (doc.documentElement \\ EName(nsOrd, "number")).headOption
       ordNumberElemOption.map(_.text).getOrElse("")
     }
 
-    expectResult("557") {
+    assertResult("557") {
       val prodNumberElemOption = (doc.documentElement \\ EName(nsProd, "number")).headOption
       prodNumberElemOption.map(_.text).getOrElse("")
     }
@@ -1004,7 +1004,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
 
     val resolvedElem = resolved.Elem(doc.documentElement)
 
-    expectResult(
+    assertResult(
       List(
         EName("envelope"),
         EName(nsOrd, "order"),
@@ -1018,11 +1018,11 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
         resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
       }
 
-    expectResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
       resolvedElem.findAllElemsOrSelf map { _.resolvedName }
     }
 
-    expectResult(resolvedEquivalentElem) {
+    assertResult(resolvedEquivalentElem) {
       resolvedElem
     }
   }

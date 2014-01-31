@@ -50,16 +50,16 @@ class ScalaXmlInteropTest extends Suite {
 
     val root: Elem = convertToElem(bookstore)
 
-    expectResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
     }
-    expectResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(8) {
+    assertResult(8) {
       root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult(3) {
+    assertResult(3) {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
@@ -68,16 +68,16 @@ class ScalaXmlInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root3.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root3.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root3.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -89,16 +89,16 @@ class ScalaXmlInteropTest extends Suite {
 
     val root5: resolved.Elem = resolved.Elem(root)
 
-    expectResult((root.findAllElems map (e => e.localName)).toSet) {
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root5.findAllElems map (e => e.localName)).toSet
     }
-    expectResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
       (root5.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root5.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult {
+    assertResult {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     } {
@@ -110,7 +110,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root6 = convertToElem(convertElem(root))
 
-    expectResult(resolved.Elem(root)) {
+    assertResult(resolved.Elem(root)) {
       resolved.Elem(root6)
     }
   }
@@ -124,7 +124,7 @@ class ScalaXmlInteropTest extends Suite {
     // (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858).
     // See method ScalaXmlToYaidomConversions.extractScope for the reason why. That method works around the bug.
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -133,7 +133,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -151,7 +151,7 @@ class ScalaXmlInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -160,7 +160,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root5 = convertToElem(convertElem(root))
 
-    expectResult(resolved.Elem(root)) {
+    assertResult(resolved.Elem(root)) {
       resolved.Elem(root5)
     }
   }
@@ -171,15 +171,15 @@ class ScalaXmlInteropTest extends Suite {
 
     val root: Elem = convertToElem(trivialXml)
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -189,15 +189,15 @@ class ScalaXmlInteropTest extends Suite {
     val document3: eu.cdevreeze.yaidom.Document = DocBuilder.fromDocument(Document(root)).build()
     val root3: Elem = document3.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root3.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -217,15 +217,15 @@ class ScalaXmlInteropTest extends Suite {
 
     val root4 = document4.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root4.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
@@ -234,7 +234,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root5 = convertToElem(convertElem(root))
 
-    expectResult(resolved.Elem(root)) {
+    assertResult(resolved.Elem(root)) {
       resolved.Elem(root5)
     }
   }
@@ -246,30 +246,30 @@ class ScalaXmlInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildTextAndEntityRef(rootElm: Elem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expectResult(true) {
+      assertResult(true) {
         childOption.isDefined
       }
-      expectResult(2) {
+      assertResult(2) {
         childOption.get.textChildren.size
       }
-      expectResult(1) {
+      assertResult(1) {
         val result = childOption.get.children collect { case er: EntityRef => er }
         result.size
       }
-      expectResult(EntityRef("hello")) {
+      assertResult(EntityRef("hello")) {
         val entityRefs = childOption.get.children collect { case er: EntityRef => er }
         val entityRef: EntityRef = entityRefs.head
         entityRef
       }
       val s = "This text contains an entity reference, viz."
-      expectResult(s) {
+      assertResult(s) {
         childOption.get.trimmedText.take(s.length)
       }
     }
@@ -280,7 +280,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -300,7 +300,7 @@ class ScalaXmlInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -311,7 +311,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root5 = convertToElem(convertElem(root))
 
-    expectResult(resolved.Elem(root)) {
+    assertResult(resolved.Elem(root)) {
       resolved.Elem(root5)
     }
   }
@@ -323,7 +323,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -332,7 +332,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -350,7 +350,7 @@ class ScalaXmlInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -359,7 +359,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root5 = convertToElem(convertElem(root))
 
-    expectResult(resolved.Elem(root)) {
+    assertResult(resolved.Elem(root)) {
       resolved.Elem(root5)
     }
   }
@@ -375,31 +375,31 @@ class ScalaXmlInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expectResult(2) {
+      assertResult(2) {
         childElms.size
       }
 
       val text = "Jansen & co"
 
       // Remember: we set the parser to coalescing!
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.attributeOption(EName("about")).getOrElse("Missing text") }
         result.toSet
       }
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = rootElm.commentChildren map { c => c.text.trim }
         result.toSet
       }
@@ -411,7 +411,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -431,7 +431,7 @@ class ScalaXmlInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -446,20 +446,20 @@ class ScalaXmlInteropTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: Elem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expectResult(2) {
+      assertResult(2) {
         childElms.size
       }
 
       val text = "\u20AC 200"
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
@@ -471,7 +471,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -491,7 +491,7 @@ class ScalaXmlInteropTest extends Suite {
       parseResult.get.build()
     }
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -502,7 +502,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val root5 = convertToElem(convertElem(root))
 
-    expectResult(resolved.Elem(root)) {
+    assertResult(resolved.Elem(root)) {
       resolved.Elem(root5)
     }
   }
@@ -514,41 +514,41 @@ class ScalaXmlInteropTest extends Suite {
   @Test def testConvertGroovyXmlExample(): Unit = {
     val doc = Document(convertToElem(cars))
 
-    expectResult("records") {
+    assertResult("records") {
       doc.documentElement.localName
     }
 
     val recordsElm = doc.documentElement
 
-    expectResult(3) {
+    assertResult(3) {
       (recordsElm \ (_.localName == "car")).size
     }
 
-    expectResult(10) {
+    assertResult(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
     val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
-    expectResult("car") {
+    assertResult("car") {
       firstRecordElm.localName
     }
 
-    expectResult("Holden") {
+    assertResult("Holden") {
       firstRecordElm.attribute(EName("make"))
     }
 
-    expectResult("Australia") {
+    assertResult("Australia") {
       firstRecordElm.getChildElem(_.localName == "country").trimmedText
     }
 
-    expectResult(2) {
+    assertResult(2) {
       val carElms = recordsElm \ (_.localName == "car")
       val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
       result.size
     }
 
-    expectResult(Set("Holden", "Peel")) {
+    assertResult(Set("Holden", "Peel")) {
       val carElms = recordsElm \ (_.localName == "car")
       val pattern = ".*s.*a.*".r.pattern
 
@@ -560,7 +560,7 @@ class ScalaXmlInteropTest extends Suite {
       (resultElms map (e => e.attribute(EName("make")))).toSet
     }
 
-    expectResult(Set("speed", "size", "price")) {
+    assertResult(Set("speed", "size", "price")) {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
@@ -571,11 +571,11 @@ class ScalaXmlInteropTest extends Suite {
     val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
     val updatedDoc = doc.updated(countryPath, updatedCountryElm)
 
-    expectResult("New Zealand") {
+    assertResult("New Zealand") {
       updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).getChildElem(_.localName == "country").trimmedText
     }
 
-    expectResult(List("Royale", "P50", "HSV Maloo")) {
+    assertResult(List("Royale", "P50", "HSV Maloo")) {
       val carElms = recordsElm \ (_.localName == "car")
       val resultElms = carElms sortBy { e => e.attributeOption(EName("year")).getOrElse("0").toInt }
       resultElms map { e => e.attribute(EName("name")) }
@@ -585,7 +585,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val newRoot = convertToElem(convertElem(doc.documentElement))
 
-    expectResult(resolved.Elem(doc.documentElement)) {
+    assertResult(resolved.Elem(doc.documentElement)) {
       resolved.Elem(newRoot)
     }
   }

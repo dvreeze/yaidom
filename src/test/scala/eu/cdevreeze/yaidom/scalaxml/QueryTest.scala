@@ -39,7 +39,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     val elems = bookstore.findAllElemsOrSelf
 
-    expectResult(true) {
+    assertResult(true) {
       !elems.isEmpty
     }
   }
@@ -80,10 +80,10 @@ class QueryTest extends AbstractElemLikeQueryTest {
             textElem(QName("First_Name"), searchedForFirstNames.head))).build()
       }
 
-    expectResult(2) {
+    assertResult(2) {
       titleAndFirstNames.size
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
       val result = titleElms.flatten map { e => e.trimmedText }
       result.toSet
@@ -131,14 +131,14 @@ class QueryTest extends AbstractElemLikeQueryTest {
             textElem(QName("Price"), price.toString))).build()
       }
 
-    expectResult(2) {
+    assertResult(2) {
       cheapBooks.size
     }
-    expectResult(Set(50, 25)) {
+    assertResult(Set(50, 25)) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
       result.toSet
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
       result.toSet
     }
@@ -182,13 +182,13 @@ class QueryTest extends AbstractElemLikeQueryTest {
       }
     }
 
-    expectResult(4) {
+    assertResult(4) {
       books.size
     }
-    expectResult(List(25, 50, 85, 100)) {
+    assertResult(List(25, 50, 85, 100)) {
       books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
     }
-    expectResult(List(
+    assertResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",

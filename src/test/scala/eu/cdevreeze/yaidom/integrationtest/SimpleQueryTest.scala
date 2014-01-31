@@ -45,11 +45,11 @@ class SimpleQueryTest extends Suite {
         productElem <- catalogDoc.documentElement \ EName("product")
       } yield productElem
 
-    expectResult(List("WMN", "ACC", "ACC", "MEN")) {
+    assertResult(List("WMN", "ACC", "ACC", "MEN")) {
       productElems flatMap (e => e \@ EName("dept"))
     }
 
-    expectResult(catalogDoc.documentElement.findAllChildElems) {
+    assertResult(catalogDoc.documentElement.findAllChildElems) {
       productElems
     }
   }
@@ -61,7 +61,7 @@ class SimpleQueryTest extends Suite {
         dept <- productElem \@ EName("dept")
       } yield dept
 
-    expectResult(List("WMN", "ACC", "ACC", "MEN")) {
+    assertResult(List("WMN", "ACC", "ACC", "MEN")) {
       depts
     }
   }
@@ -74,11 +74,11 @@ class SimpleQueryTest extends Suite {
         if dept == "ACC"
       } yield productElem
 
-    expectResult(List("ACC", "ACC")) {
+    assertResult(List("ACC", "ACC")) {
       accProductElems flatMap (e => e \@ EName("dept"))
     }
 
-    expectResult(catalogDoc.documentElement.filterChildElems(_ \@ EName("dept") == Some("ACC"))) {
+    assertResult(catalogDoc.documentElement.filterChildElems(_ \@ EName("dept") == Some("ACC"))) {
       accProductElems
     }
   }
@@ -97,7 +97,7 @@ class SimpleQueryTest extends Suite {
       convertToElem(<name language="en">Deluxe Travel Bag</name>),
       convertToElem(<name language="en">Floppy Sun Hat</name>))
 
-    expectResult(expectedResult.map(e => resolved.Elem(e))) {
+    assertResult(expectedResult.map(e => resolved.Elem(e))) {
       accProductNameElems.map(e => resolved.Elem(e))
     }
   }
@@ -129,7 +129,7 @@ class SimpleQueryTest extends Suite {
       convertToElem(xml)
     }
 
-    expectResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
       resolved.Elem(accProductUlElem).removeAllInterElementWhitespace
     }
   }
@@ -171,7 +171,7 @@ class SimpleQueryTest extends Suite {
       convertToElem(xml)
     }
 
-    expectResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
       resolved.Elem(accProductUlElem).removeAllInterElementWhitespace
     }
   }
@@ -211,7 +211,7 @@ class SimpleQueryTest extends Suite {
       convertToElem(xml)
     }
 
-    expectResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
       resolved.Elem(accProductUlElem).removeAllInterElementWhitespace
     }
   }
@@ -243,7 +243,7 @@ class SimpleQueryTest extends Suite {
         <item num="557" name="Fleece Pullover" quan="1"/>) map (e => convertToElem(e))
     }
 
-    expectResult(expectedResult.map(e => resolved.Elem(e).removeAllInterElementWhitespace)) {
+    assertResult(expectedResult.map(e => resolved.Elem(e).removeAllInterElementWhitespace)) {
       itemElems.map(e => resolved.Elem(e).removeAllInterElementWhitespace)
     }
   }
@@ -272,7 +272,7 @@ class SimpleQueryTest extends Suite {
         <department name="WMN" totQuantity="2"/>) map (e => convertToElem(e))
     }
 
-    expectResult(expectedResult.map(e => resolved.Elem(e).removeAllInterElementWhitespace)) {
+    assertResult(expectedResult.map(e => resolved.Elem(e).removeAllInterElementWhitespace)) {
       departmentElems.map(e => resolved.Elem(e).removeAllInterElementWhitespace)
     }
   }

@@ -62,10 +62,10 @@ class UpdateTest extends Suite {
 
     val doc1: Document = docParser.parse(is)
 
-    expectResult(Set(EName("Price"), EName("Edition"))) {
+    assertResult(Set(EName("Price"), EName("Edition"))) {
       attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
-    expectResult(Set()) {
+    assertResult(Set()) {
       elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
@@ -74,10 +74,10 @@ class UpdateTest extends Suite {
       turnBookAttributeIntoElem[Node, Elem](
         turnBookAttributeIntoElem[Node, Elem](doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
-    expectResult(Set()) {
+    assertResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
-    expectResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
+    assertResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
       elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
@@ -89,11 +89,11 @@ class UpdateTest extends Suite {
       turnBookAttributeIntoElem[resolved.Node, resolved.Elem](
         turnBookAttributeIntoElem[resolved.Node, resolved.Elem](resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
 
-    expectResult(false) {
+    assertResult(false) {
       resolvedOriginalElm == resolvedUpdatedElm
     }
 
-    expectResult(true) {
+    assertResult(true) {
       resolvedUpdatedElm == updatedResolvedElm
     }
   }
@@ -103,10 +103,10 @@ class UpdateTest extends Suite {
 
     val doc1: Document = docParser.parse(is)
 
-    expectResult(Set(EName("Price"), EName("Edition"))) {
+    assertResult(Set(EName("Price"), EName("Edition"))) {
       attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
-    expectResult(Set()) {
+    assertResult(Set()) {
       elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
@@ -115,10 +115,10 @@ class UpdateTest extends Suite {
       turnBookAttributeIntoElemUsingPathSet[Node, Elem](
         turnBookAttributeIntoElemUsingPathSet[Node, Elem](doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
-    expectResult(Set()) {
+    assertResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
-    expectResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
+    assertResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
       elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
@@ -130,11 +130,11 @@ class UpdateTest extends Suite {
       turnBookAttributeIntoElemUsingPathSet[resolved.Node, resolved.Elem](
         turnBookAttributeIntoElemUsingPathSet[resolved.Node, resolved.Elem](resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
 
-    expectResult(false) {
+    assertResult(false) {
       resolvedOriginalElm == resolvedUpdatedElm
     }
 
-    expectResult(true) {
+    assertResult(true) {
       resolvedUpdatedElm == updatedResolvedElm
     }
   }
@@ -144,10 +144,10 @@ class UpdateTest extends Suite {
 
     val doc1: Document = docParser.parse(is)
 
-    expectResult(Set(EName("Price"), EName("Edition"))) {
+    assertResult(Set(EName("Price"), EName("Edition"))) {
       attrNames[Node, Elem](doc1.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
-    expectResult(Set()) {
+    assertResult(Set()) {
       elemNames[Node, Elem](doc1.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
@@ -156,10 +156,10 @@ class UpdateTest extends Suite {
       turnBookAttributeIntoElem(
         turnBookAttributeIntoElem(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
-    expectResult(Set()) {
+    assertResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
-    expectResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
+    assertResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
       elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
@@ -171,11 +171,11 @@ class UpdateTest extends Suite {
       turnBookAttributeIntoElem(
         turnBookAttributeIntoElem(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
 
-    expectResult(false) {
+    assertResult(false) {
       resolvedOriginalElm == resolvedUpdatedElm
     }
 
-    expectResult(true) {
+    assertResult(true) {
       resolvedUpdatedElm == updatedResolvedElm
     }
   }
@@ -221,27 +221,27 @@ class UpdateTest extends Suite {
 
     // Is the parsed expected update result indeed as expected?
 
-    expectResult(Seq("M1", "F2")) {
+    assertResult(Seq("M1", "F2")) {
       (expectedResolvedNewRoot \\ (_.localName == "Employee")) flatMap (_ \@ EName("id"))
     }
-    expectResult(Seq("PANKAJ", "LISA")) {
+    assertResult(Seq("PANKAJ", "LISA")) {
       (expectedResolvedNewRoot \\ (_.localName == "name")) map (_.text)
     }
-    expectResult(Seq()) {
+    assertResult(Seq()) {
       (expectedResolvedNewRoot \\ (_.localName == "gender"))
     }
-    expectResult(Seq("10000", "10000")) {
+    assertResult(Seq("10000", "10000")) {
       (expectedResolvedNewRoot \\ (_.localName == "salary")) map (_.text)
     }
 
     // Finally we check the result of the functional update against this parsed expected update result
 
-    expectResult(expectedResolvedNewRoot) {
+    assertResult(expectedResolvedNewRoot) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
     }
 
     // Same check, but invoking plusAttribute and minusAttribute as well.
-    expectResult(expectedResolvedNewRoot) {
+    assertResult(expectedResolvedNewRoot) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace.
         minusAttribute(QName("x")).plusAttribute(QName("x"), "v").minusAttribute(QName("x")))
     }
@@ -290,29 +290,29 @@ class UpdateTest extends Suite {
 
     // Is the parsed expected update result indeed as expected?
 
-    expectResult(Seq("M1", "F2")) {
+    assertResult(Seq("M1", "F2")) {
       (expectedResolvedNewRoot \\ (_.localName == "Employee")) flatMap (_ \@ EName("id"))
     }
-    expectResult(Seq("PANKAJ", "LISA")) {
+    assertResult(Seq("PANKAJ", "LISA")) {
       (expectedResolvedNewRoot \\ (_.localName == "name")) map (_.text)
     }
-    expectResult(Seq()) {
+    assertResult(Seq()) {
       (expectedResolvedNewRoot \\ (_.localName == "gender"))
     }
-    expectResult(Seq("10000", "10000")) {
+    assertResult(Seq("10000", "10000")) {
       (expectedResolvedNewRoot \\ (_.localName == "salary")) map (_.text)
     }
 
     // Finally we check the result of the functional update against this parsed expected update result
 
-    expectResult(expectedResolvedNewRoot.findAllElemsOrSelf.map(_.resolvedName)) {
+    assertResult(expectedResolvedNewRoot.findAllElemsOrSelf.map(_.resolvedName)) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.map(_.resolvedName)
     }
-    expectResult(expectedResolvedNewRoot.findAllElemsOrSelf.flatMap(_.resolvedAttributes)) {
+    assertResult(expectedResolvedNewRoot.findAllElemsOrSelf.flatMap(_.resolvedAttributes)) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.flatMap(_.resolvedAttributes)
     }
 
-    expectResult(expectedResolvedNewRoot) {
+    assertResult(expectedResolvedNewRoot) {
       resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
     }
   }

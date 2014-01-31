@@ -40,18 +40,18 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     val elems = bookstore.findAllElemsOrSelf
 
-    expectResult(true) {
+    assertResult(true) {
       !elems.isEmpty
     }
 
-    expectResult(true) {
+    assertResult(true) {
       elems forall { e =>
         val parentScope = e.path.parentPathOption.map(p => e.rootElem.getElemOrSelfByPath(p).scope).getOrElse(Scope.Empty)
         parentScope.resolve(e.namespaces) == e.scope
       }
     }
 
-    expectResult(bookstore.elem.findAllElemsOrSelf) {
+    assertResult(bookstore.elem.findAllElemsOrSelf) {
       elems map { e => e.elem }
     }
   }
@@ -70,7 +70,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
           (title.path.parentPath.elementNameOption == Some(EName("Magazine")))
       } yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -93,7 +93,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         if title.path.entries.size == 2
       } yield title
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
@@ -121,7 +121,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         titleOption
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles map { _.trimmedText }
@@ -150,7 +150,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield bookElem.getChildElem(EName("Title"))
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles2 map { _.trimmedText }
@@ -167,7 +167,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield (bookElem \ EName("Title")).head
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
       val result = bookTitles3 map { _.elem.trimmedText }
@@ -194,7 +194,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         bookElm
       }
 
-    expectResult(Set(
+    assertResult(Set(
       "A First Course in Database Systems",
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
@@ -217,7 +217,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     assert(elms.size > 10, "Expected more than 10 matching elements")
 
-    expectResult(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
+    assertResult(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
       val result = elms map { e => e.elem.qname }
       result.toSet
     }
@@ -255,10 +255,10 @@ class QueryTest extends AbstractElemLikeQueryTest {
           fromElem(title.elem)(Scope.Empty),
           textElem(QName("First_Name"), searchedForFirstNames.head))).build()
 
-    expectResult(2) {
+    assertResult(2) {
       titleAndFirstNames.size
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
       val result = titleElms.flatten map { e => e.trimmedText }
       result.toSet
@@ -301,14 +301,14 @@ class QueryTest extends AbstractElemLikeQueryTest {
           fromElem(book.getChildElem(EName("Title")).elem)(Scope.Empty),
           textElem(QName("Price"), price.toString))).build()
 
-    expectResult(2) {
+    assertResult(2) {
       cheapBooks.size
     }
-    expectResult(Set(50, 25)) {
+    assertResult(Set(50, 25)) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
       result.toSet
     }
-    expectResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
       val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
       result.toSet
     }
@@ -347,13 +347,13 @@ class QueryTest extends AbstractElemLikeQueryTest {
           textElem(QName("Price"), price.toString))).build()
     }
 
-    expectResult(4) {
+    assertResult(4) {
       books.size
     }
-    expectResult(List(25, 50, 85, 100)) {
+    assertResult(List(25, 50, 85, 100)) {
       books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
     }
-    expectResult(List(
+    assertResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
@@ -429,7 +429,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val invertedBookstore: Elem =
       Elem(bookstore.docUri, eu.cdevreeze.yaidom.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
 
-    expectResult(3) {
+    assertResult(3) {
       invertedBookstore.findAllChildElems.size
     }
   }
@@ -461,17 +461,17 @@ class QueryTest extends AbstractElemLikeQueryTest {
       Elem(bookstore.docUri, result)
     }
 
-    expectResult(4) {
+    assertResult(4) {
       bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    expectResult(0) {
+    assertResult(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
-    expectResult(4) {
+    assertResult(4) {
       val elms = bookstore findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       elms.size
     }
-    expectResult(0) {
+    assertResult(0) {
       val elms = bookstoreWithoutPrices findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       elms.size
     }

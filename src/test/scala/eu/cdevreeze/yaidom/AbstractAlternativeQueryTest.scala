@@ -45,7 +45,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     val productElems =
       catalogElem filterChildElems withLocalName("product")
 
-    expectResult(List(
+    assertResult(List(
       "557",
       "563",
       "443",
@@ -60,7 +60,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <colorChoices>navy black</colorChoices>
       </product>
 
-    expectResult(resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -72,7 +72,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <desc>Our <i>favorite</i> shirt!</desc>
       </product>
 
-    expectResult(resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -89,7 +89,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         dept <- productElem \@ EName("dept")
       } yield dept
 
-    expectResult(List("WMN", "ACC", "ACC", "MEN")) {
+    assertResult(List("WMN", "ACC", "ACC", "MEN")) {
       depts
     }
   }
@@ -104,7 +104,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         elem.localName == "product" && elem.attributeOption(EName("dept")) == Some("ACC")
       }
 
-    expectResult(List(
+    assertResult(List(
       "563",
       "443")) {
       productElems.map(_.getChildElem(withLocalName("number"))).map(_.text)
@@ -116,7 +116,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    expectResult(resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -126,7 +126,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <name language="en">Deluxe Travel Bag</name>
       </product>
 
-    expectResult(resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -145,7 +145,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    expectResult(resolved.Elem(convertToElem(expectedProd)).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(convertToElem(expectedProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElem).removeAllInterElementWhitespace
     }
   }
@@ -168,7 +168,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
       <name language="en">Deluxe Travel Bag</name>,
       <name language="en">Floppy Sun Hat</name>).map(e => resolved.Elem(convertToElem(e)))
 
-    expectResult(expectedNameElems) {
+    assertResult(expectedNameElems) {
       sortedProductNameElems.map(e => toResolvedElem(e))
     }
   }
@@ -199,7 +199,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <li class="ACC">Floppy Sun Hat</li>
       </ul>
 
-    expectResult(resolved.Elem(convertToElem(expectedResult)).removeAllInterElementWhitespace) {
+    assertResult(resolved.Elem(convertToElem(expectedResult)).removeAllInterElementWhitespace) {
       toResolvedElem(resultElem).removeAllInterElementWhitespace
     }
   }
@@ -238,7 +238,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <item num="784" name="Cotton Dress Shirt" quan="1"/>,
         <item num="557" name="Fleece Pullover" quan="1"/>)
 
-    expectResult(expectedResults.map(e => resolved.Elem(convertToElem(e)).removeAllInterElementWhitespace)) {
+    assertResult(expectedResults.map(e => resolved.Elem(convertToElem(e)).removeAllInterElementWhitespace)) {
       itemElems.map(e => resolved.Elem(e).removeAllInterElementWhitespace)
     }
   }

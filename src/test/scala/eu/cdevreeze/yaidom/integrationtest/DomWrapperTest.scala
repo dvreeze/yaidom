@@ -58,16 +58,16 @@ class DomWrapperTest extends Suite {
 
     val root: DomElem = domDoc.documentElement
 
-    expectResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
     }
-    expectResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElemsOrSelf map (e => e.localName)).toSet
     }
-    expectResult(8) {
+    assertResult(8) {
       root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
-    expectResult(3) {
+    assertResult(3) {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
@@ -81,7 +81,7 @@ class DomWrapperTest extends Suite {
 
     val root: DomElem = domDoc.documentElement
 
-    expectResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -95,15 +95,15 @@ class DomWrapperTest extends Suite {
 
     val root: DomElem = domDoc.documentElement
 
-    expectResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(QName("root"), QName("child"))) {
+    assertResult(Set(QName("root"), QName("child"))) {
       val result = root.findAllElemsOrSelf map { e => e.qname }
       result.toSet
     }
-    expectResult("Trivial XML") {
+    assertResult("Trivial XML") {
       val result = root.findAllElemsOrSelf flatMap { e => e.commentChildren.map(_.text.trim) }
       result.mkString
     }
@@ -153,11 +153,11 @@ class DomWrapperTest extends Suite {
         EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
         EName(ns, "notation"))
 
-    expectResult(xsElmENames) {
+    assertResult(xsElmENames) {
       val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
-    expectResult(Set(0, 1)) {
+    assertResult(Set(0, 1)) {
       val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
       result.toSet
     }
@@ -168,14 +168,14 @@ class DomWrapperTest extends Suite {
         result.headOption
       }
 
-      expectResult(true) {
+      assertResult(true) {
         forChoiceDefOption.isDefined
       }
 
       val forChoiceDefDocumentation: String =
         forChoiceDefOption.get.filterElems(EName(ns, "documentation")) flatMap { e => e.trimmedText } mkString ""
 
-      expectResult("A utility type, not for public use") {
+      assertResult("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
       }
     }
@@ -192,7 +192,7 @@ class DomWrapperTest extends Suite {
       val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
 
       // The XML string contains "&lt;", but the parsed text should contain an unescaped "<" instead
-      expectResult(true) {
+      assertResult(true) {
         documentationText.containsSlice("""XML Schema language.  The documentation (within <documentation> elements)""")
       }
     }
@@ -213,17 +213,17 @@ class DomWrapperTest extends Suite {
           }
         } yield idConstraintElm
 
-      expectResult(1) {
+      assertResult(1) {
         identityConstraintElms.size
       }
 
       val selectorElms = identityConstraintElms.head \ EName(ns, "selector")
 
-      expectResult(1) {
+      assertResult(1) {
         selectorElms.size
       }
 
-      expectResult(""".//xs:key|.//xs:unique|.//xs:keyref""") {
+      assertResult(""".//xs:key|.//xs:unique|.//xs:keyref""") {
         selectorElms.head.attributeOption(EName("xpath")).getOrElse("")
       }
     }
@@ -238,7 +238,7 @@ class DomWrapperTest extends Suite {
             e.attributeOption(EName("abstract")) == Some("true")
         }
 
-      expectResult(1) {
+      assertResult(1) {
         complexTypeElms.size
       }
 
@@ -250,41 +250,41 @@ class DomWrapperTest extends Suite {
       val attributeElms = complexTypeElms.head.filterElems(EName(ns, "attribute"))
       val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
-      expectResult(Set(EName("base"))) {
+      assertResult(Set(EName("base"))) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
-      expectResult(Set("xs:annotated")) {
+      assertResult(Set("xs:annotated")) {
         val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.values }
         result.toSet
       }
 
-      expectResult(Set()) {
+      assertResult(Set()) {
         val result = sequenceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("minOccurs"))) {
+      assertResult(Set(EName("minOccurs"))) {
         val result = choiceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("name"), EName("type"))) {
+      assertResult(Set(EName("name"), EName("type"))) {
         val result = elementElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
+      assertResult(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
         val result = groupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
+      assertResult(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
         val result = attributeElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
 
-      expectResult(Set(EName("ref"))) {
+      assertResult(Set(EName("ref"))) {
         val result = attributeGroupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
         result.toSet
       }
@@ -301,11 +301,11 @@ class DomWrapperTest extends Suite {
 
       val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
 
-      expectResult(1) {
+      assertResult(1) {
         patternElms.size
       }
 
-      expectResult("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
+      assertResult("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
         patternElms.head.attributeOption(EName("value")).getOrElse("")
       }
     }
@@ -323,21 +323,21 @@ class DomWrapperTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildText(rootElm: DomElem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expectResult(true) {
+      assertResult(true) {
         childOption.isDefined
       }
-      expectResult(1) {
+      assertResult(1) {
         childOption.get.textChildren.size
       }
       val text = "This text contains an entity reference, viz. hi"
-      expectResult(text) {
+      assertResult(text) {
         val txt = childOption.get.trimmedText
         txt.take(text.length)
       }
@@ -357,30 +357,30 @@ class DomWrapperTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def checkChildTextAndEntityRef(rootElm: DomElem): Unit = {
       val childOption = rootElm.findElem(EName(ns, "child"))
-      expectResult(true) {
+      assertResult(true) {
         childOption.isDefined
       }
-      expectResult(2) {
+      assertResult(2) {
         childOption.get.textChildren.size
       }
-      expectResult(1) {
+      assertResult(1) {
         val result = childOption.get.children collect { case er: DomEntityRef => er }
         result.size
       }
-      expectResult("hello") {
+      assertResult("hello") {
         val entityRefs = childOption.get.children collect { case er: DomEntityRef => er }
         val entityRef: DomEntityRef = entityRefs.head
         entityRef.wrappedNode.getNodeName
       }
       val s = "This text contains an entity reference, viz."
-      expectResult(s) {
+      assertResult(s) {
         childOption.get.trimmedText.take(s.length)
       }
     }
@@ -398,7 +398,7 @@ class DomWrapperTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
@@ -415,31 +415,31 @@ class DomWrapperTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: DomElem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expectResult(2) {
+      assertResult(2) {
         childElms.size
       }
 
       val text = "Jansen & co"
 
       // Remember: we set the parser to coalescing!
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.attributeOption(EName("about")).getOrElse("Missing text") }
         result.toSet
       }
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = rootElm.commentChildren map { c => c.text.trim }
         result.toSet
       }
@@ -458,20 +458,20 @@ class DomWrapperTest extends Suite {
 
     val ns = "urn:foo:bar"
 
-    expectResult(Set(EName(ns, "root"), EName(ns, "child"))) {
+    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
 
     def doChecks(rootElm: DomElem): Unit = {
       val childElms = rootElm.findTopmostElems(EName(ns, "child"))
-      expectResult(2) {
+      assertResult(2) {
         childElms.size
       }
 
       val text = "\u20AC 200"
 
-      expectResult(Set(text)) {
+      assertResult(Set(text)) {
         val result = childElms map { e => e.trimmedText }
         result.toSet
       }
@@ -543,21 +543,21 @@ class DomWrapperTest extends Suite {
 
     val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
 
-    expectResult(4) {
+    assertResult(4) {
       tableRowElms.size
     }
 
     val isbnElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(1).headOption }
     val isbns = isbnElms map { e => e.trimmedText }
 
-    expectResult(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
+    assertResult(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
       isbns.toSet
     }
 
     val authorsElms = tableRowElms flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(3).headOption }
     val authors = authorsElms map { e => e.trimmedText }
 
-    expectResult(Set(
+    assertResult(Set(
       "Jeffrey Ullman, Jennifer Widom",
       "Hector Garcia-Molina, Jeffrey Ullman, Jennifer Widom",
       "Jeffrey Ullman, Hector Garcia-Molina",
@@ -597,13 +597,13 @@ class DomWrapperTest extends Suite {
     intercept[SAXParseException] {
       db.parse(is)
     }
-    expectResult(1) {
+    assertResult(1) {
       fatalErrorCount
     }
-    expectResult(0) {
+    assertResult(0) {
       errorCount
     }
-    expectResult(0) {
+    assertResult(0) {
       warningCount
     }
   }
@@ -618,41 +618,41 @@ class DomWrapperTest extends Suite {
     val is = classOf[DomWrapperTest].getResourceAsStream("cars.xml")
     val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
 
-    expectResult("records") {
+    assertResult("records") {
       domDoc.documentElement.localName
     }
 
     val recordsElm = domDoc.documentElement
 
-    expectResult(3) {
+    assertResult(3) {
       (recordsElm \ (_.localName == "car")).size
     }
 
-    expectResult(10) {
+    assertResult(10) {
       recordsElm.findAllElemsOrSelf.size
     }
 
     val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
-    expectResult("car") {
+    assertResult("car") {
       firstRecordElm.localName
     }
 
-    expectResult("Holden") {
+    assertResult("Holden") {
       firstRecordElm.attribute(EName("make"))
     }
 
-    expectResult("Australia") {
+    assertResult("Australia") {
       firstRecordElm.getChildElem(_.localName == "country").trimmedText
     }
 
-    expectResult(2) {
+    assertResult(2) {
       val carElms = recordsElm \ (_.localName == "car")
       val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
       result.size
     }
 
-    expectResult(Set("Holden", "Peel")) {
+    assertResult(Set("Holden", "Peel")) {
       val carElms = recordsElm \ (_.localName == "car")
       val pattern = ".*s.*a.*".r.pattern
 
@@ -664,7 +664,7 @@ class DomWrapperTest extends Suite {
       (resultElms map (e => e.attribute(EName("make")))).toSet
     }
 
-    expectResult(Set("speed", "size", "price")) {
+    assertResult(Set("speed", "size", "price")) {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
@@ -685,7 +685,7 @@ class DomWrapperTest extends Suite {
 
     val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")) == Some("AddressRecord") }
 
-    expectResult(Some("AddressRecord")) {
+    assertResult(Some("AddressRecord")) {
       anElementDeclOption flatMap { e => (e \@ EName("name")) }
     }
 
@@ -694,7 +694,7 @@ class DomWrapperTest extends Suite {
       ancestorOption flatMap { e => (e \@ EName("targetNamespace")) }
     }
 
-    expectResult(Some("http://xasb.org/gaap")) {
+    assertResult(Some("http://xasb.org/gaap")) {
       tnsOption
     }
   }

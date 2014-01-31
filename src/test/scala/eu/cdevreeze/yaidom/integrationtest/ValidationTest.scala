@@ -112,7 +112,7 @@ class ValidationTest extends Suite {
 
     val validationResult = validateUSAddress(addressElm)
 
-    expectResult(true) {
+    assertResult(true) {
       validationResult.success
     }
 
@@ -120,7 +120,7 @@ class ValidationTest extends Suite {
 
     val nonOkValidationResult = validateUSAddress(wrongAddressElm)
 
-    expectResult(false) {
+    assertResult(false) {
       nonOkValidationResult.success
     }
 
@@ -128,7 +128,7 @@ class ValidationTest extends Suite {
 
     val anotherNonOkValidationResult = validateUSAddress(anotherWrongAddressElm)
 
-    expectResult(false) {
+    assertResult(false) {
       anotherNonOkValidationResult.success
     }
   }
@@ -140,7 +140,7 @@ class ValidationTest extends Suite {
 
     val validationResult = validateRootElement(doc.documentElement)
 
-    expectResult(true) {
+    assertResult(true) {
       validationResult.success
     }
 
@@ -149,7 +149,7 @@ class ValidationTest extends Suite {
 
     val nonOkValidationResult = validateRootElement(wrongDoc.documentElement)
 
-    expectResult(false) {
+    assertResult(false) {
       nonOkValidationResult.success
     }
   }

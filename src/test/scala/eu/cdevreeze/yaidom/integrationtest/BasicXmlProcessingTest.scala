@@ -70,36 +70,36 @@ class BasicXmlProcessingTest extends Suite {
             txt = "yellow"))).build()
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
-    expectResult("hi1yellow") {
+    assertResult("hi1yellow") {
       foo.findAllChildElems.map(_.text).mkString
     }
-    expectResult("hi1yellow") {
+    assertResult("hi1yellow") {
       foo.removeAllInterElementWhitespace.findAllElems.map(_.text).mkString
     }
-    expectResult("hi1yellow") {
+    assertResult("hi1yellow") {
       foo.removeAllInterElementWhitespace.findAllElemsOrSelf.map(_.text).mkString
     }
 
     val bars = foo \ (_.localName == "bar")
 
-    expectResult(List("bar", "bar", "bar")) {
+    assertResult(List("bar", "bar", "bar")) {
       bars map { _.localName }
     }
 
-    expectResult("hi 1 yellow") {
+    assertResult("hi 1 yellow") {
       val bars = foo \ (_.localName == "bar")
       bars map { _.text } mkString " "
     }
 
-    expectResult(List("greet", "count", "color")) {
+    assertResult(List("greet", "count", "color")) {
       (foo \ (_.localName == "bar")) map { _.attributeOption(EName("type")).getOrElse("") }
     }
-    expectResult(List("greet", "count", "color")) {
+    assertResult(List("greet", "count", "color")) {
       // Knowing that the attribute "type" is always present
       (foo \ (_.localName == "bar")) map { _.attribute(EName("type")) }
     }
 
-    expectResult(List("greet" -> "hi", "count" -> "1", "color" -> "yellow")) {
+    assertResult(List("greet" -> "hi", "count" -> "1", "color" -> "yellow")) {
       (foo \ (_.localName == "bar")) map { e => (e.attribute(EName("type")) -> e.text) }
     }
 
@@ -129,11 +129,11 @@ class BasicXmlProcessingTest extends Suite {
 
     val zs = baz \\ (_.localName == "z")
 
-    expectResult(List("z", "z", "z", "z")) {
+    assertResult(List("z", "z", "z", "z")) {
       zs map { _.localName }
     }
 
-    expectResult(List("1", "2", "3", "4")) {
+    assertResult(List("1", "2", "3", "4")) {
       (baz \\ (_.localName == "z")) map { _.attribute(EName("x")) }
     }
 
@@ -145,12 +145,12 @@ class BasicXmlProcessingTest extends Suite {
 
     // No, I do not believe in some magic implicit notion of equality for XML, for many reasons
     // (whitespace handling, namespaces/prefixes, dependency on external files, comments, etc. etc.)
-    expectResult(false) {
+    assertResult(false) {
       foo == fooElemFromString
     }
 
     // Let's take control of the equality we want here
-    expectResult(true) {
+    assertResult(true) {
       val fooResolved = resolved.Elem(foo).removeAllInterElementWhitespace
       val fooFromStringResolved = resolved.Elem(fooElemFromString).removeAllInterElementWhitespace
       fooResolved == fooFromStringResolved
@@ -167,7 +167,7 @@ class BasicXmlProcessingTest extends Suite {
 
     val totalTime = songs.map(_.timeInSeconds).sum
 
-    expectResult(11311) {
+    assertResult(11311) {
       totalTime
     }
 
@@ -192,13 +192,13 @@ class BasicXmlProcessingTest extends Suite {
       artist.albums map { album => (artist.name, album.title, album.length) }
     }
 
-    expectResult(4) {
+    assertResult(4) {
       albumLengths.size
     }
-    expectResult(("Radiohead", "The King of Limbs", "37:34")) {
+    assertResult(("Radiohead", "The King of Limbs", "37:34")) {
       albumLengths(0)
     }
-    expectResult(("Portishead", "Third", "48:50")) {
+    assertResult(("Portishead", "Third", "48:50")) {
       albumLengths(3)
     }
 
@@ -242,17 +242,17 @@ class BasicXmlProcessingTest extends Suite {
         case e => e
       }
 
-    expectResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
+    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
       resolved.Elem(musicElm2).removeAllInterElementWhitespace.findAllElemsOrSelf.size
     }
-    expectResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       resolved.Elem(musicElm2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
 
-    expectResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
+    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
       resolved.Elem(musicElm3).removeAllInterElementWhitespace.findAllElemsOrSelf.size
     }
-    expectResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       resolved.Elem(musicElm3).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
