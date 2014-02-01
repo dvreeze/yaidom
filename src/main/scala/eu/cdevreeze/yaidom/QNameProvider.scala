@@ -88,9 +88,11 @@ object QNameProvider {
    */
   final class UpdatableQNameProvider(@volatile var currentInstance: QNameProvider) extends QNameProvider {
 
-    def become(updatedInstance: QNameProvider): Unit = {
-      currentInstance = updatedInstance
+    def become(instance: QNameProvider): Unit = {
+      currentInstance = instance
     }
+
+    def reset(): Unit = become(defaultInstance)
 
     def getQName(prefixOption: Option[String], localPart: String): QName =
       currentInstance.getQName(prefixOption, localPart)

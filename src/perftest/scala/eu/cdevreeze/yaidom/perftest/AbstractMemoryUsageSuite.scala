@@ -113,8 +113,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     memBean.gc()
     logger.info(s"Heap memory usage after these queries on the large combined XML: ${getUsedHeapMemoryInMiB} MiB")
 
-    ENameProvider.globalENameProvider.become(ENameProvider.defaultInstance)
-    QNameProvider.globalQNameProvider.become(QNameProvider.defaultInstance)
+    ENameProvider.globalENameProvider.reset()
+    QNameProvider.globalQNameProvider.reset()
 
     logger.info(s"Leaving test. Test class: ${this.getClass.getName}")
   }

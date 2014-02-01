@@ -88,9 +88,11 @@ object ENameProvider {
    */
   final class UpdatableENameProvider(@volatile var currentInstance: ENameProvider) extends ENameProvider {
 
-    def become(updatedInstance: ENameProvider): Unit = {
-      currentInstance = updatedInstance
+    def become(instance: ENameProvider): Unit = {
+      currentInstance = instance
     }
+
+    def reset(): Unit = become(defaultInstance)
 
     def getEName(namespaceUriOption: Option[String], localPart: String): EName =
       currentInstance.getEName(namespaceUriOption, localPart)
