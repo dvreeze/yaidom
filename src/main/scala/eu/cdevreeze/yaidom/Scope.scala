@@ -88,7 +88,7 @@ import scala.collection.immutable
  * val scope = Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")
  * import scope._
  *
- * val elemDecls = schemaElem \\ withEName(QName("xs", "element").e)
+ * val elemDecls = schemaElem \\ withEName(QName("xs", "element").res)
  * }}}
  *
  * This is exactly equivalent to the following query:
@@ -418,9 +418,9 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   implicit class ToEName(val qname: QName) {
 
     /**
-     * Expands (or resolves) the QName, using this Scope. The function `e` could be read as "expanded" or "ename".
+     * Expands (or resolves) the QName, using this Scope.
      */
-    def e: EName = Scope.this.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve $qname with scope ${Scope.this}"))
+    def res: EName = Scope.this.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve $qname with scope ${Scope.this}"))
   }
 }
 

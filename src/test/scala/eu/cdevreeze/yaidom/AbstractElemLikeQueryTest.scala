@@ -66,7 +66,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     val bookTitles = {
       import scope._
 
-      (bookstore \ (QName("Book").e)) map { e => e getChildElem (QName("Title").e) }
+      (bookstore \ (QName("Book").res)) map { e => e getChildElem (QName("Title").res) }
     }
 
     assertResult(Set(
@@ -231,8 +231,8 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       import scope._
 
       for {
-        book <- bookstore \ (QName("Book").e)
-        price <- book \@ (QName("Price").e)
+        book <- bookstore \ (QName("Book").res)
+        price <- book \@ (QName("Price").res)
         if price.toInt < 90
       } yield book
     }
@@ -545,11 +545,11 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
     val magazines =
       for {
-        magazine <- bookstore \ (QName("Magazine").e)
-        magazineTitle = magazine.getChildElem(QName("Title").e).trimmedText
+        magazine <- bookstore \ (QName("Magazine").res)
+        magazineTitle = magazine.getChildElem(QName("Title").res).trimmedText
         booksWithSameName = for {
-          book <- bookstore \ (QName("Book").e)
-          bookTitle = book.getChildElem(QName("Title").e).trimmedText
+          book <- bookstore \ (QName("Book").res)
+          bookTitle = book.getChildElem(QName("Title").res).trimmedText
           if magazineTitle == bookTitle
         } yield book
         if !booksWithSameName.isEmpty

@@ -44,7 +44,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
     val scope = Scope.from("books" -> "http://bookstore")
     import scope._
 
-    val bookElems = doc.documentElement \\ withEName(QName("books", "Book").e)
+    val bookElems = doc.documentElement \\ withEName(QName("books", "Book").res)
 
     assertResult(2) {
       bookElems.size
@@ -61,7 +61,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
     val bookElems2 = {
       import scope2._
 
-      doc.documentElement \\ withEName(QName("books", "Book").e)
+      doc.documentElement \\ withEName(QName("books", "Book").res)
     }
 
     assertResult(1) {
@@ -86,9 +86,9 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
       import scope._
 
       for {
-        bookElem <- doc.documentElement \\ (QName("books", "Book").e)
-        authorElem <- bookElem \\ (QName("books", "Author").e)
-        lastNameElem <- authorElem \ (QName("books", "Last_Name").e)
+        bookElem <- doc.documentElement \\ (QName("books", "Book").res)
+        authorElem <- bookElem \\ (QName("books", "Author").res)
+        lastNameElem <- authorElem \ (QName("books", "Last_Name").res)
       } yield lastNameElem
     }
 
@@ -110,9 +110,9 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
       import scope._
 
       for {
-        bookElem <- doc.documentElement \\ (QName("Book").e)
-        authorElem <- bookElem \\ (QName("Author").e)
-        lastNameElem <- authorElem \ (QName("Last_Name").e)
+        bookElem <- doc.documentElement \\ (QName("Book").res)
+        authorElem <- bookElem \\ (QName("Author").res)
+        lastNameElem <- authorElem \ (QName("Last_Name").res)
       } yield lastNameElem
     }
 

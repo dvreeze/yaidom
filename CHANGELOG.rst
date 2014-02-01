@@ -31,6 +31,7 @@ The changes in this version are:
 
 * Added "thread-local" DocumentParser and DocumentPrinter classes, for use in an "enterprise" application
 * Added ``HasQName`` trait, to enable abstraction over elements that expose QNames
+* Upgraded some (test) dependencies to newer versions, e.g. ScalaTest was upgraded to version 2.0
 * Removed (soon to be deprecated?) procedure syntax
 * More tests
 
