@@ -51,8 +51,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
   }
 
   test("On querying, memory usage should be within reasonable bounds", PerformanceTest) {
-    ENameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultENameProvider
-    QNameProvider.globalMutableInstance = AbstractMemoryUsageSuite.defaultQNameProvider
+    ENameProvider.globalENameProvider.become(AbstractMemoryUsageSuite.defaultENameProvider)
+    QNameProvider.globalQNameProvider.become(AbstractMemoryUsageSuite.defaultQNameProvider)
 
     require(rootDir.isDirectory, s"Expected directory $rootDir, but this is not an existing directory")
 
@@ -113,8 +113,8 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
     memBean.gc()
     logger.info(s"Heap memory usage after these queries on the large combined XML: ${getUsedHeapMemoryInMiB} MiB")
 
-    ENameProvider.globalMutableInstance = ENameProvider.defaultInstance
-    QNameProvider.globalMutableInstance = QNameProvider.defaultInstance
+    ENameProvider.globalENameProvider.become(ENameProvider.defaultInstance)
+    QNameProvider.globalQNameProvider.become(QNameProvider.defaultInstance)
 
     logger.info(s"Leaving test. Test class: ${this.getClass.getName}")
   }

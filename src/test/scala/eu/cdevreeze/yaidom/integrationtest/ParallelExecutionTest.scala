@@ -177,7 +177,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   private def doTestNumberOfRefEqualENames(enameProvider: ENameProvider, numberOfRefEqualGrandChildENames: Int): Unit = {
-    ENameProvider.globalMutableInstance = enameProvider
+    ENameProvider.globalENameProvider.become(enameProvider)
 
     val docParser = new ThreadLocalDocumentParser(DocumentParserUsingSax.newInstance)
     val docPrinter = new ThreadLocalDocumentPrinter(DocumentPrinterUsingSax.newInstance)
@@ -218,7 +218,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
       refEqualGrandChildElems.size
     }
 
-    ENameProvider.globalMutableInstance = ENameProvider.defaultInstance
+    ENameProvider.globalENameProvider.become(ENameProvider.defaultInstance)
 
     logger.info(s"Found $refEqualGrandChildENameCount 'grandChild' elements with the same reference-equal resolved name as the first one (expected $numberOfRefEqualGrandChildENames)")
 

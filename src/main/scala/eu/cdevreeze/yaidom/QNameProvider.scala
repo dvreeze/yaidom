@@ -74,12 +74,36 @@ object QNameProvider {
 
   /**
    * The implicit global QNameProvider is by default a "trivial" QNameProvider, but can be updated.
+   * Being a val holding an UpdatableQNameProvider, instead of a var holding any QNameProvider, the identifier
+   * `QNameProvider.globalQNameProvider` is stable, and therefore its members can be imported.
    *
    * Be careful: this global instance should be updated only during the "startup phase" of the application.
    * Also be careful to choose an instance that is thread-safe and designed for a "long life" (unlike caching providers
    * that can only grow a lot).
    */
-  @volatile implicit var globalMutableInstance: QNameProvider = defaultInstance
+  implicit val globalQNameProvider: UpdatableQNameProvider = new UpdatableQNameProvider(defaultInstance)
+
+  /**
+   * "Updatable" QName provider.
+   */
+  final class UpdatableQNameProvider(@volatile var currentInstance: QNameProvider) extends QNameProvider {
+
+    def become(updatedInstance: QNameProvider): Unit = {
+      currentInstance = updatedInstance
+    }
+
+    def getQName(prefixOption: Option[String], localPart: String): QName =
+      currentInstance.getQName(prefixOption, localPart)
+
+    def getQName(prefix: String, localPart: String): QName =
+      currentInstance.getQName(prefix, localPart)
+
+    def getUnprefixedQName(localPart: String): QName =
+      currentInstance.getUnprefixedQName(localPart)
+
+    def parseQName(s: String): QName =
+      currentInstance.parseQName(s)
+  }
 
   /**
    * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.

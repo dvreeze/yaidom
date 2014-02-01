@@ -74,12 +74,35 @@ object ENameProvider {
 
   /**
    * The implicit global ENameProvider is by default a "trivial" ENameProvider, but can be updated.
+   * Being a val holding an UpdatableENameProvider, instead of a var holding any ENameProvider, the identifier
+   * `ENameProvider.globalENameProvider` is stable, and therefore its members can be imported.
    *
    * Be careful: this global instance should be updated only during the "startup phase" of the application.
    * Also be careful to choose an instance that is thread-safe and designed for a "long life" (unlike caching providers
    * that can only grow a lot).
    */
-  @volatile implicit var globalMutableInstance: ENameProvider = defaultInstance
+  implicit val globalENameProvider: UpdatableENameProvider = new UpdatableENameProvider(defaultInstance)
+
+  /**
+   * "Updatable" EName provider.
+   */
+  final class UpdatableENameProvider(@volatile var currentInstance: ENameProvider) extends ENameProvider {
+
+    def become(updatedInstance: ENameProvider): Unit = {
+      currentInstance = updatedInstance
+    }
+
+    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
+      currentInstance.getEName(namespaceUriOption, localPart)
+
+    def getEName(namespaceUri: String, localPart: String): EName =
+      currentInstance.getEName(namespaceUri, localPart)
+
+    def getNoNsEName(localPart: String): EName =
+      currentInstance.getNoNsEName(localPart)
+
+    def parseEName(s: String): EName = currentInstance.parseEName(s)
+  }
 
   /**
    * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.
