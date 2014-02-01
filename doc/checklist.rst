@@ -13,25 +13,26 @@ Two kinds of checks are performed: code checks and other checks.
 Code checks
 ===========
 
-The (more functional) library code checks are as follows:
+The (somewhat more functional) library code checks are as follows:
 
-* Is the scope of the library clear? E.g., namespaces are in scope, but schema types are not.
+* Is the scope of the library clear? E.g., namespaces are within the scope of the library, but schema types are not.
 * Who is the intended audience of the library?
 * Is the API clear, correct, minimal, and the opposite of "random"? See `The trouble with types`_. Yet note that correctness is not an absolute notion.
 * As for clarity and correctness, how well can you learn the domain (of XML, e.g. namespaces) by using the API and its vocabulary?
+* As for clarity and correctness, how well can you reason about the code in the first place? (Immutability helps in this regard.)
+* As for clarity, correctness and minimality, is the API (partly) a (mathematical) theory, and also documented as such? That could provide an extra safety net.
+* As for clarity and minimality, is it easy to get started with the library without documentation, for basic usage? For example, by experimenting in the Scala REPL.
 * Is the programming style consistent? E.g., a moderate Scala OO-functional style, preferring immutability, but not too alien to Java programmers.
-* As for clarity, correctness and minimality, is the API (partly) a mathematical theory, and also documented as such? That would provide an extra safety net.
-* Is it easy to get started with the library without documentation, for basic usage? E.g., by trying it out in the Scala REPL.
 * Is more advanced usage supported? E.g., tuning the library for decreased memory usage.
 * How extensible is the library?
 
-The (more technical) code checks are:
+Other code checks are:
 
 * Scala packages contain package objects, containing documentation relevant to the package/namespace.
+* Only clear unidirectional dependencies among packages (and classes).
 * Proper deprecation of changes that are not backward compatible.
 * Avoidance of deprecated or soon to be deprecated language features, such as procedure syntax in Scala.
 * Avoidance of problematic language features or language feature combinations, such as the use of val or var in a trait.
-* Only clear unidirectional dependencies among packages (and classes).
 * Production quality: thread-safe (if applicable), supporting large data sets, configurable, well documented, etc.
 
 .. _`The trouble with types`: http://www.infoq.com/presentations/data-types-issues
