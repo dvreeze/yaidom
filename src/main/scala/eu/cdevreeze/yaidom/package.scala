@@ -468,7 +468,7 @@ package eu.cdevreeze
  *
  * For example, during the startup phase of an application, we could set the global ENameProvider as follows:
  * {{{
- * ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableMap(knownENames))
+ * ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(knownENames))
  * }}}
  *
  * Note that the global ENameProvider or QNameProvider can typically be configured rather late during development, but the

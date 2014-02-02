@@ -154,7 +154,7 @@ object AbstractMemoryUsageSuite {
     val enameCache =
       enameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => EName.parse(s) }
 
-    new ENameProvider.ENameProviderUsingImmutableMap(enameCache.toSet + EName("{http://www.xbrl.org/2003/instance}periodType"))
+    new ENameProvider.ENameProviderUsingImmutableCache(enameCache.toSet + EName("{http://www.xbrl.org/2003/instance}periodType"))
   }
 
   val defaultQNameProvider: QNameProvider = {
@@ -167,6 +167,6 @@ object AbstractMemoryUsageSuite {
     val qnameCache =
       qnameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => QName.parse(s) }
 
-    new QNameProvider.QNameProviderUsingImmutableMap(qnameCache.toSet + QName("xbrli:periodType"))
+    new QNameProvider.QNameProviderUsingImmutableCache(qnameCache.toSet + QName("xbrli:periodType"))
   }
 }

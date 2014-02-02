@@ -108,9 +108,9 @@ object QNameProvider {
   }
 
   /**
-   * Simple QName provider using an immutable Map. It does not grow, and can be long-lived.
+   * Simple QName provider using an immutable cache. It can be long-lived.
    */
-  final class QNameProviderUsingImmutableMap(val qnames: Set[QName]) extends QNameProvider {
+  final class QNameProviderUsingImmutableCache(val qnames: Set[QName]) extends QNameProvider {
 
     val cache: Map[(Option[String], String), QName] =
       qnames.map(qname => (qname.prefixOption, qname.localPart) -> qname).toMap

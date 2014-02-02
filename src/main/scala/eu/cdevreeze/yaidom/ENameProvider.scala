@@ -107,9 +107,9 @@ object ENameProvider {
   }
 
   /**
-   * Simple EName provider using an immutable Map. It does not grow, and can be long-lived.
+   * Simple EName provider using an immutable cache. It can be long-lived.
    */
-  final class ENameProviderUsingImmutableMap(val enames: Set[EName]) extends ENameProvider {
+  final class ENameProviderUsingImmutableCache(val enames: Set[EName]) extends ENameProvider {
 
     val cache: Map[(Option[String], String), EName] =
       enames.map(ename => (ename.namespaceUriOption, ename.localPart) -> ename).toMap
