@@ -1,8 +1,11 @@
 {http://www.w3.org/1999/xlink}actuate
+{http://www.w3.org/1999/xlink}arc
 {http://www.w3.org/1999/xlink}arcrole
 {http://www.w3.org/1999/xlink}from
 {http://www.w3.org/1999/xlink}href
 {http://www.w3.org/1999/xlink}label
+{http://www.w3.org/1999/xlink}locator
+{http://www.w3.org/1999/xlink}resource
 {http://www.w3.org/1999/xlink}role
 {http://www.w3.org/1999/xlink}show
 {http://www.w3.org/1999/xlink}title

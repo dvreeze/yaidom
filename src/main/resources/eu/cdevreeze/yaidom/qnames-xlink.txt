@@ -1,8 +1,11 @@
 xlink:actuate
+xlink:arc
 xlink:arcrole
 xlink:from
 xlink:href
 xlink:label
+xlink:locator
+xlink:resource
 xlink:role
 xlink:show
 xlink:title
