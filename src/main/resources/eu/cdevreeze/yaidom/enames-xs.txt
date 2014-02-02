@@ -39,7 +39,7 @@
 {http://www.w3.org/2001/XMLSchema}totalDigits
 {http://www.w3.org/2001/XMLSchema}union
 {http://www.w3.org/2001/XMLSchema}unique
-{http://www.w3.org/2001/XMLSchema}whitespace
+{http://www.w3.org/2001/XMLSchema}whiteSpace
 abstract
 attributeFormDefault
 base

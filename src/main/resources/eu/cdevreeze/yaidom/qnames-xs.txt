@@ -39,7 +39,7 @@ xs:simpleType
 xs:totalDigits
 xs:union
 xs:unique
-xs:whitespace
+xs:whiteSpace
 abstract
 attributeFormDefault
 base

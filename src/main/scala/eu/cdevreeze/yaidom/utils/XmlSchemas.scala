@@ -41,6 +41,11 @@ private[utils] object XmlSchemas {
     def targetNamespaceOption: Option[String] =
       (elem \@ QName("targetNamespace").res)
 
+    def targetNamespacePrefixOption: Option[String] = {
+      val tnsOption = targetNamespaceOption
+      tnsOption flatMap (tns => elem.scope.withoutDefaultNamespace.inverse.getOrElse(tns, Set[String]()).headOption)
+    }
+
     def elementFormDefaultOption: Option[String] =
       (elem \@ QName("elementFormDefault").res)
 
