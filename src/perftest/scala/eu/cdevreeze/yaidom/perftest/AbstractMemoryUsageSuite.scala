@@ -143,6 +143,10 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
 }
 
 object AbstractMemoryUsageSuite {
+  
+  // To show that the global EName and QName providers have stable identifiers, so they can be imported
+  import ENameProvider.globalENameProvider._
+  import QNameProvider.globalQNameProvider._
 
   val defaultENameProvider: ENameProvider = {
     val thisClass = classOf[AbstractMemoryUsageSuite]
@@ -152,7 +156,7 @@ object AbstractMemoryUsageSuite {
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/enames-xlink.txt").toURI),
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/enames-link.txt").toURI))
     val enameCache =
-      enameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => EName.parse(s) }
+      enameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => parseEName(s) }
 
     new ENameProvider.ENameProviderUsingImmutableCache(enameCache.toSet + EName("{http://www.xbrl.org/2003/instance}periodType"))
   }
@@ -165,7 +169,7 @@ object AbstractMemoryUsageSuite {
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-xlink.txt").toURI),
         new File(thisClass.getResource("/eu/cdevreeze/yaidom/qnames-link.txt").toURI))
     val qnameCache =
-      qnameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => QName.parse(s) }
+      qnameFiles flatMap { file => scala.io.Source.fromFile(file).getLines.toVector } map { s => parseQName(s) }
 
     new QNameProvider.QNameProviderUsingImmutableCache(qnameCache.toSet + QName("xbrli:periodType"))
   }
