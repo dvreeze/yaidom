@@ -24,6 +24,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import Blog1Test._
 
 /**
  * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from http://xbrl.squarespace.com/.
@@ -45,10 +46,6 @@ import org.scalatest.junit.JUnitRunner
  */
 @RunWith(classOf[JUnitRunner])
 class Blog1Test extends Suite {
-
-  private val xsNamespace = "http://www.w3.org/2001/XMLSchema"
-  private val xbrliNamespace = "http://www.xbrl.org/2003/instance"
-  private val helloWorldNamespace = "http://xbrl.squarespace.com/HelloWorld"
 
   /**
    * Showing trivial queries for child elements, descendant elements, or descendant-or-self elements.
@@ -260,6 +257,40 @@ class Blog1Test extends Suite {
   }
 
   /**
+   * Showing that different element implementations can be queried using the same queries, also for "indexed" elements!
+   * These "indexed" elements know their ancestry but are immutable!
+   */
+  @Test def testQueryApiIsUniformForIndexedElemsToo(): Unit = {
+    val docParser = parse.DocumentParserUsingSax.newInstance
+    val schemaDoc: Document = docParser.parse(classOf[Blog1Test].getResource("HelloWorld.xsd").toURI)
+
+    val indexedSchemaDoc = indexed.Document(schemaDoc)
+
+    val indexedItemDecls = findAllItemDeclarations(indexedSchemaDoc.documentElement)
+
+    // Convert to yaidom Elems and show equivalence
+
+    assertResult(findAllItemDeclarations(schemaDoc.documentElement).map(e => resolved.Elem(e))) {
+      indexedItemDecls.map(e => resolved.Elem(e.elem))
+    }
+
+    // Using "indexed" elements, we can query more directly if facts all correspond to declared concepts
+
+    val instanceDoc: Document = docParser.parse(classOf[Blog1Test].getResource("HelloWorld.xml").toURI)
+
+    val factElems = instanceDoc.documentElement \ (e => e.resolvedName.namespaceUriOption == Some(helloWorldNamespace))
+
+    // Are all facts for declared concepts?
+
+    val targetENames: Set[EName] =
+      indexedItemDecls.map(e => e.toGlobalElementDeclaration.targetEName).toSet
+
+    assertResult(true) {
+      factElems.map(e => e.resolvedName).toSet.subsetOf(targetENames)
+    }
+  }
+
+  /**
    * Finds all item declarations, accepting any ElemApi[_] element tree holding the schema.
    */
   private def findAllItemDeclarations[E <: ElemApi[E]](docElem: E): immutable.IndexedSeq[E] = {
@@ -271,7 +302,29 @@ class Blog1Test extends Suite {
 
     for {
       elemDecl <- docElem \ withEName(xsNamespace, "element")
-      if elemDecl.attributeOption(EName("substitutionGroup")) == Some("xbrli:item")
+      if (elemDecl \@ EName("substitutionGroup")) == Some("xbrli:item")
     } yield elemDecl
+  }
+}
+
+object Blog1Test {
+
+  val xsNamespace = "http://www.w3.org/2001/XMLSchema"
+  val xbrliNamespace = "http://www.xbrl.org/2003/instance"
+  val helloWorldNamespace = "http://xbrl.squarespace.com/HelloWorld"
+
+  final class GlobalElementDeclaration(val indexedElem: indexed.Elem) {
+    require(indexedElem.rootElem.resolvedName == EName(xsNamespace, "schema"))
+    require(indexedElem.path.entries.size == 1)
+    require(indexedElem.resolvedName == EName(xsNamespace, "element"))
+
+    def tnsOption: Option[String] = (indexedElem.rootElem \@ EName("targetNamespace"))
+
+    def targetEName: EName = EName(tnsOption, (indexedElem \@ EName("name")).get)
+  }
+
+  implicit class ToGlobalElementDeclaration(val indexedElem: indexed.Elem) extends AnyVal {
+
+    def toGlobalElementDeclaration: GlobalElementDeclaration = new GlobalElementDeclaration(indexedElem)
   }
 }
