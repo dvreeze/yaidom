@@ -91,7 +91,7 @@ class Blog1Test extends Suite {
       doc.documentElement \\ (e => e.localName == "context")
     }
 
-    // Query "context" child elements, using the expanded name
+    // Query "context" descendant elements, using the expanded name
 
     assertResult(contextElems) {
       doc.documentElement.filterElems(e => e.resolvedName == EName(xbrliNamespace, "context"))
@@ -191,8 +191,6 @@ class Blog1Test extends Suite {
 
     // Again query the schema for item declarations, in both cases, using exactly the same queries!
 
-    val tns = schemaDoc.documentElement.attribute(EName("targetNamespace"))
-
     val itemDecls = findAllItemDeclarations(schemaDoc.documentElement)
     val itemDecls2 = findAllItemDeclarations(schemaDoc2.documentElement)
 
@@ -210,8 +208,6 @@ class Blog1Test extends Suite {
     val docParser = parse.DocumentParserUsingSax.newInstance
 
     val schemaDoc: Document = docParser.parse(classOf[Blog1Test].getResource("HelloWorld.xsd").toURI)
-
-    val tns = schemaDoc.documentElement.attribute(EName("targetNamespace"))
 
     val itemDecls = findAllItemDeclarations(schemaDoc.documentElement)
 
