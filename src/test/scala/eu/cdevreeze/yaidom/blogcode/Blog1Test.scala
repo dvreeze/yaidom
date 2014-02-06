@@ -323,8 +323,8 @@ class Blog1Test extends Suite {
   }
 
   /**
-   * Showing a somewhat more interesting query, using one specific element representation (the "default" one), thus being able
-   * to use specific methods of that element representation in the query.
+   * Showing a somewhat more interesting query, using one specific element representation, thus being able to use specific
+   * methods of that element representation in the query.
    *
    * Before treating this part, briefly mention XBRL formulas, and admit that this example element query is quite trivial in
    * comparison.
