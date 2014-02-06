@@ -27,13 +27,17 @@ import org.scalatest.junit.JUnitRunner
 import Blog1Test._
 
 /**
- * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from http://xbrl.squarespace.com/.
+ * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from http://xbrl.squarespace.com/. All credits for
+ * the examples go to Charles Hoffman (the "father of XBRL").
+ *
  * The blog should show yaidom's strengths (such as leveraging Scala Collections, and namespace handling),
  * and be accessible and interesting to the readers. So it should respect the limited time of the readers.
- * A little bit of Scala knowledge is assumed, in particular the basics of Scala Collections. A little bit
- * of XML Schema knowledge is assumed as well.
  *
- * The (code in this) blog shows yaidom queries, using different element representations. It also shows namespace handling
+ * It is assumed that the reader knows the basics of XML (including namespaces and XML Schema), knows a bit of Scala
+ * (in particular the Scala Collections API), and has some experience with Java XML processing (in particular JAXP).
+ * No prior XBRL experience is assumed.
+ *
+ * The (code in this) blog shows some yaidom queries, using different element representations. It also shows namespace handling
  * in yaidom, and XML comparisons based on "resolved" elements.
  *
  * The queries retrieve facts in an XBRL instance, or perform consistency checks.
@@ -42,6 +46,18 @@ import Blog1Test._
  *
  * Note: blog 2 will treat transformations, and blog 3 will cover some advanced concepts, such as configuring yaidom.
  *
+ * In the blog, first introduce XBRL briefly, and introduce yaidom (including its namespaces support).
+ * Mention that yaidom respects XML namespaces, leverages Scala and its Collections API, and leverages JAXP.
+ * Also mention that one-size-fits-all for element representations is not how yaidom looks at XML processing,
+ * although the element query API should be as much as possible the same across element representations.
+ *
+ * Yaidom's namespace support and multiple element representations sharing the same element query API make yaidom
+ * unique as a Scala XML library. As for namespaces, the article http://www.lenzconsulting.com/namespaces/ can be
+ * illustrated by yaidom examples that tell the same story (since yaidom distinguishes between qualified names and expanded
+ * names, just like the article does).
+ *
+ * Encourage the reader to play with Scala and yaidom in the REPL.
+ *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
@@ -49,6 +65,10 @@ class Blog1Test extends Suite {
 
   /**
    * Showing trivial queries for child elements, descendant elements, or descendant-or-self elements.
+   *
+   * Before treating this part, a brief introduction is needed in the blog. Who is the assumed reader? What is yaidom and
+   * why was it developed? What is XBRL, very briefly, to explain the examples? Next ENames and QNames need to be explained
+   * (referring to http://www.lenzconsulting.com/namespaces/).
    */
   @Test def testQueryXbrlInstance(): Unit = {
     val docParser = parse.DocumentParserUsingDom.newInstance
@@ -63,7 +83,7 @@ class Blog1Test extends Suite {
       unitElems.size
     }
 
-    // Query "context" child elements, using the local name
+    // Query "context" child elements (filterChildElems or "\"), using the local name
 
     val contextElems = doc.documentElement.filterChildElems(e => e.localName == "context")
 
@@ -75,13 +95,13 @@ class Blog1Test extends Suite {
       doc.documentElement \ (e => e.localName == "context")
     }
 
-    // Query "context" descendant elements, using the local name. The same elements are returned.
+    // Query "context" descendant elements (filterElems), using the local name. The same elements are returned.
 
     assertResult(contextElems) {
       doc.documentElement.filterElems(e => e.localName == "context")
     }
 
-    // Query "context" descendant-or-self elements, using the local name. Again the same elements are returned.
+    // Query "context" descendant-or-self elements (filterElemsOrSelf or "\\"), using the local name. Again the same elements are returned.
 
     assertResult(contextElems) {
       doc.documentElement.filterElemsOrSelf(e => e.localName == "context")
@@ -91,10 +111,10 @@ class Blog1Test extends Suite {
       doc.documentElement \\ (e => e.localName == "context")
     }
 
-    // Query "context" descendant elements, using the expanded name
+    // Query "context" child elements, using the expanded name
 
     assertResult(contextElems) {
-      doc.documentElement.filterElems(e => e.resolvedName == EName(xbrliNamespace, "context"))
+      doc.documentElement.filterChildElems(e => e.resolvedName == EName(xbrliNamespace, "context"))
     }
 
     // Query facts in the HelloWorld namespace
@@ -118,6 +138,9 @@ class Blog1Test extends Suite {
 
   /**
    * Somewhat more interesting queries on schema document and XBRL instance document.
+   *
+   * Before treating this part, XBRL contexts, units and facts need to be explained briefly, as well as taxonomy schemas.
+   * A query (on the schema document, as XML) is introduced, and this query turns out to be independent of element representation.
    */
   @Test def testCheckInstanceAgainstSchema(): Unit = {
     // This time using a SAX parser under the hood
@@ -174,6 +197,10 @@ class Blog1Test extends Suite {
 
   /**
    * Showing that prefixes are insignificant, and introduce "resolved" elements.
+   *
+   * Before treating this part, mention that prefixes are insignificant (referring again to http://www.lenzconsulting.com/namespaces/).
+   * This is illustrated with an equivalent schema document without default namespace. Introduce "resolved" elements, and
+   * show equivalence of both schema documents.
    */
   @Test def testPrefixesAreInsignificant(): Unit = {
     val docParser = parse.DocumentParserUsingSax.newInstance
@@ -203,6 +230,9 @@ class Blog1Test extends Suite {
 
   /**
    * Showing that different element implementations can be queried using the same queries!
+   *
+   * Before treating this part, show that the same element query can be applied to "resolved" elements, returning
+   * "equivalent" results.
    */
   @Test def testQueryApiIsUniform(): Unit = {
     val docParser = parse.DocumentParserUsingSax.newInstance
@@ -226,6 +256,9 @@ class Blog1Test extends Suite {
 
   /**
    * Showing that different element implementations can be queried using the same queries, also for DOM wrappers!
+   *
+   * Before treating this part, show that the same element query can be applied to "DOM wrapper" elements, returning
+   * "equivalent" results.
    */
   @Test def testQueryApiIsUniformForDomWrappersToo(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance
@@ -255,6 +288,9 @@ class Blog1Test extends Suite {
   /**
    * Showing that different element implementations can be queried using the same queries, also for "indexed" elements!
    * These "indexed" elements know their ancestry but are immutable!
+   *
+   * Before treating this part, show that the same element query can be applied to "indexed" elements, returning
+   * "equivalent" results.
    */
   @Test def testQueryApiIsUniformForIndexedElemsToo(): Unit = {
     val docParser = parse.DocumentParserUsingSax.newInstance
@@ -287,7 +323,81 @@ class Blog1Test extends Suite {
   }
 
   /**
-   * Finds all item declarations, accepting any ElemApi[_] element tree holding the schema.
+   * Showing a somewhat more interesting query, using one specific element representation (the "default" one), thus being able
+   * to use specific methods of that element representation in the query.
+   *
+   * Before treating this part, briefly mention XBRL formulas, and admit that this example element query is quite trivial in
+   * comparison.
+   *
+   * Closing remarks: yaidom element querying can be made more friendly (using QNames in a certain Scope), and yaidom can be
+   * configured in many ways. That is out of scope for the first blog.
+   */
+  @Test def testSimpleFormula(): Unit = {
+    val docParser = parse.DocumentParserUsingSax.newInstance
+    val schemaDoc: Document = docParser.parse(classOf[Blog1Test].getResource("HelloWorld.xsd").toURI)
+
+    val itemDecls = findAllItemDeclarationsRobustly(indexed.Document(schemaDoc).documentElement)
+
+    assertResult(findAllItemDeclarations(schemaDoc.documentElement)) {
+      itemDecls.map(_.indexedElem.elem)
+    }
+
+    // All item declarations happen to be numeric
+
+    assertResult(Set(EName(xbrliNamespace, "monetaryItemType"))) {
+      val result = itemDecls map { elem =>
+        elem.indexedElem.elem.attributeAsResolvedQNameOption(EName("type"))
+      }
+      result.toSet.flatten
+    }
+
+    val numericItemDecls = itemDecls
+
+    // For all concepts in the schema, check that the instance has corresponding facts for all combinations of contexts and units.
+
+    val instanceDoc: Document = docParser.parse(classOf[Blog1Test].getResource("HelloWorld.xml").toURI)
+
+    import ElemApi._
+
+    val contextElems = instanceDoc.documentElement.filterChildElems(withEName(xbrliNamespace, "context"))
+    val unitElems = instanceDoc.documentElement.filterChildElems(withEName(xbrliNamespace, "unit"))
+
+    val numericFactsByContextUnitPair: Map[(String, String), immutable.IndexedSeq[Elem]] = {
+      // In our sample instance, the below is true
+      val factElems = instanceDoc.documentElement \ (_.resolvedName.namespaceUriOption == Some(helloWorldNamespace))
+
+      factElems groupBy { elem =>
+        val contextRef = (elem \@ EName("contextRef")).get
+        val unitRef = (elem \@ EName("unitRef")).get
+        (contextRef, unitRef)
+      }
+    }
+
+    val contextUnitPairs: Set[(String, String)] = {
+      val result =
+        for {
+          contextElem <- contextElems
+          unitElem <- unitElems
+        } yield (contextElem.attribute(EName("id")), unitElem.attribute(EName("id")))
+
+      result.toSet
+    }
+
+    assertResult(contextUnitPairs) {
+      numericFactsByContextUnitPair.keySet
+    }
+
+    val itemTargetENames: Set[EName] = itemDecls.map(_.targetEName).toSet
+
+    assertResult(true) {
+      numericFactsByContextUnitPair.values forall (elems => elems.map(_.resolvedName).toSet == itemTargetENames)
+    }
+  }
+
+  /**
+   * Finds all item declarations, accepting any ElemApi[_] element tree holding the schema. The general nature of the query
+   * comes at a price, viz. less robustness of the query. After all, the substitution group could be encoded using a different
+   * prefix than "xbrli", depending on which namespaces are in-scope.
    */
   private def findAllItemDeclarations[E <: ElemApi[E]](docElem: E): immutable.IndexedSeq[E] = {
     require(docElem.resolvedName == EName(xsNamespace, "schema"))
@@ -300,6 +410,20 @@ class Blog1Test extends Suite {
       elemDecl <- docElem \ withEName(xsNamespace, "element")
       if (elemDecl \@ EName("substitutionGroup")) == Some("xbrli:item")
     } yield elemDecl
+  }
+
+  /**
+   * Finds all item declarations, robustly. Only for "indexed" yaidom Elems.
+   */
+  private def findAllItemDeclarationsRobustly(docElem: indexed.Elem): immutable.IndexedSeq[GlobalElementDeclaration] = {
+    require(docElem.resolvedName == EName(xsNamespace, "schema"))
+
+    import ElemApi._
+
+    for {
+      elemDecl <- docElem \ withEName(xsNamespace, "element")
+      if elemDecl.elem.attributeAsResolvedQNameOption(EName("substitutionGroup")) == Some(EName(xbrliNamespace, "item"))
+    } yield elemDecl.toGlobalElementDeclaration
   }
 }
 
