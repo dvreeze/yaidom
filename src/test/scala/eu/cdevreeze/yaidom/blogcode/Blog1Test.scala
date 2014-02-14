@@ -84,9 +84,14 @@ class Blog1Test extends Suite {
     val bookElems3 =
       docElem.filterElemsOrSelf(e => e.localName == "Book")
 
-    val bookElems4 = docElem \ (e => e.localName == "Book")
+    import ElemApi._
 
-    val bookElems5 = docElem \\ (e => e.localName == "Book")
+    val bookElems4 =
+      docElem filterElemsOrSelf withLocalName("Book")
+
+    val bookElems5 = docElem \ (e => e.localName == "Book")
+
+    val bookElems6 = docElem \\ (e => e.localName == "Book")
   }
 
   /**
