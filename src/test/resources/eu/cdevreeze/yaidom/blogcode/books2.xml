@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<books:Bookstore xmlns:books="http://bookstore">
+	<books:Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
+		<books:Title>A First Course in Database Systems</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Jeffrey</books:First_Name>
+				<books:Last_Name>Ullman</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Jennifer</books:First_Name>
+				<books:Last_Name>Widom</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+	</books:Book>
+	<books:Book ISBN="ISBN-0-13-815504-6" Price="100">
+		<books:Title>Database Systems: The Complete Book</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Hector</books:First_Name>
+				<books:Last_Name>Garcia-Molina</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Jeffrey</books:First_Name>
+				<books:Last_Name>Ullman</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Jennifer</books:First_Name>
+				<books:Last_Name>Widom</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+		<books:Remark>Buy this book bundled with "A First Course" - a great deal!
+		</books:Remark>
+	</books:Book>
+	<books:Book ISBN="ISBN-0-11-222222-3" Price="50">
+		<books:Title>Hector and Jeff's Database Hints</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Jeffrey</books:First_Name>
+				<books:Last_Name>Ullman</books:Last_Name>
+			</books:Author>
+			<books:Author>
+				<books:First_Name>Hector</books:First_Name>
+				<books:Last_Name>Garcia-Molina</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+		<books:Remark>An indispensable companion to your textbook</books:Remark>
+	</books:Book>
+	<books:Book ISBN="ISBN-9-88-777777-6" Price="25">
+		<books:Title>Jennifer's Economical Database Hints</books:Title>
+		<books:Authors>
+			<books:Author>
+				<books:First_Name>Jennifer</books:First_Name>
+				<books:Last_Name>Widom</books:Last_Name>
+			</books:Author>
+		</books:Authors>
+	</books:Book>
+	<books:Magazine Month="January" Year="2009">
+		<books:Title>National Geographic</books:Title>
+	</books:Magazine>
+	<books:Magazine Month="February" Year="2009">
+		<books:Title>National Geographic</books:Title>
+	</books:Magazine>
+	<books:Magazine Month="February" Year="2009">
+		<books:Title>Newsweek</books:Title>
+	</books:Magazine>
+	<books:Magazine Month="March" Year="2009">
+		<books:Title>Hector and Jeff's Database Hints</books:Title>
+	</books:Magazine>
+</books:Bookstore>
