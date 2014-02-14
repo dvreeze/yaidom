@@ -171,4 +171,44 @@ class Blog1Test extends Suite {
     val bookAuthors4 =
       findAllBookAuthors(indexedDoc.documentElement)
   }
+
+  /**
+   * The code in this test can be copied to the "introductory example" section in the first article on yaidom.
+   */
+  @Test def testIntroductoryExample(): Unit = {
+    // Start of section that does not need to be copied again
+
+    import java.io.File
+    import javax.xml.parsers._
+    import scala.collection.immutable
+    import eu.cdevreeze.yaidom._
+
+    val ns = "http://bookstore"
+
+    // Using a yaidom DocumentParser that used DOM internally
+    val docParser = parse.DocumentParserUsingDom.newInstance
+
+    // Replace the following path!
+    val parentDir = new File(pathToParentDir.getPath)
+
+    val doc: Document =
+      docParser.parse(new File(parentDir, "books.xml"))
+
+    val docElem = doc.documentElement
+
+    // End of section that does not need to be copied again
+
+    import ElemApi._
+
+    val authorLastNames =
+      for {
+        bookElem <- doc.documentElement \ withLocalName("Book")
+        authorElem <- bookElem \\ withLocalName("Author")
+        lastNameElem <- authorElem \ withLocalName("Last_Name")
+      } yield lastNameElem.text
+
+    assertResult(Set("Garcia-Molina", "Ullman", "Widom")) {
+      authorLastNames.toSet
+    }
+  }
 }
