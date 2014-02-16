@@ -78,20 +78,30 @@ class Blog1Test extends Suite {
     val bookElems1 =
       docElem.filterChildElems(e => e.localName == "Book")
 
+    require(bookElems1.size == 4, "Expected 4 books")
+
     val bookElems2 =
       docElem.filterElems(e => e.localName == "Book")
 
+    require(
+      bookElems2 == bookElems1,
+      "Expected the same books as in bookElems1")
+
     val bookElems3 =
       docElem.filterElemsOrSelf(e => e.localName == "Book")
+
+    require(
+      bookElems3 == bookElems1,
+      "Expected the same books as in bookElems1")
 
     import ElemApi._
 
     val bookElems4 =
       docElem filterElemsOrSelf withLocalName("Book")
 
-    val bookElems5 = docElem \ (e => e.localName == "Book")
+    val bookElems5 = docElem \ withLocalName("Book")
 
-    val bookElems6 = docElem \\ (e => e.localName == "Book")
+    val bookElems6 = docElem \\ withLocalName("Book")
   }
 
   /**
@@ -157,6 +167,10 @@ class Blog1Test extends Suite {
     val bookAuthors2 =
       findAllBookAuthors(resolvedDocElem)
 
+    require(
+      bookAuthors2 == bookAuthors1,
+      "Expected the same authors as bookAuthors1")
+
     // "DOM wrapper" elements
 
     // Using a JAXP (DOM) DocumentBuilderFactory
@@ -169,12 +183,20 @@ class Blog1Test extends Suite {
     val bookAuthors3 =
       findAllBookAuthors(wrapperDoc.documentElement)
 
+    require(
+      bookAuthors3 == bookAuthors1,
+      "Expected the same authors as bookAuthors1")
+
     // "Indexed" elements
 
     val indexedDoc = indexed.Document(doc)
 
     val bookAuthors4 =
       findAllBookAuthors(indexedDoc.documentElement)
+
+    require(
+      bookAuthors4 == bookAuthors1,
+      "Expected the same authors as bookAuthors1")
   }
 
   /**
