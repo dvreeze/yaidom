@@ -71,8 +71,7 @@ class XPathInteropTest extends Suite with BeforeAndAfterAll {
     val parentScope = domElems.foldLeft(Scope.Empty) {
       case (acc, e) =>
         val currElem = dom.DomElem(e)
-        val currScope = currElem.scope
-        acc ++ currScope
+        acc ++ (currElem.parentOption.map(_.scope).getOrElse(Scope.Empty))
     }
 
     assertResult(true) {
