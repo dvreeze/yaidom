@@ -481,6 +481,83 @@ class ScopeTest extends Suite {
     }
   }
 
+  @Test def testConvertToNamespaceContext(): Unit = {
+    val scope =
+      Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
+    val namespaceContext = scope.toNamespaceContext
+
+    import scala.collection.JavaConverters._
+
+    assertResult("http://a") {
+      namespaceContext.getNamespaceURI("")
+    }
+    assertResult("http://a") {
+      namespaceContext.getNamespaceURI("a")
+    }
+    assertResult("http://b") {
+      namespaceContext.getNamespaceURI("b")
+    }
+    assertResult("http://c") {
+      namespaceContext.getNamespaceURI("c")
+    }
+    assertResult("http://d") {
+      namespaceContext.getNamespaceURI("d")
+    }
+    assertResult("http://d") {
+      namespaceContext.getNamespaceURI("dd")
+    }
+    assertResult("") {
+      namespaceContext.getNamespaceURI("abc")
+    }
+    assertResult("http://www.w3.org/XML/1998/namespace") {
+      namespaceContext.getNamespaceURI("xml")
+    }
+    assertResult("http://www.w3.org/2000/xmlns/") {
+      namespaceContext.getNamespaceURI("xmlns")
+    }
+    assertResult("") {
+      scope.withoutDefaultNamespace.toNamespaceContext.getNamespaceURI("")
+    }
+
+    assertResult(Set("a", "")) {
+      namespaceContext.getPrefixes("http://a").asScala.toSet
+    }
+    assertResult(Set()) {
+      namespaceContext.getPrefixes("http://abc").asScala.toSet
+    }
+    assertResult(Set("c")) {
+      namespaceContext.getPrefixes("http://c").asScala.toSet
+    }
+    assertResult(Set("d", "dd")) {
+      namespaceContext.getPrefixes("http://d").asScala.toSet
+    }
+    assertResult(Set("xml")) {
+      namespaceContext.getPrefixes("http://www.w3.org/XML/1998/namespace").asScala.toSet
+    }
+    assertResult(Set("xmlns")) {
+      namespaceContext.getPrefixes("http://www.w3.org/2000/xmlns/").asScala.toSet
+    }
+
+    assertResult(true) {
+      Set("a", "").contains(namespaceContext.getPrefix("http://a"))
+    }
+    assertResult(null) {
+      namespaceContext.getPrefix("http://abc")
+    }
+    assertResult(true) {
+      Set("c").contains(namespaceContext.getPrefix("http://c"))
+    }
+    assertResult(true) {
+      Set("d", "dd").contains(namespaceContext.getPrefix("http://d"))
+    }
+    assertResult("xml") {
+      namespaceContext.getPrefix("http://www.w3.org/XML/1998/namespace")
+    }
+    assertResult("xmlns") {
+      namespaceContext.getPrefix("http://www.w3.org/2000/xmlns/")
+    }
+  }
+
   private def testPropertyAboutMultipleScopes(scope1: Scope, scope2: Scope, prefix: String): Unit = {
     assertResult(scope2.prefixNamespaceMap.get(prefix)) {
       scope1.resolve(scope1.relativize(scope2)).prefixNamespaceMap.get(prefix)

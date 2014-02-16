@@ -16,7 +16,11 @@
 
 package eu.cdevreeze.yaidom
 
+import java.{ util => jutil }
+import javax.xml.XMLConstants
+import javax.xml.namespace.NamespaceContext
 import scala.collection.immutable
+import scala.collection.JavaConverters._
 
 /**
  * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace. In other words, <em>in-scope
@@ -410,6 +414,50 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   def prefixesForNamespace(namespaceUri: String): Set[String] = {
     val prefixes = this.prefixNamespaceMap.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
     prefixes.toSet
+  }
+
+  /**
+   * Returns the Java NamespaceContext corresponding to this Scope. Note that this method is very useful if we want to create
+   * a NamespaceContext in an easy manner. Indeed, yaidom Scopes make excellent NamespaceContext factories.
+   */
+  def toNamespaceContext: NamespaceContext = {
+    new NamespaceContext {
+
+      def getNamespaceURI(prefix: String): String = {
+        require(prefix ne null)
+
+        prefix match {
+          case XMLConstants.XML_NS_PREFIX => XMLConstants.XML_NS_URI
+          case XMLConstants.XMLNS_ATTRIBUTE => XMLConstants.XMLNS_ATTRIBUTE_NS_URI
+          case pref => prefixNamespaceMap.getOrElse(pref, XMLConstants.NULL_NS_URI)
+        }
+      }
+
+      def getPrefix(namespaceURI: String): String = {
+        require(namespaceURI ne null)
+
+        val inverseWithoutDefaultNs = withoutDefaultNamespace.inverse
+
+        namespaceURI match {
+          case XMLConstants.XML_NS_URI => XMLConstants.XML_NS_PREFIX
+          case XMLConstants.XMLNS_ATTRIBUTE_NS_URI => XMLConstants.XMLNS_ATTRIBUTE
+          case nsUri if defaultNamespaceOption == Some(nsUri) => XMLConstants.DEFAULT_NS_PREFIX
+          case nsUri => inverseWithoutDefaultNs.get(nsUri).map(_.iterator.next).orNull
+        }
+      }
+
+      def getPrefixes(namespaceURI: String): jutil.Iterator[String] = {
+        require(namespaceURI ne null)
+
+        val inverseMap = inverse
+
+        namespaceURI match {
+          case XMLConstants.XML_NS_URI => Set(XMLConstants.XML_NS_PREFIX).iterator.asJava
+          case XMLConstants.XMLNS_ATTRIBUTE_NS_URI => Set(XMLConstants.XMLNS_ATTRIBUTE).iterator.asJava
+          case nsUri => inverseMap.getOrElse(nsUri, Set[String]()).iterator.asJava
+        }
+      }
+    }
   }
 
   /**
