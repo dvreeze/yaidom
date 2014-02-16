@@ -68,17 +68,11 @@ class XPathInteropTest extends Suite with BeforeAndAfterAll {
 
     // Now converting DOM elements to yaidom Elems
 
-    val parentScope = domElems.foldLeft(Scope.Empty) {
-      case (acc, e) =>
-        val currElem = dom.DomElem(e)
-        acc ++ (currElem.parentOption.map(_.scope).getOrElse(Scope.Empty))
+    val bookElems = domElems map { e =>
+      val parentScope = dom.DomElem(e).parentOption.map(_.scope).getOrElse(Scope.Empty)
+      require(parentScope.inverse.contains(ns), s"Expected parent scope $parentScope to contain namespace $ns")
+      convertToElem(e, parentScope)
     }
-
-    assertResult(true) {
-      parentScope.inverse.contains(ns)
-    }
-
-    val bookElems = domElems map (e => convertToElem(e, parentScope))
 
     assertResult(4) {
       bookElems.size
