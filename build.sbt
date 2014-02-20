@@ -41,6 +41,8 @@ libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
 libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
 
+libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.5.1-4" % "test"
+
 publishMavenStyle := true
 
 publishTo <<= version { (v: String) =>

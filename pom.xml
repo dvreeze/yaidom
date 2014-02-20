@@ -220,6 +220,13 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<version>9.5.1-4</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 </project>
