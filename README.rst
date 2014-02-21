@@ -3,7 +3,7 @@ Yaidom
 ======
 
 Yaidom is a uniform XML query API, written in Scala. Equally important, yaidom provides several specific-purpose DOM-like tree
-implementations adhering to this XML query API. Moreover, other implementations can easily be added.
+implementations adhering to this XML query API. What's more, other implementations can easily be added.
 
 Yaidom initially stood for yet another (Scala) immutable DOM-like API. Over time, the yaidom XML query API grew more important
 than any single DOM-like tree implementation, whether immutable or mutable. Currently, the name yaidom reflects the ease with which
@@ -18,9 +18,8 @@ and Anti-XML. Indeed, yaidom has several nice properties:
 * precise and first-class **namespace support**
 * **precision, clarity and minimality** in its genes, at the expense of some (but not much) verbosity and lack of XPath support
 * acceptance of some XML realities, such as the peculiarities of "XML equality" and whitespace in XML
-* no attempt to abstract **JAXP** away 
-* acceptance of **JAXP** for parsing and serialization, without offering any broken XML parser/serializer abstractions
-* a scope limited to basic namespace-aware XML processing, instead of offering half-baked schema type and DTD support
+* no attempt to abstract **JAXP** away, but instead leveraging it for parsing/serializing XML
+* a scope limited to basic namespace-aware XML processing, instead of offering half-baked schema type, DTD and/or XPath support
 
 Usage
 =====
