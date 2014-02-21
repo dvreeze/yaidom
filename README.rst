@@ -1,23 +1,26 @@
-=========================
-Yet Another Immutable DOM
-=========================
+======
+Yaidom
+======
 
-Yaidom (yet another immutable DOM) is a Scala DOM-like API. It represents XML as in-memory trees, offering multiple DOM-like
-tree implementations.
+Yaidom is a uniform XML query API, written in Scala. Equally important, yaidom provides several specific-purpose DOM-like tree
+implementations adhering to this XML query API. Moreover, other implementations can easily be added.
 
-Why do we need yet another Scala DOM-like API? After all, there are alternatives such as the standard Scala XML library and Anti-XML.
-Yaidom grew out of a desire to:
+Yaidom initially stood for yet another (Scala) immutable DOM-like API. Over time, the yaidom XML query API grew more important
+than any single DOM-like tree implementation, whether immutable or mutable. Currently, the name yaidom reflects the ease with which
+new DOM-like tree implementations can be added, while having them conform to the yaidom query API.
 
-* offer precise and first-class **namespace support**
-* support **multiple DOM-like** tree implementations that make sense in different situations
-* support **extensibility**, w.r.t. new DOM-like tree implementations
-* make the default DOM-like element implementation (deeply) **immutable**
-* offer only one **uniform element query API**, in spite of these different tree implementations
-* leverage the **Scala Collections API** in the element query API, and forget about any XPath support
-* accept some XML realities, like the vagueness surrounding the notion of "XML equality"
-* leverage **JAXP** for parsing and serialization, without offering any broken XML parser/serializer abstractions
-* limit the scope of the API to XML and namespaces, thus ignoring (schema) types etc.
-* offer a **precise, clear and minimal** XML API overall
+Why do we need yet another Scala (tree-oriented) XML library? After all, there are alternatives such as the standard Scala XML library
+and Anti-XML. Indeed, yaidom has several nice properties:
+
+* the **uniform XML query API**, playing well with the **Scala Collections API** (and leveraging it internally)
+* multiple (existing or future) **specific-purpose DOM-like tree implementations**, conforming to this XML query API
+* among them, a nice immutable "default" DOM-like tree implementation
+* precise and first-class **namespace support**
+* **precision, clarity and minimality** in its genes, at the expense of some (but not much) verbosity and lack of XPath support
+* acceptance of some XML realities, such as the peculiarities of "XML equality" and whitespace in XML
+* no attempt to abstract **JAXP** away 
+* acceptance of **JAXP** for parsing and serialization, without offering any broken XML parser/serializer abstractions
+* a scope limited to basic namespace-aware XML processing, instead of offering half-baked schema type and DTD support
 
 Usage
 =====
