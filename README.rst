@@ -18,7 +18,7 @@ and Anti-XML. Indeed, yaidom has several nice properties:
 * precise and first-class **namespace support**
 * **precision, clarity and minimality** in its genes, at the expense of some (but not much) verbosity and lack of XPath support
 * acceptance of some XML realities, such as the peculiarities of "XML equality" and whitespace in XML
-* no attempt to abstract **JAXP** away, but instead leveraging it for parsing/serializing XML
+* and therefore no attempt to abstract **JAXP** away, but instead leveraging it for parsing/serializing XML
 * a scope limited to basic namespace-aware XML processing, instead of offering half-baked schema type, DTD and/or XPath support
 
 Usage
