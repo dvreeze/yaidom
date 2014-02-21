@@ -52,8 +52,14 @@ class XPathInteropTest extends Suite with BeforeAndAfterAll {
     val expr = "//bk:Book"
 
     val is = classOf[XPathInteropTest].getResourceAsStream("books.xml")
+    val docParser = parse.DocumentParserUsingSax.newInstance
+    val doc = docParser.parse(is)
+    val db = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    val domDoc = convert.DomConversions.convertDocument(doc)(db.newDocument())
 
-    val nodeList = xpath.evaluate(expr, new InputSource(is), XPathConstants.NODESET).asInstanceOf[NodeList]
+    // Passing a DOMSource, to make sure that a NodeList is returned (even for a Saxon XPathFactory)
+    val domSource = new javax.xml.transform.dom.DOMSource(domDoc)
+    val nodeList = xpath.evaluate(expr, domSource, XPathConstants.NODESET).asInstanceOf[NodeList]
 
     // Converting NodeList to a Scala IndexedSeq of (DOM) Node instances.
     val domNodes = nodeListToIndexedSeq(nodeList)
