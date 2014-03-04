@@ -110,6 +110,9 @@ class MileageRecordsTest extends Suite {
       assertResult(mileageRecords.knownTripsByName(trip1.tripName).toAddressName) {
         mileageRecords.knownTripsByName(trip2.tripName).fromAddressName
       }
+      assertResult(true) {
+        !trip1.date.isAfter(trip2.date)
+      }
     }
   }
 }
