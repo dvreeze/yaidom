@@ -182,6 +182,8 @@ object MileageRecordsTest {
     val toAddressName: String,
     val km: BigDecimal) {
 
+    require(km >= 0, s"${km} must be >= 0")
+
     def toElem: Elem = {
       val xml =
         <knownTrip name={ name }>
