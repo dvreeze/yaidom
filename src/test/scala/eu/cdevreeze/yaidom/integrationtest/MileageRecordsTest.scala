@@ -26,7 +26,7 @@ import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
-import org.joda.time.LocalDate
+import org.joda.time.{ LocalDate, DateTimeConstants }
 import parse._
 import print._
 import convert.ScalaXmlConversions._
@@ -254,6 +254,42 @@ class MileageRecordsTest extends Suite {
     }
 
     // docPrinter.print(newMileageRecords.toElem, "UTF-8", System.out)
+  }
+
+  @Test def testNoWorkTripsInWeekends(): Unit = {
+    import ElemApi._
+
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val doc: Document = {
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
+      docParser.parse(is)
+    }
+    val mileageRecordsElem = doc.documentElement
+
+    val mileageRecords = MileageRecords.fromElem(mileageRecordsElem)
+
+    // Check there are no work trips in weekends
+
+    val nonPrivateTrips = mileageRecords.trips filter { trip =>
+      val knownTripOption = mileageRecords.knownTripsByName.get(trip.tripName)
+      val categoryOption =
+        knownTripOption flatMap (knownTrip => mileageRecords.tripCategoriesByName.get(knownTrip.categoryName))
+      val isPrivate = categoryOption.map(_.isPrivate).getOrElse(true)
+      !isPrivate
+    }
+
+    assertResult(true) {
+      nonPrivateTrips.size >= 100
+    }
+
+    nonPrivateTrips foreach { trip =>
+      val dayOfWeek = trip.date.getDayOfWeek()
+
+      assertResult(true, s"Work trip found on ${trip.date} in the weekend") {
+        (dayOfWeek != DateTimeConstants.SATURDAY) && (dayOfWeek != DateTimeConstants.SUNDAY)
+      }
+    }
   }
 }
 
