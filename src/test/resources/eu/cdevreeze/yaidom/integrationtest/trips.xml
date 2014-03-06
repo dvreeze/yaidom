@@ -20,6 +20,13 @@
 			<zipCode>2496XD</zipCode>
 			<country>Nederland</country>
 		</knownAddress>
+		<knownAddress name="inology-hilversum">
+			<street>Joop van den Endeplein</street>
+			<houseNumber>1</houseNumber>
+			<city>Hilversum</city>
+			<zipCode>1217WJ</zipCode>
+			<country>Nederland</country>
+		</knownAddress>
 		<knownAddress name="sportschool">
 			<street>Oudeweg</street>
 			<houseNumber>1-D</houseNumber>
@@ -69,17 +76,17 @@
 			<toAddress>home</toAddress>
 			<km>30.2</km>
 		</knownTrip>
-		<knownTrip name="ebpi-overwerk-heen">
+		<knownTrip name="inology-hilversum-heen">
 			<category>to-from-work</category>
 			<fromAddress>home</fromAddress>
-			<toAddress>ebpi</toAddress>
-			<km>30.2</km>
+			<toAddress>inology-hilversum</toAddress>
+			<km>60.5</km>
 		</knownTrip>
-		<knownTrip name="ebpi-overwerk-terug">
+		<knownTrip name="inology-hilversum-terug">
 			<category>to-from-work</category>
-			<fromAddress>ebpi</fromAddress>
+			<fromAddress>inology-hilversum</fromAddress>
 			<toAddress>home</toAddress>
-			<km>30.2</km>
+			<km>60.5</km>
 		</knownTrip>
 		<knownTrip name="sportschool-heen">
 			<category>private</category>
@@ -999,64 +1006,94 @@
 			<start>7727</start>
 			<end>7758</end>
 		</trip>
-		<trip date="2013-05-22">
-			<tripName>ebpi-heen</tripName>
+		<trip date="2013-05-21">
+			<tripName>sportschool-heen</tripName>
 			<start>7758</start>
-			<end>7789</end>
+			<end>7766</end>
+		</trip>
+		<trip date="2013-05-21">
+			<tripName>sportschool-terug</tripName>
+			<start>7766</start>
+			<end>7774</end>
+		</trip>
+		<trip date="2013-05-22">
+			<tripName>ebpi-heen</tripName>
+			<start>7774</start>
+			<end>7805</end>
 		</trip>
 		<trip date="2013-05-22">
 			<tripName>ebpi-terug</tripName>
-			<start>7789</start>
-			<end>7819</end>
+			<start>7805</start>
+			<end>7835</end>
 		</trip>
 		<trip date="2013-05-23">
 			<tripName>ebpi-heen</tripName>
-			<start>7819</start>
-			<end>7849</end>
+			<start>7835</start>
+			<end>7866</end>
 		</trip>
 		<trip date="2013-05-23">
 			<tripName>ebpi-terug</tripName>
-			<start>7849</start>
-			<end>7878</end>
+			<start>7866</start>
+			<end>7895</end>
+		</trip>
+		<trip date="2013-05-23">
+			<tripName>sportschool-heen</tripName>
+			<start>7895</start>
+			<end>7902</end>
+		</trip>
+		<trip date="2013-05-23">
+			<tripName>sportschool-terug</tripName>
+			<start>7902</start>
+			<end>7910</end>
 		</trip>
 		<trip date="2013-05-24">
 			<tripName>ebpi-heen</tripName>
-			<start>7878</start>
-			<end>7909</end>
+			<start>7910</start>
+			<end>7941</end>
 		</trip>
 		<trip date="2013-05-24">
 			<tripName>ebpi-terug</tripName>
-			<start>7909</start>
-			<end>7940</end>
-		</trip>
-		<trip date="2013-05-26">
-			<tripName>ebpi-overwerk-heen</tripName>
-			<start>7940</start>
-			<end>7971</end>
-		</trip>
-		<trip date="2013-05-26">
-			<tripName>ebpi-overwerk-terug</tripName>
-			<start>7971</start>
-			<end>8002</end>
+			<start>7941</start>
+			<end>7972</end>
 		</trip>
 		<trip date="2013-05-27">
 			<tripName>ebpi-heen</tripName>
-			<start>8002</start>
+			<start>7972</start>
+			<end>8003</end>
+		</trip>
+		<trip date="2013-05-27">
+			<tripName>ebpi-terug</tripName>
+			<start>8003</start>
 			<end>8033</end>
 		</trip>
 		<trip date="2013-05-27">
-			<tripName>ebpi-terug</tripName>
+			<tripName>sportschool-heen</tripName>
 			<start>8033</start>
-			<end>8063</end>
+			<end>8040</end>
+		</trip>
+		<trip date="2013-05-27">
+			<tripName>sportschool-terug</tripName>
+			<start>8040</start>
+			<end>8048</end>
 		</trip>
 		<trip date="2013-05-28">
 			<tripName>ebpi-heen</tripName>
-			<start>8063</start>
-			<end>8094</end>
+			<start>8048</start>
+			<end>8079</end>
 		</trip>
 		<trip date="2013-05-28">
 			<tripName>ebpi-terug</tripName>
-			<start>8094</start>
+			<start>8079</start>
+			<end>8109</end>
+		</trip>
+		<trip date="2013-05-28">
+			<tripName>sportschool-heen</tripName>
+			<start>8109</start>
+			<end>8116</end>
+		</trip>
+		<trip date="2013-05-28">
+			<tripName>sportschool-terug</tripName>
+			<start>8116</start>
 			<end>8124</end>
 		</trip>
 		<trip date="2013-05-29">
@@ -1089,44 +1126,24 @@
 			<start>8277</start>
 			<end>8307</end>
 		</trip>
-		<trip date="2013-06-01">
-			<tripName>ebpi-overwerk-heen</tripName>
+		<trip date="2013-06-03">
+			<tripName>inology-hilversum-heen</tripName>
 			<start>8307</start>
-			<end>8337</end>
-		</trip>
-		<trip date="2013-06-01">
-			<tripName>ebpi-overwerk-terug</tripName>
-			<start>8337</start>
 			<end>8367</end>
 		</trip>
-		<trip date="2013-06-02">
-			<tripName>ebpi-overwerk-heen</tripName>
+		<trip date="2013-06-03">
+			<tripName>inology-hilversum-terug</tripName>
 			<start>8367</start>
-			<end>8397</end>
-		</trip>
-		<trip date="2013-06-02">
-			<tripName>ebpi-overwerk-terug</tripName>
-			<start>8397</start>
 			<end>8427</end>
 		</trip>
-		<trip date="2013-06-03">
-			<tripName>ebpi-heen</tripName>
+		<trip date="2013-06-04">
+			<tripName>inology-hilversum-heen</tripName>
 			<start>8427</start>
-			<end>8457</end>
-		</trip>
-		<trip date="2013-06-03">
-			<tripName>ebpi-terug</tripName>
-			<start>8457</start>
-			<end>8486</end>
+			<end>8487</end>
 		</trip>
 		<trip date="2013-06-04">
-			<tripName>ebpi-heen</tripName>
-			<start>8486</start>
-			<end>8517</end>
-		</trip>
-		<trip date="2013-06-04">
-			<tripName>ebpi-terug</tripName>
-			<start>8517</start>
+			<tripName>inology-hilversum-terug</tripName>
+			<start>8487</start>
 			<end>8547</end>
 		</trip>
 		<trip date="2013-06-05">
@@ -1529,44 +1546,44 @@
 			<start>10716</start>
 			<end>10746</end>
 		</trip>
-		<trip date="2013-08-28">
+		<trip date="2013-08-27">
 			<tripName>ebpi-heen</tripName>
 			<start>10746</start>
-			<end>10777</end>
+			<end>10776</end>
+		</trip>
+		<trip date="2013-08-27">
+			<tripName>ebpi-terug</tripName>
+			<start>10776</start>
+			<end>10807</end>
+		</trip>
+		<trip date="2013-08-28">
+			<tripName>ebpi-heen</tripName>
+			<start>10807</start>
+			<end>10838</end>
 		</trip>
 		<trip date="2013-08-28">
 			<tripName>ebpi-terug</tripName>
-			<start>10777</start>
-			<end>10808</end>
-		</trip>
-		<trip date="2013-08-29">
-			<tripName>ebpi-heen</tripName>
-			<start>10808</start>
-			<end>10838</end>
-		</trip>
-		<trip date="2013-08-29">
-			<tripName>ebpi-terug</tripName>
 			<start>10838</start>
-			<end>10868</end>
+			<end>10869</end>
 		</trip>
-		<trip date="2013-08-30">
+		<trip date="2013-08-29">
 			<tripName>ebpi-heen</tripName>
-			<start>10868</start>
+			<start>10869</start>
 			<end>10899</end>
 		</trip>
-		<trip date="2013-08-30">
+		<trip date="2013-08-29">
 			<tripName>ebpi-terug</tripName>
 			<start>10899</start>
 			<end>10929</end>
 		</trip>
-		<trip date="2013-08-31">
-			<tripName>ebpi-overwerk-heen</tripName>
+		<trip date="2013-08-30">
+			<tripName>ebpi-heen</tripName>
 			<start>10929</start>
-			<end>10959</end>
+			<end>10960</end>
 		</trip>
-		<trip date="2013-08-31">
-			<tripName>ebpi-overwerk-terug</tripName>
-			<start>10959</start>
+		<trip date="2013-08-30">
+			<tripName>ebpi-terug</tripName>
+			<start>10960</start>
 			<end>10990</end>
 		</trip>
 		<trip date="2013-09-02">
@@ -2144,34 +2161,34 @@
 			<start>14110</start>
 			<end>14140</end>
 		</trip>
-		<trip date="2013-11-30">
+		<trip date="2013-12-02">
 			<tripName>ebpi-heen</tripName>
 			<start>14140</start>
 			<end>14171</end>
 		</trip>
-		<trip date="2013-11-30">
+		<trip date="2013-12-02">
 			<tripName>ebpi-terug</tripName>
 			<start>14171</start>
 			<end>14201</end>
 		</trip>
 		<trip date="2013-12-02">
-			<tripName>ebpi-heen</tripName>
-			<start>14201</start>
-			<end>14232</end>
-		</trip>
-		<trip date="2013-12-02">
-			<tripName>ebpi-terug</tripName>
-			<start>14232</start>
-			<end>14262</end>
-		</trip>
-		<trip date="2013-12-02">
 			<tripName>sportschool-heen</tripName>
-			<start>14262</start>
-			<end>14270</end>
+			<start>14201</start>
+			<end>14209</end>
 		</trip>
 		<trip date="2013-12-02">
 			<tripName>sportschool-terug</tripName>
-			<start>14270</start>
+			<start>14209</start>
+			<end>14216</end>
+		</trip>
+		<trip date="2013-12-03">
+			<tripName>ebpi-heen</tripName>
+			<start>14216</start>
+			<end>14246</end>
+		</trip>
+		<trip date="2013-12-03">
+			<tripName>ebpi-terug</tripName>
+			<start>14246</start>
 			<end>14277</end>
 		</trip>
 		<trip date="2013-12-04">

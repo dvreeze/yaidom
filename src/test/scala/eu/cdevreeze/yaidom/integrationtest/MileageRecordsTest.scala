@@ -22,9 +22,9 @@ import javax.xml.parsers._
 import javax.xml.transform.{ TransformerFactory, Transformer }
 import scala.collection.immutable
 import scala.math._
-import org.junit.{ Test, Before, Ignore }
+import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import org.joda.time.LocalDate
 import parse._
@@ -165,8 +165,8 @@ class MileageRecordsTest extends Suite {
 
     val totalPrivateKms = mileageRecords.totalPrivateKms
 
-    assertResult(true, s"Total private kms $totalPrivateKms larger than expected (>= 300)") {
-      totalPrivateKms < 300
+    assertResult(true, s"Total private kms $totalPrivateKms larger than expected (>= 350)") {
+      totalPrivateKms < 350
     }
   }
 
@@ -212,6 +212,48 @@ class MileageRecordsTest extends Suite {
     assertResult(mileageRecords.trips.map(_.date)) {
       csvRecords.map(line => LocalDate.parse(line.split('|')(0)))
     }
+  }
+
+  @Test def testUpdateKms(): Unit = {
+    import ElemApi._
+
+    val docParser = DocumentParserUsingSax.newInstance
+    val docPrinter = DocumentPrinterUsingDom.newInstance
+
+    val doc: Document = {
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
+      docParser.parse(is)
+    }
+    val mileageRecordsElem = doc.documentElement
+
+    val mileageRecords = MileageRecords.fromElem(mileageRecordsElem)
+
+    // Update
+
+    val newMileageRecords =
+      mileageRecords.
+        minus(LocalDate.parse("2013-11-13") -> 0).
+        minus(LocalDate.parse("2013-11-13") -> 0).
+        plus(LocalDate.parse("2013-11-14") -> 0, "ebpi-heen", 30).
+        plus(LocalDate.parse("2013-11-14") -> 1, "ebpi-terug", 31).
+        updateLengthInKm(LocalDate.parse("2013-11-14") -> 0, 1)
+
+    val dates = List("2013-11-11", "2013-11-15", "2013-12-18").map(s => LocalDate.parse(s))
+
+    dates foreach { date =>
+      val trip = mileageRecords.getTripAt(date, 0)
+      val newTrip = newMileageRecords.getTripAt(date, 0)
+
+      assertResult(trip.startKm) {
+        newTrip.startKm
+      }
+
+      assertResult(trip.endKm) {
+        newTrip.endKm
+      }
+    }
+
+    // docPrinter.print(newMileageRecords.toElem, "UTF-8", System.out)
   }
 }
 
