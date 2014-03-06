@@ -21,6 +21,7 @@ import java.{ util => jutil, io => jio }
 import javax.xml.parsers._
 import javax.xml.transform.{ TransformerFactory, Transformer }
 import scala.collection.immutable
+import scala.math._
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
@@ -115,6 +116,59 @@ class MileageRecordsTest extends Suite {
       }
     }
   }
+
+  @Test def testTripLengths(): Unit = {
+    import ElemApi._
+
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val doc: Document = {
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips-2013.xml")
+      docParser.parse(is)
+    }
+    val mileageRecordsElem = doc.documentElement
+
+    val mileageRecords = MileageRecords.fromElem(mileageRecordsElem)
+
+    // Check trip lengths
+
+    val trips = mileageRecords.trips
+
+    trips foreach { trip =>
+      val drivenKm = trip.endKm - trip.startKm
+
+      val knownTrip = mileageRecords.knownTripsByName(trip.tripName)
+
+      assertResult(true, s"Unexpected trip length $drivenKm for trip on ${trip.date} (expected >= ${knownTrip.minKm})") {
+        drivenKm >= knownTrip.minKm
+      }
+      assertResult(true, s"Unexpected trip length $drivenKm for trip on ${trip.date} (expected <= ${knownTrip.maxKm})") {
+        drivenKm <= knownTrip.maxKm
+      }
+    }
+  }
+
+  @Test def testTotalPrivateKms(): Unit = {
+    import ElemApi._
+
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val doc: Document = {
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips-2013.xml")
+      docParser.parse(is)
+    }
+    val mileageRecordsElem = doc.documentElement
+
+    val mileageRecords = MileageRecords.fromElem(mileageRecordsElem)
+
+    // Check total private kms
+
+    val totalPrivateKms = mileageRecords.totalPrivateKms
+
+    assertResult(true, s"Total private kms $totalPrivateKms larger than expected") {
+      totalPrivateKms < 300
+    }
+  }
 }
 
 object MileageRecordsTest {
@@ -195,6 +249,10 @@ object MileageRecordsTest {
 
       convertToElem(xml)
     }
+
+    def maxKm: Int = (ceil(km.toDouble) * BigDecimal("1.1")).toInt
+
+    def minKm: Int = (floor(km.toDouble) * BigDecimal("0.95")).toInt
   }
 
   object KnownTrip {
@@ -219,6 +277,14 @@ object MileageRecordsTest {
 
     require(startKm <= endKm, s"${startKm} must be <= ${endKm} on date ${date}")
 
+    def tripLengthInKm: Int = endKm - startKm
+
+    def +(km: Int): Trip = new Trip(date, tripName, startKm + km, endKm + km)
+
+    def -(km: Int): Trip = new Trip(date, tripName, startKm - km, endKm - km)
+
+    def updateEndKm(deltaLengthInKm: Int): Trip = new Trip(date, tripName, startKm, endKm + deltaLengthInKm)
+
     def toElem: Elem = {
       val xml =
         <trip date={ date.toString() }>
@@ -232,6 +298,11 @@ object MileageRecordsTest {
   }
 
   object Trip {
+
+    /**
+     * A Trip is identified by its date along with the relative index of the trip w.r.t. all trips on that date.
+     */
+    type Key = (LocalDate, Int)
 
     def fromElem(elem: Elem): Trip = {
       require(elem.resolvedName == EName("trip"))
@@ -259,6 +330,101 @@ object MileageRecordsTest {
 
     val knownTripsByName: Map[String, KnownTrip] =
       knownTrips.map(tr => (tr.name -> tr)).toMap
+
+    def getTripAt(date: LocalDate, relativeIdx: Int): Trip = {
+      val tripsAtDate = trips.filter(tr => tr.date == date)
+      require(!tripsAtDate.isEmpty)
+      require(relativeIdx >= 0 && relativeIdx < tripsAtDate.size)
+
+      tripsAtDate(relativeIdx)
+    }
+
+    def totalPrivateKms(): Int = {
+      val privateTrips = trips filter { trip =>
+        val knownTripOption = knownTripsByName.get(trip.tripName)
+        val categoryOption = knownTripOption.flatMap(knownTrip => tripCategoriesByName.get(knownTrip.categoryName))
+        categoryOption.map(_.isPrivate).getOrElse(true)
+      }
+      privateTrips.map(_.tripLengthInKm).sum
+    }
+
+    /**
+     * Adds a trip, returning a new MileageRecords.
+     *
+     * Mind consistency of the result (end of previous trip matching start of next trip, etc.), so typically repeated calls
+     * for adjacent trips are needed.
+     */
+    def plus(tripKey: Trip.Key, tripName: String, tripLengthInKm: Int): MileageRecords = {
+      require(this.trips.size >= 1)
+
+      val tripsWithIndexOnSameDate = trips.zipWithIndex.filter(_._1.date == tripKey._1)
+
+      val idxOfTrip =
+        if (tripsWithIndexOnSameDate.isEmpty) trips.indexWhere(trip => !trip.date.isBefore(tripKey._1)).max(0)
+        else {
+          require(tripKey._2 <= tripsWithIndexOnSameDate.size)
+
+          if (tripKey._2 == tripsWithIndexOnSameDate.size) tripsWithIndexOnSameDate.last._2 + 1
+          else tripsWithIndexOnSameDate.apply(tripKey._2)._2
+        }
+
+      assert(idxOfTrip >= 0)
+      assert(idxOfTrip <= trips.size)
+
+      val kmToAdd = tripLengthInKm
+
+      val editedTrips =
+        if (idxOfTrip == 0) {
+          val trip = new Trip(tripKey._1, tripName, trips.head.startKm, trips.head.startKm + kmToAdd)
+
+          trip +: trips.map(tr => tr + kmToAdd)
+        } else if (idxOfTrip == trips.size) {
+          assert(idxOfTrip >= 1)
+          val trip = new Trip(tripKey._1, tripName, trips.last.endKm, trips.last.endKm + kmToAdd)
+
+          trips :+ trip
+        } else {
+          assert(idxOfTrip >= 1)
+          val nextTrip = trips.apply(idxOfTrip)
+          val trip = new Trip(tripKey._1, tripName, nextTrip.startKm, nextTrip.startKm + kmToAdd)
+
+          (trips.take(idxOfTrip) :+ trip) ++ (trips.drop(idxOfTrip).map(trip => trip + kmToAdd))
+        }
+
+      new MileageRecords(tripCategories, knownAddresses, knownTrips, editedTrips)
+    }
+
+    /**
+     * Removes a trip, returning a new MileageRecords.
+     *
+     * Mind consistency of the result (end of previous trip matching start of next trip, etc.), so typically repeated calls
+     * for adjacent trips are needed.
+     */
+    def minus(tripKey: Trip.Key): MileageRecords = {
+      val idxOfTrip = trips.zipWithIndex.filter(_._1.date == tripKey._1).apply(tripKey._2)._2
+      assert(trips(idxOfTrip).date == tripKey._1)
+
+      val kmToSubtract = trips(idxOfTrip).tripLengthInKm
+      val editedTrips = trips.take(idxOfTrip) ++ trips.drop(idxOfTrip + 1).map(trip => trip - kmToSubtract)
+
+      new MileageRecords(tripCategories, knownAddresses, knownTrips, editedTrips)
+    }
+
+    /**
+     * Updates the end-km of a given trip, by passing a deltaLengthInKm for that trip.
+     */
+    def updateLengthInKm(tripKey: Trip.Key, deltaLengthInKm: Int): MileageRecords = {
+      val idxOfTrip = trips.zipWithIndex.filter(_._1.date == tripKey._1).apply(tripKey._2)._2
+      assert(trips(idxOfTrip).date == tripKey._1)
+
+      val oldTrip = trips(idxOfTrip)
+      val newTrip = oldTrip.updateEndKm(deltaLengthInKm)
+
+      val editedTrips =
+        (trips.take(idxOfTrip) :+ newTrip) ++ trips.drop(idxOfTrip + 1).map(tr => tr + deltaLengthInKm)
+
+      new MileageRecords(tripCategories, knownAddresses, knownTrips, editedTrips)
+    }
 
     def toElem: Elem = {
       val xml =
