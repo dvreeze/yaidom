@@ -553,6 +553,9 @@ class SaxonDomWrapperTest extends Suite {
 
 object SaxonDomWrapperTest {
 
+  import ENameProvider.globalENameProvider._
+  import QNameProvider.globalQNameProvider._
+
   abstract class DomNode(val wrappedNode: NodeInfo) {
 
     final override def toString: String = wrappedNode.toString
@@ -560,13 +563,13 @@ object SaxonDomWrapperTest {
     protected def nodeInfo2EName(nodeInfo: NodeInfo): EName = {
       val ns: String = nodeInfo.getURI
       val nsOption: Option[String] = if (ns == "") None else Some(ns)
-      EName(nsOption, nodeInfo.getLocalPart)
+      getEName(nsOption, nodeInfo.getLocalPart)
     }
 
     protected def nodeInfo2QName(nodeInfo: NodeInfo): QName = {
       val pref: String = nodeInfo.getPrefix
       val prefOption: Option[String] = if (pref == "") None else Some(pref)
-      QName(prefOption, nodeInfo.getLocalPart)
+      getQName(prefOption, nodeInfo.getLocalPart)
     }
   }
 

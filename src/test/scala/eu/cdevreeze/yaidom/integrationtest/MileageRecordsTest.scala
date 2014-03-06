@@ -48,7 +48,7 @@ class MileageRecordsTest extends Suite {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
-      val is = classOf[MileageRecordsTest].getResourceAsStream("trips-2013.xml")
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
       docParser.parse(is)
     }
     val mileageRecordsElem = doc.documentElement
@@ -89,7 +89,7 @@ class MileageRecordsTest extends Suite {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
-      val is = classOf[MileageRecordsTest].getResourceAsStream("trips-2013.xml")
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
       docParser.parse(is)
     }
     val mileageRecordsElem = doc.documentElement
@@ -123,7 +123,7 @@ class MileageRecordsTest extends Suite {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
-      val is = classOf[MileageRecordsTest].getResourceAsStream("trips-2013.xml")
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
       docParser.parse(is)
     }
     val mileageRecordsElem = doc.documentElement
@@ -154,7 +154,7 @@ class MileageRecordsTest extends Suite {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
-      val is = classOf[MileageRecordsTest].getResourceAsStream("trips-2013.xml")
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
       docParser.parse(is)
     }
     val mileageRecordsElem = doc.documentElement
@@ -165,8 +165,52 @@ class MileageRecordsTest extends Suite {
 
     val totalPrivateKms = mileageRecords.totalPrivateKms
 
-    assertResult(true, s"Total private kms $totalPrivateKms larger than expected") {
+    assertResult(true, s"Total private kms $totalPrivateKms larger than expected (>= 300)") {
       totalPrivateKms < 300
+    }
+  }
+
+  @Test def testConvertToCsv(): Unit = {
+    import ElemApi._
+
+    val docParser = DocumentParserUsingSax.newInstance
+
+    val doc: Document = {
+      val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
+      docParser.parse(is)
+    }
+    val mileageRecordsElem = doc.documentElement
+
+    val mileageRecords = MileageRecords.fromElem(mileageRecordsElem)
+
+    // Generate CSV
+
+    val csvRecords =
+      mileageRecords.trips map { trip =>
+        val date = trip.date
+
+        val knownTripOption = mileageRecords.knownTripsByName.get(trip.tripName)
+        val from =
+          knownTripOption flatMap (knownTrip => mileageRecords.knownAddressesByName.get(knownTrip.fromAddressName)) map (_.name) getOrElse ""
+        val to =
+          knownTripOption flatMap (knownTrip => mileageRecords.knownAddressesByName.get(knownTrip.toAddressName)) map (_.name) getOrElse ""
+
+        val isPrivate =
+          knownTripOption.flatMap(knownTrip => mileageRecords.tripCategoriesByName.get(knownTrip.categoryName)).map(_.isPrivate).getOrElse(true)
+
+        val startKm = trip.startKm
+        val endKm = trip.endKm
+
+        val categoryString = if (isPrivate) "P" else ""
+
+        List(date.toString, from, to, startKm.toString, endKm.toString, categoryString).mkString("|")
+      }
+
+    assertResult(mileageRecords.trips.size) {
+      csvRecords.size
+    }
+    assertResult(mileageRecords.trips.map(_.date)) {
+      csvRecords.map(line => LocalDate.parse(line.split('|')(0)))
     }
   }
 }
