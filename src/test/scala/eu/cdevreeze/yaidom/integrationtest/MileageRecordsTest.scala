@@ -234,8 +234,8 @@ class MileageRecordsTest extends Suite {
       mileageRecords.
         minus(LocalDate.parse("2013-11-13") -> 0).
         minus(LocalDate.parse("2013-11-13") -> 0).
-        plus(LocalDate.parse("2013-11-14") -> 0, "ebpi-heen", 30).
-        plus(LocalDate.parse("2013-11-14") -> 1, "ebpi-terug", 31).
+        plus(LocalDate.parse("2013-11-14") -> 0, "werk-heen", 30).
+        plus(LocalDate.parse("2013-11-14") -> 1, "werk-terug", 31).
         updateLengthInKm(LocalDate.parse("2013-11-14") -> 0, 1)
 
     val dates = List("2013-11-11", "2013-11-15", "2013-12-18").map(s => LocalDate.parse(s))
