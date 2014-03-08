@@ -11,7 +11,7 @@ version := "0.8.1-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
-crossScalaVersions := Seq("2.10.3")
+crossScalaVersions := Seq("2.10.3", "2.11.0-RC1")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -25,15 +25,31 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
   if (version.contains("2.11")) newSourceDirs else Seq()
 }
 
+libraryDependencies <++= scalaBinaryVersion apply { version =>
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11.0-RC1" % "1.0.0")
+  else Seq()
+}
+
+libraryDependencies <++= scalaBinaryVersion apply { version =>
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-parser-combinators_2.11.0-RC1" % "1.0.0")
+  else Seq()
+}
+
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.2.1"
 
 libraryDependencies += "junit" % "junit" % "4.11" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
+libraryDependencies <+= scalaBinaryVersion apply { version =>
+  if (version.contains("2.11")) "org.scalatest" % "scalatest_2.11.0-RC1" % "2.1.0" % "test"
+  else "org.scalatest" %% "scalatest" % "2.1.0" % "test"
+}
 
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
+libraryDependencies <+= scalaBinaryVersion apply { version =>
+  if (version.contains("2.11")) "org.scalacheck" % "scalacheck_2.11.0-RC1" % "1.11.3" % "test"
+  else "org.scalacheck" %% "scalacheck" % "1.11.3" % "test"
+}
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 

@@ -135,7 +135,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
     val futures: Vector[Future[Elem]] =
       (1 to 10).toVector map { i =>
-        future(docPrinter.print(rootElem)) map { xmlString =>
+        Future { docPrinter.print(rootElem) } map { xmlString =>
           docParser.parse(new jio.ByteArrayInputStream(xmlString.getBytes(encoding))).documentElement
         } map { elem =>
           elem transformElems { e =>
@@ -193,7 +193,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
     val futures: Vector[Future[Document]] =
       (1 to 10).toVector map { i =>
-        future {
+        Future {
           val xmlString = docPrinter.print(rootElem)
           val doc = docParser.parse(new jio.ByteArrayInputStream(xmlString.getBytes(encoding)))
           doc

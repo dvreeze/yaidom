@@ -217,7 +217,7 @@ private[yaidom] object PrettyPrinting {
     def apply(lines: Line*): LineSeq = new LineSeq(Vector(lines: _*))
 
     def apply(s: String): LineSeq = {
-      val lines = s.linesIterator.toIndexedSeq map { (ln: String) => new Line(ln) }
+      val lines = s.lines.toIndexedSeq map { (ln: String) => new Line(ln) }
       new LineSeq(lines)
     }
   }
