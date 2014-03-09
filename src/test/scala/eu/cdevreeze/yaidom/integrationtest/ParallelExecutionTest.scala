@@ -45,6 +45,8 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
   private val threadPool = juc.Executors.newFixedThreadPool(10)
 
+  private val i = new juc.atomic.AtomicInteger(0)
+
   @Test def testParallelExecutionUsingDom(): Unit = {
     doTestParallelExecution(
       { () => DocumentParserUsingDom.newInstance },
@@ -106,8 +108,8 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     val sharedENameProvider1 = new ENameProvider.SimpleCachingENameProvider
     val sharedENameProvider2 = new ENameProvider.SimpleCachingENameProvider
 
-    val i = new juc.atomic.AtomicInteger(0)
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () =>
+      logger.info(s"Creating thread-bound ENameProvider. i = $i. Thread: ${Thread.currentThread}")
       val provider = {
         if (i.incrementAndGet() % 2 == 0) sharedENameProvider1
         else sharedENameProvider2
@@ -181,7 +183,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
     val docPrinter = new ThreadLocalDocumentPrinter(DocumentPrinterUsingSax.newInstance)
 
     // No re-use (or pooling) of threads!
-    implicit val execContext = ExecutionContext.fromExecutor(new juc.Executor {
+    implicit val execContext: ExecutionContext = ExecutionContext.fromExecutor(new juc.Executor {
       def execute(command: Runnable): Unit = {
         (new Thread(command)).start()
       }
