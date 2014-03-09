@@ -103,23 +103,21 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNumberOfRefEqualENamesUsingDifferentThreadBoundENameProviders(): Unit = {
-    val sharedENameProvider = new ENameProvider.SimpleCachingENameProvider
+    val sharedENameProvider1 = new ENameProvider.SimpleCachingENameProvider
+    val sharedENameProvider2 = new ENameProvider.SimpleCachingENameProvider
 
-    @volatile var i = 0
+    val i = new juc.atomic.AtomicInteger(0)
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () =>
-      ParallelExecutionTest.this.synchronized {
-        val provider = {
-          if (i == 9) ENameProvider.defaultInstance
-          else sharedENameProvider
-        }
-        i += 1
-        provider
+      val provider = {
+        if (i.incrementAndGet() % 2 == 0) sharedENameProvider1
+        else sharedENameProvider2
       }
+      provider
     })
 
-    val refEqualGrandChildENameCount = 225
+    val refEqualGrandChildENameCount = 125
 
-    // All but 25 of the grandChild element ENames are reference-equal to the first one
+    // Half of the grandChild element ENames are reference-equal to the "first" one
     doTestNumberOfRefEqualENames(enameProvider, refEqualGrandChildENameCount)
   }
 
