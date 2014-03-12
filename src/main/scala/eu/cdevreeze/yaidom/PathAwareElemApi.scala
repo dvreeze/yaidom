@@ -126,7 +126,7 @@ import scala.collection.immutable
  * The most <em>fundamental methods</em> of this trait are ``findAllChildElemsWithPathEntries`` and ``findChildElemByPathEntry``.
  * The semantics of the other methods can be defined directly or indirectly in terms of method ``findAllChildElemsWithPathEntries``.
  *
- * The following must hold (for ``indexed.Elem``, which has structural equality defined):
+ * The following must hold (for ``resolved.Elem``, which has structural equality defined):
  * {{{
  * elem.findAllChildElemsWithPathEntries.map(_._1) == elem.findAllChildElems
  *
