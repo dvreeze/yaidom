@@ -237,5 +237,14 @@ class Blog1Test extends Suite {
     assertResult(Set("Garcia-Molina", "Ullman", "Widom")) {
       authorLastNames.toSet
     }
+
+    // Less verbose, more XPath-like version (expanding the for-comprehension)
+
+    val authorLastNames2 =
+      doc.documentElement \ withLocalName("Book") flatMap
+        (_ \\ withLocalName("Author")) flatMap
+        (_ \\ withLocalName("Last_Name")) map (_.text)
+
+    require(authorLastNames2 == authorLastNames)
   }
 }
