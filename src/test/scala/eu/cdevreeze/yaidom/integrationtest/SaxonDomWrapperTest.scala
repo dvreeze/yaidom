@@ -77,6 +77,9 @@ class SaxonDomWrapperTest extends Suite {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+    assertResult(Set(Scope.from("" -> "http://bookstore", "books" -> "http://bookstore"))) {
+      root.findAllElemsOrSelf.map(_.scope).toSet
+    }
   }
 
   @Test def testParseStrangeXml(): Unit = {
@@ -91,6 +94,12 @@ class SaxonDomWrapperTest extends Suite {
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
+    }
+    assertResult(Scope.from("ns" -> "http://www.yahoo.com")) {
+      root.scope
+    }
+    assertResult(Scope.from("ns" -> "http://www.google.com")) {
+      root.getChildElem(ElemApi.withLocalName("foo")).scope
     }
   }
 
@@ -653,6 +662,28 @@ object SaxonDomWrapperTest {
       val parentNodeOption = Option(wrappedNode.getParent)
       val parentElemOption = parentNodeOption collect { case e: NodeInfo if e.getNodeKind == Type.ELEMENT => e }
       parentElemOption map { e => DomNode.wrapElement(e) }
+    }
+
+    def scope: Scope = {
+      val it = wrappedNode.iterateAxis(AxisInfo.NAMESPACE)
+      val buf = mutable.ArrayBuffer[NodeInfo]()
+
+      while (it.next() ne null) {
+        buf += it.current()
+      }
+
+      val resultMap = {
+        val result =
+          buf.toVector map { nodeInfo =>
+            // Not very transparent: prefix is "display name" and namespace URI is "string value"
+            val prefix = nodeInfo.getDisplayName
+            val nsUri = nodeInfo.getStringValue
+            (prefix -> nsUri)
+          }
+        result.toMap
+      }
+
+      Scope.from(resultMap - "xml")
     }
   }
 
