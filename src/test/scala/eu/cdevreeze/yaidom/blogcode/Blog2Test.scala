@@ -70,17 +70,14 @@ class Blog2Test extends Suite {
 
     val elemQNames = docElem.findAllElemsOrSelf.map(_.qname).toSet
 
-    assertResult(
+    require(elemQNames ==
       Set(
         QName("feed"),
         QName("title"),
         QName("rights"),
         QName("xhtml", "div"),
         QName("xhtml", "strong"),
-        QName("xhtml", "em"))) {
-
-        elemQNames
-      }
+        QName("xhtml", "em")))
 
     // Asking for all (descendant-or-self) element ENames (using "default" yaidom elements)
 
@@ -89,17 +86,14 @@ class Blog2Test extends Suite {
     val atomNs = "http://www.w3.org/2005/Atom"
     val xhtmlNs = "http://www.w3.org/1999/xhtml"
 
-    assertResult(
+    require(elemENames ==
       Set(
         EName(atomNs, "feed"),
         EName(atomNs, "title"),
         EName(atomNs, "rights"),
         EName(xhtmlNs, "div"),
         EName(xhtmlNs, "strong"),
-        EName(xhtmlNs, "em"))) {
-
-        elemENames
-      }
+        EName(xhtmlNs, "em")))
   }
 
   /**
@@ -134,9 +128,7 @@ class Blog2Test extends Suite {
 
     val atomElems = docElem \\ (e => e.qname.prefixOption.isEmpty)
 
-    assertResult(Set(feedElem, titleElem, rightsElem)) {
-      atomElems.toSet
-    }
+    require(atomElems.toSet == Set(feedElem, titleElem, rightsElem))
 
     val divElem = docElem.findElem(withLocalName("div")).get
     val strongElem = docElem.findElem(withLocalName("strong")).get
@@ -144,9 +136,7 @@ class Blog2Test extends Suite {
 
     val xhtmlElems = docElem \\ (e => e.qname.prefixOption == Some("xhtml"))
 
-    assertResult(Set(divElem, strongElem, emElem)) {
-      xhtmlElems.toSet
-    }
+    require(xhtmlElems.toSet == Set(divElem, strongElem, emElem))
 
     // The Scope (in-scope namespaces) that all elements turn out to have
 
@@ -164,51 +154,32 @@ class Blog2Test extends Suite {
 
     // Indeed all elements have the same scope
 
-    assertResult(scope) {
-      Scope.Empty.resolve(feedElemDecls)
-    }
-    assertResult(Set(scope)) {
-      feedElem.findAllElemsOrSelf.map(_.scope).toSet
-    }
+    require(Scope.Empty.resolve(feedElemDecls) == scope)
+    require(feedElem.findAllElemsOrSelf.map(_.scope).toSet == Set(scope))
 
     // Checking the namespaces of "atom" and "xhtml" element names
 
     val defaultNs = scope.prefixNamespaceMap("")
 
-    assertResult(Set(defaultNs)) {
-      atomElems.flatMap(e => e.resolvedName.namespaceUriOption).toSet
-    }
+    require(atomElems.flatMap(e => e.resolvedName.namespaceUriOption).toSet == Set(defaultNs))
 
     val xhtmlNs = scope.prefixNamespaceMap("xhtml")
 
-    assertResult(Set(xhtmlNs)) {
-      xhtmlElems.flatMap(e => e.resolvedName.namespaceUriOption).toSet
-    }
+    require(xhtmlElems.flatMap(e => e.resolvedName.namespaceUriOption).toSet == Set(xhtmlNs))
 
     // The default namespace does not affect unprefixed attributes
     // By the way, this is the first time we show attribute querying in yaidom
 
     val scopeWithoutDefaultNs = scope.withoutDefaultNamespace
 
-    assertResult(scope.prefixNamespaceMap - "") {
-      scopeWithoutDefaultNs.prefixNamespaceMap
-    }
-    assertResult(scopeWithoutDefaultNs) {
-      feedElem.attributeScope
-    }
+    require(scopeWithoutDefaultNs.prefixNamespaceMap == scope.prefixNamespaceMap - "")
+    require(feedElem.attributeScope == scopeWithoutDefaultNs)
 
-    assertResult(Some("xhtml")) {
-      rightsElem.attributeOption(EName("type"))
-    }
-    assertResult(Some("xhtml")) {
-      rightsElem \@ EName("type")
-    }
-    assertResult(Some("silly")) {
-      rightsElem \@ EName("http://xmlportfolio.com/xmlguild-examples", "type")
-    }
-    assertResult(Set(EName("type"), EName("http://xmlportfolio.com/xmlguild-examples", "type"))) {
-      rightsElem.resolvedAttributes.toMap.keySet
-    }
+    require(rightsElem.attributeOption(EName("type")) == Some("xhtml"))
+    require(rightsElem \@ EName("type") == Some("xhtml"))
+    require(rightsElem \@ EName("http://xmlportfolio.com/xmlguild-examples", "type") == Some("silly"))
+    require(rightsElem.resolvedAttributes.toMap.keySet ==
+      Set(EName("type"), EName("http://xmlportfolio.com/xmlguild-examples", "type")))
   }
 
   /**
@@ -236,9 +207,8 @@ class Blog2Test extends Suite {
 
     import ElemApi._
 
-    assertResult(resolved.Elem(feed1Doc.documentElement).removeAllInterElementWhitespace) {
-      resolved.Elem(feed2Doc.documentElement).removeAllInterElementWhitespace
-    }
+    require(resolved.Elem(feed2Doc.documentElement).removeAllInterElementWhitespace ==
+      resolved.Elem(feed1Doc.documentElement).removeAllInterElementWhitespace)
 
     // Checking scope
 
@@ -252,15 +222,11 @@ class Blog2Test extends Suite {
         resolve(Declarations.from("example" -> exampleNs)).
         resolve(Declarations.from("" -> xhtmlNs))
 
-    assertResult(Scope.from("example" -> exampleNs, "" -> xhtmlNs)) {
-      expectedDivElemScope
-    }
+    require(expectedDivElemScope == Scope.from("example" -> exampleNs, "" -> xhtmlNs))
 
     val divElem = feed2Doc.documentElement.findElem(withLocalName("div")).get
 
-    assertResult(Set(expectedDivElemScope)) {
-      divElem.findAllElemsOrSelf.map(_.scope).toSet
-    }
+    require(divElem.findAllElemsOrSelf.map(_.scope).toSet == Set(expectedDivElemScope))
   }
 
   /**
@@ -288,9 +254,8 @@ class Blog2Test extends Suite {
 
     import ElemApi._
 
-    assertResult(resolved.Elem(feed1Doc.documentElement).removeAllInterElementWhitespace) {
-      resolved.Elem(feed3Doc.documentElement).removeAllInterElementWhitespace
-    }
+    require(resolved.Elem(feed3Doc.documentElement).removeAllInterElementWhitespace ==
+      resolved.Elem(feed1Doc.documentElement).removeAllInterElementWhitespace)
   }
 
   /**
@@ -321,19 +286,15 @@ class Blog2Test extends Suite {
 
     // Each element has as resolved name the result of resolving its QName against the Scope of the element
 
-    assertResult(true) {
-      allElems.forall(elem => elem.scope.resolveQNameOption(elem.qname).get == elem.resolvedName)
-    }
+    require(allElems.forall(elem => elem.scope.resolveQNameOption(elem.qname).get == elem.resolvedName))
 
     // The attribute scope of each element is the scope without default namespace
 
-    assertResult(true) {
-      allElems forall (e => e.attributeScope == e.scope.withoutDefaultNamespace)
-    }
+    require(allElems forall (e => e.attributeScope == e.scope.withoutDefaultNamespace))
 
     // Each element has as resolved attributes the result of resolving its attributes against the attribute scope of the element
 
-    assertResult(true) {
+    require {
       allElems forall { elem =>
         val attrs = elem.attributes
         val resolvedAttrs = attrs map {

@@ -234,9 +234,7 @@ class Blog1Test extends Suite {
         lastNameElem <- authorElem \ withLocalName("Last_Name")
       } yield lastNameElem.text
 
-    assertResult(Set("Garcia-Molina", "Ullman", "Widom")) {
-      authorLastNames.toSet
-    }
+    require(authorLastNames.toSet == Set("Garcia-Molina", "Ullman", "Widom"))
 
     // Less verbose, more XPath-like version (expanding the for-comprehension)
 

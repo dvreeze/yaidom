@@ -74,9 +74,9 @@ class Blog3Test extends Suite {
       } yield isbn
     }
 
-    assertResult(List("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3")) {
-      findIsbnsOfBooksBy("Jeffrey", "Ullman")
-    }
+    require(
+      findIsbnsOfBooksBy("Jeffrey", "Ullman") ==
+        List("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3"))
 
     def summarizeBook(isbn: String): Elem = {
       val bookElem =
@@ -92,8 +92,8 @@ class Blog3Test extends Suite {
       convert.ScalaXmlConversions.convertToElem(xml)
     }
 
-    assertResult("Jeffrey Ullman, Jennifer Widom") {
-      summarizeBook("ISBN-0-13-713526-2").getChildElem(withLocalName("Authors")).text
-    }
+    require(
+      summarizeBook("ISBN-0-13-713526-2").getChildElem(withLocalName("Authors")).text ==
+        "Jeffrey Ullman, Jennifer Widom")
   }
 }
