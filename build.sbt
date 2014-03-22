@@ -9,9 +9,9 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "0.8.1-SNAPSHOT"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.10.3", "2.11.0-RC1")
+crossScalaVersions := Seq("2.10.4", "2.11.0-RC1")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 

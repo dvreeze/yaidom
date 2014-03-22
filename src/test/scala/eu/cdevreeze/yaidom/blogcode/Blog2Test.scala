@@ -47,8 +47,6 @@ class Blog2Test extends Suite {
    */
   @Test def testFindNamesInFeed1(): Unit = {
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
     import eu.cdevreeze.yaidom._
 
     // Using a yaidom DocumentParser that used SAX internally
@@ -101,8 +99,6 @@ class Blog2Test extends Suite {
    */
   @Test def testNamespacesInFeed1(): Unit = {
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
     import eu.cdevreeze.yaidom._
 
     // Using a yaidom DocumentParser that used SAX internally
@@ -187,8 +183,6 @@ class Blog2Test extends Suite {
    */
   @Test def testCompareFeed1AndFeed2(): Unit = {
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
     import eu.cdevreeze.yaidom._
 
     // Using a yaidom DocumentParser that used SAX internally
@@ -234,8 +228,6 @@ class Blog2Test extends Suite {
    */
   @Test def testCompareFeed1AndFeed3(): Unit = {
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
     import eu.cdevreeze.yaidom._
 
     // Using a yaidom DocumentParser that used SAX internally
@@ -263,8 +255,6 @@ class Blog2Test extends Suite {
    */
   @Test def testPropertiesInFeed1(): Unit = {
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
     import eu.cdevreeze.yaidom._
 
     // Using a yaidom DocumentParser that used SAX internally

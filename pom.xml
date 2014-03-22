@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<scala.version>2.10.3</scala.version>
+		<scala.version>2.10.4</scala.version>
 		<scala.binary.version>2.10</scala.binary.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
