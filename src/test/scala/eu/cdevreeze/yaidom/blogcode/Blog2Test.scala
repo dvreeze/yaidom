@@ -40,33 +40,28 @@ import org.scalatest.junit.JUnitRunner
 class Blog2Test extends Suite {
 
   private val pathToParentDir: java.io.File =
-    (new java.io.File(classOf[Blog2Test].getResource("feed1.xml").toURI)).getParentFile
+    (new java.io.File(classOf[Blog2Test].getResource("feed1.txt").toURI)).getParentFile
 
   /**
-   * Finding element QNames and ENames in feed1.xml.
+   * The code of the entire article.
    */
   @Test def testFindNamesInFeed1(): Unit = {
-    import java.io.File
+    import java.net.URI
+    import javax.xml.parsers._
+    import scala.collection.immutable
     import eu.cdevreeze.yaidom._
+
+    import ElemApi._
 
     // Using a yaidom DocumentParser that used SAX internally
     val docParser = parse.DocumentParserUsingSax.newInstance
 
-    // Replace the following path!
-    val parentDir = new File(pathToParentDir.getPath)
+    val feed1Doc: Document =
+      docParser.parse(new java.io.File(pathToParentDir, "feed1.txt"))
 
-    val doc: Document =
-      docParser.parse(new File(parentDir, "feed1.xml"))
+    val feed1DocElem = feed1Doc.documentElement
 
-    val docElem = doc.documentElement
-
-    // The example, showing QName and ENames
-
-    import ElemApi._
-
-    // Asking for all (descendant-or-self) element QNames (using "default" yaidom elements)
-
-    val elemQNames = docElem.findAllElemsOrSelf.map(_.qname).toSet
+    val elemQNames = feed1DocElem.findAllElemsOrSelf.map(_.qname).toSet
 
     require(elemQNames ==
       Set(
@@ -77,9 +72,18 @@ class Blog2Test extends Suite {
         QName("xhtml", "strong"),
         QName("xhtml", "em")))
 
-    // Asking for all (descendant-or-self) element ENames (using "default" yaidom elements)
+    // Writing the QNames differently, corresponding to the string representations:
 
-    val elemENames = docElem.findAllElemsOrSelf.map(_.resolvedName).toSet
+    require(elemQNames ==
+      Set(
+        QName("feed"),
+        QName("title"),
+        QName("rights"),
+        QName("xhtml:div"),
+        QName("xhtml:strong"),
+        QName("xhtml:em")))
+
+    val elemENames = feed1DocElem.findAllElemsOrSelf.map(_.resolvedName).toSet
 
     val atomNs = "http://www.w3.org/2005/Atom"
     val xhtmlNs = "http://www.w3.org/1999/xhtml"
@@ -92,200 +96,90 @@ class Blog2Test extends Suite {
         EName(xhtmlNs, "div"),
         EName(xhtmlNs, "strong"),
         EName(xhtmlNs, "em")))
-  }
 
-  /**
-   * Analyzing namespaces in feed1.xml, using scopes and declarations.
-   */
-  @Test def testNamespacesInFeed1(): Unit = {
-    import java.io.File
-    import eu.cdevreeze.yaidom._
+    // Writing the ENames differently, using James Clark notation:
 
-    // Using a yaidom DocumentParser that used SAX internally
-    val docParser = parse.DocumentParserUsingSax.newInstance
+    require(elemENames ==
+      Set(
+        EName("{http://www.w3.org/2005/Atom}feed"),
+        EName("{http://www.w3.org/2005/Atom}title"),
+        EName("{http://www.w3.org/2005/Atom}rights"),
+        EName("{http://www.w3.org/1999/xhtml}div"),
+        EName("{http://www.w3.org/1999/xhtml}strong"),
+        EName("{http://www.w3.org/1999/xhtml}em")))
 
-    // Replace the following path!
-    val parentDir = new File(pathToParentDir.getPath)
+    // Namespaces and in-scope namespaces
 
-    val doc: Document =
-      docParser.parse(new File(parentDir, "feed1.xml"))
-
-    val docElem = doc.documentElement
-
-    // The example, showing namespace resolution
-
-    import ElemApi._
-
-    // Using getChildElem, knowing that precisely one child element matches (otherwise an exception is thrown)
-
-    val feedElem = docElem
-    val titleElem = feedElem.getChildElem(withLocalName("title"))
-    val rightsElem = feedElem.getChildElem(withLocalName("rights"))
-
-    val atomElems = docElem \\ (e => e.qname.prefixOption.isEmpty)
-
-    require(atomElems.toSet == Set(feedElem, titleElem, rightsElem))
-
-    val divElem = docElem.findElem(withLocalName("div")).get
-    val strongElem = docElem.findElem(withLocalName("strong")).get
-    val emElem = docElem.findElem(withLocalName("em")).get
-
-    val xhtmlElems = docElem \\ (e => e.qname.prefixOption == Some("xhtml"))
-
-    require(xhtmlElems.toSet == Set(divElem, strongElem, emElem))
-
-    // The Scope (in-scope namespaces) that all elements turn out to have
-
-    val scope = Scope.from(
+    val feed1ElemDecls = Declarations.from(
       "" -> "http://www.w3.org/2005/Atom",
       "xhtml" -> "http://www.w3.org/1999/xhtml",
       "my" -> "http://xmlportfolio.com/xmlguild-examples")
 
-    // Calculating with scopes and (namespace) declarations
+    val feed1ElemScope = Scope.Empty.resolve(feed1ElemDecls)
 
-    val feedElemDecls = Declarations.from(
+    val expectedFeed1ElemScope = Scope.from(
       "" -> "http://www.w3.org/2005/Atom",
       "xhtml" -> "http://www.w3.org/1999/xhtml",
       "my" -> "http://xmlportfolio.com/xmlguild-examples")
 
-    // Indeed all elements have the same scope
+    require(feed1ElemScope == expectedFeed1ElemScope)
 
-    require(Scope.Empty.resolve(feedElemDecls) == scope)
-    require(feedElem.findAllElemsOrSelf.map(_.scope).toSet == Set(scope))
+    require(feed1DocElem.findAllElemsOrSelf.forall(e => e.scope == feed1ElemScope))
 
-    // Checking the namespaces of "atom" and "xhtml" element names
+    val allElems = feed1DocElem.findAllElemsOrSelf
 
-    val defaultNs = scope.prefixNamespaceMap("")
+    // The default namespace is the atom namespace
+    val allAtomElems = allElems.filter(e => e.qname.prefixOption.isEmpty)
 
-    require(atomElems.flatMap(e => e.resolvedName.namespaceUriOption).toSet == Set(defaultNs))
+    require(allAtomElems.forall(e =>
+      e.scope.resolveQNameOption(e.qname) == Some(e.resolvedName)))
 
-    val xhtmlNs = scope.prefixNamespaceMap("xhtml")
+    // Indeed, the ENames are in the atom namespace
+    require(allAtomElems.forall(e =>
+      e.resolvedName.namespaceUriOption == Some(atomNs)))
 
-    require(xhtmlElems.flatMap(e => e.resolvedName.namespaceUriOption).toSet == Set(xhtmlNs))
+    val allXhtmlElems = allElems.filter(e => e.qname.prefixOption == Some("xhtml"))
 
-    // The default namespace does not affect unprefixed attributes
-    // By the way, this is the first time we show attribute querying in yaidom
+    require(allXhtmlElems.forall(e =>
+      e.scope.resolveQNameOption(e.qname) == Some(e.resolvedName)))
 
-    val scopeWithoutDefaultNs = scope.withoutDefaultNamespace
+    // Indeed, the ENames are in the xhtml namespace
+    require(allXhtmlElems.forall(e =>
+      e.resolvedName.namespaceUriOption == Some(xhtmlNs)))
 
-    require(scopeWithoutDefaultNs.prefixNamespaceMap == scope.prefixNamespaceMap - "")
-    require(feedElem.attributeScope == scopeWithoutDefaultNs)
+    require(feed1DocElem.findAllElemsOrSelf.forall(e =>
+      e.scope.resolveQNameOption(e.qname) == Some(e.resolvedName)))
 
-    require(rightsElem.attributeOption(EName("type")) == Some("xhtml"))
-    require(rightsElem \@ EName("type") == Some("xhtml"))
-    require(rightsElem \@ EName("http://xmlportfolio.com/xmlguild-examples", "type") == Some("silly"))
-    require(rightsElem.resolvedAttributes.toMap.keySet ==
-      Set(EName("type"), EName("http://xmlportfolio.com/xmlguild-examples", "type")))
-  }
+    require(feed1DocElem.findAllElemsOrSelf.forall(e =>
+      e.resolvedName.localPart == e.qname.localPart))
 
-  /**
-   * Comparing feed1 and feed2 for equality.
-   */
-  @Test def testCompareFeed1AndFeed2(): Unit = {
-    import java.io.File
-    import eu.cdevreeze.yaidom._
+    require(feed1DocElem.findAllElemsOrSelf.forall(e =>
+      e.resolvedName.namespaceUriOption ==
+        e.scope.prefixNamespaceMap.get(e.qname.prefixOption.getOrElse(""))))
 
-    // Using a yaidom DocumentParser that used SAX internally
-    val docParser = parse.DocumentParserUsingSax.newInstance
+    // Attribute querying and resolution
 
-    // Replace the following path!
-    val parentDir = new File(pathToParentDir.getPath)
+    // Get the rights child element of the root element
+    val rights1Elem: Elem = feed1DocElem.getChildElem(withEName(atomNs, "rights"))
 
-    val feed1Doc: Document =
-      docParser.parse(new File(parentDir, "feed1.xml"))
+    require(rights1Elem \@ EName("type") == Some("xhtml"))
 
-    val feed2Doc: Document =
-      docParser.parse(new File(parentDir, "feed2.xml"))
+    val examplesNs = "http://xmlportfolio.com/xmlguild-examples"
 
-    // The example, showing equality
+    require(rights1Elem \@ EName(examplesNs, "type") == Some("silly"))
 
-    import ElemApi._
+    val rights1ElemAttrs = rights1Elem.attributes
 
-    require(resolved.Elem(feed2Doc.documentElement).removeAllInterElementWhitespace ==
-      resolved.Elem(feed1Doc.documentElement).removeAllInterElementWhitespace)
+    require(rights1ElemAttrs.toMap.keySet ==
+      Set(QName("type"), QName("my", "type")))
 
-    // Checking scope
+    val rights1ElemResolvedAttrs = rights1Elem.resolvedAttributes
 
-    val atomNs = "http://www.w3.org/2005/Atom"
-    val exampleNs = "http://xmlportfolio.com/xmlguild-examples"
-    val xhtmlNs = "http://www.w3.org/1999/xhtml"
-
-    val expectedDivElemScope =
-      Scope.Empty.
-        resolve(Declarations.from("" -> atomNs)).
-        resolve(Declarations.from("example" -> exampleNs)).
-        resolve(Declarations.from("" -> xhtmlNs))
-
-    require(expectedDivElemScope == Scope.from("example" -> exampleNs, "" -> xhtmlNs))
-
-    val divElem = feed2Doc.documentElement.findElem(withLocalName("div")).get
-
-    require(divElem.findAllElemsOrSelf.map(_.scope).toSet == Set(expectedDivElemScope))
-  }
-
-  /**
-   * Comparing feed1 and feed3 for equality.
-   */
-  @Test def testCompareFeed1AndFeed3(): Unit = {
-    import java.io.File
-    import eu.cdevreeze.yaidom._
-
-    // Using a yaidom DocumentParser that used SAX internally
-    val docParser = parse.DocumentParserUsingSax.newInstance
-
-    // Replace the following path!
-    val parentDir = new File(pathToParentDir.getPath)
-
-    val feed1Doc: Document =
-      docParser.parse(new File(parentDir, "feed1.xml"))
-
-    val feed3Doc: Document =
-      docParser.parse(new File(parentDir, "feed3.xml"))
-
-    // The example, showing equality
-
-    import ElemApi._
-
-    require(resolved.Elem(feed3Doc.documentElement).removeAllInterElementWhitespace ==
-      resolved.Elem(feed1Doc.documentElement).removeAllInterElementWhitespace)
-  }
-
-  /**
-   * Checking some properties (in feed1.xml).
-   */
-  @Test def testPropertiesInFeed1(): Unit = {
-    import java.io.File
-    import eu.cdevreeze.yaidom._
-
-    // Using a yaidom DocumentParser that used SAX internally
-    val docParser = parse.DocumentParserUsingSax.newInstance
-
-    // Replace the following path!
-    val parentDir = new File(pathToParentDir.getPath)
-
-    val doc: Document =
-      docParser.parse(new File(parentDir, "feed1.xml"))
-
-    val docElem = doc.documentElement
-
-    // The example, checking some properties
-
-    import ElemApi._
-
-    val allElems = docElem.findAllElemsOrSelf
-
-    // Each element has as resolved name the result of resolving its QName against the Scope of the element
-
-    require(allElems.forall(elem => elem.scope.resolveQNameOption(elem.qname).get == elem.resolvedName))
-
-    // The attribute scope of each element is the scope without default namespace
-
-    require(allElems forall (e => e.attributeScope == e.scope.withoutDefaultNamespace))
-
-    // Each element has as resolved attributes the result of resolving its attributes against the attribute scope of the element
+    require(rights1ElemResolvedAttrs.toMap.keySet ==
+      Set(EName("type"), EName(examplesNs, "type")))
 
     require {
-      allElems forall { elem =>
+      feed1DocElem.findAllElemsOrSelf forall { elem =>
         val attrs = elem.attributes
         val resolvedAttrs = attrs map {
           case (attrQName, attrValue) =>
@@ -296,5 +190,67 @@ class Blog2Test extends Suite {
         resolvedAttrs.toMap == elem.resolvedAttributes.toMap
       }
     }
+
+    require(feed1DocElem.findAllElemsOrSelf.forall(e =>
+      e.attributeScope == e.scope.withoutDefaultNamespace))
+
+    // Equivalent XML documents
+
+    val feed2Doc: Document =
+      docParser.parse(new java.io.File(pathToParentDir, "feed2.txt"))
+
+    val feed2DocElem = feed2Doc.documentElement
+
+    val div2Elem = feed2DocElem.findElem(withEName(xhtmlNs, "div")).get
+
+    val feed2ElemDecls = Declarations.from("" -> atomNs)
+    val rights2ElemDecls = Declarations.from("example" -> examplesNs)
+    val div2ElemDecls = Declarations.from("" -> xhtmlNs)
+
+    val div2ElemScope =
+      Scope.Empty.resolve(feed2ElemDecls).resolve(rights2ElemDecls).resolve(div2ElemDecls)
+
+    require(div2ElemScope == Scope.from("" -> xhtmlNs, "example" -> examplesNs))
+
+    val feed1ResolvedElem = resolved.Elem(feed1DocElem)
+    val feed2ResolvedElem = resolved.Elem(feed2DocElem)
+
+    require(feed1ResolvedElem.removeAllInterElementWhitespace ==
+      feed2ResolvedElem.removeAllInterElementWhitespace)
+
+    require(feed1DocElem.findAllElemsOrSelf.map(_.resolvedName) ==
+      feed2DocElem.findAllElemsOrSelf.map(_.resolvedName))
+
+    require(feed1DocElem.findAllElemsOrSelf.map(_.resolvedAttributes) ==
+      feed2DocElem.findAllElemsOrSelf.map(_.resolvedAttributes))
+
+    val feed3Doc: Document =
+      docParser.parse(new java.io.File(pathToParentDir, "feed3.txt"))
+
+    val feed3DocElem = feed3Doc.documentElement
+
+    val div3Elem = feed3DocElem.findElem(withEName(xhtmlNs, "div")).get
+
+    val feed3ElemDecls =
+      Declarations.from("" -> atomNs, "xhtml" -> xhtmlNs, "my" -> examplesNs)
+    val rights3ElemDecls = feed3ElemDecls
+    val div3ElemDecls = Declarations.from("xhtml" -> xhtmlNs, "my" -> examplesNs)
+
+    val div3ElemScope =
+      Scope.Empty.resolve(feed3ElemDecls).resolve(rights3ElemDecls).resolve(div3ElemDecls)
+
+    require(div3ElemScope ==
+      Scope.from("" -> atomNs, "xhtml" -> xhtmlNs, "my" -> examplesNs))
+
+    // The namespace declarations in the rights and div elements added no information
+    require(
+      feed3DocElem.getChildElem(withEName(atomNs, "rights")).scope ==
+        feed3DocElem.scope)
+    require(div3Elem.scope == feed3DocElem.scope)
+
+    val feed3ResolvedElem = resolved.Elem(feed3DocElem)
+
+    require(feed1ResolvedElem.removeAllInterElementWhitespace ==
+      feed3ResolvedElem.removeAllInterElementWhitespace)
   }
 }
