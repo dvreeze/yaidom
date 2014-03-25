@@ -46,10 +46,15 @@ import scala.collection.immutable
  *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
  *     }
  *     bookElm <- authorElm.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { path =>
- *       authorElm.rootElem.getElemOrSelfByPath(path)
+ *       bookstoreElm.getElemOrSelfByPath(path)
  *     }
  *   } yield bookElm
  * }}}
+ *
+ * Note how we found an ancestor (Book) element of an Author element by first finding the appropriate ancestor path, and then
+ * querying the bookstore element for the element at that path. So we remembered the document element (as indexed element),
+ * and used that "snapshot" to query for elements at given ancestor paths of other elements. This is certainly more efficient
+ * than re-indexing (using an indexed element factory method).
  *
  * ==Elem more formally==
  *
@@ -99,7 +104,7 @@ final class Elem private[indexed] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: eu.cdevreeze.yaidom.Elem) extends ElemLike[Elem] with HasQName with HasText with Immutable {
+  val elem: eu.cdevreeze.yaidom.Elem) extends PathAwareElemLike[Elem] with HasQName with HasText with Immutable {
 
   // The elem must be the same as rootElem.findElemOrSelfByPath(path).get, which is not checked here
 
@@ -116,6 +121,14 @@ final class Elem private[indexed] (
   override def resolvedName: EName = elem.resolvedName
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
+
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] =
+    childElems.map(e => (e, e.path.lastEntry))
+
+  override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
+    // Not very fast
+    findChildElem(e => e.path.lastEntry == entry)
+  }
 
   override def qname: QName = elem.qname
 

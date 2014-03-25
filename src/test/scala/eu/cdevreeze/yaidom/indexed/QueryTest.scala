@@ -45,7 +45,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     assertResult(true) {
       elems forall { e =>
-        val parentScope = e.path.parentPathOption.map(p => e.rootElem.getElemOrSelfByPath(p).scope).getOrElse(Scope.Empty)
+        val parentScope = e.path.parentPathOption.map(p => bookstore.getElemOrSelfByPath(p).scope).getOrElse(Scope.Empty)
         parentScope.resolve(e.namespaces) == e.scope
       }
     }
@@ -113,9 +113,9 @@ class QueryTest extends AbstractElemLikeQueryTest {
       bookstore findTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } flatMap { elm =>
         require(elm.resolvedName == EName("Last_Name"))
         val bookOption = elm.path findAncestorPath { p =>
-          val e = elm.rootElem.getElemOrSelfByPath(p)
+          val e = bookstore.getElemOrSelfByPath(p)
           e.resolvedName == EName("Book") && e.attribute(EName("Price")).toInt < 90
-        } map { p => indexed.Elem(elm.rootElem, p) }
+        } map { p => bookstore.getElemOrSelfByPath(p) }
         val titleOption = bookOption flatMap { bookElm => bookElm findElem { e => e.resolvedName == EName("Title") } }
         titleOption
       }
@@ -144,7 +144,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         authorElem <- bookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
         if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
         bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
-          indexed.Elem(authorElem.rootElem, p)
+          bookstore.getElemOrSelfByPath(p)
         }
         if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield bookElem.getChildElem(EName("Title"))
@@ -161,7 +161,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         authorElem <- bookstore \\ EName("Author")
         if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
         bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
-          indexed.Elem(authorElem.rootElem, p)
+          bookstore.getElemOrSelfByPath(p)
         }
         if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield (bookElem \ EName("Title")).head
@@ -187,7 +187,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
             ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
         }
         bookElmPath = authorElm.path.parentPath.parentPath
-        bookElm = indexed.Elem(authorElm.rootElem, bookElmPath)
+        bookElm = bookstore.getElemOrSelfByPath(bookElmPath)
       } yield {
         require(bookElm.localName == "Book")
         bookElm
@@ -210,7 +210,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val elms =
       for {
         e <- bookstore.findAllElems
-        parent = indexed.Elem(e.rootElem, e.path.parentPath)
+        parent = bookstore.getElemOrSelfByPath(e.path.parentPath)
         if parent.elem.qname != QName("Bookstore") && parent.elem.qname != QName("Book")
       } yield e
 
