@@ -40,6 +40,13 @@ final class Elem private[docaware] (
   assert(childElems.forall(_.docUri eq this.docUri), "Corrupt element!")
 
   /**
+   * Map from child node indexes to child elem indexes, for speeding up lookups of child elements
+   */
+  private val elemIndexesByNodeIndex: Map[Int, Int] = {
+    (elem.children.zipWithIndex collect { case (e: eu.cdevreeze.yaidom.Elem, idx) => idx }).zipWithIndex.toMap
+  }
+
+  /**
    * Returns all child elements, in the correct order.
    *
    * These child elements share the same rootElem with this element, but differ in the paths, which have one more
@@ -52,8 +59,16 @@ final class Elem private[docaware] (
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
 
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    // Not very fast
-    findChildElem(e => e.path.lastEntry == entry)
+    val nodeIdx = elem.childNodeIndex(entry)
+
+    if (nodeIdx < 0) None
+    else {
+      val elemIdx = elemIndexesByNodeIndex(nodeIdx)
+      val resultElem = childElems(elemIdx)
+
+      assert(resultElem.resolvedName == entry.elementName)
+      Some(resultElem)
+    }
   }
 
   override def qname: QName = elem.qname
