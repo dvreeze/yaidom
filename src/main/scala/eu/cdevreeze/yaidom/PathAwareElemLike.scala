@@ -20,11 +20,11 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * API and implementation trait for elements as containers of elements, each having a name and possible attributes, as well
- * as having awareness of paths. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding knowledge about paths.
+ * as having awareness of paths. This trait extends trait [[eu.cdevreeze.yaidom.NavigableElemLike]], adding knowledge about paths.
  *
- * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
- * `findAllChildElemsWithPathEntries` and `findChildElemByPathEntry`. Based on these abstract methods (and the super-trait), this
- * trait offers a rich API for querying elements and paths.
+ * More precisely, this trait adds the following abstract method to the abstract methods required by its super-trait:
+ * `findAllChildElemsWithPathEntries`. Based on this abstract method (and the super-trait), this trait offers a rich API for
+ * querying elements and paths.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.PathAwareElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment.
@@ -33,14 +33,9 @@ import scala.collection.{ immutable, mutable }
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with PathAwareElemApi[E] { self: E =>
-
-  def findChildElemByPathEntry(entry: Path.Entry): Option[E]
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends NavigableElemLike[E] with PathAwareElemApi[E] { self: E =>
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
-
-  final def getChildElemByPathEntry(entry: Path.Entry): E =
-    findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $self"))
 
   final def findAllChildElemPaths: immutable.IndexedSeq[Path] =
     findAllChildElemsWithPathEntries map { case (e, pe) => Path(Vector(pe)) }
@@ -104,31 +99,6 @@ trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with Path
     val elms = self.findAllChildElemsWithPathEntries.view flatMap { case (ch, pe) => ch.findElemOrSelfPath(p) map { path => path.prepend(pe) } }
     elms.headOption
   }
-
-  /**
-   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
-   * This method must be very efficient, which depends on the efficiency of method `findChildElemByPathEntry`.
-   */
-  final def findElemOrSelfByPath(path: Path): Option[E] = {
-    // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
-
-    val entryCount = path.entries.size
-
-    def findElemOrSelfByPath(currentRoot: E, entryIndex: Int): Option[E] = {
-      assert(entryIndex >= 0 && entryIndex <= entryCount)
-
-      if (entryIndex == entryCount) Some(currentRoot) else {
-        val newRootOption: Option[E] = currentRoot.findChildElemByPathEntry(path.entries(entryIndex))
-        // Recursive call. Not tail-recursive, but recursion depth should be limited.
-        newRootOption flatMap { newRoot => findElemOrSelfByPath(newRoot, entryIndex + 1) }
-      }
-    }
-
-    findElemOrSelfByPath(self, 0)
-  }
-
-  final def getElemOrSelfByPath(path: Path): E =
-    findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
 
   final def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
     findAllChildElemsWithPathEntries map { _._2 }

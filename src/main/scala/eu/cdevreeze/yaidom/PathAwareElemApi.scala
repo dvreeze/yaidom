@@ -20,7 +20,7 @@ import scala.collection.immutable
 
 /**
  * This is the <em>Path-aware</em> part of the yaidom <em>uniform query API</em>. It is a sub-trait of trait
- * [[eu.cdevreeze.yaidom.ElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
+ * [[eu.cdevreeze.yaidom.NavigableElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
  * because some implementing sub-trait is mixed in), thus sharing this query API.
  *
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
@@ -32,13 +32,11 @@ import scala.collection.immutable
  * <li>elements can <em>have child elements</em> (as promised by ancestor trait ``ParentElemLike``)</li>
  * <li>elements have a so-called <em>"resolved name"</em> (as promised by parent trait ``ElemLike``)</li>
  * <li>elements have zero or more <em>"resolved attributes"</em> (as promised by parent trait ``ElemLike``)</li>
- * <li>elements have <em>path entries</em> (as ``Path.Entry`` objects) to their child elements,
- * and child elements can be found by their path entries</li>
+ * <li>elements can be queried for <em>path entries</em> relative to the parent element</li>
  * </ul>
  * Using this minimal knowledge alone, that trait not only offers the methods of its parent trait, but also:
  * <ul>
  * <li>methods mirroring the ``ParentElemLike`` query methods, but returning ``Path`` objects instead of elements</li>
- * <li>a method to find an element given an ``Path``</li>
  * </ul>
  * In other words, the ``PathAwareElemApi`` trait is quite a rich query API, considering the minimal knowledge it needs to
  * have about elements.
@@ -203,18 +201,7 @@ import scala.collection.immutable
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
-
-  /**
-   * Returns the equivalent of `findElemOrSelfByPath(Path(immutable.IndexedSeq(entry)))`, but it should be very efficient.
-   *
-   * Indeed, it is function `findElemOrSelfByPath` that is defined in terms of this function, `findChildElemByPathEntry`, and not
-   * the other way around.
-   */
-  def findChildElemByPathEntry(entry: Path.Entry): Option[E]
-
-  /** Returns (the equivalent of) `findChildElemByPathEntry(entry).get` */
-  def getChildElemByPathEntry(entry: Path.Entry): E
+trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends NavigableElemApi[E] { self: E =>
 
   /**
    * Returns all child elements with their `Path` entries, in the correct order. This method should be very efficient.
@@ -263,14 +250,6 @@ trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] { self: E =>
 
   /** Returns the path of the first found (topmost) descendant element obeying the given predicate, if any, wrapped in an `Option` */
   def findElemPath(p: E => Boolean): Option[Path]
-
-  /**
-   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
-   */
-  def findElemOrSelfByPath(path: Path): Option[E]
-
-  /** Returns (the equivalent of) `findElemOrSelfByPath(path).get` */
-  def getElemOrSelfByPath(path: Path): E
 
   /**
    * Returns the `Path` entries of all child elements, in the correct order.

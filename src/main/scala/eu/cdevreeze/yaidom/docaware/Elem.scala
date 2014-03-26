@@ -32,7 +32,7 @@ final class Elem private[docaware] (
   val rootElem: eu.cdevreeze.yaidom.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: eu.cdevreeze.yaidom.Elem) extends PathAwareElemLike[Elem] with HasQName with HasText with Immutable {
+  val elem: eu.cdevreeze.yaidom.Elem) extends NavigableElemLike[Elem] with HasQName with HasText with Immutable {
 
   // The elem must be the same as rootElem.findElemOrSelfByPath(path).get, which is not checked here
 
@@ -50,9 +50,6 @@ final class Elem private[docaware] (
   override def resolvedName: EName = elem.resolvedName
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
-
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] =
-    childElems.map(e => (e, e.path.lastEntry))
 
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
     // Not very fast
