@@ -21,6 +21,7 @@ import java.{ util => jutil }
 import org.w3c
 import scala.collection.{ immutable, mutable }
 import convert.DomConversions
+import DomElem._
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -83,7 +84,7 @@ final class DomElem(
   override def findAllChildElems: immutable.IndexedSeq[DomElem] = children collect { case e: DomElem => e }
 
   override def resolvedName: EName = {
-    // This is of course a very inefficient implementation
+    // Not efficient, because of expensive Scope computation
 
     scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
   }
@@ -105,16 +106,15 @@ final class DomElem(
   def attributes: immutable.IndexedSeq[(QName, String)] = DomConversions.extractAttributes(wrappedNode.getAttributes)
 
   def scope: Scope = {
-    val parent = wrappedNode.getParentNode
-    val parentElement: w3c.dom.Element = parent match {
-      case e: w3c.dom.Element => e
-      case _ => null
-    }
+    val ancestryOrSelf = getAncestorsOrSelf(this.wrappedNode)
 
-    // Recursive, but not tail-recursive
-    val parentScope = if (parentElement eq null) Scope.Empty else (new DomElem(parentElement)).scope
-
-    parentScope.resolve(declarations)
+    val resultScope =
+      ancestryOrSelf.reverse.foldLeft(Scope.Empty) {
+        case (accScope, wrappedElem) =>
+          val decls = DomConversions.extractNamespaceDeclarations(wrappedElem.getAttributes)
+          accScope.resolve(decls)
+      }
+    resultScope
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
@@ -205,6 +205,19 @@ object DomDocument {
 object DomElem {
 
   def apply(wrappedNode: w3c.dom.Element): DomElem = new DomElem(wrappedNode)
+
+  private def getAncestorsOrSelf(elem: w3c.dom.Element): List[w3c.dom.Element] = {
+    val parentElement: w3c.dom.Element = elem.getParentNode match {
+      case e: w3c.dom.Element => e
+      case _ => null
+    }
+
+    if (parentElement eq null) List(elem)
+    else {
+      // Recursive call
+      elem :: getAncestorsOrSelf(parentElement)
+    }
+  }
 }
 
 object DomText {
