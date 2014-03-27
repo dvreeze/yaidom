@@ -109,8 +109,8 @@ final class DomElem(
     val ancestryOrSelf = getAncestorsOrSelf(this.wrappedNode)
 
     val resultScope =
-      ancestryOrSelf.reverse.foldLeft(Scope.Empty) {
-        case (accScope, wrappedElem) =>
+      ancestryOrSelf.foldRight(Scope.Empty) {
+        case (wrappedElem, accScope) =>
           val decls = DomConversions.extractNamespaceDeclarations(wrappedElem.getAttributes)
           accScope.resolve(decls)
       }
