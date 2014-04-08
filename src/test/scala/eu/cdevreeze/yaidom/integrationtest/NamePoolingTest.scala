@@ -64,6 +64,29 @@ class NamePoolingTest extends Suite {
 
       xsElementElems.drop(1).filter(e => e.qname eq firstXsElementElem.qname).size >= 30
     }
+
+    // Reset EName/QName providers
+
+    ENameProvider.globalENameProvider.reset()
+    QNameProvider.globalQNameProvider.reset()
+
+    val doc2: Document = docParser.parse(classOf[NamePoolingTest].getResourceAsStream("gaap.xsd"))
+
+    val xsElementElems2 = doc2.documentElement \\ withLocalName("element")
+
+    require(xsElementElems2.size >= 50)
+
+    assertResult(true) {
+      val firstXsElementElem = xsElementElems2(0)
+
+      xsElementElems2.drop(1).filter(e => e.resolvedName eq firstXsElementElem.resolvedName).isEmpty
+    }
+
+    assertResult(true) {
+      val firstXsElementElem = xsElementElems2(0)
+
+      xsElementElems2.drop(1).filter(e => e.qname eq firstXsElementElem.qname).isEmpty
+    }
   }
 }
 
