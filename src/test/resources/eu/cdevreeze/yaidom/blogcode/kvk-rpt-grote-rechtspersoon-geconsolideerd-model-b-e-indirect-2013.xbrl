@@ -1,0 +1,2071 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xbrli:xbrl xml:lang="nl" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xbrldi="http://xbrl.org/2006/xbrldi" xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:iso4217="http://www.xbrl.org/2003/iso4217" xmlns:kvk-i="http://www.nltaxonomie.nl/8.0/basis/kvk/items/kvk-data" xmlns:kvk-t="http://www.nltaxonomie.nl/8.0/domein/kvk/tuples/kvk-tuples" xmlns:nl-cd="http://www.nltaxonomie.nl/8.0/basis/sbr/items/nl-common-data" xmlns:bw2-dm-fst="http://www.nltaxonomie.nl/8.0/basis/venj/domains/bw2-domains-financial-statements-type" xmlns:bw2-dm-eqty="http://www.nltaxonomie.nl/8.0/basis/venj/domains/bw2-domains-equity" xmlns:bw2-dim="http://www.nltaxonomie.nl/8.0/domein/venj/axes/bw2-axes" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:rj-i="http://www.nltaxonomie.nl/8.0/basis/rj/items/rj-data" xmlns:bw2-i="http://www.nltaxonomie.nl/8.0/basis/venj/items/bw2-data" xmlns:rj-t="http://www.nltaxonomie.nl/8.0/domein/rj/tuples/rj-tuples" xmlns:bw2-t="http://www.nltaxonomie.nl/8.0/domein/venj/tuples/bw2-tuples" xmlns:bw2-dm-ita="http://www.nltaxonomie.nl/8.0/basis/venj/domains/bw2-domains-intangible-assets" xmlns:bw2-dm-ppe="http://www.nltaxonomie.nl/8.0/basis/venj/domains/bw2-domains-property-plant-equipment">
+<link:schemaRef xlink:type="simple" xlink:href="http://www.nltaxonomie.nl/8.0/report/kvk/entrypoints/algemeen/kvk-rpt-grote-rechtspersoon-2013.xsd"/>
+<xbrli:context id="FY13d_Commercial_Consolidated">		
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+    </xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>	
+<xbrli:context id="FY13i_Commercial_Consolidated">		
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+    </xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_Commercial_Consolidated">		
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+    </xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_ShareCapital">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ShareCapitalMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_SharePremium">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:SharePremiumMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_RevaluationReserve">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:RevaluationReserveMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_StatutoryReserves">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:StatutoryReservesMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_ReservesOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ReservesOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_EquityTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:EquityMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_SharePremium">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:SharePremiumMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_RevaluationReserve">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:RevaluationReserveMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_StatutoryReserves">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:StatutoryReservesMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_ReservesOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ReservesOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_EquityTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:EquityMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_ShareCapital">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ShareCapitalMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_SharePremium">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:SharePremiumMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_RevaluationReserve">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:RevaluationReserveMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_StatutoryReserves">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:StatutoryReservesMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_ReservesOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ReservesOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_EquityTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:EquityMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_CostsIncorporationShareIssue">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:CostsIncorporationShareIssueMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_CostsIncorporationShareIssue">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:CostsIncorporationShareIssueMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_CostsIncorporationShareIssue">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:CostsIncorporationShareIssueMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_ResearchAndDevelopmentCosts">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:ResearchAndDevelopmentCostsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_ResearchAndDevelopmentCosts">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:ResearchAndDevelopmentCostsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_ResearchAndDevelopmentCosts">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:ResearchAndDevelopmentCostsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_PatentsTrademarksOtherRights">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PatentsTrademarksOtherRightsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_PatentsTrademarksOtherRights">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PatentsTrademarksOtherRightsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_PatentsTrademarksOtherRights">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PatentsTrademarksOtherRightsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Goodwill">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:GoodwillMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Goodwill">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:GoodwillMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Goodwill">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:GoodwillMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_PrepaymentsIntangibleAssets">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PrepaymentsIntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_PrepaymentsIntangibleAssets">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PrepaymentsIntangibleAssetsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_PrepaymentsIntangibleAssets">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PrepaymentsIntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_IntangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_IntangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_IntangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_IntangibleAssetsTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_IntangibleAssetsTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_IntangibleAssetsTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_LandAndBuildings">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:LandAndBuildingsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_LandAndBuildings">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:LandAndBuildingsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_LandAndBuildings">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:LandAndBuildingsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Machinery">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:MachineryMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Machinery">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:MachineryMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Machinery">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:MachineryMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_TangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:TangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_TangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:TangibleAssetsOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_TangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:TangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_InvestmentProperty">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:InvestmentPropertyMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_InvestmentProperty">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:InvestmentPropertyMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_InvestmentProperty">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:InvestmentPropertyMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:AssetsNotUsedInOperationsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:AssetsNotUsedInOperationsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:AssetsNotUsedInOperationsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:PropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:PropertyPlantEquipmentMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:ConsolidatedMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:PropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_Commercial_Separate">		
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+    </xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>	
+	</xbrli:scenario>
+</xbrli:context>	
+<xbrli:context id="FY13i_Commercial_Separate">		
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+    </xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>	
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_Commercial_Separate">		
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+    </xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>	
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_Separate_ShareCapital">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ShareCapitalMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_Separate_SharePremium">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:SharePremiumMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_Separate_RevaluationReserve">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:RevaluationReserveMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_Separate_StatutoryReserves">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:StatutoryReservesMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_Separate_ReservesOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ReservesOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_EquityMovement_Separate_EquityTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:EquityMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_Separate_SharePremium">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:SharePremiumMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_Separate_RevaluationReserve">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:RevaluationReserveMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_Separate_StatutoryReserves">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:StatutoryReservesMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_Separate_ReservesOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ReservesOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13d_EquityMovement_Separate_EquityTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:EquityMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_Separate_ShareCapital">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ShareCapitalMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_Separate_SharePremium">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:SharePremiumMember</xbrldi:explicitMember>			
+	</xbrli:scenario>		
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_Separate_RevaluationReserve">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:RevaluationReserveMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_Separate_StatutoryReserves">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:StatutoryReservesMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_Separate_ReservesOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:ReservesOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY13i_EquityMovement_Separate_EquityTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:EquityComponentsAxis">bw2-dm-eqty:EquityMember</xbrldi:explicitMember>			
+	</xbrli:scenario>	
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:CostsIncorporationShareIssueMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:CostsIncorporationShareIssueMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:CostsIncorporationShareIssueMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:ResearchAndDevelopmentCostsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:ResearchAndDevelopmentCostsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:ResearchAndDevelopmentCostsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PatentsTrademarksOtherRightsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PatentsTrademarksOtherRightsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PatentsTrademarksOtherRightsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_Goodwill">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:GoodwillMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_Goodwill">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:GoodwillMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_Goodwill">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:GoodwillMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PrepaymentsIntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PrepaymentsIntangibleAssetsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:PrepaymentsIntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_IntangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_IntangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:IntangibleAssetsComponentsAxis">bw2-dm-ita:IntangibleAssetsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_LandAndBuildings">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:LandAndBuildingsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_LandAndBuildings">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:LandAndBuildingsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_LandAndBuildings">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:LandAndBuildingsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_Machinery">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:MachineryMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_Machinery">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:MachineryMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_Machinery">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:MachineryMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:TangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:TangibleAssetsOtherMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:TangibleAssetsOtherMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_InvestmentProperty">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:InvestmentPropertyMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_InvestmentProperty">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:InvestmentPropertyMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_InvestmentProperty">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:InvestmentPropertyMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:AssetsNotUsedInOperationsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:AssetsNotUsedInOperationsMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:AssetsNotUsedInOperationsMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY12i_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2012-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:PropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13d_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:startDate>2013-01-01</xbrli:startDate>		
+		<xbrli:endDate>2013-12-31</xbrli:endDate>	
+    </xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:PropertyPlantEquipmentMember</xbrldi:explicitMember>			
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:context id="FY13i_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal">
+    <xbrli:entity>		
+		<xbrli:identifier scheme="http://www.kvk.nl/kvk-id">30267975</xbrli:identifier>		
+	</xbrli:entity>		
+    <xbrli:period>		
+		<xbrli:instant>2013-12-31</xbrli:instant>	    
+	</xbrli:period>		
+	<xbrli:scenario>		
+		<xbrldi:explicitMember dimension="bw2-dim:FinancialStatementsTypeAxis">bw2-dm-fst:SeparateMember</xbrldi:explicitMember>
+		<xbrldi:explicitMember dimension="bw2-dim:PropertyPlantEquipmentComponentsAxis">bw2-dm-ppe:PropertyPlantEquipmentMember</xbrldi:explicitMember>
+	</xbrli:scenario>
+</xbrli:context>
+<xbrli:unit id="EUR">
+	<xbrli:measure>iso4217:EUR</xbrli:measure>
+</xbrli:unit>
+<xbrli:unit id="pure">
+	<xbrli:measure>xbrli:pure</xbrli:measure>
+</xbrli:unit>
+<kvk-i:LegalSizeCriteriaClassification contextRef="FY13d">Groot</kvk-i:LegalSizeCriteriaClassification>
+<kvk-t:ContactForDocumentPresentation>
+<kvk-i:ContactType contextRef="FY13d">Intermediair</kvk-i:ContactType>
+<nl-cd:FirstName contextRef="FY13d">Karel</nl-cd:FirstName>
+<nl-cd:FamilyName contextRef="FY13d">Broekhuis</nl-cd:FamilyName>
+<bw2-i:OrganisationName contextRef="FY13d">Broekhuis Accountants en Adviseurs BV</bw2-i:OrganisationName>
+<nl-cd:TelephoneNumber contextRef="FY13d">01045655281</nl-cd:TelephoneNumber>
+<nl-cd:EmailAddressFull contextRef="FY13d">Karel@Broekhuis.com</nl-cd:EmailAddressFull>
+</kvk-t:ContactForDocumentPresentation>
+<nl-cd:StatutoryNameEntity contextRef="FY13d">Jensen Advies B.V.</nl-cd:StatutoryNameEntity>
+<nl-cd:LegalForm contextRef="FY13d">Besloten vennootschap</nl-cd:LegalForm>
+<nl-cd:NameBusiness contextRef="FY13d">Jensen Adviesbureau</nl-cd:NameBusiness>
+<rj-i:StatutoryPlaceOfResidence contextRef="FY13d">Rotterdam</rj-i:StatutoryPlaceOfResidence>
+<nl-cd:StartDateForFinancialPeriod contextRef="FY13d">2013-01-01</nl-cd:StartDateForFinancialPeriod>
+<nl-cd:EndDateForFinancialPeriod contextRef="FY13d">2013-12-31</nl-cd:EndDateForFinancialPeriod>
+<rj-i:FinancialPeriodDifferentThanAnnualStatus contextRef="FY13d">false</rj-i:FinancialPeriodDifferentThanAnnualStatus>
+<rj-i:DocumentRelatesToIndividualEntityOrGroup contextRef="FY13d">Geconsolideerd</rj-i:DocumentRelatesToIndividualEntityOrGroup>
+<rj-i:DocumentPresentationCurrency contextRef="FY13d">EUR</rj-i:DocumentPresentationCurrency>
+<nl-cd:DocumentCreationDate contextRef="FY13d">2013-01-22</nl-cd:DocumentCreationDate>
+<bw2-i:DocumentAdoptionStatus contextRef="FY13d">true</bw2-i:DocumentAdoptionStatus>
+<bw2-i:DocumentAdoptionDate contextRef="FY13d">2014-01-31</bw2-i:DocumentAdoptionDate>
+<bw2-i:BalanceSheetBeforeAfterAppropriationResults contextRef="FY13d_Commercial_Consolidated">Na</bw2-i:BalanceSheetBeforeAfterAppropriationResults>
+<bw2-t:SignatureManagementReportSpecification>
+<nl-cd:FirstName contextRef="FY13d">Karel</nl-cd:FirstName>
+<nl-cd:FamilyName contextRef="FY13d">Broekhuis</nl-cd:FamilyName>
+<bw2-i:OrganisationName contextRef="FY13d">Broekhuis Accountants en Adviseurs BV</bw2-i:OrganisationName>
+</bw2-t:SignatureManagementReportSpecification>
+<bw2-i:Goodwill contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">3200000</bw2-i:Goodwill>
+<bw2-i:IntangibleAssets contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">3200000</bw2-i:IntangibleAssets>
+<bw2-i:LandAndBuildings contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">16000000</bw2-i:LandAndBuildings>
+<bw2-i:Machinery contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">3200000</bw2-i:Machinery>
+<bw2-i:TangibleAssetsOther contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">800000</bw2-i:TangibleAssetsOther>
+<bw2-i:ConstructionInProgressPrepaymentsPropertyPlantEquipment contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">160000</bw2-i:ConstructionInProgressPrepaymentsPropertyPlantEquipment>
+<rj-i:InvestmentProperty contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">560000</rj-i:InvestmentProperty>
+<bw2-i:AssetsNotUsedInOperations contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">80000</bw2-i:AssetsNotUsedInOperations>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">20800000</bw2-i:PropertyPlantEquipment>
+<bw2-i:FinancialAssets contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">4800000</bw2-i:FinancialAssets>
+<bw2-i:AssetsNoncurrent contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">28800000</bw2-i:AssetsNoncurrent>
+<bw2-i:Inventories contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">2400000</bw2-i:Inventories>
+<rj-i:ConstructionContractsAssets contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">1600000</rj-i:ConstructionContractsAssets>
+<bw2-i:Receivables contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">16800000</bw2-i:Receivables>
+<bw2-i:Securities contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">16800000</bw2-i:Securities>
+<bw2-i:CashAndCashEquivalents contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">16800000</bw2-i:CashAndCashEquivalents>
+<bw2-i:AssetsCurrent contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">16800000</bw2-i:AssetsCurrent>
+<bw2-i:Assets contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">54400000</bw2-i:Assets>
+<bw2-i:ShareCapital contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">288000</bw2-i:ShareCapital>
+<bw2-i:SharePremium contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">5312000</bw2-i:SharePremium>
+<bw2-i:RevaluationReserve contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">3200000</bw2-i:RevaluationReserve>
+<bw2-i:StatutoryReserves contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">3040000</bw2-i:StatutoryReserves>
+<bw2-i:ReservesOther contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">21760000</bw2-i:ReservesOther>
+<bw2-i:Equity contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">33600000</bw2-i:Equity>
+<bw2-i:NoncontrollingInterest contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">800000</bw2-i:NoncontrollingInterest>
+<bw2-i:EquityGroup contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">34400000</bw2-i:EquityGroup>
+<bw2-i:Provisions contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">4000000</bw2-i:Provisions>
+<bw2-i:LiabilitiesNoncurrent contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">12000000</bw2-i:LiabilitiesNoncurrent>
+<bw2-i:LiabilitiesCurrent contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">4800000</bw2-i:LiabilitiesCurrent>
+<bw2-i:EquityAndLiabilities contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">54400000</bw2-i:EquityAndLiabilities>
+<bw2-i:NetRevenue contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">100640000</bw2-i:NetRevenue>
+<bw2-i:OperatingIncomeOther contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">1200000</bw2-i:OperatingIncomeOther>
+<bw2-i:OperatingIncome contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">101840000</bw2-i:OperatingIncome>
+<bw2-i:CostsRawMaterialsConsumables contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">51200000</bw2-i:CostsRawMaterialsConsumables>
+<rj-i:EmployeeBenefitsExpenses contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">36400000</rj-i:EmployeeBenefitsExpenses>
+<bw2-i:DepreciationTangibleAssetsAmortisationIntangibleAssets contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">1200000</bw2-i:DepreciationTangibleAssetsAmortisationIntangibleAssets>
+<bw2-i:ChangesInValueIntangibleTangibleAssets contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">4800000</bw2-i:ChangesInValueIntangibleTangibleAssets>
+<bw2-i:ImpairmentCurrentAssets contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">400000</bw2-i:ImpairmentCurrentAssets>
+<bw2-i:OperatingExpensesOther contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">6400000</bw2-i:OperatingExpensesOther>
+<bw2-i:OperatingExpenses contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">100400000</bw2-i:OperatingExpenses>
+<bw2-i:InterestExpensesRelatedExpenses contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">560000</bw2-i:InterestExpensesRelatedExpenses>
+<bw2-i:ResultBeforeTaxOrdinaryActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">880000</bw2-i:ResultBeforeTaxOrdinaryActivities>
+<bw2-i:IncomeTaxExpenseOrdinaryActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">264000</bw2-i:IncomeTaxExpenseOrdinaryActivities>
+<bw2-i:ShareInResultsParticipatingInterests contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">160000</bw2-i:ShareInResultsParticipatingInterests>
+<bw2-i:ResultAfterTaxOrdinaryActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">776000</bw2-i:ResultAfterTaxOrdinaryActivities>
+<bw2-i:ExtraordinaryIncome contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2400000</bw2-i:ExtraordinaryIncome>
+<bw2-i:ExtraordinaryExpenses contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">1840000</bw2-i:ExtraordinaryExpenses>
+<bw2-i:IncomeTaxExpenseExtraordinaryItems contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">168000</bw2-i:IncomeTaxExpenseExtraordinaryItems>
+<bw2-i:ResultAfterTaxExtraordinaryItems contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">1168000</bw2-i:ResultAfterTaxExtraordinaryItems>
+<bw2-i:ResultAfterTax contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">817600</bw2-i:ResultAfterTax>
+<bw2-i:NetResultAfterTax contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">817600</bw2-i:NetResultAfterTax>
+<bw2-i:OperatingResult contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">1440000</bw2-i:OperatingResult>
+<rj-i:AdjustmentsDepreciationAndAmortisationExpense contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2400000</rj-i:AdjustmentsDepreciationAndAmortisationExpense>
+<rj-i:AdjustmentsImpairmentLossReversalImpairmentLossRecognisedInProfitLoss contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">800000</rj-i:AdjustmentsImpairmentLossReversalImpairmentLossRecognisedInProfitLoss>
+<rj-i:AdjustmentsReconcileOperatingResult contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">3200000</rj-i:AdjustmentsReconcileOperatingResult>
+<rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsReceivable contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">640000</rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsReceivable>
+<rj-i:AdjustmentsIncreaseDecreaseInInventories contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">584000</rj-i:AdjustmentsIncreaseDecreaseInInventories>
+<rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsPayable contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">1280000</rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsPayable>
+<rj-i:ChangesWorkingCapital contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2504000</rj-i:ChangesWorkingCapital>
+<rj-i:CashFlowFromOperations contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">744000</rj-i:CashFlowFromOperations>
+<rj-i:InterestReceivedClassifiedAsOperatingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">240000</rj-i:InterestReceivedClassifiedAsOperatingActivities>
+<rj-i:InterestPaidClassifiedAsOperatingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">184000</rj-i:InterestPaidClassifiedAsOperatingActivities>
+<rj-i:IncomeTaxPaidClassifiedAsOperatingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">26400</rj-i:IncomeTaxPaidClassifiedAsOperatingActivities>
+<rj-i:CashFlowOperatingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">773600</rj-i:CashFlowOperatingActivities>
+<rj-i:PurchaseIntangibleAssets contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2400000</rj-i:PurchaseIntangibleAssets>
+<rj-i:ProceedsSalesIntangibleAssets contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">400000</rj-i:ProceedsSalesIntangibleAssets>
+<rj-i:PurchasePropertyPlantAndEquipment contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">5260000</rj-i:PurchasePropertyPlantAndEquipment>
+<rj-i:ProceedsSalesPropertyPlantAndEquipment contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2600000</rj-i:ProceedsSalesPropertyPlantAndEquipment>
+<rj-i:CashFlowInvestingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">-4660000</rj-i:CashFlowInvestingActivities>
+<rj-i:ProceedsFromBorrowings contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">3200000</rj-i:ProceedsFromBorrowings>
+<rj-i:RepaymentsBorrowings contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">151200</rj-i:RepaymentsBorrowings>
+<rj-i:DividendsPaidClassifiedAsFinancingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">312000</rj-i:DividendsPaidClassifiedAsFinancingActivities>
+<rj-i:CashFlowFinancingActivities contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2736800</rj-i:CashFlowFinancingActivities>
+<rj-i:NetCashFlows contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">-1149600</rj-i:NetCashFlows>
+<rj-i:EffectExchangeRateChangesCashAndCashEquivalents contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">114400</rj-i:EffectExchangeRateChangesCashAndCashEquivalents>
+<rj-i:CashAndCashEquivalentsCashFlow contextRef="FY12i_Commercial_Consolidated" unitRef="EUR" decimals="INF">2400000</rj-i:CashAndCashEquivalentsCashFlow>
+<rj-i:CashAndCashEquivalentsCashFlow contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">-1149600</rj-i:CashAndCashEquivalentsCashFlow>
+<rj-i:ComprehensiveIncome contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">817600</rj-i:ComprehensiveIncome>
+<rj-i:MostImportantActivitiesEntityDescription contextRef="FY13d">De activiteiten van Jensen Advies B.V. bestaan voornamelijk uit fiscaal advies en administratieve werkzaamheden.</rj-i:MostImportantActivitiesEntityDescription>
+<kvk-t:EntityAddressPresentation>
+<nl-cd:DescriptionLocationNL contextRef="FY13d">Gebouw Dane II</nl-cd:DescriptionLocationNL>
+<nl-cd:StreetNameNL contextRef="FY13d">Paparazzistraat</nl-cd:StreetNameNL>
+<nl-cd:HouseNumberNL contextRef="FY13d">7</nl-cd:HouseNumberNL>
+<nl-cd:HouseNumberAddition contextRef="FY13d">a</nl-cd:HouseNumberAddition>
+<nl-cd:PostalCodeNL contextRef="FY13d">2501CD</nl-cd:PostalCodeNL>
+<nl-cd:PlaceOfResidenceNL contextRef="FY13d">Den Haag</nl-cd:PlaceOfResidenceNL>
+<nl-cd:NameRegion contextRef="FY13d">Zuid-Holland</nl-cd:NameRegion>
+<nl-cd:CountryName contextRef="FY13d">Nederland</nl-cd:CountryName>
+</kvk-t:EntityAddressPresentation>
+<rj-i:LocationActualActivities contextRef="FY13d">Jensen Advies B.V is statutair gevestigd te Den Haag, waar ook de daadwerkelijke werkzaamheden plaatsvinden.</rj-i:LocationActualActivities>
+<rj-t:LocationActualActivitiesAddressNLSpecification>
+<nl-cd:DescriptionLocationNL contextRef="FY13d">Gebouw Dane II</nl-cd:DescriptionLocationNL>
+<nl-cd:StreetNameNL contextRef="FY13d">Paparazzistraat</nl-cd:StreetNameNL>
+<nl-cd:HouseNumberNL contextRef="FY13d">7</nl-cd:HouseNumberNL>
+<nl-cd:HouseNumberAddition contextRef="FY13d">a</nl-cd:HouseNumberAddition>
+<nl-cd:PostalCodeNL contextRef="FY13d">2501CD</nl-cd:PostalCodeNL>
+<nl-cd:PlaceOfResidenceNL contextRef="FY13d">Den Haag</nl-cd:PlaceOfResidenceNL>
+<nl-cd:NameRegion contextRef="FY13d">Zuid-Holland</nl-cd:NameRegion>
+<nl-cd:CountryName contextRef="FY13d">Nederland</nl-cd:CountryName>
+</rj-t:LocationActualActivitiesAddressNLSpecification>
+<rj-t:LocationActualActivitiesAddressAbroadSpecification>
+<nl-cd:HouseNumberAddition contextRef="FY13d">a</nl-cd:HouseNumberAddition>
+<nl-cd:POBoxNumber contextRef="FY13d">2312</nl-cd:POBoxNumber>
+<nl-cd:NameRegion contextRef="FY13d">Zuid-Holland</nl-cd:NameRegion>
+<nl-cd:CountryName contextRef="FY13d">Nederland</nl-cd:CountryName>
+</rj-t:LocationActualActivitiesAddressAbroadSpecification>
+<bw2-i:GroupStructureDisclosure contextRef="FY13d">Jensen Advies B.V is onderdeel van de Jensen Groep</bw2-i:GroupStructureDisclosure>
+<bw2-i:GroupStructureUltimateParentName contextRef="FY13d">Jensen International LLC</bw2-i:GroupStructureUltimateParentName>
+<bw2-i:GroupStructureUltimateParentLocation contextRef="FY13d">London</bw2-i:GroupStructureUltimateParentLocation>
+<bw2-t:ConsolidatedInterestsSpecification>
+<bw2-i:EntityName contextRef="FY13d_Commercial_Consolidated">Snafull B.V.</bw2-i:EntityName>
+<bw2-i:EntityLocation contextRef="FY13d_Commercial_Consolidated">Hilversum</bw2-i:EntityLocation>
+<bw2-i:EntityInterestInShareCapital contextRef="FY13d_Commercial_Consolidated" unitRef="pure" decimals="INF">0.15</bw2-i:EntityInterestInShareCapital>
+</bw2-t:ConsolidatedInterestsSpecification>
+<rj-i:EstimatesDisclosure contextRef="FY13d">Bij toepassing van de grondslagen en regels voor het opstellen van de jaarrekening vormt de leiding van Jensen Advies B.V. zich verschillende oordelen en schattingen die essentieel kunnen zijn voor de in de jaarrekening opgenomen bedragen. Indien het voor het geven van het in artikel 2:362 lid 1 BW vereiste inzicht noodzakelijk is, is de aard van deze oordelen en schattingen inclusief de bijbehorende veronderstellingen opgenomen bij de toelichting op de desbetreffende jaarrekeningposten.</rj-i:EstimatesDisclosure>
+<bw2-i:GeneralPolicies contextRef="FY13d">De jaarrekening is opgesteld in overeenstemming met de wettelijke bepalingen van Titel 9 Boek 2 BW en de Richtlijnen voor de Jaarverslaggeving voor kleine rechtspersonen, die zijn uitgegeven door de Raad voor de Jaarverslaggeving. De waarderingsgrondslagen zijn gebaseerd op de historische kosten en kostprijzen.</bw2-i:GeneralPolicies>
+<bw2-i:ChangeAccountingPolicies contextRef="FY13d">De gehanteerde grondslagen van waardering en van resultaatbepaling zijn ongewijzigd gebleven ten opzichte van het voorgaande jaar. Er hebben zich geen stelselwijzigingen voorgedaan.</bw2-i:ChangeAccountingPolicies>
+<bw2-i:ForeignCurrencyTranslationPolicy contextRef="FY13d">Transacties die gedurende de verslagperiode in vreemde valuta worden uitgevoerd, zijn in de jaarrekening verwerkt tegen de koers op transactiedatum. Monetaire activa in vreemde valuta worden omgerekend tegen de koers per balansdatum of de lagere historische koers. Monetaire passiva in vreemde valuta worden omgerekend tegen de koers per balansdatum of de hogere historische koers. Koersverschillen komen ten gunste of ten laste van de winst-en-verliesrekening. Voor zover ter dekking van het koersrisico op monetaire activa en passiva dekkingstransacties zijn afgesloten worden koersresultaten nog niet in de winst-en-verliesrekening verwerkt maar opgenomen onder de overlopende activa en passiva indien op balansdatum ongerealiseerde resultaten op deze dekkingstransacties deze koersresultaten neutraliseren.</bw2-i:ForeignCurrencyTranslationPolicy>
+<rj-i:LeasesPolicy contextRef="FY13d">Jensen Advies B.V. maakt gebruik van operationele leasing.</rj-i:LeasesPolicy>
+<rj-i:OperatingLeasesPolicy contextRef="FY13d">Verplichtingen uit hoofde van operationele leasing worden, rekening houdend met ontvangen vergoedingen van de lessor, op lineaire basis verwerkt in de winst-en-verliesrekening over de looptijd van het contract.</rj-i:OperatingLeasesPolicy>
+<bw2-i:AccountingPoliciesBalanceSheet contextRef="FY13d">Activa en passiva (met uitzondering van het eigen vermogen) worden in het algemeen gewaardeerd tegen de verkrijgings- of vervaardigingsprijs of de actuele waarde. Indien geen specifieke waarderingsgrondslag is vermeld, vindt waardering plaats tegen de verkrijgingsprijs.</bw2-i:AccountingPoliciesBalanceSheet>
+<bw2-i:IntangibleAssetsPolicy contextRef="FY13d">De immateriële vaste activa zijn gewaardeerd tegen verkrijgingsprijs onder aftrek van lineaire afschrijvingen met een minimum van tien jaar voor goodwill. Met op balansdatum verwachte waardeverminderingen wordt rekening gehouden; hiervan is sprake als de boekwaarde van het actief hoger is dan de realiseerbare waarde ervan. Voortbrengingskosten van immateriële activa worden in het kalenderjaar van voortbrenging ineens afgeschreven.</bw2-i:IntangibleAssetsPolicy>
+<bw2-i:PropertyPlantEquipmentPolicy contextRef="FY13d">Bedrijfsgebouwen en -terreinen worden gewaardeerd tegen aanschaffingskosten plus bijkomende kosten of voortbrengingskosten onder aftrek van lineaire afschrijvingen gedurende de geschatte economische levensduur. Op terreinen wordt niet afgeschreven. Met op balansdatum verwachte waardeverminderingen (dat wil zeggen als de bedrijfswaarde aanzienlijk lager is dan de boekwaarde) wordt rekening gehouden. Afschrijvingen op bedrijfsgebouwen in eigen gebruik vinden plaats tot de bodemwaarde; dit is 50% van de WOZ-waarde. Daarna wordt niet meer afgeboekt. Overige vaste activa worden gewaardeerd tegen verkrijgings- of vervaardigingsprijs inclusief direct toerekenbare kosten, onder aftrek van lineaire afschrijvingen gedurende de geschatte economische levensduur met een minimum van vijf jaar, of tegen lagere bedrijfswaarde. De vervaardigingsprijs bestaat uit de aanschaffingskosten van grond- en hulpstoffen en kosten die rechtstreeks toerekenbaar zijn aan de vervaardiging inclusief installatiekosten.</bw2-i:PropertyPlantEquipmentPolicy>
+<bw2-i:FinancialAssetsPolicy contextRef="FY13d">Deelnemingen worden gewaardeerd tegen verkrijgingsprijs. Eventuele goodwill die wordt betaald, wordt verwerkt als onderdeel van de verkrijgingsprijs van de deelneming. De onder financiële vaste activa opgenomen vorderingen worden gewaardeerd tegen de werkelijke waarde van het verstrekte bedrag - gewoonlijk de nominale waarde - onder aftrek van noodzakelijk geachte voorzieningen. De onder financiële vaste activa opgenomen overige vorderingen omvatten leningen en obligaties die tot de vervaldag zullen worden aangehouden. Deze vorderingen worden gewaardeerd tegen de werkelijke waarde van het verstrekte bedrag, gewoonlijk de nominale waarde. Waardeverminderingen van vorderingen worden ten laste van de winst-en-verliesrekening gebracht.</bw2-i:FinancialAssetsPolicy>
+<bw2-i:InventoriesPolicy contextRef="FY13d">De voorraden worden gewaardeerd tegen verkrijgingsprijzen onder toepassing van de lifo-methode, fifo-methode ('first in, first out') of lagere opbrengstwaarde. De opbrengstwaarde is de geschatte verkoopprijs onder aftrek van direct toerekenbare verkoop-kosten en rekening houdend met een aftrek wegens mogelijke incourantheid van de voorraden.</bw2-i:InventoriesPolicy>
+<rj-i:ConstructionContractsPolicy contextRef="FY13d">Onderhanden werken en opdrachten worden gewaardeerd op het gedeelte van de overeengekomen vergoeding voor de aangenomen opdracht dat is toe te rekenen aan die onderhanden opdracht. De voortgang van projecten wordt bepaald op basis van de kostprijs van het verrichte werk in relatie tot de verwachte kostprijs van het project als geheel. Voorzieningen voor verwachte verliezen worden opgenomen in de periode waarin komt vast te staan dat er sprake is van verliesgevende projecten, en worden in mindering gebracht op de post onderhanden werken respectievelijk onderhanden opdrachten. Verder zijn op de post onderhanden werken en opdrachten de gedeclareerde termijnen en vooruitontvangen betalingen in mindering gebracht. Gedeclareerde termijnen die de waardering van een individueel project overtreffen worden als passiefpost onder de kortlopende schulden opgenomen.</rj-i:ConstructionContractsPolicy>
+<bw2-i:ReceivablesPolicy contextRef="FY13d">Vorderingen worden opgenomen tegen de nominale waarde. Een voorziening wordt getroffen op de vorderingen op grond van verwachte oninbaarheid. Voor zover niet anders is vermeld, hebben de vorderingen een looptijd korter dan één jaar.</bw2-i:ReceivablesPolicy>
+<bw2-i:SecuritiesPolicy contextRef="FY13d">De effecten worden gewaardeerd op de verkrijgingsprijs of lagere marktwaarde.</bw2-i:SecuritiesPolicy>
+<bw2-i:CashAndCashEquivalentsPolicy contextRef="FY13d">Liquide middelen bestaan uit kas, banktegoeden en deposito's met een looptijd korter dan twaalf maanden. Rekening-courantschulden bij banken zijn opgenomen onder de kortlopende schulden.</bw2-i:CashAndCashEquivalentsPolicy>
+<bw2-i:ProvisionsPolicy contextRef="FY13d">Voorzieningen worden gevormd indien sprake is van uitgaven die hun oorsprong vinden in feiten of omstandigheden die zich in de periode voorafgaand aan de balansdatum hebben voorgedaan, en indien deze uitgaven aan die periode kunnen worden toegerekend, én indien er een redelijke mate van zekerheid bestaat dat deze uitgaven zich zullen voordoen. De voorzieningen worden gewaardeerd tegen de beste schatting van de bedragen die noodzakelijk zijn om de verplichtingen per balansdatum af te wikkelen. De voorzieningen worden gewaardeerd tegen de nominale waarde, dan wel tegen de contante waarde van de uitgaven die naar verwachting noodzakelijk zijn om de verplichtingen af te wikkelen. Waardering tegen contante waarde vindt uitsluitend plaats als het verschil met de nominale waarde aanzienlijk is.</bw2-i:ProvisionsPolicy>
+<bw2-i:ProvisionsOtherPolicy contextRef="FY13d">De overige voorzieningen omvat een voorziening ter gelijkmatige verdeling van de lasten voor groot onderhoud van gebouwen wordt bepaald op basis van de te verwachten kosten over een reeks van jaren.</bw2-i:ProvisionsOtherPolicy>
+<bw2-i:LiabilitiesNoncurrentPolicy contextRef="FY13d">De langlopende schulden betreffen leningen met een looptijd van langer dan 1 jaar.</bw2-i:LiabilitiesNoncurrentPolicy>
+<bw2-i:LiabilitiesCurrentPolicy contextRef="FY13d">Voor zover niet anders is vermeld, hebben de kortlopende schulden een looptijd korter dan één jaar. Deze worden voor zover niet anders vermeld, gewaardeerd tegen nominale waarde.</bw2-i:LiabilitiesCurrentPolicy>
+<bw2-i:AccountingPoliciesIncomeStatement contextRef="FY13d">Het resultaat wordt bepaald als het verschil tussen de opbrengstwaarde van de geleverde prestaties en de kosten en andere lasten over het jaar. De resultaten op transacties worden verantwoord in het jaar waarin zij zijn gerealiseerd.</bw2-i:AccountingPoliciesIncomeStatement>
+<rj-i:RevenueRecognitionPolicy contextRef="FY13d">De winst wordt uiterlijk verantwoord in het jaar waarin vermogensomzetting heeft plaatsgevonden, in die zin dat de verrichte dienst in het ondernemingsvermogen is vervangen door de (volwaardige) vordering, respectievelijk de contant betaalde tegenprestatie. Onderhanden werken en opdrachten worden gewaardeerd op het gedeelte van de overeengekomen vergoeding voor het de aangenomen opdracht dat is toe te rekenen aan die onderhanden opdracht.</rj-i:RevenueRecognitionPolicy>
+<bw2-i:NetRevenuePolicy contextRef="FY13d">Netto-omzet omvat de opbrengsten uit levering van goederen en diensten onder aftrek van kortingen en dergelijke en van belastingen die over de omzet geheven zijn. Netto-omzet van onderhanden projecten in opdracht van derden bestaat uit de in het boekjaar aan projecten bestede kosten verhoogd met de wijziging in het boekjaar van de tot en met het boekjaar verantwoorde winst.</bw2-i:NetRevenuePolicy>
+<bw2-i:WagesSalariesPolicy contextRef="FY13d">Lonen en salarissen worden op grond van de arbeidsvoorwaarden verwerkt in de winst-en-verliesrekening voor zover ze verschuldigd zijn aan werknemers.</bw2-i:WagesSalariesPolicy>
+<bw2-i:SocialSecurityContributionsPolicy contextRef="FY13d">Sociale lasten worden op grond van de arbeidsvoorwaarden verwerkt in de winst-en-verliesrekening voor zover ze verschuldigd zijn aan werknemers.</bw2-i:SocialSecurityContributionsPolicy>
+<bw2-i:PensionCostsPolicy contextRef="FY13d">Jensen Advies B.V. heeft een aantal pensioenregelingen. Behalve de betaling van premies heeft Jensen Advies B.V. geen verdere verplichtingen uit hoofde van deze pensioenregelingen. De premies worden verantwoord als personeelskosten als deze verschuldigd zijn. Vooruitbetaalde premies worden opgenomen als overlopende activa indien dit tot een terugstorting leidt of tot een vermindering van toekomstige betalingen.</bw2-i:PensionCostsPolicy>
+<bw2-i:DepreciationTangibleAssetsAmortisationIntangibleAssetsPolicy contextRef="FY13d">Immateriële vaste activa en materiële vaste activa worden vanaf het moment van ingebruikneming afgeschreven over de verwachte toekomstige gebruiksduur van het actief. Hierbij wordt rekening gehouden met de beperkingen die van toepassing zijn ten aanzien van bedrijfsgebouwen, beleggingsvastgoed, andere materiële vaste activa en geactiveerde goodwill. Over terreinen wordt niet afgeschreven. Boekwinsten en verliezen bij verkoop van immateriële en materiële vaste activa worden onder de post afschrijvingen opgenomen.</bw2-i:DepreciationTangibleAssetsAmortisationIntangibleAssetsPolicy>
+<bw2-i:ChangesInValueIntangibleTangibleAssetsPolicy contextRef="FY13d">Waardeverminderingen op vaste activa worden verwerkt in de winst-en-verliesrekening indien het evident is dat de boekwaarde van een vast actief hoger is dan de realiseerbare waarde ervan.</bw2-i:ChangesInValueIntangibleTangibleAssetsPolicy>
+<bw2-i:ImpairmentCurrentAssetsPolicy contextRef="FY13d">Waardeverminderingen op vlottende activa worden verwerkt in de winst-en-verliesrekening indien het evident is dat de waarde van de vlottende activa op basis van de geldende waarderingsgrondslag niet langer realiseerbaar is, zoals in het geval van het afboeken van vorderingen op dubieuze debiteuren.</bw2-i:ImpairmentCurrentAssetsPolicy>
+<bw2-i:OperatingExpensesOtherPolicy contextRef="FY13d">De kosten worden bepaald op historische basis en toegerekend aan het verslagjaar waarop zij betrekking hebben. Indien sprake is van fiscaal niet aftrekbare kosten, zoals geldboeten, worden deze integraal verwerkt in de winst-en-verliesrekening.</bw2-i:OperatingExpensesOtherPolicy>
+<bw2-i:InterestIncomeRelatedIncomePolicy contextRef="FY13d">Rentebaten worden integraal verwerkt in de winst-en-verliesrekening, ook als er op grond van fiscale wetgeving sprake is van een beperking van de renteaftrek.</bw2-i:InterestIncomeRelatedIncomePolicy>
+<bw2-i:InterestExpensesRelatedExpensesPolicy contextRef="FY13d">Rentelasten worden integraal verwerkt in de winst-en-verliesrekening, ook als er op grond van fiscale wetgeving sprake is van een beperking van de renteaftrek.</bw2-i:InterestExpensesRelatedExpensesPolicy>
+<bw2-i:ExtraordinaryIncomePolicy contextRef="FY13d">Dit betreffen baten die voortvloeien uit gebeurtenissen of transacties die niet behoren tot het resultaat uit gewone bedrijfsuitoefening.</bw2-i:ExtraordinaryIncomePolicy>
+<bw2-i:ExtraordinaryExpensesPolicy contextRef="FY13d">Dit betreffen lasten die voortvloeien uit gebeurtenissen of transacties die niet behoren tot het resultaat uit gewone bedrijfsuitoefening.</bw2-i:ExtraordinaryExpensesPolicy>
+<bw2-i:ShareInResultsParticipatingInterestsPolicy contextRef="FY13d">Dividend te ontvangen van niet op nettovermogenswaarde gewaardeerde deelnemingen en effecten worden verantwoord zodra Jensen Advies B.V. het recht hierop heeft verkregen.</bw2-i:ShareInResultsParticipatingInterestsPolicy>
+<bw2-i:IncomeTaxExpenseOrdinaryActivitiesPolicy contextRef="FY13d">De belasting over het resultaat wordt berekend over het resultaat vóór belastingen in de winst-en-verliesrekening, rekening houdend met beschikbare fiscaal compensabele verliezen uit voorgaande boekjaren en vrijgestelde winstbestanddelen en na bijtelling van niet-aftrekbare kosten en renten. </bw2-i:IncomeTaxExpenseOrdinaryActivitiesPolicy>
+<bw2-i:IncomeTaxExpenseExtraordinaryItemsPolicy contextRef="FY13d">Dit betreffen de belastingen over de baten en lasten die voortvloeien uit gebeurtenissen of transacties die niet behoren tot het resultaat uit gewone bedrijfsuitoefening.</bw2-i:IncomeTaxExpenseExtraordinaryItemsPolicy>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">160000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">320000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">320000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Goodwill" unitRef="EUR" decimals="INF">100000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">680000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_IntangibleAssetsOther" unitRef="EUR" decimals="INF">20000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">1600000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">240000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">480000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">480000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Goodwill" unitRef="EUR" decimals="INF">120000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">1040000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_IntangibleAssetsOther" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">2400000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">80000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">80000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Goodwill" unitRef="EUR" decimals="INF">24960</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">170000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_IntangibleAssetsOther" unitRef="EUR" decimals="INF">5040</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">400000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">80000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">80000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Goodwill" unitRef="EUR" decimals="INF">24960</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">170000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_IntangibleAssetsOther" unitRef="EUR" decimals="INF">5040</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">400000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">320000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">640000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">640000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Goodwill" unitRef="EUR" decimals="INF">170080</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">1380000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_IntangibleAssetsOther" unitRef="EUR" decimals="INF">49920</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">3200000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssetsDisclosure contextRef="FY13d_Commercial_Consolidated">De immateriële vaste activa bestaat uitsluitend uit computersoftware. Het afschrijvingspercentage van de immateriële vaste activa bedraagt 20% per jaar.</bw2-i:IntangibleAssetsDisclosure>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_LandAndBuildings" unitRef="EUR" decimals="INF">14800000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Machinery" unitRef="EUR" decimals="INF">2960000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_TangibleAssetsOther" unitRef="EUR" decimals="INF">680000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">148000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_InvestmentProperty" unitRef="EUR" decimals="INF">518000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">74000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">19180000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_LandAndBuildings" unitRef="EUR" decimals="INF">4000000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Machinery" unitRef="EUR" decimals="INF">800000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_TangibleAssetsOther" unitRef="EUR" decimals="INF">260000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">40000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_InvestmentProperty" unitRef="EUR" decimals="INF">140000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">20000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">5260000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_LandAndBuildings" unitRef="EUR" decimals="INF">2000000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Machinery" unitRef="EUR" decimals="INF">400000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_TangibleAssetsOther" unitRef="EUR" decimals="INF">100000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">20000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_InvestmentProperty" unitRef="EUR" decimals="INF">70000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">10000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">2600000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_LandAndBuildings" unitRef="EUR" decimals="INF">800000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Machinery" unitRef="EUR" decimals="INF">160000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_TangibleAssetsOther" unitRef="EUR" decimals="INF">40000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">8000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_InvestmentProperty" unitRef="EUR" decimals="INF">28000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">4000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">1040000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_LandAndBuildings" unitRef="EUR" decimals="INF">16000000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Machinery" unitRef="EUR" decimals="INF">3200000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_TangibleAssetsOther" unitRef="EUR" decimals="INF">800000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">160000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_InvestmentProperty" unitRef="EUR" decimals="INF">560000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">80000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">20800000</bw2-i:PropertyPlantEquipment>
+<rj-i:PropertyPlantEquipmentDisclosure contextRef="FY13d_Commercial_Consolidated">De afschrijvingspercentages zijn als volgt: bedrijfsgebouwen: 4%; vastgoedbeleggingen: 4%; overige vaste activa: 20%. Bij het bepalen van de percentages wordt steeds rekening gehouden met de fiscale afschrijvingsvoorschriften die voor de betreffende activa gelden.</rj-i:PropertyPlantEquipmentDisclosure>
+<bw2-i:FinancialAssetsDisclosure contextRef="FY13d_Commercial_Consolidated">De financiële vaste activa bestaat uit een 15% deelneming in Snafull B.V.</bw2-i:FinancialAssetsDisclosure>
+<rj-t:ParticipatingInterestsSpecification>
+<bw2-i:EntityName contextRef="FY13d_Commercial_Consolidated">Snafull B.V.</bw2-i:EntityName>
+<bw2-i:EntityLocation contextRef="FY13d_Commercial_Consolidated">Hilversum</bw2-i:EntityLocation>
+<bw2-i:EntityInterestInShareCapital contextRef="FY13d_Commercial_Consolidated" unitRef="pure" decimals="INF">0.15</bw2-i:EntityInterestInShareCapital>
+<bw2-i:EntityEquityLastFinancialStatements contextRef="FY12i_Commercial_Consolidated" unitRef="EUR" decimals="INF">12000000</bw2-i:EntityEquityLastFinancialStatements>
+<bw2-i:EntityResultsLastFinancialStatements contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">2000000</bw2-i:EntityResultsLastFinancialStatements>
+<bw2-i:EntityDateLastFinancialStatements contextRef="FY13d_Commercial_Consolidated">2013-12-31</bw2-i:EntityDateLastFinancialStatements>
+<bw2-i:EntityReasonDeviationNetAssetValue contextRef="FY13d_Commercial_Consolidated">De reden van het afwijken van de netto-vermogenswaarde voor de waardering van deelneming ligt aan het toepassen van fiscale grondslagen voor het waarderen van deelnemingen.</bw2-i:EntityReasonDeviationNetAssetValue>
+</rj-t:ParticipatingInterestsSpecification>
+<bw2-i:InventoriesDisclosure contextRef="FY13d_Commercial_Consolidated">De voorraden bestaan uit diverse kantoorartikelen en andere benodigdheden</bw2-i:InventoriesDisclosure>
+<bw2-i:ReceivablesDisclosure contextRef="FY13d_Commercial_Consolidated">De vorderingen hebben voor € 450.000 een looptijd langer dan een jaar</bw2-i:ReceivablesDisclosure>
+<bw2-i:ReceivablesMaturityExceedingOneYear contextRef="FY13i_Commercial_Consolidated" unitRef="EUR" decimals="INF">450000</bw2-i:ReceivablesMaturityExceedingOneYear>
+<bw2-i:CashAndCashEquivalentsDisclosure contextRef="FY13d_Commercial_Consolidated">De liquide middelen staan ter vrije beschikking van de onderneming.</bw2-i:CashAndCashEquivalentsDisclosure>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_ShareCapital" unitRef="EUR" decimals="INF">144000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_SharePremium" unitRef="EUR" decimals="INF">1600000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_RevaluationReserve" unitRef="EUR" decimals="INF">800000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_StatutoryReserves" unitRef="EUR" decimals="INF">800000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_ReservesOther" unitRef="EUR" decimals="INF">7200000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_EquityTotal" unitRef="EUR" decimals="INF">10544000</bw2-i:Equity>
+<bw2-i:EquityDividendDistribution contextRef="FY13d_EquityMovement_SharePremium" unitRef="EUR" decimals="INF">1056000</bw2-i:EquityDividendDistribution>
+<bw2-i:EquityResultAllocation contextRef="FY13d_EquityMovement_StatutoryReserves" unitRef="EUR" decimals="INF">720000</bw2-i:EquityResultAllocation>
+<bw2-i:EquityRevaluations contextRef="FY13d_EquityMovement_StatutoryReserves" unitRef="EUR" decimals="INF">800000</bw2-i:EquityRevaluations>
+<bw2-i:EquityDirectlyGoodwill contextRef="FY13d_EquityMovement_ReservesOther" unitRef="EUR" decimals="INF">3680000</bw2-i:EquityDirectlyGoodwill>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_SharePremium" unitRef="EUR" decimals="INF">1056000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_RevaluationReserve" unitRef="EUR" decimals="INF">800000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_StatutoryReserves" unitRef="EUR" decimals="INF">720000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_ReservesOther" unitRef="EUR" decimals="INF">3680000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_EquityTotal" unitRef="EUR" decimals="INF">6256000</bw2-i:EquityMovement>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_ShareCapital" unitRef="EUR" decimals="INF">144000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_SharePremium" unitRef="EUR" decimals="INF">2656000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_RevaluationReserve" unitRef="EUR" decimals="INF">1600000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_StatutoryReserves" unitRef="EUR" decimals="INF">1520000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_ReservesOther" unitRef="EUR" decimals="INF">10880000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_EquityTotal" unitRef="EUR" decimals="INF">16800000</bw2-i:Equity>
+<bw2-i:ShareCapitalDisclosure contextRef="FY13d_Commercial_Consolidated">Het maatschappelijk kapitaal van Jensen Advies B.V. bedraagt per 31 december 2012 € 45.000, verdeeld in 45.000 gewone aandelen van elk € 1. Het geplaatste en gestorte aandelenkapitaal is € 18.000, bestaande uit 18.000 gewone aandelen.</bw2-i:ShareCapitalDisclosure>
+<bw2-i:SharePremiumDisclosure contextRef="FY13d_Commercial_Consolidated">Het agio is tot stand gekomen bij de uitgifte van de 18.000 aandelen.</bw2-i:SharePremiumDisclosure>
+<bw2-i:RevaluationReserveDisclosure contextRef="FY13d_Commercial_Consolidated">Er wordt een herwaarderingsreserve aangehouden voor de niet-gerealiseerde herwaarderingen van activa waarvan de waardeveranderingen via de winst-en-verliesrekening zijn verantwoord en waarvoor geen frequente marktnoteringen bestaan.</bw2-i:RevaluationReserveDisclosure>
+<bw2-i:ReservesOtherDisclosure contextRef="FY13d_Commercial_Consolidated">De mutatie in de overige reserves betreft de dotatie van het resultaat ad € 200.000 over het jaar 2012.</bw2-i:ReservesOtherDisclosure>
+<bw2-i:ProvisionsDisclosure contextRef="FY13d_Commercial_Consolidated">De voorzieningen hebben betrekking op een voorziening voor latente belastingen. De voorziening latente belastingverplichtingen is gevormd voor belastbare tijdelijke verschillen tussen de fiscale waardering en de waardering in deze jaarrekening van de materiële vaste activa en onderhanden projecten. Van de voorzieningen heeft € 0 een looptijd van korter dan een jaar.</bw2-i:ProvisionsDisclosure>
+<bw2-i:LiabilitiesNoncurrentDisclosure contextRef="FY13d_Commercial_Consolidated">De langlopende schulden bevatten schulden tot een bedrag van € 650.000 met een resterende looptijd langer dan één jaar en schulden tot een bedrag van € 300.000 met een resterende looptijd van meer dan vijf jaar. De gemiddelde rentevoet van de schulden met een resterende looptijd van meer dan één jaar bedraagt 3,11%. Aflossingsverplichtingen binnen 12 maanden na afloop van het boekjaar zijn opgenomen onder de schulden op korte termijn. Alle leningen zijn afgesloten in euro's.</bw2-i:LiabilitiesNoncurrentDisclosure>
+<bw2-i:LiabilitiesCurrentDisclosure contextRef="FY13d_Commercial_Consolidated">De kortlopende schulden bevatten schulden tot een bedrag van € 50.000 met een resterende looptijd van meer dan een jaar.</bw2-i:LiabilitiesCurrentDisclosure>
+<bw2-i:LiabilitiesPledgedAsCollateralDisclosure contextRef="FY13d_Commercial_Consolidated">Als zekerheid voor de aflossing van de schulden is een (stil) pandrecht gevestigd op handelsdebiteuren en voorraden en een (eerste) recht van hypotheek op de onroerende zaken voor een bedrag van € 450.000. Tot meerdere zekerheid van het (kortlopende) bankkrediet is op de effecten een (stil) pandrecht gevestigd voor een bedrag van € 65.000.</bw2-i:LiabilitiesPledgedAsCollateralDisclosure>
+<bw2-i:ContingentLiabilitiesDisclosure contextRef="FY13d_Commercial_Consolidated">Jensen Advies BV heeft gebruikgemaakt van de mogelijkheid een toegezegd-pensioenregeling te verwerken als ware het een toegezegde-bijdrageregeling. Dientengevolge zijn de risico's verbonden aan deze pensioenregeling, welke niet tot uitdrukking is gebracht in de balans.</bw2-i:ContingentLiabilitiesDisclosure>
+<bw2-i:ContingentLiabilitiesLiabilityClaim contextRef="FY13d_Commercial_Consolidated">Jensen Advies B.V. heeft een borgstelling afgegeven ten behoeve van haar deelneming Snafull B.V. van € 20.000. De borgstellingen lopen af ultimo 2014. De vennootschap en haar Snafull B.V. zijn ten behoeve van de bankier over en weer hoofdelijk aansprakelijk.</bw2-i:ContingentLiabilitiesLiabilityClaim>
+<rj-i:ContingentLiabilitiesFiscalUnity contextRef="FY13d_Commercial_Consolidated">De vennootschap vormt met Kimmie B.V. een fiscale eenheid voor de vennootschapsbelasting. Op grond van de Invorderingswet zijn de vennootschap en de met haar gevoegde dochter-onderneming ieder hoofdelijk aansprakelijk voor terzake door de combinatie verschuldigde belasting.</rj-i:ContingentLiabilitiesFiscalUnity>
+<rj-i:OperatingLeasesCommitmentsMaturityAverage contextRef="FY13d_Commercial_Consolidated">De gemiddelde looptijd van de operationele leasecontracten is 2,5 jaar (2011: 3,0 jaar).</rj-i:OperatingLeasesCommitmentsMaturityAverage>
+<bw2-i:NetRevenueDisclosure contextRef="FY13d_Commercial_Consolidated">De netto-omzet is in het verslagjaar met 12% gestegen ten opzichte van vorig jaar.</bw2-i:NetRevenueDisclosure>
+<bw2-i:WagesSalaries contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">21840000</bw2-i:WagesSalaries>
+<bw2-i:SocialSecurityContributions contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">8960000</bw2-i:SocialSecurityContributions>
+<bw2-i:PensionCosts contextRef="FY13d_Commercial_Consolidated" unitRef="EUR" decimals="INF">5600000</bw2-i:PensionCosts>
+<bw2-i:InterestExpensesRelatedExpensesDisclosure contextRef="FY13d_Commercial_Consolidated">De financiële lasten hebben geen betrekking op groepsmaatschappijen.</bw2-i:InterestExpensesRelatedExpensesDisclosure>
+<bw2-i:ResultBeforeTaxOrdinaryActivitiesDisclosure contextRef="FY13d_Commercial_Consolidated">3776000</bw2-i:ResultBeforeTaxOrdinaryActivitiesDisclosure>
+<bw2-i:ResultAfterTaxOrdinaryActivitiesDisclosure contextRef="FY13d_Commercial_Consolidated">3104000</bw2-i:ResultAfterTaxOrdinaryActivitiesDisclosure>
+<bw2-i:ResultAfterTaxExtraordinaryItemsDisclosure contextRef="FY13d_Commercial_Consolidated">4672000</bw2-i:ResultAfterTaxExtraordinaryItemsDisclosure>
+<bw2-i:ResultAfterTaxDisclosure contextRef="FY13d_Commercial_Consolidated">3270400</bw2-i:ResultAfterTaxDisclosure>
+<bw2-i:NetResultAfterTaxDisclosure contextRef="FY13d_Commercial_Consolidated">3270400</bw2-i:NetResultAfterTaxDisclosure>
+<bw2-i:AverageNumberEmployeesDisclosure contextRef="FY13d_Commercial_Consolidated">Gedurende het jaar 2012 waren gemiddeld 23 werknemers in dienst (2011: 22). Hiervan zijn er 2 werkzaam in het buitenland (2011: 2).</bw2-i:AverageNumberEmployeesDisclosure>
+<bw2-i:AverageNumberEmployeesNetherlands contextRef="FY13d_Commercial_Consolidated" unitRef="pure" decimals="1">21.3</bw2-i:AverageNumberEmployeesNetherlands>
+<bw2-i:AverageNumberEmployeesAbroad contextRef="FY13d_Commercial_Consolidated" unitRef="pure" decimals="1">1.9</bw2-i:AverageNumberEmployeesAbroad>
+<bw2-i:AverageNumberEmployees contextRef="FY13d_Commercial_Consolidated" unitRef="pure" decimals="1">23.2</bw2-i:AverageNumberEmployees>
+<bw2-i:SignatureManagingSupervisoryDirectorsLocation contextRef="FY13d_Commercial_Consolidated">Den Haag</bw2-i:SignatureManagingSupervisoryDirectorsLocation>
+<bw2-i:SignatureManagingSupervisoryDirectorsDate contextRef="FY13d_Commercial_Consolidated">2013-01-31</bw2-i:SignatureManagingSupervisoryDirectorsDate>
+<bw2-t:SignatureManagingSupervisoryDirectorsSpecification>
+<bw2-i:DirectorType contextRef="FY13d">Bestuurder (huidig)</bw2-i:DirectorType>
+<nl-cd:FirstName contextRef="FY13d">Karel</nl-cd:FirstName>
+<nl-cd:FamilyName contextRef="FY13d">Broekhuis</nl-cd:FamilyName>
+<bw2-i:DirectorSignedStatus contextRef="FY13d">true</bw2-i:DirectorSignedStatus>
+</bw2-t:SignatureManagingSupervisoryDirectorsSpecification>
+<bw2-i:InformationOther contextRef="FY13d">Er is geen opdracht verstrekt aan een accountant tot controle van de jaarrekening. De vennootschap is op grond van artikel 2:396, lid 6 BW vrijgesteld van deze verplichting. Daarom ontbreekt een accountantsverklaring.</bw2-i:InformationOther>
+<bw2-i:ResultsAppropriation contextRef="FY13d">Door de directie wordt voorgesteld om de winst over het jaar 2012 ad € 200.000 toe te voegen aan de overige reserves. Dit voorstel winstbestemming is in de jaarrekening verwerkt.</bw2-i:ResultsAppropriation>
+<bw2-i:SubsequentEvents contextRef="FY13d">Er zijn geen relevante gebeurtenissen na balansdatum.</bw2-i:SubsequentEvents>
+<bw2-i:Goodwill contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">1600000</bw2-i:Goodwill>
+<bw2-i:IntangibleAssets contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">1600000</bw2-i:IntangibleAssets>
+<bw2-i:LandAndBuildings contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">8000000</bw2-i:LandAndBuildings>
+<bw2-i:Machinery contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">1600000</bw2-i:Machinery>
+<bw2-i:TangibleAssetsOther contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">400000</bw2-i:TangibleAssetsOther>
+<bw2-i:ConstructionInProgressPrepaymentsPropertyPlantEquipment contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">80000</bw2-i:ConstructionInProgressPrepaymentsPropertyPlantEquipment>
+<rj-i:InvestmentProperty contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">280000</rj-i:InvestmentProperty>
+<bw2-i:AssetsNotUsedInOperations contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">40000</bw2-i:AssetsNotUsedInOperations>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">10400000</bw2-i:PropertyPlantEquipment>
+<bw2-i:FinancialAssets contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">2400000</bw2-i:FinancialAssets>
+<bw2-i:AssetsNoncurrent contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">14400000</bw2-i:AssetsNoncurrent>
+<bw2-i:Inventories contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">1200000</bw2-i:Inventories>
+<rj-i:ConstructionContractsAssets contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">800000</rj-i:ConstructionContractsAssets>
+<bw2-i:Receivables contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">8400000</bw2-i:Receivables>
+<bw2-i:Securities contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">8400000</bw2-i:Securities>
+<bw2-i:CashAndCashEquivalents contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">8400000</bw2-i:CashAndCashEquivalents>
+<bw2-i:AssetsCurrent contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">8400000</bw2-i:AssetsCurrent>
+<bw2-i:Assets contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">27200000</bw2-i:Assets>
+<bw2-i:ShareCapital contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">144000</bw2-i:ShareCapital>
+<bw2-i:SharePremium contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">2656000</bw2-i:SharePremium>
+<bw2-i:RevaluationReserve contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">1600000</bw2-i:RevaluationReserve>
+<bw2-i:StatutoryReserves contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">1520000</bw2-i:StatutoryReserves>
+<bw2-i:ReservesOther contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">10880000</bw2-i:ReservesOther>
+<bw2-i:Equity contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">16800000</bw2-i:Equity>
+<bw2-i:Provisions contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">2000000</bw2-i:Provisions>
+<bw2-i:LiabilitiesNoncurrent contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">6000000</bw2-i:LiabilitiesNoncurrent>
+<bw2-i:LiabilitiesCurrent contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">2400000</bw2-i:LiabilitiesCurrent>
+<bw2-i:EquityAndLiabilities contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">27200000</bw2-i:EquityAndLiabilities>
+<bw2-i:NetRevenue contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">50320000</bw2-i:NetRevenue>
+<bw2-i:OperatingIncomeOther contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">600000</bw2-i:OperatingIncomeOther>
+<bw2-i:OperatingIncome contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">50920000</bw2-i:OperatingIncome>
+<bw2-i:CostsRawMaterialsConsumables contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">25600000</bw2-i:CostsRawMaterialsConsumables>
+<rj-i:EmployeeBenefitsExpenses contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">18200000</rj-i:EmployeeBenefitsExpenses>
+<bw2-i:DepreciationTangibleAssetsAmortisationIntangibleAssets contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">600000</bw2-i:DepreciationTangibleAssetsAmortisationIntangibleAssets>
+<bw2-i:ChangesInValueIntangibleTangibleAssets contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">2400000</bw2-i:ChangesInValueIntangibleTangibleAssets>
+<bw2-i:ImpairmentCurrentAssets contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">200000</bw2-i:ImpairmentCurrentAssets>
+<bw2-i:OperatingExpensesOther contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">3200000</bw2-i:OperatingExpensesOther>
+<bw2-i:OperatingExpenses contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">50200000</bw2-i:OperatingExpenses>
+<bw2-i:InterestExpensesRelatedExpenses contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">280000</bw2-i:InterestExpensesRelatedExpenses>
+<bw2-i:ResultBeforeTaxOrdinaryActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">440000</bw2-i:ResultBeforeTaxOrdinaryActivities>
+<bw2-i:IncomeTaxExpenseOrdinaryActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">132000</bw2-i:IncomeTaxExpenseOrdinaryActivities>
+<bw2-i:ShareInResultsParticipatingInterests contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">80000</bw2-i:ShareInResultsParticipatingInterests>
+<bw2-i:ResultAfterTaxOrdinaryActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">388000</bw2-i:ResultAfterTaxOrdinaryActivities>
+<bw2-i:ExtraordinaryIncome contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">1200000</bw2-i:ExtraordinaryIncome>
+<bw2-i:ExtraordinaryExpenses contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">920000</bw2-i:ExtraordinaryExpenses>
+<bw2-i:IncomeTaxExpenseExtraordinaryItems contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">84000</bw2-i:IncomeTaxExpenseExtraordinaryItems>
+<bw2-i:ResultAfterTaxExtraordinaryItems contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">584000</bw2-i:ResultAfterTaxExtraordinaryItems>
+<bw2-i:ResultAfterTax contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">408800</bw2-i:ResultAfterTax>
+<bw2-i:NetResultAfterTax contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">408800</bw2-i:NetResultAfterTax>
+<bw2-i:OperatingResult contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">50920000</bw2-i:OperatingResult>
+<rj-i:AdjustmentsDepreciationAndAmortisationExpense contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">12000000</rj-i:AdjustmentsDepreciationAndAmortisationExpense>
+<rj-i:AdjustmentsImpairmentLossReversalImpairmentLossRecognisedInProfitLoss contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">4000000</rj-i:AdjustmentsImpairmentLossReversalImpairmentLossRecognisedInProfitLoss>
+<rj-i:AdjustmentsReconcileOperatingResult contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">16000000</rj-i:AdjustmentsReconcileOperatingResult>
+<rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsReceivable contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-320000</rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsReceivable>
+<rj-i:AdjustmentsIncreaseDecreaseInInventories contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-292000</rj-i:AdjustmentsIncreaseDecreaseInInventories>
+<rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsPayable contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">640000</rj-i:AdjustmentsIncreaseDecreaseInTradeAccountsPayable>
+<rj-i:ChangesWorkingCapital contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">28000</rj-i:ChangesWorkingCapital>
+<rj-i:CashFlowFromOperations contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">34892000</rj-i:CashFlowFromOperations>
+<rj-i:InterestReceivedClassifiedAsOperatingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">1200000</rj-i:InterestReceivedClassifiedAsOperatingActivities>
+<rj-i:InterestPaidClassifiedAsOperatingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">920000</rj-i:InterestPaidClassifiedAsOperatingActivities>
+<rj-i:IncomeTaxPaidClassifiedAsOperatingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">132000</rj-i:IncomeTaxPaidClassifiedAsOperatingActivities>
+<rj-i:CashFlowOperatingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">35040000</rj-i:CashFlowOperatingActivities>
+<rj-i:PurchaseIntangibleAssets contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-1016000</rj-i:PurchaseIntangibleAssets>
+<rj-i:PurchasePropertyPlantAndEquipment contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-15212000</rj-i:PurchasePropertyPlantAndEquipment>
+<rj-i:ProceedsSalesPropertyPlantAndEquipment contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">1704000</rj-i:ProceedsSalesPropertyPlantAndEquipment>
+<rj-i:CashFlowInvestingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-14524000</rj-i:CashFlowInvestingActivities>
+<rj-i:ProceedsFromBorrowings contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">176520000</rj-i:ProceedsFromBorrowings>
+<rj-i:RepaymentsBorrowings contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-7560000</rj-i:RepaymentsBorrowings>
+<rj-i:DividendsPaidClassifiedAsFinancingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">-15600000</rj-i:DividendsPaidClassifiedAsFinancingActivities>
+<rj-i:CashFlowFinancingActivities contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">153360000</rj-i:CashFlowFinancingActivities>
+<rj-i:NetCashFlows contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">173876000</rj-i:NetCashFlows>
+<rj-i:EffectExchangeRateChangesCashAndCashEquivalents contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">5720000</rj-i:EffectExchangeRateChangesCashAndCashEquivalents>
+<rj-i:CashAndCashEquivalentsCashFlow contextRef="FY12i_Commercial_Separate" unitRef="EUR" decimals="INF">30400000</rj-i:CashAndCashEquivalentsCashFlow>
+<rj-i:CashAndCashEquivalentsCashFlow contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">209996000</rj-i:CashAndCashEquivalentsCashFlow>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">80000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">160000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">160000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_Goodwill" unitRef="EUR" decimals="INF">50000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">340000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_IntangibleAssetsOther" unitRef="EUR" decimals="INF">10000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY12i_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">800000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">120000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">240000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">240000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_Goodwill" unitRef="EUR" decimals="INF">60000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">520000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsOther" unitRef="EUR" decimals="INF">20000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsAdditions contextRef="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">1200000</bw2-i:IntangibleAssetsAdditions>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">20000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_Goodwill" unitRef="EUR" decimals="INF">12480</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">85000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsOther" unitRef="EUR" decimals="INF">2520</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsDisposals contextRef="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">200000</bw2-i:IntangibleAssetsDisposals>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">20000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">40000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_Goodwill" unitRef="EUR" decimals="INF">12480</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">85000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsOther" unitRef="EUR" decimals="INF">2520</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssetsAmortisation contextRef="FY13d_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">200000</bw2-i:IntangibleAssetsAmortisation>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_CostsIncorporationShareIssue" unitRef="EUR" decimals="INF">160000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_ResearchAndDevelopmentCosts" unitRef="EUR" decimals="INF">320000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_PatentsTrademarksOtherRights" unitRef="EUR" decimals="INF">320000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_Goodwill" unitRef="EUR" decimals="INF">85040</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_PrepaymentsIntangibleAssets" unitRef="EUR" decimals="INF">690000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_IntangibleAssetsOther" unitRef="EUR" decimals="INF">24960</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssets contextRef="FY13i_IntangibleAssetsMovement_Separate_IntangibleAssetsTotal" unitRef="EUR" decimals="INF">1600000</bw2-i:IntangibleAssets>
+<bw2-i:IntangibleAssetsDisclosure contextRef="FY13d_Commercial_Separate">De immateriële vaste activa bestaat uitsluitend uit computersoftware. Het afschrijvingspercentage van de immateriële vaste activa bedraagt 20% per jaar.</bw2-i:IntangibleAssetsDisclosure>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_LandAndBuildings" unitRef="EUR" decimals="INF">7400000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_Machinery" unitRef="EUR" decimals="INF">1480000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther" unitRef="EUR" decimals="INF">340000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">74000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_InvestmentProperty" unitRef="EUR" decimals="INF">259000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">37000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY12i_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">9590000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_LandAndBuildings" unitRef="EUR" decimals="INF">2000000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_Machinery" unitRef="EUR" decimals="INF">400000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther" unitRef="EUR" decimals="INF">130000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">20000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_InvestmentProperty" unitRef="EUR" decimals="INF">70000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">10000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentAdditions contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">2630000</bw2-i:PropertyPlantEquipmentAdditions>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_LandAndBuildings" unitRef="EUR" decimals="INF">1000000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_Machinery" unitRef="EUR" decimals="INF">200000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther" unitRef="EUR" decimals="INF">50000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">10000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_InvestmentProperty" unitRef="EUR" decimals="INF">35000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">5000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDisposals contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">1300000</bw2-i:PropertyPlantEquipmentDisposals>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_LandAndBuildings" unitRef="EUR" decimals="INF">400000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_Machinery" unitRef="EUR" decimals="INF">80000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther" unitRef="EUR" decimals="INF">20000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">4000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_InvestmentProperty" unitRef="EUR" decimals="INF">14000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">2000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipmentDepreciation contextRef="FY13d_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">520000</bw2-i:PropertyPlantEquipmentDepreciation>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_LandAndBuildings" unitRef="EUR" decimals="INF">8000000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_Machinery" unitRef="EUR" decimals="INF">1600000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_TangibleAssetsOther" unitRef="EUR" decimals="INF">400000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_ConstructionInProgressPrepaymentsPropertyPlantEquipment" unitRef="EUR" decimals="INF">80000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_InvestmentProperty" unitRef="EUR" decimals="INF">280000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_AssetsNotUsedInOperations" unitRef="EUR" decimals="INF">40000</bw2-i:PropertyPlantEquipment>
+<bw2-i:PropertyPlantEquipment contextRef="FY13i_PropertyPlantEquipmentMovement_Separate_PropertyPlantEquipmentTotal" unitRef="EUR" decimals="INF">10400000</bw2-i:PropertyPlantEquipment>
+<rj-i:PropertyPlantEquipmentDisclosure contextRef="FY13d_Commercial_Separate">De afschrijvingspercentages zijn als volgt: bedrijfsgebouwen: 4%; vastgoedbeleggingen: 4%; overige vaste activa: 20%. Bij het bepalen van de percentages wordt steeds rekening gehouden met de fiscale afschrijvingsvoorschriften die voor de betreffende activa gelden.</rj-i:PropertyPlantEquipmentDisclosure>
+<bw2-i:FinancialAssetsDisclosure contextRef="FY13d_Commercial_Separate">De financiële vaste activa bestaat uit een 15% deelneming in Snafull B.V.</bw2-i:FinancialAssetsDisclosure>
+<rj-t:ParticipatingInterestsSpecification>
+<bw2-i:EntityName contextRef="FY13d_Commercial_Separate">Snafull B.V.</bw2-i:EntityName>
+<bw2-i:EntityLocation contextRef="FY13d_Commercial_Separate">Hilversum</bw2-i:EntityLocation>
+<bw2-i:EntityInterestInShareCapital contextRef="FY13d_Commercial_Separate" unitRef="pure" decimals="INF">0.15</bw2-i:EntityInterestInShareCapital>
+<bw2-i:EntityEquityLastFinancialStatements contextRef="FY12i_Commercial_Separate" unitRef="EUR" decimals="INF">12000000</bw2-i:EntityEquityLastFinancialStatements>
+<bw2-i:EntityResultsLastFinancialStatements contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">2000000</bw2-i:EntityResultsLastFinancialStatements>
+<bw2-i:EntityDateLastFinancialStatements contextRef="FY13d_Commercial_Separate">2013-12-31</bw2-i:EntityDateLastFinancialStatements>
+<bw2-i:EntityReasonDeviationNetAssetValue contextRef="FY13d_Commercial_Separate">De reden van het afwijken van de netto-vermogenswaarde voor de waardering van deelneming ligt aan het toepassen van fiscale grondslagen voor het waarderen van deelnemingen.</bw2-i:EntityReasonDeviationNetAssetValue>
+</rj-t:ParticipatingInterestsSpecification>
+<bw2-i:InventoriesDisclosure contextRef="FY13d_Commercial_Separate">De voorraden bestaan uit diverse kantoorartikelen en andere benodigdheden</bw2-i:InventoriesDisclosure>
+<bw2-i:ReceivablesDisclosure contextRef="FY13d_Commercial_Separate">De vorderingen hebben voor € 450.000 een looptijd langer dan een jaar</bw2-i:ReceivablesDisclosure>
+<bw2-i:ReceivablesMaturityExceedingOneYear contextRef="FY13i_Commercial_Separate" unitRef="EUR" decimals="INF">450000</bw2-i:ReceivablesMaturityExceedingOneYear>
+<bw2-i:CashAndCashEquivalentsDisclosure contextRef="FY13d_Commercial_Separate">De liquide middelen staan ter vrije beschikking van de onderneming.</bw2-i:CashAndCashEquivalentsDisclosure>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_Separate_ShareCapital" unitRef="EUR" decimals="INF">72000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_Separate_SharePremium" unitRef="EUR" decimals="INF">800000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_Separate_RevaluationReserve" unitRef="EUR" decimals="INF">400000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_Separate_StatutoryReserves" unitRef="EUR" decimals="INF">400000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_Separate_ReservesOther" unitRef="EUR" decimals="INF">3600000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY12i_EquityMovement_Separate_EquityTotal" unitRef="EUR" decimals="INF">5272000</bw2-i:Equity>
+<bw2-i:EquityDividendDistribution contextRef="FY13d_EquityMovement_Separate_SharePremium" unitRef="EUR" decimals="INF">528000</bw2-i:EquityDividendDistribution>
+<bw2-i:EquityResultAllocation contextRef="FY13d_EquityMovement_Separate_StatutoryReserves" unitRef="EUR" decimals="INF">360000</bw2-i:EquityResultAllocation>
+<bw2-i:EquityRevaluations contextRef="FY13d_EquityMovement_Separate_StatutoryReserves" unitRef="EUR" decimals="INF">400000</bw2-i:EquityRevaluations>
+<bw2-i:EquityDirectlyGoodwill contextRef="FY13d_EquityMovement_Separate_ReservesOther" unitRef="EUR" decimals="INF">1840000</bw2-i:EquityDirectlyGoodwill>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_Separate_SharePremium" unitRef="EUR" decimals="INF">528000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_Separate_RevaluationReserve" unitRef="EUR" decimals="INF">400000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_Separate_StatutoryReserves" unitRef="EUR" decimals="INF">360000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_Separate_ReservesOther" unitRef="EUR" decimals="INF">1840000</bw2-i:EquityMovement>
+<bw2-i:EquityMovement contextRef="FY13d_EquityMovement_Separate_EquityTotal" unitRef="EUR" decimals="INF">3128000</bw2-i:EquityMovement>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_Separate_ShareCapital" unitRef="EUR" decimals="INF">72000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_Separate_SharePremium" unitRef="EUR" decimals="INF">1328000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_Separate_RevaluationReserve" unitRef="EUR" decimals="INF">800000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_Separate_StatutoryReserves" unitRef="EUR" decimals="INF">760000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_Separate_ReservesOther" unitRef="EUR" decimals="INF">5440000</bw2-i:Equity>
+<bw2-i:Equity contextRef="FY13i_EquityMovement_Separate_EquityTotal" unitRef="EUR" decimals="INF">8400000</bw2-i:Equity>
+<bw2-i:ShareCapitalDisclosure contextRef="FY13d_Commercial_Separate">Het maatschappelijk kapitaal van Jensen Advies B.V. bedraagt per 31 december 2012 € 45.000, verdeeld in 45.000 gewone aandelen van elk € 1. Het geplaatste en gestorte aandelenkapitaal is € 18.000, bestaande uit 18.000 gewone aandelen.</bw2-i:ShareCapitalDisclosure>
+<bw2-i:SharePremiumDisclosure contextRef="FY13d_Commercial_Separate">Het agio is tot stand gekomen bij de uitgifte van de 18.000 aandelen.</bw2-i:SharePremiumDisclosure>
+<bw2-i:RevaluationReserveDisclosure contextRef="FY13d_Commercial_Separate">Er wordt een herwaarderingsreserve aangehouden voor de niet-gerealiseerde herwaarderingen van activa waarvan de waardeveranderingen via de winst-en-verliesrekening zijn verantwoord en waarvoor geen frequente marktnoteringen bestaan.</bw2-i:RevaluationReserveDisclosure>
+<bw2-i:ReservesOtherDisclosure contextRef="FY13d_Commercial_Separate">De mutatie in de overige reserves betreft de dotatie van het resultaat ad € 200.000 over het jaar 2012.</bw2-i:ReservesOtherDisclosure>
+<bw2-i:ProvisionsDisclosure contextRef="FY13d_Commercial_Separate">De voorzieningen hebben betrekking op een voorziening voor latente belastingen. De voorziening latente belastingverplichtingen is gevormd voor belastbare tijdelijke verschillen tussen de fiscale waardering en de waardering in deze jaarrekening van de materiële vaste activa en onderhanden projecten. Van de voorzieningen heeft € 0 een looptijd van korter dan een jaar.</bw2-i:ProvisionsDisclosure>
+<bw2-i:LiabilitiesNoncurrentDisclosure contextRef="FY13d_Commercial_Separate">De langlopende schulden bevatten schulden tot een bedrag van € 650.000 met een resterende looptijd langer dan één jaar en schulden tot een bedrag van € 300.000 met een resterende looptijd van meer dan vijf jaar. De gemiddelde rentevoet van de schulden met een resterende looptijd van meer dan één jaar bedraagt 3,11%. Aflossingsverplichtingen binnen 12 maanden na afloop van het boekjaar zijn opgenomen onder de schulden op korte termijn. Alle leningen zijn afgesloten in euro's.</bw2-i:LiabilitiesNoncurrentDisclosure>
+<bw2-i:LiabilitiesCurrentDisclosure contextRef="FY13d_Commercial_Separate">De kortlopende schulden bevatten schulden tot een bedrag van € 50.000 met een resterende looptijd van meer dan een jaar.</bw2-i:LiabilitiesCurrentDisclosure>
+<bw2-i:LiabilitiesPledgedAsCollateralDisclosure contextRef="FY13d_Commercial_Separate">Als zekerheid voor de aflossing van de schulden is een (stil) pandrecht gevestigd op handelsdebiteuren en voorraden en een (eerste) recht van hypotheek op de onroerende zaken voor een bedrag van € 450.000. Tot meerdere zekerheid van het (kortlopende) bankkrediet is op de effecten een (stil) pandrecht gevestigd voor een bedrag van € 65.000.</bw2-i:LiabilitiesPledgedAsCollateralDisclosure>
+<bw2-i:ContingentLiabilitiesDisclosure contextRef="FY13d_Commercial_Separate">Jensen Advies BV heeft gebruikgemaakt van de mogelijkheid een toegezegd-pensioenregeling te verwerken als ware het een toegezegde-bijdrageregeling. Dientengevolge zijn de risico's verbonden aan deze pensioenregeling, welke niet tot uitdrukking is gebracht in de balans.</bw2-i:ContingentLiabilitiesDisclosure>
+<bw2-i:ContingentLiabilitiesLiabilityClaim contextRef="FY13d_Commercial_Separate">Jensen Advies B.V. heeft een borgstelling afgegeven ten behoeve van haar deelneming Snafull B.V. van € 20.000. De borgstellingen lopen af ultimo 2014. De vennootschap en haar Snafull B.V. zijn ten behoeve van de bankier over en weer hoofdelijk aansprakelijk.</bw2-i:ContingentLiabilitiesLiabilityClaim>
+<rj-i:ContingentLiabilitiesFiscalUnity contextRef="FY13d_Commercial_Separate">De vennootschap vormt met Kimmie B.V. een fiscale eenheid voor de vennootschapsbelasting. Op grond van de Invorderingswet zijn de vennootschap en de met haar gevoegde dochter-onderneming ieder hoofdelijk aansprakelijk voor terzake door de combinatie verschuldigde belasting.</rj-i:ContingentLiabilitiesFiscalUnity>
+<rj-i:OperatingLeasesCommitmentsMaturityAverage contextRef="FY13d_Commercial_Separate">De gemiddelde looptijd van de operationele leasecontracten is 2,5 jaar (2011: 3,0 jaar).</rj-i:OperatingLeasesCommitmentsMaturityAverage>
+<bw2-i:NetRevenueDisclosure contextRef="FY13d_Commercial_Separate">De netto-omzet is in het verslagjaar met 12% gestegen ten opzichte van vorig jaar.</bw2-i:NetRevenueDisclosure>
+<bw2-i:WagesSalaries contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">10920000</bw2-i:WagesSalaries>
+<bw2-i:SocialSecurityContributions contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">4480000</bw2-i:SocialSecurityContributions>
+<bw2-i:PensionCosts contextRef="FY13d_Commercial_Separate" unitRef="EUR" decimals="INF">2800000</bw2-i:PensionCosts>
+<bw2-i:InterestExpensesRelatedExpensesDisclosure contextRef="FY13d_Commercial_Separate">De financiële lasten hebben geen betrekking op groepsmaatschappijen.</bw2-i:InterestExpensesRelatedExpensesDisclosure>
+<bw2-i:ResultBeforeTaxOrdinaryActivitiesDisclosure contextRef="FY13d_Commercial_Separate">1888000</bw2-i:ResultBeforeTaxOrdinaryActivitiesDisclosure>
+<bw2-i:ResultAfterTaxOrdinaryActivitiesDisclosure contextRef="FY13d_Commercial_Separate">1552000</bw2-i:ResultAfterTaxOrdinaryActivitiesDisclosure>
+<bw2-i:ResultAfterTaxExtraordinaryItemsDisclosure contextRef="FY13d_Commercial_Separate">2336000</bw2-i:ResultAfterTaxExtraordinaryItemsDisclosure>
+<bw2-i:ResultAfterTaxDisclosure contextRef="FY13d_Commercial_Separate">1635200</bw2-i:ResultAfterTaxDisclosure>
+<bw2-i:NetResultAfterTaxDisclosure contextRef="FY13d_Commercial_Separate">1635200</bw2-i:NetResultAfterTaxDisclosure>
+<bw2-i:AverageNumberEmployeesDisclosure contextRef="FY13d_Commercial_Separate">Gedurende het jaar 2012 waren gemiddeld 23 werknemers in dienst (2011: 22). Hiervan zijn er 2 werkzaam in het buitenland (2011: 2).</bw2-i:AverageNumberEmployeesDisclosure>
+<bw2-i:AverageNumberEmployeesNetherlands contextRef="FY13d_Commercial_Separate" unitRef="pure" decimals="1">21.3</bw2-i:AverageNumberEmployeesNetherlands>
+<bw2-i:AverageNumberEmployeesAbroad contextRef="FY13d_Commercial_Separate" unitRef="pure" decimals="1">1.9</bw2-i:AverageNumberEmployeesAbroad>
+<bw2-i:AverageNumberEmployees contextRef="FY13d_Commercial_Separate" unitRef="pure" decimals="1">23.2</bw2-i:AverageNumberEmployees>
+<bw2-i:SignatureManagingSupervisoryDirectorsLocation contextRef="FY13d_Commercial_Separate">Den Haag</bw2-i:SignatureManagingSupervisoryDirectorsLocation>
+<bw2-i:SignatureManagingSupervisoryDirectorsDate contextRef="FY13d_Commercial_Separate">2013-01-31</bw2-i:SignatureManagingSupervisoryDirectorsDate>
+</xbrli:xbrl>
