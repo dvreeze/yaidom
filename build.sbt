@@ -11,7 +11,7 @@ version := "0.8.1-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.10.4", "2.11.0-RC4")
+crossScalaVersions := Seq("2.10.4", "2.11.0")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -26,12 +26,12 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 }
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11.0-RC4" % "1.0.1")
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11" % "1.0.1")
   else Seq()
 }
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-parser-combinators_2.11.0-RC4" % "1.0.1")
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.1")
   else Seq()
 }
 
@@ -42,12 +42,12 @@ libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.2.1"
 libraryDependencies += "junit" % "junit" % "4.11" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) "org.scalatest" % "scalatest_2.11.0-RC4" % "2.1.3" % "test"
+  if (version.contains("2.11")) "org.scalatest" % "scalatest_2.11" % "2.1.3" % "test"
   else "org.scalatest" %% "scalatest" % "2.1.3" % "test"
 }
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) "org.scalacheck" % "scalacheck_2.11.0-RC4" % "1.11.3" % "test"
+  if (version.contains("2.11")) "org.scalacheck" % "scalacheck_2.11" % "1.11.3" % "test"
   else "org.scalacheck" %% "scalacheck" % "1.11.3" % "test"
 }
 
