@@ -3,6 +3,27 @@ CHANGELOG
 =========
 
 
+0.8.1
+=====
+
+Version 0.8.1 is much like version 0.8.0, but it targets Scala 2.11.X as well as 2.10.X. There are no breaking changes in this version.
+
+The changes in this version are:
+
+* Built for Scala 2.11.X as well as Scala 2.10.X
+* Introduced ``NavigableElemApi`` between ``ElemApi`` and ``PathAwareElemApi``:
+
+  * This new query API trait offers Path-based navigation, but not Path-aware querying
+  * ``NavigableElemApi`` contains (existing) methods like ``findChildElemByPathEntry`` and ``findElemOrSelfByPath``
+  * Analogously, ``NavigableElemLike`` sits between ``ElemLike`` and ``NavigableElemLike``
+  * The net effect is that ``PathAwareElemApi`` and ``PathAwareElemLike`` offer the same API as before, without any breaking changes
+  * Yet now "indexed" and "docaware" Elems mix in trait ``NavigableElemApi``, thus offering (fast) Path-based navigation, making these Elems more useful
+
+* A Scope can also be used as JAXP NamespaceContext factory, thus facilitating the use of JAXP XPath support (even in Java code!)
+
+In summary, version 0.8.1 is like 0.8.0, but it supports Scala 2.11.X, and makes "indexed" and "docaware" Elems more useful.
+
+
 0.8.0
 =====
 
