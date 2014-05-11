@@ -15,7 +15,7 @@ The changes in this version are:
 
   * This new query API trait offers Path-based navigation, but not Path-aware querying
   * ``NavigableElemApi`` contains (existing) methods like ``findChildElemByPathEntry`` and ``findElemOrSelfByPath``
-  * Analogously, ``NavigableElemLike`` sits between ``ElemLike`` and ``NavigableElemLike``
+  * Analogously, ``NavigableElemLike`` sits between ``ElemLike`` and ``PathAwareElemLike``
   * The net effect is that ``PathAwareElemApi`` and ``PathAwareElemLike`` offer the same API as before, without any breaking changes
   * Yet now "indexed" and "docaware" Elems mix in trait ``NavigableElemApi``, thus offering (fast) Path-based navigation, making these Elems more useful
 
