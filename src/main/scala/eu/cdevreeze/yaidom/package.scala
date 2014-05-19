@@ -259,6 +259,19 @@ package eu.cdevreeze
  * } yield authorElem
  * }}}
  * where `\\` stands for `filterElemsOrSelf`.
+ * 
+ * There is no explicit support for filtering on the "self" element itself. In the example above, we might want to check if
+ * the root element has the expected EName, for instance. That is easy to express using a simple idiom, however. The last
+ * example then becomes:
+ * {{{
+ * for {
+ *   bookstoreElem <- Vector(bookstoreElem)
+ *   if bookstoreElem.resolvedName == EName("{http://bookstore/book}Bookstore")
+ *   bookElem <- bookstoreElem \ EName("{http://bookstore/book}Book")
+ *   if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *   authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
+ * } yield authorElem
+ * }}}
  *
  * Now suppose the same XML is stored in a (org.w3c.dom) DOM tree, wrapped in a [[eu.cdevreeze.yaidom.dom.DomElem]] `bookstoreElem`.
  * Then the same queries would use exactly the same code as above! The result would be a collection of `DomElem` instances
