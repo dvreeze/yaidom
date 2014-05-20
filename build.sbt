@@ -11,7 +11,7 @@ version := "0.8.2-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.10.4", "2.11.0")
+crossScalaVersions := Seq("2.10.4", "2.11.1")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
