@@ -1,0 +1,89 @@
+/*
+ * Copyright 2011 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.cdevreeze.yaidom
+package subtypeaware
+
+import scala.collection.immutable
+import scala.reflect.ClassTag
+
+/**
+ * Extension to ParentElemApi that makes querying for sub-types of the element type easy.
+ *
+ * @author Chris de Vreeze
+ */
+trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends ParentElemApi[A] { self: A =>
+
+  /**
+   * Returns all child elements of the given sub-type, in the correct order.
+   */
+  def findAllChildElemsTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+
+  /**
+   * Returns the child elements of the given sub-type obeying the given predicate.
+   */
+  def filterChildElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+
+  /**
+   * Returns all descendant elements of the given sub-type (not including this element).
+   */
+  def findAllElemsTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+
+  /**
+   * Returns the descendant elements of the given sub-type obeying the given predicate.
+   */
+  def filterElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+
+  /**
+   * Returns all descendant-or-self elements of the given sub-type (not including this element).
+   */
+  def findAllElemsOrSelfTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+
+  /**
+   * Returns the descendant-or-self elements of the given sub-type obeying the given predicate.
+   */
+  def filterElemsOrSelfTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+
+  /**
+   * Returns the first found child element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
+   */
+  def findChildElemTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+
+  /**
+   * Returns the first found (topmost) descendant element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
+   */
+  def findElemTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+
+  /**
+   * Returns the first found (topmost) descendant-or-self element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
+   */
+  def findElemOrSelfTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+
+  /**
+   * Returns the descendant elements of the given sub-type obeying the given predicate that have no ancestor of the given sub-type obeying the predicate.
+   */
+  def findTopmostElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+
+  /**
+   * Returns the descendant-or-self elements of the given sub-type obeying the given predicate, such that no ancestor of the given sub-type obeys the predicate.
+   */
+  def findTopmostElemsOrSelfTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+
+  /**
+   * Returns the single child element of the given sub-type obeying the given predicate, and throws an exception otherwise.
+   */
+  def getChildElemTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): B
+}
