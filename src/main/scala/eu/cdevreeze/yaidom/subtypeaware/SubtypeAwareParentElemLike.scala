@@ -77,6 +77,13 @@ trait SubtypeAwareParentElemLike[A <: SubtypeAwareParentElemLike[A]] extends Par
     result.head
   }
 
+  // Note that the filter and find methods below make the code above very concise. Arguably without these filter and
+  // find methods the code would have been more readable, at the cost of code repetition. We could even have gone further
+  // and combined the filter and find methods into one method. After all, they duplicate the same code. On the other
+  // hand, when seeking a balance between OO and functional programming (where OO stands for abstraction/naming),
+  // combining the 2 functions would have made it more difficult to come up with a good method name, making the method
+  // more difficult to understand.
+
   private final def filter[B <: A](
     subType: ClassTag[B])(p: B => Boolean)(f: ((A => Boolean) => immutable.IndexedSeq[A])): immutable.IndexedSeq[B] = {
 

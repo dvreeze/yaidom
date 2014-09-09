@@ -23,6 +23,16 @@ import scala.reflect.ClassTag
 /**
  * Extension to ParentElemApi that makes querying for sub-types of the element type easy.
  *
+ * The query methods of this trait take a sub-type as first value parameter. It is intentional that this is a value
+ * parameter, and not a second type parameter, since it is conceptually the most important parameter of these
+ * query methods. (If it were a second type parameter instead, the article http://hacking-scala.org/post/73854628325/advanced-type-constraints-with-type-classes
+ * would show how to make that solution robust, using some @NotNothing annotation.)
+ *
+ * The sub-type parameter could have been a `java.lang.Class` object, except that type erasure would make it less attractive
+ * (when doing pattern matching against that type). Hence the use of a `ClassTag` parameter, which undoes type erasure
+ * for non-generic types. So `ClassTag` is used as a better `java.lang.Class`, yet without polluting the public API with
+ * an implicit `ClassTag` parameter.
+ *
  * @author Chris de Vreeze
  */
 trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends ParentElemApi[A] { self: A =>
