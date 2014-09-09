@@ -58,7 +58,7 @@ trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends Paren
   def filterElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
-   * Returns all descendant-or-self elements of the given sub-type (not including this element).
+   * Returns all descendant-or-self elements of the given sub-type.
    */
   def findAllElemsOrSelfTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
