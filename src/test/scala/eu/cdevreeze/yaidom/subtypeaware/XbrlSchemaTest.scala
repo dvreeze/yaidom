@@ -21,9 +21,10 @@ import scala.collection.immutable
 import scala.reflect.classTag
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.Suite
+import org.scalatest.junit.JUnitRunner
 
+import SubtypeAwareParentElemApi.all
 import eu.cdevreeze.yaidom.Document
 import eu.cdevreeze.yaidom.EName
 import eu.cdevreeze.yaidom.NavigableElemLike
@@ -41,6 +42,8 @@ class XbrlSchemaTest extends Suite {
 
   import XbrlSchemaTest._
 
+  val xsNs = "http://www.w3.org/2001/XMLSchema"
+
   def testQueryXbrlSchema(): Unit = {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
@@ -54,6 +57,25 @@ class XbrlSchemaTest extends Suite {
 
     assertResult(true) {
       elmDefs.size >= 100
+    }
+    assertResult(elmDefs.map(_.wrappedElem)) {
+      xbrlSchema.filterElemsTyped(classTag[GlobalElementDeclaration])(all).map(_.wrappedElem)
+    }
+    assertResult(elmDefs.map(_.wrappedElem)) {
+      xbrlSchema.filterElemsOrSelfTyped(classTag[GlobalElementDeclaration])(all).map(_.wrappedElem)
+    }
+    assertResult(elmDefs.map(_.wrappedElem)) {
+      xbrlSchema.filterChildElemsTyped(classTag[GlobalElementDeclaration])(all).map(_.wrappedElem)
+    }
+    assertResult(elmDefs.map(_.wrappedElem)) {
+      xbrlSchema.findAllElemsOrSelfTyped(classTag[GlobalElementDeclaration]).map(_.wrappedElem)
+    }
+    assertResult(elmDefs.map(_.wrappedElem)) {
+      xbrlSchema.findAllChildElemsTyped(classTag[GlobalElementDeclaration]).map(_.wrappedElem)
+    }
+
+    assertResult(Nil) {
+      xbrlSchema.findAllChildElemsTyped(classTag[ElementReference])
     }
 
     val tns = "http://xasb.org/gaap"
@@ -97,6 +119,47 @@ class XbrlSchemaTest extends Suite {
       }
     }
   }
+
+  def testQueryMultipleXsds(): Unit = {
+    val parser = DocumentParserUsingSax.newInstance()
+    val ipoDoc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("ipo.xsd"))
+    val addressDoc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("address.xsd"))
+
+    val ipoSchemaDoc = indexed.Document(ipoDoc)
+    val ipoSchema: XsdRootElem = new XsdRootElem(ipoSchemaDoc.documentElement)
+
+    val addressSchemaDoc = indexed.Document(addressDoc)
+    val addressSchema: XsdRootElem = new XsdRootElem(addressSchemaDoc.documentElement)
+
+    val tns = ipoSchema.targetNamespaceOption.getOrElse("")
+
+    val elemDecls = ipoSchema.findAllElemsTyped(classTag[GlobalElementDeclaration])
+
+    assertResult(Set(EName(tns, "purchaseOrder"), EName(tns, "comment"))) {
+      elemDecls.map(_.targetEName).toSet
+    }
+
+    val itemsTypeDefOption = ipoSchema.findChildElemTyped(classTag[XsdElem]) { elem =>
+      elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")) == Some("Items")
+    }
+
+    assertResult(true) {
+      itemsTypeDefOption.isDefined
+    }
+    assertResult(itemsTypeDefOption.get.wrappedElem) {
+      val result =
+        ipoSchema getChildElem { elem =>
+          elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")) == Some("Items")
+        }
+      result.wrappedElem
+    }
+
+    val itemsTypeDef = itemsTypeDefOption.get
+
+    assertResult(1) {
+      itemsTypeDef.findAllElemsTyped(classTag[ElementReference]).size
+    }
+  }
 }
 
 object XbrlSchemaTest {
@@ -133,6 +196,10 @@ object XbrlSchemaTest {
     def targetEName: EName = {
       val tnsOption = wrappedElem.rootElem.attributeOption(EName("targetNamespace"))
       EName(tnsOption, wrappedElem.attribute(EName("name")))
+    }
+
+    def typeAttrOption: Option[EName] = {
+      wrappedElem.elem.attributeAsResolvedQNameOption(EName("type"))
     }
   }
 
