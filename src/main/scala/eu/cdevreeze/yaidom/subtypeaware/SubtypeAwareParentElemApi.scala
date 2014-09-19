@@ -40,62 +40,62 @@ trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends Paren
   /**
    * Returns all child elements of the given sub-type, in the correct order.
    */
-  def findAllChildElemsTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+  def findAllChildElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the child elements of the given sub-type obeying the given predicate.
    */
-  def filterChildElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def filterChildElemsOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns all descendant elements of the given sub-type (not including this element).
    */
-  def findAllElemsTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+  def findAllElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant elements of the given sub-type obeying the given predicate.
    */
-  def filterElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def filterElemsOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns all descendant-or-self elements of the given sub-type.
    */
-  def findAllElemsOrSelfTyped[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+  def findAllElemsOrSelfOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant-or-self elements of the given sub-type obeying the given predicate.
    */
-  def filterElemsOrSelfTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def filterElemsOrSelfOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns the first found child element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
    */
-  def findChildElemTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+  def findChildElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
 
   /**
    * Returns the first found (topmost) descendant element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
    */
-  def findElemTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+  def findElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
 
   /**
    * Returns the first found (topmost) descendant-or-self element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
    */
-  def findElemOrSelfTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+  def findElemOrSelfOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
 
   /**
    * Returns the descendant elements of the given sub-type obeying the given predicate that have no ancestor of the given sub-type obeying the predicate.
    */
-  def findTopmostElemsTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def findTopmostElemsOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant-or-self elements of the given sub-type obeying the given predicate, such that no ancestor of the given sub-type obeys the predicate.
    */
-  def findTopmostElemsOrSelfTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def findTopmostElemsOrSelfOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns the single child element of the given sub-type obeying the given predicate, and throws an exception otherwise.
    */
-  def getChildElemTyped[B <: A](subType: ClassTag[B])(p: B => Boolean): B
+  def getChildElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): B
 }
 
 object SubtypeAwareParentElemApi {
@@ -103,5 +103,5 @@ object SubtypeAwareParentElemApi {
   /**
    * Element predicate that filters away no elements, and that can be used in many methods of the SubtypeAwareParentElemApi trait.
    */
-  val all: ParentElemApi[_] => Boolean = { e => true }
+  val anyElem: ParentElemApi[_] => Boolean = { e => true }
 }

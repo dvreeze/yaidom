@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import SubtypeAwareParentElemApi.all
+import SubtypeAwareParentElemApi.anyElem
 import eu.cdevreeze.yaidom.Document
 import eu.cdevreeze.yaidom.EName
 import eu.cdevreeze.yaidom.NavigableElemLike
@@ -53,29 +53,29 @@ class XbrlSchemaTest extends Suite {
 
     // Check concepts
 
-    val elmDefs = xbrlSchema.findAllElemsTyped(classTag[GlobalElementDeclaration])
+    val elmDefs = xbrlSchema.findAllElemsOfType(classTag[GlobalElementDeclaration])
 
     assertResult(true) {
       elmDefs.size >= 100
     }
     assertResult(elmDefs.map(_.wrappedElem)) {
-      xbrlSchema.filterElemsTyped(classTag[GlobalElementDeclaration])(all).map(_.wrappedElem)
+      xbrlSchema.filterElemsOfType(classTag[GlobalElementDeclaration])(anyElem).map(_.wrappedElem)
     }
     assertResult(elmDefs.map(_.wrappedElem)) {
-      xbrlSchema.filterElemsOrSelfTyped(classTag[GlobalElementDeclaration])(all).map(_.wrappedElem)
+      xbrlSchema.filterElemsOrSelfOfType(classTag[GlobalElementDeclaration])(anyElem).map(_.wrappedElem)
     }
     assertResult(elmDefs.map(_.wrappedElem)) {
-      xbrlSchema.filterChildElemsTyped(classTag[GlobalElementDeclaration])(all).map(_.wrappedElem)
+      xbrlSchema.filterChildElemsOfType(classTag[GlobalElementDeclaration])(anyElem).map(_.wrappedElem)
     }
     assertResult(elmDefs.map(_.wrappedElem)) {
-      xbrlSchema.findAllElemsOrSelfTyped(classTag[GlobalElementDeclaration]).map(_.wrappedElem)
+      xbrlSchema.findAllElemsOrSelfOfType(classTag[GlobalElementDeclaration]).map(_.wrappedElem)
     }
     assertResult(elmDefs.map(_.wrappedElem)) {
-      xbrlSchema.findAllChildElemsTyped(classTag[GlobalElementDeclaration]).map(_.wrappedElem)
+      xbrlSchema.findAllChildElemsOfType(classTag[GlobalElementDeclaration]).map(_.wrappedElem)
     }
 
     assertResult(Nil) {
-      xbrlSchema.findAllChildElemsTyped(classTag[ElementReference])
+      xbrlSchema.findAllChildElemsOfType(classTag[ElementReference])
     }
 
     val tns = "http://xasb.org/gaap"
@@ -98,11 +98,11 @@ class XbrlSchemaTest extends Suite {
     val paths = xbrlSchema.wrappedElem.elem.findAllElemOrSelfPaths
 
     assertResult(paths) {
-      xbrlSchema.findAllElemsOrSelfTyped(classTag[XsdElem]) map { _.wrappedElem.path }
+      xbrlSchema.findAllElemsOrSelfOfType(classTag[XsdElem]) map { _.wrappedElem.path }
     }
 
     val elemsContainingPlus =
-      xbrlSchema.filterElemsTyped(classTag[XsdElem]) { e =>
+      xbrlSchema.filterElemsOfType(classTag[XsdElem]) { e =>
         e.attributeOption(EName("name")).getOrElse("").contains("Plus")
       }
     val pathsOfElemsContainingPlus =
@@ -133,13 +133,13 @@ class XbrlSchemaTest extends Suite {
 
     val tns = ipoSchema.targetNamespaceOption.getOrElse("")
 
-    val elemDecls = ipoSchema.findAllElemsTyped(classTag[GlobalElementDeclaration])
+    val elemDecls = ipoSchema.findAllElemsOfType(classTag[GlobalElementDeclaration])
 
     assertResult(Set(EName(tns, "purchaseOrder"), EName(tns, "comment"))) {
       elemDecls.map(_.targetEName).toSet
     }
 
-    val itemsTypeDefOption = ipoSchema.findChildElemTyped(classTag[XsdElem]) { elem =>
+    val itemsTypeDefOption = ipoSchema.findChildElemOfType(classTag[XsdElem]) { elem =>
       elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")) == Some("Items")
     }
 
@@ -157,7 +157,7 @@ class XbrlSchemaTest extends Suite {
     val itemsTypeDef = itemsTypeDefOption.get
 
     assertResult(1) {
-      itemsTypeDef.findAllElemsTyped(classTag[ElementReference]).size
+      itemsTypeDef.findAllElemsOfType(classTag[ElementReference]).size
     }
   }
 }
