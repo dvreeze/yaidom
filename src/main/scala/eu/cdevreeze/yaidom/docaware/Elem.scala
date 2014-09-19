@@ -36,8 +36,9 @@ final class Elem private[docaware] (
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
-   * These assertions are not invoked here, for performance reasons. It is advisable to call this method in test code
-   * for this element class.
+   * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this
+   * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
+   * class, it can be reasoned that these assertions must hold.)
    */
   def assertConsistency(): Unit = {
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
