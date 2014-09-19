@@ -30,8 +30,9 @@ import scala.reflect.ClassTag
  *
  * The sub-type parameter could have been a `java.lang.Class` object, except that type erasure would make it less attractive
  * (when doing pattern matching against that type). Hence the use of a `ClassTag` parameter, which undoes type erasure
- * for non-generic types. So `ClassTag` is used as a better `java.lang.Class`, yet without polluting the public API with
- * an implicit `ClassTag` parameter.
+ * for non-generic types, if available implicitly. So `ClassTag` is used as a better `java.lang.Class`, yet without
+ * polluting the public API with an implicit `ClassTag` parameter. (Instead, the ClassTag is made implicit inside the
+ * method implementations.)
  *
  * @author Chris de Vreeze
  */
