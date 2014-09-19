@@ -112,7 +112,7 @@ final class Elem private[indexed] (
    * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
    * class, it can be reasoned that these assertions must hold.)
    */
-  def assertConsistency(): Unit = {
+  private[yaidom] def assertConsistency(): Unit = {
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
     assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
   }
