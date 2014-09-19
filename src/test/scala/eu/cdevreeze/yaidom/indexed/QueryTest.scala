@@ -34,6 +34,14 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
+  @Test def testInternalConsistency(): Unit = {
+    require(bookstore.localName == "Bookstore")
+
+    val elems = bookstore.findAllElemsOrSelf
+
+    elems.foreach(e => e.assertConsistency())
+  }
+
   @Test def testQueryAll(): Unit = {
     require(bookstore.localName == "Bookstore")
 

@@ -34,10 +34,16 @@ final class Elem private[docaware] (
   val path: Path,
   val elem: eu.cdevreeze.yaidom.Elem) extends NavigableElemLike[Elem] with HasQName with HasText with Immutable {
 
-  // The elem must be the same as rootElem.findElemOrSelfByPath(path).get, which is not checked here
-
-  assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
-  assert(childElems.forall(_.docUri eq this.docUri), "Corrupt element!")
+  /**
+   * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
+   * These assertions are not invoked here, for performance reasons. It is advisable to call this method in test code
+   * for this element class.
+   */
+  def assertConsistency(): Unit = {
+    assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
+    assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
+    assert(childElems.forall(_.docUri eq this.docUri), "Corrupt element!")
+  }
 
   /**
    * Map from child node indexes to child elem indexes, for speeding up lookups of child elements
