@@ -71,7 +71,7 @@ class XmlSchemasTest extends Suite {
 
     val root: Elem = domParser.parse(is).documentElement
 
-    val schemaRoot = indexed.Elem(root).toSchemaRoot
+    val schemaRoot = SchemaRoot(indexed.Elem(root))
 
     // Global element declarations
 

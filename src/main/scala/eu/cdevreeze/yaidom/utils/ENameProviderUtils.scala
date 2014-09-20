@@ -37,7 +37,7 @@ object ENameProviderUtils {
   def newENameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): ENameProvider.ENameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => indexed.Elem(e).toSchemaRoot)
+    val schemaRoots = schemaElems.map(e => new SchemaRoot(indexed.Elem(e)))
 
     val globalElemDeclENames = schemaRoots.flatMap(e => e.findAllGlobalElementDeclarations.map(_.targetEName)).toSet
 
