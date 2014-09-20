@@ -699,6 +699,67 @@ class DomWrapperTest extends Suite {
     }
   }
 
+  /**
+   * Example of parsing a document with multiple kinds of nodes.
+   */
+  @Test def testParseMultipleNodeKinds(): Unit = {
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithDifferentKindsOfNodes.xml")
+    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+
+    val root: DomElem = domDoc.documentElement
+
+    assertResult(2) {
+      domDoc.comments.size
+    }
+    assertResult(1) {
+      domDoc.processingInstructions.size
+    }
+
+    assertResult("Some comment") {
+      domDoc.comments(1).text.trim
+    }
+    assertResult("pi") {
+      domDoc.processingInstructions.head.wrappedNode.getTarget
+    }
+
+    assertResult(true) {
+      domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
+        case t: DomText if t.wrappedNode.isInstanceOf[org.w3c.dom.CDATASection] && t.text == "Piet & co" => true
+        case _ => false
+      })
+    }
+
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case c: DomComment if c.text.trim == "Another comment" => c }).size
+    }
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case pi: DomProcessingInstruction if pi.wrappedNode.getTarget == "some_pi" => pi }).size
+    }
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case t: DomText if t.text.trim.contains("Some Text") => t }).size
+    }
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
+    }
+
+    val hasEntityRef =
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case er: DomEntityRef if er.wrappedNode.getNodeName == "hello" => er }).size >= 1
+    val hasExpandedEntity =
+      domDoc.documentElement.findAllElemsOrSelf.
+        filter(e => e.text.contains("This text contains an entity reference, viz. hi there.")).size >= 1
+
+    assertResult(true) {
+      hasEntityRef || hasExpandedEntity
+    }
+  }
+
   class LoggingEntityResolver extends EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
       logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")

@@ -30,6 +30,14 @@ final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) {
   require(wrappedDocument ne null)
 
   def documentElement: ScalaXmlElem = ScalaXmlNode.wrapElement(wrappedDocument.docElem.asInstanceOf[scala.xml.Elem])
+
+  def comments: immutable.IndexedSeq[ScalaXmlComment] = {
+    wrappedDocument.children.toIndexedSeq.collect({ case c: scala.xml.Comment => ScalaXmlComment(c) })
+  }
+
+  def processingInstructions: immutable.IndexedSeq[ScalaXmlProcessingInstruction] = {
+    wrappedDocument.children.toIndexedSeq.collect({ case pi: scala.xml.ProcInstr => ScalaXmlProcessingInstruction(pi) })
+  }
 }
 
 object ScalaXmlDocument {

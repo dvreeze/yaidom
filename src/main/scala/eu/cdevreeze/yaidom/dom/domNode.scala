@@ -66,6 +66,14 @@ final class DomDocument(
   override type DomType = w3c.dom.Document
 
   def documentElement: DomElem = DomNode.wrapElement(wrappedNode.getDocumentElement)
+
+  def comments: immutable.IndexedSeq[DomComment] = {
+    children.collect({ case c: DomComment => c })
+  }
+
+  def processingInstructions: immutable.IndexedSeq[DomProcessingInstruction] = {
+    children.collect({ case pi: DomProcessingInstruction => pi })
+  }
 }
 
 /**

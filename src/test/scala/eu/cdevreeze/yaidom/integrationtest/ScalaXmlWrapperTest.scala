@@ -616,6 +616,75 @@ class ScalaXmlWrapperTest extends Suite {
     }
   }
 
+  /**
+   * Example of parsing a document with multiple kinds of nodes.
+   */
+  @Test def testParseMultipleNodeKinds(): Unit = {
+    val is = classOf[ScalaXmlWrapperTest].getResourceAsStream("trivialXmlWithDifferentKindsOfNodes.xml")
+    val parser = ConstructingParser.fromSource(scala.io.Source.fromInputStream(is), preserveWS)
+    val doc = parser.document
+
+    val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
+
+    val root: ScalaXmlElem = domDoc.documentElement
+
+    assertResult(2) {
+      domDoc.comments.size
+    }
+    assertResult(1) {
+      domDoc.processingInstructions.size
+    }
+
+    assertResult("Some comment") {
+      domDoc.comments(1).text.trim
+    }
+    assertResult("pi") {
+      domDoc.processingInstructions.head.wrappedNode.target
+    }
+
+    assertResult(true) {
+      domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
+        case t: ScalaXmlCData if t.text == "Piet & co" => true
+        case _ => false
+      })
+    }
+
+    assertResult(true) {
+      !domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
+        case t: ScalaXmlAtom => true
+        case _ => false
+      })
+    }
+
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case c: ScalaXmlComment if c.text.trim == "Another comment" => c }).size
+    }
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case pi: ScalaXmlProcessingInstruction if pi.wrappedNode.target == "some_pi" => pi }).size
+    }
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case t: ScalaXmlText if t.text.trim.contains("Some Text") => t }).size
+    }
+    assertResult(1) {
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
+    }
+
+    val hasEntityRef =
+      domDoc.documentElement.findAllElemsOrSelf.
+        flatMap(_.children collect { case er: ScalaXmlEntityRef if er.wrappedNode.entityName == "hello" => er }).size >= 1
+    val hasExpandedEntity =
+      domDoc.documentElement.findAllElemsOrSelf.
+        filter(e => e.text.contains("This text contains an entity reference, viz. hi there.")).size >= 1
+
+    assertResult(true) {
+      hasEntityRef || hasExpandedEntity
+    }
+  }
+
   private def testEquality(wrapperElem1: ScalaXmlElem, wrapperElem2: ScalaXmlElem): Unit = {
     assertResult(true) {
       ScalaXmlWrapperTest.areEqual(wrapperElem1, wrapperElem2)
