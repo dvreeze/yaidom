@@ -37,7 +37,7 @@ object QNameProviderUtils {
   def newQNameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): QNameProvider.QNameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => new SchemaRoot(indexed.Elem(e)))
+    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem(e)))
 
     require(
       schemaRoots forall (e => e.targetNamespacePrefixOption.isDefined),

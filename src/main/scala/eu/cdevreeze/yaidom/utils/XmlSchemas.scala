@@ -229,19 +229,19 @@ private[utils] object XmlSchemas {
 
   trait XsdElemFactory[B <: XsdElem] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[B]
+    def tryToCreate(elem: indexed.Elem): Option[B]
   }
 
   object XsdElem {
 
     def apply(elem: indexed.Elem): XsdElem = {
-      SchemaRoot.optionallyCreate(elem).
-        orElse(GlobalElementDeclaration.optionallyCreate(elem)).
-        orElse(LocalElementDeclaration.optionallyCreate(elem)).
-        orElse(ElementReference.optionallyCreate(elem)).
-        orElse(GlobalAttributeDeclaration.optionallyCreate(elem)).
-        orElse(LocalAttributeDeclaration.optionallyCreate(elem)).
-        orElse(AttributeReference.optionallyCreate(elem)).
+      SchemaRoot.tryToCreate(elem).
+        orElse(GlobalElementDeclaration.tryToCreate(elem)).
+        orElse(LocalElementDeclaration.tryToCreate(elem)).
+        orElse(ElementReference.tryToCreate(elem)).
+        orElse(GlobalAttributeDeclaration.tryToCreate(elem)).
+        orElse(LocalAttributeDeclaration.tryToCreate(elem)).
+        orElse(AttributeReference.tryToCreate(elem)).
         getOrElse(new XsdElem(elem))
     }
   }
@@ -250,7 +250,7 @@ private[utils] object XmlSchemas {
 
     def apply(elem: indexed.Elem): SchemaRoot = new SchemaRoot(elem)
 
-    def optionallyCreate(elem: indexed.Elem): Option[SchemaRoot] = {
+    def tryToCreate(elem: indexed.Elem): Option[SchemaRoot] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "schema").res) Some(new SchemaRoot(elem)) else None
@@ -259,7 +259,7 @@ private[utils] object XmlSchemas {
 
   object GlobalElementDeclaration extends XsdElemFactory[GlobalElementDeclaration] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[GlobalElementDeclaration] = {
+    def tryToCreate(elem: indexed.Elem): Option[GlobalElementDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "element").res && elem.path.entries.size == 1)
@@ -270,7 +270,7 @@ private[utils] object XmlSchemas {
 
   object LocalElementDeclaration extends XsdElemFactory[LocalElementDeclaration] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[LocalElementDeclaration] = {
+    def tryToCreate(elem: indexed.Elem): Option[LocalElementDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "element").res &&
@@ -281,7 +281,7 @@ private[utils] object XmlSchemas {
 
   object ElementReference extends XsdElemFactory[ElementReference] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[ElementReference] = {
+    def tryToCreate(elem: indexed.Elem): Option[ElementReference] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "element").res &&
@@ -292,7 +292,7 @@ private[utils] object XmlSchemas {
 
   object GlobalAttributeDeclaration extends XsdElemFactory[GlobalAttributeDeclaration] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[GlobalAttributeDeclaration] = {
+    def tryToCreate(elem: indexed.Elem): Option[GlobalAttributeDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "attribute").res && elem.path.entries.size == 1)
@@ -303,7 +303,7 @@ private[utils] object XmlSchemas {
 
   object LocalAttributeDeclaration extends XsdElemFactory[LocalAttributeDeclaration] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[LocalAttributeDeclaration] = {
+    def tryToCreate(elem: indexed.Elem): Option[LocalAttributeDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "attribute").res &&
@@ -314,7 +314,7 @@ private[utils] object XmlSchemas {
 
   object AttributeReference extends XsdElemFactory[AttributeReference] {
 
-    def optionallyCreate(elem: indexed.Elem): Option[AttributeReference] = {
+    def tryToCreate(elem: indexed.Elem): Option[AttributeReference] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "attribute").res &&
