@@ -21,6 +21,7 @@ import java.{ util => jutil, io => jio }
 import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
+import scala.reflect.classTag
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
@@ -158,6 +159,30 @@ class XmlSchemasTest extends Suite {
     assertResult(true) {
       Set(QName("id").res, QName("targetNamespace").res, QName("elementFormDefault").res, QName("maxOccurs").res).subsetOf(
         localAttrDeclENames)
+    }
+
+    // Element references
+
+    val elemRefs = schemaRoot.findAllElemsOfType(classTag[ElementReference])
+    val elemRefENames = elemRefs.map(_.ref).toSet
+
+    assertResult(true) {
+      elemRefs.filter(e => e.ref == QName("xs:annotation").res).size >= 10
+    }
+    assertResult(true) {
+      schemaRoot.findAllElemsOrSelf exists { elem =>
+        elem.findAllChildElemsOfType(classTag[ElementReference]).map(_.ref) ==
+          List("xs:simpleType", "xs:complexType", "xs:group", "xs:attributeGroup").map(s => QName(s).res)
+      }
+    }
+
+    // Attribute references
+
+    val attrRefs = schemaRoot.findAllElemsOfType(classTag[AttributeReference])
+    val attrRefENames = attrRefs.map(_.ref).toSet
+
+    assertResult(Set(QName("xml:lang").res)) {
+      attrRefENames.toSet
     }
   }
 }

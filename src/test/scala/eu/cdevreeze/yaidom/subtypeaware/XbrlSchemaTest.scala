@@ -159,6 +159,20 @@ class XbrlSchemaTest extends Suite {
     assertResult(1) {
       itemsTypeDef.findAllElemsOfType(classTag[ElementReference]).size
     }
+    val firstElementReference = itemsTypeDef.findAllElemsOfType(classTag[ElementReference]).head
+
+    assertResult(Some(firstElementReference.wrappedElem)) {
+      itemsTypeDef.findElemOfType(classTag[ElementReference])(anyElem).map(_.wrappedElem)
+    }
+    assertResult(Some(firstElementReference.wrappedElem)) {
+      itemsTypeDef.findElemOrSelfOfType(classTag[ElementReference])(anyElem).map(_.wrappedElem)
+    }
+    assertResult(Some(firstElementReference.wrappedElem)) {
+      itemsTypeDef.findTopmostElemsOfType(classTag[ElementReference])(anyElem).headOption.map(_.wrappedElem)
+    }
+    assertResult(Some(firstElementReference.wrappedElem)) {
+      itemsTypeDef.findTopmostElemsOrSelfOfType(classTag[ElementReference])(anyElem).headOption.map(_.wrappedElem)
+    }
   }
 }
 
