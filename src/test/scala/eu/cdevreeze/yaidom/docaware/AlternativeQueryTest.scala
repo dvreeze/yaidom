@@ -60,7 +60,14 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    docaware.Elem(new URI("http://catalog"), convertToElem(xml))
+    val result = docaware.Elem(new URI("http://catalog"), convertToElem(xml))
+
+    // Invoking some Document methods, but without altering the result
+
+    val doc = docaware.Document(result)
+    require(result == doc.documentElement)
+    require(result == doc.withDocumentElement(result).documentElement)
+    result
   }
 
   protected val pricesElem: E = {
