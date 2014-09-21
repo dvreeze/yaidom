@@ -16,7 +16,7 @@ The changes in this version are:
   * For example, when implementing XML schema components as immutable "elements", these traits come in handy as mix-ins
   * Many more XML (immutable) object hierarchies could use these traits, such as XBRL instance support and XLink support
   * The traits are not used by yaidom itself (except for internals in the utils package)
-  * The ``SubtypeAwareParentElemLike`` trait is trivially implemented in terms of ``ParentElemApi``, and only offers convenience
+  * The ``SubtypeAwareParentElemLike`` trait is trivially implemented in terms of ``ParentElemLike``, and only offers convenience
 
 * Added methods ``comments`` and ``processingInstructions`` to docaware and indexed Documents
 * More test coverage
