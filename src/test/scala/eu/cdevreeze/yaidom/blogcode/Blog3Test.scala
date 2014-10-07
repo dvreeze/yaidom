@@ -34,6 +34,17 @@ import org.scalatest.junit.JUnitRunner
  * We will gradually introduce the different query API traits, and mention some element classes implementing them.
  * Each query API sub-trait has something to offer (w.r.t. the problem mentioned above) that its super-trait does
  * not offer, in order to make matching between element declaration and elements in the instance document easier.
+ * 
+ * TODO Use XBRL instances instead of XML Schema for the blog examples. E.g. http://www.xbrlsite.com/examples/comprehensiveexample/2008-04-18/sample-Instance-Proof.xml.
+ * Using ParentElemApi, check if all namespace declarations are at top-level. Using ElemApi (and Elem implementation),
+ * ask for all used dimensions and their used members. Using NavigableElemApi (and indexed.Elem) build Map from context
+ * IDs to Paths, and use this Map to quickly navigate from facts to contexts. Using PathAwareElemApi (and Elem) do the
+ * same, but somewhat differently. Using UpdatableElemApi, add prefix for XBRL instance namespace, and use it in
+ * unit measure values. Using TransformableElemApi, replace the default namespace everywhere. Using an instance model
+ * mixing in SubtypeAwareElemApi, repeat some of the queries above, but in a more type-safe manner. Also implement
+ * some checks, such as facts only pointing to existing contexts etc. Per query trait, sometimes use multiple element
+ * implementations, and show the uniform nature of the query API, as well as equivalence of query results (e.g. using
+ * resolved.Elems).
  *
  * @author Chris de Vreeze
  */

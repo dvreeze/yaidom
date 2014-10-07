@@ -22,6 +22,9 @@ The (somewhat more functional) library code checks are as follows:
 * As for clarity and correctness, how well can you reason about the code in the first place? (Immutability helps in this regard.)
 * As for clarity, correctness and minimality, is the API (partly) a (mathematical) theory, and also documented as such? That could provide an extra safety net.
 * As for clarity and minimality, is it easy to get started with the library without documentation, for basic usage? For example, by experimenting in the Scala REPL.
+* Given the chosen scope, is the API complete enough? E.g., check yaidom against Saxon and XQuery.
+* On the other hand, still strive for minimality, and keep in mind that completeness may mean good interop with other APIs (JAXP, wrapped DOM-like APIs etc.).
+* Does the API use names consistently?
 * Is the programming style consistent? E.g., a moderate Scala OO-functional style, preferring immutability, but not too alien to Java programmers.
 * Is more advanced usage supported? E.g., tuning the library for decreased memory usage.
 * How extensible is the library?
@@ -33,7 +36,7 @@ Other code checks are:
 * Proper deprecation of changes that are not backward compatible.
 * Avoidance of deprecated or soon to be deprecated language features, such as procedure syntax in Scala.
 * Avoidance of problematic language features or language feature combinations, such as the use of val or var in a trait.
-* Production quality: thread-safe (if applicable), supporting large data sets, configurable, well documented, etc.
+* Production quality: thread-safe (if applicable), supporting large data sets, well performing, configurable, well documented, etc.
 
 .. _`The trouble with types`: http://www.infoq.com/presentations/data-types-issues
 
