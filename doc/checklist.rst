@@ -22,7 +22,7 @@ The (somewhat more functional) library code checks are as follows:
 * As for clarity and correctness, how well can you reason about the code in the first place? (Immutability helps in this regard.)
 * As for clarity, correctness and minimality, is the API (partly) a (mathematical) theory, and also documented as such? That could provide an extra safety net.
 * As for clarity and minimality, is it easy to get started with the library without documentation, for basic usage? For example, by experimenting in the Scala REPL.
-* As for minimality, does the API have a good signal-to-noise ratio (or much "bang for the buck", or a small "conceptual surface area")?
+* As for minimality, does the API have a good "signal-to-noise ratio" (or much "bang for the buck", or a small "conceptual surface area")? Joshua Bloch: "When in doubt, leave it out".
 * Given the chosen scope, is the API complete enough? E.g., check yaidom against Saxon and XQuery.
 * On the other hand, still strive for minimality, and keep in mind that completeness may mean good interop with other APIs (JAXP, wrapped DOM-like APIs etc.).
 * Does the API use names consistently?
@@ -53,10 +53,11 @@ Other checks (w.r.t. documentation and bookkeeping) are:
 * Issue tracking.
 * Test coverage.
 * Builds against different JDKs, including at least one IBM JDK.
-* Scala code can be used relatively easily from Java.
+* Scala code can be used relatively easily from Java (distinguish between Java < 8 and >= 8).
 * All sources contain the license info, and there is a license file.
 * All sources contain documentation, including the author.
 * Change log up-to-date.
 * README up-to-date, including version info.
+* No sufficiently urgent TODOs are left.
 * Running a diff against the preceding release (using diff or meld).
 
