@@ -38,7 +38,7 @@ Other code checks are:
 * Avoidance of deprecated or soon to be deprecated language features, such as procedure syntax in Scala.
 * Avoidance of problematic language features or language feature combinations, such as the use of val or var in a trait.
 * Avoidance of problematic dependencies; the fewer JARs the API depends on, the better; the more common they are, the better.
-* Production quality: thread-safe (if applicable), supporting large data sets, well performing, configurable, well documented, etc.
+* Production quality: thread-safe (if applicable), supporting large data sets, well performing, configurable, well documented, needs no network connection, etc.
 
 .. _`The trouble with types`: http://www.infoq.com/presentations/data-types-issues
 

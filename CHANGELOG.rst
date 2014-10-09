@@ -3,6 +3,23 @@ CHANGELOG
 =========
 
 
+1.0
+===
+
+Version 1.0 is basically version 0.8.2, given the "1.0 status". Yaidom is now considered mature enough for a 1.0 release,
+at least by the author and his colleagues, who use yaidom extensively in production code.
+
+From now on, this "yaidom core" project is not expected to change a lot from the API perspective. Of course, performance
+improvements and documentation improvements are to be expected, but the API has already stabilized a lot. If at some
+point a different and better yaidom is conceived, it will likely become "yaidom 2" (reflected in package names).
+
+Several (small) libraries depending on this "yaidom core", and leveraging its extensibility, would make sense, though.
+Think for example about Saxon yaidom wrappers (offering the ElemApi query API, at least), or XML Schema support (offering
+the SubtypeAwareParentElemApi query API, at least).
+
+Compared to version 0.8.2, there are no changes worth mentioning.
+
+
 0.8.2
 =====
 

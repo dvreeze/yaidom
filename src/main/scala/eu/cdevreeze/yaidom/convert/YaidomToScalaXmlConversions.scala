@@ -22,7 +22,6 @@ import javax.xml.XMLConstants
 import scala.collection.JavaConverters._
 import scala.collection.{ immutable, mutable }
 import scala.annotation.tailrec
-import eu.cdevreeze.yaidom
 
 /**
  * Converter from yaidom nodes to Scala XML nodes, in particular from [[eu.cdevreeze.yaidom.Elem]] to a `scala.xml.Elem`.
