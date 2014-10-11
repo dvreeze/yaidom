@@ -23,6 +23,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem
 import eu.cdevreeze.yaidom.queryapi.HasQName
 import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.NavigableElemLike
@@ -109,10 +110,10 @@ import eu.cdevreeze.yaidom.queryapi.NavigableElemLike
  * @author Chris de Vreeze
  */
 final class Elem private[indexed] (
-  val rootElem: eu.cdevreeze.yaidom.defaultelem.Elem,
+  val rootElem: defaultelem.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: eu.cdevreeze.yaidom.defaultelem.Elem) extends NavigableElemLike[Elem] with HasQName with HasText with Immutable {
+  val elem: defaultelem.Elem) extends NavigableElemLike[Elem] with HasQName with HasText with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -129,7 +130,7 @@ final class Elem private[indexed] (
    * Map from child node indexes to child elem indexes, for speeding up lookups of child elements
    */
   private val elemIndexesByNodeIndex: Map[Int, Int] = {
-    (elem.children.zipWithIndex collect { case (e: eu.cdevreeze.yaidom.defaultelem.Elem, idx) => idx }).zipWithIndex.toMap
+    (elem.children.zipWithIndex collect { case (e: defaultelem.Elem, idx) => idx }).zipWithIndex.toMap
   }
 
   /**
@@ -200,14 +201,14 @@ object Elem {
   /**
    * Calls `apply(rootElem, Path.Root)`
    */
-  def apply(rootElem: eu.cdevreeze.yaidom.defaultelem.Elem): Elem = {
+  def apply(rootElem: defaultelem.Elem): Elem = {
     apply(rootElem, Path.Root)
   }
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply(rootElem: eu.cdevreeze.yaidom.defaultelem.Elem, path: Path): Elem = {
+  def apply(rootElem: defaultelem.Elem, path: Path): Elem = {
     val elem = rootElem.getElemOrSelfByPath(path)
 
     // Recursive calls

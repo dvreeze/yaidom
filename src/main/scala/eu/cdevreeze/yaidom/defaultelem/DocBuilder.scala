@@ -90,4 +90,17 @@ object DocBuilder {
       processingInstructions = doc.processingInstructions collect { case pi: ProcessingInstruction => fromProcessingInstruction(pi) },
       comments = doc.comments collect { case c => fromComment(c) })
   }
+
+  def document(
+    uriOption: Option[String] = None,
+    documentElement: ElemBuilder,
+    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] = Vector(),
+    comments: immutable.IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
+
+    new DocBuilder(
+      uriOption map { uriString => new URI(uriString) },
+      documentElement,
+      processingInstructions,
+      comments)
+  }
 }

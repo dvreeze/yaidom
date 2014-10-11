@@ -212,4 +212,17 @@ object Document {
    * comments and processing instructions.
    */
   def apply(documentElement: Elem): Document = apply(None, documentElement)
+
+  def document(
+    uriOption: Option[String] = None,
+    documentElement: Elem,
+    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
+    comments: immutable.IndexedSeq[Comment] = Vector()): Document = {
+
+    new Document(
+      uriOption map { uriString => new URI(uriString) },
+      documentElement,
+      processingInstructions,
+      comments)
+  }
 }

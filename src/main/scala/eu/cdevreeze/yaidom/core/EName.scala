@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.core
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import javax.xml.XMLConstants
-import javax.xml.namespace.{QName => JQName}
+import javax.xml.namespace.{ QName => JQName }
 
 /**
  * Expanded name. See http://www.w3.org/TR/xml-names11/. It has a localPart and an optional namespace URI.

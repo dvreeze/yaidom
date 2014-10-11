@@ -271,22 +271,6 @@ final case class CommentBuilder(text: String) extends NodeBuilder {
 
 object NodeBuilder {
 
-  /*
-  def document(
-    uriOption: Option[String] = None,
-    documentElement: ElemBuilder,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] = Vector(),
-    comments: immutable.IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
-
-    new DocBuilder(
-      uriOption map { uriString => new URI(uriString) },
-      documentElement,
-      processingInstructions,
-      comments)
-  }
-  * 
-  */
-
   def elem(
     qname: QName,
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
