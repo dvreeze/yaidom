@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package print
+package eu.cdevreeze.yaidom.print
 
-import java.{ util => jutil, io => jio }
-import javax.xml.stream._
-import javax.xml.stream.events.XMLEvent
+import java.{ io => jio }
+
 import scala.collection.immutable
-import convert.YaidomToStaxEventsConversions
+
+import eu.cdevreeze.yaidom.convert.YaidomToStaxEventsConversions
+import eu.cdevreeze.yaidom.defaultelem.Document
+import javax.xml.stream.XMLEventFactory
+import javax.xml.stream.XMLEventWriter
+import javax.xml.stream.XMLOutputFactory
+import javax.xml.stream.events.XMLEvent
 
 /**
  * StAX-based `Document` printer.

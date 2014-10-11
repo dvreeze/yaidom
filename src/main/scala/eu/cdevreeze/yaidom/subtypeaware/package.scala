@@ -17,16 +17,15 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Query traits that resemble ParentElemApi and ParentElemLike, but offering query support for object hierarchies.
- *
- * For example, XML Schema can be modeled with an object hierarchy, starting with some XsdElem super-type which
- * mixes in trait SubtypeAwareParentElemApi, among other query traits. The object hierarchy could contain sub-classes
- * of XsdElem such as XsdRootElem, GlobalElementDeclaration, etc. Then the SubtypeAwareParentElemApi trait makes it
- * easy to query for all or some global element declarations, etc.
- *
- * There is no magic in these traits: it is just ParentElemApi and ParentElemLike underneath. It is only the syntactic
- * convenience that makes the difference.
+ * This package contains the subtypeaware query API (the type aliases, that is).
  *
  * @author Chris de Vreeze
  */
-package object subtypeaware
+package object subtypeaware {
+
+  type SubtypeAwareParentElemApi[E <: SubtypeAwareParentElemApi[E]] = eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemApi[E]
+
+  type SubtypeAwareParentElemLike[E <: SubtypeAwareParentElemLike[E]] = eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemLike[E]
+
+  val SubtypeAwareParentElemApi = eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemApi
+}

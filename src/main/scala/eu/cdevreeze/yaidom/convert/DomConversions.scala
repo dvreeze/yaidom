@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package convert
+package eu.cdevreeze.yaidom.convert
 
 /**
  * Conversions between yaidom nodes and DOM nodes.

@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package utils
+package eu.cdevreeze.yaidom.utils
 
 import scala.collection.immutable
+
+import XmlSchemas.SchemaRoot
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.indexed
 
 /**
  * Utility for creating QNameProviders by parsing XML schema files.

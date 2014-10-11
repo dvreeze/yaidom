@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import org.w3c.dom.Element
+
 import org.xml.sax.InputSource
+
 import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.defaultelem.Document
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * DOM-based `Document` parser.

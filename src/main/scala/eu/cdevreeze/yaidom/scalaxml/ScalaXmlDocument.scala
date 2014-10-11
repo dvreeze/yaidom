@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package scalaxml
+package eu.cdevreeze.yaidom.scalaxml
 
-import java.{ util => jutil }
-import scala.collection.{ immutable, mutable }
+import scala.collection.immutable
 
 /**
  * Wrapper around a `scala.xml.Document`.

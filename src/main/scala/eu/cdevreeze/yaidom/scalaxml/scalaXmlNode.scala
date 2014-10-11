@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package scalaxml
+package eu.cdevreeze.yaidom.scalaxml
 
-import java.{ util => jutil }
-import scala.collection.{ immutable, mutable }
-import convert.ScalaXmlConversions._
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasQName
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
@@ -71,7 +77,7 @@ final class ScalaXmlElem(
    * Returns the resolved name of the element. Note that there is no guarantee that the element name can be resolved!
    */
   override def resolvedName: EName = {
-    val qname = toQName(wrappedNode)
+    val qname = ScalaXmlConversions.toQName(wrappedNode)
     scope.resolveQNameOption(qname).getOrElse(
       sys.error(s"Could not resolve QName from prefix ${Option(wrappedNode.prefix).getOrElse("")} and label ${wrappedNode.label}"))
   }
@@ -93,14 +99,14 @@ final class ScalaXmlElem(
     wrappedNode.child.toIndexedSeq flatMap { n: scala.xml.Node => ScalaXmlNode.wrapNodeOption(n) }
   }
 
-  def qname: QName = toQName(wrappedNode)
+  def qname: QName = ScalaXmlConversions.toQName(wrappedNode)
 
-  def attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(wrappedNode.attributes)
+  def attributes: immutable.IndexedSeq[(QName, String)] = ScalaXmlConversions.extractAttributes(wrappedNode.attributes)
 
   /**
    * Returns the scope of the element. Note that there is no guarantee that this scope is complete!
    */
-  def scope: Scope = extractScope(wrappedNode.scope)
+  def scope: Scope = ScalaXmlConversions.extractScope(wrappedNode.scope)
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }

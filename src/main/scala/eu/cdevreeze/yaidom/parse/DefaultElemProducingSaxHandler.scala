@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
-import org.xml.sax.{ ContentHandler, Attributes, Locator }
-import org.xml.sax.helpers.DefaultHandler
+import scala.collection.immutable
+import scala.collection.mutable
+
+import org.xml.sax.Attributes
 import org.xml.sax.ext.LexicalHandler
-import scala.collection.{ immutable, mutable }
+
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.defaultelem.Text
 import net.jcip.annotations.NotThreadSafe
-import eu.cdevreeze.yaidom._
-import NodeBuilder._
 
 /**
  * Default [[eu.cdevreeze.yaidom.parse.ElemProducingSaxHandler]] implementation.

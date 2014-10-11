@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package convert
+package eu.cdevreeze.yaidom.convert
 
-import java.{ util => jutil }
-import javax.xml.XMLConstants
-import scala.collection.JavaConverters._
-import scala.collection.{ immutable, mutable }
-import scala.annotation.tailrec
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.ElemConverter
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.defaultelem.Text
 
 /**
  * Converter from yaidom nodes to Scala XML nodes, in particular from [[eu.cdevreeze.yaidom.Elem]] to a `scala.xml.Elem`.

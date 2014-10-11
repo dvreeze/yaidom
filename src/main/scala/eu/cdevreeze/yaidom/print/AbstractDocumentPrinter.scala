@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package print
+package eu.cdevreeze.yaidom.print
 
-import java.io.{ OutputStream, ByteArrayOutputStream }
+import java.io.ByteArrayOutputStream
+import java.io.OutputStream
+
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
 
 /**
  * Partial `DocumentPrinter` implementation.

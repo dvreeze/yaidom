@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package print
+package eu.cdevreeze.yaidom.print
 
 import java.{ io => jio }
+
+import eu.cdevreeze.yaidom.defaultelem.Document
 
 /**
  * Thread-local DocumentPrinter. This class exists because typical JAXP factory objects (DocumentBuilderFactory etc.) are

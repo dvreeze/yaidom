@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
-import org.w3c.dom.Element
-import org.w3c.dom.ls.{ DOMImplementationLS, LSParser, LSInput }
+
 import org.w3c.dom.bootstrap.DOMImplementationRegistry
+import org.w3c.dom.ls.DOMImplementationLS
+import org.w3c.dom.ls.LSInput
+import org.w3c.dom.ls.LSParser
+
 import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.defaultelem.Document
 
 /**
  * DOM-LS-based `Document` parser.

@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package convert
+package eu.cdevreeze.yaidom.convert
 
-import java.{ util => jutil }
-import javax.xml.XMLConstants
-import org.w3c.dom.{ Element }
-import scala.collection.JavaConverters._
-import scala.collection.{ immutable, mutable }
+import scala.collection.immutable
+
+import org.w3c.dom.Element
+
 import eu.cdevreeze.yaidom
-import YaidomToDomConversions._
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.DocumentConverter
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.ElemConverter
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.defaultelem.Text
+import YaidomToDomConversions.DocumentProducer
+import YaidomToDomConversions.ElementProducer
 
 /**
  * Converter from yaidom nodes to DOM nodes, in particular from [[eu.cdevreeze.yaidom.Elem]] to a `org.w3c.dom.Element`,
@@ -34,7 +44,7 @@ import YaidomToDomConversions._
 trait YaidomToDomConversions extends ElemConverter[ElementProducer] with DocumentConverter[DocumentProducer] {
 
   /** Converts a yaidom `Document` to a function from DOM documents (as node factories) to (filled) DOM documents */
-  final def convertDocument(document: yaidom.Document): DocumentProducer = {
+  final def convertDocument(document: defaultelem.Document): DocumentProducer = {
     { (doc: org.w3c.dom.Document) =>
       val pis: immutable.IndexedSeq[org.w3c.dom.ProcessingInstruction] =
         document.processingInstructions map { pi => convertProcessingInstruction(pi, doc) }

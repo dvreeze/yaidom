@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package dom
+package eu.cdevreeze.yaidom.dom
 
-import java.{ util => jutil }
+import scala.collection.immutable
+
 import org.w3c
-import scala.collection.{ immutable, mutable }
-import convert.DomConversions
-import DomElem._
+
+import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.HasQName
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -114,7 +122,7 @@ final class DomElem(
   def attributes: immutable.IndexedSeq[(QName, String)] = DomConversions.extractAttributes(wrappedNode.getAttributes)
 
   def scope: Scope = {
-    val ancestryOrSelf = getAncestorsOrSelf(this.wrappedNode)
+    val ancestryOrSelf = DomElem.getAncestorsOrSelf(this.wrappedNode)
 
     val resultScope =
       ancestryOrSelf.foldRight(Scope.Empty) {

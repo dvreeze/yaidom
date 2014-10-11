@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
 import org.xml.sax.helpers.DefaultHandler
-import scala.collection.immutable
-import eu.cdevreeze.yaidom._
+
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
 
 /**
  * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.Elem]] using

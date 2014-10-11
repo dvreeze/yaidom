@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package print
+package eu.cdevreeze.yaidom.print
 
-import java.{ io => jio, util => jutil }
-import org.xml.sax.{ Attributes, XMLReader }
+import java.{ io => jio }
+
+import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import javax.xml.transform.{ TransformerFactory, URIResolver, OutputKeys }
-import javax.xml.transform.sax.{ SAXTransformerFactory, TransformerHandler }
+
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.defaultelem.Text
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.sax.SAXTransformerFactory
+import javax.xml.transform.sax.TransformerHandler
 import javax.xml.transform.stream.StreamResult
 
 /**

@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package print
+package eu.cdevreeze.yaidom.print
 
-import java.{ util => jutil, io => jio }
-import javax.xml.transform.{ TransformerFactory, Transformer, OutputKeys }
+import java.{ io => jio }
+
+import DocumentPrinterUsingDom.transformerCreatorForHtml
+import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.defaultelem.Document
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.Transformer
+import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import scala.collection.immutable
-import convert.DomConversions._
-import DocumentPrinterUsingDom._
 
 /**
  * DOM-based `Document` printer.
@@ -83,7 +86,7 @@ final class DocumentPrinterUsingDom(
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
 
     val transformer = transformerCreator(transformerFactory)
     transformer.setOutputProperty(OutputKeys.ENCODING, encoding)
@@ -103,7 +106,7 @@ final class DocumentPrinterUsingDom(
 
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
 
     val transformer = transformerCreator(transformerFactory)
 

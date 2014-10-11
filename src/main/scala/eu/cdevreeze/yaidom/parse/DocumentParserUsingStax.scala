@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
-import java.{ io => jio, util => jutil }
-import javax.xml.stream.{ XMLInputFactory, XMLEventReader }
+import java.{ io => jio }
+import java.{ util => jutil }
+
+import scala.collection.Iterator
+import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.util.control.Exception.ignoring
+
+import eu.cdevreeze.yaidom.convert.StaxConversions
+import eu.cdevreeze.yaidom.defaultelem.Document
+import javax.xml.stream.XMLEventReader
+import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
-import scala.collection.{ immutable, Iterator }
-import scala.collection.JavaConverters._
-import scala.util.control.Exception._
-import convert.StaxConversions._
 
 /**
  * StAX-based `Document` parser.
@@ -81,7 +85,7 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends A
       val streamSource = new StreamSource(inputStream)
       xmlEventReader = inputFactory.createXMLEventReader(streamSource)
 
-      convertToDocument(asIterator(xmlEventReader))
+      StaxConversions.convertToDocument(asIterator(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
         if (xmlEventReader ne null) xmlEventReader.close()

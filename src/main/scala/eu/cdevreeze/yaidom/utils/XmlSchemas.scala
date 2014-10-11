@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package utils
+package eu.cdevreeze.yaidom.utils
 
 import scala.collection.immutable
 import scala.reflect.classTag
-import eu.cdevreeze.yaidom.subtypeaware.SubtypeAwareParentElemLike
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemLike
 
 /**
  * Simple (package-private) utility for querying XML schemas for element declarations, attribute declarations, etc.

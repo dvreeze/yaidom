@@ -14,16 +14,31 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package convert
+package eu.cdevreeze.yaidom.convert
 
 import java.{ util => jutil }
-import javax.xml.XMLConstants
-import javax.xml.stream._
-import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
-import scala.collection.JavaConverters._
-import scala.collection.{ immutable, mutable }
-import YaidomToStaxEventsConversions._
+
+import scala.collection.JavaConverters.bufferAsJavaListConverter
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.DocumentConverter
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.ElemConverter
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.defaultelem.Text
+import javax.xml.stream.XMLEventFactory
+import javax.xml.stream.events.Attribute
+import javax.xml.stream.events.EndElement
+import javax.xml.stream.events.Namespace
+import javax.xml.stream.events.StartElement
+import javax.xml.stream.events.XMLEvent
+import YaidomToStaxEventsConversions.XmlEventsProducer
 
 /**
  * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.Elem]] to `immutable.IndexedSeq[XMLEvent]`,

@@ -259,7 +259,7 @@ package eu.cdevreeze
  * } yield authorElem
  * }}}
  * where `\\` stands for `filterElemsOrSelf`.
- * 
+ *
  * There is no explicit support for filtering on the "self" element itself. In the example above, we might want to check if
  * the root element has the expected EName, for instance. That is easy to express using a simple idiom, however. The last
  * example then becomes:
@@ -498,4 +498,147 @@ package eu.cdevreeze
  *
  * @author Chris de Vreeze
  */
-package object yaidom
+package object yaidom {
+
+  // Aliases for types and objects in the core package
+
+  type QName = eu.cdevreeze.yaidom.core.QName
+
+  type UnprefixedName = eu.cdevreeze.yaidom.core.UnprefixedName
+
+  type PrefixedName = eu.cdevreeze.yaidom.core.PrefixedName
+
+  val QName = eu.cdevreeze.yaidom.core.QName
+
+  val UnprefixedName = eu.cdevreeze.yaidom.core.UnprefixedName
+
+  val PrefixedName = eu.cdevreeze.yaidom.core.PrefixedName
+
+  type EName = eu.cdevreeze.yaidom.core.EName
+
+  val EName = eu.cdevreeze.yaidom.core.EName
+
+  type QNameProvider = eu.cdevreeze.yaidom.core.QNameProvider
+
+  val QNameProvider = eu.cdevreeze.yaidom.core.QNameProvider
+
+  type ENameProvider = eu.cdevreeze.yaidom.core.ENameProvider
+
+  val ENameProvider = eu.cdevreeze.yaidom.core.ENameProvider
+
+  type Declarations = eu.cdevreeze.yaidom.core.Declarations
+
+  val Declarations = eu.cdevreeze.yaidom.core.Declarations
+
+  type Scope = eu.cdevreeze.yaidom.core.Scope
+
+  val Scope = eu.cdevreeze.yaidom.core.Scope
+
+  type Path = eu.cdevreeze.yaidom.core.Path
+
+  val Path = eu.cdevreeze.yaidom.core.Path
+
+  type PathBuilder = eu.cdevreeze.yaidom.core.PathBuilder
+
+  val PathBuilder = eu.cdevreeze.yaidom.core.PathBuilder
+
+  // Aliases for types and objects in the queryapi package
+
+  type ParentElemApi[E <: ParentElemApi[E]] = eu.cdevreeze.yaidom.queryapi.ParentElemApi[E]
+
+  type ParentElemLike[E <: ParentElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ParentElemLike[E]
+
+  type ElemApi[E <: ElemApi[E]] = eu.cdevreeze.yaidom.queryapi.ElemApi[E]
+
+  val ElemApi = eu.cdevreeze.yaidom.queryapi.ElemApi
+
+  type ElemLike[E <: ElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ElemLike[E]
+
+  type NavigableElemApi[E <: NavigableElemApi[E]] = eu.cdevreeze.yaidom.queryapi.NavigableElemApi[E]
+
+  type NavigableElemLike[E <: NavigableElemLike[E]] = eu.cdevreeze.yaidom.queryapi.NavigableElemLike[E]
+
+  type PathAwareElemApi[E <: PathAwareElemApi[E]] = eu.cdevreeze.yaidom.queryapi.PathAwareElemApi[E]
+
+  type PathAwareElemLike[E <: PathAwareElemLike[E]] = eu.cdevreeze.yaidom.queryapi.PathAwareElemLike[E]
+
+  type UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] = eu.cdevreeze.yaidom.queryapi.UpdatableElemApi[N, E]
+
+  type UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] = eu.cdevreeze.yaidom.queryapi.UpdatableElemLike[N, E]
+
+  type TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] = eu.cdevreeze.yaidom.queryapi.TransformableElemApi[N, E]
+
+  type TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] = eu.cdevreeze.yaidom.queryapi.TransformableElemLike[N, E]
+
+  type HasParent[E <: HasParent[E]] = eu.cdevreeze.yaidom.queryapi.HasParent[E]
+
+  type HasQName = eu.cdevreeze.yaidom.queryapi.HasQName
+
+  type HasText = eu.cdevreeze.yaidom.queryapi.HasText
+
+  // Aliases for types and objects in the defaultelem package
+
+  type Node = eu.cdevreeze.yaidom.defaultelem.Node
+
+  type Elem = eu.cdevreeze.yaidom.defaultelem.Elem
+
+  type Text = eu.cdevreeze.yaidom.defaultelem.Text
+
+  type Comment = eu.cdevreeze.yaidom.defaultelem.Comment
+
+  type ProcessingInstruction = eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+
+  type EntityRef = eu.cdevreeze.yaidom.defaultelem.EntityRef
+
+  val Node = eu.cdevreeze.yaidom.defaultelem.Node
+
+  val Elem = eu.cdevreeze.yaidom.defaultelem.Elem
+
+  val Text = eu.cdevreeze.yaidom.defaultelem.Text
+
+  val Comment = eu.cdevreeze.yaidom.defaultelem.Comment
+
+  val ProcessingInstruction = eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+
+  val EntityRef = eu.cdevreeze.yaidom.defaultelem.EntityRef
+
+  type Document = eu.cdevreeze.yaidom.defaultelem.Document
+
+  val Document = eu.cdevreeze.yaidom.defaultelem.Document
+
+  type NodeBuilder = eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+
+  type ElemBuilder = eu.cdevreeze.yaidom.defaultelem.ElemBuilder
+
+  type TextBuilder = eu.cdevreeze.yaidom.defaultelem.TextBuilder
+
+  type CommentBuilder = eu.cdevreeze.yaidom.defaultelem.CommentBuilder
+
+  type ProcessingInstructionBuilder = eu.cdevreeze.yaidom.defaultelem.ProcessingInstructionBuilder
+
+  type EntityRefBuilder = eu.cdevreeze.yaidom.defaultelem.EntityRefBuilder
+
+  val NodeBuilder = eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+
+  val TextBuilder = eu.cdevreeze.yaidom.defaultelem.TextBuilder
+
+  val CommentBuilder = eu.cdevreeze.yaidom.defaultelem.CommentBuilder
+
+  val ProcessingInstructionBuilder = eu.cdevreeze.yaidom.defaultelem.ProcessingInstructionBuilder
+
+  val EntityRefBuilder = eu.cdevreeze.yaidom.defaultelem.EntityRefBuilder
+
+  type DocBuilder = eu.cdevreeze.yaidom.defaultelem.DocBuilder
+
+  val DocBuilder = eu.cdevreeze.yaidom.defaultelem.DocBuilder
+
+  type ConverterToDocument[A] = eu.cdevreeze.yaidom.defaultelem.ConverterToDocument[A]
+
+  type ConverterToElem[A] = eu.cdevreeze.yaidom.defaultelem.ConverterToElem[A]
+
+  type DocumentConverter[A] = eu.cdevreeze.yaidom.defaultelem.DocumentConverter[A]
+
+  type ElemConverter[A] = eu.cdevreeze.yaidom.defaultelem.ElemConverter[A]
+
+  val TreeReprParsers = eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
+}

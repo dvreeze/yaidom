@@ -14,18 +14,38 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package convert
+package eu.cdevreeze.yaidom.convert
 
-import java.{ util => jutil }
 import java.net.URI
+
+import scala.collection.BufferedIterator
+import scala.collection.Iterator
+import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.collection.immutable
+import scala.collection.mutable
+
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.ConverterToDocument
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.defaultelem.Text
 import javax.xml.XMLConstants
-import javax.xml.stream._
-import javax.xml.stream.events.{ ProcessingInstruction => _, Comment => _, _ }
 import javax.xml.namespace.{ QName => JQName }
-import scala.collection.JavaConverters._
-import scala.collection.{ immutable, mutable, Iterator, BufferedIterator }
-import StaxEventsToYaidomConversions._
+import javax.xml.stream.events.Attribute
+import javax.xml.stream.events.Characters
+import javax.xml.stream.events.EndElement
+import javax.xml.stream.events.EntityReference
+import javax.xml.stream.events.Namespace
+import javax.xml.stream.events.StartDocument
+import javax.xml.stream.events.StartElement
+import javax.xml.stream.events.XMLEvent
 
 /**
  * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.Elem]] and
@@ -40,6 +60,9 @@ import StaxEventsToYaidomConversions._
  * @author Chris de Vreeze
  */
 trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
+  import StaxEventsToYaidomConversions.EventWithDepth
+  import StaxEventsToYaidomConversions.DocumentResult
+  import StaxEventsToYaidomConversions.ElemResult
 
   /**
    * Converts the given sequence of `XMLEvent` instances to a yaidom `Document`. Invokes `convertToDocument(v.iterator)`.

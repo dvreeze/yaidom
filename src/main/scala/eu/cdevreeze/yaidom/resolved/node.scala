@@ -13,10 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cdevreeze.yaidom
-package resolved
 
-import scala.collection.{ immutable, mutable }
+package eu.cdevreeze.yaidom.resolved
+
+import java.io.ObjectStreamException
+
+import scala.Vector
+import scala.collection.immutable
+import scala.collection.mutable
+
+import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.defaultelem
+import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
+import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
 /**
  * Immutable "resolved" Node. It is called "resolved" because the element trees in this package only contain resolved element and
@@ -356,9 +368,9 @@ object Node {
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
-  def apply(n: eu.cdevreeze.yaidom.Node): Node = n match {
-    case e: eu.cdevreeze.yaidom.Elem => Elem(e)
-    case t: eu.cdevreeze.yaidom.Text => Text(t)
+  def apply(n: defaultelem.Node): Node = n match {
+    case e: defaultelem.Elem => Elem(e)
+    case t: defaultelem.Text => Text(t)
     case n => sys.error(s"Not an element or text node: $n")
   }
 }
@@ -374,10 +386,10 @@ object Elem {
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
   }
 
-  def apply(e: eu.cdevreeze.yaidom.Elem): Elem = {
+  def apply(e: defaultelem.Elem): Elem = {
     val children = e.children collect {
-      case childElm: eu.cdevreeze.yaidom.Elem => childElm
-      case childText: eu.cdevreeze.yaidom.Text => childText
+      case childElm: defaultelem.Elem => childElm
+      case childText: defaultelem.Text => childText
     }
     val resolvedChildren = children map { node => Node(node) }
 
@@ -387,5 +399,5 @@ object Elem {
 
 object Text {
 
-  def apply(t: eu.cdevreeze.yaidom.Text): Text = Text(t.text)
+  def apply(t: defaultelem.Text): Text = Text(t.text)
 }

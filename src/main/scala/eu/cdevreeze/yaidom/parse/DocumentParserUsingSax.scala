@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
-import javax.xml.parsers.{ SAXParserFactory, SAXParser }
+
 import org.xml.sax.InputSource
-import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.ext.LexicalHandler
+import org.xml.sax.helpers.DefaultHandler
+
+import eu.cdevreeze.yaidom.defaultelem.Document
+import javax.xml.parsers.SAXParser
+import javax.xml.parsers.SAXParserFactory
 
 /**
  * SAX-based `Document` parser.

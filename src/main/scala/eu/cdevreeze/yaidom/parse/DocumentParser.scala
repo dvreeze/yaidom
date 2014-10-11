@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
-import java.io.{ InputStream, File }
+import java.io.File
+import java.io.InputStream
 import java.net.URI
+
+import eu.cdevreeze.yaidom.defaultelem.Document
 
 /**
  * [[eu.cdevreeze.yaidom.Document]] parser. This trait is purely abstract.

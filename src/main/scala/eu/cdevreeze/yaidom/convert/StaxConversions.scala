@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package convert
-
-import java.{ util => jutil }
-import javax.xml.stream.XMLEventReader
-import javax.xml.stream.events.XMLEvent
-import scala.collection.immutable
-import scala.collection.JavaConverters._
+package eu.cdevreeze.yaidom.convert
 
 /**
  * Conversions between yaidom nodes and StAX events.

@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package print
+package eu.cdevreeze.yaidom.print
 
-import java.{ util => jutil, io => jio }
-import org.w3c.dom.ls.{ DOMImplementationLS, LSSerializer, LSOutput }
+import java.{ io => jio }
+
+import scala.Vector
+
 import org.w3c.dom.bootstrap.DOMImplementationRegistry
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import scala.collection.immutable
-import convert.DomConversions._
-import DocumentPrinterUsingDomLS._
+import org.w3c.dom.ls.DOMImplementationLS
+import org.w3c.dom.ls.LSOutput
+import org.w3c.dom.ls.LSSerializer
+
+import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Text
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * DOM-LS-based `Document` printer.
@@ -56,7 +62,7 @@ final class DocumentPrinterUsingDomLS(
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
 
     val serializer: LSSerializer = serializerCreator(domImplementation)
 
@@ -74,7 +80,7 @@ final class DocumentPrinterUsingDomLS(
 
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
 
     val serializer: LSSerializer = serializerCreator(domImplementation)
 

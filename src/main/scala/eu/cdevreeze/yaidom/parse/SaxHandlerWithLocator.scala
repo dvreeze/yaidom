@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
-import org.xml.sax.{ ContentHandler, Locator }
+import org.xml.sax.Locator
 import org.xml.sax.helpers.DefaultHandler
-import scala.collection.immutable
+
 import net.jcip.annotations.NotThreadSafe
-import eu.cdevreeze.yaidom._
 
 /**
  * Mixin extending `DefaultHandler` that contains a `Locator`. Typically this `Locator` is used by an `ErrorHandler` mixed in after this trait.

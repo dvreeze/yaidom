@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package parse
+package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
+
+import eu.cdevreeze.yaidom.defaultelem.Document
 
 /**
  * Thread-local DocumentParser. This class exists because typical JAXP factory objects (DocumentBuilderFactory etc.) are
