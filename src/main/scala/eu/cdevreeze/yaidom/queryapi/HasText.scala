@@ -24,13 +24,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  *
  * @author Chris de Vreeze
  */
-trait HasText {
-
-  /**
-   * Returns the concatenation of the texts of (the implicit) text children, including whitespace and CData.
-   * Non-text children are ignored. If there are no text children, the empty string is returned.
-   */
-  def text: String
+trait HasText extends HasTextApi {
 
   /** Returns `text.trim`. */
   final def trimmedText: String = text.trim

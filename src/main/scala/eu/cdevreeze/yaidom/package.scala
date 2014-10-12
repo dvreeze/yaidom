@@ -572,7 +572,7 @@ package object yaidom {
 
   type HasParent[E <: HasParent[E]] = eu.cdevreeze.yaidom.queryapi.HasParent[E]
 
-  type HasQName = eu.cdevreeze.yaidom.queryapi.HasQName
+  type HasQNameApi = eu.cdevreeze.yaidom.queryapi.HasQNameApi
 
   type HasText = eu.cdevreeze.yaidom.queryapi.HasText
 

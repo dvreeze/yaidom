@@ -16,26 +16,19 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.collection.immutable
-
-import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Path
 
 /**
- * Trait defining the contract for elements that have a QName, as well as attributes with QName keys.
+ * Trait defining the contract for elements that have a stored Path.
  *
  * Using this trait (possibly in combination with other "element traits") we can abstract over several element implementations.
  *
  * @author Chris de Vreeze
  */
-trait HasQName {
+trait HasPathApi {
 
   /**
-   * The QName of the element
+   * The Path stored with the element
    */
-  def qname: QName
-
-  /**
-   * The attributes of the element as mapping from QNames to values
-   */
-  def attributes: immutable.Iterable[(QName, String)]
+  def path: Path
 }

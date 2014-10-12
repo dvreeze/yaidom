@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.queryapi
 
 /**
- * This package contains the query API traits. It contains both the purely abstract API traits as well as the
- * partial implementation traits.
- *
- * This package depends only on the core package in yaidom, but many other packages do depend on this one.
+ * Trait defining the contract for elements as text containers.
+ * Typical element types are both an [[eu.cdevreeze.yaidom.ElemLike]] as well as a [[eu.cdevreeze.yaidom.HasText]].
  *
  * @author Chris de Vreeze
  */
-package object queryapi
+trait HasTextApi {
+
+  /**
+   * Returns the concatenation of the texts of (the implicit) text children, including whitespace and CData.
+   * Non-text children are ignored. If there are no text children, the empty string is returned.
+   */
+  def text: String
+
+  /** Returns `text.trim`. */
+  def trimmedText: String
+
+  /** Returns `XmlStringUtils.normalizeString(text)`. */
+  def normalizedText: String
+}

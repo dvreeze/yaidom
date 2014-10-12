@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.HasQName
+import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
@@ -90,7 +90,7 @@ final class DomDocument(
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasParent[DomElem] with HasQName with HasText { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasParent[DomElem] with HasQNameApi with HasText { self =>
 
   require(wrappedNode ne null)
 

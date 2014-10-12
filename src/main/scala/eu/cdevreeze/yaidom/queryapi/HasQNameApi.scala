@@ -14,14 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.queryapi
+
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.QName
 
 /**
- * This package contains the query API traits. It contains both the purely abstract API traits as well as the
- * partial implementation traits.
+ * Trait defining the contract for elements that have a QName, as well as attributes with QName keys.
  *
- * This package depends only on the core package in yaidom, but many other packages do depend on this one.
+ * Using this trait (possibly in combination with other "element traits") we can abstract over several element implementations.
  *
  * @author Chris de Vreeze
  */
-package object queryapi
+trait HasQNameApi {
+
+  /**
+   * The QName of the element
+   */
+  def qname: QName
+
+  /**
+   * The attributes of the element as mapping from QNames to values
+   */
+  def attributes: immutable.Iterable[(QName, String)]
+}
