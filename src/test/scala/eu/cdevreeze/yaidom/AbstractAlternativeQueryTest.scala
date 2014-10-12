@@ -22,8 +22,11 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import HasENameApi._
+import eu.cdevreeze.yaidom.queryapi.HasENameApi._
 import convert.ScalaXmlConversions._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Alternative query test, with yaidom queries ported from XQuery examples.

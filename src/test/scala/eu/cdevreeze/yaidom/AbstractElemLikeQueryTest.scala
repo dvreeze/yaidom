@@ -22,7 +22,10 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import HasENameApi._
+import eu.cdevreeze.yaidom.queryapi.HasENameApi._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * ElemLike-based query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat

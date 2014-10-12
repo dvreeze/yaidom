@@ -31,6 +31,7 @@ import parse._
 import print._
 import convert.ScalaXmlConversions._
 import MileageRecordsTest._
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
  * Test case using yaidom for mileage records.

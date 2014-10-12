@@ -21,6 +21,10 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import eu.cdevreeze.yaidom.queryapi.ElemApi
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from the coursera course Introduction to Databases,

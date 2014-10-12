@@ -19,18 +19,18 @@ package subtypeaware
 
 import scala.collection.immutable
 import scala.reflect.classTag
-
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-
 import SubtypeAwareParentElemApi.anyElem
 import eu.cdevreeze.yaidom.Document
 import eu.cdevreeze.yaidom.EName
-import eu.cdevreeze.yaidom.IsNavigable
 import eu.cdevreeze.yaidom.Path
 import eu.cdevreeze.yaidom.indexed
 import parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
 
 /**
  * Test case using yaidom sub-type-aware elements for XBRL schema processing.

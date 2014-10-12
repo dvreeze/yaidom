@@ -29,6 +29,7 @@ import org.scalatest.junit.JUnitRunner
 import convert.DomConversions._
 import parse._
 import print._
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
  * XPath interoperability test. This test shows that DOM Node lists obtained with XPath queries can be processed further using

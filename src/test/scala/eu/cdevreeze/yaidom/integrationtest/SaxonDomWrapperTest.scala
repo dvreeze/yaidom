@@ -32,6 +32,11 @@ import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.om.{ NodeInfo, DocumentInfo, AxisInfo }
 import net.sf.saxon.`type`.Type
 import SaxonDomWrapperTest._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.HasParent
 
 /**
  * Saxon DOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around Saxon DOMNodeWrapper Elements.

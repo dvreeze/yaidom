@@ -25,6 +25,7 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import parse.DocumentParserUsingDom
 import com.google.common.cache._
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
  * Name pooling test, using Google Guava cache based EName and QName providers.

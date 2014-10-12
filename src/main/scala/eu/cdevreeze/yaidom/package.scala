@@ -500,9 +500,10 @@ package eu.cdevreeze
  */
 package object yaidom {
 
-  implicit class ToHasElemApi(val ename: EName) extends (ElemApi[_] with HasENameApi => Boolean) {
+  implicit class ToHasElemApi(val ename: EName) extends (eu.cdevreeze.yaidom.queryapi.ElemApi[_] with eu.cdevreeze.yaidom.queryapi.HasENameApi => Boolean) {
 
-    def apply(elem: ElemApi[_] with HasENameApi): Boolean = (elem.resolvedName == this.ename)
+    def apply(elem: eu.cdevreeze.yaidom.queryapi.ElemApi[_] with eu.cdevreeze.yaidom.queryapi.HasENameApi): Boolean =
+      (elem.resolvedName == this.ename)
   }
 
   // Aliases for types and objects in the core package
@@ -547,39 +548,7 @@ package object yaidom {
 
   val PathBuilder = eu.cdevreeze.yaidom.core.PathBuilder
 
-  // Aliases for types and objects in the queryapi package
-
-  type ElemApi[E <: ElemApi[E]] = eu.cdevreeze.yaidom.queryapi.ElemApi[E]
-
-  type ElemLike[E <: ElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ElemLike[E]
-
-  type HasENameApi = eu.cdevreeze.yaidom.queryapi.HasENameApi
-
-  val HasENameApi = eu.cdevreeze.yaidom.queryapi.HasENameApi
-
-  type HasEName = eu.cdevreeze.yaidom.queryapi.HasEName
-
-  type IsNavigableApi[E <: IsNavigableApi[E]] = eu.cdevreeze.yaidom.queryapi.IsNavigableApi[E]
-
-  type IsNavigable[E <: IsNavigable[E]] = eu.cdevreeze.yaidom.queryapi.IsNavigable[E]
-
-  type PathAwareElemApi[E <: PathAwareElemApi[E]] = eu.cdevreeze.yaidom.queryapi.PathAwareElemApi[E]
-
-  type PathAwareElemLike[E <: PathAwareElemLike[E]] = eu.cdevreeze.yaidom.queryapi.PathAwareElemLike[E]
-
-  type UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] = eu.cdevreeze.yaidom.queryapi.UpdatableElemApi[N, E]
-
-  type UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] = eu.cdevreeze.yaidom.queryapi.UpdatableElemLike[N, E]
-
-  type TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] = eu.cdevreeze.yaidom.queryapi.TransformableElemApi[N, E]
-
-  type TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] = eu.cdevreeze.yaidom.queryapi.TransformableElemLike[N, E]
-
-  type HasParent[E <: HasParent[E]] = eu.cdevreeze.yaidom.queryapi.HasParent[E]
-
-  type HasQNameApi = eu.cdevreeze.yaidom.queryapi.HasQNameApi
-
-  type HasText = eu.cdevreeze.yaidom.queryapi.HasText
+  // There are no aliases for types and objects in the queryapi package!
 
   // Aliases for types and objects in the defaultelem package
 

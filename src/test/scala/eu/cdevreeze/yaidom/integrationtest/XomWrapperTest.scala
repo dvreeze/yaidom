@@ -29,6 +29,10 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import XomWrapperTest._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * XOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around XOM Elements.

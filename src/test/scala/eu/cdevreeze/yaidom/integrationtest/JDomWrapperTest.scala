@@ -29,6 +29,10 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import JDomWrapperTest._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.HasParent
 
 /**
  * JDOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around JDOM Elements.

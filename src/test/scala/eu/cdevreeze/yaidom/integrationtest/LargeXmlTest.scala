@@ -29,6 +29,9 @@ import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore, ConfigMap }
 import org.scalatest.junit.JUnitRunner
 import parse._
 import print._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Large XML test case.

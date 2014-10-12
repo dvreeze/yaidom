@@ -22,7 +22,12 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import HasENameApi._
+import eu.cdevreeze.yaidom.queryapi.HasENameApi._
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * PathAwareElemLike-based query test case, extending AbstractElemLikeQueryTest.

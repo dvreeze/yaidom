@@ -21,6 +21,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
  * Code of yaidom blog 2 ("namespaces in yaidom"). The blog uses the excellent article http://www.lenzconsulting.com/namespaces/.
