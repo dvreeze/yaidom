@@ -33,12 +33,12 @@ This leads to the road map below (shortly after 1.0).
 Changes:
 
 * Splitting the root package into 3 sub-packages (as mentioned above)
-* Hiding this split as much as possible to the yaidom user, by aliases in the root package (and an implicit conversion from ENames to predicates)
-* Rework the query API traits, which is indeed a breaking change
+* Hiding this split as much as possible to the yaidom user, by aliases in the root package
+* Rework the query API traits, which is indeed a breaking change (but easing the pain by offering an implicit conversion from ENames to predicates)
 * Yet leave the net query API offered by the different element implementations as much as possible the same
 
 Yaidom users upgrading from 1.0 to 1.1 are affected wherever query API traits are explicitly used in code.
-In particular, the 1.0 ElemApi companion object no longer contains element predicates (they are now in the HasENameApi companion object)
+In particular, the 1.0 ElemApi companion object no longer contains element predicates (they are now in the HasENameApi companion object).
 Given that query API traits are typically not used that much in yaidom client code, the upgrade should not take too long
 (and is low risk, with help of the compiler).
 
@@ -61,5 +61,5 @@ Changes:
 
 * Remove the deprecated aliases in the root package, resulting in a meaner and cleaner yaidom
 
-Yaidom users upgrading from 1.2 to 1.3 had the time to fix deprecation warnings, so this upgrade should be easy.
+Yaidom users upgrading from 1.2 to 1.3 had the time to fix the deprecation warnings, so this upgrade should be easy.
 
