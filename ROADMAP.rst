@@ -5,7 +5,7 @@ ROAD MAP
 
 After releasing version 1.0, the author of yaidom tried to write a blog post, showing the purpose and strength of
 the different query API traits. That turned out to be difficult, because the query API traits are not sufficiently
-orthogonal, depending on inheritance too much. For example, in yaidom 1.0 we cannot abstract over indexed and docaware
+**orthogonal**, depending on inheritance too much. For example, in yaidom 1.0 we cannot abstract over indexed and docaware
 elements. Moreover, some query API traits are far more useful than others.
 
 In particular, the ParentElemApi trait is by far the most important one, but the ElemApi trait offers nothing fundamental.

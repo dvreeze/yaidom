@@ -22,15 +22,15 @@ import scala.reflect.classTag
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import SubtypeAwareParentElemApi.anyElem
 import eu.cdevreeze.yaidom.Document
 import eu.cdevreeze.yaidom.EName
 import eu.cdevreeze.yaidom.Path
 import eu.cdevreeze.yaidom.indexed
 import parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemLike
 
 /**
  * Test case using yaidom sub-type-aware elements for XBRL schema processing.
@@ -183,7 +183,7 @@ object XbrlSchemaTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase"
   val nsXLink = "http://www.w3.org/1999/xlink"
 
-  class XsdElem(val wrappedElem: indexed.Elem) extends ElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] with SubtypeAwareParentElemLike[XsdElem] {
+  class XsdElem(val wrappedElem: indexed.Elem) extends SubtypeAwareParentElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] {
 
     override def findAllChildElems: immutable.IndexedSeq[XsdElem] =
       wrappedElem.findAllChildElems.map(e => XsdElem(e))

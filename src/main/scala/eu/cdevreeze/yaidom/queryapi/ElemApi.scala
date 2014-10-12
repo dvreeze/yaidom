@@ -250,3 +250,11 @@ trait ElemApi[E <: ElemApi[E]] { self: E =>
   /** Shorthand for `findTopmostElemsOrSelf(p)`. Use this shorthand only if the predicate is a short expression. */
   def \\!(p: E => Boolean): immutable.IndexedSeq[E]
 }
+
+object ElemApi {
+
+  /**
+   * Element predicate that filters away no elements, and that can be used in many methods of the SubtypeAwareParentElemApi trait.
+   */
+  val anyElem: ElemApi[_] => Boolean = { e => true }
+}

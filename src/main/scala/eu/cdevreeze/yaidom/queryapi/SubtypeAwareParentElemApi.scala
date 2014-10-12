@@ -105,11 +105,3 @@ trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends ElemA
    */
   def getChildElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): B
 }
-
-object SubtypeAwareParentElemApi {
-
-  /**
-   * Element predicate that filters away no elements, and that can be used in many methods of the SubtypeAwareParentElemApi trait.
-   */
-  val anyElem: ElemApi[_] => Boolean = { e => true }
-}

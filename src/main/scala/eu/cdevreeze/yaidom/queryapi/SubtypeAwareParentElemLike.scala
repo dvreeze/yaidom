@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.queryapi
 import scala.collection.immutable
 import scala.reflect.ClassTag
 
-import SubtypeAwareParentElemApi.anyElem
+import ElemApi.anyElem
 
 /**
  * Default implementation of SubtypeAwareParentElemApi.
