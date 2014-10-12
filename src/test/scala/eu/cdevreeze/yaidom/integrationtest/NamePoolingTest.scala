@@ -35,7 +35,7 @@ import com.google.common.cache._
 class NamePoolingTest extends Suite {
 
   import NamePoolingTest._
-  import ElemApi._
+  import HasENameApi._
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

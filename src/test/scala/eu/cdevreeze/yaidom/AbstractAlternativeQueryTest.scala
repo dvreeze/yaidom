@@ -22,7 +22,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import ElemApi._
+import HasENameApi._
 import convert.ScalaXmlConversions._
 
 /**
@@ -35,7 +35,7 @@ import convert.ScalaXmlConversions._
  */
 abstract class AbstractAlternativeQueryTest extends Suite {
 
-  type E <: ElemLike[E] with HasText
+  type E <: ParentElemLike[E] with HasEName with HasText
 
   @Test def testFindAllCatalogProducts(): Unit = {
     // See example 1-4.

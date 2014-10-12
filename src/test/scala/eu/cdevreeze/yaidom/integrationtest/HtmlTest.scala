@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
-import ElemApi._
+import HasENameApi._
 import convert.ScalaXmlConversions._
 import parse._
 import print._

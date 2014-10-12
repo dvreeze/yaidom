@@ -500,6 +500,11 @@ package eu.cdevreeze
  */
 package object yaidom {
 
+  implicit class ToHasElemApi(val ename: EName) extends (ParentElemApi[_] with HasENameApi => Boolean) {
+
+    def apply(elem: ParentElemApi[_] with HasENameApi): Boolean = (elem.resolvedName == this.ename)
+  }
+
   // Aliases for types and objects in the core package
 
   type QName = eu.cdevreeze.yaidom.core.QName
@@ -548,11 +553,11 @@ package object yaidom {
 
   type ParentElemLike[E <: ParentElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ParentElemLike[E]
 
-  type ElemApi[E <: ElemApi[E]] = eu.cdevreeze.yaidom.queryapi.ElemApi[E]
+  type HasENameApi = eu.cdevreeze.yaidom.queryapi.HasENameApi
 
-  val ElemApi = eu.cdevreeze.yaidom.queryapi.ElemApi
+  val HasENameApi = eu.cdevreeze.yaidom.queryapi.HasENameApi
 
-  type ElemLike[E <: ElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ElemLike[E]
+  type HasEName = eu.cdevreeze.yaidom.queryapi.HasEName
 
   type NavigableElemApi[E <: NavigableElemApi[E]] = eu.cdevreeze.yaidom.queryapi.NavigableElemApi[E]
 

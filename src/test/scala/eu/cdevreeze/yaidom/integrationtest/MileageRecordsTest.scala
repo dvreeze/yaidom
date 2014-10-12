@@ -43,7 +43,7 @@ class MileageRecordsTest extends Suite {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   @Test def testReferentialIntegrity(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
 
@@ -84,7 +84,7 @@ class MileageRecordsTest extends Suite {
   }
 
   @Test def testSucceedingTrips(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
 
@@ -118,7 +118,7 @@ class MileageRecordsTest extends Suite {
   }
 
   @Test def testTripLengths(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
 
@@ -149,7 +149,7 @@ class MileageRecordsTest extends Suite {
   }
 
   @Test def testTotalPrivateKms(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
 
@@ -171,7 +171,7 @@ class MileageRecordsTest extends Suite {
   }
 
   @Test def testConvertToCsv(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
 
@@ -215,7 +215,7 @@ class MileageRecordsTest extends Suite {
   }
 
   @Test def testUpdateKms(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
     val docPrinter = DocumentPrinterUsingDom.newInstance
@@ -257,7 +257,7 @@ class MileageRecordsTest extends Suite {
   }
 
   @Test def testNoWorkTripsInWeekends(): Unit = {
-    import ElemApi._
+    import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
 
@@ -295,7 +295,7 @@ class MileageRecordsTest extends Suite {
 
 object MileageRecordsTest {
 
-  import ElemApi._
+  import HasENameApi._
 
   final class TripCategory(val name: String, val isPrivate: Boolean) {
 

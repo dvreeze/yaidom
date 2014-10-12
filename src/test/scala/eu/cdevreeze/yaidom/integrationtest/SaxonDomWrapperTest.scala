@@ -99,7 +99,7 @@ class SaxonDomWrapperTest extends Suite {
       root.scope
     }
     assertResult(Scope.from("ns" -> "http://www.google.com")) {
-      root.getChildElem(ElemApi.withLocalName("foo")).scope
+      root.getChildElem(HasENameApi.withLocalName("foo")).scope
     }
   }
 
@@ -610,7 +610,7 @@ object SaxonDomWrapperTest {
   }
 
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ElemLike[DomElem] with HasParent[DomElem] with HasText { self =>
+    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ParentElemLike[DomElem] with HasEName with HasParent[DomElem] with HasText { self =>
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)

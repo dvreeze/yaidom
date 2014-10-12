@@ -22,7 +22,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import ElemApi._
+import HasENameApi._
 
 /**
  * ElemLike-based query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat
@@ -36,7 +36,7 @@ import ElemApi._
  */
 abstract class AbstractElemLikeQueryTest extends Suite {
 
-  type E <: ElemLike[E] with HasText
+  type E <: ParentElemLike[E] with HasEName with HasText
 
   @Test def testQueryBookTitles(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
@@ -81,7 +81,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
   @Test def testQueryBookTitlesAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
-    // This time using the ElemApi companion object
+    // This time using the HasENameApi companion object
 
     require(bookstore.localName == "Bookstore")
 
@@ -323,7 +323,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
   @Test def testQueryCheapBookAuthorsAgain(): Unit = {
     // Own example..
-    // This time using the ElemApi companion object
+    // This time using the HasENameApi companion object
 
     require(bookstore.localName == "Bookstore")
 

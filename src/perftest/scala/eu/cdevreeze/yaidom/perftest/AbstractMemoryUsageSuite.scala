@@ -41,7 +41,7 @@ import AbstractMemoryUsageSuite._
  */
 abstract class AbstractMemoryUsageSuite extends FunSuite {
 
-  type E <: ElemLike[E] with HasText
+  type E <: ParentElemLike[E] with HasEName with HasText
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.perftest")
 

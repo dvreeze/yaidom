@@ -32,7 +32,7 @@ trait HasENameApi {
   /**
    * The EName of the element
    */
-  def ename: EName
+  def resolvedName: EName
 
   /**
    * The resolved attributes of the element as mapping from ENames to values
@@ -59,6 +59,11 @@ trait HasENameApi {
    * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
    */
   def findAttributeByLocalName(localName: String): Option[String]
+
+  /**
+   * Shorthand for `attributeOption(expandedName)`.
+   */
+  def \@(expandedName: EName): Option[String]
 }
 
 /**
@@ -85,34 +90,34 @@ object HasENameApi {
   /**
    * Returns the equivalent of `{ _.ename == ename }`
    */
-  def withEName(ename: EName): (HasEName => Boolean) = { elem =>
-    elem.ename == ename
+  def withEName(ename: EName): (ParentElemApi[_] with HasENameApi => Boolean) = { elem =>
+    elem.resolvedName == ename
   }
 
   /**
    * Returns the equivalent of `{ _.ename == EName(namespaceOption, localPart) }`, but without creating any EName instance.
    */
-  def withEName(namespaceOption: Option[String], localPart: String): (HasEName => Boolean) = { elem =>
-    val resolvedName = elem.ename
+  def withEName(namespaceOption: Option[String], localPart: String): (ParentElemApi[_] with HasENameApi => Boolean) = { elem =>
+    val resolvedName = elem.resolvedName
     (resolvedName.namespaceUriOption == namespaceOption) && (resolvedName.localPart == localPart)
   }
 
   /**
    * Returns the equivalent of `withEName(Some(namespace), localPart)`
    */
-  def withEName(namespace: String, localPart: String): (HasEName => Boolean) =
+  def withEName(namespace: String, localPart: String): (ParentElemApi[_] with HasENameApi => Boolean) =
     withEName(Some(namespace), localPart)
 
   /**
    * Returns the equivalent of `withEName(None, localPart)`
    */
-  def withNoNsEName(localPart: String): (HasEName => Boolean) =
+  def withNoNsEName(localPart: String): (ParentElemApi[_] with HasENameApi => Boolean) =
     withEName(None, localPart)
 
   /**
    * Returns the equivalent of `{ _.localName == localName }`
    */
-  def withLocalName(localName: String): (HasEName => Boolean) = { elem =>
+  def withLocalName(localName: String): (ParentElemApi[_] with HasENameApi => Boolean) = { elem =>
     elem.localName == localName
   }
 }

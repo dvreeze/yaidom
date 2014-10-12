@@ -729,7 +729,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ElemLike[JDomElem] with HasParent[JDomElem] with HasText { self =>
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ParentElemLike[JDomElem] with HasEName with HasParent[JDomElem] with HasText { self =>
 
     require(wrappedNode ne null)
 

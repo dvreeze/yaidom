@@ -87,7 +87,7 @@ class XPathInteropTest extends Suite with BeforeAndAfterAll {
       bookElems.map(_.resolvedName).toSet
     }
 
-    import ElemApi._
+    import HasENameApi._
 
     val authors: Set[String] = {
       val result =

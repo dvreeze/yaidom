@@ -100,7 +100,7 @@ import javax.xml.namespace.NamespaceContext
  *
  * This is exactly equivalent to the following query:
  * {{{
- * import ElemApi._
+ * import HasENameApi._
  *
  * val elemDecls = schemaElem \\ withEName("http://www.w3.org/2001/XMLSchema", "element")
  * }}}

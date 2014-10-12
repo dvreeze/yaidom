@@ -51,7 +51,7 @@ class Blog2Test extends Suite {
     import scala.collection.immutable
     import eu.cdevreeze.yaidom._
 
-    import ElemApi._
+    import HasENameApi._
 
     // Using a yaidom DocumentParser that used SAX internally
     val docParser = parse.DocumentParserUsingSax.newInstance

@@ -30,7 +30,7 @@ trait HasEName extends HasENameApi {
   /**
    * The local name, that is, the local part of the EName
    */
-  final def localName: String = ename.localPart
+  final def localName: String = resolvedName.localPart
 
   /**
    * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
@@ -51,4 +51,9 @@ trait HasEName extends HasENameApi {
     val matchingAttrs = resolvedAttributes filter { case (en, v) => en.localPart == localName }
     matchingAttrs.map(_._2).headOption
   }
+
+  /**
+   * Shorthand for `attributeOption(expandedName)`.
+   */
+  final def \@(expandedName: EName): Option[String] = attributeOption(expandedName)
 }

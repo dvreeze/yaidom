@@ -23,7 +23,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemLike
 
 /**
@@ -38,7 +38,7 @@ private[utils] object XmlSchemas {
   /**
    * Any element in an xs:schema (including xs:schema itself).
    */
-  sealed class XsdElem private[utils] (val elem: indexed.Elem) extends ElemLike[XsdElem] with SubtypeAwareParentElemLike[XsdElem] {
+  sealed class XsdElem private[utils] (val elem: indexed.Elem) extends SubtypeAwareParentElemLike[XsdElem] with HasEName {
 
     final override def findAllChildElems: immutable.IndexedSeq[XsdElem] = {
       elem.findAllChildElems.map(e => XsdElem(e))

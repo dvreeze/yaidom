@@ -681,7 +681,7 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomParentNode with ElemLike[XomElem] with HasParent[XomElem] with HasText { self =>
+    override val wrappedNode: nu.xom.Element) extends XomParentNode with ParentElemLike[XomElem] with HasEName with HasParent[XomElem] with HasText { self =>
 
     require(wrappedNode ne null)
 

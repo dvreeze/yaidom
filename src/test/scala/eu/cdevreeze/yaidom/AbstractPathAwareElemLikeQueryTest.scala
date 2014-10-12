@@ -22,7 +22,7 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import ElemApi._
+import HasENameApi._
 
 /**
  * PathAwareElemLike-based query test case, extending AbstractElemLikeQueryTest.
@@ -53,7 +53,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
   @Test def testQueryBookTitlesUsingPathsAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
-    // This time using the ElemApi companion object
+    // This time using the HasENameApi companion object
 
     require(bookstore.localName == "Bookstore")
 
@@ -95,7 +95,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
   @Test def testQueryBookOrMagazineTitlesUsingPathsAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
-    // This time using the ElemApi companion object
+    // This time using the HasENameApi companion object
 
     require(bookstore.localName == "Bookstore")
 
@@ -231,7 +231,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
   @Test def testQueryCheapBooksUsingPathsAgain(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
-    // This time using the ElemApi companion object
+    // This time using the HasENameApi companion object
 
     require(bookstore.localName == "Bookstore")
 
@@ -334,7 +334,7 @@ abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryT
 
   @Test def testQueryBooksByJeffreyUllmanUsingPathsAgain(): Unit = {
     // Own example
-    // This time using the ElemApi companion object
+    // This time using the HasENameApi companion object
 
     require(bookstore.localName == "Bookstore")
 

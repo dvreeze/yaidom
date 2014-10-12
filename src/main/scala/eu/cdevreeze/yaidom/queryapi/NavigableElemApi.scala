@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait NavigableElemApi[E <: NavigableElemApi[E]] extends ElemApi[E] { self: E =>
+trait NavigableElemApi[E <: NavigableElemApi[E]] extends ParentElemApi[E] with HasENameApi { self: E =>
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.

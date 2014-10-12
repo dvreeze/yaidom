@@ -94,7 +94,7 @@ class Blog1Test extends Suite {
       bookElems3 == bookElems1,
       "Expected the same books as in bookElems1")
 
-    import ElemApi._
+    import HasENameApi._
 
     val bookElems4 =
       docElem filterElemsOrSelf withLocalName("Book")
@@ -130,8 +130,8 @@ class Blog1Test extends Suite {
 
     // End of section that does not need to be copied again
 
-    def findAllBookAuthors[E <: ElemApi[E] with HasText](docElem: E): immutable.IndexedSeq[String] = {
-      import ElemApi._
+    def findAllBookAuthors[E <: ParentElemApi[E] with HasEName with HasText](docElem: E): immutable.IndexedSeq[String] = {
+      import HasENameApi._
       val result =
         for {
           bookElem <- docElem \ withEName(ns, "Book")
@@ -225,7 +225,7 @@ class Blog1Test extends Suite {
 
     // End of section that does not need to be copied again
 
-    import ElemApi._
+    import HasENameApi._
 
     val authorLastNames =
       for {
