@@ -22,10 +22,10 @@ import eu.cdevreeze.yaidom.defaultelem.Document
 import eu.cdevreeze.yaidom.defaultelem.Elem
 
 /**
- * [[eu.cdevreeze.yaidom.Document]] printer (to the XML as a `String` or byte array). This trait is purely abstract.
+ * [[eu.cdevreeze.yaidom.defaultelem.Document]] printer (to the XML as a `String` or byte array). This trait is purely abstract.
  *
  * Implementing classes deal with the details of printing yaidom documents as XML strings or byte arrays.
- * The [[eu.cdevreeze.yaidom]] package itself is agnostic of those details.
+ * The [[eu.cdevreeze.yaidom.defaultelem]] package itself is agnostic of those details.
  *
  * Typical implementations use DOM or StAX, but make them easier to use in the tradition of the "template" classes
  * of the Spring framework. That is, resource management is done as much as possible by the `DocumentPrinter`,

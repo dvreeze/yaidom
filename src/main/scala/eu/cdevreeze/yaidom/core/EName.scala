@@ -25,7 +25,7 @@ import javax.xml.namespace.{ QName => JQName }
  * Semantically like a `QName` in Java, but not keeping the prefix.
  *
  * To get an [[eu.cdevreeze.yaidom.core.EName]] from a [[eu.cdevreeze.yaidom.core.QName]],
- * the latter needs to be resolved against a [[eu.cdevreeze.yaidom.Scope]].
+ * the latter needs to be resolved against a [[eu.cdevreeze.yaidom.core.Scope]].
  *
  * The short class name illustrates that expanded names are at least as important as qualified names, and should be
  * equally easy to construct (using the companion object).

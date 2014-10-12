@@ -77,7 +77,7 @@ import eu.cdevreeze.yaidom.core.Path
  * </book:Bookstore>
  * }}}
  *
- * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.Elem]] instance ``bookstoreElem``. Then we can perform the
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.defaultelem.Elem]] instance ``bookstoreElem``. Then we can perform the
  * following query, using only the ``ElemApi`` query API:
  * {{{
  * val bookstoreNamespace = "http://bookstore/book"

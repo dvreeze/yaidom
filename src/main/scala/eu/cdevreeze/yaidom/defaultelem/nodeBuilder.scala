@@ -56,14 +56,14 @@ import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
  * There is an impedance mismatch between XML's scoping rules (which are top-down, from root to leaves) and "functional trees"
  * (which are built bottom-up, from leaves to root). In the context of the Anti-XML library, Daniel Spiewak explained this
  * impedance mismatch in https://github.com/djspiewak/anti-xml/issues/78. In yaidom, however, this impedance mismatch
- * is far less severe. Yaidom distinguishes between [[eu.cdevreeze.yaidom.Node]] and [[eu.cdevreeze.yaidom.defaultelem.NodeBuilder]],
+ * is far less severe. Yaidom distinguishes between [[eu.cdevreeze.yaidom.defaultelem.Node]] and [[eu.cdevreeze.yaidom.defaultelem.NodeBuilder]],
  * and [[eu.cdevreeze.yaidom.defaultelem.Elem]] and [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]] in particular. `Elem`s have (fixed, resolved) `Scope`s,
  * but `ElemBuilder`s do not. Using `NodeBuilder`s, `Scope` determination is postponed. Only `ElemBuilder`s
  * can have unbound prefixes, but only `Elem`s have (resolved) scopes. Instead of a [[eu.cdevreeze.yaidom.core.Scope]], an `ElemBuilder`
  * has a [[eu.cdevreeze.yaidom.core.Declarations]].
  *
  * Another reason that the above-mentioned impedance mismatch is less of a problem in practice is that typically the XML
- * trees (as `NodeBuilder`s or directly as `Node`s) are built in a top-down manner. The [[eu.cdevreeze.yaidom.ConverterToDocument]]s
+ * trees (as `NodeBuilder`s or directly as `Node`s) are built in a top-down manner. The [[eu.cdevreeze.yaidom.defaultelem.ConverterToDocument]]s
  * in package [[eu.cdevreeze.yaidom.convert]] recursively build `Elem`s in a top-down manner, possibly creating an `Elem`
  * instance (for each element) twice (first without children, and finally as a copy with children added).
  *
@@ -84,7 +84,7 @@ sealed trait NodeBuilder extends Immutable with Serializable {
    */
   final def build(): NodeType = build(Scope.Empty)
 
-  /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.Node]]. */
+  /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.defaultelem.Node]]. */
   final def toTreeRepr(parentScope: Scope): String = build(parentScope).toTreeRepr(parentScope)
 
   /**
@@ -101,7 +101,7 @@ sealed trait NodeBuilder extends Immutable with Serializable {
 }
 
 /**
- * Builder for elements. See [[eu.cdevreeze.yaidom.NodeBuilder]].
+ * Builder for elements. See [[eu.cdevreeze.yaidom.defaultelem.NodeBuilder]].
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */

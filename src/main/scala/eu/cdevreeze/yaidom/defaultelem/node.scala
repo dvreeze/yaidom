@@ -91,8 +91,8 @@ sealed trait Node extends Immutable with Serializable {
  * these default elements (or the corresponding `Document` instances), respectively.
  *
  * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.defaultelem.Elem]] is among the most powerful element implementations offered
- * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]] and [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]]
- * query APIs.
+ * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.queryapi.ElemApi]], [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]] and
+ * [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]] query APIs, and more.
  *
  * '''See the documentation of the mixed-in query API traits for more details on the uniform query API offered by this class.'''
  *
@@ -143,9 +143,9 @@ sealed trait Node extends Immutable with Serializable {
  *
  * An Elem has the following state:
  * <ul>
- * <li>the [[eu.cdevreeze.yaidom.QName]] of the element</li>
- * <li>the attributes of the element, mapping attribute [[eu.cdevreeze.yaidom.QName]]s to String values</li>
- * <li>a [[eu.cdevreeze.yaidom.Scope]] mapping prefixes to namespace URIs</li>
+ * <li>the [[eu.cdevreeze.yaidom.core.QName]] of the element</li>
+ * <li>the attributes of the element, mapping attribute [[eu.cdevreeze.yaidom.core.QName]]s to String values</li>
+ * <li>a [[eu.cdevreeze.yaidom.core.Scope]] mapping prefixes to namespace URIs</li>
  * <li>an immutable collection of child nodes</li>
  * </ul>
  * Note that namespace declarations are not considered to be attributes in `Elem`, just like in the rest of yaidom.
