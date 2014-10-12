@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasPathApi
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.NavigableElemLike
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
 
 /**
  * An element just like `indexed.Elem`, but storing the URI of the containing document as well. See [[eu.cdevreeze.yaidom.indexed.Elem]]
@@ -45,7 +45,7 @@ final class Elem private[docaware] (
   val rootElem: defaultelem.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: defaultelem.Elem) extends ElemLike[Elem] with HasEName with NavigableElemLike[Elem] with HasQNameApi with HasText with HasPathApi with Immutable {
+  val elem: defaultelem.Elem) extends ElemLike[Elem] with HasEName with IsNavigable[Elem] with HasQNameApi with HasText with HasPathApi with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.

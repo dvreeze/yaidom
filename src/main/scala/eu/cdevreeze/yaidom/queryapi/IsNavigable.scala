@@ -25,14 +25,14 @@ import eu.cdevreeze.yaidom.core.Path
  * More precisely, this trait adds the following abstract method to the abstract methods required by its super-trait:
  * `findChildElemByPathEntry`.
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.NavigableElemApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.IsNavigableApi]]. See the documentation of that trait
  * for more information.
  *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait NavigableElemLike[E <: NavigableElemLike[E]] extends NavigableElemApi[E] { self: E =>
+trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 
   def findChildElemByPathEntry(entry: Path.Entry): Option[E]
 

@@ -22,7 +22,7 @@ import eu.cdevreeze.yaidom.core.Path
 
 /**
  * This is the <em>Path-aware</em> part of the yaidom <em>uniform query API</em>. It is a sub-trait of trait
- * [[eu.cdevreeze.yaidom.NavigableElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
+ * [[eu.cdevreeze.yaidom.IsNavigableApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
  * because some implementing sub-trait is mixed in), thus sharing this query API.
  *
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
@@ -203,7 +203,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] with HasENameApi with NavigableElemApi[E] { self: E =>
+trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] with HasENameApi with IsNavigableApi[E] { self: E =>
 
   /**
    * Returns all child elements with their `Path` entries, in the correct order. This method should be very efficient.

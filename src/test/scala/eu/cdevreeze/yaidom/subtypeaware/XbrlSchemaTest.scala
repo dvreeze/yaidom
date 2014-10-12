@@ -27,7 +27,7 @@ import org.scalatest.junit.JUnitRunner
 import SubtypeAwareParentElemApi.anyElem
 import eu.cdevreeze.yaidom.Document
 import eu.cdevreeze.yaidom.EName
-import eu.cdevreeze.yaidom.NavigableElemLike
+import eu.cdevreeze.yaidom.IsNavigable
 import eu.cdevreeze.yaidom.Path
 import eu.cdevreeze.yaidom.indexed
 import parse.DocumentParserUsingSax
@@ -183,7 +183,7 @@ object XbrlSchemaTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase"
   val nsXLink = "http://www.w3.org/1999/xlink"
 
-  class XsdElem(val wrappedElem: indexed.Elem) extends ElemLike[XsdElem] with HasEName with NavigableElemLike[XsdElem] with SubtypeAwareParentElemLike[XsdElem] {
+  class XsdElem(val wrappedElem: indexed.Elem) extends ElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] with SubtypeAwareParentElemLike[XsdElem] {
 
     override def findAllChildElems: immutable.IndexedSeq[XsdElem] =
       wrappedElem.findAllChildElems.map(e => XsdElem(e))

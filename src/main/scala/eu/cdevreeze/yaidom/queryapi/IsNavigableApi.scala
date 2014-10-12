@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.core.Path
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
  * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
  *
- * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.NavigableElemLike]].
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.IsNavigable]].
  * Most element implementations mixing in this trait also mix in sub-trait [[eu.cdevreeze.yaidom.PathAwareElemLike]]. See the latter
  * trait for more information.
  *
@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait NavigableElemApi[E <: NavigableElemApi[E]] { self: E =>
+trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.

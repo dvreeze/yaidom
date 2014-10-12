@@ -559,9 +559,9 @@ package object yaidom {
 
   type HasEName = eu.cdevreeze.yaidom.queryapi.HasEName
 
-  type NavigableElemApi[E <: NavigableElemApi[E]] = eu.cdevreeze.yaidom.queryapi.NavigableElemApi[E]
+  type IsNavigableApi[E <: IsNavigableApi[E]] = eu.cdevreeze.yaidom.queryapi.IsNavigableApi[E]
 
-  type NavigableElemLike[E <: NavigableElemLike[E]] = eu.cdevreeze.yaidom.queryapi.NavigableElemLike[E]
+  type IsNavigable[E <: IsNavigable[E]] = eu.cdevreeze.yaidom.queryapi.IsNavigable[E]
 
   type PathAwareElemApi[E <: PathAwareElemApi[E]] = eu.cdevreeze.yaidom.queryapi.PathAwareElemApi[E]
 

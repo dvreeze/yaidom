@@ -23,7 +23,7 @@ import eu.cdevreeze.yaidom.core.Path
 
 /**
  * API and implementation trait for elements as containers of elements, each having a name and possible attributes, as well
- * as having awareness of paths. This trait extends trait [[eu.cdevreeze.yaidom.NavigableElemLike]], adding knowledge about paths.
+ * as having awareness of paths. This trait extends trait [[eu.cdevreeze.yaidom.IsNavigable]], adding knowledge about paths.
  *
  * More precisely, this trait adds the following abstract method to the abstract methods required by its super-trait:
  * `findAllChildElemsWithPathEntries`. Based on this abstract method (and the super-trait), this trait offers a rich API for
@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with HasEName with NavigableElemLike[E] with PathAwareElemApi[E] { self: E =>
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with HasEName with IsNavigable[E] with PathAwareElemApi[E] { self: E =>
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
