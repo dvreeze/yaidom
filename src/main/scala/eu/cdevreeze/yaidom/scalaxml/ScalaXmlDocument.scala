@@ -16,18 +16,24 @@
 
 package eu.cdevreeze.yaidom.scalaxml
 
+import java.net.URI
+
 import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
 
 /**
  * Wrapper around a `scala.xml.Document`.
  *
  * @author Chris de Vreeze
  */
-final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) {
+final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends DocumentApi[ScalaXmlElem] {
 
   require(wrappedDocument ne null)
 
   def documentElement: ScalaXmlElem = ScalaXmlNode.wrapElement(wrappedDocument.docElem.asInstanceOf[scala.xml.Elem])
+
+  def uriOption: Option[URI] = Option(wrappedDocument.baseURI).map(s => new URI(s))
 
   def comments: immutable.IndexedSeq[ScalaXmlComment] = {
     wrappedDocument.children.toIndexedSeq.collect({ case c: scala.xml.Comment => ScalaXmlComment(c) })

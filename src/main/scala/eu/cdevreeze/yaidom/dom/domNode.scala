@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.dom
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import org.w3c
@@ -26,11 +28,12 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.ElemLike
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -68,13 +71,15 @@ trait DomParentNode extends DomNode {
 }
 
 final class DomDocument(
-  override val wrappedNode: w3c.dom.Document) extends DomParentNode {
+  override val wrappedNode: w3c.dom.Document) extends DomParentNode with DocumentApi[DomElem] {
 
   require(wrappedNode ne null)
 
   override type DomType = w3c.dom.Document
 
   def documentElement: DomElem = DomNode.wrapElement(wrappedNode.getDocumentElement)
+
+  def uriOption: Option[URI] = Option(wrappedNode.getDocumentURI).map(s => new URI(s))
 
   def comments: immutable.IndexedSeq[DomComment] = {
     children.collect({ case c: DomComment => c })

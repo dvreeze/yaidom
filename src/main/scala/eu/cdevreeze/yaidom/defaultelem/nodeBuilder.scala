@@ -22,8 +22,9 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasQNameApi
+import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 
 /**
@@ -109,7 +110,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -140,6 +141,18 @@ final class ElemBuilder(
       }
     withChildren(newChildren)
   }
+
+  /**
+   * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
+   * If there are no text children, the empty string is returned.
+   */
+  override def text: String = {
+    val textStrings = textChildren map { t => t.text }
+    textStrings.mkString
+  }
+
+  /** Returns the text children */
+  def textChildren: immutable.IndexedSeq[TextBuilder] = children collect { case t: TextBuilder => t }
 
   /**
    * Creates an `Elem` from this element builder, using the passed parent scope.

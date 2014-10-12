@@ -501,7 +501,7 @@ package eu.cdevreeze
 package object yaidom {
 
   /**
-   * Making ElemApi take ENames which are implicitly converted to element predicates.
+   * Making ElemApi filter/find methods accept ENames which are implicitly converted to element predicates.
    */
   implicit class ToHasElemApi(val ename: EName) extends (eu.cdevreeze.yaidom.queryapi.ElemApi[_] with eu.cdevreeze.yaidom.queryapi.HasENameApi => Boolean) {
 
