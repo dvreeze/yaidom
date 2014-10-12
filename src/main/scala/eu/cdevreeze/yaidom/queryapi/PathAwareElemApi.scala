@@ -203,7 +203,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends NavigableElemApi[E] { self: E =>
+trait PathAwareElemApi[E <: PathAwareElemApi[E]] extends ElemApi[E] with HasENameApi with NavigableElemApi[E] { self: E =>
 
   /**
    * Returns all child elements with their `Path` entries, in the correct order. This method should be very efficient.

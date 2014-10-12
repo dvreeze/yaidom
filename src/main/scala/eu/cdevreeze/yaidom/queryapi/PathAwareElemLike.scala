@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends NavigableElemLike[E] with PathAwareElemApi[E] { self: E =>
+trait PathAwareElemLike[E <: PathAwareElemLike[E]] extends ElemLike[E] with HasEName with NavigableElemLike[E] with PathAwareElemApi[E] { self: E =>
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
