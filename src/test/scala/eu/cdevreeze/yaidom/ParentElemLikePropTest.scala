@@ -26,7 +26,7 @@ import org.scalatest.prop.Checkers
 import org.scalatest.junit.JUnitRunner
 
 /**
- * ParentElemLike properties test case.
+ * ElemLike properties test case.
  *
  * @author Chris de Vreeze
  */

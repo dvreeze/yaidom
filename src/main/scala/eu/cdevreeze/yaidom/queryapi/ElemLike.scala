@@ -24,25 +24,25 @@ import scala.collection.mutable
  * about elements. It does not know about names, attributes, etc. All it knows about elements is that elements can have element children (other
  * node types are entirely out of scope in this trait).
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.ParentElemApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.ElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment. Below follows an even more formal treatment, with proofs by induction
  * of important properties obeyed by methods of this API. It shows the <em>mathematical</em> rigor of the yaidom query API.
  * API users that are only interested in how to use the API can safely skip that formal treatment.
  *
- * ==ParentElemLike more formally==
+ * ==ElemLike more formally==
  *
  * '''In order to get started using the API, this more formal section can safely be skipped. On the other hand, this section
  * may provide a deeper understanding of the API.'''
  *
  * The only abstract method is `findAllChildElems`. Based on this method alone, this trait offers a rich API for querying elements.
- * This is entirely consistent with the semantics defined in the `ParentElemApi` trait. Indeed, the implementation of the methods
+ * This is entirely consistent with the semantics defined in the `ElemApi` trait. Indeed, the implementation of the methods
  * follows the semantics defined there.
  *
- * In the `ParentElemApi` trait, some (simple) provable laws were mentioned. Some proofs follow below.
+ * In the `ElemApi` trait, some (simple) provable laws were mentioned. Some proofs follow below.
  *
  * ===1. Proving property about filterElemsOrSelf===
  *
- * Below follows a proof by structural induction of one of the laws mentioned in the documentation of trait `ParentElemApi`.
+ * Below follows a proof by structural induction of one of the laws mentioned in the documentation of trait `ElemApi`.
  *
  * First we make a few assumptions, for this proof, and (implicitly) for the other proofs:
  * <ul>
@@ -218,7 +218,7 @@ import scala.collection.mutable
  *
  * @author Chris de Vreeze
  */
-trait ParentElemLike[E <: ParentElemLike[E]] extends ParentElemApi[E] { self: E =>
+trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
 
   def findAllChildElems: immutable.IndexedSeq[E]
 

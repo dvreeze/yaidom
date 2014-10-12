@@ -26,7 +26,7 @@ import SubtypeAwareParentElemApi.anyElem
  *
  * @author Chris de Vreeze
  */
-trait SubtypeAwareParentElemLike[A <: SubtypeAwareParentElemLike[A]] extends ParentElemLike[A] with SubtypeAwareParentElemApi[A] { self: A =>
+trait SubtypeAwareParentElemLike[A <: SubtypeAwareParentElemLike[A]] extends ElemLike[A] with SubtypeAwareParentElemApi[A] { self: A =>
 
   final def findAllChildElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterChildElemsOfType(subType)(anyElem)

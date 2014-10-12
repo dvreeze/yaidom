@@ -27,7 +27,7 @@ import java.net.URI
  *
  * @author Chris de Vreeze
  */
-trait DocumentApi[E <: ParentElemApi[E]] {
+trait DocumentApi[E <: ElemApi[E]] {
 
   /** Returns the document element */
   def documentElement: E

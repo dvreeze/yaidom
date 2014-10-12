@@ -91,7 +91,7 @@ import scala.collection.mutable
  *
  * '''Warning: indexing using Paths can be slow, especially in large XML trees.''' Hence, it is advisable to use class `Path`
  * wisely in queries and "functional updates". Most queries for elements can be written without them (using the methods in trait
- * `ParentElemLike`, instead of those added by subtrait `PathAwareElemLike`).
+ * `ElemLike`, instead of those added by subtrait `PathAwareElemLike`).
  *
  * @author Chris de Vreeze
  */

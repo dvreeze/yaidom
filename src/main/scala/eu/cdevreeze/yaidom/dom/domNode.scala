@@ -30,11 +30,11 @@ import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.ParentElemLike
+import eu.cdevreeze.yaidom.queryapi.ElemLike
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
- * [[eu.cdevreeze.yaidom.ParentElemLike]] API.
+ * [[eu.cdevreeze.yaidom.ElemLike]] API.
  *
  * Not all DOM node types are exposed via these wrappers. For example, attributes are not nodes according to the `ElemLike` API,
  * so there is no wrapper for attributes.
@@ -91,7 +91,7 @@ final class DomDocument(
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ParentElemLike[DomElem] with HasEName with HasParent[DomElem] with HasQNameApi with HasText { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ElemLike[DomElem] with HasEName with HasParent[DomElem] with HasQNameApi with HasText { self =>
 
   require(wrappedNode ne null)
 

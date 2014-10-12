@@ -20,14 +20,14 @@ import scala.collection.immutable
 import scala.reflect.ClassTag
 
 /**
- * Extension to ParentElemApi that makes querying for sub-types of the element type easy.
+ * Extension to ElemApi that makes querying for sub-types of the element type easy.
  *
  * For example, XML Schema can be modeled with an object hierarchy, starting with some XsdElem super-type which
  * mixes in trait SubtypeAwareParentElemApi, among other query traits. The object hierarchy could contain sub-classes
  * of XsdElem such as XsdRootElem, GlobalElementDeclaration, etc. Then the SubtypeAwareParentElemApi trait makes it
  * easy to query for all or some global element declarations, etc.
  *
- * There is no magic in these traits: it is just ParentElemApi and ParentElemLike underneath. It is only the syntactic
+ * There is no magic in these traits: it is just ElemApi and ElemLike underneath. It is only the syntactic
  * convenience that makes the difference.
  *
  * The query methods of this trait take a sub-type as first value parameter. It is intentional that this is a value
@@ -43,7 +43,7 @@ import scala.reflect.ClassTag
  *
  * @author Chris de Vreeze
  */
-trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends ParentElemApi[A] { self: A =>
+trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends ElemApi[A] { self: A =>
 
   /**
    * Returns all child elements of the given sub-type, in the correct order.
@@ -111,5 +111,5 @@ object SubtypeAwareParentElemApi {
   /**
    * Element predicate that filters away no elements, and that can be used in many methods of the SubtypeAwareParentElemApi trait.
    */
-  val anyElem: ParentElemApi[_] => Boolean = { e => true }
+  val anyElem: ElemApi[_] => Boolean = { e => true }
 }

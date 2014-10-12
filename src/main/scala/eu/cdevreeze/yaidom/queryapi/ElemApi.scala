@@ -25,16 +25,16 @@ import scala.collection.immutable
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
  * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
  *
- * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ParentElemLike]].
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows that elements can <em>have child elements</em>
  * (again not knowing about other child nodes). Using this minimal knowledge alone, it offers methods to query for
  * <em>descendant</em> elements, <em>descendant-or-self</em> methods, or sub-collections thereof. It is this minimal knowledge that
  * makes this API uniform.
  *
  * This query API leverages the Scala Collections API. Query results can be manipulated using the Collections API, and the
- * query API implementation (in ``ParentElemLike``) uses the Collections API internally.
+ * query API implementation (in ``ElemLike``) uses the Collections API internally.
  *
- * ==ParentElemApi examples==
+ * ==ElemApi examples==
  *
  * To illustrate usage of this API, consider the following example. Let's say we want to determine if some XML has its namespace
  * declarations (if any) only at the root element level. We show the query code for several yaidom DOM-like element implementations.
@@ -71,16 +71,16 @@ import scala.collection.immutable
  * rootElem filterElemsOrSelf (elem => !elem.namespaces.isEmpty)
  * }}}
  *
- * In summary, the extremely simple ``ParentElemApi`` query API is indeed a uniform query API, offered by many different
+ * In summary, the extremely simple ``ElemApi`` query API is indeed a uniform query API, offered by many different
  * yaidom DOM-like element implementations. It should be noted that most of these element implementations offer the
- * ``ElemApi`` query API, which extends the ``ParentElemApi`` query API.
+ * ``ElemApi`` query API, which extends the ``ElemApi`` query API.
  *
- * ==ParentElemApi more formally==
+ * ==ElemApi more formally==
  *
  * '''In order to get started using the API, this more formal section can safely be skipped. On the other hand, this section
  * may provide a deeper understanding of the API.'''
  *
- * The ``ParentElemApi`` trait can be understood in a precise <em>mathematical</em> sense, as shown below.
+ * The ``ElemApi`` trait can be understood in a precise <em>mathematical</em> sense, as shown below.
  *
  * The most <em>fundamental method</em> of this trait is ``findAllChildElems``. The semantics of the other methods can be defined
  * directly or indirectly in terms of this method.
@@ -148,7 +148,7 @@ import scala.collection.immutable
  *
  * @author Chris de Vreeze
  */
-trait ParentElemApi[E <: ParentElemApi[E]] { self: E =>
+trait ElemApi[E <: ElemApi[E]] { self: E =>
 
   /**
    * '''Core method''' that returns '''all child elements''', in the correct order.

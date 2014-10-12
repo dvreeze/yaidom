@@ -35,7 +35,7 @@ import convert.ScalaXmlConversions._
  */
 abstract class AbstractAlternativeQueryTest extends Suite {
 
-  type E <: ParentElemLike[E] with HasEName with HasText
+  type E <: ElemLike[E] with HasEName with HasText
 
   @Test def testFindAllCatalogProducts(): Unit = {
     // See example 1-4.

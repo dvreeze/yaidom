@@ -27,7 +27,7 @@ import scala.collection.immutable
  *
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.TransformableElemLike]].
  * That trait only knows how to transform child elements. Using this minimal knowledge, the trait offers methods to transform
- * descendant elements and descendant-or-self elements. Indeed, the trait is similar to `ParentElemLike`, except that it
+ * descendant elements and descendant-or-self elements. Indeed, the trait is similar to `ElemLike`, except that it
  * transforms elements instead of querying for elements.
  *
  * The big conceptual difference with "updatable" elements (in trait `UpdatableElemLike[N, E]`) is that "transformations" are

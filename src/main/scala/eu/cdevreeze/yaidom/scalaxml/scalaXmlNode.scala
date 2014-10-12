@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.ParentElemLike
+import eu.cdevreeze.yaidom.queryapi.ElemLike
 
 /**
  * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
@@ -59,14 +59,14 @@ sealed trait ScalaXmlNode {
  *
  * Keep in mind that the `ElemApi` specific part of the API is a '''broken abstraction'''. If the wrapped Scala XML element
  * misses some namespace declarations for used element or attribute names, these element and/or attribute names
- * cannot be resolved, and exceptions are thrown when querying for them! The `ParentElemApi` part of the API does not
+ * cannot be resolved, and exceptions are thrown when querying for them! The `ElemApi` part of the API does not
  * suffer from this broken abstraction, so is less dangerous to use.
  *
  * The wrapper instances are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ParentElemLike[ScalaXmlElem] with HasEName with HasQNameApi with HasText { self =>
+  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ElemLike[ScalaXmlElem] with HasEName with HasQNameApi with HasText { self =>
 
   require(wrappedNode ne null)
 

@@ -285,7 +285,7 @@ package eu.cdevreeze
  * operations, as can be seen in the corresponding documentation.
  *
  * The uniform query API traits turn minimal APIs into richer APIs, where each richer API is defined very precisely in terms
- * of the minimal API. The top-level query API trait is [[eu.cdevreeze.yaidom.ParentElemLike]]. It needs to be given a method
+ * of the minimal API. The top-level query API trait is [[eu.cdevreeze.yaidom.ElemLike]]. It needs to be given a method
  * implementation to query for child elements (not child nodes in general, but just child elements!), and it offers methods to query
  * for some or all child elements, descendant elements, and descendant-or-self elements. That is, the minimal API consists
  * of abstract method `findAllChildElems`, and it offers methods such as `filterChildElems`, `filterElems` and `filterElemsOrSelf`.
@@ -301,14 +301,14 @@ package eu.cdevreeze
  * have been circular dependencies between both concepts, because attributes with namespaces require in-scope namespaces and therefore
  * namespace declarations for resolving the names of these attributes.
  *
- * Note that traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.ParentElemLike]] only know about elements, not
+ * Note that traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.ElemLike]] only know about elements, not
  * about other kinds of nodes. Of course the actual element implementations mixing in this query API know about other node
  * types, but that knowledge is outside the uniform query API. Note that the example queries above only use the minimal
- * element knowledge that traits `ElemLike` and `ParentElemLike` have about elements. Therefore the query code can be used
+ * element knowledge that traits `ElemLike` and `ElemLike` have about elements. Therefore the query code can be used
  * unchanged for different element implementations.
  *
  * The `ElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds knowledge about <em>paths</em>.
- * Paths can be queried (in the same way that elements can be queried in trait `ParentElemLike`), and elements can be found
+ * Paths can be queried (in the same way that elements can be queried in trait `ElemLike`), and elements can be found
  * given a path.
  *
  * For example, to query for the Scala book authors, the following alternative code can be used (if the used element
@@ -330,7 +330,7 @@ package eu.cdevreeze
  *
  * ==Some element implementations==
  *
- * The uniform query API traits, especially `ParentElemLike` and its sub-trait `ElemLike` are mixed in by many element
+ * The uniform query API traits, especially `ElemLike` and its sub-trait `ElemLike` are mixed in by many element
  * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.ElemBuilder]]
  * and [[eu.cdevreeze.yaidom.Elem]].
  *
@@ -361,7 +361,7 @@ package eu.cdevreeze
  * <ul>
  * <li>Instead of a `Scope`, an `ElemBuilder` contains a `Declarations`</li>
  * <li>This makes an `ElemBuilder` easier to compose than an `Elem`, because no Scope needs to be passed around throughout the tree</li>
- * <li>Class `ElemBuilder` uses a minimal query API, mixing in only traits `ParentElemLike` and `TransformableElemLike`</li>
+ * <li>Class `ElemBuilder` uses a minimal query API, mixing in only traits `ElemLike` and `TransformableElemLike`</li>
  * <li>After all, an `ElemBuilder` neither keeps nor knows about Scopes, so does not know about resolved element/attribute names</li>
  * </ul>
  *
@@ -500,9 +500,9 @@ package eu.cdevreeze
  */
 package object yaidom {
 
-  implicit class ToHasElemApi(val ename: EName) extends (ParentElemApi[_] with HasENameApi => Boolean) {
+  implicit class ToHasElemApi(val ename: EName) extends (ElemApi[_] with HasENameApi => Boolean) {
 
-    def apply(elem: ParentElemApi[_] with HasENameApi): Boolean = (elem.resolvedName == this.ename)
+    def apply(elem: ElemApi[_] with HasENameApi): Boolean = (elem.resolvedName == this.ename)
   }
 
   // Aliases for types and objects in the core package
@@ -549,9 +549,9 @@ package object yaidom {
 
   // Aliases for types and objects in the queryapi package
 
-  type ParentElemApi[E <: ParentElemApi[E]] = eu.cdevreeze.yaidom.queryapi.ParentElemApi[E]
+  type ElemApi[E <: ElemApi[E]] = eu.cdevreeze.yaidom.queryapi.ElemApi[E]
 
-  type ParentElemLike[E <: ParentElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ParentElemLike[E]
+  type ElemLike[E <: ElemLike[E]] = eu.cdevreeze.yaidom.queryapi.ElemLike[E]
 
   type HasENameApi = eu.cdevreeze.yaidom.queryapi.HasENameApi
 

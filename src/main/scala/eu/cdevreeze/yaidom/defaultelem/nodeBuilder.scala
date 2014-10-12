@@ -23,7 +23,7 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
-import eu.cdevreeze.yaidom.queryapi.ParentElemLike
+import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 
 /**
@@ -109,7 +109,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ParentElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi { self =>
 
   require(qname ne null)
   require(attributes ne null)

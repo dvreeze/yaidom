@@ -36,7 +36,7 @@ import HasENameApi._
  */
 abstract class AbstractElemLikeQueryTest extends Suite {
 
-  type E <: ParentElemLike[E] with HasEName with HasText
+  type E <: ElemLike[E] with HasEName with HasText
 
   @Test def testQueryBookTitles(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
@@ -103,7 +103,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    // Using only the ParentElemLike API (except for method localName)...
+    // Using only the ElemLike API (except for method localName)...
 
     val bookOrMagazineTitles =
       for {
@@ -185,7 +185,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
 
     require(bookstore.localName == "Bookstore")
 
-    // Using only the ParentElemLike API (except for method localName)...
+    // Using only the ElemLike API (except for method localName)...
 
     val isbns =
       for (book <- bookstore filterChildElems (_.localName == "Book")) yield book.attribute(EName("ISBN"))
@@ -266,7 +266,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
       result.toSet
     }
 
-    // Now the verbose way, using the ParentElemLike API and no operator notation...
+    // Now the verbose way, using the ElemLike API and no operator notation...
 
     val titles2 =
       for {

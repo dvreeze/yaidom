@@ -531,7 +531,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  private def doTest[E <: ParentElemLike[E] with HasEName with HasText](elm: E): Unit = {
+  private def doTest[E <: ElemLike[E] with HasEName with HasText](elm: E): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")

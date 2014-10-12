@@ -31,14 +31,14 @@ import eu.cdevreeze.yaidom.core.Path
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.PathAwareElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows the following about elements:
  * <ul>
- * <li>elements can <em>have child elements</em> (as promised by ancestor trait ``ParentElemLike``)</li>
+ * <li>elements can <em>have child elements</em> (as promised by ancestor trait ``ElemLike``)</li>
  * <li>elements have a so-called <em>"resolved name"</em> (as promised by parent trait ``ElemLike``)</li>
  * <li>elements have zero or more <em>"resolved attributes"</em> (as promised by parent trait ``ElemLike``)</li>
  * <li>elements can be queried for <em>path entries</em> relative to the parent element</li>
  * </ul>
  * Using this minimal knowledge alone, that trait not only offers the methods of its parent trait, but also:
  * <ul>
- * <li>methods mirroring the ``ParentElemLike`` query methods, but returning ``Path`` objects instead of elements</li>
+ * <li>methods mirroring the ``ElemLike`` query methods, but returning ``Path`` objects instead of elements</li>
  * </ul>
  * In other words, the ``PathAwareElemApi`` trait is quite a rich query API, considering the minimal knowledge it needs to
  * have about elements.
@@ -134,7 +134,7 @@ import eu.cdevreeze.yaidom.core.Path
  * }}}
  *
  * The <em>basic operations</em> definable in terms of method ``findAllChildElemsWithPathEntries`` are ``filterChildElemPaths``,
- * ``filterElemOrSelfPaths`` and ``findTopmostElemOrSelfPaths``, analogous to trait ``ParentElemApi``. Their semantics must be
+ * ``filterElemOrSelfPaths`` and ``findTopmostElemOrSelfPaths``, analogous to trait ``ElemApi``. Their semantics must be
  * as if they had been defined as follows:
  * {{{
  * def filterChildElemPaths(p: E => Boolean): immutable.IndexedSeq[Path] =
@@ -175,7 +175,7 @@ import eu.cdevreeze.yaidom.core.Path
  * def findAllElemPaths: immutable.IndexedSeq[Path] = filterElemPaths(e => true)
  * }}}
  *
- * Then, analogously to ``ParentElemApi``, the following properties hold:
+ * Then, analogously to ``ElemApi``, the following properties hold:
  * {{{
  * elem.filterElemPaths(p) == elem.findAllElemPaths.filter(path => p(elem.findElemOrSelfByPath(path).get))
  *
@@ -197,7 +197,7 @@ import eu.cdevreeze.yaidom.core.Path
  * }}}
  * etc., where ``findElemOrSelfByPath`` is defined recursively, using method ``findChildElemByPathEntry``.
  *
- * No proofs are provided. Note that the similarities with trait ``ParentElemLike`` are striking.
+ * No proofs are provided. Note that the similarities with trait ``ElemLike`` are striking.
  *
  * @tparam E The captured element subtype
  *

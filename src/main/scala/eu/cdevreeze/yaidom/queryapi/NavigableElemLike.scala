@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait NavigableElemLike[E <: NavigableElemLike[E]] extends ParentElemLike[E] with HasEName with NavigableElemApi[E] { self: E =>
+trait NavigableElemLike[E <: NavigableElemLike[E]] extends ElemLike[E] with HasEName with NavigableElemApi[E] { self: E =>
 
   def findChildElemByPathEntry(entry: Path.Entry): Option[E]
 

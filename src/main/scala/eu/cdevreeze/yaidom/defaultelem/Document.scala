@@ -43,7 +43,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * A `Document` is constructed from an optional URI, a document element (as `Elem`), top-level processing instructions,
  * if any, and top-level comments, if any.
  *
- * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ParentElemApi` does not
+ * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ElemApi` does not
  * apply to documents. Therefore, given a document, querying for elements (other than the document element itself) always goes
  * via the document element.
  *

@@ -30,7 +30,7 @@ package eu.cdevreeze.yaidom
  * </ul>
  *
  * Yet be aware that the advantages of immutability and thread-safety (offered by immutable `Elem` classes) are lost when using
- * this wrapper API. Mutable DOM trees are also very easy to break, even via the `ParentElemLike` API, if element predicates with
+ * this wrapper API. Mutable DOM trees are also very easy to break, even via the `ElemLike` API, if element predicates with
  * side-effects are used.
  *
  * To explain the "round-tripping" item above, note that class [[eu.cdevreeze.yaidom.Elem]] considers attributes in an element unordered,
