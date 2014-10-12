@@ -41,8 +41,8 @@ import javax.xml.stream.events.XMLEvent
 import YaidomToStaxEventsConversions.XmlEventsProducer
 
 /**
- * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.Elem]] to `immutable.IndexedSeq[XMLEvent]`,
- * and from  [[eu.cdevreeze.yaidom.Document]] to `immutable.IndexedSeq[XMLEvent]`.
+ * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to `immutable.IndexedSeq[XMLEvent]`,
+ * and from  [[eu.cdevreeze.yaidom.defaultelem.Document]] to `immutable.IndexedSeq[XMLEvent]`.
  *
  * @author Chris de Vreeze
  */

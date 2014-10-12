@@ -39,8 +39,8 @@ import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
 import eu.cdevreeze.yaidom.defaultelem.Text
 
 /**
- * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.Elem]] and
- * from `org.w3c.dom.Document` to [[eu.cdevreeze.yaidom.Document]].
+ * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.defaultelem.Elem]] and
+ * from `org.w3c.dom.Document` to [[eu.cdevreeze.yaidom.defaultelem.Document]].
  *
  * This converter regards the input more like an "ElemBuilder" than an "Elem", in that namespace declarations instead of
  * scopes are extracted from input "elements", and in that conversions to yaidom Elems take an additional parent scope

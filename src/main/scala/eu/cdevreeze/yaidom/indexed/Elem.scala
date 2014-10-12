@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
 
 /**
- * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.Elem]])
+ * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.defaultelem.Elem]])
  * and a path (from that root element) to this element.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''

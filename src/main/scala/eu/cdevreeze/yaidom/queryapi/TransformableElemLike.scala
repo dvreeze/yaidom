@@ -24,7 +24,7 @@ import scala.collection.immutable
  * More precisely, this trait has abstract methods `transformChildElems` and `transformChildElemsToNodeSeq`. Based on these
  * abstract methods, this trait offers a rich API for transforming descendant elements or descendant-or-self elements.
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.TransformableElemApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]]. See the documentation of that trait
  * for examples of usage.
  *
  * @tparam N The node supertype of the element subtype

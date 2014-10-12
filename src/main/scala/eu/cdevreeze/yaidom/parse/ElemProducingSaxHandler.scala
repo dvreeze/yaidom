@@ -22,7 +22,7 @@ import eu.cdevreeze.yaidom.defaultelem.Document
 import eu.cdevreeze.yaidom.defaultelem.Elem
 
 /**
- * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.Elem]] using
+ * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.defaultelem.Elem]] using
  * method `resultingElem`, or the resulting [[eu.cdevreeze.yaidom.Document]] using method
  * `resultingDocument`.
  *

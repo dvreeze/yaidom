@@ -36,11 +36,12 @@ package eu.cdevreeze
  * as much as possible to JAXP (and JAXP parser/serializer configuration). As yet another example, yaidom knows nothing about
  * (XML Schema) types of elements and attributes.
  *
- * Yaidom, and in particular this package, contains the following layers:
+ * Yaidom, and in particular the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and [[eu.cdevreeze.yaidom.defaultelem]] sub-packages,
+ * contains the following layers:
  * <ol>
- * <li><em>basic concepts</em>, such as (qualified and expanded) names of elements and attributes</li>
- * <li>the <em>uniform query API traits</em>, to query elements for child, descendant and descendant-or-self elements</li>
- * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits</li>
+ * <li><em>basic concepts</em>, such as (qualified and expanded) names of elements and attributes (in the `core` package)</li>
+ * <li>the <em>uniform query API traits</em>, to query elements for child, descendant and descendant-or-self elements (in the `queryapi` package)</li>
+ * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits (e.g. in the `defaultelem` package)</li>
  * </ol>
  *
  * It makes sense to read this documentation, because it helps in getting up-to-speed with yaidom.
@@ -54,7 +55,7 @@ package eu.cdevreeze
  * <li><em>expanded names</em>: having a namespace, such as `{http://bookstore/book}Title` (in James Clark notation),
  * and not having a namespace, such as `Edition`</li>
  * </ul>
- * They are represented by immutable classes [[eu.cdevreeze.yaidom.QName]] and [[eu.cdevreeze.yaidom.EName]], respectively.
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.core.QName]] and [[eu.cdevreeze.yaidom.core.EName]], respectively.
  *
  * Qualified names occur in XML, whereas expanded names do not. Yet qualified names have no meaning on their own. They need
  * to be resolved to expanded names, via the in-scope namespaces. Note that the term "qualified name" is often used for what
@@ -66,14 +67,14 @@ package eu.cdevreeze
  * <li><em>namespace declarations</em></li>
  * <li><em>in-scope namespaces</em></li>
  * </ul>
- * They are represented by immutable classes [[eu.cdevreeze.yaidom.Declarations]] and [[eu.cdevreeze.yaidom.Scope]], respectively.
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.core.Declarations]] and [[eu.cdevreeze.yaidom.core.Scope]], respectively.
  *
  * Namespace declarations occur in XML, whereas in-scope namespaces do not. The latter are the accumulated effect of the
  * namespace declarations of the element itself, if any, and those in ancestor elements.
  *
  * Note: in the code examples below, we assume the following import:
  * {{{
- * import eu.cdevreeze.yaidom._
+ * import eu.cdevreeze.yaidom.core._
  * }}}
  *
  * To see the resolution of qualified names in action, consider the following sample XML:
@@ -152,7 +153,7 @@ package eu.cdevreeze
  * <li><em>path builders</em></li>
  * <li><em>paths</em></li>
  * </ul>
- * They are represented by immutable classes [[eu.cdevreeze.yaidom.PathBuilder]] and [[eu.cdevreeze.yaidom.Path]], respectively.
+ * They are represented by immutable classes [[eu.cdevreeze.yaidom.core.PathBuilder]] and [[eu.cdevreeze.yaidom.core.Path]], respectively.
  *
  * Path builders are like canonical XPath expressions, yet they do not contain the root element itself, and indexing
  * starts with 0 instead of 1.
@@ -200,7 +201,7 @@ package eu.cdevreeze
  * {{{
  * bookstoreElem.filterElemsOrSelf(EName("{http://bookstore/book}Book"))
  * }}}
- * with the same result.
+ * with the same result, due to an implicit conversion from expanded names to element predicates.
  *
  * Instead of searching for appropriate descendant-or-self elements, we could have searched for <em>descendant</em> elements only,
  * without altering the result in this case:
@@ -285,34 +286,35 @@ package eu.cdevreeze
  * operations, as can be seen in the corresponding documentation.
  *
  * The uniform query API traits turn minimal APIs into richer APIs, where each richer API is defined very precisely in terms
- * of the minimal API. The top-level query API trait is [[eu.cdevreeze.yaidom.ElemLike]]. It needs to be given a method
+ * of the minimal API. The most important query API trait is [[eu.cdevreeze.yaidom.queryapi.ElemLike]]. It needs to be given a method
  * implementation to query for child elements (not child nodes in general, but just child elements!), and it offers methods to query
  * for some or all child elements, descendant elements, and descendant-or-self elements. That is, the minimal API consists
  * of abstract method `findAllChildElems`, and it offers methods such as `filterChildElems`, `filterElems` and `filterElemsOrSelf`.
  * This trait has no knowledge about elements at all, other than the fact that <em>elements can have child elements</em>.
  *
- * Sub-trait [[eu.cdevreeze.yaidom.ElemLike]] adds minimal knowledge about elements themselves, viz. that elements have a
+ * Trait [[eu.cdevreeze.yaidom.queryapi.HasEName]] needs minimal knowledge about elements themselves, viz. that elements have a
  * <em>"resolved"</em> (or expanded) name, and "resolved" attributes (mapping attribute expanded names to attribute values). That is,
  * it needs to be given implementations of abstract methods `resolvedName` and `resolvedAttributes`, and then offers methods to
- * query for attributes or child/descendant/descendant-or-self elements with a given expanded name. The trait is trivially defined
- * in terms of its super-trait.
+ * query for individual attributes or the local name of the element.
  *
  * It is important to note that yaidom does not consider namespace declarations to be attributes themselves. Otherwise, there would
  * have been circular dependencies between both concepts, because attributes with namespaces require in-scope namespaces and therefore
  * namespace declarations for resolving the names of these attributes.
  *
- * Note that traits [[eu.cdevreeze.yaidom.ElemLike]] and [[eu.cdevreeze.yaidom.ElemLike]] only know about elements, not
- * about other kinds of nodes. Of course the actual element implementations mixing in this query API know about other node
- * types, but that knowledge is outside the uniform query API. Note that the example queries above only use the minimal
- * element knowledge that traits `ElemLike` and `ElemLike` have about elements. Therefore the query code can be used
- * unchanged for different element implementations.
+ * Many traits, such as [[eu.cdevreeze.yaidom.queryapi.HasEName]], are just "capabilities", and need to be combined with trait
+ * [[eu.cdevreeze.yaidom.queryapi.ElemLike]] in order to offer a useful element querying API.
  *
- * The `ElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.PathAwareElemLike]]. It adds knowledge about <em>paths</em>.
- * Paths can be queried (in the same way that elements can be queried in trait `ElemLike`), and elements can be found
- * given a path.
+ * Note that trait [[eu.cdevreeze.yaidom.queryapi.ElemLike]] only knows about elements, not about other kinds of nodes.
+ * Of course the actual element implementations mixing in this query API know about other node types, but that knowledge is outside
+ * the uniform query API. Note that the example queries above only use the minimal element knowledge that traits `ElemLike` and `HasEName`
+ * together have about elements. Therefore the query code can be used unchanged for different element implementations.
+ *
+ * Trait [[eu.cdevreeze.yaidom.queryapi.PathAwareElemLike]] is used to query for paths instead of elements. Paths can be queried
+ * (in the same way that elements can be queried in trait `ElemLike`). Trait [[eu.cdevreeze.yaidom.queryapi.IsNavigable]] is used
+ * to navigate to an element given a Path.
  *
  * For example, to query for the Scala book authors, the following alternative code can be used (if the used element
- * implementation mixes in trait `PathAwareElemLike`, which is not the case for the Scala XML and DOM wrappers above):
+ * implementation mixes in traits `PathAwareElemLike` and `IsNavigable`, which is not the case for the Scala XML and DOM wrappers above):
  * {{{
  * for {
  *   authorPath <- bookstoreElem filterElemOrSelfPaths (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
@@ -320,39 +322,40 @@ package eu.cdevreeze
  * } yield bookstoreElem.getElemOrSelfByPath(authorPath)
  * }}}
  *
- * The `PathAwareElemLike` trait has sub-trait [[eu.cdevreeze.yaidom.UpdatableElemLike]]. This trait offers <em>functional updates</em>
- * at given paths. Whereas the super-traits know only about elements, this trait knows that elements have some node
+ * Trait [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]] (which extends trait `IsNavigable`) offers <em>functional updates</em>
+ * at given paths. Whereas the traits mentioned above know only about elements, this trait knows that elements have some node
  * super-type.
  *
  * Instead of functional updates at given paths, elements can also be "transformed" functionally without specifying
- * any paths. This is offered by trait [[eu.cdevreeze.yaidom.TransformableElemLike]], which unlike the traits above
- * has no super-traits. The Scala XML and DOM wrappers above do not mix in this trait.
+ * any paths. This is offered by trait [[eu.cdevreeze.yaidom.queryapi.TransformableElemLike]]. The Scala XML and DOM wrappers above do
+ * not mix in this trait.
  *
  * ==Some element implementations==
  *
  * The uniform query API traits, especially `ElemLike` and its sub-trait `ElemLike` are mixed in by many element
- * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.ElemBuilder]]
- * and [[eu.cdevreeze.yaidom.Elem]].
+ * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]]
+ * and [[eu.cdevreeze.yaidom.defaultelem.Elem]].
  *
- * Class [[eu.cdevreeze.yaidom.Elem]] is the <em>default element implementatio</em>n of yaidom. It extends class [[eu.cdevreeze.yaidom.Node]].
- * The latter also has sub-classes for text nodes, comments, entity references and processing instructions. Class [[eu.cdevreeze.yaidom.Document]]
+ * Class [[eu.cdevreeze.yaidom.defaultelem.Elem]] is the <em>default element implementatio</em>n of yaidom. It extends class [[eu.cdevreeze.yaidom.defaultelem.Node]].
+ * The latter also has sub-classes for text nodes, comments, entity references and processing instructions. Class [[eu.cdevreeze.yaidom.defaultelem.Document]]
  * contains a document `Elem`, but is not a `Node` sub-class itself.
  *
- * The [[eu.cdevreeze.yaidom.Elem]] class has the following characteristics:
+ * The [[eu.cdevreeze.yaidom.defaultelem.Elem]] class has the following characteristics:
  * <ul>
  * <li>It is <em>immutable</em>, and thread-safe</li>
  * <li>These elements therefore cannot be queried for their parent elements</li>
- * <li>It mixes in both query API traits [[eu.cdevreeze.yaidom.UpdatableElemLike]] and [[eu.cdevreeze.yaidom.TransformableElemLike]]</li>
- * <li>Therefore this element class offers almost all of the yaidom query API, except `HasParent`</li>
+ * <li>It mixes in query API traits [[eu.cdevreeze.yaidom.queryapi.ElemLike]], [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]] and
+ * [[eu.cdevreeze.yaidom.queryapi.TransformableElemLike]], among others</li>
+ * <li>Indeed this element class offers almost all of the yaidom query API, except `HasParent`</li>
  * <li>Besides the tag name, attributes and child nodes, it keeps a `Scope`, but no `Declarations`</li>
  * <li>This makes it easy to compose these elements, as long as scopes are passed explicitly throughout the element tree</li>
  * <li>Equality is reference equality, because it is hard to come up with a sensible equality for this element class</li>
  * <li>Roundtripping cannot be entirely lossless, but this class does try to retain the attribute order (although irrelevant according to XML InfoSet)</li>
- * <li>Sub-packages `parse` and `print` offer `DocumentParser` and `DocumentPrinter` classes for parsing/serializing these default `Elem` (and `Document`) instances</li>
+ * <li>Packages `parse` and `print` offer `DocumentParser` and `DocumentPrinter` classes for parsing/serializing these default `Elem` (and `Document`) instances</li>
  * </ul>
  *
  * Creating such `Elem` trees by hand is a bit cumbersome, partly because scopes have to be passed to each `Elem` in the tree.
- * The latter is not needed if we use class [[eu.cdevreeze.yaidom.ElemBuilder]] to create element trees by hand. When the tree
+ * The latter is not needed if we use class [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]] to create element trees by hand. When the tree
  * has been fully created as `ElemBuilder`, invoke method `ElemBuilder.build(parentScope)` to turn it into an `Elem`.
  *
  * Like their super-classes `Node` and `NodeBuilder`, classes `Elem` and `ElemBuilder` have very much in common. Both are immutable,
@@ -428,8 +431,8 @@ package eu.cdevreeze
  * "composability"), or yaidom wrappers around other DOM-like APIs (such as XOM or JDOM2). The current element implementations
  * in yaidom are:
  * <ul>
- * <li>Immutable class [[eu.cdevreeze.yaidom.Elem]], the default (immutable) element implementation. See above.</li>
- * <li>Immutable class [[eu.cdevreeze.yaidom.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.defaultelem.Elem]], the default (immutable) element implementation. See above.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.resolved.Elem]], which takes namespace prefixes out of the equation, and therefore
  * makes useful (namespace-aware) equality comparisons feasible. It mixes in the same query API traits as the default
  * element implementation.</li>
@@ -447,9 +450,11 @@ package eu.cdevreeze
  *
  * Yaidom has the following packages, and layering between packages:
  * <ol>
- * <li>Package [[eu.cdevreeze.yaidom]], with the content described above. It depends on no other yaidom packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.core]], with the core concepts described above. It depends on no other yaidom packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.queryapi]], with the query API traits described above. It only depends on the `core` package.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.defaultelem]], with the default element implementation described above. It only depends on the `core` and `queryapi` packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.convert]]. It contains conversions between default yaidom nodes on the one hand and DOM,
- * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom root package.</li>
+ * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi` and `defaultelem` packages.</li>
  * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
  * the packages mentioned above.</li>
  * <li>The other packages: [[eu.cdevreeze.yaidom.dom]], [[eu.cdevreeze.yaidom.indexed]], [[eu.cdevreeze.yaidom.docaware]],
@@ -467,7 +472,7 @@ package eu.cdevreeze
  *
  * As for querying, prefer:
  * {{{
- * import ElemApi._
+ * import HasENameApi._
  *
  * bookstoreElem filterElemsOrSelf withEName("{http://bookstore/book}", "Book")
  * }}}
@@ -477,7 +482,7 @@ package eu.cdevreeze
  * }}}
  * to avoid unnecessary (large scale) EName object creation.
  *
- * To reduce the memory footprint of parsed XML trees, see [[eu.cdevreeze.yaidom.ENameProvider]] and [[eu.cdevreeze.yaidom.QNameProvider]].
+ * To reduce the memory footprint of parsed XML trees, see [[eu.cdevreeze.yaidom.core.ENameProvider]] and [[eu.cdevreeze.yaidom.core.QNameProvider]].
  *
  * For example, during the startup phase of an application, we could set the global ENameProvider as follows:
  * {{{

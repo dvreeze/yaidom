@@ -29,7 +29,7 @@ import javax.xml.namespace.NamespaceContext
  * Scope mapping prefixes to namespace URIs, as well as holding an optional default namespace. In other words, <em>in-scope
  * namespaces</em>.
  *
- * The purpose of a [[eu.cdevreeze.yaidom.Scope]] is to resolve [[eu.cdevreeze.yaidom.QName]]s as [[eu.cdevreeze.yaidom.EName]]s.
+ * The purpose of a [[eu.cdevreeze.yaidom.core.Scope]] is to resolve [[eu.cdevreeze.yaidom.core.QName]]s as [[eu.cdevreeze.yaidom.core.EName]]s.
  *
  * For example, consider the following XML:
  * {{{

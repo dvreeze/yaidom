@@ -24,7 +24,7 @@ import javax.xml.namespace.{ QName => JQName }
  * Expanded name. See http://www.w3.org/TR/xml-names11/. It has a localPart and an optional namespace URI.
  * Semantically like a `QName` in Java, but not keeping the prefix.
  *
- * To get an [[eu.cdevreeze.yaidom.EName]] from a [[eu.cdevreeze.yaidom.QName]],
+ * To get an [[eu.cdevreeze.yaidom.core.EName]] from a [[eu.cdevreeze.yaidom.core.QName]],
  * the latter needs to be resolved against a [[eu.cdevreeze.yaidom.Scope]].
  *
  * The short class name illustrates that expanded names are at least as important as qualified names, and should be

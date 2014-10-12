@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.ElemLike
 
 /**
  * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
- * [[eu.cdevreeze.yaidom.ElemApi]] API.
+ * [[eu.cdevreeze.yaidom.queryapi.ElemApi]] API.
  *
  * Use these wrappers only if there is a specific need for them, because these wrappers do have their costs (such as the creation
  * of lots of query result objects, the repeated costs of querying element/attribute names, the conceptual differences between
@@ -53,7 +53,7 @@ sealed trait ScalaXmlNode {
 }
 
 /**
- * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.ElemApi]] API.
+ * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.queryapi.ElemApi]] API.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *

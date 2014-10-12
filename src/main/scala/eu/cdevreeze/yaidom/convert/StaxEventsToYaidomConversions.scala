@@ -48,8 +48,8 @@ import javax.xml.stream.events.StartElement
 import javax.xml.stream.events.XMLEvent
 
 /**
- * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.Elem]] and
- * to [[eu.cdevreeze.yaidom.Document]].
+ * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.defaultelem.Elem]] and
+ * to [[eu.cdevreeze.yaidom.defaultelem.Document]].
  *
  * There are also analogous conversions that take an `Iterator[XMLEvent]` instead. These can be used to reduce memory usage.
  *

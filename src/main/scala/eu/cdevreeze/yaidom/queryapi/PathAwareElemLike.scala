@@ -22,14 +22,12 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.Path
 
 /**
- * API and implementation trait for elements as containers of elements, each having a name and possible attributes, as well
- * as having awareness of paths. This trait extends trait [[eu.cdevreeze.yaidom.IsNavigable]], adding knowledge about paths.
+ * API and implementation trait for elements that can be queried for paths.
  *
- * More precisely, this trait adds the following abstract method to the abstract methods required by its super-trait:
- * `findAllChildElemsWithPathEntries`. Based on this abstract method (and the super-trait), this trait offers a rich API for
- * querying elements and paths.
+ * More precisely, this trait has the following abstract method: `findAllChildElemsWithPathEntries`.
+ * Based on this abstract method, this trait offers a rich API for querying elements and paths.
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.PathAwareElemApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.PathAwareElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment.
  *
  * @tparam E The captured element subtype

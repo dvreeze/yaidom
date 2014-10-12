@@ -19,13 +19,11 @@ package eu.cdevreeze.yaidom.queryapi
 import eu.cdevreeze.yaidom.core.Path
 
 /**
- * API and implementation trait for elements as containers of elements, each having a name and possible attributes, as well
- * as supporting navigation using paths. This trait extends trait [[eu.cdevreeze.yaidom.ElemLike]], adding navigation using paths.
+ * API and implementation trait for elements that can be navigated using paths.
  *
- * More precisely, this trait adds the following abstract method to the abstract methods required by its super-trait:
- * `findChildElemByPathEntry`.
+ * More precisely, this trait has the following abstract method: `findChildElemByPathEntry`.
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.IsNavigableApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.IsNavigableApi]]. See the documentation of that trait
  * for more information.
  *
  * @tparam E The captured element subtype

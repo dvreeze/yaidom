@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.queryapi
 import eu.cdevreeze.yaidom.core.EName
 
 /**
- * Trait defining the contract for elements that have a EName, as well as attributes with EName keys.
+ * Trait partly implementing the contract for elements that have a EName, as well as attributes with EName keys.
  *
  * Using this trait (possibly in combination with other "element traits") we can abstract over several element implementations.
  *

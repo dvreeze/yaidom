@@ -24,7 +24,7 @@ import scala.collection.mutable
  * about elements. It does not know about names, attributes, etc. All it knows about elements is that elements can have element children (other
  * node types are entirely out of scope in this trait).
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.ElemApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.ElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment. Below follows an even more formal treatment, with proofs by induction
  * of important properties obeyed by methods of this API. It shows the <em>mathematical</em> rigor of the yaidom query API.
  * API users that are only interested in how to use the API can safely skip that formal treatment.

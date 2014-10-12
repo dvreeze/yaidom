@@ -24,11 +24,11 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  *
  * There are 2 types of `QName`s:
  * <ul>
- * <li>[[eu.cdevreeze.yaidom.UnprefixedName]], which only contains a local part</li>
- * <li>[[eu.cdevreeze.yaidom.PrefixedName]], which combines a non-empty prefix with a local part</li>
+ * <li>[[eu.cdevreeze.yaidom.core.UnprefixedName]], which only contains a local part</li>
+ * <li>[[eu.cdevreeze.yaidom.core.PrefixedName]], which combines a non-empty prefix with a local part</li>
  * </ul>
  *
- * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.EName]].
+ * QNames are meaningless outside their scope, which resolves the `QName` as an [[eu.cdevreeze.yaidom.core.EName]].
  *
  * Typical usage may lead to an explosion of different QName objects that are equal. Therefore, application code
  * is encouraged to define and use constants for frequently used QNames. For example, for the XML Schema namespace:

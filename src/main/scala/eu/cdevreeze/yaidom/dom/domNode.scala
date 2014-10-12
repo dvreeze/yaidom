@@ -37,7 +37,7 @@ import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
- * [[eu.cdevreeze.yaidom.ElemLike]] API.
+ * [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
  *
  * Not all DOM node types are exposed via these wrappers. For example, attributes are not nodes according to the `ElemLike` API,
  * so there is no wrapper for attributes.
@@ -91,7 +91,7 @@ final class DomDocument(
 }
 
 /**
- * Wrapper around `org.w3c.dom.Element`, conforming to the [[eu.cdevreeze.yaidom.ElemLike]] API.
+ * Wrapper around `org.w3c.dom.Element`, conforming to the [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */

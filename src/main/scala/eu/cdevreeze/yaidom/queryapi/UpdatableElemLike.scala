@@ -22,15 +22,15 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.Path
 
 /**
- * API and implementation trait for functionally updatable elements. This trait extends trait [[eu.cdevreeze.yaidom.PathAwareElemLike]],
+ * API and implementation trait for functionally updatable elements. This trait extends trait [[eu.cdevreeze.yaidom.queryapi.IsNavigable]],
  * adding knowledge about child nodes in general, and about the correspondence between child path entries and child
  * indexes.
  *
  * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
  * `children`, `withChildren` and `childNodeIndexesByPathEntries`. Based on these abstract methods (and the super-trait), this
- * trait offers a rich API for querying elements and paths, and for functionally updating elements.
+ * trait offers a rich API for functionally updating elements.
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.UpdatableElemApi]]. See the documentation of that trait
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]]. See the documentation of that trait
  * for examples of usage, and for a more formal treatment.
  *
  * @tparam N The node supertype of the element subtype

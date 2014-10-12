@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.queryapi
 
 /**
  * Trait defining the contract for elements as text containers.
- * Typical element types are both an [[eu.cdevreeze.yaidom.ElemLike]] as well as a [[eu.cdevreeze.yaidom.HasText]].
+ * Typical element types are both an [[eu.cdevreeze.yaidom.queryapi.ElemLike]] as well as a [[eu.cdevreeze.yaidom.queryapi.HasText]].
  *
  * @author Chris de Vreeze
  */

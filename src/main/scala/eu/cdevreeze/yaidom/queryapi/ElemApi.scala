@@ -25,7 +25,7 @@ import scala.collection.immutable
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
  * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
  *
- * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.ElemLike]].
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.queryapi.ElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows that elements can <em>have child elements</em>
  * (again not knowing about other child nodes). Using this minimal knowledge alone, it offers methods to query for
  * <em>descendant</em> elements, <em>descendant-or-self</em> methods, or sub-collections thereof. It is this minimal knowledge that
@@ -53,7 +53,7 @@ import scala.collection.immutable
  * This returns all offending elements, that is, all descendant elements of the root element (excluding the root element itself)
  * that have at least one namespace declaration.
  *
- * Now let's use an [[eu.cdevreeze.yaidom.ElemBuilder]], again named ``rootElem``:
+ * Now let's use an [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]], again named ``rootElem``:
  * {{{
  * rootElem filterElems (elem => !elem.namespaces.isEmpty)
  * }}}

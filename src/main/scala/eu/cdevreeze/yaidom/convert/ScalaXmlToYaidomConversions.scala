@@ -32,8 +32,8 @@ import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
 import eu.cdevreeze.yaidom.defaultelem.Text
 
 /**
- * Converter from Scala XML nodes to yaidom nodes, in particular from `scala.xml.Elem` to [[eu.cdevreeze.yaidom.Elem]] and
- * from `scala.xml.Document` to [[eu.cdevreeze.yaidom.Document]].
+ * Converter from Scala XML nodes to yaidom nodes, in particular from `scala.xml.Elem` to [[eu.cdevreeze.yaidom.defaultelem.Elem]] and
+ * from `scala.xml.Document` to [[eu.cdevreeze.yaidom.defaultelem.Document]].
  *
  * This converter is handy when one wants to use XML literals (as offered by standard Scala XML) in combination with yaidom.
  *

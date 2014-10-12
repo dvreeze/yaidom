@@ -21,22 +21,19 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.Path
 
 /**
- * This is the <em>Path-aware</em> part of the yaidom <em>uniform query API</em>. It is a sub-trait of trait
- * [[eu.cdevreeze.yaidom.IsNavigableApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
- * because some implementing sub-trait is mixed in), thus sharing this query API.
+ * This is the <em>Path query</em> part of the yaidom <em>uniform query API</em>. Only a few DOM-like element
+ * implementations in yaidom mix in this trait (indirectly, because some implementing sub-trait is mixed in), thus
+ * sharing this query API.
  *
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
  * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
  *
- * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.PathAwareElemLike]].
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.queryapi.PathAwareElemLike]].
  * That trait only knows about elements (and not about other nodes), and only knows the following about elements:
  * <ul>
- * <li>elements can <em>have child elements</em> (as promised by ancestor trait ``ElemLike``)</li>
- * <li>elements have a so-called <em>"resolved name"</em> (as promised by parent trait ``ElemLike``)</li>
- * <li>elements have zero or more <em>"resolved attributes"</em> (as promised by parent trait ``ElemLike``)</li>
  * <li>elements can be queried for <em>path entries</em> relative to the parent element</li>
  * </ul>
- * Using this minimal knowledge alone, that trait not only offers the methods of its parent trait, but also:
+ * Using this minimal knowledge alone, that trait offers:
  * <ul>
  * <li>methods mirroring the ``ElemLike`` query methods, but returning ``Path`` objects instead of elements</li>
  * </ul>

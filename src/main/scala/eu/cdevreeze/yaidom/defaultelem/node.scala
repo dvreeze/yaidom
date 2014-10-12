@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
 /**
  * Immutable XML Node. It is the default XML node type in yaidom. There are subclasses for different types of nodes,
- * such as elements, text nodes, comments, entity references and processing instructions. See [[eu.cdevreeze.yaidom.Elem]]
+ * such as elements, text nodes, comments, entity references and processing instructions. See [[eu.cdevreeze.yaidom.defaultelem.Elem]]
  * for the default element type in yaidom.
  *
  * @author Chris de Vreeze
@@ -90,8 +90,8 @@ sealed trait Node extends Immutable with Serializable {
  * The parsers and serializers in packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] return and take
  * these default elements (or the corresponding `Document` instances), respectively.
  *
- * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.Elem]] is among the most powerful element implementations offered
- * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.UpdatableElemApi]] and [[eu.cdevreeze.yaidom.TransformableElemApi]]
+ * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.defaultelem.Elem]] is among the most powerful element implementations offered
+ * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]] and [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]]
  * query APIs.
  *
  * '''See the documentation of the mixed-in query API traits for more details on the uniform query API offered by this class.'''

@@ -36,8 +36,8 @@ import YaidomToDomConversions.DocumentProducer
 import YaidomToDomConversions.ElementProducer
 
 /**
- * Converter from yaidom nodes to DOM nodes, in particular from [[eu.cdevreeze.yaidom.Elem]] to a `org.w3c.dom.Element`,
- * and from  [[eu.cdevreeze.yaidom.Document]] to a `org.w3c.dom.Document`.
+ * Converter from yaidom nodes to DOM nodes, in particular from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to a `org.w3c.dom.Element`,
+ * and from  [[eu.cdevreeze.yaidom.defaultelem.Document]] to a `org.w3c.dom.Document`.
  *
  * @author Chris de Vreeze
  */

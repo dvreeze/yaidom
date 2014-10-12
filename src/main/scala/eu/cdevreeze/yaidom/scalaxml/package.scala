@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Wrapper around class `scala.xml.Elem`, adapting it to the [[eu.cdevreeze.yaidom.ElemLike]] API.
+ * Wrapper around class `scala.xml.Elem`, adapting it to the [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
  *
  * This wrapper brings the uniform yaidom query API to Scala XML literals (and Scala XML Elems in general).
  *

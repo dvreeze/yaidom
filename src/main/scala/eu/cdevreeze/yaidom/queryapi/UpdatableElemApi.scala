@@ -22,30 +22,29 @@ import eu.cdevreeze.yaidom.core.Path
 
 /**
  * This is the <em>functional update</em> part of the yaidom <em>uniform query API</em>. It is a sub-trait of trait
- * [[eu.cdevreeze.yaidom.PathAwareElemApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
+ * [[eu.cdevreeze.yaidom.queryapi.IsNavigableApi]]. Only a few DOM-like element implementations in yaidom mix in this trait (indirectly,
  * because some implementing sub-trait is mixed in), thus sharing this query API.
  *
  * '''This trait typically does not show up in application code using yaidom, yet its (uniform) API does. Hence, it makes sense
  * to read the documentation of this trait, knowing that the API is offered by multiple element implementations.'''
  *
- * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.UpdatableElemLike]].
+ * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]].
  * The trait has all the knowledge of its super-trait, but in addition to that knows the following:
  * <ul>
  * <li>An element has <em>child nodes</em>, which may or may not be elements. Hence the extra type parameter for nodes.</li>
  * <li>An element knows the <em>child node indexes</em> of the path entries of the child elements.</li>
  * </ul>
  * Obviously methods ``children``, ``withChildren`` and ``childNodeIndexesByPathEntries`` must be consistent with
- * methods such as ``findAllChildElems`` and ``findAllChildElemsWithPathEntries``.
+ * methods such as ``findAllChildElems`` and ``findAllChildElemsWithPathEntries``, if the corresponding traits are
+ * mixed in.
  *
  * Using this minimal knowledge alone, trait ``UpdatableElemLike`` not only offers the methods of its parent trait, but also:
  * <ul>
  * <li>methods to <em>functionally update</em> an element by replacing, adding or deleting child nodes</li>
  * <li>methods to <em>functionally update</em> an element by replacing descendant-or-self elements at specified paths</li>
  * </ul>
- * In other words, the ``UpdatableElemApi`` trait is quite a rich query API, considering the minimal knowledge it needs to
- * have about elements.
  *
- * For the conceptual difference with "transformable" elements, see trait [[eu.cdevreeze.yaidom.TransformableElemApi]].
+ * For the conceptual difference with "transformable" elements, see trait [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]].
  *
  * This query API leverages the Scala Collections API. Query results can be manipulated using the Collections API, and the
  * query API implementation (in ``UpdatableElemLike``) uses the Collections API internally.
@@ -84,7 +83,7 @@ import eu.cdevreeze.yaidom.core.Path
  * </book:Bookstore>
  * }}}
  *
- * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.Elem]] variable named ``bookstoreElem``. Then we can add a book
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.defaultelem.Elem]] variable named ``bookstoreElem``. Then we can add a book
  * as follows, where we "forget" the 2nd author for the moment:
  * {{{
  * import convert.ScalaXmlConversions._

@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.defaultelem
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.Elem]] to `A` (which can be anything, such as a DOM `Element`).
+ * Converter from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to `A` (which can be anything, such as a DOM `Element`).
  *
  * @tparam A the result type of the conversion
  *

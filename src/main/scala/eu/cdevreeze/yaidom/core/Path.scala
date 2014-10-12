@@ -74,10 +74,10 @@ import scala.collection.mutable
  *   QName("auth:Last_Name") -> 0).build(Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author"))
  * }}}
  *
- * `Path` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.PathAwareElemLike]]), and in "functional updates"
- * (see [[eu.cdevreeze.yaidom.UpdatableElemLike]]).
+ * `Path` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.queryapi.PathAwareElemLike]]), and in "functional updates"
+ * (see [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]]).
  *
- * An [[eu.cdevreeze.yaidom.Path]] corresponds to one and only one canonical path of the element (modulo prefix names),
+ * An [[eu.cdevreeze.yaidom.core.Path]] corresponds to one and only one canonical path of the element (modulo prefix names),
  * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
  * There is one catch, though. The `Path` does not know the root element name, so that is not a part of the corresponding
  * canonical XPath expression. See the documentation of method `toCanonicalXPath`.
