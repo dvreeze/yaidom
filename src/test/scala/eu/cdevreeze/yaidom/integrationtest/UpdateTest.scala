@@ -17,17 +17,23 @@
 package eu.cdevreeze.yaidom
 package integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import javax.xml.transform.{ TransformerFactory, Transformer }
+import java.{util => jutil}
+
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.TransformerFactory
 import parse.DocumentParserUsingDom
 import print.DocumentPrinterUsingDom
-import NodeBuilder._
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder._
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.Elem
 
 /**
  * XML functional update test case.
@@ -317,17 +323,17 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def attrNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+  private def attrNames[N, E <: N with ElemLike[E] with HasEName with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
     result.toSet
   }
 
-  private def elemNames[N, E <: N with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+  private def elemNames[N, E <: N with ElemLike[E] with HasEName with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf map { e => e.resolvedName }
     result.toSet
   }
 
-  private def turnBookAttributeIntoElem[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
+  private def turnBookAttributeIntoElem[N, E <: N with ElemLike[E] with HasEName with PathAwareElemLike[E] with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
     val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }
@@ -339,7 +345,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def turnBookAttributeIntoElemUsingPathSet[N, E <: N with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
+  private def turnBookAttributeIntoElemUsingPathSet[N, E <: N with ElemLike[E] with HasEName with PathAwareElemLike[E] with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
     val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
       path.endsWithName(EName("{http://bookstore}Book"))
     }

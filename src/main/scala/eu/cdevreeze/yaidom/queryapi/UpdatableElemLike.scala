@@ -38,7 +38,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends PathAwareElemLike[E] with UpdatableElemApi[N, E] { self: E =>
+trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNavigable[E] with UpdatableElemApi[N, E] { self: E =>
 
   // See https://pario.zendesk.com/entries/20124208-lesson-6-complex-xslt-example for an example of what we must be able to express easily.
 

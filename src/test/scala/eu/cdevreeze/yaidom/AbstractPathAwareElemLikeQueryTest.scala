@@ -31,7 +31,7 @@ import HasENameApi._
  */
 abstract class AbstractPathAwareElemLikeQueryTest extends AbstractElemLikeQueryTest {
 
-  override type E <: PathAwareElemLike[E] with HasText
+  override type E <: ElemLike[E] with HasEName with PathAwareElemLike[E] with IsNavigable[E] with HasText
 
   @Test def testQueryBookTitlesUsingPaths(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title

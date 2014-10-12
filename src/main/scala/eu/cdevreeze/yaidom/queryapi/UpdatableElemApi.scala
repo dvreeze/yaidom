@@ -184,7 +184,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends PathAwareElemApi[E] { self: E =>
+trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigableApi[E] { self: E =>
 
   /** Returns the child nodes of this element, in the correct order */
   def children: immutable.IndexedSeq[N]

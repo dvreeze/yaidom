@@ -32,8 +32,11 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -173,7 +176,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasQNameApi with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with PathAwareElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasQNameApi with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
