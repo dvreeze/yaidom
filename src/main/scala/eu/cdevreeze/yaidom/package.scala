@@ -505,15 +505,6 @@ package eu.cdevreeze
  */
 package object yaidom {
 
-  /**
-   * Making ElemApi filter/find methods accept ENames which are implicitly converted to element predicates.
-   */
-  implicit class ToHasElemApi(val ename: EName) extends (eu.cdevreeze.yaidom.queryapi.ElemApi[_] with eu.cdevreeze.yaidom.queryapi.HasENameApi => Boolean) {
-
-    def apply(elem: eu.cdevreeze.yaidom.queryapi.ElemApi[_] with eu.cdevreeze.yaidom.queryapi.HasENameApi): Boolean =
-      (elem.resolvedName == this.ename)
-  }
-
   // Aliases for types and objects in the core package
 
   type QName = eu.cdevreeze.yaidom.core.QName

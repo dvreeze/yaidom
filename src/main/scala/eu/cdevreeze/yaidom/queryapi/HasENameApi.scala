@@ -88,6 +88,15 @@ trait HasENameApi {
 object HasENameApi {
 
   /**
+   * Making ElemApi filter/find methods accept ENames which are implicitly converted to element predicates.
+   */
+  implicit class ToHasElemApi(val ename: EName) extends (ElemApi[_] with HasENameApi => Boolean) {
+
+    def apply(elem: ElemApi[_] with HasENameApi): Boolean =
+      (elem.resolvedName == this.ename)
+  }
+
+  /**
    * Returns the equivalent of `{ _.ename == ename }`
    */
   def withEName(ename: EName): (ElemApi[_] with HasENameApi => Boolean) = { elem =>
