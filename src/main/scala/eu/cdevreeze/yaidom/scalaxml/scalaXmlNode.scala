@@ -25,6 +25,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
+import eu.cdevreeze.yaidom.queryapi.HasScopeApi
 import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 
@@ -66,7 +67,7 @@ sealed trait ScalaXmlNode {
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ElemLike[ScalaXmlElem] with HasEName with HasQNameApi with HasText { self =>
+  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ElemLike[ScalaXmlElem] with HasEName with HasQNameApi with HasText with HasScopeApi { self =>
 
   require(wrappedNode ne null)
 
