@@ -30,7 +30,7 @@ import parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
-import eu.cdevreeze.yaidom.queryapi.SubtypeAwareParentElemLike
+import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 
 /**
  * Test case using yaidom sub-type-aware elements for XBRL schema processing.
@@ -183,7 +183,7 @@ object XbrlSchemaTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase"
   val nsXLink = "http://www.w3.org/1999/xlink"
 
-  class XsdElem(val wrappedElem: indexed.Elem) extends SubtypeAwareParentElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] {
+  class XsdElem(val wrappedElem: indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] {
 
     override def findAllChildElems: immutable.IndexedSeq[XsdElem] =
       wrappedElem.findAllChildElems.map(e => XsdElem(e))

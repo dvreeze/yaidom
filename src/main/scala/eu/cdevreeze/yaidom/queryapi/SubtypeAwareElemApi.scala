@@ -23,8 +23,8 @@ import scala.reflect.ClassTag
  * Extension to ElemApi that makes querying for sub-types of the element type easy.
  *
  * For example, XML Schema can be modeled with an object hierarchy, starting with some XsdElem super-type which
- * mixes in trait SubtypeAwareParentElemApi, among other query traits. The object hierarchy could contain sub-classes
- * of XsdElem such as XsdRootElem, GlobalElementDeclaration, etc. Then the SubtypeAwareParentElemApi trait makes it
+ * mixes in trait SubtypeAwareElemApi, among other query traits. The object hierarchy could contain sub-classes
+ * of XsdElem such as XsdRootElem, GlobalElementDeclaration, etc. Then the SubtypeAwareElemApi trait makes it
  * easy to query for all or some global element declarations, etc.
  *
  * There is no magic in these traits: it is just ElemApi and ElemLike underneath. It is only the syntactic
@@ -43,7 +43,7 @@ import scala.reflect.ClassTag
  *
  * @author Chris de Vreeze
  */
-trait SubtypeAwareParentElemApi[A <: SubtypeAwareParentElemApi[A]] extends ElemApi[A] { self: A =>
+trait SubtypeAwareElemApi[A <: SubtypeAwareElemApi[A]] extends ElemApi[A] { self: A =>
 
   /**
    * Returns all child elements of the given sub-type, in the correct order.

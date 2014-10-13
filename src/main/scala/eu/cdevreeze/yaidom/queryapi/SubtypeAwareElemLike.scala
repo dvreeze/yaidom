@@ -22,11 +22,11 @@ import scala.reflect.ClassTag
 import ElemApi.anyElem
 
 /**
- * Default implementation of SubtypeAwareParentElemApi.
+ * Default implementation of SubtypeAwareElemApi.
  *
  * @author Chris de Vreeze
  */
-trait SubtypeAwareParentElemLike[A <: SubtypeAwareParentElemLike[A]] extends ElemLike[A] with SubtypeAwareParentElemApi[A] { self: A =>
+trait SubtypeAwareElemLike[A <: SubtypeAwareElemLike[A]] extends ElemLike[A] with SubtypeAwareElemApi[A] { self: A =>
 
   final def findAllChildElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterChildElemsOfType(subType)(anyElem)

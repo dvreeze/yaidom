@@ -254,7 +254,8 @@ trait ElemApi[E <: ElemApi[E]] { self: E =>
 object ElemApi {
 
   /**
-   * Element predicate that filters away no elements, and that can be used in many methods of the SubtypeAwareParentElemApi trait.
+   * Element predicate that filters away no elements, and that can be used in many methods of the ElemApi trait.
+   * It is especially useful when using the SubtypeAwareElemApi trait.
    */
   val anyElem: ElemApi[_] => Boolean = { e => true }
 }
