@@ -23,6 +23,7 @@ The (somewhat more functional) library code checks are as follows:
 * As for clarity, correctness and minimality, is the API (partly) a (mathematical) theory, and also documented as such? That could provide an extra safety net.
 * As for clarity and minimality, is it easy to get started with the library without documentation, for basic usage? For example, by experimenting in the Scala REPL.
 * As for minimality, does the API have a good "signal-to-noise ratio" (or much "bang for the buck", or a small "conceptual surface area")? Joshua Bloch: "When in doubt, leave it out".
+* As for minimality, how "orthogonal" is the API? E.g., are query API traits like LEGO, or do they sit in a fixed inheritance hierarchy?
 * Given the chosen scope, is the API complete enough? E.g., check yaidom against Saxon and XQuery.
 * On the other hand, still strive for minimality, and keep in mind that completeness may mean good interop with other APIs (JAXP, wrapped DOM-like APIs etc.).
 * Does the API use names consistently?
