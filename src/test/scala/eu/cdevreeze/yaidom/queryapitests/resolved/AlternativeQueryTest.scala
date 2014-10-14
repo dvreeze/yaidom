@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package resolved
+package eu.cdevreeze.yaidom.queryapitest.resolved
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.resolved.Elem
 
 /**
  * Alternative query test case for resolved Elems.
@@ -59,7 +57,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    resolved.Elem(convertToElem(xml))
+    Elem(convertToElem(xml))
   }
 
   protected val pricesElem: E = {
@@ -80,7 +78,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    resolved.Elem(convertToElem(xml))
+    Elem(convertToElem(xml))
   }
 
   protected val orderElem: E = {
@@ -94,12 +92,12 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    resolved.Elem(convertToElem(xml))
+    Elem(convertToElem(xml))
   }
 
-  protected final def toResolvedElem(elem: E): resolved.Elem = elem
+  protected final def toResolvedElem(elem: E): Elem = elem
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    resolved.Elem(convertToElem(elem))
+    Elem(convertToElem(elem))
   }
 }

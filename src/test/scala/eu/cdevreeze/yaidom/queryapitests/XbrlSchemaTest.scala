@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package subtypeaware
+package eu.cdevreeze.yaidom.queryapitests
 
 import scala.collection.immutable
 import scala.reflect.classTag
+
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+
 import eu.cdevreeze.yaidom.Document
 import eu.cdevreeze.yaidom.EName
 import eu.cdevreeze.yaidom.Path
-import eu.cdevreeze.yaidom.indexed
-import parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
@@ -46,9 +46,10 @@ class XbrlSchemaTest extends Suite {
 
   def testQueryXbrlSchema(): Unit = {
     val parser = DocumentParserUsingSax.newInstance()
-    val doc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
+    val doc: eu.cdevreeze.yaidom.defaultelem.Document =
+      parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
 
-    val xbrlSchemaDoc = indexed.Document(doc)
+    val xbrlSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(doc)
     val xbrlSchema: XsdRootElem = new XsdRootElem(xbrlSchemaDoc.documentElement)
 
     // Check concepts
@@ -123,12 +124,13 @@ class XbrlSchemaTest extends Suite {
   def testQueryMultipleXsds(): Unit = {
     val parser = DocumentParserUsingSax.newInstance()
     val ipoDoc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("ipo.xsd"))
-    val addressDoc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("address.xsd"))
+    val addressDoc: Document =
+      parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("address.xsd"))
 
-    val ipoSchemaDoc = indexed.Document(ipoDoc)
+    val ipoSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(ipoDoc)
     val ipoSchema: XsdRootElem = new XsdRootElem(ipoSchemaDoc.documentElement)
 
-    val addressSchemaDoc = indexed.Document(addressDoc)
+    val addressSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(addressDoc)
     val addressSchema: XsdRootElem = new XsdRootElem(addressSchemaDoc.documentElement)
 
     val tns = ipoSchema.targetNamespaceOption.getOrElse("")
@@ -183,7 +185,7 @@ object XbrlSchemaTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase"
   val nsXLink = "http://www.w3.org/1999/xlink"
 
-  class XsdElem(val wrappedElem: indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] {
+  class XsdElem(val wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] {
 
     override def findAllChildElems: immutable.IndexedSeq[XsdElem] =
       wrappedElem.findAllChildElems.map(e => XsdElem(e))
@@ -196,14 +198,14 @@ object XbrlSchemaTest {
       wrappedElem.findChildElemByPathEntry(entry).map(elem => XsdElem(elem))
   }
 
-  final class XsdRootElem(wrappedElem: indexed.Elem) extends XsdElem(wrappedElem) {
+  final class XsdRootElem(wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends XsdElem(wrappedElem) {
     require(resolvedName == EName(nsSchema, "schema"))
     require(wrappedElem.path.isRoot)
 
     def targetNamespaceOption: Option[String] = attributeOption(EName("targetNamespace"))
   }
 
-  final class GlobalElementDeclaration(wrappedElem: indexed.Elem) extends XsdElem(wrappedElem) {
+  final class GlobalElementDeclaration(wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends XsdElem(wrappedElem) {
     require(resolvedName == EName(nsSchema, "element"))
     require(wrappedElem.path.entries.size == 1)
 
@@ -217,7 +219,7 @@ object XbrlSchemaTest {
     }
   }
 
-  final class ElementReference(wrappedElem: indexed.Elem) extends XsdElem(wrappedElem) {
+  final class ElementReference(wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends XsdElem(wrappedElem) {
     require(resolvedName == EName(nsSchema, "element"))
     require(wrappedElem.path.entries.size >= 2)
 
@@ -226,7 +228,7 @@ object XbrlSchemaTest {
 
   object XsdElem {
 
-    def apply(elem: indexed.Elem): XsdElem = elem.resolvedName match {
+    def apply(elem: eu.cdevreeze.yaidom.indexed.Elem): XsdElem = elem.resolvedName match {
       case EName(nsSchema, "schema") => new XsdRootElem(elem)
       case EName(nsSchema, "element") if elem.path.entries.size == 1 =>
         new GlobalElementDeclaration(elem)

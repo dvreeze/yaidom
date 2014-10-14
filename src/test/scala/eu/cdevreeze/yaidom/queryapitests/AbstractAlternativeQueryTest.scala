@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.queryapitests
 
-import java.{ util => jutil, io => jio }
+import scala.Vector
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
-import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+
+import org.junit.Test
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.queryapi.HasENameApi._
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
@@ -63,7 +68,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <colorChoices>navy black</colorChoices>
       </product>
 
-    assertResult(resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -75,7 +80,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <desc>Our <i>favorite</i> shirt!</desc>
       </product>
 
-    assertResult(resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -119,7 +124,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    assertResult(resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -129,7 +134,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <name language="en">Deluxe Travel Bag</name>
       </product>
 
-    assertResult(resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -148,7 +153,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    assertResult(resolved.Elem(convertToElem(expectedProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElem).removeAllInterElementWhitespace
     }
   }
@@ -169,7 +174,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
 
     val expectedNameElems = List(
       <name language="en">Deluxe Travel Bag</name>,
-      <name language="en">Floppy Sun Hat</name>).map(e => resolved.Elem(convertToElem(e)))
+      <name language="en">Floppy Sun Hat</name>).map(e => eu.cdevreeze.yaidom.resolved.Elem(convertToElem(e)))
 
     assertResult(expectedNameElems) {
       sortedProductNameElems.map(e => toResolvedElem(e))
@@ -202,7 +207,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <li class="ACC">Floppy Sun Hat</li>
       </ul>
 
-    assertResult(resolved.Elem(convertToElem(expectedResult)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedResult)).removeAllInterElementWhitespace) {
       toResolvedElem(resultElem).removeAllInterElementWhitespace
     }
   }
@@ -241,8 +246,8 @@ abstract class AbstractAlternativeQueryTest extends Suite {
         <item num="784" name="Cotton Dress Shirt" quan="1"/>,
         <item num="557" name="Fleece Pullover" quan="1"/>)
 
-    assertResult(expectedResults.map(e => resolved.Elem(convertToElem(e)).removeAllInterElementWhitespace)) {
-      itemElems.map(e => resolved.Elem(e).removeAllInterElementWhitespace)
+    assertResult(expectedResults.map(e => eu.cdevreeze.yaidom.resolved.Elem(convertToElem(e)).removeAllInterElementWhitespace)) {
+      itemElems.map(e => eu.cdevreeze.yaidom.resolved.Elem(e).removeAllInterElementWhitespace)
     }
   }
 
@@ -252,7 +257,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
 
   protected val orderElem: E
 
-  protected def toResolvedElem(elem: E): resolved.Elem
+  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
 
   protected def fromScalaElem(elem: scala.xml.Elem): E
 }

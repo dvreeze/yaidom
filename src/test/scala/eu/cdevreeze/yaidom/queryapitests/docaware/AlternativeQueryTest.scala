@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package indexed
+package eu.cdevreeze.yaidom.queryapitests.docaware
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import java.net.URI
+
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.docaware.Document
+import eu.cdevreeze.yaidom.docaware.Elem
+import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.resolved
 
 /**
- * Alternative query test case for indexed Elems.
+ * Alternative query test case for docaware Elems.
  *
  * @author Chris de Vreeze
  */
@@ -59,7 +61,14 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    indexed.Elem(convertToElem(xml))
+    val result = Elem(new URI("http://catalog"), convertToElem(xml))
+
+    // Invoking some Document methods, but without altering the result
+
+    val doc = Document(result)
+    require(result == doc.documentElement)
+    require(result == doc.withDocumentElement(result).documentElement)
+    result
   }
 
   protected val pricesElem: E = {
@@ -80,7 +89,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    indexed.Elem(convertToElem(xml))
+    Elem(new URI("http://prices"), convertToElem(xml))
   }
 
   protected val orderElem: E = {
@@ -94,12 +103,12 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    indexed.Elem(convertToElem(xml))
+    Elem(new URI("http://order"), convertToElem(xml))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    indexed.Elem(convertToElem(elem))
+    Elem(new URI("http://bogus-uri"), convertToElem(elem))
   }
 }

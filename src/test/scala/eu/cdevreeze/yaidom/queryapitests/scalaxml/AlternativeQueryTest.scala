@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package dom
+package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
-import convert.DomConversions
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
 /**
- * Alternative query test case for DOM wrapper Elems.
+ * Alternative query test case for Scala XML wrapper Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
-  final type E = DomElem
+  final type E = ScalaXmlElem
 
   protected val catalogElem: E = {
     val xml =
@@ -61,9 +58,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
+    ScalaXmlElem(xml)
   }
 
   protected val pricesElem: E = {
@@ -84,9 +79,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
+    ScalaXmlElem(xml)
   }
 
   protected val orderElem: E = {
@@ -100,18 +93,14 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
+    ScalaXmlElem(xml)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = {
-    resolved.Elem(DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
+    resolved.Elem(convertToElem(elem.wrappedNode))
   }
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    DomElem(DomConversions.convertElem(convertToElem(elem), db.newDocument, Scope.Empty))
+    ScalaXmlElem(elem)
   }
 }

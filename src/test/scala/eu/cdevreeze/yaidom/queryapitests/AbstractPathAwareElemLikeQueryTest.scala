@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.queryapitests
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
-import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
-import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.queryapi.HasENameApi._
+import org.junit.Test
+
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withNoNsEName
 import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
 
 /**
  * PathAwareElemLike-based query test case, extending AbstractElemLikeQueryTest.

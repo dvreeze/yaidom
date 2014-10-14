@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.core
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import scala.collection.JavaConverters.asScalaIteratorConverter
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 /**

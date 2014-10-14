@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.core
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalacheck.{ Prop, Gen, Arbitrary }
-import org.scalatest.{ Suite, BeforeAndAfterAll }
-import org.scalatest.prop.Checkers
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Gen.const
+import org.scalacheck.Gen.listOfN
+import org.scalacheck.Gen.oneOf
+import org.scalacheck.Gen.someOf
+import org.scalacheck.Prop.propBoolean
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.prop.Checkers
 
 /**
  * Scope properties test case.
@@ -33,8 +37,6 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class ScopePropTest extends Suite with Checkers {
 
-  import Prop._
-  import Gen._
   import Arbitrary.arbitrary
 
   @Test def testResolveProperty(): Unit = {
@@ -89,7 +91,7 @@ class ScopePropTest extends Suite with Checkers {
 
     for {
       scope <- genScope
-      prefixes <- oneOf(value(Seq[String]()), genPrefixes)
+      prefixes <- oneOf(const(Seq[String]()), genPrefixes)
       undecls = prefixes.map(pref => (pref -> "")).toMap
     } yield Declarations.from(scope.prefixNamespaceMap ++ undecls)
   }

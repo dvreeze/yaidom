@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package utils
+package eu.cdevreeze.yaidom.utils
 
-import java.{ util => jutil, io => jio }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import scala.collection.immutable
-import scala.reflect.classTag
-import org.junit.{ Test, Before, Ignore }
+import java.{ util => jutil }
+
+import scala.Vector
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingDom
-import print.DocumentPrinterUsingDom
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
+
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * ENameProviderUtils and QNameProviderUtils test case.

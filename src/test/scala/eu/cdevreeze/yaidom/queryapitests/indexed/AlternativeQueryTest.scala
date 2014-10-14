@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package scalaxml
+package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.indexed.Elem
+import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.resolved
 
 /**
- * Alternative query test case for Scala XML wrapper Elems.
+ * Alternative query test case for indexed Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
-  final type E = ScalaXmlElem
+  final type E = Elem
 
   protected val catalogElem: E = {
     val xml =
@@ -59,7 +58,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    ScalaXmlElem(xml)
+    Elem(convertToElem(xml))
   }
 
   protected val pricesElem: E = {
@@ -80,7 +79,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    ScalaXmlElem(xml)
+    Elem(convertToElem(xml))
   }
 
   protected val orderElem: E = {
@@ -94,14 +93,12 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    ScalaXmlElem(xml)
+    Elem(convertToElem(xml))
   }
 
-  protected final def toResolvedElem(elem: E): resolved.Elem = {
-    resolved.Elem(convertToElem(elem.wrappedNode))
-  }
+  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    ScalaXmlElem(elem)
+    Elem(convertToElem(elem))
   }
 }

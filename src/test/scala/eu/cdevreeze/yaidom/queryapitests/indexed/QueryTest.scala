@@ -14,148 +14,230 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package resolved
+package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import java.{ util => jutil, io => jio }
+import scala.Vector
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.ElemBuilder
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.elem
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.fromElem
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.indexed.Elem
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
+import eu.cdevreeze.yaidom.resolved
+
 /**
- * Query test case for resolved Elems.
+ * Query test case for indexed Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class QueryTest extends AbstractPathAwareElemLikeQueryTest {
+class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths(): Unit = {
+  @Test def testInternalConsistency(): Unit = {
+    require(bookstore.localName == "Bookstore")
+
+    val elems = bookstore.findAllElemsOrSelf
+
+    elems.foreach(e => e.assertConsistency())
+  }
+
+  @Test def testQueryAll(): Unit = {
+    require(bookstore.localName == "Bookstore")
+
+    val elems = bookstore.findAllElemsOrSelf
+
+    assertResult(true) {
+      !elems.isEmpty
+    }
+
+    assertResult(true) {
+      elems forall { e =>
+        val parentScope = e.path.parentPathOption.map(p => bookstore.getElemOrSelfByPath(p).scope).getOrElse(Scope.Empty)
+        parentScope.resolve(e.namespaces) == e.scope
+      }
+    }
+
+    assertResult(bookstore.elem.findAllElemsOrSelf) {
+      elems map { e => e.elem }
+    }
+  }
+
+  @Test def testQueryBookOrMagazineTitlesUsingParent(): Unit = {
+    // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
+
+    require(bookstore.localName == "Bookstore")
+
+    // Indexed Elems can be queried for the parent element!
+
+    val bookOrMagazineTitles2 =
+      for {
+        title <- bookstore filterElems { _.resolvedName == EName("Title") }
+        if (title.path.parentPath.elementNameOption == Some(EName("Book"))) ||
+          (title.path.parentPath.elementNameOption == Some(EName("Magazine")))
+      } yield title
+
+    assertResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints",
+      "National Geographic",
+      "Newsweek")) {
+      val result = bookOrMagazineTitles2 map { _.trimmedText }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryTitlesUsingPaths(): Unit = {
+    // XPath: doc("bookstore.xml")/Bookstore/*/Title
+
+    require(bookstore.localName == "Bookstore")
+
+    val titles =
+      for {
+        title <- bookstore findTopmostElems { _.resolvedName == EName("Title") }
+        if title.path.entries.size == 2
+      } yield title
+
+    assertResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints",
+      "Jennifer's Economical Database Hints",
+      "National Geographic",
+      "Newsweek")) {
+      val result = titles map { e => bookstore.elem.getElemOrSelfByPath(e.path).trimmedText }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryTitlesOfCheapBooksByUllmanUsingParent(): Unit = {
+    // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
+
+    require(bookstore.localName == "Bookstore")
+
+    val bookTitles =
+      bookstore findTopmostElems { e => e.localName == "Last_Name" && e.trimmedText == "Ullman" } flatMap { elm =>
+        require(elm.resolvedName == EName("Last_Name"))
+        val bookOption = elm.path findAncestorPath { p =>
+          val e = bookstore.getElemOrSelfByPath(p)
+          e.resolvedName == EName("Book") && e.attribute(EName("Price")).toInt < 90
+        } map { p => bookstore.getElemOrSelfByPath(p) }
+        val titleOption = bookOption flatMap { bookElm => bookElm findElem { e => e.resolvedName == EName("Title") } }
+        titleOption
+      }
+
+    assertResult(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookTitles map { _.trimmedText }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryTitlesOfCheapBooksByJeffreyUllmanUsingParent(): Unit = {
+    // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
+
+    require(bookstore.localName == "Bookstore")
+
+    def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.Elem): (String, String) = {
+      val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
+      val firstNames = authorElem.filterChildElems(EName("First_Name")) map { _.text.trim }
+      (lastNames.mkString, firstNames.mkString)
+    }
+
+    val bookTitles2 =
+      for {
+        authorElem <- bookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
+        if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+        bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
+          bookstore.getElemOrSelfByPath(p)
+        }
+        if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
+      } yield bookElem.getChildElem(EName("Title"))
+
+    assertResult(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookTitles2 map { _.trimmedText }
+      result.toSet
+    }
+
+    val bookTitles3 =
+      for {
+        authorElem <- bookstore \\ EName("Author")
+        if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+        bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
+          bookstore.getElemOrSelfByPath(p)
+        }
+        if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
+      } yield (bookElem \ EName("Title")).head
+
+    assertResult(Set(
+      "A First Course in Database Systems",
+      "Hector and Jeff's Database Hints")) {
+      val result = bookTitles3 map { _.elem.trimmedText }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryBooksByJeffreyUllmanUsingParent(): Unit = {
+    // Own example
+
+    require(bookstore.localName == "Bookstore")
+
+    val ullmanBookElms =
+      for {
+        authorElm <- bookstore filterElems { e =>
+          (e.localName == "Author") &&
+            ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
+            ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
+        }
+        bookElmPath = authorElm.path.parentPath.parentPath
+        bookElm = bookstore.getElemOrSelfByPath(bookElmPath)
+      } yield {
+        require(bookElm.localName == "Book")
+        bookElm
+      }
+
+    assertResult(Set(
+      "A First Course in Database Systems",
+      "Database Systems: The Complete Book",
+      "Hector and Jeff's Database Hints")) {
+      val result = ullmanBookElms map { e => e.getChildElem(_.localName == "Title").text }
+      result.toSet
+    }
+  }
+
+  @Test def testQueryElementsWithParentNotBookOrBookstore(): Unit = {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     require(bookstore.localName == "Bookstore")
 
-    def addElemPaths(e: Elem, path: Path, scope: Scope): Elem = {
-      def getChildPathEntry(e: Elem, nodeIdx: Int): Path.Entry = {
-        val includedChildren = e.children.take(nodeIdx + 1)
-        val ename = includedChildren.last.asInstanceOf[Elem].resolvedName
-        val childElmsWithSameName = includedChildren collect { case che: Elem if che.resolvedName == ename => che }
-        Path.Entry(ename, childElmsWithSameName.size - 1)
-      }
-
-      Elem(
-        resolvedName = e.resolvedName,
-        resolvedAttributes = e.resolvedAttributes + (EName("path") -> path.toCanonicalXPath(scope)),
-        children = e.children.zipWithIndex map {
-          case (ch, idx) =>
-            ch match {
-              case che: Elem =>
-                val childPath = path.append(getChildPathEntry(e, idx))
-                // Recursive call
-                addElemPaths(che, childPath, scope)
-              case _ => ch
-            }
-        })
-    }
-
-    // Not using method Elem.updated here
-    val bookStoreWithPaths = addElemPaths(bookstore, Path.Root, Scope.Empty)
-
     val elms =
       for {
-        desc <- bookStoreWithPaths.findAllElems
-        path = Path.fromCanonicalXPath(desc.attribute(EName("path")))(Scope.Empty)
-        parent <- bookstore.findElemOrSelfByPath(path.parentPath)
-        if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
-      } yield desc
+        e <- bookstore.findAllElems
+        parent = bookstore.getElemOrSelfByPath(e.path.parentPath)
+        if parent.elem.qname != QName("Bookstore") && parent.elem.qname != QName("Book")
+      } yield e
 
     assert(elms.size > 10, "Expected more than 10 matching elements")
-    val enames: Set[EName] = {
-      val result = elms map { _.resolvedName }
-      result.toSet
-    }
-    assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
-      enames
-    }
 
-    // We could do a lot better, using the PathAwareElemLike API...
-
-    val paths =
-      for {
-        path <- bookstore.findAllElemPaths
-        parentPath = path.parentPath
-        parent = bookstore.getElemOrSelfByPath(parentPath)
-        if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
-      } yield path
-
-    assert(paths.size > 10, "Expected more than 10 matching paths")
-
-    assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
-      val result = paths map { path => bookstore.getElemOrSelfByPath(path).resolvedName }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitlesUsingPaths(): Unit = {
-    // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
-
-    require(bookstore.localName == "Bookstore")
-
-    val bookAndMagazinePaths =
-      for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
-        bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
-        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
-        nextChildren = bookstore.children.drop(nodeIndex + 1)
-        prevChildren = bookstore.children.take(nodeIndex)
-        nextOption = nextChildren find {
-          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        prevOption = prevChildren find {
-          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        if (nextOption.isDefined || prevOption.isDefined)
-      } yield bookOrMagazinePath
-
-    assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBookUsingPaths(): Unit = {
-    // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
-
-    require(bookstore.localName == "Bookstore")
-
-    val bookAndMagazinePaths =
-      for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
-        bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
-        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
-        nextChildren = bookstore.children.drop(nodeIndex + 1)
-        prevChildren = bookstore.children.take(nodeIndex)
-        nextBookOption = nextChildren find {
-          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        prevBookOption = prevChildren find {
-          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        if (nextBookOption.isDefined || prevBookOption.isDefined)
-      } yield bookOrMagazinePath
-
-    assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
+    assertResult(Set(QName("Title"), QName("Author"), QName("First_Name"), QName("Last_Name"))) {
+      val result = elms map { e => e.elem.qname }
       result.toSet
     }
   }
@@ -174,6 +256,8 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
   @Test def testQueryBooksWithAuthorInTitle(): Unit = {
     require(bookstore.localName == "Bookstore")
 
+    import NodeBuilder._
+
     val titleAndFirstNames =
       for {
         book <- bookstore \ (_.localName == "Book")
@@ -184,12 +268,11 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         }
         searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
         if !searchedForFirstNames.isEmpty
-      } yield Elem(
-        resolvedName = EName("Book"),
-        resolvedAttributes = Map(),
+      } yield elem(
+        qname = QName("Book"),
         children = Vector(
-          title,
-          Elem(EName("First_Name"), Map(), Vector(Text(searchedForFirstNames.head)))))
+          fromElem(title.elem)(Scope.Empty),
+          textElem(QName("First_Name"), searchedForFirstNames.head))).build()
 
     assertResult(2) {
       titleAndFirstNames.size
@@ -216,6 +299,8 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
   @Test def testQueryBooksPricedBelowAverage(): Unit = {
     require(bookstore.localName == "Bookstore")
 
+    import NodeBuilder._
+
     val prices: immutable.IndexedSeq[Double] =
       for {
         book <- bookstore \ (_.localName == "Book")
@@ -229,12 +314,11 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         book <- bookstore \ (_.localName == "Book")
         price = book.attribute(EName("Price")).toDouble
         if price < avg
-      } yield Elem(
-        resolvedName = EName("Book"),
-        resolvedAttributes = Map(),
+      } yield elem(
+        qname = QName("Book"),
         children = Vector(
-          book.getChildElem(EName("Title")),
-          Elem(EName("Price"), Map(), Vector(Text(price.toString)))))
+          fromElem(book.getChildElem(EName("Title")).elem)(Scope.Empty),
+          textElem(QName("Price"), price.toString))).build()
 
     assertResult(2) {
       cheapBooks.size
@@ -263,6 +347,8 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
   @Test def testQueryBooksOrderedByPrice(): Unit = {
     require(bookstore.localName == "Bookstore")
 
+    import NodeBuilder._
+
     def cheaper(book1: Elem, book2: Elem): Boolean = {
       val price1 = book1.attribute(EName("Price")).toInt
       val price2 = book2.attribute(EName("Price")).toInt
@@ -273,12 +359,11 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       for {
         book <- bookstore \ (_.localName == "Book") sortWith { cheaper _ }
         price = book.attribute(EName("Price")).toDouble
-      } yield Elem(
-        resolvedName = EName("Book"),
-        resolvedAttributes = Map(),
+      } yield elem(
+        qname = QName("Book"),
         children = Vector(
-          book.getChildElem(EName("Title")),
-          Elem(EName("Price"), Map(), Vector(Text(price.toString)))))
+          fromElem(book.getChildElem(EName("Title")).elem)(Scope.Empty),
+          textElem(QName("Price"), price.toString))).build()
     }
 
     assertResult(4) {
@@ -316,20 +401,22 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
   @Test def testQueryInvertedBookstore(): Unit = {
     require(bookstore.localName == "Bookstore")
 
+    import NodeBuilder._
+
     def books(authorLastName: String) =
       for {
         book <- bookstore \ (_.localName == "Book")
         author <- book.filterElems(EName("Author"))
         if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
-        val attrs = book.resolvedAttributes filter { case (en, v) => Set(EName("ISBN"), EName("Price")).contains(en) }
+        val attrs = book.elem.attributes filter { case (qn, v) => Set(QName("ISBN"), QName("Price")).contains(qn) }
 
-        val children = book.filterChildElems(EName("Title"))
+        val children = book.elem.filterChildElems(EName("Title")) map { e => NodeBuilder.fromElem(e)(book.elem.scope) }
 
-        Elem(
-          resolvedName = EName("Book"),
-          resolvedAttributes = attrs,
-          children = children)
+        elem(
+          qname = QName("Book"),
+          attributes = attrs,
+          children = children).build()
       }
 
     val authorsWithBooks =
@@ -349,16 +436,17 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
 
         val foundBooks = books(lastNameValue)
+        val bookBuilders = foundBooks map { book => fromElem(book)(Scope.Empty) }
 
-        Elem(
-          resolvedName = EName("Author"),
-          resolvedAttributes = Map(),
+        elem(
+          qname = QName("Author"),
           children = Vector(
-            Elem(EName("First_Name"), Map(), Vector(Text(firstNameValue))),
-            Elem(EName("Last_Name"), Map(), Vector(Text(lastNameValue)))) ++ foundBooks)
+            textElem(QName("First_Name"), firstNameValue),
+            textElem(QName("Last_Name"), lastNameValue)) ++ bookBuilders).build()
       }
 
-    val invertedBookstore: Elem = Elem(resolvedName = EName("InvertedBookstore"), resolvedAttributes = Map(), children = authorsWithBooks)
+    val invertedBookstore: Elem =
+      Elem(eu.cdevreeze.yaidom.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
 
     assertResult(3) {
       invertedBookstore.findAllChildElems.size
@@ -374,19 +462,23 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
-    def removePrice(book: Elem): Elem = {
+    def removePrice(book: eu.cdevreeze.yaidom.Elem): eu.cdevreeze.yaidom.Elem = {
       require(book.resolvedName == EName("Book"))
-      Elem(
-        resolvedName = book.resolvedName,
-        resolvedAttributes = book.resolvedAttributes filter { case (en, v) => en != EName("Price") },
+      eu.cdevreeze.yaidom.Elem(
+        qname = book.qname,
+        attributes = book.attributes filter { case (qn, v) => qn != QName("Price") },
+        scope = book.scope,
         children = book.children)
     }
 
-    val bookstoreWithoutPrices: Elem =
-      bookstore transformElemsOrSelf {
-        case e if e.resolvedName == EName("Book") => removePrice(e)
-        case e => e
+    val bookstoreWithoutPrices: Elem = {
+      val f: eu.cdevreeze.yaidom.Elem => eu.cdevreeze.yaidom.Elem = {
+        case e: eu.cdevreeze.yaidom.Elem if e.resolvedName == EName("Book") => removePrice(e)
+        case e: eu.cdevreeze.yaidom.Elem => e
       }
+      val result = bookstore.elem.transformElemsOrSelf(f)
+      Elem(result)
+    }
 
     assertResult(4) {
       bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
@@ -395,74 +487,12 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     assertResult(4) {
-      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
-      paths.size
+      val elms = bookstore findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      elms.size
     }
     assertResult(0) {
-      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
-      paths.size
-    }
-  }
-
-  @Test def testTransformCombiningFirstAndLastName(): Unit = {
-    // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
-    // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
-    // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
-
-    // Transforms the XML tree, combining first and last names into Name elements
-
-    require(bookstore.localName == "Bookstore")
-
-    def combineName(author: Elem): Elem = {
-      require(author.resolvedName == EName("Author"))
-
-      val firstNameValue: String = author.getChildElem(EName("First_Name")).trimmedText
-      val lastNameValue: String = author.getChildElem(EName("Last_Name")).trimmedText
-      val nameValue: String = s"$firstNameValue $lastNameValue"
-      val name: Elem = Elem(EName("Name"), Map(), Vector(Text(nameValue)))
-
-      Elem(
-        resolvedName = author.resolvedName,
-        resolvedAttributes = author.resolvedAttributes,
-        children = Vector(name))
-    }
-
-    val bookstoreWithCombinedNames: Elem =
-      bookstore transformElemsOrSelf {
-        case e if e.resolvedName == EName("Author") => combineName(e)
-        case e => e
-      }
-
-    assertResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
-      val result = bookstoreWithCombinedNames.filterElems(EName("Name")) map { _.trimmedText }
-      result.toSet
-    }
-  }
-
-  @Test def testTransformAuthors(): Unit = {
-    // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
-    // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
-    // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
-
-    // Transforms the XML tree, giving a namespace to Author elements
-
-    require(bookstore.localName == "Bookstore")
-
-    val updatedBookstoreElm: Elem =
-      bookstore transformElemsOrSelf {
-        case e if e.resolvedName == EName("Author") =>
-          val newElmName = EName("http://def", e.localName)
-          Elem(newElmName, e.resolvedAttributes, e.children)
-        case e => e
-      }
-
-    // Only the Author elements are functionally changed!
-
-    assertResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
-      EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {
-
-      val result = updatedBookstoreElm.findAllElemsOrSelf map { _.resolvedName }
-      result.toSet
+      val elms = bookstoreWithoutPrices findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      elms.size
     }
   }
 
@@ -600,7 +630,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         textElem(QName("Title"), "Hector and Jeff's Database Hints")))
   }
 
-  protected final val bookstore: resolved.Elem = {
+  protected final val bookstore: Elem = {
     import NodeBuilder._
 
     val result =
@@ -609,8 +639,8 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
         children = Vector(
           book1Builder, book2Builder, book3Builder, book4Builder,
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
-    resolved.Elem(result)
+    Elem(result)
   }
 
-  protected final def toResolvedElem(elem: E): resolved.Elem = elem
+  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
 }

@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package docaware
+package eu.cdevreeze.yaidom.queryapitests.dom
 
-import java.{ util => jutil, io => jio }
-import java.net.URI
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.dom.DomElem
+import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.resolved
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * Alternative query test case for docaware Elems.
+ * Alternative query test case for DOM wrapper Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
-  final type E = Elem
+  final type E = DomElem
 
   protected val catalogElem: E = {
     val xml =
@@ -60,14 +61,9 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    val result = docaware.Elem(new URI("http://catalog"), convertToElem(xml))
-
-    // Invoking some Document methods, but without altering the result
-
-    val doc = docaware.Document(result)
-    require(result == doc.documentElement)
-    require(result == doc.withDocumentElement(result).documentElement)
-    result
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
 
   protected val pricesElem: E = {
@@ -88,7 +84,9 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    docaware.Elem(new URI("http://prices"), convertToElem(xml))
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
 
   protected val orderElem: E = {
@@ -102,12 +100,18 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    docaware.Elem(new URI("http://order"), convertToElem(xml))
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
 
-  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
+  protected final def toResolvedElem(elem: E): resolved.Elem = {
+    resolved.Elem(DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
+  }
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    docaware.Elem(new URI("http://bogus-uri"), convertToElem(elem))
+    val dbf = DocumentBuilderFactory.newInstance
+    val db = dbf.newDocumentBuilder
+    DomElem(DomConversions.convertElem(convertToElem(elem), db.newDocument, Scope.Empty))
   }
 }

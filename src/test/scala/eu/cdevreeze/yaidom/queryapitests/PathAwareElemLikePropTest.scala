@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.queryapitests
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import scala.Vector
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalacheck.{ Prop, Gen, Arbitrary }
-import org.scalatest.{ Suite, BeforeAndAfterAll }
-import org.scalatest.prop.Checkers
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Gen.oneOf
+import org.scalacheck.Gen.someOf
+import org.scalacheck.Prop.propBoolean
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.prop.Checkers
+
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.parse
 
 /**
  * PathAwareElemLike properties test case.
@@ -33,8 +45,6 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class PathAwareElemLikePropTest extends Suite with Checkers {
 
-  import Prop._
-  import Gen._
   import Arbitrary.arbitrary
 
   // Consistency of findAllChildElemsWithPathEntries

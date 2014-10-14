@@ -16,12 +16,13 @@
 
 package eu.cdevreeze.yaidom
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+
+import XmlStringUtils.isAllowedElementLocalName
+import XmlStringUtils.isProbablyValidXmlName
 
 /**
  * Test case for [[eu.cdevreeze.yaidom.XmlStringUtils]].
