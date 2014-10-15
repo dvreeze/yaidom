@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import org.w3c.dom
-import javax.xml.transform.stream.StreamSource
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import scala.collection.immutable
-import scala.collection.JavaConverters._
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import XomWrapperTest._
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
+
+import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.HasText
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * XOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around XOM Elements.
@@ -52,6 +57,8 @@ class XomWrapperTest extends Suite {
   private val nsGoogle = "http://www.google.com"
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
+
+  import XomWrapperTest._
 
   @Test def testParse(): Unit = {
     val dbf = DocumentBuilderFactory.newInstance

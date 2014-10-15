@@ -14,27 +14,34 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{util => jutil}
-import scala.collection.immutable
+import java.{ util => jutil }
+
+import scala.Vector
+
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.TransformerFactory
-import parse.DocumentParserUsingDom
-import print.DocumentPrinterUsingDom
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder._
-import eu.cdevreeze.yaidom.defaultelem.Node
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Document
 import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
+import eu.cdevreeze.yaidom.resolved
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.TransformerFactory
 
 /**
  * XML functional update test case.

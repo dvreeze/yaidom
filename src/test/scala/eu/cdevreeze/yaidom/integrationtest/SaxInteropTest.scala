@@ -14,22 +14,41 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import javax.xml.transform.stream.StreamSource
-import javax.xml.parsers.{ SAXParserFactory, SAXParser }
-import org.xml.sax.helpers.DefaultHandler
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
-import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
-import org.scalatest.junit.JUnitRunner
+
 import org.ccil.cowan.tagsoup.jaxp.{ SAXFactoryImpl => TagSoupSAXFactoryImpl }
-import parse.{ DocumentParserUsingSax, DefaultElemProducingSaxHandler, SaxHandlerWithLocator }
-import print.DocumentPrinterUsingSax
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.scalatest.Suite
+import org.scalatest.junit.JUnitRunner
+import org.xml.sax.EntityResolver
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.DocBuilder
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.parse.DefaultElemProducingSaxHandler
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.SaxHandlerWithLocator
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
+import javax.xml.parsers.SAXParserFactory
+import net.jcip.annotations.NotThreadSafe
 
 /**
  * SAX interoperability test case.

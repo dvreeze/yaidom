@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory, XMLEventReader }
-import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.stream.{ StreamSource, StreamResult }
-import scala.collection.{ immutable, mutable }
-import org.junit.{ Test, Before }
+import java.{ io => jio }
+import java.{ util => jutil }
+
+import scala.Vector
+import scala.collection.mutable
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore, ConfigMap }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.ConfigMap
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse._
-import print._
+
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import javax.xml.stream.XMLEventReader
+import javax.xml.stream.XMLInputFactory
+import javax.xml.stream.XMLOutputFactory
+import javax.xml.stream.events.XMLEvent
+import javax.xml.transform.stream.StreamSource
 
 /**
  * Large XML test case, using streaming, thus keeping the memory footprint low.
@@ -77,7 +83,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val outputFactory = XMLOutputFactory.newInstance
 
-    val docParser = parse.DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance
 
     var contactCount = 0
     var elemCount = 0

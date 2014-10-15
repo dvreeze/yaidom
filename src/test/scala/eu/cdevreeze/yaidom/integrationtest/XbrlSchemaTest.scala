@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingSax
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.defaultelem.Document
 import eu.cdevreeze.yaidom.indexed
-import XbrlSchemaTest._
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 
 /**
  * Test case using yaidom in-context elements for XBRL schema processing.
@@ -34,6 +32,7 @@ import XbrlSchemaTest._
  */
 @RunWith(classOf[JUnitRunner])
 class XbrlSchemaTest extends Suite {
+  import XbrlSchemaTest._
 
   def testQueryXbrlSchema(): Unit = {
     val parser = DocumentParserUsingSax.newInstance()

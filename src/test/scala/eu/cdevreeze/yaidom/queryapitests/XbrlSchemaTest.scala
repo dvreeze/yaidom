@@ -23,9 +23,9 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.Document
-import eu.cdevreeze.yaidom.EName
-import eu.cdevreeze.yaidom.Path
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.defaultelem.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.HasEName

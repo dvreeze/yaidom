@@ -152,7 +152,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
-    def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.Elem): (String, String) = {
+    def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.defaultelem.Elem): (String, String) = {
       val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
       val firstNames = authorElem.filterChildElems(EName("First_Name")) map { _.text.trim }
       (lastNames.mkString, firstNames.mkString)
@@ -445,7 +445,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       }
 
     val invertedBookstore: Elem =
-      Elem(bookstore.docUri, eu.cdevreeze.yaidom.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
+      Elem(bookstore.docUri, eu.cdevreeze.yaidom.defaultelem.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
 
     assertResult(3) {
       invertedBookstore.findAllChildElems.size
@@ -461,9 +461,9 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
-    def removePrice(book: eu.cdevreeze.yaidom.Elem): eu.cdevreeze.yaidom.Elem = {
+    def removePrice(book: eu.cdevreeze.yaidom.defaultelem.Elem): eu.cdevreeze.yaidom.defaultelem.Elem = {
       require(book.resolvedName == EName("Book"))
-      eu.cdevreeze.yaidom.Elem(
+      eu.cdevreeze.yaidom.defaultelem.Elem(
         qname = book.qname,
         attributes = book.attributes filter { case (qn, v) => qn != QName("Price") },
         scope = book.scope,
@@ -471,9 +471,9 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
 
     val bookstoreWithoutPrices: Elem = {
-      val f: eu.cdevreeze.yaidom.Elem => eu.cdevreeze.yaidom.Elem = {
-        case e: eu.cdevreeze.yaidom.Elem if e.resolvedName == EName("Book") => removePrice(e)
-        case e: eu.cdevreeze.yaidom.Elem => e
+      val f: eu.cdevreeze.yaidom.defaultelem.Elem => eu.cdevreeze.yaidom.defaultelem.Elem = {
+        case e: eu.cdevreeze.yaidom.defaultelem.Elem if e.resolvedName == EName("Book") => removePrice(e)
+        case e: eu.cdevreeze.yaidom.defaultelem.Elem => e
       }
       val result = bookstore.elem.transformElemsOrSelf(f)
       Elem(bookstore.docUri, result)

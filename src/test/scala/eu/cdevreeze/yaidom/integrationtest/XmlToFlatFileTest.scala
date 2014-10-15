@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import java.{ io => jio }
+
+import scala.Vector
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 
 /**
  * Test case that "ports" http://www.jroller.com/jurberg/entry/converting_xml_to_flat_files to Scala.
@@ -34,7 +39,7 @@ import org.scalatest.junit.JUnitRunner
 class XmlToFlatFileTest extends Suite {
 
   @Test def testConvertXmlToFlatFile(): Unit = {
-    val docParser = parse.DocumentParserUsingStax.newInstance
+    val docParser = DocumentParserUsingStax.newInstance
 
     val xmlData = """<?xml version="1.0"?>
 <catalog>

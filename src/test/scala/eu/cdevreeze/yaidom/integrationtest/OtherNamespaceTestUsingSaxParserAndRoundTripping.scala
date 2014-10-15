@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.InputStream
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse._
-import print._
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.parse.AbstractDocumentParser
+import eu.cdevreeze.yaidom.parse.DocumentParser
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * See AbstractOtherNamespaceTest.

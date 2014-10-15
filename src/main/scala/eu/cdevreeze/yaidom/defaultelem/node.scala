@@ -159,7 +159,7 @@ sealed trait Node extends Immutable with Serializable {
  * allowed in XML 1.0. The underlying issue is that <em>functional</em> Elem trees are created in a <em>bottom-up</em> manner,
  * whereas namespace scoping works in a <em>top-down</em> manner. This is not a big issue in practice, since manual Elem creation
  * is rather rare, and it is always possible to call method `notUndeclaringPrefixes` afterwards. An alternative method to create
- * element trees by hand uses class [[eu.cdevreeze.yaidom.ElemBuilder]]. A manually created `ElemBuilder` can be converted to
+ * element trees by hand uses class [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]]. A manually created `ElemBuilder` can be converted to
  * an `Elem` by calling method `build`.
  *
  * <em>Round-tripping</em> (parsing and serializing) is not entirely loss-less, but (in spite of the good composability and rather small

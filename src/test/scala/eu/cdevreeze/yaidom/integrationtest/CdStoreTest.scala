@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory }
-import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.stream.{ StreamSource, StreamResult }
-import scala.collection.immutable
-import org.junit.{ Test, Before }
+import java.{ util => jutil }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse._
-import print._
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 
 /**
  * CD store test case, using yaidom instead of XPath.

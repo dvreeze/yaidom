@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import org.w3c.dom
-import javax.xml.transform.stream.StreamSource
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import scala.collection.immutable
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import scala.collection.JavaConverters._
-import org.junit.{ Test, Before, Ignore }
+import scala.collection.immutable
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
+
 import JDomWrapperTest._
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.HasText
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * JDOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around JDOM Elements.

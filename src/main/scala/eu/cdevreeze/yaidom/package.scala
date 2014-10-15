@@ -507,111 +507,163 @@ package object yaidom {
 
   // Aliases for types and objects in the core package
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type QName = eu.cdevreeze.yaidom.core.QName
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type UnprefixedName = eu.cdevreeze.yaidom.core.UnprefixedName
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type PrefixedName = eu.cdevreeze.yaidom.core.PrefixedName
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val QName = eu.cdevreeze.yaidom.core.QName
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val UnprefixedName = eu.cdevreeze.yaidom.core.UnprefixedName
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val PrefixedName = eu.cdevreeze.yaidom.core.PrefixedName
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type EName = eu.cdevreeze.yaidom.core.EName
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val EName = eu.cdevreeze.yaidom.core.EName
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type QNameProvider = eu.cdevreeze.yaidom.core.QNameProvider
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val QNameProvider = eu.cdevreeze.yaidom.core.QNameProvider
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type ENameProvider = eu.cdevreeze.yaidom.core.ENameProvider
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val ENameProvider = eu.cdevreeze.yaidom.core.ENameProvider
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type Declarations = eu.cdevreeze.yaidom.core.Declarations
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val Declarations = eu.cdevreeze.yaidom.core.Declarations
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type Scope = eu.cdevreeze.yaidom.core.Scope
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val Scope = eu.cdevreeze.yaidom.core.Scope
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type Path = eu.cdevreeze.yaidom.core.Path
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val Path = eu.cdevreeze.yaidom.core.Path
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.core instead", "1.2")
   type PathBuilder = eu.cdevreeze.yaidom.core.PathBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.core instead", "1.2")
   val PathBuilder = eu.cdevreeze.yaidom.core.PathBuilder
 
   // There are no aliases for types and objects in the queryapi package!
 
   // Aliases for types and objects in the defaultelem package
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type Node = eu.cdevreeze.yaidom.defaultelem.Node
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type Elem = eu.cdevreeze.yaidom.defaultelem.Elem
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type Text = eu.cdevreeze.yaidom.defaultelem.Text
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type Comment = eu.cdevreeze.yaidom.defaultelem.Comment
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type ProcessingInstruction = eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type EntityRef = eu.cdevreeze.yaidom.defaultelem.EntityRef
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val Node = eu.cdevreeze.yaidom.defaultelem.Node
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val Elem = eu.cdevreeze.yaidom.defaultelem.Elem
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val Text = eu.cdevreeze.yaidom.defaultelem.Text
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val Comment = eu.cdevreeze.yaidom.defaultelem.Comment
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val ProcessingInstruction = eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val EntityRef = eu.cdevreeze.yaidom.defaultelem.EntityRef
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type Document = eu.cdevreeze.yaidom.defaultelem.Document
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val Document = eu.cdevreeze.yaidom.defaultelem.Document
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type NodeBuilder = eu.cdevreeze.yaidom.defaultelem.NodeBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type ElemBuilder = eu.cdevreeze.yaidom.defaultelem.ElemBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type TextBuilder = eu.cdevreeze.yaidom.defaultelem.TextBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type CommentBuilder = eu.cdevreeze.yaidom.defaultelem.CommentBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type ProcessingInstructionBuilder = eu.cdevreeze.yaidom.defaultelem.ProcessingInstructionBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type EntityRefBuilder = eu.cdevreeze.yaidom.defaultelem.EntityRefBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val NodeBuilder = eu.cdevreeze.yaidom.defaultelem.NodeBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val TextBuilder = eu.cdevreeze.yaidom.defaultelem.TextBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val CommentBuilder = eu.cdevreeze.yaidom.defaultelem.CommentBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val ProcessingInstructionBuilder = eu.cdevreeze.yaidom.defaultelem.ProcessingInstructionBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val EntityRefBuilder = eu.cdevreeze.yaidom.defaultelem.EntityRefBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type DocBuilder = eu.cdevreeze.yaidom.defaultelem.DocBuilder
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val DocBuilder = eu.cdevreeze.yaidom.defaultelem.DocBuilder
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type ConverterToDocument[A] = eu.cdevreeze.yaidom.defaultelem.ConverterToDocument[A]
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type ConverterToElem[A] = eu.cdevreeze.yaidom.defaultelem.ConverterToElem[A]
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type DocumentConverter[A] = eu.cdevreeze.yaidom.defaultelem.DocumentConverter[A]
 
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   type ElemConverter[A] = eu.cdevreeze.yaidom.defaultelem.ElemConverter[A]
 
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
   val TreeReprParsers = eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
 }

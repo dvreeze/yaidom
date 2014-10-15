@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers._
+import java.{ util => jutil }
+
+import scala.Vector
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse._
-import print._
-import NodeBuilder._
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.elem
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 
 /**
  * Test case using yaidom for validation of XML documents, playing with an "alternative schema language" (inspired by Relax NG and

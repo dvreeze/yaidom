@@ -51,7 +51,7 @@ import eu.cdevreeze.yaidom.defaultelem.Text
 trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
 
   /**
-   * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.Document]].
+   * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.defaultelem.Document]].
    */
   final def convertToDocument(v: org.w3c.dom.Document): Document = {
     // It seems that the DOM Document does not keep the URI from which it was loaded. Related (but not the same) is bug
@@ -68,7 +68,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /**
-   * Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.Elem]].
+   * Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.defaultelem.Elem]].
    *
    * The result `Elem` gets Scope `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
    *
@@ -94,7 +94,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /**
-   * Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.Node]].
+   * Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.defaultelem.Node]].
    *
    * In case of an element, the result `Elem` (wrapped in an Option) gets Scope
    * `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
@@ -114,20 +114,20 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     }
   }
 
-  /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.Text]] */
+  /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.defaultelem.Text]] */
   final def convertToText(v: org.w3c.dom.Text): Text = v match {
     case cdata: org.w3c.dom.CDATASection => Text(text = v.getData, isCData = true)
     case _ => Text(text = v.getData, isCData = false)
   }
 
-  /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.ProcessingInstruction]] */
+  /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction]] */
   final def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
 
-  /** Converts an `org.w3c.dom.EntityReference` to a [[eu.cdevreeze.yaidom.EntityRef]] */
+  /** Converts an `org.w3c.dom.EntityReference` to a [[eu.cdevreeze.yaidom.defaultelem.EntityRef]] */
   final def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)
 
-  /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.Comment]] */
+  /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.defaultelem.Comment]] */
   final def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
   /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */

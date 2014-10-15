@@ -14,22 +14,35 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory, XMLResolver, XMLStreamException }
-import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.stream.StreamSource
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingStax
-import print.DocumentPrinterUsingStax
-import convert.StaxConversions._
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.DocBuilder
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
+import javax.xml.stream.XMLInputFactory
+import javax.xml.stream.XMLResolver
 
 /**
  * StAX interoperability test case.

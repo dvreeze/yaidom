@@ -14,24 +14,41 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.stream.{ XMLInputFactory, XMLOutputFactory, XMLEventFactory }
-import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.stream.{ StreamSource, StreamResult }
-import scala.collection.immutable
-import org.junit.{ Test, Before }
+import java.{ io => jio }
+import java.{ util => jutil }
+
+import scala.Vector
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore, ConfigMap }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.ConfigMap
+import org.scalatest.Ignore
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse._
-import print._
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.DocBuilder
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers.parseAll
+import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * Large XML test case.

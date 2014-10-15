@@ -14,25 +14,45 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.w3c.dom.{ Element, DOMErrorHandler, DOMError }
-import org.w3c.dom.ls.{ DOMImplementationLS, LSParser, LSInput, LSResourceResolver, LSException }
-import org.w3c.dom.bootstrap.DOMImplementationRegistry
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import javax.xml.transform.stream.StreamSource
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import java.{ io => jio }
+import java.{ util => jutil }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import NodeBuilder._
-import parse.DocumentParserUsingDomLS
-import print.DocumentPrinterUsingDomLS
-import convert.DomConversions._
+import org.w3c.dom.DOMError
+import org.w3c.dom.DOMErrorHandler
+import org.w3c.dom.ls.DOMImplementationLS
+import org.w3c.dom.ls.LSException
+import org.w3c.dom.ls.LSInput
+import org.w3c.dom.ls.LSParser
+import org.w3c.dom.ls.LSResourceResolver
+
+import eu.cdevreeze.yaidom.convert.DomConversions.convertDocument
+import eu.cdevreeze.yaidom.convert.DomConversions.convertElem
+import eu.cdevreeze.yaidom.convert.DomConversions.convertToDocument
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.DocBuilder
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers.document
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers.parseAll
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDomLS
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * DOM LS interoperability test case.
@@ -383,7 +403,7 @@ class DomLSInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val document2: eu.cdevreeze.yaidom.Document = convertToDocument(doc2)
+    val document2: eu.cdevreeze.yaidom.defaultelem.Document = convertToDocument(doc2)
     val root2: Elem = document2.documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
@@ -407,7 +427,7 @@ class DomLSInteropTest extends Suite {
 
     // 5. Convert to NodeBuilder and back, and check again
 
-    val document3: eu.cdevreeze.yaidom.Document = DocBuilder.fromDocument(document2).build()
+    val document3: eu.cdevreeze.yaidom.defaultelem.Document = DocBuilder.fromDocument(document2).build()
     val root3: Elem = document3.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {

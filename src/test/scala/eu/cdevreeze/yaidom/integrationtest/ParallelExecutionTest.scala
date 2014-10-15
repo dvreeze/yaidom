@@ -14,22 +14,45 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
+import java.{ io => jio }
+import java.{ util => jutil }
 import java.util.{ concurrent => juc }
-import scala.collection.{ immutable, mutable }
-import scala.concurrent._
-import scala.concurrent.duration._
-import scala.util.{ Try, Success, Failure }
-import org.junit.{ Test, Before }
+
+import scala.Vector
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+import scala.util.Failure
+import scala.util.Success
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.Ignore
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
-import parse._
-import print._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.core.ENameProvider
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.parse.DocumentParser
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.parse.ThreadLocalDocumentParser
+import eu.cdevreeze.yaidom.print.DocumentPrinter
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDomLS
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax
+import eu.cdevreeze.yaidom.print.ThreadLocalDocumentPrinter
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * Parallel execution test. It starts 10 "threads of execution", in which elements are serialized, parsed, and transformed.

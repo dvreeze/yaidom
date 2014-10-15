@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil, io => jio }
 import scala.collection.immutable
@@ -23,7 +22,13 @@ import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
-import convert.ScalaXmlConversions._
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
+import eu.cdevreeze.yaidom.convert
+import eu.cdevreeze.yaidom.dom
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Elem
 
 /**
  * Alternative updates test case. It demonstrates many ways of performing functional updates.

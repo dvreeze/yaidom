@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil, io => jio }
-import javax.xml.parsers._
+import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse._
-import print._
+import eu.cdevreeze.yaidom.defaultelem.ElemBuilder
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.core.QName
 
 /**
  * Test case using yaidom on files of airports.

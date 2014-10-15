@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before }
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.queryapi.HasENameApi._
-import convert.ScalaXmlConversions._
-import parse._
-import print._
+
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * QName-based query test.

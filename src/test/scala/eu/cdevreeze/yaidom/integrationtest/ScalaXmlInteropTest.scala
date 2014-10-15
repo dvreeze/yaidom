@@ -14,17 +14,33 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before }
+import java.{ util => jutil }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.Ignore
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import NodeBuilder._
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Comment
+import eu.cdevreeze.yaidom.defaultelem.DocBuilder
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.EntityRef
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
+import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers.parseAll
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * Scala XML interoperability test case.
@@ -186,7 +202,7 @@ class ScalaXmlInteropTest extends Suite {
 
     // 2. Convert to NodeBuilder and back, and check again
 
-    val document3: eu.cdevreeze.yaidom.Document = DocBuilder.fromDocument(Document(root)).build()
+    val document3: eu.cdevreeze.yaidom.defaultelem.Document = DocBuilder.fromDocument(Document(root)).build()
     val root3: Elem = document3.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {

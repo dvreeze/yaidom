@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers._
-import javax.xml.transform.TransformerFactory
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
-import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
-import org.scalatest.junit.JUnitRunner
+import java.{ io => jio }
+import java.{ util => jutil }
+
+import org.junit.Test
+import org.scalatest.Suite
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.parse.DocumentParser
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * Test case testing the use of namespaces in immutable Documents.
@@ -38,9 +44,9 @@ abstract class AbstractOtherNamespaceTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  def documentParser: parse.DocumentParser
+  def documentParser: DocumentParser
 
-  def documentParserForXml11: parse.DocumentParser
+  def documentParserForXml11: DocumentParser
 
   @Test def testNamespaceDeclaration(): Unit = {
     val xml =

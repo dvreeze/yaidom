@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
-import javax.xml.transform.{ TransformerFactory, Transformer }
+import java.{ util => jutil }
+
+import scala.Vector
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingDom
-import print.DocumentPrinterUsingDom
-import convert.ScalaXmlConversions._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * Another XML functional update test case. More precisely, mainly a transformation test case.

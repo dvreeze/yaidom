@@ -14,23 +14,31 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers._
-import javax.xml.transform.{ TransformerFactory, Transformer }
+import java.{ util => jutil }
+
 import scala.collection.immutable
-import scala.math._
-import org.junit.{ Test, Before }
+import scala.math.BigDecimal
+import scala.math.BigDecimal.double2bigDecimal
+import scala.math.BigDecimal.int2bigDecimal
+import scala.math.ceil
+import scala.math.floor
+
+import org.joda.time.DateTimeConstants
+import org.joda.time.LocalDate
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import org.joda.time.{ LocalDate, DateTimeConstants }
-import parse._
-import print._
-import convert.ScalaXmlConversions._
-import MileageRecordsTest._
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
@@ -40,6 +48,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
  */
 @RunWith(classOf[JUnitRunner])
 class MileageRecordsTest extends Suite {
+  import MileageRecordsTest.MileageRecords
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

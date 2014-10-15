@@ -14,20 +14,34 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.w3c.dom.{ Element }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import javax.xml.transform.stream.StreamSource
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.dom._
+import org.xml.sax.EntityResolver
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.dom.DomComment
+import eu.cdevreeze.yaidom.dom.DomDocument
+import eu.cdevreeze.yaidom.dom.DomElem
+import eu.cdevreeze.yaidom.dom.DomEntityRef
+import eu.cdevreeze.yaidom.dom.DomNode
+import eu.cdevreeze.yaidom.dom.DomProcessingInstruction
+import eu.cdevreeze.yaidom.dom.DomText
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * DOM wrapper test case.

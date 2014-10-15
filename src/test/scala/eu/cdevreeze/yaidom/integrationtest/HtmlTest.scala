@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil, io => jio }
 import scala.collection.immutable
@@ -25,9 +24,12 @@ import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
 import eu.cdevreeze.yaidom.queryapi.HasENameApi._
-import convert.ScalaXmlConversions._
-import parse._
-import print._
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * HTML support test case.

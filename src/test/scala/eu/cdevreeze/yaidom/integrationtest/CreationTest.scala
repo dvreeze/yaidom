@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil, io => jio }
 import javax.xml.transform.stream.StreamSource
@@ -24,8 +23,17 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingDom
-import NodeBuilder._
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder._
+import eu.cdevreeze.yaidom.defaultelem.ElemBuilder
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.defaultelem
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * XML creation test case.
@@ -46,7 +54,7 @@ class CreationTest extends Suite {
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
 
-    val doc1: Document = docParser.parse(is)
+    val doc1: defaultelem.Document = docParser.parse(is)
     val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
 
     val expectedResolvedBookElm: resolved.Elem = {
@@ -102,7 +110,7 @@ class CreationTest extends Suite {
                   textElem(QName("names:First_Name"), "Jennifer"),
                   textElem(QName("names:Last_Name"), "Widom")))))))
 
-    val elm2: Elem = elm2Builder.build()
+    val elm2: defaultelem.Elem = elm2Builder.build()
     val resolvedElm2 = resolved.Elem(elm2)
 
     assertResult(expectedResolvedBookElm) {
@@ -160,14 +168,14 @@ class CreationTest extends Suite {
       elm3Builder.allDeclarationsAreAtTopLevel
     }
 
-    val elm3: Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
+    val elm3: defaultelem.Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
     val resolvedElm3 = resolved.Elem(elm3)
 
     assertResult(expectedResolvedBookElm) {
       resolvedElm3
     }
 
-    val elm4: Elem = {
+    val elm4: defaultelem.Elem = {
       import Node._
 
       elem(
@@ -209,7 +217,7 @@ class CreationTest extends Suite {
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
 
-    val doc1: Document = docParser.parse(is)
+    val doc1: defaultelem.Document = docParser.parse(is)
     val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
 
     val isbn = "ISBN-9-88-777777-6"
@@ -217,17 +225,17 @@ class CreationTest extends Suite {
       e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm1 = bookElm1.getChildElem(_.localName == "Authors")
 
-    val doc2: Document = Document(doc1.documentElement.notUndeclaringPrefixes(Scope.Empty))
+    val doc2: defaultelem.Document = defaultelem.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.Empty))
     val bookElm2 = doc2.documentElement.findElem(e =>
       e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm2 = bookElm2.getChildElem(_.localName == "Authors")
 
-    val doc3: Document = Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore")))
+    val doc3: defaultelem.Document = defaultelem.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore")))
     val bookElm3 = doc3.documentElement.findElem(e =>
       e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm3 = bookElm3.getChildElem(_.localName == "Authors")
 
-    val doc4: Document = Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://abc")))
+    val doc4: defaultelem.Document = defaultelem.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://abc")))
     val bookElm4 = doc4.documentElement.findElem(e =>
       e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm4 = bookElm4.getChildElem(_.localName == "Authors")
@@ -268,7 +276,7 @@ class CreationTest extends Suite {
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
 
-    val doc1: Document = docParser.parse(is)
+    val doc1: defaultelem.Document = docParser.parse(is)
     val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
 
     // First call notUndeclaringPrefixes with an empty Scope
@@ -349,7 +357,7 @@ class CreationTest extends Suite {
       booksElmBuilder.allDeclarationsAreAtTopLevel
     }
 
-    val booksElm: Elem = booksElmBuilder.build(Scope.Empty)
+    val booksElm: defaultelem.Elem = booksElmBuilder.build(Scope.Empty)
 
     val prefixBooks = booksElm.scope.prefixesForNamespace("http://bookstore").headOption.getOrElse("bks")
 
@@ -379,14 +387,14 @@ class CreationTest extends Suite {
       authorElmBuilder.allDeclarationsAreAtTopLevel
     }
 
-    val authorElm: Elem = authorElmBuilder.build(Scope.Empty)
+    val authorElm: defaultelem.Elem = authorElmBuilder.build(Scope.Empty)
 
     // Let's functionally insert the author
 
     val authorsPath = booksElm.findElemPath(_.resolvedName == EName("{http://bookstore}Authors")).
       getOrElse(sys.error("No 'Authors' element found"))
 
-    val updatedBooksElm: Elem = booksElm.updated(authorsPath) {
+    val updatedBooksElm: defaultelem.Elem = booksElm.updated(authorsPath) {
       e => e.plusChild(authorElm)
     }
 

@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+import java.{ util => jutil }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import parse.DocumentParserUsingDom
-import com.google.common.cache._
+
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.ENameProvider
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**

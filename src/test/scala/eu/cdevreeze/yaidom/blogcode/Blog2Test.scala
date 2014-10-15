@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package blogcode
+package eu.cdevreeze.yaidom.blogcode
 
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
@@ -50,7 +49,10 @@ class Blog2Test extends Suite {
     import java.net.URI
     import javax.xml.parsers._
     import scala.collection.immutable
-    import eu.cdevreeze.yaidom._
+    import eu.cdevreeze.yaidom.core._
+    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.parse
+    import eu.cdevreeze.yaidom.resolved
 
     import HasENameApi._
 

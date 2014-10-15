@@ -49,7 +49,7 @@ import eu.cdevreeze.yaidom.defaultelem.Text
 trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document] with ConverterToElem[scala.xml.Elem] {
 
   /**
-   * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.Document]]. The resulting yaidom Document has no document URI.
+   * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.defaultelem.Document]]. The resulting yaidom Document has no document URI.
    *
    * If the input Scala XML Document is not namespace-valid, an exception will be thrown.
    */
@@ -68,7 +68,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   }
 
   /**
-   * Converts an `scala.xml.Elem` to an [[eu.cdevreeze.yaidom.Elem]].
+   * Converts an `scala.xml.Elem` to an [[eu.cdevreeze.yaidom.defaultelem.Elem]].
    *
    * If the input Scala XML Elem is not namespace-valid, an exception will be thrown.
    */
@@ -88,7 +88,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   }
 
   /**
-   * Converts an `scala.xml.Node` to an optional [[eu.cdevreeze.yaidom.Node]].
+   * Converts an `scala.xml.Node` to an optional [[eu.cdevreeze.yaidom.defaultelem.Node]].
    */
   final def convertToNodeOption(v: scala.xml.Node): Option[Node] = {
     v match {
@@ -105,20 +105,20 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     }
   }
 
-  /** Converts an `scala.xml.Text` to a [[eu.cdevreeze.yaidom.Text]] */
+  /** Converts an `scala.xml.Text` to a [[eu.cdevreeze.yaidom.defaultelem.Text]] */
   final def convertToText(v: scala.xml.Text): Text = Text(text = v.data, isCData = false)
 
-  /** Converts an `scala.xml.PCData` to a [[eu.cdevreeze.yaidom.Text]] */
+  /** Converts an `scala.xml.PCData` to a [[eu.cdevreeze.yaidom.defaultelem.Text]] */
   final def convertToCData(v: scala.xml.PCData): Text = Text(text = v.data, isCData = true)
 
-  /** Converts an `scala.xml.ProcInstr` to a [[eu.cdevreeze.yaidom.ProcessingInstruction]] */
+  /** Converts an `scala.xml.ProcInstr` to a [[eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction]] */
   final def convertToProcessingInstruction(v: scala.xml.ProcInstr): ProcessingInstruction =
     ProcessingInstruction(v.target, v.proctext)
 
-  /** Converts an `scala.xml.EntityRef` to a [[eu.cdevreeze.yaidom.EntityRef]] */
+  /** Converts an `scala.xml.EntityRef` to a [[eu.cdevreeze.yaidom.defaultelem.EntityRef]] */
   final def convertToEntityRef(v: scala.xml.EntityRef): EntityRef = EntityRef(v.entityName)
 
-  /** Converts an `scala.xml.Comment` to a [[eu.cdevreeze.yaidom.Comment]] */
+  /** Converts an `scala.xml.Comment` to a [[eu.cdevreeze.yaidom.defaultelem.Comment]] */
   final def convertToComment(v: scala.xml.Comment): Comment = Comment(v.commentText)
 
   /** Converts attributes, given as `scala.xml.MetaData`, to an `immutable.IndexedSeq[(QName, String)]`. */

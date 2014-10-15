@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package integrationtest
+package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import org.w3c.dom
-import javax.xml.transform.stream.StreamSource
-import javax.xml.parsers.{ SAXParserFactory, SAXParser }
-import scala.collection.immutable
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import scala.collection.JavaConverters._
+import scala.collection.immutable
 import scala.xml.parsing.ConstructingParser
-import org.junit.{ Test, Before }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.scalaxml._
+import org.xml.sax.InputSource
+
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.scalaxml._
 
 /**
  * Scala XML wrapper test case. It shows that we can easily create `ElemLike` wrappers around Scala XML Elems.

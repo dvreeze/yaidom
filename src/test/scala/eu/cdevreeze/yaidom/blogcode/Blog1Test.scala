@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package blogcode
+package eu.cdevreeze.yaidom.blogcode
 
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
@@ -61,12 +60,14 @@ class Blog1Test extends Suite {
     import java.io.File
     import javax.xml.parsers._
     import scala.collection.immutable
-    import eu.cdevreeze.yaidom._
+    import eu.cdevreeze.yaidom.core._
+    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.parse._
 
     val ns = "http://bookstore"
 
     // Using a yaidom DocumentParser that used DOM internally
-    val docParser = parse.DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance
 
     // Replace the following path!
     val parentDir = new File(pathToParentDir.getPath)
@@ -117,12 +118,17 @@ class Blog1Test extends Suite {
     import java.io.File
     import javax.xml.parsers._
     import scala.collection.immutable
-    import eu.cdevreeze.yaidom._
+    import eu.cdevreeze.yaidom.core._
+    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.parse._
+    import eu.cdevreeze.yaidom.resolved
+    import eu.cdevreeze.yaidom.dom
+    import eu.cdevreeze.yaidom.indexed
 
     val ns = "http://bookstore"
 
     // Using a yaidom DocumentParser that used DOM internally
-    val docParser = parse.DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance
 
     // Replace the following path!
     val parentDir = new File(pathToParentDir.getPath)
@@ -212,12 +218,14 @@ class Blog1Test extends Suite {
     import java.io.File
     import javax.xml.parsers._
     import scala.collection.immutable
-    import eu.cdevreeze.yaidom._
+    import eu.cdevreeze.yaidom.core._
+    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.parse._
 
     val ns = "http://bookstore"
 
     // Using a yaidom DocumentParser that used DOM internally
-    val docParser = parse.DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance
 
     // Replace the following path!
     val parentDir = new File(pathToParentDir.getPath)
