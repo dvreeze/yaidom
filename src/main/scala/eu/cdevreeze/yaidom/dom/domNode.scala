@@ -124,11 +124,11 @@ final class DomElem(
     }
   }
 
-  def qname: QName = DomConversions.toQName(wrappedNode)
+  override def qname: QName = DomConversions.toQName(wrappedNode)
 
-  def attributes: immutable.IndexedSeq[(QName, String)] = DomConversions.extractAttributes(wrappedNode.getAttributes)
+  override def attributes: immutable.IndexedSeq[(QName, String)] = DomConversions.extractAttributes(wrappedNode.getAttributes)
 
-  def scope: Scope = {
+  override def scope: Scope = {
     val ancestryOrSelf = DomElem.getAncestorsOrSelf(this.wrappedNode)
 
     val resultScope =

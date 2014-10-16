@@ -107,7 +107,7 @@ final class Elem private[docaware] (
   /**
    * Returns `this.elem.scope`
    */
-  final def scope: Scope = this.elem.scope
+  final override def scope: Scope = this.elem.scope
 
   /**
    * Returns the namespaces declared in this element.

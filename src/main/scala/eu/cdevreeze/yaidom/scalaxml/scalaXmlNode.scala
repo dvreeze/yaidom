@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.scalaxml
 
 import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
@@ -101,14 +100,14 @@ final class ScalaXmlElem(
     wrappedNode.child.toIndexedSeq flatMap { n: scala.xml.Node => ScalaXmlNode.wrapNodeOption(n) }
   }
 
-  def qname: QName = ScalaXmlConversions.toQName(wrappedNode)
+  override def qname: QName = ScalaXmlConversions.toQName(wrappedNode)
 
-  def attributes: immutable.IndexedSeq[(QName, String)] = ScalaXmlConversions.extractAttributes(wrappedNode.attributes)
+  override def attributes: immutable.IndexedSeq[(QName, String)] = ScalaXmlConversions.extractAttributes(wrappedNode.attributes)
 
   /**
    * Returns the scope of the element. Note that there is no guarantee that this scope is complete!
    */
-  def scope: Scope = ScalaXmlConversions.extractScope(wrappedNode.scope)
+  override def scope: Scope = ScalaXmlConversions.extractScope(wrappedNode.scope)
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }

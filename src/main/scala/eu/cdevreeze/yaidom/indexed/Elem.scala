@@ -176,7 +176,7 @@ final class Elem private[indexed] (
   /**
    * Returns `this.elem.scope`
    */
-  final def scope: Scope = this.elem.scope
+  final override def scope: Scope = this.elem.scope
 
   /**
    * Returns the namespaces declared in this element.
