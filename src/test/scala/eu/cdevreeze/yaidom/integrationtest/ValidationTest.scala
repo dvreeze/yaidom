@@ -28,9 +28,9 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.elem
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
+import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 
 /**

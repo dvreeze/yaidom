@@ -23,15 +23,15 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.DocumentConverter
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.ElemConverter
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.DocumentConverter
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.ElemConverter
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.stream.XMLEventFactory
 import javax.xml.stream.events.Attribute
 import javax.xml.stream.events.EndElement
@@ -41,8 +41,8 @@ import javax.xml.stream.events.XMLEvent
 import YaidomToStaxEventsConversions.XmlEventsProducer
 
 /**
- * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to `immutable.IndexedSeq[XMLEvent]`,
- * and from  [[eu.cdevreeze.yaidom.defaultelem.Document]] to `immutable.IndexedSeq[XMLEvent]`.
+ * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.simple.Elem]] to `immutable.IndexedSeq[XMLEvent]`,
+ * and from  [[eu.cdevreeze.yaidom.simple.Document]] to `immutable.IndexedSeq[XMLEvent]`.
  *
  * @author Chris de Vreeze
  */

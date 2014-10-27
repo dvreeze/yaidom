@@ -21,7 +21,7 @@ import java.{ io => jio }
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.convert.YaidomToStaxEventsConversions
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.stream.XMLEventFactory
 import javax.xml.stream.XMLEventWriter
 import javax.xml.stream.XMLOutputFactory

@@ -21,9 +21,9 @@ import java.net.URI
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.defaultelem
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 
 /**
@@ -42,8 +42,8 @@ final class Document(
 
   require(documentElement.path == Path.Root, "The document element must have the root Path")
 
-  def document: defaultelem.Document =
-    new defaultelem.Document(uriOption, documentElement.elem, processingInstructions, comments)
+  def document: simple.Document =
+    new simple.Document(uriOption, documentElement.elem, processingInstructions, comments)
 
   def uri: URI = documentElement.docUri
 
@@ -68,7 +68,7 @@ object Document {
     new Document(documentElement, processingInstructions, comments)
   }
 
-  def apply(docUri: URI, d: defaultelem.Document): Document = {
+  def apply(docUri: URI, d: simple.Document): Document = {
     new Document(Elem(docUri, d.documentElement), d.processingInstructions, d.comments)
   }
 }

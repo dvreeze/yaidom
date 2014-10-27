@@ -21,7 +21,7 @@ import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 

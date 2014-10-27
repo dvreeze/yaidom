@@ -33,7 +33,7 @@ import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import javax.xml.parsers.DocumentBuilder

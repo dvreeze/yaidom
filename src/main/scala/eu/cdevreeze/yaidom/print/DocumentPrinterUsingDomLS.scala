@@ -26,8 +26,8 @@ import org.w3c.dom.ls.LSOutput
 import org.w3c.dom.ls.LSSerializer
 
 import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 

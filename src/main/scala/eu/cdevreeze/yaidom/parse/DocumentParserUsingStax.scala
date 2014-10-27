@@ -24,7 +24,7 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.util.control.Exception.ignoring
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.stream.XMLEventReader
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent

@@ -61,7 +61,7 @@ class Blog1Test extends Suite {
     import javax.xml.parsers._
     import scala.collection.immutable
     import eu.cdevreeze.yaidom.core._
-    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse._
 
     val ns = "http://bookstore"
@@ -119,7 +119,7 @@ class Blog1Test extends Suite {
     import javax.xml.parsers._
     import scala.collection.immutable
     import eu.cdevreeze.yaidom.core._
-    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse._
     import eu.cdevreeze.yaidom.resolved
     import eu.cdevreeze.yaidom.dom
@@ -219,7 +219,7 @@ class Blog1Test extends Suite {
     import javax.xml.parsers._
     import scala.collection.immutable
     import eu.cdevreeze.yaidom.core._
-    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse._
 
     val ns = "http://bookstore"

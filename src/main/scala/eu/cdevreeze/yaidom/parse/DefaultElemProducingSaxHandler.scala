@@ -26,13 +26,13 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 import net.jcip.annotations.NotThreadSafe
 
 /**

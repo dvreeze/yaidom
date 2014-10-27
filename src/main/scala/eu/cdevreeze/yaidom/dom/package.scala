@@ -19,12 +19,12 @@ package eu.cdevreeze.yaidom
 /**
  * Wrapper around class `org.w3c.dom.Element`, adapting it to the [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
  *
- * This wrapper is not thread-safe, and should only be used if the immutable element classes such as [[eu.cdevreeze.yaidom.defaultelem.Elem]]
+ * This wrapper is not thread-safe, and should only be used if the immutable element classes such as [[eu.cdevreeze.yaidom.simple.Elem]]
  * are not the best fit.
  *
  * Such scenarios could be as follows:
  * <ul>
- * <li>Conversions from DOM to [[eu.cdevreeze.yaidom.defaultelem.Elem]] (and back) have more runtime costs than needed or wanted.</li>
+ * <li>Conversions from DOM to [[eu.cdevreeze.yaidom.simple.Elem]] (and back) have more runtime costs than needed or wanted.</li>
  * <li>Roundtripping from XML string to "tree", and back to XML string should keep the resulting XML string as much as possible the same.</li>
  * <li>In-place updates (instead of "functional updates") of DOM trees are desired.</li>
  * </ul>
@@ -33,7 +33,7 @@ package eu.cdevreeze.yaidom
  * this wrapper API. Mutable DOM trees are also very easy to break, even via the `ElemLike` API, if element predicates with
  * side-effects are used.
  *
- * To explain the "round-tripping" item above, note that class [[eu.cdevreeze.yaidom.defaultelem.Elem]] considers attributes in an element unordered,
+ * To explain the "round-tripping" item above, note that class [[eu.cdevreeze.yaidom.simple.Elem]] considers attributes in an element unordered,
  * let alone namespace declarations. That is consistent with the XML InfoSet specification, but can sometimes be impractical.
  * Using `org.w3c.dom.Element` instances, parsed from XML input sources, chances are that this order is retained.
  *

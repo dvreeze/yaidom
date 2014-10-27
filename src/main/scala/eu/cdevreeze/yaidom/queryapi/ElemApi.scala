@@ -53,7 +53,7 @@ import scala.collection.immutable
  * This returns all offending elements, that is, all descendant elements of the root element (excluding the root element itself)
  * that have at least one namespace declaration.
  *
- * Now let's use an [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]], again named ``rootElem``:
+ * Now let's use an [[eu.cdevreeze.yaidom.simple.ElemBuilder]], again named ``rootElem``:
  * {{{
  * rootElem filterElems (elem => !elem.namespaces.isEmpty)
  * }}}

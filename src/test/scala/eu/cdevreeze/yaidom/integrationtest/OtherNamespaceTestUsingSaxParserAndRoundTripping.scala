@@ -23,7 +23,7 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.AbstractDocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax

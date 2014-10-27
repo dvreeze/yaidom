@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi._
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.resolved
 

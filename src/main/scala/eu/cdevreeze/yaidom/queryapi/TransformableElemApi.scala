@@ -67,7 +67,7 @@ import scala.collection.immutable
  * </book:Bookstore>
  * }}}
  *
- * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.defaultelem.Elem]] variable named ``bookstoreElem``. Then we can combine
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.simple.Elem]] variable named ``bookstoreElem``. Then we can combine
  * author first and last names as follows:
  * {{{
  * val authorNamespace = "http://bookstore/author"

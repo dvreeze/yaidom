@@ -23,7 +23,6 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasPathApi
@@ -31,9 +30,10 @@ import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasScopeApi
 import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.simple
 
 /**
- * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.defaultelem.Elem]])
+ * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.simple.Elem]])
  * and a path (from that root element) to this element.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
@@ -114,10 +114,10 @@ import eu.cdevreeze.yaidom.queryapi.IsNavigable
  * @author Chris de Vreeze
  */
 final class Elem private[indexed] (
-  val rootElem: defaultelem.Elem,
+  val rootElem: simple.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: defaultelem.Elem) extends ElemLike[Elem] with HasEName with IsNavigable[Elem] with HasQNameApi with HasText with HasPathApi with HasScopeApi with Immutable {
+  val elem: simple.Elem) extends ElemLike[Elem] with HasEName with IsNavigable[Elem] with HasQNameApi with HasText with HasPathApi with HasScopeApi with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -134,7 +134,7 @@ final class Elem private[indexed] (
    * Map from child node indexes to child elem indexes, for speeding up lookups of child elements
    */
   private val elemIndexesByNodeIndex: Map[Int, Int] = {
-    (elem.children.zipWithIndex collect { case (e: defaultelem.Elem, idx) => idx }).zipWithIndex.toMap
+    (elem.children.zipWithIndex collect { case (e: simple.Elem, idx) => idx }).zipWithIndex.toMap
   }
 
   /**
@@ -205,14 +205,14 @@ object Elem {
   /**
    * Calls `apply(rootElem, Path.Root)`
    */
-  def apply(rootElem: defaultelem.Elem): Elem = {
+  def apply(rootElem: simple.Elem): Elem = {
     apply(rootElem, Path.Root)
   }
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply(rootElem: defaultelem.Elem, path: Path): Elem = {
+  def apply(rootElem: simple.Elem, path: Path): Elem = {
     val elem = rootElem.getElemOrSelfByPath(path)
 
     // Recursive calls

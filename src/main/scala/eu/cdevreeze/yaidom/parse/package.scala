@@ -41,7 +41,7 @@ package eu.cdevreeze.yaidom
  * issue. This `DocumentParser` implementation is best integrated with DOM, and is highly configurable, although
  * DOM LS configuration is somewhat involved.
  *
- * This package depends on the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]], [[eu.cdevreeze.yaidom.defaultelem]]
+ * This package depends on the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]], [[eu.cdevreeze.yaidom.simple]]
  * and [[eu.cdevreeze.yaidom.convert]] packages, and not the other way around.
  *
  * @author Chris de Vreeze

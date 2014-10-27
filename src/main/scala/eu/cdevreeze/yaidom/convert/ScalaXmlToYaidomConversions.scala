@@ -21,19 +21,19 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.ConverterToDocument
-import eu.cdevreeze.yaidom.defaultelem.ConverterToElem
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.ConverterToDocument
+import eu.cdevreeze.yaidom.simple.ConverterToElem
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 
 /**
- * Converter from Scala XML nodes to yaidom nodes, in particular from `scala.xml.Elem` to [[eu.cdevreeze.yaidom.defaultelem.Elem]] and
- * from `scala.xml.Document` to [[eu.cdevreeze.yaidom.defaultelem.Document]].
+ * Converter from Scala XML nodes to yaidom nodes, in particular from `scala.xml.Elem` to [[eu.cdevreeze.yaidom.simple.Elem]] and
+ * from `scala.xml.Document` to [[eu.cdevreeze.yaidom.simple.Document]].
  *
  * This converter is handy when one wants to use XML literals (as offered by standard Scala XML) in combination with yaidom.
  *
@@ -49,7 +49,7 @@ import eu.cdevreeze.yaidom.defaultelem.Text
 trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document] with ConverterToElem[scala.xml.Elem] {
 
   /**
-   * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.defaultelem.Document]]. The resulting yaidom Document has no document URI.
+   * Converts an `scala.xml.Document` to a [[eu.cdevreeze.yaidom.simple.Document]]. The resulting yaidom Document has no document URI.
    *
    * If the input Scala XML Document is not namespace-valid, an exception will be thrown.
    */
@@ -68,7 +68,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   }
 
   /**
-   * Converts an `scala.xml.Elem` to an [[eu.cdevreeze.yaidom.defaultelem.Elem]].
+   * Converts an `scala.xml.Elem` to an [[eu.cdevreeze.yaidom.simple.Elem]].
    *
    * If the input Scala XML Elem is not namespace-valid, an exception will be thrown.
    */
@@ -88,7 +88,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   }
 
   /**
-   * Converts an `scala.xml.Node` to an optional [[eu.cdevreeze.yaidom.defaultelem.Node]].
+   * Converts an `scala.xml.Node` to an optional [[eu.cdevreeze.yaidom.simple.Node]].
    */
   final def convertToNodeOption(v: scala.xml.Node): Option[Node] = {
     v match {
@@ -105,20 +105,20 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     }
   }
 
-  /** Converts an `scala.xml.Text` to a [[eu.cdevreeze.yaidom.defaultelem.Text]] */
+  /** Converts an `scala.xml.Text` to a [[eu.cdevreeze.yaidom.simple.Text]] */
   final def convertToText(v: scala.xml.Text): Text = Text(text = v.data, isCData = false)
 
-  /** Converts an `scala.xml.PCData` to a [[eu.cdevreeze.yaidom.defaultelem.Text]] */
+  /** Converts an `scala.xml.PCData` to a [[eu.cdevreeze.yaidom.simple.Text]] */
   final def convertToCData(v: scala.xml.PCData): Text = Text(text = v.data, isCData = true)
 
-  /** Converts an `scala.xml.ProcInstr` to a [[eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction]] */
+  /** Converts an `scala.xml.ProcInstr` to a [[eu.cdevreeze.yaidom.simple.ProcessingInstruction]] */
   final def convertToProcessingInstruction(v: scala.xml.ProcInstr): ProcessingInstruction =
     ProcessingInstruction(v.target, v.proctext)
 
-  /** Converts an `scala.xml.EntityRef` to a [[eu.cdevreeze.yaidom.defaultelem.EntityRef]] */
+  /** Converts an `scala.xml.EntityRef` to a [[eu.cdevreeze.yaidom.simple.EntityRef]] */
   final def convertToEntityRef(v: scala.xml.EntityRef): EntityRef = EntityRef(v.entityName)
 
-  /** Converts an `scala.xml.Comment` to a [[eu.cdevreeze.yaidom.defaultelem.Comment]] */
+  /** Converts an `scala.xml.Comment` to a [[eu.cdevreeze.yaidom.simple.Comment]] */
   final def convertToComment(v: scala.xml.Comment): Comment = Comment(v.commentText)
 
   /** Converts attributes, given as `scala.xml.MetaData`, to an `immutable.IndexedSeq[(QName, String)]`. */

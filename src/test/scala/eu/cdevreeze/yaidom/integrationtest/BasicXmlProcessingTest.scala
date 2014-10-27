@@ -25,13 +25,13 @@ import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder._
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder._
 import eu.cdevreeze.yaidom.parse._
 import eu.cdevreeze.yaidom.print._
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse
 import eu.cdevreeze.yaidom.resolved
 

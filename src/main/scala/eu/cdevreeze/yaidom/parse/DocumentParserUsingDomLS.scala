@@ -24,7 +24,7 @@ import org.w3c.dom.ls.LSInput
 import org.w3c.dom.ls.LSParser
 
 import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 
 /**
  * DOM-LS-based `Document` parser.

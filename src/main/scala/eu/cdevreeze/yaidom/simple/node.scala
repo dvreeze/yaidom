@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.defaultelem
+package eu.cdevreeze.yaidom.simple
 
 import java.io.ObjectStreamException
 
@@ -43,7 +43,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
 /**
  * Immutable XML Node. It is the default XML node type in yaidom. There are subclasses for different types of nodes,
- * such as elements, text nodes, comments, entity references and processing instructions. See [[eu.cdevreeze.yaidom.defaultelem.Elem]]
+ * such as elements, text nodes, comments, entity references and processing instructions. See [[eu.cdevreeze.yaidom.simple.Elem]]
  * for the default element type in yaidom.
  *
  * @author Chris de Vreeze
@@ -91,7 +91,7 @@ sealed trait Node extends Immutable with Serializable {
  * The parsers and serializers in packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] return and take
  * these default elements (or the corresponding `Document` instances), respectively.
  *
- * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.defaultelem.Elem]] is among the most powerful element implementations offered
+ * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.simple.Elem]] is among the most powerful element implementations offered
  * by yaidom. These elements offer all of the [[eu.cdevreeze.yaidom.queryapi.ElemApi]], [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]] and
  * [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]] query APIs, and more.
  *
@@ -159,7 +159,7 @@ sealed trait Node extends Immutable with Serializable {
  * allowed in XML 1.0. The underlying issue is that <em>functional</em> Elem trees are created in a <em>bottom-up</em> manner,
  * whereas namespace scoping works in a <em>top-down</em> manner. This is not a big issue in practice, since manual Elem creation
  * is rather rare, and it is always possible to call method `notUndeclaringPrefixes` afterwards. An alternative method to create
- * element trees by hand uses class [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]]. A manually created `ElemBuilder` can be converted to
+ * element trees by hand uses class [[eu.cdevreeze.yaidom.simple.ElemBuilder]]. A manually created `ElemBuilder` can be converted to
  * an `Elem` by calling method `build`.
  *
  * <em>Round-tripping</em> (parsing and serializing) is not entirely loss-less, but (in spite of the good composability and rather small

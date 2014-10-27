@@ -20,8 +20,8 @@ of such an overhaul can be rather limited. Moreover, this internal overhaul is n
 as part of "yaidom 2". Rather it is an evolution of "yaidom 1".
 
 While cleaning up the query API traits, it also makes sense to split the root package of yaidom into 3 sub-packages:
-"core" (with concepts such as QName, EName, Scope etc.), "queryapi" (with the query API traits) and "defaultelem" (with
-the default Elem implementation, along with ElemBuilder). This would impact a lot of import statements in yaidom
+"core" (with concepts such as QName, EName, Scope etc.), "queryapi" (with the query API traits) and "simple" (with
+the default (simple) Elem implementation, along with ElemBuilder). This would impact a lot of import statements in yaidom
 client code, and can be facilitated by aliases in the root yaidom package that can gradually be deprecated and removed.
 
 This leads to the road map below (shortly after 1.0).

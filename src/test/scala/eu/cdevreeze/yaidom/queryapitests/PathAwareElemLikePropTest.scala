@@ -32,9 +32,9 @@ import org.scalatest.prop.Checkers
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.Node
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.parse
 
 /**

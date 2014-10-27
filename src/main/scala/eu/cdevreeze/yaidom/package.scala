@@ -36,12 +36,12 @@ package eu.cdevreeze
  * as much as possible to JAXP (and JAXP parser/serializer configuration). As yet another example, yaidom knows nothing about
  * (XML Schema) types of elements and attributes.
  *
- * Yaidom, and in particular the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and [[eu.cdevreeze.yaidom.defaultelem]] sub-packages,
+ * Yaidom, and in particular the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and [[eu.cdevreeze.yaidom.simple]] sub-packages,
  * contains the following layers:
  * <ol>
  * <li><em>basic concepts</em>, such as (qualified and expanded) names of elements and attributes (in the `core` package)</li>
  * <li>the <em>uniform query API traits</em>, to query elements for child, descendant and descendant-or-self elements (in the `queryapi` package)</li>
- * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits (e.g. in the `defaultelem` package)</li>
+ * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits (e.g. in the `simple` package)</li>
  * </ol>
  *
  * It makes sense to read this documentation, because it helps in getting up-to-speed with yaidom.
@@ -333,14 +333,14 @@ package eu.cdevreeze
  * ==Some element implementations==
  *
  * The uniform query API traits, especially `ElemLike` and its sub-trait `ElemLike` are mixed in by many element
- * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]]
- * and [[eu.cdevreeze.yaidom.defaultelem.Elem]].
+ * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.simple.ElemBuilder]]
+ * and [[eu.cdevreeze.yaidom.simple.Elem]].
  *
- * Class [[eu.cdevreeze.yaidom.defaultelem.Elem]] is the <em>default element implementatio</em>n of yaidom. It extends class [[eu.cdevreeze.yaidom.defaultelem.Node]].
- * The latter also has sub-classes for text nodes, comments, entity references and processing instructions. Class [[eu.cdevreeze.yaidom.defaultelem.Document]]
+ * Class [[eu.cdevreeze.yaidom.simple.Elem]] is the <em>default element implementatio</em>n of yaidom. It extends class [[eu.cdevreeze.yaidom.simple.Node]].
+ * The latter also has sub-classes for text nodes, comments, entity references and processing instructions. Class [[eu.cdevreeze.yaidom.simple.Document]]
  * contains a document `Elem`, but is not a `Node` sub-class itself.
  *
- * The [[eu.cdevreeze.yaidom.defaultelem.Elem]] class has the following characteristics:
+ * The [[eu.cdevreeze.yaidom.simple.Elem]] class has the following characteristics:
  * <ul>
  * <li>It is <em>immutable</em>, and thread-safe</li>
  * <li>These elements therefore cannot be queried for their parent elements</li>
@@ -355,7 +355,7 @@ package eu.cdevreeze
  * </ul>
  *
  * Creating such `Elem` trees by hand is a bit cumbersome, partly because scopes have to be passed to each `Elem` in the tree.
- * The latter is not needed if we use class [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]] to create element trees by hand. When the tree
+ * The latter is not needed if we use class [[eu.cdevreeze.yaidom.simple.ElemBuilder]] to create element trees by hand. When the tree
  * has been fully created as `ElemBuilder`, invoke method `ElemBuilder.build(parentScope)` to turn it into an `Elem`.
  *
  * Like their super-classes `Node` and `NodeBuilder`, classes `Elem` and `ElemBuilder` have very much in common. Both are immutable,
@@ -431,8 +431,8 @@ package eu.cdevreeze
  * "composability"), or yaidom wrappers around other DOM-like APIs (such as XOM or JDOM2). The current element implementations
  * in yaidom are:
  * <ul>
- * <li>Immutable class [[eu.cdevreeze.yaidom.defaultelem.Elem]], the default (immutable) element implementation. See above.</li>
- * <li>Immutable class [[eu.cdevreeze.yaidom.defaultelem.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.simple.Elem]], the default (immutable) element implementation. See above.</li>
+ * <li>Immutable class [[eu.cdevreeze.yaidom.simple.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.resolved.Elem]], which takes namespace prefixes out of the equation, and therefore
  * makes useful (namespace-aware) equality comparisons feasible. It mixes in the same query API traits as the default
  * element implementation.</li>
@@ -452,9 +452,9 @@ package eu.cdevreeze
  * <ol>
  * <li>Package [[eu.cdevreeze.yaidom.core]], with the core concepts described above. It depends on no other yaidom packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.queryapi]], with the query API traits described above. It only depends on the `core` package.</li>
- * <li>Package [[eu.cdevreeze.yaidom.defaultelem]], with the default element implementation described above. It only depends on the `core` and `queryapi` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core` and `queryapi` packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.convert]]. It contains conversions between default yaidom nodes on the one hand and DOM,
- * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi` and `defaultelem` packages.</li>
+ * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi` and `simple` packages.</li>
  * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
  * the packages mentioned above.</li>
  * <li>The other packages: [[eu.cdevreeze.yaidom.dom]], [[eu.cdevreeze.yaidom.indexed]], [[eu.cdevreeze.yaidom.docaware]],
@@ -569,101 +569,101 @@ package object yaidom {
 
   // There are no aliases for types and objects in the queryapi package!
 
-  // Aliases for types and objects in the defaultelem package
+  // Aliases for types and objects in the simple package
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type Node = eu.cdevreeze.yaidom.defaultelem.Node
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type Node = eu.cdevreeze.yaidom.simple.Node
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type Elem = eu.cdevreeze.yaidom.defaultelem.Elem
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type Elem = eu.cdevreeze.yaidom.simple.Elem
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type Text = eu.cdevreeze.yaidom.defaultelem.Text
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type Text = eu.cdevreeze.yaidom.simple.Text
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type Comment = eu.cdevreeze.yaidom.defaultelem.Comment
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type Comment = eu.cdevreeze.yaidom.simple.Comment
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type ProcessingInstruction = eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type ProcessingInstruction = eu.cdevreeze.yaidom.simple.ProcessingInstruction
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type EntityRef = eu.cdevreeze.yaidom.defaultelem.EntityRef
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type EntityRef = eu.cdevreeze.yaidom.simple.EntityRef
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val Node = eu.cdevreeze.yaidom.defaultelem.Node
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val Node = eu.cdevreeze.yaidom.simple.Node
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val Elem = eu.cdevreeze.yaidom.defaultelem.Elem
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val Elem = eu.cdevreeze.yaidom.simple.Elem
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val Text = eu.cdevreeze.yaidom.defaultelem.Text
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val Text = eu.cdevreeze.yaidom.simple.Text
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val Comment = eu.cdevreeze.yaidom.defaultelem.Comment
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val Comment = eu.cdevreeze.yaidom.simple.Comment
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val ProcessingInstruction = eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val ProcessingInstruction = eu.cdevreeze.yaidom.simple.ProcessingInstruction
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val EntityRef = eu.cdevreeze.yaidom.defaultelem.EntityRef
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val EntityRef = eu.cdevreeze.yaidom.simple.EntityRef
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type Document = eu.cdevreeze.yaidom.defaultelem.Document
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type Document = eu.cdevreeze.yaidom.simple.Document
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val Document = eu.cdevreeze.yaidom.defaultelem.Document
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val Document = eu.cdevreeze.yaidom.simple.Document
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type NodeBuilder = eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type NodeBuilder = eu.cdevreeze.yaidom.simple.NodeBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type ElemBuilder = eu.cdevreeze.yaidom.defaultelem.ElemBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type ElemBuilder = eu.cdevreeze.yaidom.simple.ElemBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type TextBuilder = eu.cdevreeze.yaidom.defaultelem.TextBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type TextBuilder = eu.cdevreeze.yaidom.simple.TextBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type CommentBuilder = eu.cdevreeze.yaidom.defaultelem.CommentBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type CommentBuilder = eu.cdevreeze.yaidom.simple.CommentBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type ProcessingInstructionBuilder = eu.cdevreeze.yaidom.defaultelem.ProcessingInstructionBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type ProcessingInstructionBuilder = eu.cdevreeze.yaidom.simple.ProcessingInstructionBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type EntityRefBuilder = eu.cdevreeze.yaidom.defaultelem.EntityRefBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type EntityRefBuilder = eu.cdevreeze.yaidom.simple.EntityRefBuilder
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val NodeBuilder = eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val NodeBuilder = eu.cdevreeze.yaidom.simple.NodeBuilder
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val TextBuilder = eu.cdevreeze.yaidom.defaultelem.TextBuilder
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val TextBuilder = eu.cdevreeze.yaidom.simple.TextBuilder
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val CommentBuilder = eu.cdevreeze.yaidom.defaultelem.CommentBuilder
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val CommentBuilder = eu.cdevreeze.yaidom.simple.CommentBuilder
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val ProcessingInstructionBuilder = eu.cdevreeze.yaidom.defaultelem.ProcessingInstructionBuilder
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val ProcessingInstructionBuilder = eu.cdevreeze.yaidom.simple.ProcessingInstructionBuilder
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val EntityRefBuilder = eu.cdevreeze.yaidom.defaultelem.EntityRefBuilder
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val EntityRefBuilder = eu.cdevreeze.yaidom.simple.EntityRefBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type DocBuilder = eu.cdevreeze.yaidom.defaultelem.DocBuilder
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type DocBuilder = eu.cdevreeze.yaidom.simple.DocBuilder
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val DocBuilder = eu.cdevreeze.yaidom.defaultelem.DocBuilder
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val DocBuilder = eu.cdevreeze.yaidom.simple.DocBuilder
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type ConverterToDocument[A] = eu.cdevreeze.yaidom.defaultelem.ConverterToDocument[A]
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type ConverterToDocument[A] = eu.cdevreeze.yaidom.simple.ConverterToDocument[A]
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type ConverterToElem[A] = eu.cdevreeze.yaidom.defaultelem.ConverterToElem[A]
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type ConverterToElem[A] = eu.cdevreeze.yaidom.simple.ConverterToElem[A]
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type DocumentConverter[A] = eu.cdevreeze.yaidom.defaultelem.DocumentConverter[A]
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type DocumentConverter[A] = eu.cdevreeze.yaidom.simple.DocumentConverter[A]
 
-  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  type ElemConverter[A] = eu.cdevreeze.yaidom.defaultelem.ElemConverter[A]
+  @deprecated("Use corresponding type in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  type ElemConverter[A] = eu.cdevreeze.yaidom.simple.ElemConverter[A]
 
-  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.defaultelem instead", "1.2")
-  val TreeReprParsers = eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
+  @deprecated("Use corresponding object in package eu.cdevreeze.yaidom.simple instead", "1.2")
+  val TreeReprParsers = eu.cdevreeze.yaidom.simple.TreeReprParsers
 }

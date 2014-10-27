@@ -20,13 +20,13 @@ import java.io.File
 import java.io.InputStream
 import java.net.URI
 
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 
 /**
- * [[eu.cdevreeze.yaidom.defaultelem.Document]] parser. This trait is purely abstract.
+ * [[eu.cdevreeze.yaidom.simple.Document]] parser. This trait is purely abstract.
  *
  * Implementing classes deal with the details of parsing XML strings/streams into yaidom `Document`s.
- * The [[eu.cdevreeze.yaidom.defaultelem]] package itself is agnostic of those details.
+ * The [[eu.cdevreeze.yaidom.simple]] package itself is agnostic of those details.
  *
  * Typical implementations use DOM, StAX or SAX, but make them easier to use in the tradition of the "template" classes
  * of the Spring framework. That is, resource management is done as much as possible by the DocumentParser,

@@ -25,7 +25,6 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasPathApi
@@ -33,6 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasScopeApi
 import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.simple
 
 /**
  * An element just like `indexed.Elem`, but storing the URI of the containing document as well. See [[eu.cdevreeze.yaidom.indexed.Elem]]
@@ -43,10 +43,10 @@ import eu.cdevreeze.yaidom.queryapi.IsNavigable
  */
 final class Elem private[docaware] (
   val docUri: URI,
-  val rootElem: defaultelem.Elem,
+  val rootElem: simple.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: defaultelem.Elem) extends ElemLike[Elem] with HasEName with IsNavigable[Elem] with HasQNameApi with HasText with HasPathApi with HasScopeApi with Immutable {
+  val elem: simple.Elem) extends ElemLike[Elem] with HasEName with IsNavigable[Elem] with HasQNameApi with HasText with HasPathApi with HasScopeApi with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -64,7 +64,7 @@ final class Elem private[docaware] (
    * Map from child node indexes to child elem indexes, for speeding up lookups of child elements
    */
   private val elemIndexesByNodeIndex: Map[Int, Int] = {
-    (elem.children.zipWithIndex collect { case (e: defaultelem.Elem, idx) => idx }).zipWithIndex.toMap
+    (elem.children.zipWithIndex collect { case (e: simple.Elem, idx) => idx }).zipWithIndex.toMap
   }
 
   /**
@@ -136,14 +136,14 @@ object Elem {
   /**
    * Calls `apply(docUri, rootElem, Path.Root)`
    */
-  def apply(docUri: URI, rootElem: defaultelem.Elem): Elem = {
+  def apply(docUri: URI, rootElem: simple.Elem): Elem = {
     apply(docUri, rootElem, Path.Root)
   }
 
   /**
    * Expensive recursive factory method for "docaware elements".
    */
-  def apply(docUri: URI, rootElem: defaultelem.Elem, path: Path): Elem = {
+  def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
     val elem = rootElem.getElemOrSelfByPath(path)
 
     // Recursive calls

@@ -23,28 +23,28 @@ import org.w3c.dom.Element
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.DocumentConverter
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.ElemConverter
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.DocumentConverter
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.ElemConverter
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 import YaidomToDomConversions.DocumentProducer
 import YaidomToDomConversions.ElementProducer
 
 /**
- * Converter from yaidom nodes to DOM nodes, in particular from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to a `org.w3c.dom.Element`,
- * and from  [[eu.cdevreeze.yaidom.defaultelem.Document]] to a `org.w3c.dom.Document`.
+ * Converter from yaidom nodes to DOM nodes, in particular from [[eu.cdevreeze.yaidom.simple.Elem]] to a `org.w3c.dom.Element`,
+ * and from  [[eu.cdevreeze.yaidom.simple.Document]] to a `org.w3c.dom.Document`.
  *
  * @author Chris de Vreeze
  */
 trait YaidomToDomConversions extends ElemConverter[ElementProducer] with DocumentConverter[DocumentProducer] {
 
   /** Converts a yaidom `Document` to a function from DOM documents (as node factories) to (filled) DOM documents */
-  final def convertDocument(document: defaultelem.Document): DocumentProducer = {
+  final def convertDocument(document: simple.Document): DocumentProducer = {
     { (doc: org.w3c.dom.Document) =>
       val pis: immutable.IndexedSeq[org.w3c.dom.ProcessingInstruction] =
         document.processingInstructions map { pi => convertProcessingInstruction(pi, doc) }

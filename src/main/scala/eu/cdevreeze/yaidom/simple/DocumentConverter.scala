@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.defaultelem
+package eu.cdevreeze.yaidom.simple
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.defaultelem.Document]] to `A` (which can be anything, such as a DOM `Document`).
+ * Converter from [[eu.cdevreeze.yaidom.simple.Document]] to `A` (which can be anything, such as a DOM `Document`).
  *
  * @tparam A the result type of the conversion
  *

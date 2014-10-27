@@ -50,7 +50,7 @@ class Blog2Test extends Suite {
     import javax.xml.parsers._
     import scala.collection.immutable
     import eu.cdevreeze.yaidom.core._
-    import eu.cdevreeze.yaidom.defaultelem._
+    import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse
     import eu.cdevreeze.yaidom.resolved
 

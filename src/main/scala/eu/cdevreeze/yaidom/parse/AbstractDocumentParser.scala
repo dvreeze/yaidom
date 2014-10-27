@@ -20,7 +20,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.net.URI
 
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 
 /**
  * Partial `DocumentParser` implementation, leaving only one of the `parse` methods abstract.

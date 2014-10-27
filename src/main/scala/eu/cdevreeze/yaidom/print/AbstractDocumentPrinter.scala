@@ -19,8 +19,8 @@ package eu.cdevreeze.yaidom.print
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * Partial `DocumentPrinter` implementation.

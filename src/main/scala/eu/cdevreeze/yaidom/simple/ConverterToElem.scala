@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.defaultelem
+package eu.cdevreeze.yaidom.simple
 
 /**
- * Converter from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to `A` (which can be anything, such as a DOM `Element`).
+ * Converter from `A` (which can be anything) to [[eu.cdevreeze.yaidom.simple.Elem]].
  *
- * @tparam A the result type of the conversion
+ * @tparam A the type of the value to convert
  *
  * @author Chris de Vreeze
  */
-trait ElemConverter[A] {
+trait ConverterToElem[A] {
 
-  def convertElem(elm: Elem): A
+  def convertToElem(v: A): Elem
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.defaultelem
+package eu.cdevreeze.yaidom.queryapitests.simple
 
 import scala.Vector
 import scala.collection.immutable
@@ -28,10 +28,10 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.ElemBuilder
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.ElemBuilder
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractPathAwareElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved

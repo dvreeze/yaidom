@@ -28,8 +28,8 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.ElemBuilder
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
+import eu.cdevreeze.yaidom.simple.ElemBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.docaware.Elem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
@@ -152,7 +152,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
-    def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.defaultelem.Elem): (String, String) = {
+    def authorLastAndFirstName(authorElem: eu.cdevreeze.yaidom.simple.Elem): (String, String) = {
       val lastNames = authorElem.filterChildElems(EName("Last_Name")) map { _.text.trim }
       val firstNames = authorElem.filterChildElems(EName("First_Name")) map { _.text.trim }
       (lastNames.mkString, firstNames.mkString)
@@ -445,7 +445,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       }
 
     val invertedBookstore: Elem =
-      Elem(bookstore.docUri, eu.cdevreeze.yaidom.defaultelem.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
+      Elem(bookstore.docUri, eu.cdevreeze.yaidom.simple.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
 
     assertResult(3) {
       invertedBookstore.findAllChildElems.size
@@ -461,9 +461,9 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
-    def removePrice(book: eu.cdevreeze.yaidom.defaultelem.Elem): eu.cdevreeze.yaidom.defaultelem.Elem = {
+    def removePrice(book: eu.cdevreeze.yaidom.simple.Elem): eu.cdevreeze.yaidom.simple.Elem = {
       require(book.resolvedName == EName("Book"))
-      eu.cdevreeze.yaidom.defaultelem.Elem(
+      eu.cdevreeze.yaidom.simple.Elem(
         qname = book.qname,
         attributes = book.attributes filter { case (qn, v) => qn != QName("Price") },
         scope = book.scope,
@@ -471,9 +471,9 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
 
     val bookstoreWithoutPrices: Elem = {
-      val f: eu.cdevreeze.yaidom.defaultelem.Elem => eu.cdevreeze.yaidom.defaultelem.Elem = {
-        case e: eu.cdevreeze.yaidom.defaultelem.Elem if e.resolvedName == EName("Book") => removePrice(e)
-        case e: eu.cdevreeze.yaidom.defaultelem.Elem => e
+      val f: eu.cdevreeze.yaidom.simple.Elem => eu.cdevreeze.yaidom.simple.Elem = {
+        case e: eu.cdevreeze.yaidom.simple.Elem if e.resolvedName == EName("Book") => removePrice(e)
+        case e: eu.cdevreeze.yaidom.simple.Elem => e
       }
       val result = bookstore.elem.transformElemsOrSelf(f)
       Elem(bookstore.docUri, result)

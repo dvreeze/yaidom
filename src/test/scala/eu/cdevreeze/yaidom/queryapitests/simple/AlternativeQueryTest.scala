@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.defaultelem
+package eu.cdevreeze.yaidom.queryapitests.simple
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
 import eu.cdevreeze.yaidom.resolved
 

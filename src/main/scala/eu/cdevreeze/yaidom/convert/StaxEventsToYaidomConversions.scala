@@ -28,14 +28,14 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.ConverterToDocument
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.ConverterToDocument
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.XMLConstants
 import javax.xml.namespace.{ QName => JQName }
 import javax.xml.stream.events.Attribute
@@ -48,8 +48,8 @@ import javax.xml.stream.events.StartElement
 import javax.xml.stream.events.XMLEvent
 
 /**
- * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.defaultelem.Elem]] and
- * to [[eu.cdevreeze.yaidom.defaultelem.Document]].
+ * Converter from StAX events to yaidom nodes, in particular from `immutable.IndexedSeq[XMLEvent]` to [[eu.cdevreeze.yaidom.simple.Elem]] and
+ * to [[eu.cdevreeze.yaidom.simple.Document]].
  *
  * There are also analogous conversions that take an `Iterator[XMLEvent]` instead. These can be used to reduce memory usage.
  *

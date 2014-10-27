@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
 
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 
 /**
  * Thread-local DocumentParser. This class exists because typical JAXP factory objects (DocumentBuilderFactory etc.) are

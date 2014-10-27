@@ -37,16 +37,16 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.DocBuilder
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder
-import eu.cdevreeze.yaidom.defaultelem.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers
-import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers.document
-import eu.cdevreeze.yaidom.defaultelem.TreeReprParsers.parseAll
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.DocBuilder
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.simple.TreeReprParsers
+import eu.cdevreeze.yaidom.simple.TreeReprParsers.document
+import eu.cdevreeze.yaidom.simple.TreeReprParsers.parseAll
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
@@ -401,7 +401,7 @@ class DomInteropTest extends Suite {
 
     // 3. Convert DOM element into Elem
 
-    val document2: eu.cdevreeze.yaidom.defaultelem.Document = convertToDocument(doc2)
+    val document2: eu.cdevreeze.yaidom.simple.Document = convertToDocument(doc2)
     val root2: Elem = document2.documentElement
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
@@ -425,7 +425,7 @@ class DomInteropTest extends Suite {
 
     // 5. Convert to NodeBuilder and back, and check again
 
-    val document3: eu.cdevreeze.yaidom.defaultelem.Document = DocBuilder.fromDocument(document2).build()
+    val document3: eu.cdevreeze.yaidom.simple.Document = DocBuilder.fromDocument(document2).build()
     val root3: Elem = document3.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {

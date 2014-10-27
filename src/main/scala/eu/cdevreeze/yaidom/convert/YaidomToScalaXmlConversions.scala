@@ -20,16 +20,16 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.ElemConverter
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.ElemConverter
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 
 /**
- * Converter from yaidom nodes to Scala XML nodes, in particular from [[eu.cdevreeze.yaidom.defaultelem.Elem]] to a `scala.xml.Elem`.
+ * Converter from yaidom nodes to Scala XML nodes, in particular from [[eu.cdevreeze.yaidom.simple.Elem]] to a `scala.xml.Elem`.
  *
  * There is no conversion from yaidom Documents to Scala XML documents, because there is no direct way to create Scala XML
  * documents.

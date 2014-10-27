@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.defaultelem
+package eu.cdevreeze.yaidom.simple
 
 import java.net.URI
 

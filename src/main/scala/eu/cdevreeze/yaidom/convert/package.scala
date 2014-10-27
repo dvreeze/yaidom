@@ -26,7 +26,7 @@ package eu.cdevreeze.yaidom
  * These JAXP-object conversions suggest that yaidom is optimistic about the available (heap) memory.
  *
  * This package depends on the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and
- * [[eu.cdevreeze.yaidom.defaultelem]] packages, and not the other way around.
+ * [[eu.cdevreeze.yaidom.simple]] packages, and not the other way around.
  * The [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] packages depend on this package.
  *
  * @author Chris de Vreeze

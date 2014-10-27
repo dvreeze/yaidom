@@ -20,7 +20,7 @@ import java.{ io => jio }
 
 import DocumentPrinterUsingDom.transformerCreatorForHtml
 import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys

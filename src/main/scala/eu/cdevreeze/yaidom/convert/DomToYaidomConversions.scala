@@ -29,18 +29,18 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Comment
-import eu.cdevreeze.yaidom.defaultelem.ConverterToDocument
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
-import eu.cdevreeze.yaidom.defaultelem.EntityRef
-import eu.cdevreeze.yaidom.defaultelem.Node
-import eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction
-import eu.cdevreeze.yaidom.defaultelem.Text
+import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.ConverterToDocument
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.EntityRef
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.Text
 
 /**
- * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.defaultelem.Elem]] and
- * from `org.w3c.dom.Document` to [[eu.cdevreeze.yaidom.defaultelem.Document]].
+ * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.simple.Elem]] and
+ * from `org.w3c.dom.Document` to [[eu.cdevreeze.yaidom.simple.Document]].
  *
  * This converter regards the input more like an "ElemBuilder" than an "Elem", in that namespace declarations instead of
  * scopes are extracted from input "elements", and in that conversions to yaidom Elems take an additional parent scope
@@ -51,7 +51,7 @@ import eu.cdevreeze.yaidom.defaultelem.Text
 trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
 
   /**
-   * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.defaultelem.Document]].
+   * Converts an `org.w3c.dom.Document` to a [[eu.cdevreeze.yaidom.simple.Document]].
    */
   final def convertToDocument(v: org.w3c.dom.Document): Document = {
     // It seems that the DOM Document does not keep the URI from which it was loaded. Related (but not the same) is bug
@@ -68,7 +68,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /**
-   * Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.defaultelem.Elem]].
+   * Given a parent scope, converts an `org.w3c.dom.Element` to a [[eu.cdevreeze.yaidom.simple.Elem]].
    *
    * The result `Elem` gets Scope `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
    *
@@ -94,7 +94,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /**
-   * Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.defaultelem.Node]].
+   * Given a parent scope, converts an `org.w3c.dom.Node` to an optional [[eu.cdevreeze.yaidom.simple.Node]].
    *
    * In case of an element, the result `Elem` (wrapped in an Option) gets Scope
    * `parentScope.resolve(extractNamespaceDeclarations(v.getAttributes))`.
@@ -114,20 +114,20 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     }
   }
 
-  /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.defaultelem.Text]] */
+  /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.simple.Text]] */
   final def convertToText(v: org.w3c.dom.Text): Text = v match {
     case cdata: org.w3c.dom.CDATASection => Text(text = v.getData, isCData = true)
     case _ => Text(text = v.getData, isCData = false)
   }
 
-  /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.defaultelem.ProcessingInstruction]] */
+  /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.simple.ProcessingInstruction]] */
   final def convertToProcessingInstruction(v: org.w3c.dom.ProcessingInstruction): ProcessingInstruction =
     ProcessingInstruction(v.getTarget, v.getData)
 
-  /** Converts an `org.w3c.dom.EntityReference` to a [[eu.cdevreeze.yaidom.defaultelem.EntityRef]] */
+  /** Converts an `org.w3c.dom.EntityReference` to a [[eu.cdevreeze.yaidom.simple.EntityRef]] */
   final def convertToEntityRef(v: org.w3c.dom.EntityReference): EntityRef = EntityRef(v.getNodeName)
 
-  /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.defaultelem.Comment]] */
+  /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.simple.Comment]] */
   final def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
   /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */

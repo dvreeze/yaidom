@@ -83,7 +83,7 @@ import eu.cdevreeze.yaidom.core.Path
  * </book:Bookstore>
  * }}}
  *
- * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.defaultelem.Elem]] variable named ``bookstoreElem``. Then we can add a book
+ * Suppose this XML has been parsed into [[eu.cdevreeze.yaidom.simple.Elem]] variable named ``bookstoreElem``. Then we can add a book
  * as follows, where we "forget" the 2nd author for the moment:
  * {{{
  * import convert.ScalaXmlConversions._

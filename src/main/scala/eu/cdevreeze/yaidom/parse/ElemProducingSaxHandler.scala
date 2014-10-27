@@ -18,12 +18,12 @@ package eu.cdevreeze.yaidom.parse
 
 import org.xml.sax.helpers.DefaultHandler
 
-import eu.cdevreeze.yaidom.defaultelem.Document
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
- * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.defaultelem.Elem]] using
- * method `resultingElem`, or the resulting [[eu.cdevreeze.yaidom.defaultelem.Document]] using method
+ * Contract of a SAX ContentHandler that, once ready, can be asked for the resulting [[eu.cdevreeze.yaidom.simple.Elem]] using
+ * method `resultingElem`, or the resulting [[eu.cdevreeze.yaidom.simple.Document]] using method
  * `resultingDocument`.
  *
  * @author Chris de Vreeze

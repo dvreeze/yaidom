@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.defaultelem
+package eu.cdevreeze.yaidom
 
 /**
- * Converter from `A` (which can be anything) to [[eu.cdevreeze.yaidom.defaultelem.Elem]].
+ * This package contains the default element implementation.
  *
- * @tparam A the type of the value to convert
+ * This package depends only on the core and queryapi packages in yaidom, but many other packages do depend on this one.
  *
  * @author Chris de Vreeze
  */
-trait ConverterToElem[A] {
-
-  def convertToElem(v: A): Elem
-}
+package simple

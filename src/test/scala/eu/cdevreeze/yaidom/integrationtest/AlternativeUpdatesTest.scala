@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * Alternative updates test case. It demonstrates many ways of performing functional updates.

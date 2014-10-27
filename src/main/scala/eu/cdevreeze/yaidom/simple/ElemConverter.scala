@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
+package eu.cdevreeze.yaidom.simple
 
 /**
- * This package contains the default element implementation.
+ * Converter from [[eu.cdevreeze.yaidom.simple.Elem]] to `A` (which can be anything, such as a DOM `Element`).
  *
- * This package depends only on the core and queryapi packages in yaidom, but many other packages do depend on this one.
+ * @tparam A the result type of the conversion
  *
  * @author Chris de Vreeze
  */
-package object defaultelem
+trait ElemConverter[A] {
+
+  def convertElem(elm: Elem): A
+}

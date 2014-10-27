@@ -20,7 +20,7 @@ import scala.collection.immutable
 
 import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.ENameProvider
-import eu.cdevreeze.yaidom.defaultelem.Elem
+import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.indexed
 
 /**

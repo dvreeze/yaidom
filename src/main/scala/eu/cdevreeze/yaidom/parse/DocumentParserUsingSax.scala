@@ -22,7 +22,7 @@ import org.xml.sax.InputSource
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.DefaultHandler
 
-import eu.cdevreeze.yaidom.defaultelem.Document
+import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.parsers.SAXParser
 import javax.xml.parsers.SAXParserFactory
 
