@@ -445,7 +445,7 @@ class ElemLikeTest extends Suite {
 
     assertResult(Set(bookstore)) {
       val paths =
-        IndexedElem(bookstore).findAllElemsOrSelf map (_.path) filter { path => bookElms.contains(bookstore.getElemOrSelfByPath(path)) }
+        IndexedElem(bookstore) filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result
@@ -455,7 +455,7 @@ class ElemLikeTest extends Suite {
 
     assertResult(Set(EName(ns, "Author"))) {
       val paths =
-        IndexedElem(bookstore).findAllElemsOrSelf map (_.path) filter { path => lastNameElms.contains(bookstore.getElemOrSelfByPath(path)) }
+        IndexedElem(bookstore) filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result map { e => e.resolvedName }
@@ -469,7 +469,7 @@ class ElemLikeTest extends Suite {
     assertResult(cheapBookAuthorElms.toSet) {
       // Taking cheapBookElm as root! Finding parents of lastNameElms.
       val paths =
-        IndexedElem(cheapBookElm).findAllElemsOrSelf map (_.path) filter { path => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(path)) }
+        IndexedElem(cheapBookElm) filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => cheapBookElm.getElemOrSelfByPath(path) }
       result

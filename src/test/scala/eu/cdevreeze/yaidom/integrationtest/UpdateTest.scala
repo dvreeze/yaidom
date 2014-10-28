@@ -311,9 +311,9 @@ class UpdateTest extends Suite {
 
   private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
     val matchingPaths =
-      indexed.Elem(rootElm) filterElems { e => e.attributeOption(EName(attrName)).isDefined } map (_.path) filter { path =>
-        path.endsWithName(EName("{http://bookstore}Book"))
-      }
+      indexed.Elem(rootElm) filterElems { e =>
+        e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
+      } map (_.path)
 
     matchingPaths.reverse.foldLeft(rootElm) { (acc, path) =>
       require(rootElm.findElemOrSelfByPath(path).isDefined)
@@ -324,9 +324,9 @@ class UpdateTest extends Suite {
 
   private def turnBookAttributeIntoElemUsingPathSet(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
     val matchingPaths =
-      indexed.Elem(rootElm) filterElems { e => e.attributeOption(EName(attrName)).isDefined } map (_.path) filter { path =>
-        path.endsWithName(EName("{http://bookstore}Book"))
-      }
+      indexed.Elem(rootElm) filterElems { e =>
+        e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
+      } map (_.path)
 
     rootElm.updatedAtPaths(matchingPaths.toSet) { (elem, path) =>
       require(rootElm.findElemOrSelfByPath(path).isDefined)

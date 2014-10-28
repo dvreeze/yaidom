@@ -24,6 +24,9 @@ While cleaning up the query API traits, it also makes sense to split the root pa
 the default (simple) Elem implementation, along with ElemBuilder). This would impact a lot of import statements in yaidom
 client code, and can be facilitated by aliases in the root yaidom package that can gradually be deprecated and removed.
 
+It is also expected that the PathAwareElemApi is removed entirely. Using ElemApi (after renaming) on indexed elements
+is far more powerful, since the predicate can filter both on element and path.
+
 This leads to the road map below (shortly after 1.0).
 
 
@@ -36,11 +39,14 @@ Changes:
 * Hiding this split as much as possible to the yaidom user, by aliases in the root package
 * Rework the query API traits, which is indeed a breaking change (but easing the pain by offering an implicit conversion from ENames to predicates)
 * Yet leave the net query API offered by the different element implementations as much as possible the same
+* Only PathAwareElemApi disappears completely
 
 Yaidom users upgrading from 1.0 to 1.1 are affected wherever query API traits are explicitly used in code.
 In particular, the 1.0 ElemApi companion object no longer contains element predicates (they are now in the HasENameApi companion object).
 Given that query API traits are typically not used that much in yaidom client code, the upgrade should not take too long
 (and is low risk, with help of the compiler).
+
+The loss of PathAwareElemApi (for simple elements) can be compensated by the use of indexed elements.
 
 
 1.2

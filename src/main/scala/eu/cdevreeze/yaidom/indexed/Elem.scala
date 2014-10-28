@@ -84,29 +84,25 @@ import eu.cdevreeze.yaidom.simple
  * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
- * val paths = indexedRootElem.elem.findAllElemOrSelfPaths
+ * val paths = indexedRootElem.findAllElemsOrSelf.map(_.path)
  * }}}
  * the following (rather obvious) properties hold for indexed elements:
  * {{{
  * elems forall (e => e.rootElem == indexedRootElem.rootElem)
- *
- * (elems map (_.path)) == paths
  *
  * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
  * }}}
  *
  * Analogous remarks apply to the other query methods. For example, given:
  * {{{
- * // Let p be a predicate of type (yaidom.Elem => Boolean)
+ * // Let p be a predicate of type (simple.Elem => Boolean)
  *
  * val elems = indexedRootElem filterElems { e => p(e.elem) }
- * val paths = indexedRootElem.elem filterElemPaths p
+ * val paths = indexedRootElem filterElems { e => p(e.elem) } map (_.path)
  * }}}
  * we have:
  * {{{
  * elems forall (e => e.rootElem == indexedRootElem.rootElem)
- *
- * (elems map (_.path)) == paths
  *
  * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
  * }}}

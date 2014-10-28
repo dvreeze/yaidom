@@ -139,7 +139,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * val fpBookAuthorsPaths =
  *   for {
- *     authorsPath <- bookstoreElem filterElemPaths { e => e.resolvedName == EName(bookstoreNamespace, "Authors") }
+ *     authorsPath <- indexed.Elem(bookstoreElem) filterElems { e => e.resolvedName == EName(bookstoreNamespace, "Authors") } map (_.path)
  *     if authorsPath.findAncestorPath(path => path.endsWithName(EName(bookstoreNamespace, "Book")) &&
  *       bookstoreElem.getElemOrSelfByPath(path).attribute(EName("ISBN")) == "978-1617290657").isDefined
  *   } yield authorsPath
@@ -164,7 +164,7 @@ import eu.cdevreeze.yaidom.core.Path
  * To illustrate functional update methods taking collections of paths, let's remove the added book from the book store.
  * Here is one (somewhat inefficient) way to do that:
  * {{{
- * val bookPaths = bookstoreElem filterElemPaths (_.resolvedName == EName(bookstoreNamespace, "Book"))
+ * val bookPaths = indexed.Elem(bookstoreElem) filterElems (_.resolvedName == EName(bookstoreNamespace, "Book")) map (_.path)
  *
  * bookstoreElem = bookstoreElem.updatedWithNodeSeqAtPaths(bookPaths.toSet) { (elem, path) =>
  *   if ((elem \@ EName("ISBN")) == Some("978-1617290657")) Vector() else Vector(elem)
@@ -282,9 +282,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }
    * }}}
    *
-   * It is also equivalent to:
+   * For simple elements, it is also equivalent to:
    * {{{
-   * val pathsReversed = findAllElemOrSelfPaths.filter(p => paths.contains(p)).reverse
+   * val pathsReversed = indexed.Elem(this).findAllElemsOrSelf.map(_.path).filter(p => paths.contains(p)).reverse
    * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path) { e => f(e, path) } }
    * }}}
    */
