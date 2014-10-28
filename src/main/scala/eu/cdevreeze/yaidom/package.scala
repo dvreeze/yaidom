@@ -309,18 +309,7 @@ package eu.cdevreeze
  * the uniform query API. Note that the example queries above only use the minimal element knowledge that traits `ElemLike` and `HasEName`
  * together have about elements. Therefore the query code can be used unchanged for different element implementations.
  *
- * Trait [[eu.cdevreeze.yaidom.queryapi.PathAwareElemLike]] is used to query for paths instead of elements. Paths can be queried
- * (in the same way that elements can be queried in trait `ElemLike`). Trait [[eu.cdevreeze.yaidom.queryapi.IsNavigable]] is used
- * to navigate to an element given a Path.
- *
- * For example, to query for the Scala book authors, the following alternative code can be used (if the used element
- * implementation mixes in traits `PathAwareElemLike` and `IsNavigable`, which is not the case for the Scala XML and DOM wrappers above):
- * {{{
- * for {
- *   authorPath <- bookstoreElem filterElemOrSelfPaths (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
- *   if authorPath.entries.contains(Path.Entry(EName("{http://bookstore/book}Book"), 1))
- * } yield bookstoreElem.getElemOrSelfByPath(authorPath)
- * }}}
+ * Trait [[eu.cdevreeze.yaidom.queryapi.IsNavigable]] is used to navigate to an element given a Path.
  *
  * Trait [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]] (which extends trait `IsNavigable`) offers <em>functional updates</em>
  * at given paths. Whereas the traits mentioned above know only about elements, this trait knows that elements have some node

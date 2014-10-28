@@ -107,17 +107,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val resolvedRoot = resolved.Elem(doc.documentElement)
     doTest(resolvedRoot)
 
-    val emailPaths = resolvedRoot findTopmostElemPaths { e => e.localName == "email" } take (10)
     val emailElms = resolvedRoot findTopmostElems { e => e.localName == "email" } take (10)
 
     assertResult(10) {
-      emailPaths.size
-    }
-    assertResult(10) {
       emailElms.size
-    }
-    assertResult(emailElms) {
-      emailPaths map { path => resolvedRoot.getElemOrSelfByPath(path) }
     }
   }
 

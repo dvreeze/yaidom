@@ -33,7 +33,8 @@ import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.queryapitests.AbstractPathAwareElemLikeQueryTest
+import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 
 /**
@@ -42,7 +43,7 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class QueryTest extends AbstractPathAwareElemLikeQueryTest {
+class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
@@ -95,11 +96,11 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       qnames
     }
 
-    // We could do a lot better, using the PathAwareElemLike API...
+    // We could do a lot better, using Paths and indexed Elems...
 
     val paths =
       for {
-        path <- bookstore.findAllElemPaths
+        path <- indexed.Elem(bookstore).findAllElems.map(_.path)
         parentPath = path.parentPath
         parent = bookstore.getElemOrSelfByPath(parentPath)
         if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
@@ -120,7 +121,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazinePath <- indexed.Elem(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
         bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
@@ -150,7 +151,7 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
 
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
+        bookOrMagazinePath <- indexed.Elem(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
         bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
@@ -414,11 +415,11 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     assertResult(4) {
-      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val paths = indexed.Elem(bookstore).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
       paths.size
     }
     assertResult(0) {
-      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
+      val paths = indexed.Elem(bookstoreWithoutPrices).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
       paths.size
     }
   }

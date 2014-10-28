@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.queryapitests.AbstractPathAwareElemLikeQueryTest
+import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved.Elem
 import eu.cdevreeze.yaidom.resolved.Node
 import eu.cdevreeze.yaidom.resolved.Text
@@ -41,7 +41,7 @@ import eu.cdevreeze.yaidom.resolved.Text
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class QueryTest extends AbstractPathAwareElemLikeQueryTest {
+class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
@@ -91,83 +91,6 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
     assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
       enames
-    }
-
-    // We could do a lot better, using the PathAwareElemLike API...
-
-    val paths =
-      for {
-        path <- bookstore.findAllElemPaths
-        parentPath = path.parentPath
-        parent = bookstore.getElemOrSelfByPath(parentPath)
-        if parent.resolvedName != EName("Bookstore") && parent.resolvedName != EName("Book")
-      } yield path
-
-    assert(paths.size > 10, "Expected more than 10 matching paths")
-
-    assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
-      val result = paths map { path => bookstore.getElemOrSelfByPath(path).resolvedName }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitlesUsingPaths(): Unit = {
-    // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
-
-    require(bookstore.localName == "Bookstore")
-
-    val bookAndMagazinePaths =
-      for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
-        bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
-        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
-        nextChildren = bookstore.children.drop(nodeIndex + 1)
-        prevChildren = bookstore.children.take(nodeIndex)
-        nextOption = nextChildren find {
-          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        prevOption = prevChildren find {
-          case e: Elem if (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        if (nextOption.isDefined || prevOption.isDefined)
-      } yield bookOrMagazinePath
-
-    assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
-    }
-  }
-
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBookUsingPaths(): Unit = {
-    // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
-
-    require(bookstore.localName == "Bookstore")
-
-    val bookAndMagazinePaths =
-      for {
-        bookOrMagazinePath <- bookstore filterChildElemPaths { e => Set("Book", "Magazine").contains(e.localName) }
-        bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
-        title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
-        nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
-        nextChildren = bookstore.children.drop(nodeIndex + 1)
-        prevChildren = bookstore.children.take(nodeIndex)
-        nextBookOption = nextChildren find {
-          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        prevBookOption = prevChildren find {
-          case e: Elem if (e.localName == "Book") && (e.getChildElem(EName("Title")).trimmedText == title) => true
-          case n: Node => false
-        } collect { case e: Elem => e }
-        if (nextBookOption.isDefined || prevBookOption.isDefined)
-      } yield bookOrMagazinePath
-
-    assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = bookAndMagazinePaths flatMap { path => bookstore.getElemOrSelfByPath(path).findElem(EName("Title")) map { _.trimmedText } }
-      result.toSet
     }
   }
 
@@ -404,14 +327,6 @@ class QueryTest extends AbstractPathAwareElemLikeQueryTest {
     }
     assertResult(0) {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
-    }
-    assertResult(4) {
-      val paths = bookstore findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
-      paths.size
-    }
-    assertResult(0) {
-      val paths = bookstoreWithoutPrices findTopmostElemPaths { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
-      paths.size
     }
   }
 

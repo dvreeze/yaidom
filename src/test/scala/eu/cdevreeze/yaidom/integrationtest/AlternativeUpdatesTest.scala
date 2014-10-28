@@ -25,6 +25,7 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.dom
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
@@ -71,7 +72,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths(): Unit = {
-    val paths = bookstore.findAllElemOrSelfPaths.toSet
+    val paths = indexed.Elem(bookstore).findAllElemsOrSelf.map(_.path).toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       elem match {
@@ -88,7 +89,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths(): Unit = {
-    val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
+    val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       elem match {
@@ -105,7 +106,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedAtPaths(): Unit = {
-    val paths = bookstore.filterElemPaths(e => e.localName == "Authors").toSet
+    val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
 
     val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
       require(elem.localName == "Authors")
@@ -119,7 +120,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths(): Unit = {
-    val paths = bookstore.filterElemPaths(e => e.localName == "Author").toSet
+    val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Author").map(_.path).toSet
 
     val updatedElem = bookstore.updatedWithNodeSeqAtPaths(paths) { (elem, path) =>
       require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")
@@ -158,7 +159,7 @@ class AlternativeUpdatesTest extends Suite {
   }
 
   @Test def testUpdatedAtPathsInternally(): Unit = {
-    val paths = bookstore.findAllElemOrSelfPaths.toSet
+    val paths = indexed.Elem(bookstore).findAllElemsOrSelf.map(_.path).toSet
 
     var foundPaths = Vector[Path]()
     var foundElemsWithoutChildren = Vector[Elem]()

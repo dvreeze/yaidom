@@ -74,7 +74,7 @@ import scala.collection.mutable
  *   QName("auth:Last_Name") -> 0).build(Scope.from("book" -> "http://bookstore/book", "auth" -> "http://bookstore/author"))
  * }}}
  *
- * `Path` instances are useful in certain queries (see [[eu.cdevreeze.yaidom.queryapi.PathAwareElemLike]]), and in "functional updates"
+ * `Path` instances are useful when navigating (see [[eu.cdevreeze.yaidom.queryapi.IsNavigable]]), and in "functional updates"
  * (see [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]]).
  *
  * An [[eu.cdevreeze.yaidom.core.Path]] corresponds to one and only one canonical path of the element (modulo prefix names),
@@ -88,10 +88,6 @@ import scala.collection.mutable
  * As an alternative to class `Path`, each element in a tree could be uniquely identified by "path entries" that only contained
  * a child index instead of an element name plus element child index (of element children with the given name). Yet that would
  * be far less easy to use. Hence `Path.Entry` instances each contain an element name plus index.
- *
- * '''Warning: indexing using Paths can be slow, especially in large XML trees.''' Hence, it is advisable to use class `Path`
- * wisely in queries and "functional updates". Most queries for elements can be written without them (using the methods in trait
- * `ElemLike`, instead of those added by subtrait `PathAwareElemLike`).
  *
  * @author Chris de Vreeze
  */

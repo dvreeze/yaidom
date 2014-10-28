@@ -96,7 +96,7 @@ class XbrlSchemaTest extends Suite {
 
     // Check equivalence of different ways to get the same concepts
 
-    val paths = xbrlSchema.wrappedElem.elem.findAllElemOrSelfPaths
+    val paths = xbrlSchema.wrappedElem.findAllElemsOrSelf.map(_.path)
 
     assertResult(paths) {
       xbrlSchema.findAllElemsOrSelfOfType(classTag[XsdElem]) map { _.wrappedElem.path }
@@ -107,7 +107,7 @@ class XbrlSchemaTest extends Suite {
         e.attributeOption(EName("name")).getOrElse("").contains("Plus")
       }
     val pathsOfElemsContainingPlus =
-      xbrlSchema.wrappedElem.elem filterElemPaths { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+      xbrlSchema.wrappedElem filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") } map (_.path)
 
     assertResult(pathsOfElemsContainingPlus) {
       elemsContainingPlus map (_.wrappedElem.path)

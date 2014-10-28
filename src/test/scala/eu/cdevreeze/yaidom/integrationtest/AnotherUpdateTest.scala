@@ -34,6 +34,7 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 
 /**
@@ -114,14 +115,16 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: Path = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val lastBookPath: Path =
+      indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPath: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val newLastBookPath: Path =
+      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
     val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
     assertResult("Programming in Scala") {
@@ -184,14 +187,16 @@ class AnotherUpdateTest extends Suite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
-    val lastBookPath: Path = doc.documentElement.filterChildElemPaths(_.localName == "Book").last
+    val lastBookPath: Path =
+      indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newLastBookPathButOne: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").init.last
+    val newLastBookPathButOne: Path =
+      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).init.last
     val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
     assertResult("Programming in Scala") {
@@ -264,7 +269,8 @@ class AnotherUpdateTest extends Suite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    val newFirstBookPath: Path = docWithScalaBook.documentElement.filterChildElemPaths(_.localName == "Book").head
+    val newFirstBookPath: Path =
+      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).head
     val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
     assertResult("Programming in Scala") {
@@ -356,9 +362,10 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformChildElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllChildElemPaths.reverse.foldLeft(elem) { (acc, path) =>
-      acc.updated(path)(f)
-    }
+    val expectedResult =
+      indexed.Elem(elem).findAllChildElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
+        acc.updated(path)(f)
+      }
 
     assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformChildElems(f))
@@ -374,9 +381,10 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllElemOrSelfPaths.reverse.foldLeft(elem) { (acc, path) =>
-      acc.updated(path)(f)
-    }
+    val expectedResult =
+      indexed.Elem(elem).findAllElemsOrSelf.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
+        acc.updated(path)(f)
+      }
 
     assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElemsOrSelf(f))
@@ -384,9 +392,10 @@ class AnotherUpdateTest extends Suite {
   }
 
   private def testPropertyAboutTransformElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
-    val expectedResult = elem.findAllElemPaths.reverse.foldLeft(elem) { (acc, path) =>
-      acc.updated(path)(f)
-    }
+    val expectedResult =
+      indexed.Elem(elem).findAllElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
+        acc.updated(path)(f)
+      }
 
     assertResult(resolved.Elem(expectedResult)) {
       resolved.Elem(elem.transformElems(f))

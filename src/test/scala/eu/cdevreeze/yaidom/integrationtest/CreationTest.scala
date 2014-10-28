@@ -32,6 +32,7 @@ import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 
@@ -391,7 +392,7 @@ class CreationTest extends Suite {
 
     // Let's functionally insert the author
 
-    val authorsPath = booksElm.findElemPath(_.resolvedName == EName("{http://bookstore}Authors")).
+    val authorsPath = indexed.Elem(booksElm).findElem(_.resolvedName == EName("{http://bookstore}Authors")).map(_.path).
       getOrElse(sys.error("No 'Authors' element found"))
 
     val updatedBooksElm: simple.Elem = booksElm.updated(authorsPath) {
@@ -399,7 +400,7 @@ class CreationTest extends Suite {
     }
 
     assertResult(Some(authorsPath)) {
-      updatedBooksElm findElemOrSelfPath { e => e.localName == "Author" } flatMap { path => path.parentPathOption }
+      indexed.Elem(updatedBooksElm).findElemOrSelf(e => e.localName == "Author").flatMap(e => e.path.parentPathOption)
     }
     assertResult(true) {
       updatedBooksElm.findAllElemsOrSelf forall { e => e.scope == Scope.from("books" -> "http://bookstore") }

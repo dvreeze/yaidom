@@ -28,7 +28,6 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 import eu.cdevreeze.yaidom.simple
@@ -129,7 +128,7 @@ sealed trait Node extends Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with PathAwareElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -163,18 +162,6 @@ final case class Elem(
 
   /** Returns the element children */
   override def findAllChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
-
-  /**
-   * Returns all child elements with their `Path` entries, in the correct order.
-   *
-   * The implementation must be such that the following holds: `(findAllChildElemsWithPathEntries map (_._1)) == findAllChildElems`
-   */
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    val childElms = findAllChildElems
-    val entries = childNodeIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
-    assert(childElms.size == entries.size)
-    childElms.zip(entries)
-  }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {

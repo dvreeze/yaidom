@@ -28,6 +28,7 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
@@ -37,7 +38,6 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
@@ -85,30 +85,14 @@ class UpdateTest extends Suite {
 
     val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
     val doc2 = Document(
-      turnBookAttributeIntoElem[Node, Elem](
-        turnBookAttributeIntoElem[Node, Elem](doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+      turnBookAttributeIntoElem(
+        turnBookAttributeIntoElem(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
     assertResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
     assertResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
       elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
-    }
-
-    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
-    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
-
-    val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
-    val updatedResolvedElm =
-      turnBookAttributeIntoElem[resolved.Node, resolved.Elem](
-        turnBookAttributeIntoElem[resolved.Node, resolved.Elem](resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
-
-    assertResult(false) {
-      resolvedOriginalElm == resolvedUpdatedElm
-    }
-
-    assertResult(true) {
-      resolvedUpdatedElm == updatedResolvedElm
     }
   }
 
@@ -126,30 +110,14 @@ class UpdateTest extends Suite {
 
     val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
     val doc2 = Document(
-      turnBookAttributeIntoElemUsingPathSet[Node, Elem](
-        turnBookAttributeIntoElemUsingPathSet[Node, Elem](doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+      turnBookAttributeIntoElemUsingPathSet(
+        turnBookAttributeIntoElemUsingPathSet(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
     assertResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
     }
     assertResult(Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))) {
       elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
-    }
-
-    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
-    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
-
-    val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
-    val updatedResolvedElm =
-      turnBookAttributeIntoElemUsingPathSet[resolved.Node, resolved.Elem](
-        turnBookAttributeIntoElemUsingPathSet[resolved.Node, resolved.Elem](resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
-
-    assertResult(false) {
-      resolvedOriginalElm == resolvedUpdatedElm
-    }
-
-    assertResult(true) {
-      resolvedUpdatedElm == updatedResolvedElm
     }
   }
 
@@ -167,8 +135,8 @@ class UpdateTest extends Suite {
 
     val updElem = { (e: Elem, attr: String) => updateBook(e, attr) }
     val doc2 = Document(
-      turnBookAttributeIntoElem(
-        turnBookAttributeIntoElem(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
+      turnBookAttributeIntoElemUsingTransform(
+        turnBookAttributeIntoElemUsingTransform(doc1.documentElement, "Price", updElem), "Edition", updElem).removeAllInterElementWhitespace)
 
     assertResult(Set()) {
       attrNames[Node, Elem](doc2.documentElement) intersect Set(EName("Price"), EName("Edition"))
@@ -182,8 +150,8 @@ class UpdateTest extends Suite {
 
     val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
     val updatedResolvedElm =
-      turnBookAttributeIntoElem(
-        turnBookAttributeIntoElem(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
+      turnBookAttributeIntoElemUsingTransform(
+        turnBookAttributeIntoElemUsingTransform(resolvedOriginalElm, "Price", updResolvedElem), "Edition", updResolvedElem).removeAllInterElementWhitespace
 
     assertResult(false) {
       resolvedOriginalElm == resolvedUpdatedElm
@@ -341,10 +309,11 @@ class UpdateTest extends Suite {
     result.toSet
   }
 
-  private def turnBookAttributeIntoElem[N, E <: N with ElemLike[E] with HasEName with PathAwareElemLike[E] with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
-    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
-      path.endsWithName(EName("{http://bookstore}Book"))
-    }
+  private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    val matchingPaths =
+      indexed.Elem(rootElm) filterElems { e => e.attributeOption(EName(attrName)).isDefined } map (_.path) filter { path =>
+        path.endsWithName(EName("{http://bookstore}Book"))
+      }
 
     matchingPaths.reverse.foldLeft(rootElm) { (acc, path) =>
       require(rootElm.findElemOrSelfByPath(path).isDefined)
@@ -353,10 +322,11 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def turnBookAttributeIntoElemUsingPathSet[N, E <: N with ElemLike[E] with HasEName with PathAwareElemLike[E] with UpdatableElemLike[N, E]](rootElm: E, attrName: String, upd: (E, String) => E): E = {
-    val matchingPaths = rootElm filterElemPaths { e => e.attributeOption(EName(attrName)).isDefined } filter { path =>
-      path.endsWithName(EName("{http://bookstore}Book"))
-    }
+  private def turnBookAttributeIntoElemUsingPathSet(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    val matchingPaths =
+      indexed.Elem(rootElm) filterElems { e => e.attributeOption(EName(attrName)).isDefined } map (_.path) filter { path =>
+        path.endsWithName(EName("{http://bookstore}Book"))
+      }
 
     rootElm.updatedAtPaths(matchingPaths.toSet) { (elem, path) =>
       require(rootElm.findElemOrSelfByPath(path).isDefined)
@@ -364,7 +334,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+  private def turnBookAttributeIntoElemUsingTransform(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
     val f: Elem => Elem = {
       case e: Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
       case e => e
@@ -373,7 +343,7 @@ class UpdateTest extends Suite {
     rootElm.transformElemsOrSelf(f)
   }
 
-  private def turnBookAttributeIntoElem(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
+  private def turnBookAttributeIntoElemUsingTransform(rootElm: resolved.Elem, attrName: String, upd: (resolved.Elem, String) => resolved.Elem): resolved.Elem = {
     val f: resolved.Elem => resolved.Elem = {
       case e: resolved.Elem if e.resolvedName == EName("{http://bookstore}Book") && e.attributeOption(EName(attrName)).isDefined => upd(e, attrName)
       case e => e

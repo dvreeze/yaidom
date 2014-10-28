@@ -37,7 +37,6 @@ import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
 import eu.cdevreeze.yaidom.queryapi.HasScopeApi
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.PathAwareElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -177,7 +176,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with PathAwareElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasQNameApi with HasText with HasScopeApi { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasQNameApi with HasText with HasScopeApi { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -235,18 +234,6 @@ final class Elem(
   /** Returns the element children */
   override def findAllChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
 
-  /**
-   * Returns all child elements with their `Path` entries, in the correct order.
-   *
-   * The implementation must be such that the following holds: `(findAllChildElemsWithPathEntries map (_._1)) == findAllChildElems`
-   */
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    val childElms = findAllChildElems
-    val entries = childNodeIndexesByPathEntries.toSeq.sortBy(_._2).map(_._1)
-    assert(childElms.size == entries.size)
-    childElms.zip(entries)
-  }
-
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
   override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
     copy(children = newChildren)
@@ -273,6 +260,14 @@ final class Elem(
         case n: Node => Vector(n)
       }
     withChildren(newChildren)
+  }
+
+  /**
+   * Returns all child element `Path` entries, in the correct order.
+   */
+  def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
+    val entries = childNodeIndexesByPathEntries.toVector.sortBy(_._2).map(_._1)
+    entries
   }
 
   /**
