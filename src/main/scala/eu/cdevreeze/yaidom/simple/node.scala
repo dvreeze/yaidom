@@ -32,11 +32,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.HasQNameApi
-import eu.cdevreeze.yaidom.queryapi.HasScopeApi
-import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -176,7 +172,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasQNameApi with HasText with HasScopeApi { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -337,45 +333,6 @@ final class Elem(
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
   }
-
-  /**
-   * Returns the QName value of the attribute with the given expanded name, if any, wrapped in an `Option`.
-   * If the attribute exists, but its value is not a QName, an exception is thrown.
-   */
-  def attributeAsQNameOption(expandedName: EName): Option[QName] =
-    attributeOption(expandedName).map(v => QName(v.trim))
-
-  /** Returns the QName value of the attribute with the given expanded name, and throws an exception otherwise */
-  def attributeAsQName(expandedName: EName): QName =
-    attributeAsQNameOption(expandedName).getOrElse(
-      sys.error(s"Missing QName-valued attribute $expandedName"))
-
-  /**
-   * Returns the resolved QName value (as EName) of the attribute with the given expanded name, if any, wrapped in an `Option`.
-   * None is returned if the attribute does not exist. If the QName value cannot be resolved given the scope of the element,
-   * an exception is thrown.
-   */
-  def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
-    attributeAsQNameOption(expandedName) map { qname =>
-      scope.resolveQNameOption(qname).getOrElse(
-        sys.error(s"Could not resolve QName-valued attribute value $qname, given scope [${scope}]"))
-    }
-  }
-
-  /**
-   * Returns the resolved QName value (as EName) of the attribute with the given expanded name, and throws an exception otherwise
-   */
-  def attributeAsResolvedQName(expandedName: EName): EName =
-    attributeAsResolvedQNameOption(expandedName).getOrElse(
-      sys.error(s"Missing QName-valued attribute $expandedName"))
-
-  /** Returns `QName(text.trim)` */
-  def textAsQName: QName = QName(text.trim)
-
-  /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
-  def textAsResolvedQName: EName =
-    scope.resolveQNameOption(textAsQName).getOrElse(
-      sys.error(s"Could not resolve QName-valued element text $qname, given scope [${scope}]"))
 
   /**
    * Returns an "equivalent" `Elem` in which the implicit namespace declarations throughout the tree do not contain any
