@@ -189,6 +189,30 @@ final class Elem private[indexed] (
     val textStrings = elem.textChildren map { t => t.text }
     textStrings.mkString
   }
+
+  /**
+   * Returns the ENames of the ancestry-or-self, starting with the root element and ending with this element.
+   *
+   * That is, returns:
+   * {{{
+   * rootElem.resolvedName +: path.entries.map(_.elementName)
+   * }}}
+   */
+  final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
+    rootElem.resolvedName +: path.entries.map(_.elementName)
+  }
+
+  /**
+   * Returns the ENames of the ancestry, starting with the root element and ending with the parent of this element, if any.
+   *
+   * That is, returns:
+   * {{{
+   * ancestryOrSelfENames.dropRight(1)
+   * }}}
+   */
+  final def ancestryENames: immutable.IndexedSeq[EName] = {
+    ancestryOrSelfENames.dropRight(1)
+  }
 }
 
 object Elem {
