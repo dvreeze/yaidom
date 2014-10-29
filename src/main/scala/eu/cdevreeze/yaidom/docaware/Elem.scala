@@ -26,7 +26,6 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
-import eu.cdevreeze.yaidom.queryapi.HasPathApi
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.simple
 
@@ -42,7 +41,7 @@ final class Elem private[docaware] (
   val rootElem: simple.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: simple.Elem) extends ScopedElemLike[Elem] with IsNavigable[Elem] with HasPathApi with Immutable {
+  val elem: simple.Elem) extends ScopedElemLike[Elem] with IsNavigable[Elem] with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.

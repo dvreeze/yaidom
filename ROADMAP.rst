@@ -5,8 +5,8 @@ ROAD MAP
 
 After releasing version 1.0, the author of yaidom tried to write a blog post, showing the purpose and strength of
 the different query API traits. That turned out to be difficult, because the query API traits are not sufficiently
-**orthogonal**, and they depend on inheritance too much. For example, in yaidom 1.0 we cannot abstract over indexed and docaware
-elements, and the inheritance relation from the 1.0 PathAwareElemApi to the 1.0 NavigableElemApi is too arbitrary.
+**orthogonal**, and they depend on inheritance too much. For example, in yaidom 1.0 the inheritance relation from the
+1.0 PathAwareElemApi to the 1.0 NavigableElemApi is too arbitrary.
 
 In particular, the (1.0) ParentElemApi trait is by far the most important one, but the (1.0) ElemApi trait offers nothing fundamental
 other than some "HasENameApi" capability, that can be combined with (1.0) ParentElemApi to replace the (1.0) ElemApi.

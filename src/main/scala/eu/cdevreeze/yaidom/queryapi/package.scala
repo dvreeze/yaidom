@@ -44,14 +44,7 @@ package eu.cdevreeze.yaidom
  * </ul>
  *
  * The fact that the 1.0 query API traits can be simulated by (combinations of) 1.1 query API traits shows how
- * orthogonality of the query API has improved in version 1.1. For example, now we can abstract over `indexed` and `docaware`
- * elements by using the following type:
- * {{{
- * ElemApi[E] with HasPathApi with IsNavigableApi[E] with HasENameApi with HasTextApi
- * }}}
- *
- * This is a very powerful type, supporting queries using predicates in which the elements themselves contain Paths
- * (that can be navigated to).
+ * orthogonality of the query API has improved in version 1.1.
  *
  * @author Chris de Vreeze
  */
