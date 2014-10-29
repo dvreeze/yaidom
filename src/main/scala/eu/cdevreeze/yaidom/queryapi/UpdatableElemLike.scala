@@ -62,6 +62,14 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
   final def plusChild(child: N): E = withChildren(children :+ child)
 
+  final def plusChildOption(index: Int, childOption: Option[N]): E = {
+    if (childOption.isEmpty) self else plusChild(index, childOption.get)
+  }
+
+  final def plusChildOption(childOption: Option[N]): E = {
+    if (childOption.isEmpty) self else plusChild(childOption.get)
+  }
+
   final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
 
   final def updated(pathEntry: Path.Entry)(f: E => E): E = {
