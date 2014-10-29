@@ -20,8 +20,12 @@ import org.junit.Test
 import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
@@ -31,7 +35,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractScopedElemLikeQueryTest extends Suite {
 
-  type E <: ScopedElemLike[E]
+  type E <: ScopedElemLike[E] with IsNavigable[E]
 
   val XsNamespace = "http://www.w3.org/2001/XMLSchema"
 
@@ -82,6 +86,44 @@ abstract class AbstractScopedElemLikeQueryTest extends Suite {
     }
     assertResult(EName(XsNamespace, "element")) {
       elemKeyDef.findElem(_.attributeOption(EName("xpath")).isDefined).head.attributeAsResolvedQName(EName("xpath"))
+    }
+  }
+
+  @Test def testNavigation(): Unit = {
+    val scope = Scope.from("xs" -> XsNamespace)
+    val path1 = PathBuilder.from(QName("xs:element") -> 0, QName("xs:complexType") -> 0, QName("xs:complexContent") -> 0).build(scope)
+    val path2 = PathBuilder.from(QName("xs:extension") -> 0, QName("xs:sequence") -> 0, QName("xs:choice") -> 0, QName("xs:element") -> 3).build(scope)
+    val path = path1.append(path2)
+
+    val complexContentElemOption = xsdSchemaElem.findElemOrSelfByPath(path1)
+
+    assertResult(true) {
+      complexContentElemOption.isDefined
+    }
+
+    val elemElemOption = complexContentElemOption.get.findElemOrSelfByPath(path2)
+
+    assertResult(true) {
+      elemElemOption.isDefined
+    }
+    assertResult(EName(XsNamespace, "element")) {
+      elemElemOption.get.resolvedName
+    }
+    assertResult(Some("xs:annotation")) {
+      elemElemOption.get \@ EName("ref")
+    }
+
+    assertResult(elemElemOption.map(e => toResolvedElem(e).removeAllInterElementWhitespace)) {
+      val elemOption =
+        xsdSchemaElem.findChildElem(withEName(XsNamespace, "element")).toVector.flatMap(_.filterElems(withEName(XsNamespace, "element"))).drop(3).headOption
+
+      elemOption.map(e => toResolvedElem(e).removeAllInterElementWhitespace)
+    }
+
+    assertResult(elemElemOption.map(e => toResolvedElem(e).removeAllInterElementWhitespace)) {
+      val elemOption = xsdSchemaElem.findElemOrSelfByPath(path)
+
+      elemOption.map(e => toResolvedElem(e).removeAllInterElementWhitespace)
     }
   }
 

@@ -24,13 +24,17 @@ import org.w3c
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
+import eu.cdevreeze.yaidom.convert.DomConversions.toQName
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -93,7 +97,7 @@ final class DomDocument(
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ScopedElemLike[DomElem] with IsNavigable[DomElem] with HasParent[DomElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -134,6 +138,22 @@ final class DomElem(
           accScope.resolve(decls)
       }
     resultScope
+  }
+
+  override def findChildElemByPathEntry(entry: Path.Entry): Option[DomElem] = {
+    import DomConversions._
+
+    // Expensive scope only computed once, for acceptable performance
+    val sc = scope
+    val childNodes = nodeListToIndexedSeq(wrappedNode.getChildNodes)
+
+    val filteredChildrenWithIndex = childNodes.toStream.zipWithIndex filter {
+      case (e: w3c.dom.Element, idx) if sc.resolveQNameOption(toQName(e)) == Some(entry.elementName) => true
+      case _ => false
+    }
+
+    val idxOption = filteredChildrenWithIndex.drop(entry.index).headOption.map(_._2)
+    idxOption.map(idx => DomElem(childNodes(idx).asInstanceOf[w3c.dom.Element]))
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
