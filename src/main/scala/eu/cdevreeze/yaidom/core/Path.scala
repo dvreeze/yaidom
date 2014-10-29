@@ -104,6 +104,9 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   /** Prepends a given `Entry` to this `Path` */
   def prepend(entry: Path.Entry): Path = Path(entry +: self.entries)
 
+  /** Prepends a given `Path` to this `Path` */
+  def prepend(other: Path): Path = Path(other.entries ++ self.entries)
+
   /** Returns the `Path` with the first path entry (if any) removed, wrapped in an `Option`. */
   def withoutFirstEntryOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
@@ -117,7 +120,10 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   def append(entry: Path.Entry): Path = Path(self.entries :+ entry)
 
   /** Appends a given relative `Path` to this `Path` */
-  def ++(other: Path): Path = Path(this.entries ++ other.entries)
+  def append(other: Path): Path = Path(self.entries ++ other.entries)
+
+  /** Appends a given relative `Path` to this `Path`. Alias for `append(other)`. */
+  def ++(other: Path): Path = append(other)
 
   /**
    * Gets the parent path (if any, because the root path has no parent) wrapped in an `Option`.
