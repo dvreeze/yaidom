@@ -148,12 +148,14 @@ final class DomElem(
     val childNodes = nodeListToIndexedSeq(wrappedNode.getChildNodes)
 
     val filteredChildrenWithIndex = childNodes.toStream.zipWithIndex filter {
-      case (e: w3c.dom.Element, idx) if sc.resolveQNameOption(toQName(e)) == Some(entry.elementName) => true
+      case (e: w3c.dom.Element, idx) if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
       case _ => false
     }
 
     val idxOption = filteredChildrenWithIndex.drop(entry.index).headOption.map(_._2)
-    idxOption.map(idx => DomElem(childNodes(idx).asInstanceOf[w3c.dom.Element]))
+    val result = idxOption.map(idx => DomElem(childNodes(idx).asInstanceOf[w3c.dom.Element]))
+    assert(result.forall(_.resolvedName == entry.elementName))
+    result
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */

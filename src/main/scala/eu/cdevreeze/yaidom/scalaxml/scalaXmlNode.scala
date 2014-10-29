@@ -116,12 +116,14 @@ final class ScalaXmlElem(
     val sc = scope
 
     val filteredChildrenWithIndex = wrappedNode.child.toStream.zipWithIndex filter {
-      case (e: scala.xml.Elem, idx) if sc.resolveQNameOption(toQName(e)) == Some(entry.elementName) => true
+      case (e: scala.xml.Elem, idx) if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
       case _ => false
     }
 
     val idxOption = filteredChildrenWithIndex.drop(entry.index).headOption.map(_._2)
-    idxOption.map(idx => ScalaXmlElem(wrappedNode.child(idx).asInstanceOf[scala.xml.Elem]))
+    val result = idxOption.map(idx => ScalaXmlElem(wrappedNode.child(idx).asInstanceOf[scala.xml.Elem]))
+    assert(result.forall(_.resolvedName == entry.elementName))
+    result
   }
 
   /** Returns the text children */
