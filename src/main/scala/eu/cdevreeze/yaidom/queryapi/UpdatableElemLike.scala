@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.core.Path
  * indexes.
  *
  * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
- * `children`, `withChildren` and `childNodeIndexesByPathEntries`. Based on these abstract methods (and the super-trait), this
+ * `children`, `withChildren` and `childNodeIndex`. Based on these abstract methods (and the super-trait), this
  * trait offers a rich API for functionally updating elements.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]]. See the documentation of that trait

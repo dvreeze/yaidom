@@ -254,19 +254,13 @@ final class Elem(
 
   /**
    * Returns all child elements with `Path` entries, in the correct order.
+   * This method is also needed for fast recursive construction of docaware/indexed Elems.
    */
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
     childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
       case (entry, idx) =>
         (children(idx).asInstanceOf[Elem], entry)
     }
-  }
-
-  /**
-   * Returns all child element `Path` entries, in the correct order.
-   */
-  def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
-    findAllChildElemsWithPathEntries.map(_._2)
   }
 
   /**

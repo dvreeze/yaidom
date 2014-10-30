@@ -195,13 +195,6 @@ final case class Elem(
     }
   }
 
-  /**
-   * Returns all child element `Path` entries, in the correct order.
-   */
-  def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
-    findAllChildElemsWithPathEntries.map(_._2)
-  }
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 

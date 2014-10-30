@@ -515,7 +515,7 @@ class ElemLikeTest extends Suite {
       bookstore.findElemOrSelfByPath(path) map { _.trimmedText }
     }
 
-    val bookstoreChildIndexes = bookstore.findAllChildElemPathEntries
+    val bookstoreChildIndexes = bookstore.findAllChildElemsWithPathEntries.map(_._2)
 
     assertResult(8) {
       bookstoreChildIndexes.size

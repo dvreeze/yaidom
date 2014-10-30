@@ -371,7 +371,7 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(elem.transformChildElems(f))
     }
 
-    val expectedResult2 = elem.findAllChildElemPathEntries.reverse.foldLeft(elem) { (acc, pathEntry) =>
+    val expectedResult2 = elem.findAllChildElemsWithPathEntries.map(_._2).reverse.foldLeft(elem) { (acc, pathEntry) =>
       acc.updated(pathEntry)(f)
     }
 

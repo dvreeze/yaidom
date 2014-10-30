@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.core.Path
  * <li>An element has <em>child nodes</em>, which may or may not be elements. Hence the extra type parameter for nodes.</li>
  * <li>An element knows the <em>child node indexes</em> of the path entries of the child elements.</li>
  * </ul>
- * Obviously methods ``children``, ``withChildren`` and ``childNodeIndexesByPathEntries`` must be consistent with
+ * Obviously methods ``children``, ``withChildren`` and ``childNodeIndex`` must be consistent with
  * methods such as ``findAllChildElems`` and ``findAllChildElemsWithPathEntries``, if the corresponding traits are
  * mixed in.
  *
@@ -192,7 +192,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
   /**
-   * Shorthand for `childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)`.
+   * Returns the child node index of the child element at the given path entry, if any, and -1 otherwise.
    * The faster this method is, the better.
    */
   def childNodeIndex(childPathEntry: Path.Entry): Int
@@ -238,7 +238,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val newChildren = childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2).reverse.foldLeft(children) {
+   * val newChildren = pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2).reverse.foldLeft(children) {
    *   case (acc, (pathEntry, idx)) =>
    *     acc.updated(idx, f(acc(idx).asInstanceOf[E], pathEntry))
    * }
@@ -328,7 +328,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val indexesByPathEntries = childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2).reverse
+   * val indexesByPathEntries = pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2).reverse
    * val newChildGroups =
    *   indexesByPathEntries.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
    *     case (acc, (pathEntry, idx)) =>
