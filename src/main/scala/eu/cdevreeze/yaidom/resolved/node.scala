@@ -137,26 +137,16 @@ final case class Elem(
   @throws(classOf[java.io.ObjectStreamException])
   private[resolved] def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
 
-  override def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-    for ((node, idx) <- self.children.zipWithIndex) {
-      node match {
-        case elm: Elem =>
-          val ename = elm.resolvedName
-          val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = Path.Entry(ename, countForName)
-          elementNameCounts.update(ename, countForName + 1)
-          acc += ((entry, idx))
-        case _ => ()
-      }
+  override def childNodeIndex(childPathEntry: Path.Entry): Int = {
+    val filteredChildrenWithChildIndex = children.toStream.zipWithIndex filter {
+      case (e: Elem, idx) if e.resolvedName == childPathEntry.elementName => true
+      case _ => false
     }
 
-    val result = acc.toMap
-    result
+    val childWithIndexOption = filteredChildrenWithChildIndex.drop(childPathEntry.index).headOption
+    val result = childWithIndexOption collect { case (e: Elem, idx) => (e, idx) }
+    assert(result.forall(_._1.resolvedName == childPathEntry.elementName))
+    result.map(_._2).getOrElse(-1)
   }
 
   /** Returns the element children */
@@ -168,13 +158,11 @@ final case class Elem(
   }
 
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    val filteredChildren = children.toStream filter {
-      case e: Elem if e.resolvedName == entry.elementName => true
-      case _ => false
-    }
-
-    val childOption = filteredChildren.drop(entry.index).headOption
-    val result = childOption collect { case e: Elem => e }
+    val result =
+      childNodeIndex(entry) match {
+        case -1 => None
+        case idx => Some(children(idx).asInstanceOf[Elem])
+      }
     assert(result.forall(_.resolvedName == entry.elementName))
     result
   }
@@ -356,6 +344,28 @@ final case class Elem(
     }
 
     self.withChildren(resultChildren)
+  }
+
+  private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
+    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
+
+    val elementNameCounts = mutable.Map[EName, Int]()
+    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
+
+    for ((node, idx) <- self.children.zipWithIndex) {
+      node match {
+        case elm: Elem =>
+          val ename = elm.resolvedName
+          val countForName = elementNameCounts.getOrElse(ename, 0)
+          val entry = Path.Entry(ename, countForName)
+          elementNameCounts.update(ename, countForName + 1)
+          acc += ((entry, idx))
+        case _ => ()
+      }
+    }
+
+    val result = acc.toMap
+    result
   }
 }
 

@@ -46,11 +46,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
-  def childNodeIndexesByPathEntries: Map[Path.Entry, Int]
-
-  final def childNodeIndex(childPathEntry: Path.Entry): Int = {
-    childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)
-  }
+  def childNodeIndex(childPathEntry: Path.Entry): Int
 
   final def withUpdatedChildren(index: Int, newChild: N): E =
     withChildren(children.updated(index, newChild))
@@ -83,7 +79,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     if (pathEntries.isEmpty) self
     else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-        self.childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2)
+        pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
+
       require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries
@@ -166,7 +163,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     if (pathEntries.isEmpty) self
     else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-        self.childNodeIndexesByPathEntries.filterKeys(pathEntries).toSeq.sortBy(_._2)
+        pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
+
       require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries

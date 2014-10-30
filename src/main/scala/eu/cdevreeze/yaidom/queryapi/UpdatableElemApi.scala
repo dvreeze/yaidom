@@ -192,12 +192,6 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
   /**
-   * Returns a Map from path entries (with respect to this element as parent element) to child node indexes.
-   * The faster this method is, the better.
-   */
-  def childNodeIndexesByPathEntries: Map[Path.Entry, Int]
-
-  /**
    * Shorthand for `childNodeIndexesByPathEntries.getOrElse(childPathEntry, -1)`.
    * The faster this method is, the better.
    */
