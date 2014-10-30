@@ -147,13 +147,13 @@ final class DomElem(
     val sc = scope
     val childNodes = nodeListToIndexedSeq(wrappedNode.getChildNodes)
 
-    val filteredChildrenWithIndex = childNodes.toStream.zipWithIndex filter {
-      case (e: w3c.dom.Element, idx) if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
+    val filteredChildren = childNodes.toStream filter {
+      case e: w3c.dom.Element if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
       case _ => false
     }
 
-    val idxOption = filteredChildrenWithIndex.drop(entry.index).headOption.map(_._2)
-    val result = idxOption.map(idx => DomElem(childNodes(idx).asInstanceOf[w3c.dom.Element]))
+    val childOption = filteredChildren.drop(entry.index).headOption
+    val result = childOption.map(ch => DomElem(ch.asInstanceOf[w3c.dom.Element]))
     assert(result.forall(_.resolvedName == entry.elementName))
     result
   }

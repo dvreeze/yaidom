@@ -115,13 +115,13 @@ final class ScalaXmlElem(
     // Scope only computed once, for acceptable performance
     val sc = scope
 
-    val filteredChildrenWithIndex = wrappedNode.child.toStream.zipWithIndex filter {
-      case (e: scala.xml.Elem, idx) if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
+    val filteredChildren = wrappedNode.child.toStream filter {
+      case e: scala.xml.Elem if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
       case _ => false
     }
 
-    val idxOption = filteredChildrenWithIndex.drop(entry.index).headOption.map(_._2)
-    val result = idxOption.map(idx => ScalaXmlElem(wrappedNode.child(idx).asInstanceOf[scala.xml.Elem]))
+    val childOption = filteredChildren.drop(entry.index).headOption
+    val result = childOption.map(ch => ScalaXmlElem(ch.asInstanceOf[scala.xml.Elem]))
     assert(result.forall(_.resolvedName == entry.elementName))
     result
   }
