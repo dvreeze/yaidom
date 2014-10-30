@@ -201,8 +201,7 @@ final class Elem(
     }
   }
 
-  /** Cache for speeding up child element lookups by path */
-  override val childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
+  override def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
     // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
 
     val elementNameCounts = mutable.Map[EName, Int]()
@@ -236,8 +235,15 @@ final class Elem(
   }
 
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    val idx = childNodeIndex(entry)
-    if (idx < 0) None else Some(children(idx).asInstanceOf[Elem])
+    val filteredChildren = children.toStream filter {
+      case e: Elem if e.resolvedName == entry.elementName => true
+      case _ => false
+    }
+
+    val childOption = filteredChildren.drop(entry.index).headOption
+    val result = childOption collect { case e: Elem => e }
+    assert(result.forall(_.resolvedName == entry.elementName))
+    result
   }
 
   override def transformChildElems(f: Elem => Elem): Elem = {
@@ -259,11 +265,20 @@ final class Elem(
   }
 
   /**
+   * Returns all child elements with `Path` entries, in the correct order.
+   */
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
+    childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
+      case (entry, idx) =>
+        (children(idx).asInstanceOf[Elem], entry)
+    }
+  }
+
+  /**
    * Returns all child element `Path` entries, in the correct order.
    */
   def findAllChildElemPathEntries: immutable.IndexedSeq[Path.Entry] = {
-    val entries = childNodeIndexesByPathEntries.toVector.sortBy(_._2).map(_._1)
-    entries
+    findAllChildElemsWithPathEntries.map(_._2)
   }
 
   /**

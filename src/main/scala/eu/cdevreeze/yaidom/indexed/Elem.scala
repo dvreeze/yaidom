@@ -228,10 +228,18 @@ object Elem {
    * Expensive recursive factory method for "indexed elements".
    */
   def apply(rootElem: simple.Elem, path: Path): Elem = {
+    // Expensive call, so invoked only once
     val elem = rootElem.getElemOrSelfByPath(path)
 
+    apply(rootElem, path, elem)
+  }
+
+  private def apply(rootElem: simple.Elem, path: Path, elem: simple.Elem): Elem = {
     // Recursive calls
-    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(rootElem, path.append(entry)))
+    val childElems = elem.findAllChildElemsWithPathEntries map {
+      case (e, entry) =>
+        apply(rootElem, path.append(entry), e)
+    }
 
     new Elem(rootElem, childElems, path, elem)
   }

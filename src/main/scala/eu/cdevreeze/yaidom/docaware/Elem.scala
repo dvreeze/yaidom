@@ -163,10 +163,18 @@ object Elem {
    * Expensive recursive factory method for "docaware elements".
    */
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
+    // Expensive call, so invoked only once
     val elem = rootElem.getElemOrSelfByPath(path)
 
+    apply(docUri, rootElem, path, elem)
+  }
+
+  private def apply(docUri: URI, rootElem: simple.Elem, path: Path, elem: simple.Elem): Elem = {
     // Recursive calls
-    val childElems = elem.findAllChildElemPathEntries.map(entry => apply(docUri, rootElem, path.append(entry)))
+    val childElems = elem.findAllChildElemsWithPathEntries map {
+      case (e, entry) =>
+        apply(docUri, rootElem, path.append(entry), e)
+    }
 
     new Elem(docUri, rootElem, childElems, path, elem)
   }
