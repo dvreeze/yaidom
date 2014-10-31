@@ -21,6 +21,7 @@ import java.net.URI
 import java.{ util => jutil }
 
 import scala.Vector
+import scala.xml.XML
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,12 +39,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.docaware
-import eu.cdevreeze.yaidom.simple.DocBuilder
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Text
-import eu.cdevreeze.yaidom.simple.TreeReprParsers
-import eu.cdevreeze.yaidom.simple.TreeReprParsers.parseAll
+import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -53,6 +49,14 @@ import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
+import eu.cdevreeze.yaidom.simple.DocBuilder
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Text
+import eu.cdevreeze.yaidom.simple.TreeReprParsers
+import eu.cdevreeze.yaidom.simple.TreeReprParsers.parseAll
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * Large XML test case.
@@ -209,6 +213,26 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val docawareDoc = docaware.Document(new URI(""), doc)
 
     doTest(docawareDoc.documentElement)
+  }
+
+  @Test def testProcessLargeXmlIntoDomElem(): Unit = {
+    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+
+    val startMs = System.currentTimeMillis()
+    val domDoc = DomDocument(db.parse(new jio.ByteArrayInputStream(xmlBytes)))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testProcessLargeXmlIntoDomElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    doTest(domDoc.documentElement)
+  }
+
+  @Test def testProcessLargeXmlIntoScalaXmlElem(): Unit = {
+    val startMs = System.currentTimeMillis()
+    val rootElem = ScalaXmlElem(XML.load(new jio.ByteArrayInputStream(xmlBytes)))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testProcessLargeXmlIntoScalaXmlElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    doTest(rootElem)
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
