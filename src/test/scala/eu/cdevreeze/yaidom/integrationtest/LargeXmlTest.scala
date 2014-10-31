@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
+import java.net.URI
 import java.{ util => jutil }
 
 import scala.Vector
@@ -30,10 +31,13 @@ import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
@@ -63,6 +67,13 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   @volatile private var xmlBytes: Array[Byte] = _
+
+  val enames =
+    Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))
+  val qnames = enames.map(en => QName(en.localPart))
+
+  ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(enames))
+  QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(qnames))
 
   override def beforeAll(configMap: ConfigMap): Unit = {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
@@ -144,7 +155,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
             }
             result.toSet
           }
-          logger.info(s"Different e-mails (${emails.size}): %s. Thread ${Thread.currentThread.getName}")
+          logger.info(s"Different e-mails (${emails.size}). Thread ${Thread.currentThread.getName}")
         case 4 =>
           val firstNameElms = doc.documentElement \\ FirstNameEName
           logger.info(s"Number of first names: ${firstNameElms.size}. Thread ${Thread.currentThread.getName}")
@@ -185,6 +196,19 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val indexedDoc = indexed.Document(doc)
 
     doTest(indexedDoc.documentElement)
+  }
+
+  @Test def testProcessLargeXmlIntoDocawareElem(): Unit = {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testProcessLargeXmlIntoDocawareElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    val docawareDoc = docaware.Document(new URI(""), doc)
+
+    doTest(docawareDoc.documentElement)
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
@@ -375,7 +399,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    val path = PathBuilder.from(QName("contact") -> 2499, QName("phone") -> 0).build(Scope.Empty)
+    val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
 
     val newPhone = "012-34567890"
 
@@ -435,7 +459,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    val path = PathBuilder.from(QName("contact") -> 2499, QName("phone") -> 0).build(Scope.Empty)
+    val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
     // Arbitrarily adding root path as extra (ignored) update path
     val paths = Set(path, Path.Root)
 
@@ -499,7 +523,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    val path = PathBuilder.from(QName("contact") -> 2499, QName("phone") -> 0).build(Scope.Empty)
+    val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
 
     val newPhone = "012-34567890"
 
