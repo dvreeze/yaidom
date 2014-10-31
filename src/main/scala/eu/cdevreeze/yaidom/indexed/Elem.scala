@@ -122,13 +122,6 @@ final class Elem private[indexed] (
   }
 
   /**
-   * Map from child node indexes to child elem indexes, for speeding up lookups of child elements
-   */
-  private val elemIndexesByNodeIndex: Map[Int, Int] = {
-    (elem.children.zipWithIndex collect { case (e: simple.Elem, idx) => idx }).zipWithIndex.toMap
-  }
-
-  /**
    * Returns all child elements, in the correct order.
    *
    * These child elements share the same rootElem with this element, but differ in the paths, which have one more
@@ -141,16 +134,11 @@ final class Elem private[indexed] (
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
 
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    val nodeIdx = elem.childNodeIndex(entry)
+    val filteredChildElems = childElems.toStream filter { e => e.resolvedName == entry.elementName }
 
-    if (nodeIdx < 0) None
-    else {
-      val elemIdx = elemIndexesByNodeIndex(nodeIdx)
-      val resultElem = childElems(elemIdx)
-
-      assert(resultElem.resolvedName == entry.elementName)
-      Some(resultElem)
-    }
+    val childElemOption = filteredChildElems.drop(entry.index).headOption
+    assert(childElemOption.forall(_.resolvedName == entry.elementName))
+    childElemOption
   }
 
   override def qname: QName = elem.qname
