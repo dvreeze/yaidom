@@ -21,7 +21,6 @@ import java.net.URI
 import java.{ util => jutil }
 
 import scala.Vector
-import scala.xml.XML
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +30,7 @@ import org.scalatest.Ignore
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.Path
@@ -41,9 +41,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
@@ -71,7 +69,9 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @volatile private var xmlBytes: Array[Byte] = _
+  @volatile private var doc: Document = _
+  @volatile private var domDoc: org.w3c.dom.Document = _
+  @volatile private var scalaElem: scala.xml.Elem = _
 
   val enames =
     Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))
@@ -98,36 +98,16 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
     is.close()
 
-    this.xmlBytes = bos.toByteArray
-  }
+    val xmlBytes = bos.toByteArray
 
-  @Test def testProcessLargeXmlUsingSax(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance
+    this.doc = docParser.parse(new jio.ByteArrayInputStream(xmlBytes))
 
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
+    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    this.domDoc = db.newDocument()
+    this.domDoc = convert.DomConversions.convertDocument(this.doc)(this.domDoc)
 
-    doTest(doc.documentElement)
-  }
-
-  @Test def testProcessLargeXmlIntoResolvedElemUsingSax(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    val resolvedRoot = resolved.Elem(doc.documentElement)
-    doTest(resolvedRoot)
-
-    val emailElms = resolvedRoot findTopmostElems { e => e.localName == "email" } take (10)
-
-    assertResult(10) {
-      emailElms.size
-    }
+    this.scalaElem = convert.ScalaXmlConversions.convertElem(this.doc.documentElement)
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
@@ -138,10 +118,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val EmailEName = EName("email")
 
     for (i <- (0 until 200).par) {
-      val parser = DocumentParserUsingSax.newInstance
-
-      val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-      logger.info(s"Parsed Document (${i + 1}) in thread ${Thread.currentThread.getName}")
+      logger.info(s"Queried Document (run ${i + 1}) in thread ${Thread.currentThread.getName}")
 
       (i % 5) match {
         case 0 =>
@@ -168,83 +145,38 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testProcessLargeXmlUsingStax(): Unit = {
-    val parser = DocumentParserUsingStax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingStax] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doTest(doc.documentElement)
-  }
-
-  @Test def testProcessLargeXmlUsingDom(): Unit = {
-    val parser = DocumentParserUsingDom.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingDom] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doTest(doc.documentElement)
+  @Test def testProcessLargeXmlIntoSimpleElem(): Unit = {
+    doQueryTest(doc.documentElement, "simple.Elem")
   }
 
   @Test def testProcessLargeXmlIntoIndexedElem(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlIntoIndexedElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val indexedDoc = indexed.Document(doc)
 
-    doTest(indexedDoc.documentElement)
+    doQueryTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
   @Test def testProcessLargeXmlIntoDocawareElem(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlIntoDocawareElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val docawareDoc = docaware.Document(new URI(""), doc)
 
-    doTest(docawareDoc.documentElement)
+    doQueryTest(docawareDoc.documentElement, "docaware.Elem")
+  }
+
+  @Test def testProcessLargeXmlIntoResolvedElem(): Unit = {
+    val resolvedElem = resolved.Elem(doc.documentElement)
+
+    doQueryTest(resolvedElem, "resolved.Elem")
   }
 
   @Test def testProcessLargeXmlIntoDomElem(): Unit = {
-    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-
-    val startMs = System.currentTimeMillis()
-    val domDoc = DomDocument(db.parse(new jio.ByteArrayInputStream(xmlBytes)))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlIntoDomElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doTest(domDoc.documentElement)
+    doQueryTest(DomDocument(domDoc).documentElement, "dom.DomElem")
   }
 
   @Test def testProcessLargeXmlIntoScalaXmlElem(): Unit = {
-    val startMs = System.currentTimeMillis()
-    val rootElem = ScalaXmlElem(XML.load(new jio.ByteArrayInputStream(xmlBytes)))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlIntoScalaXmlElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doTest(rootElem)
+    doQueryTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
   @Ignore @Test def testProcessLargeTreeRepr(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs1 = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs1 = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeTreeRepr] Parsing (into a Document) took ${endMs1 - startMs1} ms")
-
     val startMs2 = System.currentTimeMillis()
     val treeRepr: String = doc.toString
     val endMs2 = System.currentTimeMillis()
@@ -264,17 +196,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs3 = System.currentTimeMillis()
     logger.info(s"[testProcessLargeTreeRepr] Parsing the tree representation took ${endMs3 - startMs3} ms")
 
-    doTest(doc2.documentElement)
+    doQueryTest(doc2.documentElement, "testProcessLargeTreeRepr: simple.Elem")
   }
 
   @Ignore @Test def testSerializeLargeNodeBuilder(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs1 = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs1 = System.currentTimeMillis()
-    logger.info(s"[testSerializeLargeNodeBuilder] Parsing (into a Document) took ${endMs1 - startMs1} ms")
-
     val startMs2 = System.currentTimeMillis()
 
     val docBuilder = DocBuilder.fromDocument(doc)
@@ -299,17 +224,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs3 = System.currentTimeMillis()
     logger.info(s"[testSerializeLargeNodeBuilder] Deserializing took ${endMs3 - startMs3} ms")
 
-    doTest(doc2.documentElement)
+    doQueryTest(doc2.documentElement, "testSerializeLargeNodeBuilder: simple.Elem")
   }
 
   @Ignore @Test def testSerializeLargeNode(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs1 = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs1 = System.currentTimeMillis()
-    logger.info(s"[testSerializeLargeNode] Parsing (into a Document) took ${endMs1 - startMs1} ms")
-
     val startMs2 = System.currentTimeMillis()
 
     val bos = new jio.ByteArrayOutputStream
@@ -332,17 +250,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val endMs3 = System.currentTimeMillis()
     logger.info(s"[testSerializeLargeNode] Deserializing took ${endMs3 - startMs3} ms")
 
-    doTest(doc2.documentElement)
+    doQueryTest(doc2.documentElement, "testSerializeLargeNode: simple.Elem")
   }
 
   @Test def testFind(): Unit = {
-    val parser = DocumentParserUsingDom.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testFind] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -413,13 +324,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testUpdate(): Unit = {
-    val parser = DocumentParserUsingDom.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testUpdate] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -473,13 +377,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testUpdateUsingPaths(): Unit = {
-    val parser = DocumentParserUsingDom.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testUpdateUsingPaths] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -537,13 +434,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testTransform(): Unit = {
-    val parser = DocumentParserUsingDom.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testTransform] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -594,63 +484,36 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNavigation(): Unit = {
-    val parser = DocumentParserUsingDom.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testNavigation] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doNavigationTest(doc.documentElement)
+    doNavigationTest(doc.documentElement, "simple.Elem")
   }
 
   @Test def testNavigationForIndexedElem(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testNavigationForIndexedElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val indexedDoc = indexed.Document(doc)
 
-    doNavigationTest(indexedDoc.documentElement)
+    doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
   @Test def testNavigationForDocawareElem(): Unit = {
-    val parser = DocumentParserUsingSax.newInstance
-
-    val startMs = System.currentTimeMillis()
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testNavigationForDocawareElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
     val docawareDoc = docaware.Document(new URI(""), doc)
 
-    doNavigationTest(docawareDoc.documentElement)
+    doNavigationTest(docawareDoc.documentElement, "docaware.Elem")
+  }
+
+  @Test def testNavigationForResolvedElem(): Unit = {
+    val resolvedElem = resolved.Elem(doc.documentElement)
+
+    doNavigationTest(resolvedElem, "resolved.Elem")
   }
 
   @Test def testNavigationForDomElem(): Unit = {
-    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-
-    val startMs = System.currentTimeMillis()
-    val domDoc = DomDocument(db.parse(new jio.ByteArrayInputStream(xmlBytes)))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testNavigationForDomElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doNavigationTest(domDoc.documentElement)
+    doNavigationTest(DomDocument(domDoc).documentElement, "dom.DomElem")
   }
 
   @Test def testNavigationForScalaXmlElem(): Unit = {
-    val startMs = System.currentTimeMillis()
-    val rootElem = ScalaXmlElem(XML.load(new jio.ByteArrayInputStream(xmlBytes)))
-    val endMs = System.currentTimeMillis()
-    logger.info(s"[testNavigationForScalaXmlElem] Parsing (into a Document) took ${endMs - startMs} ms")
-
-    doNavigationTest(rootElem)
+    doNavigationTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
-  private def doTest[E <: ElemLike[E] with HasEName with HasText](elm: E): Unit = {
+  private def doQueryTest[E <: ElemLike[E] with HasEName with HasText](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -665,10 +528,10 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     assert(elms1.size >= 1, s"Expected at least one phone element with text value '${s}'")
 
     val endMs = System.currentTimeMillis()
-    logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms")
+    logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms ($msg)")
   }
 
-  private def doNavigationTest[E <: ElemLike[E] with HasEName with HasText with IsNavigable[E]](elm: E): Unit = {
+  private def doNavigationTest[E <: ElemLike[E] with HasEName with HasText with IsNavigable[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
@@ -684,6 +547,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
 
     val endMs = System.currentTimeMillis()
-    logger.info(s"The navigation test (invoking findElemOrSelfByPath twice) took ${endMs - startMs} ms")
+    logger.info(s"The navigation test (invoking findElemOrSelfByPath twice) took ${endMs - startMs} ms ($msg)")
   }
 }
