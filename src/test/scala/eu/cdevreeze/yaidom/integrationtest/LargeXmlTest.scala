@@ -48,6 +48,7 @@ import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.DocBuilder
@@ -592,6 +593,63 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
+  @Test def testNavigation(): Unit = {
+    val parser = DocumentParserUsingDom.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testNavigation] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    doNavigationTest(doc.documentElement)
+  }
+
+  @Test def testNavigationForIndexedElem(): Unit = {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testNavigationForIndexedElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    val indexedDoc = indexed.Document(doc)
+
+    doNavigationTest(indexedDoc.documentElement)
+  }
+
+  @Test def testNavigationForDocawareElem(): Unit = {
+    val parser = DocumentParserUsingSax.newInstance
+
+    val startMs = System.currentTimeMillis()
+    val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testNavigationForDocawareElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    val docawareDoc = docaware.Document(new URI(""), doc)
+
+    doNavigationTest(docawareDoc.documentElement)
+  }
+
+  @Test def testNavigationForDomElem(): Unit = {
+    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+
+    val startMs = System.currentTimeMillis()
+    val domDoc = DomDocument(db.parse(new jio.ByteArrayInputStream(xmlBytes)))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testNavigationForDomElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    doNavigationTest(domDoc.documentElement)
+  }
+
+  @Test def testNavigationForScalaXmlElem(): Unit = {
+    val startMs = System.currentTimeMillis()
+    val rootElem = ScalaXmlElem(XML.load(new jio.ByteArrayInputStream(xmlBytes)))
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testNavigationForScalaXmlElem] Parsing (into a Document) took ${endMs - startMs} ms")
+
+    doNavigationTest(rootElem)
+  }
+
   private def doTest[E <: ElemLike[E] with HasEName with HasText](elm: E): Unit = {
     val startMs = System.currentTimeMillis()
 
@@ -608,5 +666,24 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val endMs = System.currentTimeMillis()
     logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms")
+  }
+
+  private def doNavigationTest[E <: ElemLike[E] with HasEName with HasText with IsNavigable[E]](elm: E): Unit = {
+    val startMs = System.currentTimeMillis()
+
+    val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
+
+    assertResult(true) {
+      elm.findElemOrSelfByPath(path).isDefined
+    }
+
+    val otherPath = PathBuilder.from(QName("contact") -> 1000000, QName("phone") -> 0).build(Scope.Empty)
+
+    assertResult(true) {
+      elm.findElemOrSelfByPath(otherPath).isEmpty
+    }
+
+    val endMs = System.currentTimeMillis()
+    logger.info(s"The navigation test (invoking findElemOrSelfByPath twice) took ${endMs - startMs} ms")
   }
 }
