@@ -26,6 +26,34 @@ import eu.cdevreeze.yaidom.core.QName
  * supported by element implementations, because most element implementations know about scopes, QNames, ENames and
  * text content, as well as offering the `ElemApi` query API.
  *
+ * ==ScopedElemApi more formally==
+ *
+ * Scopes resolve QNames as ENames, so some properties are expected to hold for the element "name":
+ * {{{
+ * this.scope.resolveQNameOption(this.qname) == Some(this.resolvedName)
+ *
+ * // Therefore:
+ * this.resolvedName.localPart == this.qname.localPart
+ *
+ * this.resolvedName.namespaceUriOption ==
+ *   this.scope.prefixNamespaceMap.get(this.qname.prefixOption.getOrElse(""))
+ * }}}
+ *
+ * For the attribute "name" properties, first define:
+ * {{{
+ * val attributeScope = this.scope.withoutDefaultNamespace
+ *
+ * val resolvedAttrs = this.attributes map {
+ *   case (attrQName, attrValue) =>
+ *     val resolvedAttrName = attributeScope.resolveQNameOption(attrQName).get
+ *     (resolvedAttrName -> attrValue)
+ * }
+ * }}}
+ * Then the following must hold:
+ * {{{
+ * resolvedAttrs.toMap == this.resolvedAttributes.toMap
+ * }}}
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze

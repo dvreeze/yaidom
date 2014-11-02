@@ -111,7 +111,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testParseLargeXmlRepeatedly(): Unit = {
+  @Ignore @Test def testQueryLargeXmlRepeatedly(): Unit = {
     val FirstNameEName = EName("firstName")
     val LastNameEName = EName("lastName")
     val ContactEName = EName("contact")
@@ -145,33 +145,33 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testProcessLargeXmlIntoSimpleElem(): Unit = {
+  @Test def testQuerySimpleElem(): Unit = {
     doQueryTest(doc.documentElement, "simple.Elem")
   }
 
-  @Test def testProcessLargeXmlIntoIndexedElem(): Unit = {
+  @Test def testQueryIndexedElem(): Unit = {
     val indexedDoc = indexed.Document(doc)
 
     doQueryTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
-  @Test def testProcessLargeXmlIntoDocawareElem(): Unit = {
+  @Test def testQueryDocawareElem(): Unit = {
     val docawareDoc = docaware.Document(new URI(""), doc)
 
     doQueryTest(docawareDoc.documentElement, "docaware.Elem")
   }
 
-  @Test def testProcessLargeXmlIntoResolvedElem(): Unit = {
+  @Test def testQueryResolvedElem(): Unit = {
     val resolvedElem = resolved.Elem(doc.documentElement)
 
     doQueryTest(resolvedElem, "resolved.Elem")
   }
 
-  @Test def testProcessLargeXmlIntoDomElem(): Unit = {
+  @Test def testQueryDomElem(): Unit = {
     doQueryTest(DomDocument(domDoc).documentElement, "dom.DomElem")
   }
 
-  @Test def testProcessLargeXmlIntoScalaXmlElem(): Unit = {
+  @Test def testQueryScalaXmlElem(): Unit = {
     doQueryTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 

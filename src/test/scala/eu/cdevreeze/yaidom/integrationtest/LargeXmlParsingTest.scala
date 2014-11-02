@@ -81,24 +81,24 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     this.xmlBytes = bos.toByteArray
   }
 
-  @Test def testProcessLargeXmlUsingSax(): Unit = {
+  @Test def testParseLargeXmlUsingSax(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
+    logger.info(s"[testParseLargeXmlUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doQueryTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlIntoResolvedElemUsingSax(): Unit = {
+  @Test def testParseLargeXmlIntoResolvedElemUsingSax(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
+    logger.info(s"[testParseLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
 
     val resolvedRoot = resolved.Elem(doc.documentElement)
     doQueryTest(resolvedRoot)
@@ -114,35 +114,35 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testProcessLargeXmlUsingStax(): Unit = {
+  @Test def testParseLargeXmlUsingStax(): Unit = {
     val parser = DocumentParserUsingStax.newInstance
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingStax] Parsing (into a Document) took ${endMs - startMs} ms")
+    logger.info(s"[testParseLargeXmlUsingStax] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doQueryTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlUsingDom(): Unit = {
+  @Test def testParseLargeXmlUsingDom(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingDom] Parsing (into a Document) took ${endMs - startMs} ms")
+    logger.info(s"[testParseLargeXmlUsingDom] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doQueryTest(doc.documentElement)
   }
 
-  @Test def testProcessLargeXmlUsingDomLS(): Unit = {
+  @Test def testParseLargeXmlUsingDomLS(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
     val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeXmlUsingDomLS] Parsing (into a Document) took ${endMs - startMs} ms")
+    logger.info(s"[testParseLargeXmlUsingDomLS] Parsing (into a Document) took ${endMs - startMs} ms")
 
     doQueryTest(doc.documentElement)
   }
