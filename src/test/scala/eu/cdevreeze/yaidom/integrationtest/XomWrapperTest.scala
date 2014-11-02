@@ -29,13 +29,13 @@ import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.HasText
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -692,7 +692,7 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomParentNode with ElemLike[XomElem] with HasEName with HasParent[XomElem] with HasText { self =>
+    override val wrappedNode: nu.xom.Element) extends XomParentNode with ScopedElemLike[XomElem] with HasParent[XomElem] { self =>
 
     require(wrappedNode ne null)
 
@@ -720,9 +720,9 @@ object XomWrapperTest {
       result.toIndexedSeq
     }
 
-    def qname: QName = QName(wrappedNode.getQualifiedName)
+    override def qname: QName = QName(wrappedNode.getQualifiedName)
 
-    def attributes: immutable.IndexedSeq[(QName, String)] = {
+    override def attributes: immutable.IndexedSeq[(QName, String)] = {
       val attrs: immutable.IndexedSeq[nu.xom.Attribute] =
         (0 until wrappedNode.getAttributeCount).toIndexedSeq map { (idx: Int) => wrappedNode.getAttribute(idx) }
 
@@ -749,6 +749,23 @@ object XomWrapperTest {
       val parentNodeOption = Option(wrappedNode.getParent)
       val parentElemOption = parentNodeOption collect { case e: nu.xom.Element => e }
       parentElemOption map { e => XomNode.wrapElement(e) }
+    }
+
+    override def scope: Scope = {
+      val ancestryOrSelf = XomNode.getAncestorsOrSelf(this.wrappedNode)
+
+      val resultScope =
+        ancestryOrSelf.foldRight(Scope.Empty) {
+          case (wrappedElem, accScope) =>
+            val declsMap =
+              (0 until wrappedElem.getNamespaceDeclarationCount) map { i =>
+                val pref = wrappedElem.getNamespacePrefix(i)
+                pref -> wrappedElem.getNamespaceURI(pref)
+              }
+            val decls = Declarations.from(declsMap.toMap)
+            accScope.resolve(decls)
+        }
+      resultScope
     }
   }
 
@@ -793,5 +810,18 @@ object XomWrapperTest {
     def wrapDocument(doc: nu.xom.Document): XomDocument = new XomDocument(doc)
 
     def wrapElement(elm: nu.xom.Element): XomElem = new XomElem(elm)
+
+    def getAncestorsOrSelf(elem: nu.xom.Element): List[nu.xom.Element] = {
+      val parentElement: nu.xom.Element = elem.getParent match {
+        case e: nu.xom.Element => e
+        case _ => null
+      }
+
+      if (parentElement eq null) List(elem)
+      else {
+        // Recursive call
+        elem :: getAncestorsOrSelf(parentElement)
+      }
+    }
   }
 }

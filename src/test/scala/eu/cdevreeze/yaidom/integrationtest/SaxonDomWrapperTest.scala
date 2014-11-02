@@ -17,27 +17,28 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil }
+
 import scala.Vector
 import scala.collection.immutable
 import scala.collection.mutable
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
-import org.scalatest.junit.JUnitRunner
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
+import org.scalatest.junit.JUnitRunner
+
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.QNameProvider.globalQNameProvider.getQName
+import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.`type`.Type
 import net.sf.saxon.lib.ParseOptions
@@ -45,10 +46,6 @@ import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.DocumentInfo
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.s9api.Processor
-import eu.cdevreeze.yaidom.integrationtest.SaxonDomWrapperTest.DomDocument
-import eu.cdevreeze.yaidom.integrationtest.SaxonDomWrapperTest.DomElem
-import eu.cdevreeze.yaidom.integrationtest.SaxonDomWrapperTest.DomNode
-import eu.cdevreeze.yaidom.core.QNameProvider
 
 /**
  * Saxon DOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around Saxon DOMNodeWrapper Elements.
@@ -61,6 +58,8 @@ import eu.cdevreeze.yaidom.core.QNameProvider
  */
 @RunWith(classOf[JUnitRunner])
 class SaxonDomWrapperTest extends Suite {
+
+  import SaxonDomWrapperTest._
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -627,7 +626,7 @@ object SaxonDomWrapperTest {
   }
 
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ElemLike[DomElem] with HasEName with HasParent[DomElem] with HasText { self =>
+    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
@@ -647,9 +646,9 @@ object SaxonDomWrapperTest {
       buf.toVector map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
     }
 
-    def qname: QName = nodeInfo2QName(wrappedNode)
+    override def qname: QName = nodeInfo2QName(wrappedNode)
 
-    def attributes: immutable.IndexedSeq[(QName, String)] = {
+    override def attributes: immutable.IndexedSeq[(QName, String)] = {
       val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
       val buf = mutable.ArrayBuffer[NodeInfo]()
 
@@ -681,7 +680,7 @@ object SaxonDomWrapperTest {
       parentElemOption map { e => DomNode.wrapElement(e) }
     }
 
-    def scope: Scope = {
+    override def scope: Scope = {
       val it = wrappedNode.iterateAxis(AxisInfo.NAMESPACE)
       val buf = mutable.ArrayBuffer[NodeInfo]()
 

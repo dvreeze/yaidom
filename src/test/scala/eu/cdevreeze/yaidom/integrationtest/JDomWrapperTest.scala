@@ -35,10 +35,8 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -741,7 +739,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ElemLike[JDomElem] with HasEName with HasParent[JDomElem] with HasText { self =>
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ScopedElemLike[JDomElem] with HasParent[JDomElem] { self =>
 
     require(wrappedNode ne null)
 
@@ -773,9 +771,9 @@ object JDomWrapperTest {
       result.toIndexedSeq
     }
 
-    def qname: QName = QName(wrappedNode.getQualifiedName)
+    override def qname: QName = QName(wrappedNode.getQualifiedName)
 
-    def attributes: immutable.IndexedSeq[(QName, String)] = {
+    override def attributes: immutable.IndexedSeq[(QName, String)] = {
       val jdomAttrs: immutable.IndexedSeq[org.jdom2.Attribute] = wrappedNode.getAttributes.asScala.toIndexedSeq
 
       val result = jdomAttrs map { attr =>
@@ -784,7 +782,7 @@ object JDomWrapperTest {
       result.toIndexedSeq
     }
 
-    def scope: Scope = {
+    override def scope: Scope = {
       val m: Map[String, String] = {
         val result = wrappedNode.getNamespacesInScope.asScala.toIndexedSeq map { (ns: org.jdom2.Namespace) => (ns.getPrefix -> ns.getURI) }
         result.toMap
