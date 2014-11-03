@@ -26,6 +26,15 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * This trait is purely <em>abstract</em>. The most common implementation of this trait is [[eu.cdevreeze.yaidom.queryapi.IsNavigable]].
  *
+ * ==IsNavigableApi more formally==
+ *
+ * Some properties are expected to hold for "navigable elements":
+ * {{{
+ * getElemOrSelfByPath(Path.Root) == self
+ *
+ * findElemOrSelfByPath(path1).flatMap(e => e.findElemOrSelfByPath(path2)) == findElemOrSelfByPath(path1.append(path2))
+ * }}}
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze

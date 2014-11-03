@@ -25,8 +25,10 @@ package eu.cdevreeze.yaidom.queryapi
 trait HasTextApi {
 
   /**
-   * Returns the concatenation of the texts of (the implicit) text children, including whitespace and CData.
+   * Returns the concatenation of the text values of (the implicit) text children, including whitespace and CData.
    * Non-text children are ignored. If there are no text children, the empty string is returned.
+   *
+   * Therefore, element children are ignored and do not contribute to the resulting text string.
    */
   def text: String
 

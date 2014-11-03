@@ -24,6 +24,10 @@ import scala.collection.mutable
  * Unique identification of a descendant (or self) `Elem` given a root `Elem`. It represents a unique path to an element, given
  * a root element, independent of other types of nodes, as if the XML tree only consists of elements.
  *
+ * In other words, a `Path` is a '''sequence of instructions, each of them stating how to get to a specific child element'''.
+ * Each such instruction is a `Path.Entry`. So Paths do not contain the root element, and we can talk about Paths
+ * in isolation, without referring to any specific DOM-like tree.
+ *
  * For example, consider the following XML:
  * {{{
  * <book:Bookstore xmlns:book="http://bookstore/book" xmlns:auth="http://bookstore/author">
