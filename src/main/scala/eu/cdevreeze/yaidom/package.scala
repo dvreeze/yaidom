@@ -26,7 +26,7 @@ package eu.cdevreeze
  * </ul>
  *
  * Yaidom takes a different approach, avoiding XPath-like query support, and offering good namespace and decent (functional) update
- * support. Yaidom is also characterized by <em>mathematical precision</em> and clarity. Still, the API remains practical and
+ * support. Yaidom is also characterized by <em>almost mathematical precision</em> and clarity. Still, the API remains practical and
  * pragmatic. In particular, the API user has much configuration control over parsing and serialization, because yaidom exposes
  * the underlying JAXP parsers and serializers, which can be configured by the library user.
  *
@@ -35,6 +35,20 @@ package eu.cdevreeze
  * As another example, yaidom tries to leave the handling of the gory details of XML processing (such as whitespace handling)
  * as much as possible to JAXP (and JAXP parser/serializer configuration). As yet another example, yaidom knows nothing about
  * (XML Schema) types of elements and attributes.
+ *
+ * As mentioned above, yaidom tries to treat basic XML processing with '''almost mathematical precision''', even if this is "incorrect".
+ * At the same time, yaidom tries to be useful in practice. For example, yaidom compromises "correctness" in the following ways:
+ * <ul>
+ * <li>Yaidom does not generally consider documents to be nodes (or "document information items" in InfoSet speak),
+ * thus introducing fewer constraints on DOM-like node construction</li>
+ * <li>Yaidom does not consider attributes to be (non-child) nodes (or "attribute information items" in InfoSet speak),
+ * thus introducing fewer constraints on DOM-like node construction</li>
+ * <li>Yaidom does not consider namespace declarations to be attributes, thus facilitating a clear theory of namespaces</li>
+ * <li>Yaidom tries to keep the order of the attributes (for better round-tripping), although attribute order is irrelevant
+ * according to the InfoSet</li>
+ * <li>Very importantly, yaidom clearly distinguishes between qualified names (QNames) and expanded names (Enames),
+ * which is essential in facilitating a clear theory of namespaces</li>
+ * </ul>
  *
  * Yaidom, and in particular the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and [[eu.cdevreeze.yaidom.simple]] sub-packages,
  * contains the following layers:
