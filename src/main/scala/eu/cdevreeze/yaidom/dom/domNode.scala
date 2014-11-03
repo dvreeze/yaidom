@@ -95,6 +95,17 @@ final class DomDocument(
  * Wrapper around `org.w3c.dom.Element`, conforming to the [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
+ *
+ * By design the only state of the DomElem is the wrapped element. Otherwise it would be easy to cause any inconsistency
+ * between this wrapper element and the wrapped element. The down-side is that computing the resolved name or resolved
+ * attributes is expensive, because on each call first the in-scope namespaces are computed (by following namespace
+ * declarations in the ancestry and in the element itself). This is done for reliable namespace support, independent
+ * of namespace-awareness of the underlying element's document.
+ *
+ * This choice for reliable namespace support (see the documented properties of `ScopedElemApi`) and defensive handling
+ * of mutable state makes this DomElem slower (when querying for resolved names or attributes) than other wrapper
+ * element implementations, such as `ScalaXmlElem`. On the other hand, if the use of `org.w3c.dom` is a given, then
+ * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
   override val wrappedNode: w3c.dom.Element) extends DomParentNode with ScopedElemLike[DomElem] with IsNavigable[DomElem] with HasParent[DomElem] { self =>
