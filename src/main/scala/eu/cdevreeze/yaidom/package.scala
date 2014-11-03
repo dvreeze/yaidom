@@ -367,7 +367,7 @@ package eu.cdevreeze
  * <ul>
  * <li>Instead of a `Scope`, an `ElemBuilder` contains a `Declarations`</li>
  * <li>This makes an `ElemBuilder` easier to compose than an `Elem`, because no Scope needs to be passed around throughout the tree</li>
- * <li>Class `ElemBuilder` uses a minimal query API, mixing in only traits `ElemLike` and `TransformableElemLike`</li>
+ * <li>Class `ElemBuilder` uses a minimal query API, mixing in almost only traits `ElemLike` and `TransformableElemLike`</li>
  * <li>After all, an `ElemBuilder` neither keeps nor knows about Scopes, so does not know about resolved element/attribute names</li>
  * </ul>
  *
