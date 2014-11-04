@@ -39,14 +39,14 @@ package eu.cdevreeze
  * As mentioned above, yaidom tries to treat basic XML processing with '''almost mathematical precision''', even if this is "incorrect".
  * At the same time, yaidom tries to be useful in practice. For example, yaidom compromises "correctness" in the following ways:
  * <ul>
- * <li>Yaidom does not generally consider documents to be nodes (or "document information items" in InfoSet speak),
+ * <li>Yaidom does not generally consider documents to be nodes (called "document information items" in the XML Infoset),
  * thus introducing fewer constraints on DOM-like node construction</li>
- * <li>Yaidom does not consider attributes to be (non-child) nodes (or "attribute information items" in InfoSet speak),
+ * <li>Yaidom does not consider attributes to be (non-child) nodes (called "attribute information items" in the XML Infoset),
  * thus introducing fewer constraints on DOM-like node construction</li>
  * <li>Yaidom does not consider namespace declarations to be attributes, thus facilitating a clear theory of namespaces</li>
  * <li>Yaidom tries to keep the order of the attributes (for better round-tripping), although attribute order is irrelevant
- * according to the InfoSet</li>
- * <li>Very importantly, yaidom clearly distinguishes between qualified names (QNames) and expanded names (Enames),
+ * according to the XML Infoset</li>
+ * <li>Very importantly, yaidom clearly distinguishes between qualified names (QNames) and expanded names (ENames),
  * which is essential in facilitating a clear theory of namespaces</li>
  * </ul>
  *
