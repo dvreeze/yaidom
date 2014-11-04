@@ -34,7 +34,7 @@ package eu.cdevreeze.yaidom
  * side-effects are used.
  *
  * To explain the "round-tripping" item above, note that class [[eu.cdevreeze.yaidom.simple.Elem]] considers attributes in an element unordered,
- * let alone namespace declarations. That is consistent with the XML InfoSet specification, but can sometimes be impractical.
+ * let alone namespace declarations. That is consistent with the XML Infoset specification, but can sometimes be impractical.
  * Using `org.w3c.dom.Element` instances, parsed from XML input sources, chances are that this order is retained.
  *
  * There are of course limitations to what formatting data is retained in a DOM tree. A good example is the short versus long form

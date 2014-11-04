@@ -353,7 +353,7 @@ package eu.cdevreeze
  * <li>Besides the tag name, attributes and child nodes, it keeps a `Scope`, but no `Declarations`</li>
  * <li>This makes it easy to compose these elements, as long as scopes are passed explicitly throughout the element tree</li>
  * <li>Equality is reference equality, because it is hard to come up with a sensible equality for this element class</li>
- * <li>Roundtripping cannot be entirely lossless, but this class does try to retain the attribute order (although irrelevant according to XML InfoSet)</li>
+ * <li>Roundtripping cannot be entirely lossless, but this class does try to retain the attribute order (although irrelevant according to XML Infoset)</li>
  * <li>Packages `parse` and `print` offer `DocumentParser` and `DocumentPrinter` classes for parsing/serializing these default `Elem` (and `Document`) instances</li>
  * </ul>
  *

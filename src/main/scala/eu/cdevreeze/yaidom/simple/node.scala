@@ -159,7 +159,7 @@ sealed trait Node extends Immutable with Serializable {
  *
  * <em>Round-tripping</em> (parsing and serializing) is not entirely loss-less, but (in spite of the good composability and rather small
  * state) not much is lost. Comments, processing instructions and entity references are retained. Attribute order is retained,
- * although according to the XML InfoSet this order is irrelevant. Namespace declaration order is not necessarily retained,
+ * although according to the XML Infoset this order is irrelevant. Namespace declaration order is not necessarily retained,
  * however. Superfluous namespace declarations are also lost. (That is because namespace declarations are not explicitly
  * stored in Elems, but are implicit, viz. `parentElem.scope.relativize(this.scope)`). The short versus long form of an empty
  * element is also not remembered.
