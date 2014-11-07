@@ -33,6 +33,7 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
+import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print
@@ -235,7 +236,7 @@ class FriendFeedTest extends Suite {
           getEntryServiceId(entryElm) == serviceId
         }
 
-        elem(
+        emptyElem(
           qname = QName("Service"),
           attributes = Vector(QName("cnt") -> serviceCount.toString, QName("id") -> serviceId)).build(StatsScope)
       }
@@ -314,7 +315,7 @@ class FriendFeedTest extends Suite {
     val entryElms = filterFeedEntriesOnServiceName(feedElm, serviceName)
 
     val serviceElm: ElemBuilder =
-      elem(
+      emptyElem(
         qname = QName("Service"),
         attributes = Vector(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName))
 

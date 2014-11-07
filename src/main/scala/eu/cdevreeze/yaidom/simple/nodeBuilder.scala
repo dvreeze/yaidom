@@ -286,9 +286,32 @@ object NodeBuilder {
 
   def elem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
-    namespaces: Declarations = Declarations.Empty,
-    children: immutable.IndexedSeq[NodeBuilder] = Vector()): ElemBuilder = {
+    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+
+    elem(qname, Vector(), children)
+  }
+
+  def elem(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)],
+    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+
+    elem(qname, attributes, Declarations.Empty, children)
+  }
+
+  def elem(
+    qname: QName,
+    namespaces: Declarations,
+    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+
+    elem(qname, Vector(), namespaces, children)
+  }
+
+  def elem(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)],
+    namespaces: Declarations,
+    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, children)
   }
@@ -318,11 +341,45 @@ object NodeBuilder {
 
   def textElem(
     qname: QName,
+    namespaces: Declarations,
+    txt: String): ElemBuilder = {
+
+    textElem(qname, Vector(), namespaces, txt)
+  }
+
+  def textElem(
+    qname: QName,
     attributes: immutable.IndexedSeq[(QName, String)],
     namespaces: Declarations,
     txt: String): ElemBuilder = {
 
     new ElemBuilder(qname, attributes, namespaces, Vector(text(txt)))
+  }
+
+  def emptyElem(qname: QName): ElemBuilder = {
+    emptyElem(qname, Vector())
+  }
+
+  def emptyElem(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)]): ElemBuilder = {
+
+    emptyElem(qname, attributes, Declarations.Empty)
+  }
+
+  def emptyElem(
+    qname: QName,
+    namespaces: Declarations): ElemBuilder = {
+
+    emptyElem(qname, Vector(), namespaces)
+  }
+
+  def emptyElem(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)],
+    namespaces: Declarations): ElemBuilder = {
+
+    new ElemBuilder(qname, attributes, namespaces, Vector())
   }
 
   /**

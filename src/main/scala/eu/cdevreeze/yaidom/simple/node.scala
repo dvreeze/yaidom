@@ -337,8 +337,10 @@ final class Elem(
    *
    * This method could be defined by recursion as follows:
    * {{{
-   * val newScope = parentScope.withoutDefaultNamespace ++ this.scope
-   * this.copy(scope = newScope) transformChildElems { e => e.notUndeclaringPrefixes(newScope) }
+   * def notUndeclaringPrefixes(parentScope: Scope): Elem = {
+   *   val newScope = parentScope.withoutDefaultNamespace ++ this.scope
+   *   this.copy(scope = newScope) transformChildElems { e => e.notUndeclaringPrefixes(newScope) }
+   * }
    * }}}
    *
    * It can be proven by structural induction that for each `parentScope` the XML remains the "same":
@@ -347,7 +349,7 @@ final class Elem(
    * }}}
    * Moreover, there are no prefixed namespace undeclarations:
    * {{{
-   * NodeBuilder.fromElem(this)(parentScope).findAllElemsOrSelf.
+   * NodeBuilder.fromElem(this.notUndeclaringPrefixes(parentScope))(Scope.Empty).findAllElemsOrSelf.
    *   map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet ==
    *     Set(Declarations.Empty)
    * }}}
@@ -667,9 +669,17 @@ object Node {
 
   def elem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope,
-    children: immutable.IndexedSeq[Node] = Vector()): Elem = {
+    children: immutable.IndexedSeq[Node]): Elem = {
+
+    elem(qname, Vector(), scope, children)
+  }
+
+  def elem(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)],
+    scope: Scope,
+    children: immutable.IndexedSeq[Node]): Elem = {
 
     new Elem(qname, attributes, scope, children)
   }
@@ -696,5 +706,17 @@ object Node {
     txt: String): Elem = {
 
     new Elem(qname, attributes, scope, Vector(text(txt)))
+  }
+
+  def emptyElem(qname: QName, scope: Scope): Elem = {
+    emptyElem(qname, Vector(), scope)
+  }
+
+  def emptyElem(
+    qname: QName,
+    attributes: immutable.IndexedSeq[(QName, String)],
+    scope: Scope): Elem = {
+
+    new Elem(qname, attributes, scope, Vector())
   }
 }

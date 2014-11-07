@@ -345,7 +345,7 @@ class CreationTest extends Suite {
         namespaces = Declarations.from("books" -> "http://bookstore"),
         children = Vector(
           textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
-          elem(
+          emptyElem(
             qname = QName("books:Authors"))))
 
     assertResult(true) {

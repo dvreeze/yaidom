@@ -229,7 +229,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
       } yield {
         import NodeBuilder._
 
-        elem(
+        emptyElem(
           qname = QName("item"),
           attributes = Vector(
             QName("num") -> itemElem.attribute(EName("num")),

@@ -113,22 +113,22 @@ class BasicXmlProcessingTest extends Suite {
       elem(
         qname = QName("a"),
         children = Vector(
-          elem(
+          emptyElem(
             qname = QName("z"),
             attributes = Vector(QName("x") -> "1")),
           elem(
             qname = QName("b"),
             children = Vector(
-              elem(
+              emptyElem(
                 qname = QName("z"),
                 attributes = Vector(QName("x") -> "2")),
               elem(
                 qname = QName("c"),
                 children = Vector(
-                  elem(
+                  emptyElem(
                     qname = QName("z"),
                     attributes = Vector(QName("x") -> "3")))),
-              elem(
+              emptyElem(
                 qname = QName("z"),
                 attributes = Vector(QName("x") -> "4")))))).build()
 
@@ -222,7 +222,7 @@ class BasicXmlProcessingTest extends Suite {
                 attributes = Vector(QName("title") -> album.title),
                 children = {
                   val songChildren: immutable.IndexedSeq[NodeBuilder] = album.songs map { song =>
-                    elem(
+                    emptyElem(
                       qname = QName("song"),
                       attributes = Vector(QName("title") -> song.title, QName("length") -> song.length))
                   }

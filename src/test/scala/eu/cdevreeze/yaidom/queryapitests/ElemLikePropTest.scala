@@ -164,7 +164,7 @@ class ElemLikePropTest extends Suite with Checkers {
 
     val docs = uris.map(uri => docParser.parse(uri))
     val bigDoc = Document(Node.elem(qname = QName("all"), scope = Scope.Empty, children = docs.map(_.documentElement)))
-    val smallDoc = Document(Node.elem(qname = QName("a"), scope = Scope.Empty))
+    val smallDoc = Document(Node.emptyElem(qname = QName("a"), scope = Scope.Empty))
     docs :+ bigDoc :+ smallDoc
   }
 
