@@ -80,5 +80,12 @@ object SubtypeAwareElemLikeQueryTest {
     def ancestryOrSelfENames: immutable.IndexedSeq[EName] = nativeElem.ancestryOrSelfENames
 
     def toElem: eu.cdevreeze.yaidom.simple.Elem = nativeElem.elem
+
+    override def equals(other: Any): Boolean = other match {
+      case e: IndexedWrappedElem => nativeElem == e.nativeElem
+      case _ => false
+    }
+
+    override def hashCode: Int = nativeElem.hashCode
   }
 }

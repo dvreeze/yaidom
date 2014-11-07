@@ -78,6 +78,21 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
     }
   }
 
+  @Test def testEqualities(): Unit = {
+    val documentContent = new DocumentContent(wrappedDocumentContent)
+
+    assertResult(documentContent.findAllElemsOfType(classTag[TableCell])) {
+      documentContent.findAllElemsOfType(classTag[Table]).flatMap(_.rows).flatMap(_.cells)
+    }
+
+    assertResult(documentContent.findAllElemsOfType(classTag[Table]).flatMap(_.rows).flatMap(_.cells).flatMap(_.findAllElemsOfType(classTag[Paragraph]))) {
+      documentContent.filterElemsOrSelfOfType(classTag[Paragraph]) { e =>
+        val ancestryOrSelfENames = e.ancestryOrSelfENames
+        Set("table", "table-row", "table-cell", "p").subsetOf(ancestryOrSelfENames.map(_.localPart).toSet)
+      }
+    }
+  }
+
   protected val wrappedDocumentContent: E
 }
 
@@ -149,6 +164,13 @@ object AbstractSubtypeAwareElemLikeQueryTest {
       wrappedElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
 
     final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = wrappedElem.ancestryOrSelfENames
+
+    override def equals(other: Any): Boolean = other match {
+      case e: SpreadsheetElem => wrappedElem == e.wrappedElem
+      case _ => false
+    }
+
+    override def hashCode: Int = wrappedElem.hashCode
   }
 
   final class DocumentContent(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) {

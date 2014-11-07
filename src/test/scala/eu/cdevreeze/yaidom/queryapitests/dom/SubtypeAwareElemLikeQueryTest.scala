@@ -87,5 +87,12 @@ object SubtypeAwareElemLikeQueryTest {
     def toElem: eu.cdevreeze.yaidom.simple.Elem = {
       DomConversions.convertToElem(nativeElem.wrappedNode, Scope.Empty)
     }
+
+    override def equals(other: Any): Boolean = other match {
+      case e: DomWrappedElem => nativeElem.wrappedNode == e.nativeElem.wrappedNode
+      case _ => false
+    }
+
+    override def hashCode: Int = nativeElem.wrappedNode.hashCode
   }
 }
