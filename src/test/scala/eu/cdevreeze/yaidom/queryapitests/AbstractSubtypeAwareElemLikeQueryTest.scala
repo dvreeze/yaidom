@@ -130,25 +130,25 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    */
   sealed class SpreadsheetElem(val wrappedElem: WrappedElem) extends ScopedElemLike[SpreadsheetElem] with IsNavigable[SpreadsheetElem] with SubtypeAwareElemLike[SpreadsheetElem] {
 
-    def findAllChildElems: immutable.IndexedSeq[SpreadsheetElem] =
+    final def findAllChildElems: immutable.IndexedSeq[SpreadsheetElem] =
       wrappedElem.findAllChildElems.map(e => SpreadsheetElem(e))
 
-    def resolvedName: EName = wrappedElem.resolvedName
+    final def resolvedName: EName = wrappedElem.resolvedName
 
-    def resolvedAttributes: immutable.Iterable[(EName, String)] = wrappedElem.resolvedAttributes
+    final def resolvedAttributes: immutable.Iterable[(EName, String)] = wrappedElem.resolvedAttributes
 
-    def qname: QName = wrappedElem.qname
+    final def qname: QName = wrappedElem.qname
 
-    def attributes: immutable.Iterable[(QName, String)] = wrappedElem.attributes
+    final def attributes: immutable.Iterable[(QName, String)] = wrappedElem.attributes
 
-    def scope: Scope = wrappedElem.scope
+    final def scope: Scope = wrappedElem.scope
 
-    def text: String = wrappedElem.text
+    final def text: String = wrappedElem.text
 
-    def findChildElemByPathEntry(entry: Path.Entry): Option[SpreadsheetElem] =
+    final def findChildElemByPathEntry(entry: Path.Entry): Option[SpreadsheetElem] =
       wrappedElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
 
-    def ancestryOrSelfENames: immutable.IndexedSeq[EName] = wrappedElem.ancestryOrSelfENames
+    final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = wrappedElem.ancestryOrSelfENames
   }
 
   final class DocumentContent(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) {
