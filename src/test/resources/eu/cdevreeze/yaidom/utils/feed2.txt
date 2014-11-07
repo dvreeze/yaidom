@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>Example Feed</title>
+  <rights type="xhtml"
+          example:type="silly"
+          xmlns:example="http://xmlportfolio.com/xmlguild-examples">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      You may not read, utter, interpret, or otherwise
+      <strong>verbally process</strong> the words
+      contained in this feed without <em>express written
+      permission</em> from the authors.
+    </div>
+  </rights>
+
+  <!-- ... -->
+
+</feed>
