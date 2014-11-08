@@ -18,9 +18,11 @@ package eu.cdevreeze.yaidom.utils
 
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.indexed
 
 /**
- * Utility for manipulating namespaces.
+ * Utility for manipulating and finding namespaces.
  *
  * @author Chris de Vreeze
  */
@@ -35,7 +37,7 @@ object NamespaceUtils {
    *
    * The function can be defined as:
    * {{{
-   * elem.notUndeclaringPrefixes(findSuitableParentScope(elem))
+   * elem.notUndeclaringPrefixes(findCombinedScope(elem))
    * }}}
    *
    * Therefore:
@@ -45,15 +47,84 @@ object NamespaceUtils {
    * and the result contains no prefixed namespace undeclarations (not allowed in XML 1.0).
    */
   def pushUpPrefixedNamespaces(elem: Elem): Elem = {
-    elem.notUndeclaringPrefixes(findSuitableParentScope(elem))
+    elem.notUndeclaringPrefixes(findCombinedScope(elem))
   }
 
-  private def findSuitableParentScope(elem: Elem): Scope = {
+  /**
+   * Returns an adapted copy (as simple Elem) where all unused namespaces have been removed. To determine the used namespaces,
+   * method `findAllNamespaces` is called on the element.
+   *
+   * This method is very useful when retrieving and serializing a small fragment of an XML tree in which most
+   * namespace declarations in the root element are not needed for the retrieved fragment.
+   */
+  def stripUnusedNamespaces(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Elem = {
+    val usedNamespaces = findAllNamespaces(elem, documentENameExtractor)
+
+    val resultElem = elem.elem transformElemsOrSelf { e =>
+      e.copy(scope = e.scope filter { case (pref, ns) => usedNamespaces.contains(ns) })
+    }
+    resultElem
+  }
+
+  /**
+   * Finds all ENames, in element names, attribute names, but also in element content and attribute values,
+   * using the given DocumentENameExtractor. The element and all its descendants are taken into account.
+   * The root element of the given indexed element must be the root element of the document.
+   */
+  def findAllENames(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
+    val enames =
+      elem.findAllElemsOrSelf.flatMap(e => findENamesInElementItself(e, documentENameExtractor)).toSet
+    enames
+  }
+
+  /**
+   * Returns `findAllENames(elem, documentENameExtractor).flatMap(_.namespaceUriOption)`.
+   * That is, finds all namespaces used in the element and its descendants.
+   * The root element of the given indexed element must be the root element of the document.
+   */
+  def findAllNamespaces(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[String] = {
+    findAllENames(elem, documentENameExtractor).flatMap(_.namespaceUriOption)
+  }
+
+  /**
+   * Finds the ENames, in element name, attribute names, but also in element content and attribute values,
+   * using the given DocumentENameExtractor. Only the element itself is taken into consideration, not its
+   * descendants.
+   */
+  def findENamesInElementItself(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
+    val scope = elem.scope
+
+    val enamesInElemText: Set[EName] =
+      documentENameExtractor.findElemTextENameExtractor(elem).map(_.extractENames(scope, elem.text)).getOrElse(Set())
+
+    val enamesInAttrValues: Set[EName] =
+      (elem.resolvedAttributes flatMap {
+        case (attrEName, attrValue) =>
+          documentENameExtractor.findAttributeValueENameExtractor(elem, attrEName).map(_.extractENames(scope, attrValue)).getOrElse(Set())
+      }).toSet
+
+    Set(elem.resolvedName).union(elem.resolvedAttributes.toMap.keySet).union(enamesInElemText).union(enamesInAttrValues)
+  }
+
+  /**
+   * Returns `findENamesInElementItself(elem, documentENameExtractor).flatMap(_.namespaceUriOption)`.
+   * That is, finds the namespaces used in the element itself, ignoring its descendants.
+   */
+  def findNamespacesInElementItself(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[String] = {
+    findENamesInElementItself(elem, documentENameExtractor).flatMap(_.namespaceUriOption)
+  }
+
+  /**
+   * Finds the combined Scope of the entire element tree. In case of conflicts, Scopes of elements higher in
+   * the tree take precedence, and conflicting Scopes in sibling elements are combined by choosing one of the
+   * namespaces for the prefix in question.
+   */
+  def findCombinedScope(elem: Elem): Scope = {
     // Recursive calls
     val combinedChildScope =
       elem.findAllChildElems.foldLeft(Scope.Empty) {
         case (accScope, che) =>
-          accScope ++ (findSuitableParentScope(che).withoutDefaultNamespace)
+          accScope ++ (findCombinedScope(che).withoutDefaultNamespace)
       }
     assert(combinedChildScope.defaultNamespaceOption.isEmpty)
     combinedChildScope ++ elem.scope.withoutDefaultNamespace

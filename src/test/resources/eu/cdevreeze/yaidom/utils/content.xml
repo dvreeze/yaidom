@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- See http://file.fyicenter.com/73_Spreadsheet_.ODS_File_Extension_for_OpenDocument_Spreadshee.html -->
+<office:document-content
+	xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+	xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+	xmlns:msoxl="http://schemas.microsoft.com/office/excel/formula">
+	<office:font-face-decls>
+		<style:font-face style:name="Arial" svg:font-family="Arial" />
+	</office:font-face-decls>
+	<office:automatic-styles>
+		<style:style style:name="ce1" style:family="table-cell"
+			style:parent-style-name="Default" style:data-style-name="N0" />
+		<style:style style:name="co1" style:family="table-column">
+			<style:table-column-properties
+				fo:break-before="auto" style:column-width="1.69333333333333cm" />
+		</style:style>
+		<style:style style:name="co2" style:family="table-column">
+			<style:table-column-properties
+				fo:break-before="auto" style:column-width="2.06375cm" />
+		</style:style>
+		<style:style style:name="ro1" style:family="table-row">
+			<style:table-row-properties
+				style:row-height="12.75pt" style:use-optimal-row-height="true"
+				fo:break-before="auto" />
+		</style:style>
+		<style:style style:name="ta1" style:family="table"
+			style:master-page-name="mp1">
+			<style:table-properties table:display="true"
+				style:writing-mode="lr-tb" />
+		</style:style>
+	</office:automatic-styles>
+	<office:body>
+		<office:spreadsheet>
+			<table:calculation-settings
+				table:case-sensitive="false"
+				table:search-criteria-must-apply-to-whole-cell="false" />
+			<table:table table:name="Sheet1" table:style-name="ta1">
+				<table:table-column table:style-name="co1"
+					table:default-cell-style-name="ce1" />
+				<table:table-column table:style-name="co2"
+					table:default-cell-style-name="ce1" />
+				<table:table-column table:style-name="co1"
+					table:number-columns-repeated="16382"
+					table:default-cell-style-name="ce1" />
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Welcome to File Extension FYI Center!</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16383"
+						table:style-name="ce1" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell table:number-columns-repeated="16384" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>ID</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Type</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Description</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16381" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="float"
+						office:value="1" table:style-name="ce1">
+						<text:p>1</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>ASP</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Active Server Pages</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16381" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="float"
+						office:value="2" table:style-name="ce1">
+						<text:p>2</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>JSP</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>JavaServer Pages</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16381" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="float"
+						office:value="3" table:style-name="ce1">
+						<text:p>3</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>PNG</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Portable Network Graphics</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16381" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="float"
+						office:value="4" table:style-name="ce1">
+						<text:p>4</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>GIF</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Graphics Interchange Format</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16381" />
+				</table:table-row>
+				<table:table-row table:style-name="ro1">
+					<table:table-cell office:value-type="float"
+						office:value="5" table:style-name="ce1">
+						<text:p>5</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>WMV</text:p>
+					</table:table-cell>
+					<table:table-cell office:value-type="string"
+						table:style-name="ce1">
+						<text:p>Windows Media Video</text:p>
+					</table:table-cell>
+					<table:table-cell table:number-columns-repeated="16381" />
+				</table:table-row>
+				<table:table-row table:number-rows-repeated="1048568"
+					table:style-name="ro1">
+					<table:table-cell table:number-columns-repeated="16384" />
+				</table:table-row>
+			</table:table>
+			<table:table table:name="Sheet2" table:style-name="ta1">
+				<table:table-column table:style-name="co1"
+					table:number-columns-repeated="16384"
+					table:default-cell-style-name="ce1" />
+				<table:table-row table:number-rows-repeated="1048576"
+					table:style-name="ro1">
+					<table:table-cell table:number-columns-repeated="16384" />
+				</table:table-row>
+			</table:table>
+			<table:table table:name="Sheet3" table:style-name="ta1">
+				<table:table-column table:style-name="co1"
+					table:number-columns-repeated="16384"
+					table:default-cell-style-name="ce1" />
+				<table:table-row table:number-rows-repeated="1048576"
+					table:style-name="ro1">
+					<table:table-cell table:number-columns-repeated="16384" />
+				</table:table-row>
+			</table:table>
+		</office:spreadsheet>
+	</office:body>
+</office:document-content>

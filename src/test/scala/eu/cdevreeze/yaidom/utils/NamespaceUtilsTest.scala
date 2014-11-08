@@ -24,7 +24,15 @@ import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 import NamespaceUtils.pushUpPrefixedNamespaces
+import NamespaceUtils.stripUnusedNamespaces
+import NamespaceUtils.findAllENames
+import NamespaceUtils.findAllNamespaces
+import NamespaceUtils.findENamesInElementItself
+import NamespaceUtils.findNamespacesInElementItself
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.NodeBuilder
@@ -148,5 +156,90 @@ class NamespaceUtilsTest extends Suite {
     assertResult(Map("" -> "http://d", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
       editedRootElemBuilder.namespaces.prefixNamespaceMap
     }
+  }
+
+  @Test def testStripNamespaces(): Unit = {
+    val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("content.xml"))
+    val rootElem = indexed.Elem(doc.documentElement)
+
+    assertResult(11) {
+      rootElem.scope.prefixNamespaceMap.size
+    }
+
+    val lastTableOption = rootElem.filterElems(_.qname == QName("table:table")).lastOption
+
+    assertResult(true) {
+      lastTableOption.isDefined
+    }
+
+    val lastTable = lastTableOption.get
+
+    assertResult(rootElem.scope) {
+      lastTable.scope
+    }
+    assertResult(rootElem.scope.prefixNamespaceMap.keySet) {
+      lastTable.findAllElemsOrSelf.flatMap(_.scope.prefixNamespaceMap.keySet).toSet
+    }
+
+    val editedLastTable = stripUnusedNamespaces(lastTable, DocumentENameExtractor.NoOp)
+
+    assertResult(resolved.Elem(lastTable.elem)) {
+      resolved.Elem(editedLastTable)
+    }
+
+    assertResult(Set("table")) {
+      editedLastTable.findAllElemsOrSelf.flatMap(_.scope.prefixNamespaceMap.keySet).toSet
+    }
+  }
+
+  @Test def testFindUsedNamespaces(): Unit = {
+    val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("HelloWorld.xml"))
+    val rootElem = indexed.Elem(doc.documentElement)
+
+    val xbrliENameExtractor = new XbrliDocumentENameExtractor
+
+    val measureElem = rootElem.findElem(_.resolvedName == EName(XbrliNs, "measure")).get
+
+    assertResult(true) {
+      findAllENames(rootElem, xbrliENameExtractor).contains(EName(Iso4217Ns, "USD"))
+    }
+    assertResult(true) {
+      findAllNamespaces(rootElem, xbrliENameExtractor).contains(Iso4217Ns)
+    }
+    assertResult(EName(Iso4217Ns, "USD")) {
+      measureElem.textAsResolvedQName
+    }
+    assertResult(true) {
+      findENamesInElementItself(measureElem, xbrliENameExtractor).contains(EName(Iso4217Ns, "USD"))
+    }
+    assertResult(true) {
+      findNamespacesInElementItself(measureElem, xbrliENameExtractor).contains(Iso4217Ns)
+    }
+
+    assertResult(7) {
+      measureElem.scope.prefixNamespaceMap.size
+    }
+    assertResult(rootElem.scope) {
+      measureElem.scope
+    }
+    assertResult(Scope.from("" -> XbrliNs, "xbrli" -> XbrliNs, "iso4217" -> Iso4217Ns)) {
+      stripUnusedNamespaces(measureElem, xbrliENameExtractor).scope
+    }
+  }
+
+  private val XbrliNs = "http://www.xbrl.org/2003/instance"
+  private val Iso4217Ns = "http://www.xbrl.org/2003/iso4217"
+
+  private val xbrliMeasureENameExtractor = SimpleTextENameExtractor
+
+  final class XbrliDocumentENameExtractor extends DocumentENameExtractor {
+
+    def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor] = {
+      if (elem.rootElem.resolvedName == EName(XbrliNs, "xbrl") && elem.resolvedName == EName(XbrliNs, "measure")) {
+        Some(xbrliMeasureENameExtractor)
+      } else None
+    }
+
+    def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor] = None
   }
 }
