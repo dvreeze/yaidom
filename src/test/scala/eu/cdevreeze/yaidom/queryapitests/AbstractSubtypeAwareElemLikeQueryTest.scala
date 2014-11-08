@@ -27,6 +27,8 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import AbstractSubtypeAwareElemLikeQueryTest._
@@ -42,7 +44,7 @@ import AbstractSubtypeAwareElemLikeQueryTest._
  */
 abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
 
-  type E <: WrappedElem
+  type E <: BridgeElem
 
   @Test def testQueryTable(): Unit = {
     val documentContent = new DocumentContent(wrappedDocumentContent)
@@ -74,7 +76,7 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
     }
 
     assertResult(documentContent.findAllElemsOrSelf.map(_.resolvedName)) {
-      eu.cdevreeze.yaidom.resolved.Elem(documentContent.wrappedElem.toElem).findAllElemsOrSelf.map(_.resolvedName)
+      eu.cdevreeze.yaidom.resolved.Elem(documentContent.bridgeElem.toElem).findAllElemsOrSelf.map(_.resolvedName)
     }
   }
 
@@ -107,16 +109,16 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    * Bridge between SpreadsheetElem API and native element implementation. It is easy to use, having no type
    * parameters with intimidating type constraints, and without paying any "cake pattern tax".
    *
-   * This wrapped element must know at least the names of the ancestor elements. Moreover, it must know about
+   * This bridge element must know at least the names of the ancestor elements. Moreover, it must know about
    * qualified and expanded (element and attribute) names, in-scope namespaces, child elements etc.
    */
-  abstract class WrappedElem {
+  abstract class BridgeElem {
 
-    type NativeElem
+    type BackingElem
 
-    type SelfType <: WrappedElem
+    type SelfType <: BridgeElem
 
-    def nativeElem: NativeElem
+    def backingElem: BackingElem
 
     def findAllChildElems: immutable.IndexedSeq[SelfType]
 
@@ -143,49 +145,49 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    * Super-class of elements in an ODS spreadsheet content.xml file. It offers the `SubtypeAwareElemApi` API, among
    * other query API traits.
    */
-  sealed class SpreadsheetElem(val wrappedElem: WrappedElem) extends ScopedElemLike[SpreadsheetElem] with IsNavigable[SpreadsheetElem] with SubtypeAwareElemLike[SpreadsheetElem] {
+  sealed class SpreadsheetElem(val bridgeElem: BridgeElem) extends ScopedElemLike[SpreadsheetElem] with IsNavigable[SpreadsheetElem] with SubtypeAwareElemLike[SpreadsheetElem] {
 
     final def findAllChildElems: immutable.IndexedSeq[SpreadsheetElem] =
-      wrappedElem.findAllChildElems.map(e => SpreadsheetElem(e))
+      bridgeElem.findAllChildElems.map(e => SpreadsheetElem(e))
 
-    final def resolvedName: EName = wrappedElem.resolvedName
+    final def resolvedName: EName = bridgeElem.resolvedName
 
-    final def resolvedAttributes: immutable.Iterable[(EName, String)] = wrappedElem.resolvedAttributes
+    final def resolvedAttributes: immutable.Iterable[(EName, String)] = bridgeElem.resolvedAttributes
 
-    final def qname: QName = wrappedElem.qname
+    final def qname: QName = bridgeElem.qname
 
-    final def attributes: immutable.Iterable[(QName, String)] = wrappedElem.attributes
+    final def attributes: immutable.Iterable[(QName, String)] = bridgeElem.attributes
 
-    final def scope: Scope = wrappedElem.scope
+    final def scope: Scope = bridgeElem.scope
 
-    final def text: String = wrappedElem.text
+    final def text: String = bridgeElem.text
 
     final def findChildElemByPathEntry(entry: Path.Entry): Option[SpreadsheetElem] =
-      wrappedElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
+      bridgeElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
 
-    final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = wrappedElem.ancestryOrSelfENames
+    final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = bridgeElem.ancestryOrSelfENames
 
     override def equals(other: Any): Boolean = other match {
-      case e: SpreadsheetElem => wrappedElem == e.wrappedElem
+      case e: SpreadsheetElem => bridgeElem == e.bridgeElem
       case _ => false
     }
 
-    override def hashCode: Int = wrappedElem.hashCode
+    override def hashCode: Int = bridgeElem.hashCode
   }
 
-  final class DocumentContent(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) {
+  final class DocumentContent(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) {
     require(resolvedName == EName(Some(OfficeNs), "document-content"))
   }
 
-  final class Body(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) {
+  final class Body(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) {
     require(resolvedName == EName(Some(OfficeNs), "body"))
   }
 
-  final class Spreadsheet(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) {
+  final class Spreadsheet(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) {
     require(resolvedName == EName(Some(OfficeNs), "spreadsheet"))
   }
 
-  final class Table(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) with HasStyle {
+  final class Table(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table"))
 
     def columns: immutable.IndexedSeq[TableColumn] = findAllChildElemsOfType(classTag[TableColumn])
@@ -193,23 +195,23 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     def rows: immutable.IndexedSeq[TableRow] = findAllChildElemsOfType(classTag[TableRow])
   }
 
-  final class TableRow(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) with HasStyle {
+  final class TableRow(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table-row"))
 
     def cells: immutable.IndexedSeq[TableCell] = findAllChildElemsOfType(classTag[TableCell])
   }
 
-  final class TableColumn(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) with HasStyle {
+  final class TableColumn(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table-column"))
   }
 
-  final class TableCell(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) with HasStyle {
+  final class TableCell(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table-cell"))
 
     def cellText: String = findAllChildElemsOfType(classTag[Paragraph]).map(_.text).mkString
   }
 
-  final class Paragraph(wrappedElem: WrappedElem) extends SpreadsheetElem(wrappedElem) with HasStyle {
+  final class Paragraph(bridgeElem: BridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
     require(resolvedName == EName(Some(TextNs), "p"))
   }
 
@@ -220,7 +222,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
   object SpreadsheetElem {
 
-    def apply(elem: WrappedElem): SpreadsheetElem = {
+    def apply(elem: BridgeElem): SpreadsheetElem = {
       elem.resolvedName match {
         case EName(Some(OfficeNs), "document-content") =>
           new DocumentContent(elem)

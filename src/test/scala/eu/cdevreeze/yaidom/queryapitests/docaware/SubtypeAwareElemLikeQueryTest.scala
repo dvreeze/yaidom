@@ -40,52 +40,52 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.docaware")
 
-  final type E = SubtypeAwareElemLikeQueryTest.DocAwareWrappedElem
+  final type E = SubtypeAwareElemLikeQueryTest.DocAwareBridgeElem
 
   protected val wrappedDocumentContent: E = {
     val docParser = DocumentParserUsingDom.newInstance
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = docParser.parse(docUri)
 
-    new SubtypeAwareElemLikeQueryTest.DocAwareWrappedElem(eu.cdevreeze.yaidom.docaware.Document(docUri, doc).documentElement)
+    new SubtypeAwareElemLikeQueryTest.DocAwareBridgeElem(eu.cdevreeze.yaidom.docaware.Document(docUri, doc).documentElement)
   }
 }
 
 object SubtypeAwareElemLikeQueryTest {
 
-  final class DocAwareWrappedElem(val nativeElem: eu.cdevreeze.yaidom.docaware.Elem) extends AbstractSubtypeAwareElemLikeQueryTest.WrappedElem {
+  final class DocAwareBridgeElem(val backingElem: eu.cdevreeze.yaidom.docaware.Elem) extends AbstractSubtypeAwareElemLikeQueryTest.BridgeElem {
 
-    type NativeElem = eu.cdevreeze.yaidom.docaware.Elem
+    type BackingElem = eu.cdevreeze.yaidom.docaware.Elem
 
-    type SelfType = DocAwareWrappedElem
+    type SelfType = DocAwareBridgeElem
 
     def findAllChildElems: immutable.IndexedSeq[SelfType] =
-      nativeElem.findAllChildElems.map(e => new DocAwareWrappedElem(e))
+      backingElem.findAllChildElems.map(e => new DocAwareBridgeElem(e))
 
-    def resolvedName: EName = nativeElem.resolvedName
+    def resolvedName: EName = backingElem.resolvedName
 
-    def resolvedAttributes: immutable.Iterable[(EName, String)] = nativeElem.resolvedAttributes
+    def resolvedAttributes: immutable.Iterable[(EName, String)] = backingElem.resolvedAttributes
 
-    def qname: QName = nativeElem.qname
+    def qname: QName = backingElem.qname
 
-    def attributes: immutable.Iterable[(QName, String)] = nativeElem.attributes
+    def attributes: immutable.Iterable[(QName, String)] = backingElem.attributes
 
-    def scope: Scope = nativeElem.scope
+    def scope: Scope = backingElem.scope
 
-    def text: String = nativeElem.text
+    def text: String = backingElem.text
 
     def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType] =
-      nativeElem.findChildElemByPathEntry(entry).map(e => new DocAwareWrappedElem(e))
+      backingElem.findChildElemByPathEntry(entry).map(e => new DocAwareBridgeElem(e))
 
-    def ancestryOrSelfENames: immutable.IndexedSeq[EName] = nativeElem.ancestryOrSelfENames
+    def ancestryOrSelfENames: immutable.IndexedSeq[EName] = backingElem.ancestryOrSelfENames
 
-    def toElem: eu.cdevreeze.yaidom.simple.Elem = nativeElem.elem
+    def toElem: eu.cdevreeze.yaidom.simple.Elem = backingElem.elem
 
     override def equals(other: Any): Boolean = other match {
-      case e: DocAwareWrappedElem => nativeElem == e.nativeElem
+      case e: DocAwareBridgeElem => backingElem == e.backingElem
       case _ => false
     }
 
-    override def hashCode: Int = nativeElem.hashCode
+    override def hashCode: Int = backingElem.hashCode
   }
 }
