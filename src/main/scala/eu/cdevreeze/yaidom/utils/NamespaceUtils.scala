@@ -37,7 +37,7 @@ object NamespaceUtils {
    *
    * The function can be defined as:
    * {{{
-   * elem.notUndeclaringPrefixes(findCombinedScope(elem))
+   * elem.notUndeclaringPrefixes(findCombinedScopeWithoutDefaultNamespace(elem))
    * }}}
    *
    * Therefore:
@@ -47,12 +47,13 @@ object NamespaceUtils {
    * and the result contains no prefixed namespace undeclarations (not allowed in XML 1.0).
    */
   def pushUpPrefixedNamespaces(elem: Elem): Elem = {
-    elem.notUndeclaringPrefixes(findCombinedScope(elem))
+    elem.notUndeclaringPrefixes(findCombinedScopeWithoutDefaultNamespace(elem))
   }
 
   /**
-   * Returns an adapted copy (as simple Elem) where all unused namespaces have been removed. To determine the used namespaces,
-   * method `findAllNamespaces` is called on the element.
+   * Returns an adapted copy (as simple Elem) where all unused namespaces have been removed from the Scopes (of the
+   * element and its descendants). To determine the used namespaces, method `findAllNamespaces` is called on the
+   * element.
    *
    * This method is very useful when retrieving and serializing a small fragment of an XML tree in which most
    * namespace declarations in the root element are not needed for the retrieved fragment.
@@ -115,16 +116,16 @@ object NamespaceUtils {
   }
 
   /**
-   * Finds the combined Scope of the entire element tree. In case of conflicts, Scopes of elements higher in
-   * the tree take precedence, and conflicting Scopes in sibling elements are combined by choosing one of the
-   * namespaces for the prefix in question.
+   * Finds the combined Scope of the entire element tree, without default namespace. In case of conflicts, Scopes of
+   * elements higher in the tree take precedence, and conflicting Scopes in sibling elements are combined by choosing
+   * one of the namespaces for the prefix in question.
    */
-  def findCombinedScope(elem: Elem): Scope = {
+  def findCombinedScopeWithoutDefaultNamespace(elem: Elem): Scope = {
     // Recursive calls
     val combinedChildScope =
       elem.findAllChildElems.foldLeft(Scope.Empty) {
         case (accScope, che) =>
-          accScope ++ (findCombinedScope(che).withoutDefaultNamespace)
+          accScope ++ (findCombinedScopeWithoutDefaultNamespace(che).withoutDefaultNamespace)
       }
     assert(combinedChildScope.defaultNamespaceOption.isEmpty)
     combinedChildScope ++ elem.scope.withoutDefaultNamespace
