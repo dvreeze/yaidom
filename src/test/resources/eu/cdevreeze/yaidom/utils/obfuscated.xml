@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="yes"?>
+<a:a xmlns:a="http://a" xmlns:b="http://root-b" xmlns="http://not-b">
+	<b xmlns="http://b" xmlns:b="http://maybe-b">
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+			<b:d>test</b:d>
+			<d>test</d>
+			<b:d>test</b:d>
+		</b:c>
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+			<b:d>test</b:d>
+		</b:c>
+	</b>
+	<b:b xmlns:b="http://b">
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+		</b:c>
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+			<d>test</d>
+			<b:d>test</b:d>
+		</b:c>
+	</b:b>
+	<b:b xmlns:b="http://also-not-b">
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+		</b:c>
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+			<b:d>test</b:d>
+			<b:d>test</b:d>
+		</b:c>
+	</b:b>
+	<b xmlns:b="">
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+		</b:c>
+		<b:c xmlns:b="http://b">
+			<b:d>test</b:d>
+			<b:d>test</b:d>
+		</b:c>
+	</b>
+</a:a>

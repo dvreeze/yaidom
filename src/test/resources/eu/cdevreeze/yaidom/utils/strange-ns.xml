@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<c:a xmlns:c="http://c" xmlns="http://d">
+	<a>
+		<a:a xmlns:a="http://a">
+			<a:a xmlns:a="http://a">
+				<b xmlns:b="http://b">
+					<b:c>
+						<b:d>test</b:d>
+						<b:d>test</b:d>
+					</b:c>
+					<b:c xmlns:b="http://b">
+						<b:d>test</b:d>
+						<b:d>test</b:d>
+						<d>test</d>
+						<b:d>test</b:d>
+					</b:c>
+				</b>
+				<b:b xmlns:b="http://b">
+					<b:c>
+						<b:d>test</b:d>
+					</b:c>
+					<b:c>
+						<b:d>test</b:d>
+						<d>test</d>
+						<b:d>test</b:d>
+					</b:c>
+				</b:b>
+				<b:b xmlns:b="http://b">
+					<b:c>
+						<b:d>test</b:d>
+					</b:c>
+					<b:c>
+						<b:d>test</b:d>
+						<b:d>test</b:d>
+						<b:d>test</b:d>
+					</b:c>
+				</b:b>
+			</a:a>
+		</a:a>
+	</a>
+</c:a>

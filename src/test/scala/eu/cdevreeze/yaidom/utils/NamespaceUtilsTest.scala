@@ -100,4 +100,53 @@ class NamespaceUtilsTest extends Suite {
       editedRootElemBuilder.namespaces.prefixNamespaceMap.keySet
     }
   }
+
+  @Test def testPushUpNamespacesInObfuscatedXml(): Unit = {
+    val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("obfuscated.xml"))
+    val rootElem = doc.documentElement
+
+    val editedRootElem = pushUpPrefixedNamespaces(rootElem)
+
+    assertResult(resolved.Elem(rootElem)) {
+      resolved.Elem(editedRootElem)
+    }
+
+    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+
+    assertResult(false) {
+      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+    }
+    assertResult(Map("" -> "http://not-b", "a" -> "http://a", "b" -> "http://root-b")) {
+      editedRootElemBuilder.namespaces.prefixNamespaceMap
+    }
+    assertResult(true) {
+      editedRootElemBuilder.findAllChildElems.dropRight(1).forall(e => e.namespaces.prefixNamespaceMap.keySet.contains("b"))
+    }
+    assertResult(true) {
+      editedRootElemBuilder.findAllChildElems.flatMap(e => e.findAllElems) forall { e =>
+        e.namespaces.prefixNamespaceMap.keySet.subsetOf(Set("b")) &&
+          e.namespaces.prefixNamespaceMap.forall(kv => kv._1 == "b" && kv._2 == "http://b")
+      }
+    }
+  }
+
+  @Test def testPushUpNamespacesInStrangeNsXml(): Unit = {
+    val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("strange-ns.xml"))
+    val rootElem = doc.documentElement
+
+    val editedRootElem = pushUpPrefixedNamespaces(rootElem)
+
+    assertResult(resolved.Elem(rootElem)) {
+      resolved.Elem(editedRootElem)
+    }
+
+    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+
+    assertResult(true) {
+      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+    }
+    assertResult(Map("" -> "http://d", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
+      editedRootElemBuilder.namespaces.prefixNamespaceMap
+    }
+  }
 }
