@@ -79,7 +79,6 @@ import eu.cdevreeze.yaidom.simple
  * Given:
  * {{{
  * val elems = indexedRootElem.findAllElemsOrSelf
- * val paths = indexedRootElem.findAllElemsOrSelf.map(_.path)
  * }}}
  * the following (rather obvious) properties hold for indexed elements:
  * {{{
@@ -88,19 +87,8 @@ import eu.cdevreeze.yaidom.simple
  * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
  * }}}
  *
- * Analogous remarks apply to the other query methods. For example, given:
- * {{{
- * // Let p be a predicate of type (simple.Elem => Boolean)
- *
- * val elems = indexedRootElem filterElems { e => p(e.elem) }
- * val paths = indexedRootElem filterElems { e => p(e.elem) } map (_.path)
- * }}}
- * we have:
- * {{{
- * elems forall (e => e.rootElem == indexedRootElem.rootElem)
- *
- * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
- * }}}
+ * The properties above hold for `findAllElemsOrSelf`, so they certainly hold for the other child/descendant/descendant-or-self
+ * element query methods.
  *
  * @author Chris de Vreeze
  */
