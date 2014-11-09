@@ -110,6 +110,11 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    *
    * It offers pluggable DOM-like element implementations, without any "type gymnastics" and without paying any
    * "cake pattern tax".
+   *
+   * Note that in yaidom, generics have been used extensively for composable pieces of the query API, in order to
+   * assemble these into concrete element implementations. Here we use abstract types, in order to make concrete element
+   * implementations pluggable as "XML back-ends". The goal is different, and so is the mechanism (abstract types
+   * instead of type parameters).
    */
   abstract class BridgeElem {
 

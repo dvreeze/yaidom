@@ -449,6 +449,12 @@ package eu.cdevreeze
  * </ul>
  * This illustrates that especially trait `ElemLike` is a uniform query API in yaidom.
  *
+ * One yaidom wrapper that is very useful is a Saxon tiny tree yaidom wrapper. It has not been provided out of the box,
+ * in order to prevent any yaidom dependency on Saxon (which could have been an optional dependency), and because of
+ * changes among Saxon versions. Nevertheless, a Saxon wrapper has been tried out in test code (just like wrappers
+ * around XOM and JDOM), thus showing how easy it is to create such a wrapper ourselves. In the case of Saxon, when
+ * using schema-awareness (Saxon-EE), the wrapped tiny tree would contain interesting type information.
+ *
  * ==Packages and dependencies==
  *
  * Yaidom has the following packages, and layering between packages:
