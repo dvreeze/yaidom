@@ -31,6 +31,9 @@ trait TextENameExtractor {
 
 object TextENameExtractor {
 
+  /**
+   * TextENameExtractor that always returns an empty Set of ENames.
+   */
   val NoOp = new TextENameExtractor {
 
     def extractENames(scope: Scope, text: String): Set[EName] = Set()

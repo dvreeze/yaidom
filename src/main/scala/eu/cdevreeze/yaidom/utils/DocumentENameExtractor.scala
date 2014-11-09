@@ -29,23 +29,30 @@ trait DocumentENameExtractor {
 
   /**
    * Finds the optional `TextENameExtractor` for the element text content in the given element.
+   *
    * The root element of the given indexed element must be the root element of the document.
    *
-   * If there is a corresponding XML Schema, it would possibly specify that this element text is of type xs:QName.
+   * If there is a corresponding XML Schema, and it specifies that this element text is of type xs:QName,
+   * then this optional TextENameExtractor should be `SimpleTestENameExtractor`.
    */
   def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor]
 
   /**
    * Finds the optional `TextENameExtractor` for the attribute with the given name in the given element.
+   *
    * The root element of the given indexed element must be the root element of the document.
    *
-   * If there is a corresponding XML Schema, it would possibly specify that this attribute value is of type xs:QName.
+   * If there is a corresponding XML Schema, and it specifies that this attribute value is of type xs:QName,
+   * then this optional TextENameExtractor should be `SimpleTestENameExtractor`.
    */
   def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor]
 }
 
 object DocumentENameExtractor {
 
+  /**
+   * DocumentENameExtractor that never returns any TextENameExtractor for element text or attribute values.
+   */
   val NoOp = new DocumentENameExtractor {
 
     def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor] = None

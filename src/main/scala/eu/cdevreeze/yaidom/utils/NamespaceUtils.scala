@@ -51,9 +51,27 @@ object NamespaceUtils {
   }
 
   /**
+   * Finds the combined Scope of the entire element tree, without default namespace. In case of conflicts, Scopes of
+   * elements higher in the tree take precedence, and conflicting Scopes in sibling elements are combined by choosing
+   * one of the namespaces for the prefix in question.
+   */
+  def findCombinedScopeWithoutDefaultNamespace(elem: Elem): Scope = {
+    // Recursive calls
+    val combinedChildScope =
+      elem.findAllChildElems.foldLeft(Scope.Empty) {
+        case (accScope, che) =>
+          accScope ++ (findCombinedScopeWithoutDefaultNamespace(che).withoutDefaultNamespace)
+      }
+    assert(combinedChildScope.defaultNamespaceOption.isEmpty)
+    combinedChildScope ++ elem.scope.withoutDefaultNamespace
+  }
+
+  /**
    * Returns an adapted copy (as simple Elem) where all unused namespaces have been removed from the Scopes (of the
    * element and its descendants). To determine the used namespaces, method `findAllNamespaces` is called on the
    * element.
+   *
+   * The root element of the given indexed element must be the root element of the document.
    *
    * This method is very useful when retrieving and serializing a small fragment of an XML tree in which most
    * namespace declarations in the root element are not needed for the retrieved fragment.
@@ -70,6 +88,7 @@ object NamespaceUtils {
   /**
    * Finds all ENames, in element names, attribute names, but also in element content and attribute values,
    * using the given DocumentENameExtractor. The element and all its descendants are taken into account.
+   *
    * The root element of the given indexed element must be the root element of the document.
    */
   def findAllENames(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
@@ -81,6 +100,7 @@ object NamespaceUtils {
   /**
    * Returns `findAllENames(elem, documentENameExtractor).flatMap(_.namespaceUriOption)`.
    * That is, finds all namespaces used in the element and its descendants.
+   *
    * The root element of the given indexed element must be the root element of the document.
    */
   def findAllNamespaces(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[String] = {
@@ -91,6 +111,8 @@ object NamespaceUtils {
    * Finds the ENames, in element name, attribute names, but also in element content and attribute values,
    * using the given DocumentENameExtractor. Only the element itself is taken into consideration, not its
    * descendants.
+   *
+   * The root element of the given indexed element must be the root element of the document.
    */
   def findENamesInElementItself(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
     val scope = elem.scope
@@ -110,24 +132,10 @@ object NamespaceUtils {
   /**
    * Returns `findENamesInElementItself(elem, documentENameExtractor).flatMap(_.namespaceUriOption)`.
    * That is, finds the namespaces used in the element itself, ignoring its descendants.
+   *
+   * The root element of the given indexed element must be the root element of the document.
    */
   def findNamespacesInElementItself(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[String] = {
     findENamesInElementItself(elem, documentENameExtractor).flatMap(_.namespaceUriOption)
-  }
-
-  /**
-   * Finds the combined Scope of the entire element tree, without default namespace. In case of conflicts, Scopes of
-   * elements higher in the tree take precedence, and conflicting Scopes in sibling elements are combined by choosing
-   * one of the namespaces for the prefix in question.
-   */
-  def findCombinedScopeWithoutDefaultNamespace(elem: Elem): Scope = {
-    // Recursive calls
-    val combinedChildScope =
-      elem.findAllChildElems.foldLeft(Scope.Empty) {
-        case (accScope, che) =>
-          accScope ++ (findCombinedScopeWithoutDefaultNamespace(che).withoutDefaultNamespace)
-      }
-    assert(combinedChildScope.defaultNamespaceOption.isEmpty)
-    combinedChildScope ++ elem.scope.withoutDefaultNamespace
   }
 }
