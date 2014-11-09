@@ -18,12 +18,19 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.{ util => jutil }
 
+import scala.collection.immutable
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.bridge.BridgeElemTakingIndexedElem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
+import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest.IndexedBridgeElem
+import SubtypeAwareElemLikeQueryTest.BridgeElemTakingIndexedElem
 
 /**
  * Query test case for an XML dialect using indexed elements.
@@ -43,5 +50,53 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
     val doc = docParser.parse(docUri)
 
     new BridgeElemTakingIndexedElem(eu.cdevreeze.yaidom.indexed.Document(doc).documentElement)
+  }
+}
+
+object SubtypeAwareElemLikeQueryTest {
+
+  /**
+   * Overridable bridge element taking an `indexed.Elem`.
+   */
+  class BridgeElemTakingIndexedElem(val backingElem: eu.cdevreeze.yaidom.indexed.Elem) extends IndexedBridgeElem {
+
+    final type BackingElem = eu.cdevreeze.yaidom.indexed.Elem
+
+    final type SelfType = BridgeElemTakingIndexedElem
+
+    final type UnwrappedBackingElem = eu.cdevreeze.yaidom.simple.Elem
+
+    final def findAllChildElems: immutable.IndexedSeq[SelfType] =
+      backingElem.findAllChildElems.map(e => new BridgeElemTakingIndexedElem(e))
+
+    final def resolvedName: EName = backingElem.resolvedName
+
+    final def resolvedAttributes: immutable.Iterable[(EName, String)] = backingElem.resolvedAttributes
+
+    final def qname: QName = backingElem.qname
+
+    final def attributes: immutable.Iterable[(QName, String)] = backingElem.attributes
+
+    final def scope: Scope = backingElem.scope
+
+    final def text: String = backingElem.text
+
+    final def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType] =
+      backingElem.findChildElemByPathEntry(entry).map(e => new BridgeElemTakingIndexedElem(e))
+
+    final def toElem: eu.cdevreeze.yaidom.simple.Elem = backingElem.elem
+
+    final def rootElem: UnwrappedBackingElem = backingElem.rootElem
+
+    final def path: Path = backingElem.path
+
+    final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.elem
+
+    final override def equals(other: Any): Boolean = other match {
+      case e: BridgeElemTakingIndexedElem => backingElem == e.backingElem
+      case _ => false
+    }
+
+    final override def hashCode: Int = backingElem.hashCode
   }
 }

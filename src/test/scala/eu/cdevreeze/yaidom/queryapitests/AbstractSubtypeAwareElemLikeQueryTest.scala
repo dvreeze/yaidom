@@ -18,16 +18,17 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import scala.collection.immutable
 import scala.reflect.classTag
+
 import org.junit.Test
 import org.scalatest.Suite
-import eu.cdevreeze.yaidom.bridge.IndexedBridgeElem
+
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ElemApi
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
-import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import AbstractSubtypeAwareElemLikeQueryTest._
@@ -103,6 +104,70 @@ object AbstractSubtypeAwareElemLikeQueryTest {
   val StyleNs = "urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   val TableNs = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   val TextNs = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+
+  /**
+   * Bridge element that enables the `ScopedElemLike with IsNavigableLike` API on the classes delegating to this bridge element.
+   *
+   * It offers pluggable DOM-like element implementations, without any "type gymnastics" and without paying any
+   * "cake pattern tax".
+   */
+  abstract class BridgeElem {
+
+    /**
+     * The backing element type, for example `docaware.Elem`
+     */
+    type BackingElem
+
+    /**
+     * The type of this bridge element itself
+     */
+    type SelfType <: BridgeElem
+
+    def backingElem: BackingElem
+
+    // Needed for the ScopedElemLike API
+
+    def findAllChildElems: immutable.IndexedSeq[SelfType]
+
+    def resolvedName: EName
+
+    def resolvedAttributes: immutable.Iterable[(EName, String)]
+
+    def qname: QName
+
+    def attributes: immutable.Iterable[(QName, String)]
+
+    def scope: Scope
+
+    def text: String
+
+    // Needed for the IsNavigable API
+
+    def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType]
+
+    // Extra method
+
+    def toElem: eu.cdevreeze.yaidom.simple.Elem
+  }
+
+  /**
+   * Bridge element that adds support for "indexed elements".
+   */
+  abstract class IndexedBridgeElem extends BridgeElem {
+
+    override type SelfType <: IndexedBridgeElem
+
+    /**
+     * The unwrapped backing element type, for example `simple.Elem`
+     */
+    type UnwrappedBackingElem <: ElemApi[UnwrappedBackingElem] with HasENameApi
+
+    def rootElem: UnwrappedBackingElem
+
+    def path: Path
+
+    def unwrappedBackingElem: UnwrappedBackingElem
+  }
 
   /**
    * Super-class of elements in an ODS spreadsheet content.xml file. It offers the `SubtypeAwareElemApi` API, among
