@@ -483,11 +483,11 @@ package eu.cdevreeze
  * {{{
  * import HasENameApi._
  *
- * bookstoreElem filterElemsOrSelf withEName("{http://bookstore/book}", "Book")
+ * bookstoreElem filterElemsOrSelf withEName("http://bookstore/book", "Book")
  * }}}
  * to:
  * {{{
- * bookstoreElem.filterElemsOrSelf(EName("{http://bookstore/book}", "Book"))
+ * bookstoreElem.filterElemsOrSelf(EName("http://bookstore/book", "Book"))
  * }}}
  * to avoid unnecessary (large scale) EName object creation.
  *
@@ -502,7 +502,7 @@ package eu.cdevreeze
  * memory cost savings can be substantial. Also note that the global ENameProvider or QNameProvider can be used implicitly in
  * application code, by writing:
  * {{{
- * bookstoreElem filterElemsOrSelf getEName("{http://bookstore/book}", "Book")
+ * bookstoreElem filterElemsOrSelf getEName("http://bookstore/book", "Book")
  * }}}
  * using an implicit ENameProvider, whose members are in scope. Still, for querying the first alternative using `withEName` is
  * better, but there are likely many scenarios in yaidom client code where an implicit ENameProvider or QNameProvider makes sense.
