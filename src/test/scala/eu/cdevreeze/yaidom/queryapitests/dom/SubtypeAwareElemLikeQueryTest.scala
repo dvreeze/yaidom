@@ -19,16 +19,10 @@ package eu.cdevreeze.yaidom.queryapitests.dom
 import java.io.File
 import java.{ util => jutil }
 
-import scala.collection.immutable
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.bridge.BridgeElemTakingDomElem
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
 import javax.xml.parsers.DocumentBuilderFactory
@@ -43,7 +37,7 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.dom")
 
-  final type E = SubtypeAwareElemLikeQueryTest.DomBridgeElem
+  final type E = BridgeElemTakingDomElem
 
   protected val wrappedDocumentContent: E = {
     val dbf = DocumentBuilderFactory.newInstance()
@@ -51,48 +45,6 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = db.parse(new File(docUri))
 
-    new SubtypeAwareElemLikeQueryTest.DomBridgeElem(DomDocument(doc).documentElement)
-  }
-}
-
-object SubtypeAwareElemLikeQueryTest {
-
-  final class DomBridgeElem(val backingElem: eu.cdevreeze.yaidom.dom.DomElem) extends AbstractSubtypeAwareElemLikeQueryTest.BridgeElem {
-
-    type BackingElem = eu.cdevreeze.yaidom.dom.DomElem
-
-    type SelfType = DomBridgeElem
-
-    def findAllChildElems: immutable.IndexedSeq[SelfType] =
-      backingElem.findAllChildElems.map(e => new DomBridgeElem(e))
-
-    def resolvedName: EName = backingElem.resolvedName
-
-    def resolvedAttributes: immutable.Iterable[(EName, String)] = backingElem.resolvedAttributes
-
-    def qname: QName = backingElem.qname
-
-    def attributes: immutable.Iterable[(QName, String)] = backingElem.attributes
-
-    def scope: Scope = backingElem.scope
-
-    def text: String = backingElem.text
-
-    def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType] =
-      backingElem.findChildElemByPathEntry(entry).map(e => new DomBridgeElem(e))
-
-    def ancestryOrSelfENames: immutable.IndexedSeq[EName] =
-      backingElem.ancestorsOrSelf.reverse.map(_.resolvedName)
-
-    def toElem: eu.cdevreeze.yaidom.simple.Elem = {
-      DomConversions.convertToElem(backingElem.wrappedNode, Scope.Empty)
-    }
-
-    override def equals(other: Any): Boolean = other match {
-      case e: DomBridgeElem => backingElem.wrappedNode == e.backingElem.wrappedNode
-      case _ => false
-    }
-
-    override def hashCode: Int = backingElem.wrappedNode.hashCode
+    new BridgeElemTakingDomElem(DomDocument(doc).documentElement)
   }
 }

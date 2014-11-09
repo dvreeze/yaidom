@@ -18,15 +18,10 @@ package eu.cdevreeze.yaidom.queryapitests.docaware
 
 import java.{ util => jutil }
 
-import scala.collection.immutable
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.bridge.BridgeElemTakingDocawareElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
 
@@ -40,52 +35,13 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.docaware")
 
-  final type E = SubtypeAwareElemLikeQueryTest.DocAwareBridgeElem
+  final type E = BridgeElemTakingDocawareElem
 
   protected val wrappedDocumentContent: E = {
     val docParser = DocumentParserUsingDom.newInstance
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = docParser.parse(docUri)
 
-    new SubtypeAwareElemLikeQueryTest.DocAwareBridgeElem(eu.cdevreeze.yaidom.docaware.Document(docUri, doc).documentElement)
-  }
-}
-
-object SubtypeAwareElemLikeQueryTest {
-
-  final class DocAwareBridgeElem(val backingElem: eu.cdevreeze.yaidom.docaware.Elem) extends AbstractSubtypeAwareElemLikeQueryTest.BridgeElem {
-
-    type BackingElem = eu.cdevreeze.yaidom.docaware.Elem
-
-    type SelfType = DocAwareBridgeElem
-
-    def findAllChildElems: immutable.IndexedSeq[SelfType] =
-      backingElem.findAllChildElems.map(e => new DocAwareBridgeElem(e))
-
-    def resolvedName: EName = backingElem.resolvedName
-
-    def resolvedAttributes: immutable.Iterable[(EName, String)] = backingElem.resolvedAttributes
-
-    def qname: QName = backingElem.qname
-
-    def attributes: immutable.Iterable[(QName, String)] = backingElem.attributes
-
-    def scope: Scope = backingElem.scope
-
-    def text: String = backingElem.text
-
-    def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType] =
-      backingElem.findChildElemByPathEntry(entry).map(e => new DocAwareBridgeElem(e))
-
-    def ancestryOrSelfENames: immutable.IndexedSeq[EName] = backingElem.ancestryOrSelfENames
-
-    def toElem: eu.cdevreeze.yaidom.simple.Elem = backingElem.elem
-
-    override def equals(other: Any): Boolean = other match {
-      case e: DocAwareBridgeElem => backingElem == e.backingElem
-      case _ => false
-    }
-
-    override def hashCode: Int = backingElem.hashCode
+    new BridgeElemTakingDocawareElem(eu.cdevreeze.yaidom.docaware.Document(docUri, doc).documentElement)
   }
 }
