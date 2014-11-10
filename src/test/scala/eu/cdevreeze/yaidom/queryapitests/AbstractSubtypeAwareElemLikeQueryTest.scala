@@ -115,8 +115,10 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    * assemble these into concrete element implementations. Here we use abstract types, in order to make concrete element
    * implementations pluggable as "XML back-ends". The goal is different, and so is the mechanism (abstract types
    * instead of type parameters).
+   * 
+   * This is a purely abstract universal trait, allowing for allocation-free value objects.
    */
-  abstract class BridgeElem {
+  trait BridgeElem extends Any {
 
     /**
      * The backing element type, for example `docaware.Elem`
@@ -157,8 +159,10 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
   /**
    * Bridge element that adds support for "indexed elements".
+   * 
+   * This is a purely abstract universal trait, allowing for allocation-free value objects.
    */
-  abstract class IndexedBridgeElem extends BridgeElem {
+  trait IndexedBridgeElem extends Any with BridgeElem {
 
     override type SelfType <: IndexedBridgeElem
 
@@ -203,11 +207,11 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     }
 
     override def equals(other: Any): Boolean = other match {
-      case e: SpreadsheetElem => bridgeElem == e.bridgeElem
+      case e: SpreadsheetElem => bridgeElem.backingElem == e.bridgeElem.backingElem
       case _ => false
     }
 
-    override def hashCode: Int = bridgeElem.hashCode
+    override def hashCode: Int = bridgeElem.backingElem.hashCode
   }
 
   final class DocumentContent(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) {

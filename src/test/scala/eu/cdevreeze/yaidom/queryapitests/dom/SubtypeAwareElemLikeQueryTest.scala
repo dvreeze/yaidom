@@ -61,9 +61,9 @@ object SubtypeAwareElemLikeQueryTest {
 
   /**
    * Overridable bridge element taking a `dom.DomElem`. Having this bridge implement IndexedBridgeElement
-   * is a poor match, performance-wise.
+   * is a poor match, performance-wise. This is a value class instance, to prevent object creation.
    */
-  class BridgeElemTakingDomElem(val backingElem: eu.cdevreeze.yaidom.dom.DomElem) extends IndexedBridgeElem {
+  class BridgeElemTakingDomElem(val backingElem: eu.cdevreeze.yaidom.dom.DomElem) extends AnyVal with IndexedBridgeElem {
 
     final type BackingElem = eu.cdevreeze.yaidom.dom.DomElem
 
@@ -112,13 +112,6 @@ object SubtypeAwareElemLikeQueryTest {
     }
 
     final def unwrappedBackingElem: UnwrappedBackingElem = backingElem
-
-    final override def equals(other: Any): Boolean = other match {
-      case e: BridgeElemTakingDomElem => backingElem.wrappedNode == e.backingElem.wrappedNode
-      case _ => false
-    }
-
-    final override def hashCode: Int = backingElem.wrappedNode.hashCode
 
     private def findPreviousSiblingElements(elem: org.w3c.dom.Element): List[org.w3c.dom.Element] = {
       findPreviousSiblings(elem) collect { case e: org.w3c.dom.Element => e }

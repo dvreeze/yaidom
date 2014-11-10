@@ -56,9 +56,9 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
 object SubtypeAwareElemLikeQueryTest {
 
   /**
-   * Overridable bridge element taking a `docaware.Elem`.
+   * Overridable bridge element taking a `docaware.Elem`. This is a value class instance, to prevent object creation.
    */
-  class BridgeElemTakingDocawareElem(val backingElem: eu.cdevreeze.yaidom.docaware.Elem) extends IndexedBridgeElem {
+  class BridgeElemTakingDocawareElem(val backingElem: eu.cdevreeze.yaidom.docaware.Elem) extends AnyVal with IndexedBridgeElem {
 
     final type BackingElem = eu.cdevreeze.yaidom.docaware.Elem
 
@@ -91,12 +91,5 @@ object SubtypeAwareElemLikeQueryTest {
     final def path: Path = backingElem.path
 
     final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.elem
-
-    final override def equals(other: Any): Boolean = other match {
-      case e: BridgeElemTakingDocawareElem => backingElem == e.backingElem
-      case _ => false
-    }
-
-    final override def hashCode: Int = backingElem.hashCode
   }
 }

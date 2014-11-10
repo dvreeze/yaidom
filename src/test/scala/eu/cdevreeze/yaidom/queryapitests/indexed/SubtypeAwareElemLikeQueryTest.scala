@@ -56,9 +56,9 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
 object SubtypeAwareElemLikeQueryTest {
 
   /**
-   * Overridable bridge element taking an `indexed.Elem`.
+   * Overridable bridge element taking an `indexed.Elem`. This is a value class instance, to prevent object creation.
    */
-  class BridgeElemTakingIndexedElem(val backingElem: eu.cdevreeze.yaidom.indexed.Elem) extends IndexedBridgeElem {
+  class BridgeElemTakingIndexedElem(val backingElem: eu.cdevreeze.yaidom.indexed.Elem) extends AnyVal with IndexedBridgeElem {
 
     final type BackingElem = eu.cdevreeze.yaidom.indexed.Elem
 
@@ -91,12 +91,5 @@ object SubtypeAwareElemLikeQueryTest {
     final def path: Path = backingElem.path
 
     final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.elem
-
-    final override def equals(other: Any): Boolean = other match {
-      case e: BridgeElemTakingIndexedElem => backingElem == e.backingElem
-      case _ => false
-    }
-
-    final override def hashCode: Int = backingElem.hashCode
   }
 }

@@ -194,6 +194,14 @@ final class DomElem(
     val parentElemOption = parentNodeOption collect { case e: w3c.dom.Element => e }
     parentElemOption map { e => DomNode.wrapElement(e) }
   }
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: DomElem =>
+      (other.wrappedNode == this.wrappedNode)
+    case _ => false
+  }
+
+  override def hashCode: Int = wrappedNode.hashCode
 }
 
 final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode {
