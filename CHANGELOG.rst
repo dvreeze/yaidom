@@ -44,7 +44,7 @@ The (mostly breaking) changes in this version are:
   
 * A test case shows how yaidom (and its ``SubtypeAwareElemApi`` query API trait) can be used to support individual XML dialects
 
-  * The test case also shows how to do that while keeping the "XML backend implementation" largely pluggable
+  * The test case also shows how to do that while keeping the "XML backend implementation" pluggable
   * Type-safe querying for such XML dialects thus becomes feasible using yaidom
   
 * Namespace-related utilities have been added, for moving up namespace declarations, stripping unused namespaces etc.
