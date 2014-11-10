@@ -3,6 +3,56 @@ CHANGELOG
 =========
 
 
+1.1
+===
+
+Version 1.1 is much more than a minor release. It has a lot of breaking changes. See the road map document.
+
+Here is why yaidom 1.1 is an important release:
+
+* Yaidom has been reconstructed by making the query API cleaner and more orthogonal under the hood, and therefore more flexible
+* Related to this query API reorganization: the top-level package has been split into 3 sub-packages
+* Most element implementations now offer more of the yaidom query API, and therefore become more interchangeable
+* Yaidom is now both faster and less memory-hungry
+* Yaidom is not only extensible w.r.t. element implementations (even more so than before), but also to support "XML dialects"
+* Namespace-related utilities have been added
+
+The (mostly breaking) changes in this version are:
+
+* The root package has been split into sub-packages ``core``, ``queryapi`` and ``simple``
+
+  * Package ``core`` contains core concepts, such as expanded names, qualified names etc.
+  * Package ``queryapi`` contains the query API traits
+  * Package ``simple`` contains the default (simple) element implementation
+  * In version 1.1, there are aliases to ``core`` and ``simple`` classes, to ease the transition to yaidom 1.2 and 1.3
+  
+* The query API traits have been re-organized, renamed, and made more orthogonal:
+
+  * The old inheritance hierarchy is gone
+  * The ``PathAwareElemApi`` trait is gone, with no replacement (use indexed elements instead)
+  * ``ParentElemApi`` (1.0) has been renamed to ``ElemApi``
+  * ``ElemApi`` (1.0) is now ``ElemApi with HasENameApi``
+  * ``NavigableElemApi`` (1.0) is now ``ElemApi with HasENameApi with IsNavigableApi``
+  * ``UpdatableElemApi`` minus ``PathAwareElemApi`` (1.0) is now ``ElemApi with HasENameApi with UpdatableElemApi``
+  * ``SubtypeAwareParentElemApi`` (1.0) has been renamed to ``SubtypeAwareElemApi``
+  * The (1.1) combination ``ElemApi with HasENameApi with HasQNameApi with HasScopeApi with HasTextApi`` (with some additional methods) is called ``ScopedElemApi``
+  
+* Most element implementations now mix in ``ScopedElemApi with IsNavigableApi``, therefore offering almost the same query API
+* Yaidom (simple, docaware, indexed) elements now store less data per element, thus reducing memory usage
+
+  * Not only memory usage went down, but yaidom became faster as well (unless performing Path-based navigation in bulk)
+  
+* A test case shows how yaidom (and its ``SubtypeAwareElemApi`` query API trait) can be used to support individual XML dialects
+
+  * The test case also shows how to do that while keeping the "XML backend implementation" largely pluggable
+  * Type-safe querying for such XML dialects thus becomes feasible using yaidom
+  
+* Namespace-related utilities have been added, for moving up namespace declarations, stripping unused namespaces etc.
+* The Node and NodeBuilder creation DSLs have been cleaned up a bit, resulting in breaking changes
+* Small additions, such as method ``plusChildOption``, Path method ``append``, and method ``ancestryOrSelfENames``
+* Upgraded Scala 2.11 version, as well as versions of dependencies
+
+
 1.0
 ===
 
