@@ -43,8 +43,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  * Not all DOM node types are exposed via these wrappers. For example, attributes are not nodes according to the `ElemLike` API,
  * so there is no wrapper for attributes.
  *
- * Use these wrappers only if there is a specific need for them. They are not immutable, they are not thread-safe, no equality
- * is defined, they are not serializable, etc.
+ * Use these wrappers only if there is a specific need for them. They are not immutable, and they are not thread-safe.
  *
  * The wrappers are very light-weight, and typically very short-lived. On the other hand, each query may create many wrapper
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped DOM node, so changes to

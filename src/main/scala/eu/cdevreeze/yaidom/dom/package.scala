@@ -25,8 +25,9 @@ package eu.cdevreeze.yaidom
  * Such scenarios could be as follows:
  * <ul>
  * <li>Conversions from DOM to [[eu.cdevreeze.yaidom.simple.Elem]] (and back) have more runtime costs than needed or wanted.</li>
- * <li>Roundtripping from XML string to "tree", and back to XML string should keep the resulting XML string as much as possible the same.</li>
+ * <li>Round-tripping from XML string to "tree", and back to XML string should keep the resulting XML string as much as possible the same.</li>
  * <li>In-place updates (instead of "functional updates") of DOM trees are desired.</li>
+ * <li>The DOM elements are desired for their PSVI information.</li>
  * </ul>
  *
  * Yet be aware that the advantages of immutability and thread-safety (offered by immutable `Elem` classes) are lost when using
