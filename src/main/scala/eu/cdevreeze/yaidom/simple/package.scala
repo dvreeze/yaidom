@@ -23,4 +23,4 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-package simple
+package object simple
