@@ -26,29 +26,29 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 }
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11" % "1.0.1")
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2")
   else Seq()
 }
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.1")
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.2")
   else Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
-libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.2.1"
+libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
 
 libraryDependencies += "junit" % "junit" % "4.11" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
   if (version.contains("2.11")) "org.scalatest" % "scalatest_2.11" % "2.1.3" % "test"
-  else "org.scalatest" %% "scalatest" % "2.1.3" % "test"
+  else "org.scalatest" %% "scalatest" % "2.2.2" % "test"
 }
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
   if (version.contains("2.11")) "org.scalacheck" % "scalacheck_2.11" % "1.11.3" % "test"
-  else "org.scalacheck" %% "scalacheck" % "1.11.3" % "test"
+  else "org.scalacheck" %% "scalacheck" % "1.11.6" % "test"
 }
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
@@ -57,15 +57,15 @@ libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
 libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
 
-libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.5.1-4" % "test"
+libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.5.1-8" % "test"
 
-libraryDependencies += ("joda-time" % "joda-time" % "2.3" % "test").intransitive()
+libraryDependencies += ("joda-time" % "joda-time" % "2.5" % "test").intransitive()
 
-libraryDependencies += ("org.joda" % "joda-convert" % "1.2" % "test").intransitive()
+libraryDependencies += ("org.joda" % "joda-convert" % "1.7" % "test").intransitive()
 
-libraryDependencies += "com.google.guava" % "guava" % "16.0.1" % "test"
+libraryDependencies += "com.google.guava" % "guava" % "18.0" % "test"
 
-libraryDependencies += "com.google.code.findbugs" % "jsr305" % "2.0.3" % "test"
+libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0" % "test"
 
 publishMavenStyle := true
 
