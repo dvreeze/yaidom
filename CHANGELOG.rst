@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+1.2
+===
+
+Version 1.2 is like version 1.1, except that the aliases in the root package to ``core`` and ``simple`` have been
+deprecated. In version 1.3, these deprecated aliases will be removed.
+
+
 1.1
 ===
 
