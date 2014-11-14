@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.qieryapitests.docaware
+package eu.cdevreeze.yaidom.queryapitests.docaware
 
 import java.net.URI
 

@@ -136,9 +136,33 @@ final class Elem private[docaware] (
   final def ancestryENames: immutable.IndexedSeq[EName] = {
     ancestryOrSelfENames.dropRight(1)
   }
+
+  /**
+   * Returns the base URI of the element, by @xml:base processing starting with the document URI
+   */
+  final def baseUri: URI = baseUri(path)
+
+  private final def baseUri(path: Path): URI = {
+    if (path.isRoot) {
+      val explicitBaseUriOption = rootElem.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
+      explicitBaseUriOption.map(u => docUri.resolve(u)).getOrElse(docUri)
+    } else {
+      val parentPath = path.parentPath
+
+      // Recursive call
+      val parentBaseUri = baseUri(parentPath)
+
+      val e = rootElem.getElemOrSelfByPath(path)
+      val explicitBaseUriOption = e.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
+      explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
+    }
+  }
 }
 
 object Elem {
+
+  private val XmlNs = "http://www.w3.org/XML/1998/namespace"
+  private val XmlBaseEName = EName(XmlNs, "base")
 
   /**
    * Calls `apply(docUri, rootElem, Path.Root)`
