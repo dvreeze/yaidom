@@ -138,7 +138,7 @@ final class Elem private[docaware] (
   }
 
   /**
-   * Returns the base URI of the element, by @xml:base processing starting with the document URI
+   * Returns the base URI of the element, by XML Base processing starting with the document URI
    */
   final def baseUri: URI = baseUri(path)
 
