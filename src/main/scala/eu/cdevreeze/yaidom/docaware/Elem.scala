@@ -138,21 +138,23 @@ final class Elem private[docaware] (
   }
 
   /**
-   * Returns the base URI of the element, by XML Base processing starting with the document URI
+   * Returns the base URI of the element, by XML Base processing starting with the document URI.
+   * That is, returns `baseUriOfAncestorOrSelf(path)`.
    */
-  final def baseUri: URI = baseUri(path)
+  final def baseUri: URI = baseUriOfAncestorOrSelf(path)
 
-  private final def baseUri(path: Path): URI = {
-    if (path.isRoot) {
+  /**
+   * Returns the base URI of an ancestor-or-self element.
+   */
+  final def baseUriOfAncestorOrSelf(ancestorOrSelfPath: Path): URI = {
+    if (ancestorOrSelfPath.isRoot) {
       val explicitBaseUriOption = rootElem.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
       explicitBaseUriOption.map(u => docUri.resolve(u)).getOrElse(docUri)
     } else {
-      val parentPath = path.parentPath
-
       // Recursive call
-      val parentBaseUri = baseUri(parentPath)
+      val parentBaseUri = baseUriOfAncestorOrSelf(ancestorOrSelfPath.parentPath)
 
-      val e = rootElem.getElemOrSelfByPath(path)
+      val e = rootElem.getElemOrSelfByPath(ancestorOrSelfPath)
       val explicitBaseUriOption = e.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
       explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
     }
