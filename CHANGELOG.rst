@@ -3,6 +3,15 @@ CHANGELOG
 =========
 
 
+1.3
+===
+
+Version 1.3 is like version 1.2, except that the aliases in the root package to ``core`` and ``simple`` have been
+removed entirely.
+
+Moreover, method `baseUri` has been added to `docaware.Elem` (thus implementing XML Base).
+
+
 1.2
 ===
 
