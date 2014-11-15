@@ -42,12 +42,12 @@ import eu.cdevreeze.yaidom.simple.Document
  */
 trait DocumentParser {
 
-  /** Parses the input stream into a [[eu.cdevreeze.yaidom.Document]]. This method should close the input stream afterwards. */
+  /** Parses the input stream into a [[eu.cdevreeze.yaidom.simple.Document]]. This method should close the input stream afterwards. */
   def parse(inputStream: InputStream): Document
 
-  /** Parses the content of the given URI into a [[eu.cdevreeze.yaidom.Document]]. */
+  /** Parses the content of the given URI into a [[eu.cdevreeze.yaidom.simple.Document]]. */
   def parse(uri: URI): Document
 
-  /** Parses the content of the given File into a [[eu.cdevreeze.yaidom.Document]]. */
+  /** Parses the content of the given File into a [[eu.cdevreeze.yaidom.simple.Document]]. */
   def parse(file: File): Document
 }

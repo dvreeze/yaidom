@@ -220,7 +220,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
 
   /**
    * '''Core method''' that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to the element that has the given [[eu.cdevreeze.yaidom.Path.Entry]] (compared to this element as root).
+   * to the element that has the given [[eu.cdevreeze.yaidom.core.Path.Entry]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path entry.
    *
@@ -249,7 +249,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
 
   /**
    * Method that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to the element that has the given [[eu.cdevreeze.yaidom.Path]] (compared to this element as root).
+   * to the element that has the given [[eu.cdevreeze.yaidom.core.Path]] (compared to this element as root).
    *
    * The method throws an exception if no element is found with the given path.
    *
@@ -292,7 +292,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
 
   /**
    * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
-   * that has the given [[eu.cdevreeze.yaidom.Path]] (compared to this element as root). If the given path is the
+   * that has the given [[eu.cdevreeze.yaidom.core.Path]] (compared to this element as root). If the given path is the
    * root path, this element itself is returned unchanged.
    *
    * This function could be defined as follows:

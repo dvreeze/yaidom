@@ -29,9 +29,9 @@ import eu.cdevreeze.yaidom.simple.Document
  */
 abstract class AbstractDocumentParser extends DocumentParser {
 
-  /** Parses the content of the given URI into a [[eu.cdevreeze.yaidom.Document]]. */
+  /** Parses the content of the given URI into a [[eu.cdevreeze.yaidom.simple.Document]]. */
   final def parse(uri: URI): Document = parse(uri.toURL.openStream())
 
-  /** Parses the content of the given File into a [[eu.cdevreeze.yaidom.Document]]. */
+  /** Parses the content of the given File into a [[eu.cdevreeze.yaidom.simple.Document]]. */
   final def parse(file: File): Document = parse(new FileInputStream(file))
 }

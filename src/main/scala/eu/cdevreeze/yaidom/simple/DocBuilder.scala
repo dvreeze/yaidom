@@ -55,7 +55,7 @@ final class DocBuilder(
     (processingInstructions ++ comments) :+ documentElement
 
   /**
-   * Creates a [[eu.cdevreeze.yaidom.Document]] from this document builder.
+   * Creates a [[eu.cdevreeze.yaidom.simple.Document]] from this document builder.
    */
   def build(): Document = {
     val parentScope = Scope.Empty
@@ -67,7 +67,7 @@ final class DocBuilder(
       comments = comments map { (c: CommentBuilder) => c.build(parentScope) })
   }
 
-  /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.Document]]. */
+  /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.simple.Document]]. */
   final def toTreeRepr(): String = build().toTreeRepr()
 
   /** Returns `toTreeRepr` */
