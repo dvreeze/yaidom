@@ -11,6 +11,19 @@ removed entirely.
 
 Moreover, method ``baseUri`` has been added to ``docaware.Elem`` (thus implementing XML Base).
 
+Note that versions 1.1 and 1.2 were only meant as intermediate versions leading up to version 1.3. It makes sense to
+compare version 1.3 to version 1.0 w.r.t. performance. In version 1.0, "simple" elements stored (in each element node!)
+a Map from path entries to child node indices. In version 1.3 (even in version 1.1) that is no longer the case.
+
+This means that path-based navigation (see ``IsNavigableApi``) is no longer effectively in constant time. Hence path-based
+navigation in bulk, and as a consequence functional updates in bulk (see ``UpdatableElemApi``) are much slower in
+version 1.3 than in version 1.0! So bulk navigation is now really a bad idea.
+
+The upside is that in version 1.3 there are no longer any costs associated with the above-mentioned Map (per element).
+As a consequence, in version 1.3 parsing and transforming (simple) elements is a bit faster and uses somewhat less
+memory than in version 1.0. Given that typically bulk navigation is avoided, the overall performance is better using
+version 1.3 than version 1.0 of yaidom.
+
 
 1.2
 ===
