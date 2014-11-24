@@ -39,20 +39,70 @@ class XmlBaseTest extends Suite {
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"
 
-  @Test def testInternalConsistency(): Unit = {
+  @Test def testXmlBase(): Unit = {
     val docParser = DocumentParserUsingDom.newInstance
     val docUri = classOf[XmlBaseTest].getResource("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml").toURI
     val doc = docParser.parse(docUri)
     val docawareDoc = docaware.Document(docUri, doc)
 
+    testXmlBase(docawareDoc.documentElement)
+  }
+
+  @Test def testXmlBase2(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+    val docUri = classOf[XmlBaseTest].getResource("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml").toURI
+    val doc = docParser.parse(docUri)
+    val docawareDoc = docaware.Document(docUri, doc)
+
+    val elem = docaware.Elem(docUri, doc.documentElement)
+
+    testXmlBase(elem)
+  }
+
+  @Test def testXmlBase3(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+    val docUri = classOf[XmlBaseTest].getResource("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml").toURI
+    val doc = docParser.parse(docUri)
+    val docawareDoc = docaware.Document(docUri, doc)
+
+    val elem = docaware.Elem(docUri, new URI("http://bogusBaseUri"), doc.documentElement)
+
+    testXmlBase(elem)
+  }
+
+  @Test def testXmlBase4(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+    val docUri = classOf[XmlBaseTest].getResource("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml").toURI
+    val doc = docParser.parse(docUri)
+    val docawareDoc = docaware.Document(docUri, doc)
+
+    val path = docawareDoc.documentElement.findElem(_.resolvedName == EName("olist")).get.path
+    val elem = docaware.Elem(docUri, doc.documentElement, path)
+
+    testXmlBaseOfNonRootElem(elem)
+  }
+
+  @Test def testXmlBase5(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+    val docUri = classOf[XmlBaseTest].getResource("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml").toURI
+    val doc = docParser.parse(docUri)
+    val docawareDoc = docaware.Document(docUri, doc)
+
+    val path = docawareDoc.documentElement.findElem(_.resolvedName == EName("olist")).get.path
+    val elem = docaware.Elem(docUri, docawareDoc.documentElement.baseUri, doc.documentElement, path)
+
+    testXmlBaseOfNonRootElem(elem)
+  }
+
+  private def testXmlBase(elem: docaware.Elem): Unit = {
     assertResult(2) {
-      docawareDoc.documentElement.filterElemsOrSelf(e => e.attributeOption(XmlBaseEName).isDefined).size
+      elem.filterElemsOrSelf(e => e.attributeOption(XmlBaseEName).isDefined).size
     }
     assertResult(new URI("http://example.org/today/")) {
-      docawareDoc.documentElement.baseUri
+      elem.baseUri
     }
     assertResult(Set(new URI("http://example.org/hotpicks/"))) {
-      docawareDoc.documentElement.filterElems(EName("olist")).map(_.baseUri).toSet
+      elem.filterElems(EName("olist")).map(_.baseUri).toSet
     }
     assertResult(Set(
       new URI("http://example.org/today/new.xml"),
@@ -61,7 +111,28 @@ class XmlBaseTest extends Suite {
       new URI("http://example.org/hotpicks/pick3.xml"))) {
 
       val uris =
-        docawareDoc.documentElement.filterElems(EName("link")) map { e =>
+        elem.filterElems(EName("link")) map { e =>
+          val href = new URI(e.attribute(EName(XLinkNs, "href")))
+          e.baseUri.resolve(href)
+        }
+      uris.toSet
+    }
+  }
+
+  private def testXmlBaseOfNonRootElem(elem: docaware.Elem): Unit = {
+    require(elem.resolvedName == EName("olist"))
+
+    assertResult(new URI("http://example.org/hotpicks/")) {
+      elem.baseUri
+    }
+
+    assertResult(Set(
+      new URI("http://example.org/hotpicks/pick1.xml"),
+      new URI("http://example.org/hotpicks/pick2.xml"),
+      new URI("http://example.org/hotpicks/pick3.xml"))) {
+
+      val uris =
+        elem.filterElems(EName("link")) map { e =>
           val href = new URI(e.attribute(EName(XLinkNs, "href")))
           e.baseUri.resolve(href)
         }

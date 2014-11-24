@@ -30,14 +30,15 @@ import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.simple
 
 /**
- * An element just like `indexed.Elem`, but storing the URI of the containing document as well. See [[eu.cdevreeze.yaidom.indexed.Elem]]
- * for more details. These details apply to [[eu.cdevreeze.yaidom.docaware.Elem]] too, except that additionally the document URI
- * is stored.
+ * An element just like `indexed.Elem`, but storing the containing document URI (and base URI) as well. See [[eu.cdevreeze.yaidom.indexed.Elem]]
+ * for more details. These details apply to [[eu.cdevreeze.yaidom.docaware.Elem]] too, except that additionally the document and base URIs
+ * are stored.
  *
  * @author Chris de Vreeze
  */
 final class Elem private[docaware] (
   val docUri: URI,
+  val parentBaseUri: URI,
   val rootElem: simple.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
@@ -138,26 +139,11 @@ final class Elem private[docaware] (
   }
 
   /**
-   * Returns the base URI of the element, by XML Base processing starting with the document URI.
-   * That is, returns `baseUriOfAncestorOrSelf(path)`.
+   * Returns the base URI of the element.
    */
-  final def baseUri: URI = baseUriOfAncestorOrSelf(path)
-
-  /**
-   * Returns the base URI of an ancestor-or-self element.
-   */
-  final def baseUriOfAncestorOrSelf(ancestorOrSelfPath: Path): URI = {
-    if (ancestorOrSelfPath.isRoot) {
-      val explicitBaseUriOption = rootElem.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
-      explicitBaseUriOption.map(u => docUri.resolve(u)).getOrElse(docUri)
-    } else {
-      // Recursive call
-      val parentBaseUri = baseUriOfAncestorOrSelf(ancestorOrSelfPath.parentPath)
-
-      val e = rootElem.getElemOrSelfByPath(ancestorOrSelfPath)
-      val explicitBaseUriOption = e.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
-      explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
-    }
+  final def baseUri: URI = {
+    val explicitBaseUriOption = attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
+    explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
   }
 }
 
@@ -174,22 +160,56 @@ object Elem {
   }
 
   /**
-   * Expensive recursive factory method for "docaware elements".
+   * Calls `apply(docUri, parentBaseUri, rootElem, Path.Root)`
+   */
+  def apply(docUri: URI, parentBaseUri: URI, rootElem: simple.Elem): Elem = {
+    apply(docUri, parentBaseUri, rootElem, Path.Root)
+  }
+
+  /**
+   * Expensive recursive factory method for "docaware elements", which first computes the parent base URI.
    */
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
     // Expensive call, so invoked only once
-    val elem = rootElem.getElemOrSelfByPath(path)
+    val elems = path.entries.scanLeft(rootElem) {
+      case (accElem, entry) =>
+        accElem.getChildElemByPathEntry(entry)
+    }
 
-    apply(docUri, rootElem, path, elem)
+    val parentBaseUri = getBaseUri(docUri, elems.init)
+    val elem = elems.last
+
+    apply(docUri, parentBaseUri, rootElem, path, elem)
   }
 
-  private def apply(docUri: URI, rootElem: simple.Elem, path: Path, elem: simple.Elem): Elem = {
+  /**
+   * Expensive recursive factory method for "docaware elements", which is explicitly passed the parent base URI.
+   */
+  def apply(docUri: URI, parentBaseUri: URI, rootElem: simple.Elem, path: Path): Elem = {
+    // Expensive call, so invoked only once
+    val elem = rootElem.getElemOrSelfByPath(path)
+
+    apply(docUri, parentBaseUri, rootElem, path, elem)
+  }
+
+  private def apply(docUri: URI, parentBaseUri: URI, rootElem: simple.Elem, path: Path, elem: simple.Elem): Elem = {
+    val explicitBaseUriOption = elem.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
+    val baseUri = explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
+
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        apply(docUri, rootElem, path.append(entry), e)
+        apply(docUri, baseUri, rootElem, path.append(entry), e)
     }
 
-    new Elem(docUri, rootElem, childElems, path, elem)
+    new Elem(docUri, parentBaseUri, rootElem, childElems, path, elem)
+  }
+
+  private def getBaseUri(docUri: URI, elems: immutable.IndexedSeq[simple.Elem]): URI = {
+    elems.foldLeft(docUri) {
+      case (accUri, elem) =>
+        val explicitBaseUriOption = elem.attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
+        explicitBaseUriOption.map(u => accUri.resolve(u)).getOrElse(accUri)
+    }
   }
 }
