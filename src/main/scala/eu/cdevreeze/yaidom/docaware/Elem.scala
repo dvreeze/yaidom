@@ -139,7 +139,10 @@ final class Elem private[docaware] (
   }
 
   /**
-   * Returns the base URI of the element.
+   * Returns the base URI of the element. That is, returns:
+   * {{{
+   * attributeOption(Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+   * }}}
    */
   final def baseUri: URI = {
     val explicitBaseUriOption = attributeOption(Elem.XmlBaseEName).map(s => new URI(s))
