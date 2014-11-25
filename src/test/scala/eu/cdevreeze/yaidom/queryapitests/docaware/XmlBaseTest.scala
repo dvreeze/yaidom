@@ -18,15 +18,21 @@ package eu.cdevreeze.yaidom.queryapitests.docaware
 
 import java.net.URI
 
+import scala.Vector
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.simple
 
 /**
  * XML Base test case for docaware Elems.
@@ -94,6 +100,30 @@ class XmlBaseTest extends Suite {
     testXmlBaseOfNonRootElem(elem)
   }
 
+  @Test def testXmlBase6(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+    val docUri = classOf[XmlBaseTest].getResource("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml").toURI
+    val doc = docParser.parse(docUri)
+    val docawareDoc = docaware.Document(docUri, doc)
+
+    val foundElem = docawareDoc.documentElement.findElem(_.resolvedName == EName("olist")).get
+    // Now make the olist element root itself
+    val elem = docaware.Elem(docUri, docawareDoc.documentElement.baseUri, foundElem.elem, Path.Root)
+
+    testXmlBaseOfNonRootElem(elem)
+  }
+
+  @Test def testOtherXmlBase(): Unit = {
+    val elem = testElem
+
+    assertResult(new URI("http://example.org/wine/")) {
+      elem.baseUri
+    }
+    assertResult(new URI("http://example.org/wine/rosé")) {
+      elem.getChildElem(_.localName == "e2").baseUri
+    }
+  }
+
   private def testXmlBase(elem: docaware.Elem): Unit = {
     assertResult(2) {
       elem.filterElemsOrSelf(e => e.attributeOption(XmlBaseEName).isDefined).size
@@ -138,5 +168,17 @@ class XmlBaseTest extends Suite {
         }
       uris.toSet
     }
+  }
+
+  private def testElem: docaware.Elem = {
+    import simple.Node._
+
+    val scope = Scope.Empty
+
+    val elm =
+      emptyElem(QName("e1"), Vector(QName("xml:base") -> "http://example.org/wine/"), scope).
+        plusChild(emptyElem(QName("e2"), Vector(QName("xml:base") -> "rosé"), scope))
+
+    docaware.Elem(new URI(""), elm)
   }
 }
