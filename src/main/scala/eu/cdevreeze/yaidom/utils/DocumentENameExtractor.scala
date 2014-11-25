@@ -33,7 +33,7 @@ trait DocumentENameExtractor {
    * The root element of the given indexed element must be the root element of the document.
    *
    * If there is a corresponding XML Schema, and it specifies that this element text is of type xs:QName,
-   * then this optional TextENameExtractor should be `SimpleTestENameExtractor`.
+   * then this optional TextENameExtractor should be `SimpleTextENameExtractor`.
    */
   def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor]
 
@@ -43,7 +43,7 @@ trait DocumentENameExtractor {
    * The root element of the given indexed element must be the root element of the document.
    *
    * If there is a corresponding XML Schema, and it specifies that this attribute value is of type xs:QName,
-   * then this optional TextENameExtractor should be `SimpleTestENameExtractor`.
+   * then this optional TextENameExtractor should be `SimpleTextENameExtractor`.
    */
   def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor]
 }
