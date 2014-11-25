@@ -3,6 +3,16 @@ CHANGELOG
 =========
 
 
+1.3.1
+=====
+
+Version 1.3.1 is like version 1.3, except that XML Base support has been improved with respect to performance
+(in version 1.3 XML Base support was too slow to be useful).
+
+Breaking change: method ``baseUriOfAncestorOrSelf`` has been removed. Doc-aware elements now also keep the parent
+base URI as state.
+
+
 1.3
 ===
 
