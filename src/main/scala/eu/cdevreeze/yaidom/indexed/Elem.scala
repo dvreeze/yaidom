@@ -38,6 +38,10 @@ import eu.cdevreeze.yaidom.simple
  * snapshots. (This could have been modeled in an alternative design of the class, using a member type, but such a design has
  * not been chosen.)
  *
+ * Be careful not to create any memory leaks. After all, each element, even a leaf element, keeps the entire underlying
+ * document element tree as state. Hence the underlying document element tree will always remain in memory if at least
+ * one indexed element contains it in its state.
+ *
  * ==Example==
  *
  * Below follows an example. This example queries for all book elements having at least Jeffrey Ullman as author. It can be written as follows,
