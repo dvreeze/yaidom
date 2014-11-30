@@ -60,9 +60,9 @@ import eu.cdevreeze.yaidom.simple
  * }}}
  * although the implementation is not this inefficient.
  *
- * Given a parent base URI `parentBaseUri`, which for the root element is the document URI, the base URI of element `elem` is:
+ * Hence, the base URI of element `elem` is:
  * {{{
- * elem.attributeOption(Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+ * elem.attributeOption(Elem.XmlBaseEName).map(s => elem.parentBaseUri.resolve(new URI(s))).getOrElse(elem.parentBaseUri)
  * }}}
  *
  * Note the analogy with Scope resolution, where base URIs and parent base URIs map to scopes and parent scopes, and
