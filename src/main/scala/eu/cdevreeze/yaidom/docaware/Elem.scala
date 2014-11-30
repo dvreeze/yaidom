@@ -48,12 +48,12 @@ import eu.cdevreeze.yaidom.simple
  * uri.resolve(emptyUri) == uri
  * }}}
  *
- * The base URI of an element `elem` can be defined as follows, given document URI `docUri`:
+ * The base URI of an element `elem` can be defined as follows:
  * {{{
  * val ancestorsOrSelf = elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
  *
  * val baseUri =
- *   ancestorsOrSelf.foldLeft(docUri) {
+ *   ancestorsOrSelf.foldLeft(elem.docUri) {
  *     case (currBaseUri, e) =>
  *       e.attributeOption(Elem.XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
  *   }
