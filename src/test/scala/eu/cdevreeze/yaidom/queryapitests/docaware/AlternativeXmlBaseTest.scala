@@ -280,6 +280,142 @@ class AlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
+  @Test def testEmptyDocUriAndXmlBaseAttribute(): Unit = {
+    val scope = Scope.from("xlink" -> XLinkNs)
+
+    val docElem =
+      emptyElem(
+        QName("reference"),
+        Vector(QName("xml:base") -> "", QName("xlink:href") -> "a.xml", QName("xlink:type") -> "simple"),
+        scope)
+
+    val doc = docaware.Document(new URI(""), simple.Document(docElem))
+
+    assertResult(new URI("")) {
+      doc.documentElement.baseUri
+    }
+    assertResult(new URI("a.xml")) {
+      val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
+      doc.documentElement.baseUri.resolve(href)
+    }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
+  }
+
+  @Test def testEmptyXmlBaseAttribute(): Unit = {
+    val scope = Scope.from("xlink" -> XLinkNs)
+
+    val docElem =
+      emptyElem(
+        QName("reference"),
+        Vector(QName("xml:base") -> "", QName("xlink:href") -> "a.xml", QName("xlink:type") -> "simple"),
+        scope)
+
+    val doc = docaware.Document(new URI("http://www.somewhere.com/f1.xml"), simple.Document(docElem))
+
+    require(doc.uri.resolve(new URI("")) == (new URI("http://www.somewhere.com/")))
+
+    assertResult(new URI("http://www.somewhere.com/")) {
+      doc.documentElement.baseUri
+    }
+    assertResult(new URI("http://www.somewhere.com/a.xml")) {
+      val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
+      doc.documentElement.baseUri.resolve(href)
+    }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
+  }
+
+  @Test def testNestedSometimesEmptyXmlBaseAttributes(): Unit = {
+    val scope = Scope.from("xlink" -> XLinkNs)
+
+    val referenceElem =
+      emptyElem(
+        QName("reference"),
+        Vector(QName("xlink:href") -> "a.xml", QName("xlink:type") -> "simple"),
+        scope)
+    val pElem =
+      emptyElem(
+        QName("p"),
+        Vector(QName("xml:base") -> ""),
+        scope).plusChild(referenceElem)
+    val docElem =
+      emptyElem(
+        QName("doc"),
+        Vector(QName("xml:base") -> "http://www.zvon.org/yy/"),
+        scope).plusChild(pElem)
+
+    val doc = docaware.Document(new URI(""), simple.Document(docElem))
+
+    assertResult(new URI("http://www.zvon.org/yy/")) {
+      doc.documentElement.baseUri
+    }
+    assertResult(new URI("http://www.zvon.org/yy/")) {
+      val pElem = doc.documentElement.getChildElem(_.localName == "p")
+      pElem.baseUri
+    }
+    assertResult(new URI("http://www.zvon.org/yy/")) {
+      val pElem = doc.documentElement.getChildElem(_.localName == "p")
+      val referenceElem = pElem.getChildElem(_.localName == "reference")
+      referenceElem.baseUri
+    }
+    assertResult(new URI("http://www.zvon.org/yy/a.xml")) {
+      val pElem = doc.documentElement.getChildElem(_.localName == "p")
+      val referenceElem = pElem.getChildElem(_.localName == "reference")
+      val href = new URI(referenceElem.attribute(XLinkHrefEName))
+      referenceElem.baseUri.resolve(href)
+    }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
+  }
+
+  @Test def testNestedSometimesEmptyXmlBaseAttributesAgain(): Unit = {
+    val scope = Scope.from("xlink" -> XLinkNs)
+
+    val referenceElem =
+      emptyElem(
+        QName("reference"),
+        Vector(QName("xlink:href") -> "a.xml", QName("xlink:type") -> "simple"),
+        scope)
+    val pElem =
+      emptyElem(
+        QName("p"),
+        Vector(QName("xml:base") -> ""),
+        scope).plusChild(referenceElem)
+    val docElem =
+      emptyElem(
+        QName("doc"),
+        Vector(QName("xml:base") -> "http://www.zvon.org/yy/f1.xml"),
+        scope).plusChild(pElem)
+
+    val doc = docaware.Document(new URI(""), simple.Document(docElem))
+
+    assertResult(new URI("http://www.zvon.org/yy/f1.xml")) {
+      doc.documentElement.baseUri
+    }
+    assertResult(new URI("http://www.zvon.org/yy/")) {
+      val pElem = doc.documentElement.getChildElem(_.localName == "p")
+      pElem.baseUri
+    }
+    assertResult(new URI("http://www.zvon.org/yy/")) {
+      val pElem = doc.documentElement.getChildElem(_.localName == "p")
+      val referenceElem = pElem.getChildElem(_.localName == "reference")
+      referenceElem.baseUri
+    }
+    assertResult(new URI("http://www.zvon.org/yy/a.xml")) {
+      val pElem = doc.documentElement.getChildElem(_.localName == "p")
+      val referenceElem = pElem.getChildElem(_.localName == "reference")
+      val href = new URI(referenceElem.attribute(XLinkHrefEName))
+      referenceElem.baseUri.resolve(href)
+    }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
+  }
+
   private def testXmlBaseProperty1(elem: docaware.Elem): Unit = {
     val ancestorsOrSelf =
       elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))

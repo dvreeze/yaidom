@@ -40,6 +40,14 @@ import eu.cdevreeze.yaidom.simple
  * the document URI is empty and the XML Base attributes also contain only relative URIs, as long as one is aware of it.
  * Of course, the user of the API is free to reject those relative base URIs.
  *
+ * With respect to empty (string)  `emptyUri`, the following holds:
+ * {{{
+ * emptyUri.resolve(uri) == uri
+ *
+ * // If uri ends in a slash, so its path ends in a slash (and there is no query string and fragment):
+ * uri.resolve(emptyUri) == uri
+ * }}}
+ *
  * The base URI of an element `elem` can be defined as follows, given document URI `docUri`:
  * {{{
  * val ancestorsOrSelf = elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
