@@ -52,6 +52,9 @@ class XmlBaseTest extends Suite {
     val docawareDoc = docaware.Document(docUri, doc)
 
     testXmlBase(docawareDoc.documentElement)
+
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testXmlBase2(): Unit = {
@@ -63,6 +66,9 @@ class XmlBaseTest extends Suite {
     val elem = docaware.Elem(docUri, doc.documentElement)
 
     testXmlBase(elem)
+
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testXmlBase3(): Unit = {
@@ -74,6 +80,9 @@ class XmlBaseTest extends Suite {
     val elem = docaware.Elem(docUri, new URI("http://bogusBaseUri"), doc.documentElement)
 
     testXmlBase(elem)
+
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testXmlBase4(): Unit = {
@@ -86,6 +95,9 @@ class XmlBaseTest extends Suite {
     val elem = docaware.Elem(docUri, doc.documentElement, path)
 
     testXmlBaseOfNonRootElem(elem)
+
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testXmlBase5(): Unit = {
@@ -98,6 +110,9 @@ class XmlBaseTest extends Suite {
     val elem = docaware.Elem(docUri, docawareDoc.documentElement.baseUri, doc.documentElement, path)
 
     testXmlBaseOfNonRootElem(elem)
+
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testXmlBase6(): Unit = {
@@ -111,6 +126,9 @@ class XmlBaseTest extends Suite {
     val elem = docaware.Elem(docUri, docawareDoc.documentElement.baseUri, foundElem.elem, Path.Root)
 
     testXmlBaseOfNonRootElem(elem)
+
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    docawareDoc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testOtherXmlBase(): Unit = {
@@ -122,6 +140,9 @@ class XmlBaseTest extends Suite {
     assertResult(new URI("http://example.org/wine/rosé")) {
       elem.getChildElem(_.localName == "e2").baseUri
     }
+
+    elem.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    elem.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   private def testXmlBase(elem: docaware.Elem): Unit = {
@@ -180,5 +201,30 @@ class XmlBaseTest extends Suite {
         plusChild(emptyElem(QName("e2"), Vector(QName("xml:base") -> "rosé"), scope))
 
     docaware.Elem(new URI(""), elm)
+  }
+
+  private def testXmlBaseProperty1(elem: docaware.Elem): Unit = {
+    val ancestorsOrSelf =
+      elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
+
+    val expectedBaseUri =
+      ancestorsOrSelf.foldLeft(elem.docUri) {
+        case (currBaseUri, e) =>
+          e.attributeOption(docaware.Elem.XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
+      }
+
+    assertResult(expectedBaseUri) {
+      elem.baseUri
+    }
+  }
+
+  private def testXmlBaseProperty2(elem: docaware.Elem): Unit = {
+    val parentBaseUri = elem.parentBaseUri
+    val expectedBaseUri =
+      elem.attributeOption(docaware.Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+
+    assertResult(expectedBaseUri) {
+      elem.baseUri
+    }
   }
 }

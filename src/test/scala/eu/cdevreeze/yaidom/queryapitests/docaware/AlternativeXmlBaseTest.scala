@@ -70,6 +70,9 @@ class AlternativeXmlBaseTest extends Suite {
       val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
       doc.documentElement.baseUri.resolve(href)
     }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testTwoEquivalentHrefs(): Unit = {
@@ -106,6 +109,12 @@ class AlternativeXmlBaseTest extends Suite {
       val href = new URI(doc2.documentElement.attribute(XLinkHrefEName))
       doc2.documentElement.baseUri.resolve(href)
     }
+
+    doc1.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc1.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
+
+    doc2.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc2.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testMissingXmlBaseAttribute(): Unit = {
@@ -126,6 +135,9 @@ class AlternativeXmlBaseTest extends Suite {
       val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
       doc.documentElement.baseUri.resolve(href)
     }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testXmlBaseAttributeOnParent(): Unit = {
@@ -152,6 +164,9 @@ class AlternativeXmlBaseTest extends Suite {
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
       referenceElem.baseUri.resolve(href)
     }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testNestedXmlBaseAttributes(): Unit = {
@@ -188,6 +203,9 @@ class AlternativeXmlBaseTest extends Suite {
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
       referenceElem.baseUri.resolve(href)
     }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testOtherNestedXmlBaseAttributes(): Unit = {
@@ -218,6 +236,9 @@ class AlternativeXmlBaseTest extends Suite {
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
       referenceElem.baseUri.resolve(href)
     }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
   @Test def testNestedAbsoluteXmlBaseAttributes(): Unit = {
@@ -253,6 +274,34 @@ class AlternativeXmlBaseTest extends Suite {
       val referenceElem = pElem.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
       referenceElem.baseUri.resolve(href)
+    }
+
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
+    doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
+  }
+
+  private def testXmlBaseProperty1(elem: docaware.Elem): Unit = {
+    val ancestorsOrSelf =
+      elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
+
+    val expectedBaseUri =
+      ancestorsOrSelf.foldLeft(elem.docUri) {
+        case (currBaseUri, e) =>
+          e.attributeOption(docaware.Elem.XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
+      }
+
+    assertResult(expectedBaseUri) {
+      elem.baseUri
+    }
+  }
+
+  private def testXmlBaseProperty2(elem: docaware.Elem): Unit = {
+    val parentBaseUri = elem.parentBaseUri
+    val expectedBaseUri =
+      elem.attributeOption(docaware.Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+
+    assertResult(expectedBaseUri) {
+      elem.baseUri
     }
   }
 }

@@ -40,6 +40,26 @@ import eu.cdevreeze.yaidom.simple
  * the document URI is empty and the XML Base attributes also contain only relative URIs, as long as one is aware of it.
  * Of course, the user of the API is free to reject those relative base URIs.
  *
+ * The base URI of an element `elem` can be defined as follows, given document URI `docUri`:
+ * {{{
+ * val ancestorsOrSelf = elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
+ *
+ * val baseUri =
+ *   ancestorsOrSelf.foldLeft(docUri) {
+ *     case (currBaseUri, e) =>
+ *       e.attributeOption(Elem.XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
+ *   }
+ * }}}
+ * although the implementation is not this inefficient.
+ *
+ * Given a parent base URI `parentBaseUri`, which for the root element is the document URI, the base URI of element `elem` is:
+ * {{{
+ * elem.attributeOption(Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+ * }}}
+ *
+ * Note the analogy with Scope resolution, where base URIs and parent base URIs map to scopes and parent scopes, and
+ * where XML Base attributes map to namespace declarations.
+ *
  * @author Chris de Vreeze
  */
 final class Elem private[docaware] (
@@ -159,7 +179,8 @@ final class Elem private[docaware] (
 object Elem {
 
   private val XmlNs = "http://www.w3.org/XML/1998/namespace"
-  private val XmlBaseEName = EName(XmlNs, "base")
+
+  val XmlBaseEName = EName(XmlNs, "base")
 
   /**
    * Calls `apply(docUri, rootElem, Path.Root)`
@@ -214,6 +235,10 @@ object Elem {
     new Elem(docUri, parentBaseUri, rootElem, childElems, path, elem)
   }
 
+  /**
+   * Computes the base URI of `elems.last`, if any, from the passed document URI and the passed ancestor-or-self `elems`
+   * (starting with the root element, and ending with "this" element). If `elems` is empty, `docUri` is returned.
+   */
   private def getBaseUri(docUri: URI, elems: immutable.IndexedSeq[simple.Elem]): URI = {
     elems.foldLeft(docUri) {
       case (accUri, elem) =>
