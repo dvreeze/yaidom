@@ -34,6 +34,12 @@ import eu.cdevreeze.yaidom.simple
  * for more details. These details apply to [[eu.cdevreeze.yaidom.docaware.Elem]] too, except that additionally the document and base URIs
  * are stored.
  *
+ * If XML Base support is important, but the documents may have no document URI, still consider using `docaware` elements,
+ * using the empty URI as document URI. Note that the empty URI is a relative URI, containing only an empty path, and
+ * that resolving URIs against the empty URI leaves those URIs the same. XML Base processing is still possible if
+ * the document URI is empty and the XML Base attributes also contain only relative URIs, as long as one is aware of it.
+ * Of course, the user of the API is free to reject those relative base URIs.
+ *
  * @author Chris de Vreeze
  */
 final class Elem private[docaware] (
