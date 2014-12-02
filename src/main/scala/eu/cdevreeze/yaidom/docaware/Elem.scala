@@ -55,14 +55,14 @@ import eu.cdevreeze.yaidom.simple
  * val baseUri =
  *   ancestorsOrSelf.foldLeft(elem.docUri) {
  *     case (currBaseUri, e) =>
- *       e.attributeOption(Elem.XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
+ *       e.attributeOption(XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
  *   }
  * }}}
  * although the implementation is not this inefficient.
  *
  * Hence, the base URI of element `elem` is:
  * {{{
- * elem.attributeOption(Elem.XmlBaseEName).map(s => elem.parentBaseUri.resolve(new URI(s))).getOrElse(elem.parentBaseUri)
+ * elem.attributeOption(XmlBaseEName).map(s => elem.parentBaseUri.resolve(new URI(s))).getOrElse(elem.parentBaseUri)
  * }}}
  *
  * Note the analogy with Scope resolution, where base URIs and parent base URIs map to scopes and parent scopes, and
@@ -175,7 +175,7 @@ final class Elem private[docaware] (
   /**
    * Returns the base URI of the element. That is, returns:
    * {{{
-   * attributeOption(Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+   * attributeOption(XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
    * }}}
    */
   final def baseUri: URI = {
@@ -188,7 +188,7 @@ object Elem {
 
   private val XmlNs = "http://www.w3.org/XML/1998/namespace"
 
-  val XmlBaseEName = EName(XmlNs, "base")
+  private val XmlBaseEName = EName(XmlNs, "base")
 
   /**
    * Calls `apply(docUri, rootElem, Path.Root)`
