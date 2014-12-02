@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+1.3.2
+=====
+
+Version 1.3.2 is like version 1.3.1, but with more documentation and test cases with respect to XML Base support in
+``docaware`` elements.
+
+
 1.3.1
 =====
 

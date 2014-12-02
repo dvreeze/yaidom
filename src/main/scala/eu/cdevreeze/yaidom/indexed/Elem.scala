@@ -38,9 +38,10 @@ import eu.cdevreeze.yaidom.simple
  * snapshots. (This could have been modeled in an alternative design of the class, using a member type, but such a design has
  * not been chosen.)
  *
- * Be careful not to create any memory leaks. After all, each element, even a leaf element, keeps the entire underlying
+ * Be careful not to create any '''memory leaks'''. After all, an element, even a leaf element, typically keeps the entire underlying
  * document element tree as state. Hence the underlying document element tree will always remain in memory if at least
- * one indexed element contains it in its state.
+ * one indexed element contains it in its state. (Yet with mutable org.w3c.dom element trees, it is also easy to cause
+ * memory leaks. See http://apmblog.compuware.com/2011/04/20/the-top-java-memory-problems-part-1/.)
  *
  * ==Example==
  *
