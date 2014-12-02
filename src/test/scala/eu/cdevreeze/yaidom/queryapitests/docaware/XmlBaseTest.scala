@@ -210,7 +210,7 @@ class XmlBaseTest extends Suite {
     val expectedBaseUri =
       ancestorsOrSelf.foldLeft(elem.docUri) {
         case (currBaseUri, e) =>
-          e.attributeOption(docaware.Elem.XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
+          e.attributeOption(XmlBaseEName).map(s => currBaseUri.resolve(new URI(s))).getOrElse(currBaseUri)
       }
 
     assertResult(expectedBaseUri) {
@@ -221,7 +221,7 @@ class XmlBaseTest extends Suite {
   private def testXmlBaseProperty2(elem: docaware.Elem): Unit = {
     val parentBaseUri = elem.parentBaseUri
     val expectedBaseUri =
-      elem.attributeOption(docaware.Elem.XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
+      elem.attributeOption(XmlBaseEName).map(s => parentBaseUri.resolve(new URI(s))).getOrElse(parentBaseUri)
 
     assertResult(expectedBaseUri) {
       elem.baseUri
