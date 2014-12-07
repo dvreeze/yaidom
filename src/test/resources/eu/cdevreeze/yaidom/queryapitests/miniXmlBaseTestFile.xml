@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- See http://www.w3.org/TR/xmlbase/ -->
+<e1 xml:base="http://example.org/wine/">
+  <!-- Adapted 4th character in next xml:base to circumvent issue with (internal) URI parsing/resolution in JDK -->
+  <e2 xml:base="rose">ros&#x00E9;</e2>
+</e1>
