@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.dom
+package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
+import java.io.File
+import java.io.FileInputStream
 import java.net.URI
 
 import scala.collection.immutable
@@ -23,37 +25,34 @@ import scala.collection.immutable
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom
-import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.dom.DomDocument
-import eu.cdevreeze.yaidom.dom.DomElem
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
-import eu.cdevreeze.yaidom.simple.Document
-import javax.xml.parsers.DocumentBuilderFactory
+import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
+import javax.xml.transform.stream.StreamSource
+import net.sf.saxon.lib.ParseOptions
 
 /**
- * Alternative XML Base test case for DOM wrapper Elems. This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
- *
- * Note the use of empty URIs in some places.
+ * XML Base test case for Saxon wrapper Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
+class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
 
   type E = DomElem
 
   type E2 = DomElem
 
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E] = {
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    val d = db.newDocument()
-    DomConversions.convertDocument(Document(elem))(d)
-    d.setDocumentURI(docUri.toString)
-    val doc = DomDocument(d)
+  protected def getDocument(path: String, docUri: URI): DomDocument = {
+    val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
+    val parseOptions = new ParseOptions
+    val is = new FileInputStream(new File(parsedDocUri))
+    val doc: DomDocument =
+      DomNode.wrapDocument(
+        processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is, docUri.toString), parseOptions))
     doc
+  }
+
+  protected def getDocument(path: String): DomDocument = {
+    getDocument(path, classOf[XmlBaseTest].getResource(path).toURI)
   }
 
   protected def getBaseUri(elem: E): URI = {
@@ -62,16 +61,14 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   protected def getParentBaseUri(elem: E): URI = {
     elem.parentOption.map(e => toUri(e.wrappedNode.getBaseURI)).getOrElse(
-      toUri(elem.wrappedNode.getOwnerDocument.getDocumentURI))
+      toUri(elem.wrappedNode.getDocumentRoot.getSystemId))
   }
 
   protected def getDocumentUri(elem: E): URI = {
-    toUri(elem.wrappedNode.getOwnerDocument.getDocumentURI)
+    toUri(elem.wrappedNode.getDocumentRoot.getSystemId)
   }
 
   protected def getAncestorsOrSelfReversed(elem: E): immutable.IndexedSeq[E2] = {
     elem.ancestorsOrSelf.reverse
   }
-
-  protected def nullUri: URI = new URI("")
 }

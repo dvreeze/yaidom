@@ -69,7 +69,9 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
   }
 
   protected def toUri(s: String): URI =
-    Option(s).map(s => new URI(s)).getOrElse(new URI(""))
+    Option(s).map(s => new URI(s)).getOrElse(nullUri)
+
+  protected def nullUri: URI
 
   @Test def testXmlBaseAttributeOnElement(): Unit = {
     val scope = Scope.from("xlink" -> XLinkNs)
@@ -103,7 +105,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xlink:href") -> "http://www.zvon.org/a.xml", QName("xlink:type") -> "simple"),
         scope)
 
-    val doc1 = convertToDocument(docElem1, new URI(""))
+    val doc1 = convertToDocument(docElem1, nullUri)
 
     val docElem2 =
       emptyElem(
@@ -111,7 +113,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "http://www.zvon.org/", QName("xlink:href") -> "a.xml", QName("xlink:type") -> "simple"),
         scope)
 
-    val doc2 = convertToDocument(docElem2, new URI(""))
+    val doc2 = convertToDocument(docElem2, nullUri)
 
     assertResult(new URI("")) {
       getBaseUri(doc1.documentElement)
@@ -173,7 +175,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "http://www.zvon.org/"),
         scope).plusChild(referenceElem)
 
-    val doc = convertToDocument(docElem, new URI(""))
+    val doc = convertToDocument(docElem, nullUri)
 
     assertResult(new URI("http://www.zvon.org/")) {
       getBaseUri(doc.documentElement)
@@ -207,7 +209,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "http://www.zvon.org/"),
         scope).plusChild(pElem)
 
-    val doc = convertToDocument(docElem, new URI(""))
+    val doc = convertToDocument(docElem, nullUri)
 
     assertResult(new URI("http://www.zvon.org/")) {
       getBaseUri(doc.documentElement)
@@ -279,7 +281,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "http://www.zvon.org/"),
         scope).plusChild(pElem)
 
-    val doc = convertToDocument(docElem, new URI(""))
+    val doc = convertToDocument(docElem, nullUri)
 
     assertResult(new URI("http://www.zvon.org/")) {
       getBaseUri(doc.documentElement)
@@ -308,7 +310,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "", QName("xlink:href") -> "a.xml", QName("xlink:type") -> "simple"),
         scope)
 
-    val doc = convertToDocument(docElem, new URI(""))
+    val doc = convertToDocument(docElem, nullUri)
 
     assertResult(new URI("")) {
       getBaseUri(doc.documentElement)
@@ -366,7 +368,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "http://www.zvon.org/yy/"),
         scope).plusChild(pElem)
 
-    val doc = convertToDocument(docElem, new URI(""))
+    val doc = convertToDocument(docElem, nullUri)
 
     assertResult(new URI("http://www.zvon.org/yy/")) {
       getBaseUri(doc.documentElement)
@@ -410,7 +412,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
         Vector(QName("xml:base") -> "http://www.zvon.org/yy/f1.xml"),
         scope).plusChild(pElem)
 
-    val doc = convertToDocument(docElem, new URI(""))
+    val doc = convertToDocument(docElem, nullUri)
 
     assertResult(new URI("http://www.zvon.org/yy/f1.xml")) {
       getBaseUri(doc.documentElement)

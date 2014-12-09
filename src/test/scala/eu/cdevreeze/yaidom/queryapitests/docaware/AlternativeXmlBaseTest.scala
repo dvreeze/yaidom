@@ -66,4 +66,6 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
     // Note the different behavior for resolving the empty URI!
     base.resolve(uri)
   }
+
+  protected def nullUri: URI = new URI("")
 }
