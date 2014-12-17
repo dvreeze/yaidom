@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.convert
 
 import java.net.URI
 
+import scala.Vector
 import scala.collection.BufferedIterator
 import scala.collection.Iterator
 import scala.collection.JavaConverters.asScalaIteratorConverter
@@ -40,7 +41,6 @@ import javax.xml.XMLConstants
 import javax.xml.namespace.{ QName => JQName }
 import javax.xml.stream.events.Attribute
 import javax.xml.stream.events.Characters
-import javax.xml.stream.events.EndElement
 import javax.xml.stream.events.EntityReference
 import javax.xml.stream.events.Namespace
 import javax.xml.stream.events.StartDocument
@@ -60,7 +60,8 @@ import javax.xml.stream.events.XMLEvent
  * @author Chris de Vreeze
  */
 trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
-  import StaxEventsToYaidomConversions.EventWithDepth
+  import StaxEventsToYaidomConversions.AncestryOrSelf
+  import StaxEventsToYaidomConversions.EventState
   import StaxEventsToYaidomConversions.DocumentResult
   import StaxEventsToYaidomConversions.ElemResult
 
@@ -79,21 +80,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
   final def convertToDocument(v: Iterator[XMLEvent]): Document = {
     val eventIterator: Iterator[XMLEvent] = v dropWhile { ev => !ev.isStartDocument }
 
-    val eventWithDepthIterator: BufferedIterator[EventWithDepth] = {
-      var depth = 0
-      val result = eventIterator map { ev =>
-        ev match {
-          case start: StartElement =>
-            depth += 1; new EventWithDepth(start, depth)
-          case end: EndElement =>
-            val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
-          case _ => new EventWithDepth(ev, depth)
-        }
-      }
+    val eventStateIterator: BufferedIterator[EventState] = {
+      val result = convertToEventStateIterator(eventIterator)
       result.buffered
     }
 
-    val result = eventsToDocument(eventWithDepthIterator)
+    val result = eventsToDocument(eventStateIterator)
 
     require {
       result.remainder forall { ev =>
@@ -127,21 +119,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
   final def convertToElem(v: Iterator[XMLEvent], parentScope: Scope): Elem = {
     val eventIterator: Iterator[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
 
-    val eventWithDepthIterator: BufferedIterator[EventWithDepth] = {
-      var depth = 0
-      val result = eventIterator map { ev =>
-        ev match {
-          case start: StartElement =>
-            depth += 1; new EventWithDepth(start, depth)
-          case end: EndElement =>
-            val currDepth = depth; depth -= 1; new EventWithDepth(end, currDepth)
-          case _ => new EventWithDepth(ev, depth)
-        }
-      }
+    val eventStateIterator: BufferedIterator[EventState] = {
+      val result = convertToEventStateIterator(eventIterator)
       result.buffered
     }
 
-    val result = eventsToElem(eventWithDepthIterator, parentScope)
+    val result = eventsToElem(eventStateIterator)
 
     require {
       result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
@@ -165,19 +148,34 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
   /** Converts a StAX `Comment` event to a yaidom `Comment` */
   final def convertToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
 
-  private def eventsToDocument(eventWithDepthIterator: BufferedIterator[EventWithDepth]): DocumentResult = {
-    require(eventWithDepthIterator.hasNext)
+  /**
+   * Converts the iterator of XMLEvents to an iterator of EventState objects.
+   * This method can also be used in streaming scenarios, where only chunks of a large XML stream are kept in memory
+   * at any moment in time.
+   */
+  final def convertToEventStateIterator(events: Iterator[XMLEvent]): Iterator[EventState] = {
+    var state = new AncestryOrSelf(Nil)
 
-    var it = eventWithDepthIterator
+    events map { event =>
+      val nextState = state.next(event)
+      state = nextState
+      new EventState(event, nextState)
+    }
+  }
+
+  private def eventsToDocument(eventStateIterator: BufferedIterator[EventState]): DocumentResult = {
+    require(eventStateIterator.hasNext)
+
+    var it = eventStateIterator
 
     val head = it.next()
     require(head.event.isStartDocument)
 
     val startDocument: StartDocument = head.event.asInstanceOf[StartDocument]
 
-    def startsWithEndDocument(eventIterator: BufferedIterator[EventWithDepth]): Boolean = {
+    def startsWithEndDocument(eventIterator: BufferedIterator[EventState]): Boolean = {
       if (!eventIterator.hasNext) false else {
-        val hd: EventWithDepth = eventIterator.head
+        val hd: EventState = eventIterator.head
         hd.event.isEndDocument
       }
     }
@@ -193,7 +191,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       nextHead.event match {
         case ev if ev.isStartElement => {
           require(docElement eq null, "Only 1 document element allowed and required")
-          val result = eventsToElem(it, Scope.Empty)
+          val result = eventsToElem(it)
           docElement = result.elem
           it = result.remainder
         }
@@ -228,22 +226,23 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     new DocumentResult(doc, it)
   }
 
-  private def eventsToElem(eventWithDepthIterator: BufferedIterator[EventWithDepth], parentScope: Scope): ElemResult = {
-    require(eventWithDepthIterator.hasNext)
+  private def eventsToElem(eventStateIterator: BufferedIterator[EventState]): ElemResult = {
+    require(eventStateIterator.hasNext)
 
-    var it = eventWithDepthIterator
+    var it = eventStateIterator
 
     val head = it.next()
     require(head.event.isStartElement)
 
     val startElement: StartElement = head.event.asStartElement
+    require(!head.state.ancestorsOrSelf.isEmpty)
 
-    val elem: Elem = eventToElem(startElement, parentScope)
+    val elem: Elem = head.state.ancestorsOrSelf.head.toElem
 
-    def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithDepth]): Boolean = {
+    def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventState]): Boolean = {
       if (!eventIterator.hasNext) false else {
-        val hd: EventWithDepth = eventIterator.head
-        (hd.depth == head.depth) && (hd.event.isEndElement)
+        val hd: EventState = eventIterator.head
+        (hd.event.isEndElement) && (hd.state.ancestorsOrSelf.map(_.qname) == head.state.ancestorsOrSelf.tail.map(_.qname))
       }
     }
 
@@ -256,7 +255,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       nextHead.event match {
         case ev: StartElement => {
           // Recursive call (not tail-recursive, but recursion depth is rather limited)
-          val result = eventsToElem(it, elem.scope)
+          val result = eventsToElem(it)
           val ch = result.elem
           children += ch
           it = result.remainder
@@ -286,13 +285,55 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     }
     require(startsWithMatchingEndElement(it))
     val endElementEv = it.next.event.asEndElement
-    require(endElementEv.getName == head.event.asStartElement.getName)
+    require(
+      endElementEv.getName == head.event.asStartElement.getName,
+      s"Expected end-element name ${head.event.asStartElement.getName} but encountered ${endElementEv.getName}")
 
     val elemWithChildren: Elem = elem.withChildren(children.toIndexedSeq)
     new ElemResult(elemWithChildren, it)
   }
+}
 
-  private def eventToElem(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): Elem = {
+object StaxEventsToYaidomConversions {
+
+  /**
+   * The element, without its children.
+   */
+  final class ElemInfo(val qname: QName, val attributes: immutable.IndexedSeq[(QName, String)], val scope: Scope) {
+
+    def toElem: Elem = Elem(qname, attributes, scope, Vector())
+  }
+
+  /**
+   * Conversion state, holding the ancestor-or-self ElemInfo objects, from the inside to the root.
+   */
+  final class AncestryOrSelf(val ancestorsOrSelf: List[ElemInfo]) {
+
+    def parentScope: Scope = ancestorsOrSelf.headOption.map(_.scope).getOrElse(Scope.Empty)
+
+    def next(event: XMLEvent): AncestryOrSelf = {
+      if (event.isStartElement) {
+        val startElemEvent = event.asStartElement
+        val elemInfo = eventToElemInfo(startElemEvent, parentScope)
+        new AncestryOrSelf(elemInfo :: ancestorsOrSelf)
+      } else if (event.isEndElement) {
+        val endElemEvent = event.asEndElement
+        require(ancestorsOrSelf.headOption.isDefined && ancestorsOrSelf.head.qname.localPart == endElemEvent.getName.getLocalPart)
+        new AncestryOrSelf(ancestorsOrSelf.tail)
+      } else this
+    }
+  }
+
+  /**
+   * An XMLEvent combined with its end-state.
+   */
+  final class EventState(val event: XMLEvent, val state: AncestryOrSelf) extends Immutable
+
+  private class ElemResult(val elem: Elem, val remainder: BufferedIterator[EventState]) extends Immutable
+
+  private class DocumentResult(val doc: Document, val remainder: BufferedIterator[EventState]) extends Immutable
+
+  private def eventToElemInfo(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): ElemInfo = {
     val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
@@ -347,7 +388,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here
 
-    Elem(elemQName, currAttrs, currScope, immutable.IndexedSeq())
+    new ElemInfo(elemQName, currAttrs, currScope)
   }
 
   /** Gets an optional prefix from a `javax.xml.namespace.QName` */
@@ -355,13 +396,4 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val prefix: String = jqname.getPrefix
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
   }
-}
-
-private object StaxEventsToYaidomConversions {
-
-  private class EventWithDepth(val event: XMLEvent, val depth: Int) extends Immutable
-
-  private class ElemResult(val elem: Elem, val remainder: BufferedIterator[EventWithDepth]) extends Immutable
-
-  private class DocumentResult(val doc: Document, val remainder: BufferedIterator[EventWithDepth]) extends Immutable
 }

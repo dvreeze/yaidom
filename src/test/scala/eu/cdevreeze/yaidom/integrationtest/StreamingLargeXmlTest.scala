@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.{ io => jio }
 import java.{ util => jutil }
 
-import scala.Vector
+import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.collection.mutable
 
 import org.junit.Test
@@ -29,10 +29,12 @@ import org.scalatest.ConfigMap
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.convert.StaxConversions.convertToElem
+import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventStateIterator
+import eu.cdevreeze.yaidom.convert.StaxEventsToYaidomConversions.EventState
+import eu.cdevreeze.yaidom.core.Scope
 import javax.xml.stream.XMLEventReader
 import javax.xml.stream.XMLInputFactory
-import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
 
@@ -81,26 +83,20 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
 
-    val outputFactory = XMLOutputFactory.newInstance
-
-    val docParser = DocumentParserUsingSax.newInstance
+    val eventStateIterator =
+      convertToEventStateIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
     var elemCount = 0
 
-    collectUntilNextIsContactOrEnd(xmlEventReader)
+    collectUntilNextIsContactOrEnd(eventStateIterator)
 
-    while (!stop(xmlEventReader)) {
-      val events =
-        trimContactEvents((xmlEventReader.nextTag().asStartElement) +: collectUntilNextIsContactOrEnd(xmlEventReader))
+    while (!stop(eventStateIterator)) {
+      val eventStates =
+        trimContactEvents((eventStateIterator.next()) +: collectUntilNextIsContactOrEnd(eventStateIterator))
 
-      val bos = new jio.ByteArrayOutputStream()
-      val xmlEventWriter = outputFactory.createXMLEventWriter(bos, "UTF-8")
-      events foreach (ev => xmlEventWriter.add(ev))
-      xmlEventWriter.flush() // Needed on IBM JDK
-      val contactBytes = bos.toByteArray
-
-      val contactElem = docParser.parse(new jio.ByteArrayInputStream(contactBytes)).documentElement
+      val contactElem =
+        convertToElem(eventStates.map(_.event), eventStates.head.state.parentScope)
 
       assert(contactElem.localName == "contact")
       contactCount += 1
@@ -127,21 +123,26 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     xmlEvent.isEndElement() && xmlEvent.asEndElement().getName.getLocalPart == "contact"
   }
 
-  private def stop(xmlEventReader: XMLEventReader): Boolean =
-    (!xmlEventReader.hasNext) || (!isStartContact(xmlEventReader.peek()))
+  private def stop(it: BufferedIterator[EventState]): Boolean =
+    (!it.hasNext) || (!isStartContact(it.head.event))
 
-  private def collectUntilNextIsContactOrEnd(xmlEventReader: XMLEventReader): Vector[XMLEvent] = {
-    var result = mutable.ArrayBuffer[XMLEvent]()
+  private def collectUntilNextIsContactOrEnd(it: BufferedIterator[EventState]): Vector[EventState] = {
+    var result = mutable.ArrayBuffer[EventState]()
 
-    while (xmlEventReader.hasNext() && !isStartContact(xmlEventReader.peek())) {
-      result += xmlEventReader.nextEvent()
+    while (it.hasNext && !isStartContact(it.head.event)) {
+      result += it.next()
     }
 
-    // ArrayBuffer.toVector not working on Scala 2.9.X ...
-    Vector(result.toIndexedSeq: _*)
+    // Did not work on Scala 2.9.X ...
+    result.toVector
   }
 
-  private def trimContactEvents(events: Vector[XMLEvent]): Vector[XMLEvent] = {
-    events.dropWhile(ev => !isStartContact(ev)).reverse.dropWhile(ev => !isEndContact(ev)).reverse
+  private def trimContactEvents(eventStates: Vector[EventState]): Vector[EventState] = {
+    eventStates.dropWhile(ev => !isStartContact(ev.event)).reverse.dropWhile(ev => !isEndContact(ev.event)).reverse
+  }
+
+  private def asIterator(xmlEventReader: XMLEventReader): BufferedIterator[XMLEvent] = {
+    val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
+    it.asScala.buffered
   }
 }
