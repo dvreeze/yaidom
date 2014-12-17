@@ -34,6 +34,8 @@ class OtherNamespaceTestUsingStaxParser extends AbstractOtherNamespaceTest {
 
   val documentParser: parse.DocumentParser = parse.DocumentParserUsingStax.newInstance
 
-  // The StAX-based parser does not correctly handle XML 1.1, so we use a different one
-  val documentParserForXml11: parse.DocumentParser = parse.DocumentParserUsingDom.newInstance
+  // The StAX-based parser in the Oracle JDK does not correctly handle XML 1.1, so we use a different one.
+  // Having Woodstox on the test classpath, the XMLInputFactory must be com.ctc.wstx.stax.WstxInputFactory.
+  // On an IBM JDK, we do not need Woodstox for StAX support for XML 1.1 (nice to know when using WebSphere).
+  val documentParserForXml11: parse.DocumentParser = parse.DocumentParserUsingStax.newInstance
 }

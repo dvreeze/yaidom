@@ -67,6 +67,10 @@ libraryDependencies += "com.google.guava" % "guava" % "18.0" % "test"
 
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0" % "test"
 
+libraryDependencies += ("org.codehaus.woodstox" % "woodstox-core-asl" % "4.4.1" % "test").intransitive()
+
+libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "3.1.4" % "test"
+
 publishMavenStyle := true
 
 publishTo <<= version { (v: String) =>
