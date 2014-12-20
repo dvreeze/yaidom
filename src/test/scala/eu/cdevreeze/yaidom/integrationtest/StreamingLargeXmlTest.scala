@@ -17,6 +17,8 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
+import java.io.File
+import java.io.FileInputStream
 import java.{ util => jutil }
 
 import org.junit.Test
@@ -107,6 +109,44 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     }
     assertResult(true) {
       elemCount >= 10000
+    }
+  }
+
+  @Test def testProcessAnotherXmlUsingStreaming(): Unit = {
+    val fileUri = classOf[StreamingLargeXmlTest].getResource("enterprise-info.xml").toURI
+
+    val inputFactory = XMLInputFactory.newInstance
+
+    val streamSource = new StreamSource(new FileInputStream(new File(fileUri)))
+    val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+
+    var enterpriseCount = 0
+
+    def isEnterprise(xmlEvent: XMLEvent): Boolean =
+      xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "Enterprise"
+
+    it = it.dropWhile(es => !isEnterprise(es.event)).buffered
+
+    while (it.hasNext) {
+      val enterpriseResult = takeElem(it)
+
+      val enterpriseElem = enterpriseResult.elem
+      it = enterpriseResult.remainder
+
+      assert(enterpriseElem.localName == "Enterprise")
+      enterpriseCount += 1
+
+      assertResult(true) {
+        Set("Address", "LocalUnit").subsetOf(enterpriseElem.findAllChildElems.map(_.localName).toSet)
+      }
+
+      it = it.dropWhile(es => !isEnterprise(es.event)).buffered
+    }
+
+    assertResult(2000) {
+      enterpriseCount
     }
   }
 
