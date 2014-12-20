@@ -141,8 +141,10 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
       assert(enterpriseElem.localName == "Enterprise")
       enterpriseCount += 1
 
-      assertResult(true) {
-        Set("Address", "LocalUnit").subsetOf(enterpriseElem.findAllChildElems.map(_.localName).toSet)
+      if (enterpriseCount % 100 == 0) {
+        assertResult(true) {
+          Set("Address", "LocalUnit").subsetOf(enterpriseElem.findAllChildElems.map(_.localName).toSet)
+        }
       }
 
       it = it.dropWhile(es => !isEnterprise(es.event)).buffered
