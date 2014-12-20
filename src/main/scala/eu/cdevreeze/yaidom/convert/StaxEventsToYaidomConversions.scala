@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.convert
 
 import java.net.URI
+import java.{ util => jutil }
 
 import scala.Vector
 import scala.collection.BufferedIterator
@@ -39,6 +40,7 @@ import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.XMLConstants
 import javax.xml.namespace.{ QName => JQName }
+import javax.xml.stream.XMLEventReader
 import javax.xml.stream.events.Attribute
 import javax.xml.stream.events.Characters
 import javax.xml.stream.events.EntityReference
@@ -60,10 +62,10 @@ import javax.xml.stream.events.XMLEvent
  * @author Chris de Vreeze
  */
 trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
-  import StaxEventsToYaidomConversions.AncestryOrSelf
-  import StaxEventsToYaidomConversions.EventState
-  import StaxEventsToYaidomConversions.DocumentResult
-  import StaxEventsToYaidomConversions.ElemResult
+  import StaxEventsToYaidomConversions.EventEndState
+  import StaxEventsToYaidomConversions.EventWithEndState
+  import StaxEventsToYaidomConversions.DocumentWithRemainingEventStates
+  import StaxEventsToYaidomConversions.ElemWithRemainingEventStates
 
   /**
    * Converts the given sequence of `XMLEvent` instances to a yaidom `Document`. Invokes `convertToDocument(v.iterator)`.
@@ -80,12 +82,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
   final def convertToDocument(v: Iterator[XMLEvent]): Document = {
     val eventIterator: Iterator[XMLEvent] = v dropWhile { ev => !ev.isStartDocument }
 
-    val eventStateIterator: BufferedIterator[EventState] = {
-      val result = convertToEventStateIterator(eventIterator)
+    val eventStateIterator: BufferedIterator[EventWithEndState] = {
+      val result = convertToEventWithEndStateIterator(eventIterator)
       result.buffered
     }
 
-    val result = eventsToDocument(eventStateIterator)
+    val result = takeDocument(eventStateIterator)
 
     require {
       result.remainder forall { ev =>
@@ -119,12 +121,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
   final def convertToElem(v: Iterator[XMLEvent], parentScope: Scope): Elem = {
     val eventIterator: Iterator[XMLEvent] = v dropWhile { ev => !ev.isStartElement }
 
-    val eventStateIterator: BufferedIterator[EventState] = {
-      val result = convertToEventStateIterator(eventIterator)
+    val eventStateIterator: BufferedIterator[EventWithEndState] = {
+      val result = convertToEventWithEndStateIterator(eventIterator)
       result.buffered
     }
 
-    val result = eventsToElem(eventStateIterator)
+    val result = takeElem(eventStateIterator)
 
     require {
       result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
@@ -149,33 +151,40 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
   final def convertToComment(event: javax.xml.stream.events.Comment): Comment = Comment(event.getText)
 
   /**
-   * Converts the iterator of XMLEvents to an iterator of EventState objects.
+   * Converts the iterator of XMLEvents to an iterator of EventWithEndState objects.
    * This method can also be used in streaming scenarios, where only chunks of a large XML stream are kept in memory
    * at any moment in time.
    */
-  final def convertToEventStateIterator(events: Iterator[XMLEvent]): Iterator[EventState] = {
-    var state = new AncestryOrSelf(Nil)
+  final def convertToEventWithEndStateIterator(events: Iterator[XMLEvent]): Iterator[EventWithEndState] = {
+    var state = new EventEndState(Nil)
 
     events map { event =>
       val nextState = state.next(event)
       state = nextState
-      new EventState(event, nextState)
+      new EventWithEndState(event, nextState)
     }
   }
 
-  private def eventsToDocument(eventStateIterator: BufferedIterator[EventState]): DocumentResult = {
+  /**
+   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to a Document. The remaining
+   * event end states are also returned in the result. The first event must be a StartDocument event, or else an
+   * exception is thrown.
+   *
+   * The input iterator should come from a call to method `convertToEventWithEndStateIterator`.
+   */
+  final def takeDocument(eventStateIterator: BufferedIterator[EventWithEndState]): DocumentWithRemainingEventStates = {
     require(eventStateIterator.hasNext)
 
     var it = eventStateIterator
 
     val head = it.next()
-    require(head.event.isStartDocument)
+    require(head.event.isStartDocument, s"Not a StartDocument event: ${head.event}")
 
     val startDocument: StartDocument = head.event.asInstanceOf[StartDocument]
 
-    def startsWithEndDocument(eventIterator: BufferedIterator[EventState]): Boolean = {
+    def startsWithEndDocument(eventIterator: BufferedIterator[EventWithEndState]): Boolean = {
       if (!eventIterator.hasNext) false else {
-        val hd: EventState = eventIterator.head
+        val hd: EventWithEndState = eventIterator.head
         hd.event.isEndDocument
       }
     }
@@ -191,7 +200,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       nextHead.event match {
         case ev if ev.isStartElement => {
           require(docElement eq null, "Only 1 document element allowed and required")
-          val result = eventsToElem(it)
+          val result = takeElem(it)
           docElement = result.elem
           it = result.remainder
         }
@@ -223,25 +232,32 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       documentElement = docElement,
       processingInstructions = pis.toIndexedSeq,
       comments = comments.toIndexedSeq)
-    new DocumentResult(doc, it)
+    new DocumentWithRemainingEventStates(doc, it)
   }
 
-  private def eventsToElem(eventStateIterator: BufferedIterator[EventState]): ElemResult = {
+  /**
+   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to a Elem. The remaining
+   * event end states are also returned in the result. The first event must be a StartElement event, or else an
+   * exception is thrown.
+   *
+   * The input iterator should come from a call to method `convertToEventWithEndStateIterator`.
+   */
+  final def takeElem(eventStateIterator: BufferedIterator[EventWithEndState]): ElemWithRemainingEventStates = {
     require(eventStateIterator.hasNext)
 
     var it = eventStateIterator
 
     val head = it.next()
-    require(head.event.isStartElement)
+    require(head.event.isStartElement, s"Not a StartElement event: ${head.event}")
 
     val startElement: StartElement = head.event.asStartElement
     require(!head.state.ancestorsOrSelf.isEmpty)
 
     val elem: Elem = head.state.ancestorsOrSelf.head.toElem
 
-    def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventState]): Boolean = {
+    def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithEndState]): Boolean = {
       if (!eventIterator.hasNext) false else {
-        val hd: EventState = eventIterator.head
+        val hd: EventWithEndState = eventIterator.head
         (hd.event.isEndElement) && (hd.state.ancestorsOrSelf.map(_.qname) == head.state.ancestorsOrSelf.tail.map(_.qname))
       }
     }
@@ -255,7 +271,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       nextHead.event match {
         case ev: StartElement => {
           // Recursive call (not tail-recursive, but recursion depth is rather limited)
-          val result = eventsToElem(it)
+          val result = takeElem(it)
           val ch = result.elem
           children += ch
           it = result.remainder
@@ -290,7 +306,15 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       s"Expected end-element name ${head.event.asStartElement.getName} but encountered ${endElementEv.getName}")
 
     val elemWithChildren: Elem = elem.withChildren(children.toIndexedSeq)
-    new ElemResult(elemWithChildren, it)
+    new ElemWithRemainingEventStates(elemWithChildren, it)
+  }
+
+  /**
+   * Convenience method to turn an XMLEventReader into a Scala Iterator of XMLEvent objects.
+   */
+  final def asIterator(xmlEventReader: XMLEventReader): Iterator[XMLEvent] = {
+    val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
+    it.asScala
   }
 }
 
@@ -299,27 +323,34 @@ object StaxEventsToYaidomConversions {
   /**
    * The element, without its children.
    */
-  final class ElemInfo(val qname: QName, val attributes: immutable.IndexedSeq[(QName, String)], val scope: Scope) {
+  final class ElemWithoutChildren(val qname: QName, val attributes: immutable.IndexedSeq[(QName, String)], val scope: Scope) {
 
     def toElem: Elem = Elem(qname, attributes, scope, Vector())
   }
 
   /**
-   * Conversion state, holding the ancestor-or-self ElemInfo objects, from the inside to the root.
+   * Conversion state, holding the ancestor-or-self ElemWithoutChildren objects, from the inside to the root.
    */
-  final class AncestryOrSelf(val ancestorsOrSelf: List[ElemInfo]) {
+  final class EventEndState(val ancestorsOrSelf: List[ElemWithoutChildren]) {
 
-    def parentScope: Scope = ancestorsOrSelf.headOption.map(_.scope).getOrElse(Scope.Empty)
+    def currentElemOption: Option[ElemWithoutChildren] = ancestorsOrSelf.headOption
 
-    def next(event: XMLEvent): AncestryOrSelf = {
+    def ancestorsOption: Option[List[ElemWithoutChildren]] = ancestorsOrSelf match {
+      case Nil => None
+      case xs => Some(xs.tail)
+    }
+
+    def currentScope: Scope = currentElemOption.map(_.scope).getOrElse(Scope.Empty)
+
+    def next(event: XMLEvent): EventEndState = {
       if (event.isStartElement) {
         val startElemEvent = event.asStartElement
-        val elemInfo = eventToElemInfo(startElemEvent, parentScope)
-        new AncestryOrSelf(elemInfo :: ancestorsOrSelf)
+        val elemInfo = eventToElemWithoutChildren(startElemEvent, currentScope)
+        new EventEndState(elemInfo :: ancestorsOrSelf)
       } else if (event.isEndElement) {
         val endElemEvent = event.asEndElement
         require(ancestorsOrSelf.headOption.isDefined && ancestorsOrSelf.head.qname.localPart == endElemEvent.getName.getLocalPart)
-        new AncestryOrSelf(ancestorsOrSelf.tail)
+        new EventEndState(ancestorsOrSelf.tail)
       } else this
     }
   }
@@ -327,13 +358,18 @@ object StaxEventsToYaidomConversions {
   /**
    * An XMLEvent combined with its end-state.
    */
-  final class EventState(val event: XMLEvent, val state: AncestryOrSelf) extends Immutable
+  final class EventWithEndState(val event: XMLEvent, val state: EventEndState) {
+    require(
+      !event.isStartElement ||
+        (state.currentElemOption.map(_.qname.localPart) == Some(event.asStartElement.getName.getLocalPart)),
+      s"Corrupt EventWithEndState. Mismatch between StartElement and EventEndState.")
+  }
 
-  private class ElemResult(val elem: Elem, val remainder: BufferedIterator[EventState]) extends Immutable
+  final class DocumentWithRemainingEventStates(val doc: Document, val remainder: BufferedIterator[EventWithEndState])
 
-  private class DocumentResult(val doc: Document, val remainder: BufferedIterator[EventState]) extends Immutable
+  final class ElemWithRemainingEventStates(val elem: Elem, val remainder: BufferedIterator[EventWithEndState])
 
-  private def eventToElemInfo(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): ElemInfo = {
+  private def eventToElemWithoutChildren(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): ElemWithoutChildren = {
     val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
@@ -388,7 +424,7 @@ object StaxEventsToYaidomConversions {
 
     // Line and column numbers can be retrieved from startElement.getLocation, but are ignored here
 
-    new ElemInfo(elemQName, currAttrs, currScope)
+    new ElemWithoutChildren(elemQName, currAttrs, currScope)
   }
 
   /** Gets an optional prefix from a `javax.xml.namespace.QName` */

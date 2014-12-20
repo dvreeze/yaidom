@@ -19,9 +19,6 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.{ io => jio }
 import java.{ util => jutil }
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
-import scala.collection.mutable
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
@@ -29,11 +26,9 @@ import org.scalatest.ConfigMap
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.convert.StaxConversions.convertToElem
-import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventStateIterator
-import eu.cdevreeze.yaidom.convert.StaxEventsToYaidomConversions.EventState
-import eu.cdevreeze.yaidom.core.Scope
-import javax.xml.stream.XMLEventReader
+import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
+import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithEndStateIterator
+import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
@@ -83,20 +78,18 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
 
-    val eventStateIterator =
-      convertToEventStateIterator(asIterator(xmlEventReader)).buffered
+    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
     var elemCount = 0
 
-    collectUntilNextIsContactOrEnd(eventStateIterator)
+    it = it.dropWhile(es => !isStartContact(es.event)).buffered
 
-    while (!stop(eventStateIterator)) {
-      val eventStates =
-        trimContactEvents((eventStateIterator.next()) +: collectUntilNextIsContactOrEnd(eventStateIterator))
+    while (it.hasNext) {
+      val contactResult = takeElem(it)
 
-      val contactElem =
-        convertToElem(eventStates.map(_.event), eventStates.head.state.parentScope)
+      val contactElem = contactResult.elem
+      it = contactResult.remainder
 
       assert(contactElem.localName == "contact")
       contactCount += 1
@@ -105,6 +98,8 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
       assertResult(true) {
         Set("firstName", "lastName").subsetOf(contactElem.findAllElems.map(_.localName).toSet)
       }
+
+      it = it.dropWhile(es => !isStartContact(es.event)).buffered
     }
 
     assertResult(true) {
@@ -117,32 +112,5 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
 
   private def isStartContact(xmlEvent: XMLEvent): Boolean = {
     xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
-  }
-
-  private def isEndContact(xmlEvent: XMLEvent): Boolean = {
-    xmlEvent.isEndElement() && xmlEvent.asEndElement().getName.getLocalPart == "contact"
-  }
-
-  private def stop(it: BufferedIterator[EventState]): Boolean =
-    (!it.hasNext) || (!isStartContact(it.head.event))
-
-  private def collectUntilNextIsContactOrEnd(it: BufferedIterator[EventState]): Vector[EventState] = {
-    var result = mutable.ArrayBuffer[EventState]()
-
-    while (it.hasNext && !isStartContact(it.head.event)) {
-      result += it.next()
-    }
-
-    // Did not work on Scala 2.9.X ...
-    result.toVector
-  }
-
-  private def trimContactEvents(eventStates: Vector[EventState]): Vector[EventState] = {
-    eventStates.dropWhile(ev => !isStartContact(ev.event)).reverse.dropWhile(ev => !isEndContact(ev.event)).reverse
-  }
-
-  private def asIterator(xmlEventReader: XMLEventReader): BufferedIterator[XMLEvent] = {
-    val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
-    it.asScala.buffered
   }
 }

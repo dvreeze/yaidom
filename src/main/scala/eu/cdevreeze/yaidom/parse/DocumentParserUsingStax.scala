@@ -85,7 +85,7 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends A
       val streamSource = new StreamSource(inputStream)
       xmlEventReader = inputFactory.createXMLEventReader(streamSource)
 
-      StaxConversions.convertToDocument(asIterator(xmlEventReader))
+      StaxConversions.convertToDocument(StaxConversions.asIterator(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
         if (xmlEventReader ne null) xmlEventReader.close()
@@ -94,11 +94,6 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends A
         if (inputStream ne null) inputStream.close()
       }
     }
-  }
-
-  private def asIterator(xmlEventReader: XMLEventReader): Iterator[XMLEvent] = {
-    val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
-    it.asScala
   }
 }
 
