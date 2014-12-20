@@ -85,6 +85,9 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     var contactCount = 0
     var elemCount = 0
 
+    def isStartContact(xmlEvent: XMLEvent): Boolean =
+      xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
+
     it = it.dropWhile(es => !isStartContact(es.event)).buffered
 
     while (it.hasNext) {
@@ -148,9 +151,5 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     assertResult(2000) {
       enterpriseCount
     }
-  }
-
-  private def isStartContact(xmlEvent: XMLEvent): Boolean = {
-    xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
   }
 }
