@@ -94,19 +94,17 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     require(storesElem.localName == "stores")
 
     val storeElemsByStoreNumber: Map[String, E] = {
-      val result = storesElem.filterChildElems(withLocalName("store")) map { elem =>
-        val storeNumber = elem.getChildElem(withLocalName("store-number")).text
-        (storeNumber -> elem)
+      val result = storesElem.filterChildElems(withLocalName("store")) groupBy { elem =>
+        elem.getChildElem(withLocalName("store-number")).text
       }
-      result.toMap
+      result.toMap.mapValues(_.head)
     }
 
     val productElemsByName: Map[String, E] = {
-      val result = productsElem.filterChildElems(withLocalName("product")) map { elem =>
-        val productName = elem.getChildElem(withLocalName("name")).text
-        (productName -> elem)
+      val result = productsElem.filterChildElems(withLocalName("product")) groupBy { elem =>
+        elem.getChildElem(withLocalName("name")).text
       }
-      result.toMap
+      result.toMap.mapValues(_.head)
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
@@ -175,19 +173,17 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     require(storesElem.localName == "stores")
 
     val storeElemsByStoreNumber: Map[String, E] = {
-      val result = storesElem.filterChildElems(withLocalName("store")) map { elem =>
-        val storeNumber = elem.getChildElem(withLocalName("store-number")).text
-        (storeNumber -> elem)
+      val result = storesElem.filterChildElems(withLocalName("store")) groupBy { elem =>
+        elem.getChildElem(withLocalName("store-number")).text
       }
-      result.toMap
+      result.toMap.mapValues(_.head)
     }
 
     val productElemsByName: Map[String, E] = {
-      val result = productsElem.filterChildElems(withLocalName("product")) map { elem =>
-        val productName = elem.getChildElem(withLocalName("name")).text
-        (productName -> elem)
+      val result = productsElem.filterChildElems(withLocalName("product")) groupBy { elem =>
+        elem.getChildElem(withLocalName("name")).text
       }
-      result.toMap
+      result.toMap.mapValues(_.head)
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
