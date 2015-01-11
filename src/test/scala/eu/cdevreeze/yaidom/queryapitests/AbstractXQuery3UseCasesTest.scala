@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.queryapitests
 
 import scala.Vector
+import scala.collection.immutable
 
 import org.junit.Test
 import org.scalatest.Suite
@@ -31,6 +32,10 @@ import eu.cdevreeze.yaidom.simple.Node
 
 /**
  * Query test, using examples from http://www.w3.org/TR/xquery-30-use-cases that show uses cases for XQuery 3.0.
+ *
+ * Note that using yaidom, like when using Scala in general, it is needed to think about the efficiency of the
+ * query algorithm. The upside is that it is clear from the code how efficient the query is. Moreover, chances are
+ * the XQuery is not really accessible to non-programmmers in the first place.
  *
  * @author Chris de Vreeze
  */
@@ -48,14 +53,15 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
       salesRecord.getChildElem(withLocalName("product-name")).text
     }
 
-    val groupedSalesRecords = salesRecords.groupBy(e => productName(e)).toVector.sortBy(_._1)
+    val salesRecordsGroupedByProduct = salesRecords.groupBy(e => productName(e)).toVector.sortBy(_._1)
 
     val scope = Scope.Empty
 
-    val productResults = groupedSalesRecords map {
+    val productResults = salesRecordsGroupedByProduct map {
       case (productName, salesRecordGroup) =>
         import Node._
         val sum = salesRecordGroup.map(_.getChildElem(withLocalName("qty")).text.toInt).sum
+
         textElem(QName("product"), Vector(QName("name") -> productName), scope, sum.toString)
     }
 
@@ -89,22 +95,36 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
 
     val salesRecords = salesElem \ withLocalName("record")
 
+    // Build Maps for store and product elements, for efficient lookups
+
+    val storeElemsByStoreNumber: Map[String, E] = {
+      val result = storesElem.filterChildElems(withLocalName("store")) map { elem =>
+        val storeNumber = elem.getChildElem(withLocalName("store-number")).text
+        (storeNumber -> elem)
+      }
+      result.toMap
+    }
+
+    val productElemsByName: Map[String, E] = {
+      val result = productsElem.filterChildElems(withLocalName("product")) map { elem =>
+        val productName = elem.getChildElem(withLocalName("name")).text
+        (productName -> elem)
+      }
+      result.toMap
+    }
+
+    // Use the Maps above
+
     def findState(salesRecord: E): Option[String] = {
       require(salesRecord.localName == "record")
-      val storeNumberElemOption = storesElem findChildElem { e =>
-        e.localName == "store" &&
-          e.getChildElem(withLocalName("store-number")).text == salesRecord.getChildElem(withLocalName("store-number")).text
-      }
-      storeNumberElemOption.map(_.getChildElem(withLocalName("state")).text)
+      val storeNumber = salesRecord.getChildElem(withLocalName("store-number")).text
+      storeElemsByStoreNumber.get(storeNumber).map(_.getChildElem(withLocalName("state")).text)
     }
 
     def findCategory(salesRecord: E): Option[String] = {
       require(salesRecord.localName == "record")
-      val productElemOption = productsElem findChildElem { e =>
-        e.localName == "product" &&
-          e.getChildElem(withLocalName("name")).text == salesRecord.getChildElem(withLocalName("product-name")).text
-      }
-      productElemOption.map(_.getChildElem(withLocalName("category")).text)
+      val productName = salesRecord.getChildElem(withLocalName("product-name")).text
+      productElemsByName.get(productName).map(_.getChildElem(withLocalName("category")).text)
     }
 
     val groupedSalesRecords =
@@ -161,26 +181,43 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
 
     val salesRecords = salesElem \ withLocalName("record")
 
-    def findState(salesRecord: E): Option[String] = {
-      require(salesRecord.localName == "record")
-      val storeNumberElemOption = storesElem findChildElem { e =>
-        e.localName == "store" &&
-          e.getChildElem(withLocalName("store-number")).text == salesRecord.getChildElem(withLocalName("store-number")).text
+    // Build Maps for store and product elements, for efficient lookups
+
+    val storeElemsByStoreNumber: Map[String, E] = {
+      val result = storesElem.filterChildElems(withLocalName("store")) map { elem =>
+        val storeNumber = elem.getChildElem(withLocalName("store-number")).text
+        (storeNumber -> elem)
       }
-      storeNumberElemOption.map(_.getChildElem(withLocalName("state")).text)
+      result.toMap
     }
 
-    def findProductElem(salesRecord: E): Option[E] = {
-      require(salesRecord.localName == "record")
-      val productElemOption = productsElem findChildElem { e =>
-        e.localName == "product" &&
-          e.getChildElem(withLocalName("name")).text == salesRecord.getChildElem(withLocalName("product-name")).text
+    val productElemsByName: Map[String, E] = {
+      val result = productsElem.filterChildElems(withLocalName("product")) map { elem =>
+        val productName = elem.getChildElem(withLocalName("name")).text
+        (productName -> elem)
       }
-      productElemOption
+      result.toMap
+    }
+
+    // Convenience method
+
+    def productName(salesRecord: E): String = {
+      require(salesRecord.localName == "record")
+      salesRecord.getChildElem(withLocalName("product-name")).text
+    }
+
+    // Use the Maps above
+
+    def findState(salesRecord: E): Option[String] = {
+      require(salesRecord.localName == "record")
+      val storeNumber = salesRecord.getChildElem(withLocalName("store-number")).text
+      storeElemsByStoreNumber.get(storeNumber).map(_.getChildElem(withLocalName("state")).text)
     }
 
     def findCategory(salesRecord: E): Option[String] = {
-      findProductElem(salesRecord).map(_.getChildElem(withLocalName("category")).text)
+      require(salesRecord.localName == "record")
+      val productName = salesRecord.getChildElem(withLocalName("product-name")).text
+      productElemsByName.get(productName).map(_.getChildElem(withLocalName("category")).text)
     }
 
     val groupedSalesRecords =
@@ -192,7 +229,8 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
       case ((state, category), salesRecordGroup) =>
         import Node._
         val qtys = salesRecordGroup.map(_.getChildElem(withLocalName("qty")).text.toInt)
-        val prices = salesRecordGroup.map(e => findProductElem(e).get.getChildElem(withLocalName("price")).text.toInt)
+        val prices =
+          salesRecordGroup.map(e => productElemsByName(productName(e)).getChildElem(withLocalName("price")).text.toInt)
         val revenues = qtys.zip(prices) map { case (q, p) => q * p }
 
         val revenue = revenues.sum
@@ -227,6 +265,87 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
         group("CA", "kitchen", 6500),
         group("MA", "clothes", 100),
         group("MA", "kitchen", 14000)))
+    }
+
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+      toResolvedElem(result).removeAllInterElementWhitespace
+    }
+  }
+
+  /**
+   * See http://xmllondon.com/2014/xmllondon-2014-proceedings.pdf, on XML processing in Scala.
+   */
+  @Test def testQ4(): Unit = {
+    import Node._
+
+    require(productsElem.localName == "products")
+    require(salesElem.localName == "sales")
+    require(storesElem.localName == "stores")
+
+    val allStoresByState: Vector[(String, immutable.IndexedSeq[E])] =
+      storesElem.filterChildElems(withLocalName("store")).groupBy(_.getChildElem(withLocalName("state")).text).toVector.sortBy(_._1)
+
+    val allProductsByCategory: Vector[(String, immutable.IndexedSeq[E])] =
+      productsElem.filterChildElems(withLocalName("product")).groupBy(_.getChildElem(withLocalName("category")).text).toVector.sortBy(_._1)
+
+    val allSalesByProduct: Map[String, immutable.IndexedSeq[E]] =
+      salesElem.filterChildElems(withLocalName("record")).groupBy(_.getChildElem(withLocalName("product-name")).text)
+
+    val scope = Scope.Empty
+
+    val unfilteredResultElem =
+      emptyElem(QName("result"), scope) withChildren {
+        for {
+          (state, stateStores) <- allStoresByState
+          storeNumbers = stateStores.flatMap(_ \ withLocalName("store-number")).map(_.text).toSet
+        } yield {
+          emptyElem(QName("state"), Vector(QName("name") -> state), scope) withChildren {
+            for {
+              (category, products) <- allProductsByCategory
+              productRecords = allSalesByProduct.filterKeys(products.flatMap(_ \ withLocalName("name")).map(_.text).toSet)
+            } yield {
+              emptyElem(QName("category"), Vector(QName("name") -> category), scope) withChildren {
+                for {
+                  (productName, productSales) <- productRecords.toVector.sortBy(_._1)
+                  filteredSales = productSales.filter(e => storeNumbers(e.getChildElem(withLocalName("store-number")).text))
+                  if !filteredSales.isEmpty
+                  totalQty = filteredSales.flatMap(_ \ withLocalName("qty")).map(_.text.toInt).sum
+                } yield {
+                  emptyElem(
+                    QName("product"),
+                    Vector(QName("name") -> productName, QName("total-qty") -> totalQty.toString),
+                    scope)
+                }
+              }
+            }
+          }
+        }
+      }
+    val resultElem = unfilteredResultElem transformChildElemsToNodeSeq {
+      case e if e.localName == "state" && e.filterElems(withLocalName("product")).isEmpty => Vector()
+      case e => Vector(e)
+    }
+
+    val result = fromSimpleElem(resultElem)
+
+    // Compare with expected result
+
+    val expectedResult = {
+      import Node._
+
+      elem(QName("result"), scope, Vector(
+        elem(QName("state"), Vector(QName("name") -> "CA"), scope, Vector(
+          elem(QName("category"), Vector(QName("name") -> "clothes"), scope, Vector(
+            emptyElem(QName("product"), Vector(QName("name") -> "socks", QName("total-qty") -> "510"), scope))),
+          elem(QName("category"), Vector(QName("name") -> "kitchen"), scope, Vector(
+            emptyElem(QName("product"), Vector(QName("name") -> "broiler", QName("total-qty") -> "20"), scope),
+            emptyElem(QName("product"), Vector(QName("name") -> "toaster", QName("total-qty") -> "150"), scope))))),
+        elem(QName("state"), Vector(QName("name") -> "MA"), scope, Vector(
+          elem(QName("category"), Vector(QName("name") -> "clothes"), scope, Vector(
+            emptyElem(QName("product"), Vector(QName("name") -> "shirt", QName("total-qty") -> "10"), scope))),
+          elem(QName("category"), Vector(QName("name") -> "kitchen"), scope, Vector(
+            emptyElem(QName("product"), Vector(QName("name") -> "blender", QName("total-qty") -> "250"), scope),
+            emptyElem(QName("product"), Vector(QName("name") -> "toaster", QName("total-qty") -> "50"), scope)))))))
     }
 
     assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
