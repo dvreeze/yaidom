@@ -330,6 +330,65 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     }
   }
 
+  @Test def testQ5(): Unit = {
+    import Node._
+
+    require(productsElem.localName == "products")
+    require(salesElem.localName == "sales")
+    require(storesElem.localName == "stores")
+
+    val allSalesByStoreNumber: Vector[(String, immutable.IndexedSeq[E])] =
+      salesElem.filterChildElems(withLocalName("record")).groupBy(_.getChildElem(withLocalName("store-number")).text).toVector.sortBy(_._1)
+
+    val scope = Scope.Empty
+
+    val resultElem =
+      emptyElem(QName("result"), scope) withChildren {
+        for {
+          (storeNumber, storeSales) <- allSalesByStoreNumber
+        } yield {
+          emptyElem(QName("store"), Vector(QName("number") -> storeNumber), scope) withChildren {
+            for {
+              sales <- storeSales.sortBy(_.getChildElem(withLocalName("qty")).text.toInt).reverse
+            } yield {
+              emptyElem(
+                QName("product"),
+                Vector(
+                  QName("name") -> sales.getChildElem(withLocalName("product-name")).text,
+                  QName("qty") -> sales.getChildElem(withLocalName("qty")).text),
+                scope)
+            }
+          }
+        }
+      }
+
+    val result = fromSimpleElem(resultElem)
+
+    // Compare with expected result
+
+    val expectedResult = {
+      import Node._
+
+      elem(QName("result"), scope, Vector(
+        elem(QName("store"), Vector(QName("number") -> "1"), scope, Vector(
+          emptyElem(QName("product"), Vector(QName("name") -> "socks", QName("qty") -> "500"), scope),
+          emptyElem(QName("product"), Vector(QName("name") -> "broiler", QName("qty") -> "20"), scope))),
+        elem(QName("store"), Vector(QName("number") -> "2"), scope, Vector(
+          emptyElem(QName("product"), Vector(QName("name") -> "toaster", QName("qty") -> "100"), scope),
+          emptyElem(QName("product"), Vector(QName("name") -> "toaster", QName("qty") -> "50"), scope),
+          emptyElem(QName("product"), Vector(QName("name") -> "socks", QName("qty") -> "10"), scope))),
+        elem(QName("store"), Vector(QName("number") -> "3"), scope, Vector(
+          emptyElem(QName("product"), Vector(QName("name") -> "blender", QName("qty") -> "150"), scope),
+          emptyElem(QName("product"), Vector(QName("name") -> "blender", QName("qty") -> "100"), scope),
+          emptyElem(QName("product"), Vector(QName("name") -> "toaster", QName("qty") -> "50"), scope),
+          emptyElem(QName("product"), Vector(QName("name") -> "shirt", QName("qty") -> "10"), scope)))))
+    }
+
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+      toResolvedElem(result).removeAllInterElementWhitespace
+    }
+  }
+
   protected val productsElem: E
 
   protected val salesElem: E
