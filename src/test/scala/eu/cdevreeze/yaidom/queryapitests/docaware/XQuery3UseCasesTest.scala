@@ -38,7 +38,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   protected val productsElem: E = {
     val xml =
-      <products>
+      <products xmlns="http://www.w3.org/TR/xquery-30-use-cases/">
         <product>
           <name>broiler</name>
           <category>kitchen</category>
@@ -76,7 +76,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   protected val salesElem: E = {
     val xml =
-      <sales>
+      <sales xmlns="http://www.w3.org/TR/xquery-30-use-cases/">
         <record>
           <product-name>broiler</product-name>
           <store-number>1</store-number>
@@ -129,7 +129,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   protected val storesElem: E = {
     val xml =
-      <stores>
+      <stores xmlns="http://www.w3.org/TR/xquery-30-use-cases/">
         <store>
           <store-number>1</store-number>
           <state>CA</state>

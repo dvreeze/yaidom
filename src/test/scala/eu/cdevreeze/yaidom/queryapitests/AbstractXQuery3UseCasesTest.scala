@@ -24,7 +24,7 @@ import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.simple.Elem
@@ -32,6 +32,8 @@ import eu.cdevreeze.yaidom.simple.Node
 
 /**
  * Query test, using examples from http://www.w3.org/TR/xquery-30-use-cases that show uses cases for XQuery 3.0.
+ *
+ * This time, however, namespaces are used, in order to show yaidom's strengths w.r.t. precise namespace support.
  *
  * Note that using yaidom, like when using Scala in general, it is needed to think about the efficiency of the
  * query algorithm. The upside is that it is clear from the code how efficient the query is. Moreover, chances are
@@ -43,15 +45,17 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
 
   type E <: ScopedElemLike[E] with IsNavigable[E]
 
+  protected val ns = "http://www.w3.org/TR/xquery-30-use-cases/"
+
   @Test def testQ1(): Unit = {
     import Node._
 
     require(salesElem.localName == "sales")
 
     val allSalesByProduct: Vector[(String, immutable.IndexedSeq[E])] =
-      salesElem.filterChildElems(withLocalName("record")).groupBy(_.getChildElem(withLocalName("product-name")).text).toVector.sortBy(_._1)
+      salesElem.filterChildElems(withEName(ns, "record")).groupBy(_.getChildElem(withEName(ns, "product-name")).text).toVector.sortBy(_._1)
 
-    val scope = Scope.Empty
+    val scope = Scope.from("" -> ns)
 
     val resultElem =
       emptyElem(QName("sales-qty-by-product"), scope) withChildren {
@@ -62,7 +66,7 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
             QName("product"),
             Vector(QName("name") -> productName),
             scope,
-            productSales.map(_.getChildElem(withLocalName("qty")).text.toInt).sum.toString)
+            productSales.map(_.getChildElem(withEName(ns, "qty")).text.toInt).sum.toString)
         }
       }
 
@@ -94,41 +98,41 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     require(storesElem.localName == "stores")
 
     val storeElemsByStoreNumber: Map[String, E] = {
-      val result = storesElem.filterChildElems(withLocalName("store")) groupBy { elem =>
-        elem.getChildElem(withLocalName("store-number")).text
+      val result = storesElem.filterChildElems(withEName(ns, "store")) groupBy { elem =>
+        elem.getChildElem(withEName(ns, "store-number")).text
       }
       result.toMap.mapValues(_.head)
     }
 
     val productElemsByName: Map[String, E] = {
-      val result = productsElem.filterChildElems(withLocalName("product")) groupBy { elem =>
-        elem.getChildElem(withLocalName("name")).text
+      val result = productsElem.filterChildElems(withEName(ns, "product")) groupBy { elem =>
+        elem.getChildElem(withEName(ns, "name")).text
       }
       result.toMap.mapValues(_.head)
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
       val result =
-        salesElem.filterChildElems(withLocalName("record")) groupBy { e =>
-          val storeNumber = e.getChildElem(withLocalName("store-number")).text
-          val productName = e.getChildElem(withLocalName("product-name")).text
+        salesElem.filterChildElems(withEName(ns, "record")) groupBy { e =>
+          val storeNumber = e.getChildElem(withEName(ns, "store-number")).text
+          val productName = e.getChildElem(withEName(ns, "product-name")).text
 
-          val state = storeElemsByStoreNumber(storeNumber).getChildElem(withLocalName("state")).text
-          val category = productElemsByName(productName).getChildElem(withLocalName("category")).text
+          val state = storeElemsByStoreNumber(storeNumber).getChildElem(withEName(ns, "state")).text
+          val category = productElemsByName(productName).getChildElem(withEName(ns, "category")).text
 
           (state, category)
         }
       result.toVector.sortBy(_._1)
     }
 
-    val scope = Scope.Empty
+    val scope = Scope.from("" -> ns)
 
     val resultElem =
       emptyElem(QName("result"), scope) withChildren {
         for {
           ((state, category), salesGroup) <- allSalesByStateAndCategory
         } yield {
-          val sum = salesGroup.map(_.getChildElem(withLocalName("qty")).text.toInt).sum
+          val sum = salesGroup.map(_.getChildElem(withEName(ns, "qty")).text.toInt).sum
 
           emptyElem(QName("group"), scope).
             plusChild(textElem(QName("state"), scope, state)).
@@ -173,43 +177,43 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     require(storesElem.localName == "stores")
 
     val storeElemsByStoreNumber: Map[String, E] = {
-      val result = storesElem.filterChildElems(withLocalName("store")) groupBy { elem =>
-        elem.getChildElem(withLocalName("store-number")).text
+      val result = storesElem.filterChildElems(withEName(ns, "store")) groupBy { elem =>
+        elem.getChildElem(withEName(ns, "store-number")).text
       }
       result.toMap.mapValues(_.head)
     }
 
     val productElemsByName: Map[String, E] = {
-      val result = productsElem.filterChildElems(withLocalName("product")) groupBy { elem =>
-        elem.getChildElem(withLocalName("name")).text
+      val result = productsElem.filterChildElems(withEName(ns, "product")) groupBy { elem =>
+        elem.getChildElem(withEName(ns, "name")).text
       }
       result.toMap.mapValues(_.head)
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
       val result =
-        salesElem.filterChildElems(withLocalName("record")) groupBy { e =>
-          val storeNumber = e.getChildElem(withLocalName("store-number")).text
-          val productName = e.getChildElem(withLocalName("product-name")).text
+        salesElem.filterChildElems(withEName(ns, "record")) groupBy { e =>
+          val storeNumber = e.getChildElem(withEName(ns, "store-number")).text
+          val productName = e.getChildElem(withEName(ns, "product-name")).text
 
-          val state = storeElemsByStoreNumber(storeNumber).getChildElem(withLocalName("state")).text
-          val category = productElemsByName(productName).getChildElem(withLocalName("category")).text
+          val state = storeElemsByStoreNumber(storeNumber).getChildElem(withEName(ns, "state")).text
+          val category = productElemsByName(productName).getChildElem(withEName(ns, "category")).text
 
           (state, category)
         }
       result.toVector.sortBy(_._1)
     }
 
-    val scope = Scope.Empty
+    val scope = Scope.from("" -> ns)
 
     val resultElem =
       emptyElem(QName("result"), scope) withChildren {
         for {
           ((state, category), salesGroup) <- allSalesByStateAndCategory
         } yield {
-          val qtys = salesGroup.map(_.getChildElem(withLocalName("qty")).text.toInt)
+          val qtys = salesGroup.map(_.getChildElem(withEName(ns, "qty")).text.toInt)
           val prices =
-            salesGroup.map(e => productElemsByName(e.getChildElem(withLocalName("product-name")).text).getChildElem(withLocalName("price")).text.toInt)
+            salesGroup.map(e => productElemsByName(e.getChildElem(withEName(ns, "product-name")).text).getChildElem(withEName(ns, "price")).text.toInt)
           val revenues = qtys.zip(prices) map { case (q, p) => q * p }
           val revenue = revenues.sum
 
@@ -259,33 +263,33 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     require(storesElem.localName == "stores")
 
     val allStoresByState: Vector[(String, immutable.IndexedSeq[E])] =
-      storesElem.filterChildElems(withLocalName("store")).groupBy(_.getChildElem(withLocalName("state")).text).toVector.sortBy(_._1)
+      storesElem.filterChildElems(withEName(ns, "store")).groupBy(_.getChildElem(withEName(ns, "state")).text).toVector.sortBy(_._1)
 
     val allProductsByCategory: Vector[(String, immutable.IndexedSeq[E])] =
-      productsElem.filterChildElems(withLocalName("product")).groupBy(_.getChildElem(withLocalName("category")).text).toVector.sortBy(_._1)
+      productsElem.filterChildElems(withEName(ns, "product")).groupBy(_.getChildElem(withEName(ns, "category")).text).toVector.sortBy(_._1)
 
     val allSalesByProduct: Map[String, immutable.IndexedSeq[E]] =
-      salesElem.filterChildElems(withLocalName("record")).groupBy(_.getChildElem(withLocalName("product-name")).text)
+      salesElem.filterChildElems(withEName(ns, "record")).groupBy(_.getChildElem(withEName(ns, "product-name")).text)
 
-    val scope = Scope.Empty
+    val scope = Scope.from("" -> ns)
 
     val unfilteredResultElem =
       emptyElem(QName("result"), scope) withChildren {
         for {
           (state, stateStores) <- allStoresByState
-          storeNumbers = stateStores.flatMap(_ \ withLocalName("store-number")).map(_.text).toSet
+          storeNumbers = stateStores.flatMap(_ \ withEName(ns, "store-number")).map(_.text).toSet
         } yield {
           emptyElem(QName("state"), Vector(QName("name") -> state), scope) withChildren {
             for {
               (category, products) <- allProductsByCategory
-              productRecords = allSalesByProduct.filterKeys(products.flatMap(_ \ withLocalName("name")).map(_.text).toSet)
+              productRecords = allSalesByProduct.filterKeys(products.flatMap(_ \ withEName(ns, "name")).map(_.text).toSet)
             } yield {
               emptyElem(QName("category"), Vector(QName("name") -> category), scope) withChildren {
                 for {
                   (productName, productSales) <- productRecords.toVector.sortBy(_._1)
-                  filteredSales = productSales.filter(e => storeNumbers(e.getChildElem(withLocalName("store-number")).text))
+                  filteredSales = productSales.filter(e => storeNumbers(e.getChildElem(withEName(ns, "store-number")).text))
                   if !filteredSales.isEmpty
-                  totalQty = filteredSales.flatMap(_ \ withLocalName("qty")).map(_.text.toInt).sum
+                  totalQty = filteredSales.flatMap(_ \ withEName(ns, "qty")).map(_.text.toInt).sum
                 } yield {
                   emptyElem(
                     QName("product"),
@@ -299,7 +303,7 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
       }
 
     val resultElem = unfilteredResultElem transformChildElemsToNodeSeq {
-      case e if e.localName == "state" && e.filterElems(withLocalName("product")).isEmpty => Vector()
+      case e if e.localName == "state" && e.filterElems(withEName(ns, "product")).isEmpty => Vector()
       case e => Vector(e)
     }
 
@@ -338,9 +342,9 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     require(storesElem.localName == "stores")
 
     val allSalesByStoreNumber: Vector[(String, immutable.IndexedSeq[E])] =
-      salesElem.filterChildElems(withLocalName("record")).groupBy(_.getChildElem(withLocalName("store-number")).text).toVector.sortBy(_._1)
+      salesElem.filterChildElems(withEName(ns, "record")).groupBy(_.getChildElem(withEName(ns, "store-number")).text).toVector.sortBy(_._1)
 
-    val scope = Scope.Empty
+    val scope = Scope.from("" -> ns)
 
     val resultElem =
       emptyElem(QName("result"), scope) withChildren {
@@ -349,13 +353,13 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
         } yield {
           emptyElem(QName("store"), Vector(QName("number") -> storeNumber), scope) withChildren {
             for {
-              sales <- storeSales.sortBy(_.getChildElem(withLocalName("qty")).text.toInt).reverse
+              sales <- storeSales.sortBy(_.getChildElem(withEName(ns, "qty")).text.toInt).reverse
             } yield {
               emptyElem(
                 QName("product"),
                 Vector(
-                  QName("name") -> sales.getChildElem(withLocalName("product-name")).text,
-                  QName("qty") -> sales.getChildElem(withLocalName("qty")).text),
+                  QName("name") -> sales.getChildElem(withEName(ns, "product-name")).text,
+                  QName("qty") -> sales.getChildElem(withEName(ns, "qty")).text),
                 scope)
             }
           }
