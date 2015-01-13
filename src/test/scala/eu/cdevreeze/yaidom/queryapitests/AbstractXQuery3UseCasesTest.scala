@@ -254,6 +254,16 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
 
   /**
    * See http://xmllondon.com/2014/xmllondon-2014-proceedings.pdf, on XML processing in Scala.
+   *
+   * As compared to Scala XML, yaidom regards namespaces as first-class citizens. The Scala XML equivalent of
+   * this query may be less verbose, but querying for child/descendant elements on names with namespaces requires
+   * querying on local name, followed by filtering on namespace. See also http://stackoverflow.com/questions/20135832/how-to-get-namespaced-nodes-from-scala-xml.
+   * That's not first class namespace support.
+   *
+   * In the Scala XML equivalent, the operations such as groupByOrderBy are not namespace-aware either.
+   *
+   * So, when querying documents with namespaces in a namespace-aware manner, yaidom's precision and namespace support
+   * really start to shine.
    */
   @Test def testQ4(): Unit = {
     import Node._
