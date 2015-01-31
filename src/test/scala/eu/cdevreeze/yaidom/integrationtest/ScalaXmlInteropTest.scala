@@ -37,8 +37,6 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.simple.TreeReprParsers
-import eu.cdevreeze.yaidom.simple.TreeReprParsers.parseAll
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.resolved
 
@@ -154,25 +152,7 @@ class ScalaXmlInteropTest extends Suite {
       result.toSet
     }
 
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    // 4. Convert to Scala XML and back
+    // 3. Convert to Scala XML and back
 
     val root5 = convertToElem(convertElem(root))
 
@@ -218,35 +198,7 @@ class ScalaXmlInteropTest extends Suite {
       result.mkString
     }
 
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = Document(root).toString
-
-    assert(treeRepr.trim.startsWith("document("), "Expected the tree representation to start with 'document('")
-
-    val document4: Document = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.document, treeRepr)
-      parseResult.get.build()
-    }
-
-    val root4 = document4.documentElement
-
-    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-    assertResult(Set(QName("root"), QName("child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.qname }
-      result.toSet
-    }
-    assertResult("Trivial XML") {
-      val result = root4.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
-      result.mkString
-    }
-
-    // 4. Convert to Scala XML and back
+    // 3. Convert to Scala XML and back
 
     val root5 = convertToElem(convertElem(root))
 
@@ -303,27 +255,7 @@ class ScalaXmlInteropTest extends Suite {
 
     checkChildTextAndEntityRef(root3)
 
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    checkChildTextAndEntityRef(root4)
-
-    // 4. Convert to Scala XML and back
+    // 3. Convert to Scala XML and back
 
     val root5 = convertToElem(convertElem(root))
 
@@ -353,25 +285,7 @@ class ScalaXmlInteropTest extends Suite {
       result.toSet
     }
 
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    // 4. Convert to Scala XML and back
+    // 3. Convert to Scala XML and back
 
     val root5 = convertToElem(convertElem(root))
 
@@ -433,26 +347,6 @@ class ScalaXmlInteropTest extends Suite {
     }
 
     doChecks(root3)
-
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    doChecks(root4)
   }
 
   @Test def testConvertXmlWithSpecialChars(): Unit = {
@@ -494,27 +388,7 @@ class ScalaXmlInteropTest extends Suite {
 
     doChecks(root2)
 
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root3: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    doChecks(root3)
-
-    // 4. Convert to Scala XML and back
+    // 3. Convert to Scala XML and back
 
     val root5 = convertToElem(convertElem(root))
 

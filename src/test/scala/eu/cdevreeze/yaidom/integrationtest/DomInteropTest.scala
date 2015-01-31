@@ -44,9 +44,6 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.simple.TreeReprParsers
-import eu.cdevreeze.yaidom.simple.TreeReprParsers.document
-import eu.cdevreeze.yaidom.simple.TreeReprParsers.parseAll
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
@@ -203,39 +200,7 @@ class DomInteropTest extends Suite {
       result.size
     }
 
-    // 8. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = doc.toString
-
-    assert(treeRepr.trim.startsWith("document("), "Expected the tree representation to start with 'document('")
-
-    val doc6: Document = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(document, treeRepr)
-      parseResult.get.build()
-    }
-
-    val root6 = doc6.documentElement
-
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root6.findAllElems map (e => e.localName)).toSet
-    }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root6.findAllElemsOrSelf map (e => e.localName)).toSet
-    }
-    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
-      root6.filterElemsOrSelf(EName(nsBookstore, "Title")).size
-    }
-    assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
-      result.size
-    } {
-      val result = root6 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
-      result.size
-    }
-
-    // 9. Serialize the corresponding NodeBuilder, deserialize it, and check again.
+    // 8. Serialize the corresponding NodeBuilder, deserialize it, and check again.
 
     val rootDocBuilder = DocBuilder.fromDocument(Document(root))
     val bos = new jio.ByteArrayOutputStream
@@ -347,24 +312,6 @@ class DomInteropTest extends Suite {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
@@ -442,38 +389,6 @@ class DomInteropTest extends Suite {
     }
     assertResult("Trivial XML") {
       val result = root3.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
-      result.mkString
-    }
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = document.toString
-
-    assert(treeRepr.trim.startsWith("document("), "Expected the tree representation to start with 'document('")
-
-    val document4: Document = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.document, treeRepr)
-      parseResult.get.build()
-    }
-
-    val root4 = document4.documentElement
-
-    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-    assertResult(Set(QName("root"), QName("child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.qname }
-      result.toSet
-    }
-    assertResult("This is trivial XML") {
-      val result = document4.comments map { com => com.text.trim }
-      result.mkString
-    }
-    assertResult("Trivial XML") {
-      val result = root4.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
       result.mkString
     }
   }
@@ -728,34 +643,6 @@ class DomInteropTest extends Suite {
     checkIdentityConstraintElm(root3)
     checkComplexTypeElm(root3)
     checkFieldPattern(root3)
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(xsElmENames) {
-      val result = root4 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
-      result.toSet
-    }
-    assertResult(Set(0, 1)) {
-      val result = root4 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
-      result.toSet
-    }
-
-    checkForChoiceDocumentation(root4)
-    checkCommentWithEscapedChar(root4)
-    checkIdentityConstraintElm(root4)
-    checkComplexTypeElm(root4)
-    checkFieldPattern(root4)
   }
 
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
@@ -820,26 +707,6 @@ class DomInteropTest extends Suite {
     }
 
     checkChildText(root3)
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    checkChildText(root4)
   }
 
   @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
@@ -914,26 +781,6 @@ class DomInteropTest extends Suite {
     }
 
     checkChildTextAndEntityRef(root3)
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    checkChildTextAndEntityRef(root4)
   }
 
   @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
@@ -975,24 +822,6 @@ class DomInteropTest extends Suite {
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
   }
@@ -1071,26 +900,6 @@ class DomInteropTest extends Suite {
     }
 
     doChecks(root3)
-
-    // 6. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root4: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root4.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    doChecks(root4)
   }
 
   @Test def testParseXmlWithSpecialChars(): Unit = {
@@ -1136,27 +945,7 @@ class DomInteropTest extends Suite {
 
     doChecks(root2)
 
-    // 3. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = root.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val root3: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
-      result.toSet
-    }
-
-    doChecks(root3)
-
-    // 4. Show the output with different output encodings
+    // 3. Show the output with different output encodings
 
     val printer = DocumentPrinterUsingDom.newInstance()
 
@@ -1267,43 +1056,6 @@ class DomInteropTest extends Suite {
       "Jeffrey Ullman, Hector Garcia-Molina",
       "Jennifer Widom")) {
       authors.toSet
-    }
-
-    // 5. Print to tree representation String and parse back that DSL String, and check again
-
-    val treeRepr: String = htmlRoot.toString
-
-    assert(treeRepr.trim.startsWith("elem("), "Expected the tree representation to start with 'elem('")
-
-    val htmlRoot2: Elem = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.element, treeRepr)
-      parseResult.get.build()
-    }
-
-    val tableRowElms2 = htmlRoot2.filterElems(EName("tr")).drop(1)
-
-    assertResult(4) {
-      tableRowElms2.size
-    }
-
-    val isbnElms2 = tableRowElms2 flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(1).headOption }
-    val isbns2 = isbnElms2 map { e => e.trimmedText }
-
-    assertResult(Set("ISBN-0-13-713526-2", "ISBN-0-13-815504-6", "ISBN-0-11-222222-3", "ISBN-9-88-777777-6")) {
-      isbns2.toSet
-    }
-
-    val authorsElms2 = tableRowElms2 flatMap { rowElm => rowElm.filterChildElems(EName("td")).drop(3).headOption }
-    val authors2 = authorsElms2 map { e => e.trimmedText }
-
-    assertResult(Set(
-      "Jeffrey Ullman, Jennifer Widom",
-      "Hector Garcia-Molina, Jeffrey Ullman, Jennifer Widom",
-      "Jeffrey Ullman, Hector Garcia-Molina",
-      "Jennifer Widom")) {
-      authors2.toSet
     }
   }
 

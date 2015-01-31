@@ -53,8 +53,6 @@ import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Text
-import eu.cdevreeze.yaidom.simple.TreeReprParsers
-import eu.cdevreeze.yaidom.simple.TreeReprParsers.parseAll
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -186,17 +184,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
       treeRepr.take("document(".length)
     }
 
-    val startMs3 = System.currentTimeMillis()
-    val doc2: Document = {
-      import TreeReprParsers._
-
-      val parseResult = parseAll(TreeReprParsers.document, treeRepr)
-      parseResult.get.build()
-    }
-    val endMs3 = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeTreeRepr] Parsing the tree representation took ${endMs3 - startMs3} ms")
-
-    doQueryTest(doc2.documentElement, "testProcessLargeTreeRepr: simple.Elem")
+    doQueryTest(doc.documentElement, "testProcessLargeTreeRepr: simple.Elem")
   }
 
   @Ignore @Test def testSerializeLargeNodeBuilder(): Unit = {

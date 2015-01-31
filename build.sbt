@@ -30,11 +30,6 @@ libraryDependencies <++= scalaBinaryVersion apply { version =>
   else Seq()
 }
 
-libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.2")
-  else Seq()
-}
-
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
