@@ -40,8 +40,6 @@ import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
 import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
 import eu.cdevreeze.yaidom.utils.TextENameExtractor
-import AbstractBlogXbrlTestSupport.XbrliNs
-import AbstractBlogXbrlTestSupport.XmlNs
 
 /**
  * Code of yaidom XBRL blog ("introducing yaidom, using XBRL examples"). The blog introduces yaidom in the context
