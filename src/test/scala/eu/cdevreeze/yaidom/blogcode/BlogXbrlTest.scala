@@ -16,14 +16,20 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
+import scala.Vector
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+
+import AbstractBlogXbrlTestSupport.XbrliNs
+import AbstractBlogXbrlTestSupport.XmlNs
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
@@ -34,7 +40,8 @@ import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
 import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
 import eu.cdevreeze.yaidom.utils.TextENameExtractor
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
+import AbstractBlogXbrlTestSupport.XbrliNs
+import AbstractBlogXbrlTestSupport.XmlNs
 
 /**
  * Code of yaidom XBRL blog ("introducing yaidom, using XBRL examples"). The blog introduces yaidom in the context
@@ -46,18 +53,10 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class BlogXbrlTest extends Suite {
+class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[BlogXbrlTest].getResource("sample-Instance-Proof.xml").toURI))
-
-  private val xbrliNs = "http://www.xbrl.org/2003/instance"
-  private val linkNs = "http://www.xbrl.org/2003/linkbase"
-  private val xlinkNs = "http://www.w3.org/1999/xlink"
-  private val xbrldiNs = "http://xbrl.org/2006/xbrldi"
-  private val xsiNs = "http://www.w3.org/2001/XMLSchema-instance"
-  // Needs no namespace declaration:
-  private val xmlNs = "http://www.w3.org/XML/1998/namespace"
 
   private val xbrliDocumentENameExtractor: DocumentENameExtractor = {
     // Not complete, but good enough for this example!
@@ -78,6 +77,15 @@ class BlogXbrlTest extends Suite {
         case _ => None
       }
     }
+  }
+
+  private val xbrlInstance: XbrlInstance = {
+    val docParser = DocumentParserUsingStax.newInstance
+
+    val doc = docParser.parse(sampleXbrlInstanceFile)
+    val indexedDoc = indexed.Document(doc)
+
+    XbrlInstance(indexedDoc.documentElement)
   }
 
   /**
@@ -104,14 +112,14 @@ class BlogXbrlTest extends Suite {
     // Check the unit itself, minding the default namespace
 
     val uPureUnit =
-      doc.documentElement.getChildElem(e => e.resolvedName == EName(xbrliNs, "unit") && (e \@ EName("id")) == Some("U-Pure"))
+      doc.documentElement.getChildElem(e => e.resolvedName == EName(XbrliNs, "unit") && (e \@ EName("id")) == Some("U-Pure"))
 
     assertResult("pure") {
-      uPureUnit.getChildElem(withEName(xbrliNs, "measure")).text
+      uPureUnit.getChildElem(withEName(XbrliNs, "measure")).text
     }
     // Mind the default namespace. Note the precision of yaidom and its namespace support that makes this easy.
-    assertResult(EName(xbrliNs, "pure")) {
-      uPureUnit.getChildElem(withEName(xbrliNs, "measure")).textAsResolvedQName
+    assertResult(EName(XbrliNs, "pure")) {
+      uPureUnit.getChildElem(withEName(XbrliNs, "measure")).textAsResolvedQName
     }
 
     // Knowing the units are the same, the gaap:AverageNumberEmployees facts are uniquely identified by contexts.
@@ -148,7 +156,7 @@ class BlogXbrlTest extends Suite {
     // All contexts have a comment
 
     assertResult(true) {
-      val contexts = doc.documentElement.filterChildElems(withEName(xbrliNs, "context"))
+      val contexts = doc.documentElement.filterChildElems(withEName(XbrliNs, "context"))
       contexts forall (e => !e.commentChildren.isEmpty)
     }
 
@@ -226,7 +234,7 @@ class BlogXbrlTest extends Suite {
     val companyNs = "http://www.example.com/company"
 
     assertResult(namespaceUrisDeclared.diff(Set(companyNs))) {
-      findAllNamespaces(indexedDoc.documentElement, xbrliDocumentENameExtractor).diff(Set(xmlNs))
+      findAllNamespaces(indexedDoc.documentElement, xbrliDocumentENameExtractor).diff(Set(XmlNs))
     }
 
     // Strip unused company namespace, and compare Scopes agains
@@ -255,5 +263,102 @@ class BlogXbrlTest extends Suite {
     assertResult(resolvedOrgElem) {
       resolvedEditedElem
     }
+  }
+
+  /**
+   * Checks the order of child elements (rule 2.1.10). Shows yaidom's extensibility, in that new element implementations
+   * can easily be added. Also shows the SubtypeAwareElemApi query API trait, for more type-safe querying in custom
+   * XML dialects (such as the XBRL instances dialect used here).
+   */
+  @Test def testOrderInXbrlInstance(): Unit = {
+    // Rule 2.1.10: the order of child elements must be as specified in this rule
+
+    val remainingChildElems =
+      xbrlInstance.findAllChildElems dropWhile {
+        case e: SchemaRef => true
+        case e => false
+      } dropWhile {
+        case e: LinkbaseRef => true
+        case e => false
+      } dropWhile {
+        case e: RoleRef => true
+        case e => false
+      } dropWhile {
+        case e: ArcroleRef => true
+        case e => false
+      } dropWhile {
+        case e: XbrliContext => true
+        case e => false
+      } dropWhile {
+        case e: XbrliUnit => true
+        case e => false
+      } dropWhile {
+        case e: Fact => true
+        case e => false
+      } dropWhile {
+        case e: FootnoteLink => true
+        case e => false
+      }
+
+    assertResult(true) {
+      remainingChildElems.isEmpty
+    }
+  }
+
+  /**
+   * Checks some context-related requirements (rule 2.4.2, for example). Shows how yaidom's extensibility helps in
+   * supporting different XML dialects such as XBRL instances, which is to be preferred to raw XML element support.
+   */
+  @Test def testContextProperties(): Unit = {
+    // Rule 2.4.2: all contexts must be used. It is also checked that all context references are indeed correct.
+    // Note how friendly the XBRL instance model is as compared to raw XML elements.
+
+    val contextIds = xbrlInstance.allContextsById.keySet
+
+    val usedContextIds = xbrlInstance.findAllItems.map(_.contextRef).toSet
+
+    assertResult(true) {
+      usedContextIds.subsetOf(contextIds)
+    }
+    // Some contexts are not used, namely I-2004, D-2007-LI-ALL and I-2003
+    assertResult(Set("I-2004", "D-2007-LI-ALL", "I-2003")) {
+      contextIds.diff(usedContextIds)
+    }
+
+    // Rule 2.4.1: no S-equal contexts should occur
+    // Roughly, contexts are S-equal if they only differ in the attributes on the context elements
+    // We can use "resolved" elements for the comparison, after some transformation (removing context attributes, for example)
+    // This comparison is not exact, because there is no type information, but as an approximation it is not too bad
+
+    val contextsBySEqualityGroup = xbrlInstance.allContexts.groupBy(e => transformContextForSEqualityComparison(e))
+
+    assertResult(true) {
+      contextsBySEqualityGroup.size == xbrlInstance.allContexts.size
+    }
+  }
+
+  /**
+   * Checks some fact-related requirements (rule 2.8.3, for example). Again shows yaidom's support for XML dialects.
+   */
+  @Test def testFactProperties(): Unit = {
+    // Rule 2.8.3: concepts are either top-level or nested in tuples, both not both
+
+    val topLevelConceptNames = xbrlInstance.allTopLevelFactsByEName.keySet
+
+    val nestedConceptNames = xbrlInstance.allTopLevelTuples.flatMap(_.findAllFacts).map(_.resolvedName).toSet
+
+    assertResult(true) {
+      topLevelConceptNames.intersect(nestedConceptNames).isEmpty
+    }
+    // Of course, the following holds
+    assertResult(true) {
+      xbrlInstance.findAllFacts.map(_.resolvedName).toSet == (topLevelConceptNames.union(nestedConceptNames))
+    }
+  }
+
+  private def transformContextForSEqualityComparison(context: XbrliContext): resolved.Elem = {
+    // Ignoring "normalization" of dates and QNames, as well as order of dimensions etc.
+    val elem = context.indexedElem.elem.copy(attributes = Vector())
+    resolved.Elem(elem).coalesceAndNormalizeAllText.removeAllInterElementWhitespace
   }
 }
