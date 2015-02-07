@@ -20,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
@@ -28,12 +27,14 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
 import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
 import eu.cdevreeze.yaidom.utils.TextENameExtractor
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 
 /**
  * Code of yaidom XBRL blog ("introducing yaidom, using XBRL examples"). The blog introduces yaidom in the context
@@ -80,7 +81,8 @@ class BlogXbrlTest extends Suite {
   }
 
   /**
-   * Simple XBRL instance queries.
+   * Simple XBRL instance queries. Shows XBRL instances, and introduces yaidom ScopedElemApi query API, as well as
+   * Scala Collections. If you know ElemApi method `filterElemsOrSelf`, you basically know all of its methods.
    */
   @Test def testSimpleQueries(): Unit = {
     val docParser = DocumentParserUsingSax.newInstance
@@ -127,7 +129,42 @@ class BlogXbrlTest extends Suite {
   }
 
   /**
-   * Checks use of recommended namespace prefixes (rule 2.1.5).
+   * Simple XBRL instance queries for getting comments, CDATA sections etc. This shows that element implementations
+   * such as simple elements not only offer uniform yaidom query APIs, but also offer methods to query for specific
+   * nodes such as comments and CDATA text.
+   */
+  @Test def testSpecificNodeQueries(): Unit = {
+    // Now use DOM-based DocumentParser
+    val docParser = DocumentParserUsingDom.newInstance
+
+    val doc = docParser.parse(sampleXbrlInstanceFile)
+
+    // Top level comment, outside the document element
+
+    assertResult("Created by Charles Hoffman, CPA, 2008-03-27") {
+      doc.comments.map(_.text.trim).mkString
+    }
+
+    // All contexts have a comment
+
+    assertResult(true) {
+      val contexts = doc.documentElement.filterChildElems(withEName(xbrliNs, "context"))
+      contexts forall (e => !e.commentChildren.isEmpty)
+    }
+
+    // The gaap:ManagementDiscussionAndAnalysisTextBlock fact (occurring once) has 4 CDATA text children
+    // Be careful: the detection of CDATA text nodes may depend on the underlying XML parser and its configuration
+
+    assertResult(true) {
+      // Being lazy, and forgetting about the namespace
+      val facts = doc.documentElement.filterChildElems(withLocalName("ManagementDiscussionAndAnalysisTextBlock"))
+      facts.flatMap(e => e.textChildren.filter(_.isCData)).size >= 1
+    }
+  }
+
+  /**
+   * Checks use of recommended namespace prefixes (rule 2.1.5). Shows simple FRIS rules, and shows yaidom Scopes
+   * and namespace support.
    */
   @Test def testUsedNamespacePrefixes(): Unit = {
     // Now use StAX-based DocumentParser
@@ -167,11 +204,14 @@ class BlogXbrlTest extends Suite {
   }
 
   /**
-   * Checks the absence of unused namespaces (rule 2.1.7).
+   * Checks the absence of unused namespaces (rule 2.1.7). Shows more advanced yaidom namespace support.
+   * Introduces yaidom indexed and resolved elements, sharing much of the same query API with simple elements.
+   * Also shows how yaidom is useful despite its lack of schema type knowledge (although a yaidom facade wrapping
+   * type-aware Saxon-EE trees is quite feasible).
    */
   @Test def testNoUnusedNamespaces(): Unit = {
-    // Now use DOM-based DocumentParser
-    val docParser = DocumentParserUsingDom.newInstance
+    // Now use DOM-LS-based DocumentParser
+    val docParser = DocumentParserUsingDomLS.newInstance
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
     // Introducing indexed elements, offering the same query API and more
