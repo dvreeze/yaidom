@@ -35,7 +35,9 @@ trait HasEName extends HasENameApi {
   /**
    * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
    */
-  final def attributeOption(expandedName: EName): Option[String] = resolvedAttributes.toMap.get(expandedName)
+  final def attributeOption(expandedName: EName): Option[String] = {
+    resolvedAttributes find { case (en, v) => (en == expandedName) } map (_._2)
+  }
 
   /**
    * Returns the value of the attribute with the given expanded name, and throws an exception otherwise.
@@ -48,8 +50,7 @@ trait HasEName extends HasENameApi {
    * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
    */
   final def findAttributeByLocalName(localName: String): Option[String] = {
-    val matchingAttrs = resolvedAttributes filter { case (en, v) => en.localPart == localName }
-    matchingAttrs.map(_._2).headOption
+    resolvedAttributes find { case (en, v) => en.localPart == localName } map (_._2)
   }
 
   /**

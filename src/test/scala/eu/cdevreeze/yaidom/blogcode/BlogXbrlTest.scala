@@ -235,7 +235,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
       findAllNamespaces(indexedDoc.documentElement, xbrliDocumentENameExtractor).diff(Set(XmlNs))
     }
 
-    // Strip unused company namespace, and compare Scopes agains
+    // Strip unused company namespace, and compare Scopes again
 
     // Indexed elements contain a Path relative to the root
     val paths = indexedDoc.documentElement.findAllElemsOrSelf.map(_.path)
