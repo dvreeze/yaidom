@@ -3,6 +3,28 @@ CHANGELOG
 =========
 
 
+1.3.3
+=====
+
+Version 1.3.3 is a maintenance release. The (few) breaking changes are hardly interesting. The performance fix
+in attribute retrieval may be the most important change in this release.
+
+The changes in this version are:
+
+* Breaking change: removed ``TreeReprParsers``
+
+  * Hence no more parsing of the element tree string format
+  * No more dependency on Scala parser combinators
+
+* Breaking change: better streaming support in ``StaxEventsToYaidomConversions``
+
+  * Also renamed, refactored and added "event state" data classes, for better streaming support
+
+* Performance fix in ``HasEName.attributeOption`` (the inefficient ``toMap`` conversion is gone)
+* More tests (XML Base, i18n, etc.), and refactored tests
+* Woodstox StAX parser used in test code (for XML 1.1 support)
+
+
 1.3.2
 =====
 
