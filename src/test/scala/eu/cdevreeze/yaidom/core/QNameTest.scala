@@ -103,16 +103,16 @@ class QNameTest extends Suite {
       UnprefixedName(null)
     }
     intercept[Exception] {
-      UnprefixedName("")
+      UnprefixedName("").validated
     }
     intercept[Exception] {
-      UnprefixedName("a:b")
+      UnprefixedName("a:b").validated
     }
     intercept[Exception] {
-      QName.parse("")
+      QName.parse("").validated
     }
     intercept[Exception] {
-      QName.parse(":")
+      QName.parse(":").validated
     }
   }
 
@@ -211,25 +211,25 @@ class QNameTest extends Suite {
       PrefixedName("a", null)
     }
     intercept[Exception] {
-      PrefixedName("", "")
+      PrefixedName("", "").validated
     }
     intercept[Exception] {
-      PrefixedName("", "b")
+      PrefixedName("", "b").validated
     }
     intercept[Exception] {
-      PrefixedName("a", "")
+      PrefixedName("a", "").validated
     }
     intercept[Exception] {
-      PrefixedName("a:c", "b")
+      PrefixedName("a:c", "b").validated
     }
     intercept[Exception] {
-      PrefixedName("a", "b:c")
+      PrefixedName("a", "b:c").validated
     }
     intercept[Exception] {
-      QName.parse("a:")
+      QName.parse("a:").validated
     }
     intercept[Exception] {
-      QName.parse(":b")
+      QName.parse(":b").validated
     }
   }
 }

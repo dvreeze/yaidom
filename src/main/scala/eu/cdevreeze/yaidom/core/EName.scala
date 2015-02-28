@@ -55,21 +55,19 @@ import javax.xml.namespace.{ QName => JQName }
  */
 final case class EName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
   require(namespaceUriOption ne null)
-  require {
-    namespaceUriOption forall { ns => (ns ne null) && (ns.length > 0) }
-  }
   require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name")
 
   /** Given an optional prefix, creates a `QName` from this `EName` */
   def toQName(prefixOption: Option[String]): QName = {
-    require(namespaceUriOption.isDefined || prefixOption.isEmpty)
+    require(
+      namespaceUriOption.isDefined || prefixOption.isEmpty, s"Prefix only allowed if namespace non-empty in EName '${this}'")
     QName(prefixOption, localPart)
   }
 
   /** Given an optional prefix, creates a `javax.xml.namespace.QName` from this EName */
   def toJavaQName(prefixOption: Option[String]): JQName = {
-    require(namespaceUriOption.isDefined || prefixOption.isEmpty)
+    require(
+      namespaceUriOption.isDefined || prefixOption.isEmpty, s"Prefix only allowed if namespace non-empty in EName '${this}'")
     new JQName(namespaceUriOption.getOrElse(XMLConstants.NULL_NS_URI), localPart, prefixOption.getOrElse(XMLConstants.DEFAULT_NS_PREFIX))
   }
 
@@ -77,6 +75,18 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
   override def toString: String = namespaceUriOption match {
     case None => localPart
     case Some(nsUri) => "{" + nsUri + "}" + localPart
+  }
+
+  /**
+   * Partially validates the EName, throwing an exception if found not valid.
+   * If not found invalid, returns this.
+   */
+  def validated: EName = {
+    require(
+      namespaceUriOption.forall(ns => (ns ne null) && (ns.length > 0)),
+      s"Empty (as opposed to absent) namespace URI not allowed in EName '${this}'")
+    require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name in EName '${this}'")
+    this
   }
 }
 
@@ -95,13 +105,13 @@ object EName {
   def parse(s: String): EName = {
     if (s.startsWith("{")) {
       val idx = s.indexOf('}')
-      require(idx >= 2 && idx < s.length - 1)
+      require(idx >= 2 && idx < s.length - 1, s"Opening brace not closed or at at incorrect location in EName '${s}'")
       val ns = s.substring(1, idx)
       val localPart = s.substring(idx + 1)
       EName(Some(ns), localPart)
     } else {
-      require(s.indexOf("{") < 0)
-      require(s.indexOf("}") < 0)
+      require(s.indexOf("{") < 0, s"No opening brace allowed unless at the beginning in EName '${s}'")
+      require(s.indexOf("}") < 0, s"Closing brace without matching opening brace not allowed in EName '${s}'")
       EName(None, s)
     }
   }

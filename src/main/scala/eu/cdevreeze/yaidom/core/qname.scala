@@ -56,28 +56,42 @@ sealed trait QName extends Immutable with Serializable {
 
   def localPart: String
   def prefixOption: Option[String]
+
+  /**
+   * Partially validates the QName, throwing an exception if found not valid.
+   * If not found invalid, returns this.
+   */
+  def validated: QName
 }
 
 final case class UnprefixedName(override val localPart: String) extends QName {
   require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name")
 
   override def prefixOption: Option[String] = None
 
   /** The `String` representation as it appears in XML, that is, the localPart */
   override def toString: String = localPart
+
+  override def validated: UnprefixedName = {
+    require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name in QName '${this}'")
+    this
+  }
 }
 
 final case class PrefixedName(prefix: String, override val localPart: String) extends QName {
   require(prefix ne null)
-  require(XmlStringUtils.isAllowedPrefix(prefix), s"'${prefix}' is not an allowed prefix name")
   require(localPart ne null)
-  require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name")
 
   override def prefixOption: Option[String] = Some(prefix)
 
   /** The `String` representation as it appears in XML. For example, <code>xs:schema</code> */
   override def toString: String = s"${prefix}:${localPart}"
+
+  override def validated: PrefixedName = {
+    require(XmlStringUtils.isAllowedPrefix(prefix), s"'${prefix}' is not an allowed prefix name in QName '${this}'")
+    require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name in QName '${this}'")
+    this
+  }
 }
 
 object QName {
