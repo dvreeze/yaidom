@@ -69,3 +69,7 @@ Changes:
 
 Yaidom users upgrading from 1.2 to 1.3 had the time to fix the deprecation warnings, so this upgrade should be easy.
 
+After version 1.3, and leading up to version 1.4, only performance improvements (and insignificant API changes) are
+in scope. For example, construction of ENames and QNames is too expensive due to validations that typically are not
+needed.
+
