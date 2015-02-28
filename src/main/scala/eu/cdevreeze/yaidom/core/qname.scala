@@ -60,6 +60,9 @@ sealed trait QName extends Immutable with Serializable {
   /**
    * Partially validates the QName, throwing an exception if found not valid.
    * If not found invalid, returns this.
+   *
+   * It is the responsibility of the user of this class to call this method, if needed.
+   * Fortunately, this method facilitates method chaining, because the QName itself is returned.
    */
   def validated: QName
 }

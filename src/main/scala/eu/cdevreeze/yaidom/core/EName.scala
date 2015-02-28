@@ -80,6 +80,9 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
   /**
    * Partially validates the EName, throwing an exception if found not valid.
    * If not found invalid, returns this.
+   *
+   * It is the responsibility of the user of this class to call this method, if needed.
+   * Fortunately, this method facilitates method chaining, because the EName itself is returned.
    */
   def validated: EName = {
     require(
@@ -105,7 +108,7 @@ object EName {
   def parse(s: String): EName = {
     if (s.startsWith("{")) {
       val idx = s.indexOf('}')
-      require(idx >= 2 && idx < s.length - 1, s"Opening brace not closed or at at incorrect location in EName '${s}'")
+      require(idx >= 2 && idx < s.length - 1, s"Opening brace not closed or at incorrect location in EName '${s}'")
       val ns = s.substring(1, idx)
       val localPart = s.substring(idx + 1)
       EName(Some(ns), localPart)

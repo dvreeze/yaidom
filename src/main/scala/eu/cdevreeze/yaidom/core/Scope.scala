@@ -231,20 +231,7 @@ import javax.xml.namespace.NamespaceContext
 final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutable {
   import Scope._
 
-  require(prefixNamespaceMap ne null)
-  require {
-    prefixNamespaceMap.keySet forall { pref => pref ne null }
-  }
-  require {
-    prefixNamespaceMap.values forall { ns => (ns ne null) && (ns != "") && (ns != "http://www.w3.org/2000/xmlns/") }
-  }
-  require {
-    (prefixNamespaceMap - DefaultNsPrefix).keySet forall { pref => XmlStringUtils.isAllowedPrefix(pref) && (pref != "xmlns") }
-  }
-  require(!prefixNamespaceMap.keySet.contains("xml"), "A Scope must not contain the prefix 'xml'")
-  require(
-    prefixNamespaceMap.values forall (ns => (ns != "http://www.w3.org/XML/1998/namespace")),
-    "A Scope must not contain namespace URI 'http://www.w3.org/XML/1998/namespace'")
+  validate(prefixNamespaceMap)
 
   /** Returns true if this Scope is empty. Faster than comparing this Scope against the empty Scope. */
   def isEmpty: Boolean = prefixNamespaceMap.isEmpty
@@ -477,6 +464,32 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
 object Scope {
 
+  private def validate(prefixNamespaceMap: Map[String, String]): Unit = {
+    require(prefixNamespaceMap ne null)
+
+    prefixNamespaceMap foreach {
+      case (pref, ns) =>
+        require(pref ne null, s"No null prefix allowed in scope $prefixNamespaceMap")
+        require(ns ne null, s"No null namespace allowed in scope $prefixNamespaceMap")
+        require(ns != "", s"No empty namespace allowed in scope $prefixNamespaceMap")
+        require(
+          !XmlStringUtils.containsColon(pref),
+          s"The prefix must not contain any colon in scope $prefixNamespaceMap")
+        require(
+          pref != "xmlns",
+          s"The prefix must not be 'xmlns' in scope $prefixNamespaceMap")
+        require(
+          pref != "xml",
+          s"No 'xml' prefix allowed in scope $prefixNamespaceMap")
+        require(
+          ns != "http://www.w3.org/2000/xmlns/",
+          s"No 'http://www.w3.org/2000/xmlns/' namespace allowed in scope $prefixNamespaceMap")
+        require(
+          ns != "http://www.w3.org/XML/1998/namespace",
+          s"No 'http://www.w3.org/XML/1998/namespace' namespace allowed in scope $prefixNamespaceMap")
+    }
+  }
+
   /** The "empty" `Scope` */
   val Empty = Scope(Map())
 
@@ -486,7 +499,8 @@ object Scope {
    */
   def from(m: Map[String, String]): Scope = {
     if (m.contains("xml")) {
-      require(m("xml") == "http://www.w3.org/XML/1998/namespace",
+      require(
+        m("xml") == "http://www.w3.org/XML/1998/namespace",
         "The 'xml' prefix must map to 'http://www.w3.org/XML/1998/namespace'")
     }
     Scope(m - "xml")
