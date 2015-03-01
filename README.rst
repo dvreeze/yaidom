@@ -24,19 +24,19 @@ and Anti-XML. Indeed, yaidom has several nice properties:
 Usage
 =====
 
-Yaidom versions can be found in the Maven central repository. Assuming version 1.3.3, yaidom can be added as dependency
+Yaidom versions can be found in the Maven central repository. Assuming version 1.3.4, yaidom can be added as dependency
 as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.3.3"
+    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.3.4"
 
 **Maven2**::
 
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
       <artifactId>yaidom_2.11</artifactId>
-      <version>1.3.3</version>
+      <version>1.3.4</version>
     </dependency>
 
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.

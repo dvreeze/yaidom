@@ -3,6 +3,32 @@ CHANGELOG
 =========
 
 
+1.3.4
+=====
+
+Version 1.3.4 is a minor performance release. There are no breaking changes. The performance improvements are in
+the construction of the core objects, such as expanded names, qualified names, etc.
+
+The changes in this version are:
+
+* ``EName`` and ``QName`` construction has become less expensive
+
+  * This is important, since these names are created so often
+  * The increased construction speed comes at the expense of removed validity checks
+  * These checks can still be performed, using new method ``validated``, but that is the responsibility of the user
+  * Note that class ``javax.xml.namespace.QName`` also performs no validity checks on the passed construction parameters
+
+* ``Scope`` and ``Declarations`` construction has become less expensive
+
+  * This is important, since these objects are created so often
+  * The checks are still there, but are cheaper, because they now involve much less collections processing
+  * In this case, it is rather important to retain the checks, for internal consistency and conceptual clarity
+  * For example, the "xml" namespace gets "special" treatment in the yaidom "namespaces theory"
+
+This release was made after profiling by Andrea Desole and Nick Evans had shown that much time was spent in creation
+of yaidom core objects.
+
+
 1.3.3
 =====
 
