@@ -37,9 +37,9 @@ trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ElemL
       sys.error(s"Missing QName-valued attribute $expandedName"))
 
   final def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
-    attributeAsQNameOption(expandedName) map { qname =>
-      scope.resolveQNameOption(qname).getOrElse(
-        sys.error(s"Could not resolve QName-valued attribute value $qname, given scope [${scope}]"))
+    attributeAsQNameOption(expandedName) map { qn =>
+      scope.resolveQNameOption(qn).getOrElse(
+        sys.error(s"Could not resolve QName-valued attribute value $qn, given scope [${scope}]"))
     }
   }
 
@@ -51,5 +51,5 @@ trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ElemL
 
   final def textAsResolvedQName: EName =
     scope.resolveQNameOption(textAsQName).getOrElse(
-      sys.error(s"Could not resolve QName-valued element text $qname, given scope [${scope}]"))
+      sys.error(s"Could not resolve QName-valued element text $textAsQName, given scope [${scope}]"))
 }
