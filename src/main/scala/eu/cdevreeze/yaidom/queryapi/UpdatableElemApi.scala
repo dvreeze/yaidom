@@ -203,19 +203,33 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   /** Shorthand for `withChildren(children.patch(from, newChildren, replace))` */
   def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[N], replace: Int): E
 
-  /** Returns a copy in which the given child has been inserted at the given position (0-based) */
+  /**
+   * Returns a copy in which the given child has been inserted at the given position (0-based).
+   * If `index == children.size`, adds the element at the end. If `index > children.size`, throws an exception.
+   *
+   * Afterwards, the resulting element indeed has the given child at position `index` (0-based).
+   */
   def plusChild(index: Int, child: N): E
 
   /** Returns a copy in which the given child has been inserted at the end */
   def plusChild(child: N): E
 
-  /** Returns a copy in which the given child, if any, has been inserted at the given position (0-based) */
+  /**
+   * Returns a copy in which the given child, if any, has been inserted at the given position (0-based).
+   * That is, returns `plusChild(index, childOption.get)` if the given optional child element is non-empty.
+   */
   def plusChildOption(index: Int, childOption: Option[N]): E
 
-  /** Returns a copy in which the given child, if any, has been inserted at the end */
+  /**
+   * Returns a copy in which the given child, if any, has been inserted at the end.
+   * That is, returns `plusChild(childOption.get)` if the given optional child element is non-empty.
+   */
   def plusChildOption(childOption: Option[N]): E
 
-  /** Returns a copy in which the child at the given position (0-based) has been removed */
+  /**
+   * Returns a copy in which the child at the given position (0-based) has been removed.
+   * Throws an exception if `index >= children.size`.
+   */
   def minusChild(index: Int): E
 
   /**

@@ -40,8 +40,6 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNavigable[E] with UpdatableElemApi[N, E] { self: E =>
 
-  // See https://pario.zendesk.com/entries/20124208-lesson-6-complex-xslt-example for an example of what we must be able to express easily.
-
   def children: immutable.IndexedSeq[N]
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
@@ -54,7 +52,14 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   final def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[N], replace: Int): E =
     withChildren(children.patch(from, newChildren, replace))
 
-  final def plusChild(index: Int, child: N): E = withPatchedChildren(index, Vector(child, children(index)), 1)
+  final def plusChild(index: Int, child: N): E = {
+    require(
+      index <= self.children.size,
+      s"Expected index $index to be at most the number of children: ${self.children.size}")
+
+    if (index == children.size) plusChild(child)
+    else withPatchedChildren(index, Vector(child, children(index)), 1)
+  }
 
   final def plusChild(child: N): E = withChildren(children :+ child)
 
@@ -66,7 +71,13 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     if (childOption.isEmpty) self else plusChild(childOption.get)
   }
 
-  final def minusChild(index: Int): E = withPatchedChildren(index, Vector(), 1)
+  final def minusChild(index: Int): E = {
+    require(
+      index < self.children.size,
+      s"Expected index $index to be less than the number of children: ${self.children.size}")
+
+    withPatchedChildren(index, Vector(), 1)
+  }
 
   final def updated(pathEntry: Path.Entry)(f: E => E): E = {
     val idx = self.childNodeIndex(pathEntry)
