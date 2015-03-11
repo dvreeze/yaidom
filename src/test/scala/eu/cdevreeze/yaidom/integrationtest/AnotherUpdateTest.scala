@@ -145,7 +145,8 @@ class AnotherUpdateTest extends Suite {
     }
 
     val insertBook: Elem => immutable.IndexedSeq[Node] = {
-      case e: Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(e, newBook)
+      case e: Elem if resolved.Elem(e) == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+        Vector(e, newBook)
       case e: Elem => Vector(e)
     }
 
@@ -154,7 +155,8 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
 
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
-      case e: resolved.Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(e, resolved.Elem(newBook))
+      case e: resolved.Elem if e == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+        Vector(e, resolved.Elem(newBook))
       case e: resolved.Elem => Vector(e)
     })
   }
@@ -217,7 +219,8 @@ class AnotherUpdateTest extends Suite {
     }
 
     val insertBook: Elem => immutable.IndexedSeq[Node] = {
-      case e: Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(newBook, e)
+      case e: Elem if resolved.Elem(e) == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+        Vector(newBook, e)
       case e: Elem => Vector(e)
     }
 
@@ -226,7 +229,8 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
 
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
-      case e: resolved.Elem if e == doc.documentElement.findElemOrSelfByPath(lastBookPath).get => Vector(resolved.Elem(newBook), e)
+      case e: resolved.Elem if e == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+        Vector(resolved.Elem(newBook), e)
       case e: resolved.Elem => Vector(e)
     })
   }
