@@ -104,9 +104,10 @@ private[yaidom] object PrettyPrinting {
   }
 
   private def useJavaStringLiteral(s: String): Boolean = {
+    // Quite defensive, more so than needed
     s forall { c =>
       java.lang.Character.isLetterOrDigit(c) ||
-        (c == ':') || (c == '/') || (c == '.') || (c == ',') || (c == '-')
+        (c == ':') || (c == ';') || (c == '/') || (c == '.') || (c == ',') || (c == '-')
     }
   }
 
@@ -184,8 +185,7 @@ private[yaidom] object PrettyPrinting {
     }
 
     def singletonOrEmptyLineSeq(s: String): LineSeq = {
-      if (s.isEmpty) new LineSeq(Vector())
-      else new LineSeq(Vector(new Line(s)))
+      if (s.isEmpty) LineSeq() else LineSeq(new Line(s))
     }
   }
 
