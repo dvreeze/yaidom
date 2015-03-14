@@ -50,6 +50,14 @@ sealed trait ScalaXmlNode {
   def wrappedNode: DomType
 
   final override def toString: String = wrappedNode.toString
+
+  final override def equals(obj: Any): Boolean = obj match {
+    case other: ScalaXmlNode =>
+      (other.wrappedNode == this.wrappedNode)
+    case _ => false
+  }
+
+  final override def hashCode: Int = wrappedNode.hashCode
 }
 
 /**
@@ -140,14 +148,6 @@ final class ScalaXmlElem(
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
   }
-
-  override def equals(obj: Any): Boolean = obj match {
-    case other: ScalaXmlElem =>
-      (other.wrappedNode == this.wrappedNode)
-    case _ => false
-  }
-
-  override def hashCode: Int = wrappedNode.hashCode
 }
 
 final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode {
