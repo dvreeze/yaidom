@@ -105,9 +105,11 @@ private[yaidom] object PrettyPrinting {
 
   private def useJavaStringLiteral(s: String): Boolean = {
     // Quite defensive, more so than needed
+    // Typically fast enough, because immediately returns false on encountering whitespace (or newline)
     s forall { c =>
       java.lang.Character.isLetterOrDigit(c) ||
-        (c == ':') || (c == ';') || (c == '/') || (c == '.') || (c == ',') || (c == '-')
+        (c == ':') || (c == ';') || (c == '.') || (c == ',') ||
+        (c == '-') || (c == '_') || (c == '/') || (c == '\\')
     }
   }
 
