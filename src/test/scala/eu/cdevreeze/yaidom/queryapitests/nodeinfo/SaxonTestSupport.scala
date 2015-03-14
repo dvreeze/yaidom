@@ -66,6 +66,13 @@ trait SaxonTestSupport {
       val prefOption: Option[String] = if (pref == "") None else Some(pref)
       getQName(prefOption, nodeInfo.getLocalPart)
     }
+
+    final override def equals(obj: Any): Boolean = obj match {
+      case other: DomNode => this.wrappedNode == other.wrappedNode
+      case _ => false
+    }
+
+    final override def hashCode: Int = this.wrappedNode.hashCode
   }
 
   abstract class DomParentNode(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
