@@ -32,8 +32,6 @@ libraryDependencies <++= scalaBinaryVersion apply { version =>
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
-libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
-
 libraryDependencies += "junit" % "junit" % "4.11" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
@@ -65,6 +63,10 @@ libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0" % "test"
 libraryDependencies += ("org.codehaus.woodstox" % "woodstox-core-asl" % "4.4.1" % "test").intransitive()
 
 libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "3.1.4" % "test"
+
+// resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
+
+// addCompilerPlugin("com.artima.supersafe" %% "supersafe" % "1.0.3")
 
 publishMavenStyle := true
 

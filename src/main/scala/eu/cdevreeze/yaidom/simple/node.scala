@@ -24,7 +24,6 @@ import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.PrettyPrinting.LineSeq
 import eu.cdevreeze.yaidom.PrettyPrinting.LineSeqSeq
-import eu.cdevreeze.yaidom.PrettyPrinting.toConcatenatedStringLiterals
 import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteral
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Declarations
@@ -551,9 +550,9 @@ final case class Text(text: String, isCData: Boolean) extends Node {
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     if (isCData) {
-      toConcatenatedStringLiterals(text).prepend("cdata(").append(")").shift(indent)
+      LineSeq.singletonOrEmptyLineSeq(toStringLiteral(text)).prepend("cdata(").append(")").shift(indent)
     } else {
-      toConcatenatedStringLiterals(text).prepend("text(").append(")").shift(indent)
+      LineSeq.singletonOrEmptyLineSeq(toStringLiteral(text)).prepend("text(").append(")").shift(indent)
     }
   }
 }
@@ -595,7 +594,7 @@ final case class Comment(text: String) extends Node {
   require(text ne null)
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
-    toConcatenatedStringLiterals(text).prepend("comment(").append(")").shift(indent)
+    LineSeq.singletonOrEmptyLineSeq(toStringLiteral(text)).prepend("comment(").append(")").shift(indent)
   }
 }
 

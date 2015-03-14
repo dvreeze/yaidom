@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom
 
 import scala.collection.{ immutable, mutable }
-import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * Pretty printing utility, used in Node (and indirectly NodeBuilder) (sub)classes to print the tree representation.
@@ -39,10 +38,12 @@ private[yaidom] object PrettyPrinting {
    *
    * This class is designed to make `LineSeq` operations such as `append` and `prepend` efficient, without creating any
    * unnecessary string literals.
+   *
+   * The line may have newlines, but not in prefixes and suffixes. If the line contains any newlines, there will be no
+   * indentation at these line breaks.
    */
   final class Line(val indent: Int, val initialLine: String, val prefixes: List[String], val suffixesReversed: List[String]) {
     require(initialLine ne null)
-    require(initialLine.indexOf('\n') < 0)
     require(prefixes forall (s => s.indexOf('\n') < 0))
     require(suffixesReversed forall (s => s.indexOf('\n') < 0))
 
@@ -80,76 +81,37 @@ private[yaidom] object PrettyPrinting {
   }
 
   /**
-   * Utility method wrapping a string in a Java string literal.
+   * Utility method wrapping a string in a Java or multiline string literal.
    *
-   * The implementation uses the Apache Commons Lang method StringEscapeUtils.escapeJava.
-   * This in turn uses the java.util.regex.Pattern class. Alas, for large strings we may get a stack overflow error.
-   * See the bug report at http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993.
-   * There is not much we can do except for increasing the stack size, with the -Xss JVM option. For example: -Xss20M.
+   * This implementation does no "Java escaping". It uses multiline string literals, assuming that no
+   * three subsequent double quotes occur, but uses Java string literals instead, if all characters are
+   * letters, digits or some common punctuation characters.
+   *
+   * An earlier implementation used the Apache Commons Lang method StringEscapeUtils.escapeJava.
+   * That method in turn would uses the java.util.regex.Pattern class. Alas, for large strings this could result in
+   * a stack overflow error. See the bug report at http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993.
+   *
+   * Currently, however, Apache Commons Lang is not used in yaidom. Hence, this problem does not occur. Moreover,
+   * it reduces the dependencies of yaidom on other libraries.
    */
   final def toStringLiteral(s: String): String = {
-    val lines = s.linesWithSeparators
-
-    val result = new StringBuilder
-    result.append('"')
-
-    for (line <- lines) {
-      appendEscapedJava(result, line)
-    }
-
-    result.append('"')
-    result.toString
+    if (useJavaStringLiteral(s)) toJavaStringLiteral(s)
+    else toMultilineStringLiteral(s)
   }
 
-  private val commonWhitespace = Set('\r', '\n', ' ', '\t')
-
-  private def appendEscapedJava(sb: StringBuilder, s: String): Unit = {
-    if (s forall (c => java.lang.Character.isLetterOrDigit(c) || commonWhitespace.contains(c))) appendNaivelyEscapedJava(sb, s)
-    else sb.append(StringEscapeUtils.escapeJava(s))
+  final def toMultilineStringLiteral(s: String): String = {
+    "\"\"\"" + s + "\"\"\""
   }
 
-  private def appendNaivelyEscapedJava(sb: StringBuilder, s: String): Unit = {
-    // Expecting only letters, digits or "common" whitespace
-    for (c <- s) {
-      if (c == '\r') sb ++= "\\r"
-      else if (c == '\n') sb ++= "\\n"
-      else if (c == '\t') sb ++= "\\t"
-      else sb += c
+  private def useJavaStringLiteral(s: String): Boolean = {
+    s forall { c =>
+      java.lang.Character.isLetterOrDigit(c) ||
+        (c == ':') || (c == '/') || (c == '.') || (c == ',') || (c == '-')
     }
   }
 
-  /**
-   * Returns the parameter String as String literals with the concatenation operator ("+") in between, just like it
-   * would occur in Java code. The input String is first split into lines, and then each line is turned into a String literal
-   * (followed by "+", except for the last line).
-   */
-  final def toConcatenatedStringLiterals(s: String): LineSeq = {
-    val lines = s.linesWithSeparators.toIndexedSeq
-
-    val result = mutable.ArrayBuffer[Line]()
-
-    if (lines.isEmpty) LineSeq() else {
-      val linesButLast = lines.dropRight(1)
-      val lastLine = lines.last
-
-      val sb = new StringBuilder
-
-      for (line <- linesButLast) {
-        sb.clear()
-        sb.append("\"")
-        appendEscapedJava(sb, line)
-        sb.append("\" +")
-        result += new Line(sb.toString)
-      }
-
-      sb.clear()
-      sb.append("\"")
-      appendEscapedJava(sb, lastLine)
-      sb.append("\"")
-      result += new Line(sb.toString)
-    }
-
-    new LineSeq(result.toIndexedSeq)
+  private def toJavaStringLiteral(s: String): String = {
+    "\"" + s + "\""
   }
 
   /** Collection of lines, on which operations such as `shift` can be performed */
@@ -219,6 +181,11 @@ private[yaidom] object PrettyPrinting {
     def apply(s: String): LineSeq = {
       val lines = s.lines.toIndexedSeq map { (ln: String) => new Line(ln) }
       new LineSeq(lines)
+    }
+
+    def singletonOrEmptyLineSeq(s: String): LineSeq = {
+      if (s.isEmpty) new LineSeq(Vector())
+      else new LineSeq(Vector(new Line(s)))
     }
   }
 
