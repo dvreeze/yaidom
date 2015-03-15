@@ -87,8 +87,11 @@ private[yaidom] object PrettyPrinting {
    * three subsequent double quotes occur, but uses Java string literals instead, if all characters are
    * letters, digits or some common punctuation characters.
    *
+   * If three subsequent double quotes occur, then the resulting multiline string will be broken.
+   * Within the context of pretty printing, where the printed output will not be parsed, this is less of a problem.
+   *
    * An earlier implementation used the Apache Commons Lang method StringEscapeUtils.escapeJava.
-   * That method in turn would uses the java.util.regex.Pattern class. Alas, for large strings this could result in
+   * That method in turn uses the java.util.regex.Pattern class. Alas, for large strings this could result in
    * a stack overflow error. See the bug report at http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993.
    *
    * Currently, however, Apache Commons Lang is not used in yaidom. Hence, this problem does not occur. Moreover,
