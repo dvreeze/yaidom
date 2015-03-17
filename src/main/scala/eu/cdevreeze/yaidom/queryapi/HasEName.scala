@@ -36,7 +36,7 @@ trait HasEName extends HasENameApi {
    * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
    */
   final def attributeOption(expandedName: EName): Option[String] = {
-    resolvedAttributes collectFirst { case (en, v) if (en == expandedName) => v }
+    resolvedAttributes find { case (en, v) => (en == expandedName) } map (_._2)
   }
 
   /**
@@ -50,7 +50,7 @@ trait HasEName extends HasENameApi {
    * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
    */
   final def findAttributeByLocalName(localName: String): Option[String] = {
-    resolvedAttributes collectFirst { case (en, v) if en.localPart == localName => v }
+    resolvedAttributes find { case (en, v) => en.localPart == localName } map (_._2)
   }
 
   /**
