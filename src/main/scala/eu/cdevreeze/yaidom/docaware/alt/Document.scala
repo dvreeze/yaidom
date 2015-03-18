@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 
 /**
- * `Document`, containing a "docaware2" document element.
+ * `Document`, containing a "docaware.alt" document element.
  *
  * @author Chris de Vreeze
  */

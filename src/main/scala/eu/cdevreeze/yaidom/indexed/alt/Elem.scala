@@ -75,7 +75,7 @@ object Elem {
   }
 
   /**
-   * Factory method for "indexed2 elements".
+   * Factory method for "indexed.alt elements".
    */
   def apply(rootElem: simple.Elem, path: Path): Elem = {
     // Expensive call, so invoked only once

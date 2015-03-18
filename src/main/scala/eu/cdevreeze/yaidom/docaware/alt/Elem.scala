@@ -96,7 +96,7 @@ object Elem {
   }
 
   /**
-   * Factory method for "docaware2 elements", which first computes the parent base URI.
+   * Factory method for "docaware.alt elements", which first computes the parent base URI.
    */
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
     // Expensive call, so invoked only once
@@ -112,7 +112,7 @@ object Elem {
   }
 
   /**
-   * Factory method for "docaware2 elements", which is explicitly passed the parent base URI.
+   * Factory method for "docaware.alt elements", which is explicitly passed the parent base URI.
    */
   def apply(docUri: URI, parentBaseUri: URI, rootElem: simple.Elem, path: Path): Elem = {
     val elem = rootElem.getElemOrSelfByPath(path)
