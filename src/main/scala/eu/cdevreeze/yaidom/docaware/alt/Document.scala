@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.indexed
+package eu.cdevreeze.yaidom.docaware.alt
 
 import java.net.URI
 
@@ -27,21 +27,15 @@ import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 
 /**
- * `Document`, containing an "indexed" document element.
- *
- * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ElemApi` does not
- * apply to documents. Therefore, given a document, querying for elements (other than the document element itself) always goes
- * via the document element.
+ * `Document`, containing a "docaware2" document element.
  *
  * @author Chris de Vreeze
  */
 final class Document(
-  val uriOption: Option[URI],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable {
 
-  require(uriOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -51,19 +45,15 @@ final class Document(
   def document: simple.Document =
     new simple.Document(uriOption, documentElement.elem, processingInstructions, comments)
 
+  def uri: URI = documentElement.docUri
+
+  def uriOption: Option[URI] = Some(uri)
+
   override def toString: String = document.toString
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
-    uriOption = this.uriOption,
     documentElement = newRoot,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
-
-  /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
-  def withUriOption(newUriOption: Option[URI]): Document = new Document(
-    uriOption = newUriOption,
-    documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 }
@@ -71,16 +61,14 @@ final class Document(
 object Document {
 
   def apply(
-    uriOption: Option[URI],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(uriOption, documentElement, processingInstructions, comments)
+    new Document(documentElement, processingInstructions, comments)
   }
 
-  def apply(documentElement: Elem): Document = apply(None, documentElement)
-
-  def apply(d: simple.Document): Document =
-    new Document(d.uriOption, Elem(d.documentElement), d.processingInstructions, d.comments)
+  def apply(docUri: URI, d: simple.Document): Document = {
+    new Document(Elem(docUri, d.documentElement), d.processingInstructions, d.comments)
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.indexed
+package eu.cdevreeze.yaidom.indexed.alt
 
 import java.net.URI
 
@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 
 /**
- * `Document`, containing an "indexed" document element.
+ * `Document`, containing an "indexed2" document element.
  *
  * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ElemApi` does not
  * apply to documents. Therefore, given a document, querying for elements (other than the document element itself) always goes
