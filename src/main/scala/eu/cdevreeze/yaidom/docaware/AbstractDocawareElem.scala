@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.simple
 
 /**
- * Abstract super-trait of "indexed" Elem, without making any choice between speed of creation or speed of querying.
+ * Abstract super-trait of "docaware" Elem, without making any choice between speed of creation or speed of querying.
  * It leaves this choice open, by leaving method `findAllChildElems` abstract.
  *
  * @author Chris de Vreeze
