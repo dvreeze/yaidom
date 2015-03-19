@@ -3,6 +3,15 @@ CHANGELOG
 =========
 
 
+1.3.6
+=====
+
+Version 1.3.6 removed the alternative "docaware" and "indexed" elements introduced in version 1.3.5. These element
+implementations (optimized for fast creation) offer too little "bang for the buck", so they have been removed.
+As for "docaware" and "indexed" elements, they are again as in version 1.3.4. No other changes were made in this
+release.
+
+
 1.3.5
 =====
 
