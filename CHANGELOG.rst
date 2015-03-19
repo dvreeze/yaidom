@@ -3,6 +3,37 @@ CHANGELOG
 =========
 
 
+1.3.5
+=====
+
+Version 1.3.5 is a small performance release. There are no breaking changes. There are now 2 versions of "docaware" and
+"indexed" elements, with the default version being optimized for fast querying, and the alternative version being optimized
+for fast creation. The dependency on Apache Commons is gone (and pretty printing output is somewhat different).
+
+The changes in this version are:
+
+* No more dependency on Apache Commons
+
+  * Pretty printing of element trees no longer does any "Java escaping", but outputs Scala multiline string literals instead
+  * The resulting tree representation is no longer valid Scala code if the "multiline string" contains triple quotes
+  * This rare scenario can be dealt with on an ad-hoc basis, if the tree representation happens to be used as Scala code
+  * Pretty printing is probably faster than before, due to the fact that Apache Commons "Java escaping" is gone
+  
+* Added alternative "docaware" and "indexed" elements
+
+  * They live in the ``docaware.alt`` and ``indexed.alt`` sub-packages
+  * The alternatives are optimized for fast creation, not for fast querying
+  * Therefore, they make better "backing" objects of "sub-type-aware" elements
+  * For code re-use, super-traits ``AbstractDocawareElem`` and ``AbstractIndexedElem`` have been introduced
+
+* Bug fixes
+
+  * Bug fix in method ``plusChild``
+  * Bug fix in error message of ``ScopedElemLike.textAsResolvedQNameOption``
+  * Bug fixes in test code, found by the excellent Artima SuperSafe tool
+  * Moved the ``equals`` and ``hashCode`` methods up, from the element class to the node class (in 2 element implementations)
+
+
 1.3.4
 =====
 
