@@ -30,6 +30,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.findAllNamespaces
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.pushUpPrefixedNamespaces
@@ -232,6 +233,53 @@ class RemoveUnusedNamespacesTest extends Suite {
 
     assertResult(resolved.Elem(rootElem)) {
       resolved.Elem(editedRootElem)
+    }
+  }
+
+  /**
+   * See http://www.lenzconsulting.com/namespaces-in-xslt/, on "copy-namespaces".
+   */
+  @Test def testExcludeNamespaces(): Unit = {
+    val xml =
+      <doc xmlns:my="http://example.com" my:id="AAA">
+        <p>This is the first paragraph.</p>
+        <p>This is the second paragraph.</p>
+      </doc>
+
+    val rootElem = ScalaXmlConversions.convertToElem(xml)
+
+    assertResult(Set(Scope.from("my" -> "http://example.com"))) {
+      rootElem.findAllElemsOrSelf.map(_.scope).toSet
+    }
+
+    import Node._
+
+    val newElem1 =
+      elem(QName("new-doc"), Scope.Empty, rootElem.children)
+
+    assertResult(Set(Scope.Empty, Scope.from("my" -> "http://example.com"))) {
+      newElem1.findAllElemsOrSelf.map(_.scope).toSet
+    }
+    assertResult(Scope.Empty) {
+      newElem1.scope
+    }
+    assertResult(Set(Scope.from("my" -> "http://example.com"))) {
+      newElem1.findAllElems.map(_.scope).toSet
+    }
+
+    val enameExtractor = DocumentENameExtractor.NoOp
+
+    val newElem2 =
+      newElem1 transformChildElems {
+        e => stripUnusedNamespaces(indexed.Elem(e), enameExtractor)
+      }
+
+    assertResult(Set(Scope.Empty)) {
+      newElem2.findAllElemsOrSelf.map(_.scope).toSet
+    }
+
+    assertResult(resolved.Elem(newElem1)) {
+      resolved.Elem(newElem2)
     }
   }
 }
