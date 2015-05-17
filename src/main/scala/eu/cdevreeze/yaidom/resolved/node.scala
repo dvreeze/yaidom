@@ -25,7 +25,7 @@ import scala.collection.mutable
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
@@ -128,7 +128,7 @@ sealed trait Node extends Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with ElemLike[Elem] with HasEName with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] with HasText { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)

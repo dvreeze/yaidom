@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.core.QName
  *
  * @author Chris de Vreeze
  */
-trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ElemLike[E] with HasEName with HasText { self: E =>
+trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ClarkElemLike[E] { self: E =>
 
   final def attributeAsQNameOption(expandedName: EName): Option[QName] =
     attributeOption(expandedName).map(v => QName(v.trim))

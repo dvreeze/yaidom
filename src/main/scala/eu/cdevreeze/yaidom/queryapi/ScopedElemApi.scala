@@ -21,7 +21,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 
 /**
- * Shorthand for `ElemApi[E] with HasENameApi with HasQNameApi with HasScopeApi with HasTextApi` with some additional methods that
+ * Shorthand for `ClarkElemApi[E] with HasQNameApi with HasScopeApi` with some additional methods that
  * use the scope for resolving QName-valued text and attribute values. In other words, an element query API typically
  * supported by element implementations, because most element implementations know about scopes, QNames, ENames and
  * text content, as well as offering the `ElemApi` query API.
@@ -58,7 +58,7 @@ import eu.cdevreeze.yaidom.core.QName
  *
  * @author Chris de Vreeze
  */
-trait ScopedElemApi[E <: ScopedElemApi[E]] extends ElemApi[E] with HasENameApi with HasQNameApi with HasScopeApi with HasTextApi { self: E =>
+trait ScopedElemApi[E <: ScopedElemApi[E]] extends ClarkElemApi[E] with HasQNameApi with HasScopeApi { self: E =>
 
   /**
    * Returns the QName value of the attribute with the given expanded name, if any, wrapped in an `Option`.
