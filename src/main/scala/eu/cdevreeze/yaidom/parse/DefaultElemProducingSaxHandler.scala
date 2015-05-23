@@ -143,7 +143,6 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   final override def startPrefixMapping(prefix: String, uri: String): Unit = {
     pushContextIfNeeded()
 
-    println(s"Declaring prefix $prefix with URI $uri")
     namespaceSupport.declarePrefix(prefix, uri)
   }
 
