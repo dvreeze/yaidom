@@ -16,11 +16,13 @@
 
 package eu.cdevreeze.yaidom.parse
 
+import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 import scala.collection.immutable
 import scala.collection.mutable
 
 import org.xml.sax.Attributes
 import org.xml.sax.ext.LexicalHandler
+import org.xml.sax.helpers.NamespaceSupport
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
@@ -63,9 +65,16 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   private var currentlyInCData: Boolean = false
 
+  private val namespaceSupport = new NamespaceSupport()
+
+  private var namespaceContextStarted = false
+
   final override def startDocument(): Unit = ()
 
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
+    pushContextIfNeeded()
+    namespaceContextStarted = false
+
     val parentScope = if (currentElem eq null) Scope.Empty else currentElem.scope
     val elm: InternalElemNode = startElementToInternalElemNode(uri, localName, qName, atts, parentScope)
 
@@ -84,6 +93,9 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   final override def endElement(uri: String, localName: String, qName: String): Unit = {
+    require(!namespaceContextStarted, s"Corrupt internal namespace state!")
+    namespaceSupport.popContext()
+
     require(currentRoot ne null)
     require(currentElem ne null)
 
@@ -126,7 +138,17 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     characters(ch, start, length)
   }
 
-  // ContentHandler methods startPrefixMapping, endPrefixMapping, skippedEntity, setDocumentLocator not overridden
+  // ContentHandler methods skippedEntity, setDocumentLocator not overridden
+
+  final override def startPrefixMapping(prefix: String, uri: String): Unit = {
+    pushContextIfNeeded()
+
+    println(s"Declaring prefix $prefix with URI $uri")
+    namespaceSupport.declarePrefix(prefix, uri)
+  }
+
+  final override def endPrefixMapping(prefix: String): Unit = {
+  }
 
   final override def startCDATA(): Unit = {
     this.currentlyInCData = true
@@ -174,15 +196,23 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     new Document(None, docElem, pis, comments)
   }
 
+  private def pushContextIfNeeded(): Unit = {
+    if (!namespaceContextStarted) {
+      namespaceSupport.pushContext()
+      namespaceContextStarted = true
+    }
+  }
+
   private def startElementToInternalElemNode(
     uri: String, localName: String, qName: String, atts: Attributes, parentScope: Scope)(implicit qnameProvider: QNameProvider): InternalElemNode = {
+
     require(uri ne null)
     require(localName ne null)
     require(qName ne null)
 
     val elmQName: QName = if (qName != "") qnameProvider.parseQName(qName) else qnameProvider.getUnprefixedQName(localName)
 
-    val nsDecls = extractDeclarations(atts)
+    val nsDecls = extractDeclarations(namespaceSupport)
     val attrSeq = extractAttributeMap(atts)
 
     val newScope = parentScope.resolve(nsDecls)
@@ -195,15 +225,17 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
       children = mutable.IndexedSeq())
   }
 
-  private def extractDeclarations(atts: Attributes)(implicit qnameProvider: QNameProvider): Declarations = {
-    val result = attributeOrDeclarationSeq(atts) collect {
-      case (qn, v) if isNamespaceDeclaration(qn) =>
-        val key = qnameProvider.parseQName(qn)
-        val prefix = if (key.prefixOption.isEmpty) "" else key.localPart
-        val nsUri = v
-        (prefix -> nsUri)
-    }
-    Declarations.from(result.toMap)
+  private def extractDeclarations(nsSupport: NamespaceSupport): Declarations = {
+    val prefixIterator =
+      nsSupport.getDeclaredPrefixes().asInstanceOf[java.util.Enumeration[String]].asScala
+
+    val prefUriMap =
+      (prefixIterator map { pref =>
+        val uri = nsSupport.getURI(pref)
+        (pref, if (uri == null) "" else uri)
+      }).toMap
+
+    Declarations.from(prefUriMap)
   }
 
   private def extractAttributeMap(atts: Attributes)(implicit qnameProvider: QNameProvider): immutable.IndexedSeq[(QName, String)] = {

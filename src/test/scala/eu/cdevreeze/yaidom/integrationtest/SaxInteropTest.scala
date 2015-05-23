@@ -74,8 +74,12 @@ class SaxInteropTest extends Suite {
   @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
@@ -206,8 +210,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("strangeXml.xml")
@@ -252,8 +260,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXml.xml")
@@ -337,6 +349,8 @@ class SaxInteropTest extends Suite {
     // 1. Parse XML file into Elem
 
     val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
 
     // One possible EntityResolver, namely one that tries to find the needed DTDs locally
     trait EntityResolverUsingLocalDtds extends EntityResolver {
@@ -585,8 +599,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
@@ -649,8 +667,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
@@ -696,8 +718,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithEscapedChars(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
@@ -773,8 +799,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithSpecialChars(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("trivialXmlWithEuro.xml")
@@ -841,8 +871,12 @@ class SaxInteropTest extends Suite {
   @Test def testParseGeneratedHtml(): Unit = {
     // 1. Parse XML file into Elem
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       () => new DefaultElemProducingSaxHandler with LoggingEntityResolver)
 
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
@@ -962,8 +996,12 @@ class SaxInteropTest extends Suite {
 
     val handlerCreator = () => new DefaultElemProducingSaxHandler with LoggingEntityResolver with SaxHandlerWithLocator with MyErrorHandler
 
+    val spf = SAXParserFactory.newInstance
+    spf.setFeature("http://xml.org/sax/features/namespaces", true)
+    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+
     val saxParser = DocumentParserUsingSax.newInstance(
-      SAXParserFactory.newInstance,
+      spf,
       handlerCreator)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
