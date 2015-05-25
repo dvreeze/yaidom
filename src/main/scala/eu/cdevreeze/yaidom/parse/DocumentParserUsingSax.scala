@@ -32,9 +32,7 @@ import javax.xml.parsers.SAXParserFactory
  * Typical non-trivial creation is as follows, assuming a trait `MyEntityResolver`, which extends `EntityResolver`,
  * and a trait `MyErrorHandler`, which extends `ErrorHandler`:
  * {{{
- * val spf = SAXParserFactory.newInstance
- * spf.setFeature("http://xml.org/sax/features/namespaces", true)
- * spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+ * val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
  *
  * val parser = DocumentParserUsingSax.newInstance(
  *   spf,
@@ -49,9 +47,7 @@ import javax.xml.parsers.SAXParserFactory
  * val schema = schemaFactory.newSchema(schemaSource)
  *
  * val spf = {
- *   val result = SAXParserFactory.newInstance()
- *   result.setFeature("http://xml.org/sax/features/namespaces", true)
- *   result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+ *   val result = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
  *   result.setSchema(schema)
  *   result
  * }
@@ -134,24 +130,23 @@ final class DocumentParserUsingSax(
 object DocumentParserUsingSax {
 
   /**
-   * Returns a new instance. Same as `newInstance(SAXParserFactory.newInstance)`, except for the following configuration:
+   * Returns a new instance. Same as:
    * {{{
-   * spf.setFeature("http://xml.org/sax/features/namespaces", true)
-   * spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+   * newInstance(SAXParserFactory.newInstance.makeNamespaceAndPrefixAware)
    * }}}
    * Calling the `setNamespaceAware` method instead does not suffice, and is not needed.
    * See http://www.cafeconleche.org/slides/xmlone/london2002/namespaces/36.html.
    */
   def newInstance(): DocumentParserUsingSax = {
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance.makeNamespaceAndPrefixAware
     newInstance(spf)
   }
 
   /**
    * Returns `newInstance(parserFactory, new DefaultElemProducingSaxHandler {})`.
-   * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
+   *
+   * Do not forget to configure namespace handling, by calling `makeNamespaceAndPrefixAware`
+   * on the `SAXParserFactory`.
    */
   def newInstance(parserFactory: SAXParserFactory): DocumentParserUsingSax = {
     newInstance(parserFactory, () => new DefaultElemProducingSaxHandler {})
@@ -160,7 +155,9 @@ object DocumentParserUsingSax {
   /**
    * Invokes the 3-arg `newInstance` method on `parserFactory`, a `SAXParserFactory => SAXParser` "SAX parser creator", and
    * `handlerCreator`. The "SAX parser creator" invokes `parserFactory.newSAXParser()`.
-   * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
+   *
+   * Do not forget to configure namespace handling, by calling `makeNamespaceAndPrefixAware`
+   * on the `SAXParserFactory`.
    */
   def newInstance(parserFactory: SAXParserFactory, handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
     newInstance(
@@ -173,8 +170,10 @@ object DocumentParserUsingSax {
   }
 
   /**
-   * Returns a new instance, by invoking the primary constructor
-   * Do not forget to configure namespace handling as documented for the no-arg `newInstance` method.
+   * Returns a new instance, by invoking the primary constructor.
+   *
+   * Do not forget to configure namespace handling, by calling `makeNamespaceAndPrefixAware`
+   * on the `SAXParserFactory`.
    */
   def newInstance(
     parserFactory: SAXParserFactory,
@@ -182,5 +181,24 @@ object DocumentParserUsingSax {
     handlerCreator: () => ElemProducingSaxHandler): DocumentParserUsingSax = {
 
     new DocumentParserUsingSax(parserFactory, parserCreator, handlerCreator)
+  }
+
+  /**
+   * Enriches a `SAXParserFactory` with method `makeNamespaceAndPrefixAware`.
+   */
+  final implicit class RichSAXParserFactory(val saxParserFactory: SAXParserFactory) {
+
+    /**
+     * Returns the SAXParserFactory, after configuring it as follows:
+     * {{{
+     * setFeature("http://xml.org/sax/features/namespaces", true)
+     * setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+     * }}}
+     */
+    def makeNamespaceAndPrefixAware: SAXParserFactory = {
+      saxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true)
+      saxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+      saxParserFactory
+    }
   }
 }
