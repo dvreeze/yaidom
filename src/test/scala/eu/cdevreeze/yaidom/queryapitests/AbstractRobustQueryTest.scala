@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 
 /**
- * ScopedElemLike-based query test case showing robust querying.
+ * ClarkElemLike-based query test case showing robust querying.
  * This example comes from http://www.cafeconleche.org/books/effectivexml/chapters/35.html.
  *
  * Yaidom also facilitates robust querying, but in a different and more explicit (and verbose)
