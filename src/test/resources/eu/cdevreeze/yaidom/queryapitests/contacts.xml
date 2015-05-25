@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- From: http://www.cafeconleche.org/books/effectivexml/chapters/35.html -->
+<Contacts>
+  <Contact>
+    <Name>John Doe</Name>
+    <Phone>626-555-3456</Phone>
+  </Contact>
+  <Contact>
+    <Name>Joe 
+        <!--I need to check whether he prefers Joe or Joseph -->
+        Smith
+    </Name>
+    <Phone>212-555-3456</Phone>
+  </Contact>
+  <Contact>
+    <Name>Jane <![CDATA[& Ben]]> Reilly</Name>
+    <Phone>212-555-2341</Phone>
+  </Contact>
+  <Contact>
+    <Name>Mohammed Jones</Name>
+    <Phone>718-555-2349</Phone>
+    <Phone>914-555-7698</Phone>
+  </Contact>
+  <Contact>
+    <Phone>914-555-3145</Phone>
+    <Name>David Smith</Name>
+  </Contact>
+  <Contact>
+    <Name>Jason Smith</Name>
+    <Phone></Phone>
+  </Contact>
+  <Contact>
+    <Name>Xao Li</Name>
+    <Name>Jonathan Li</Name>
+    <Phone>212-555-0998</Phone>
+  </Contact>
+</Contacts>
