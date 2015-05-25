@@ -186,7 +186,7 @@ object DocumentParserUsingSax {
   /**
    * Enriches a `SAXParserFactory` with method `makeNamespaceAndPrefixAware`.
    */
-  final implicit class RichSAXParserFactory(val saxParserFactory: SAXParserFactory) {
+  final implicit class RichSAXParserFactory(val saxParserFactory: SAXParserFactory) extends AnyVal {
 
     /**
      * Returns the SAXParserFactory, after configuring it as follows:
