@@ -35,20 +35,20 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DefaultElemProducingSaxHandler
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax.RichSAXParserFactory
+import eu.cdevreeze.yaidom.parse.SaxHandlerWithLocator
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.parse.DefaultElemProducingSaxHandler
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.parse.SaxHandlerWithLocator
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.SAXParserFactory
-import net.jcip.annotations.NotThreadSafe
 
 /**
  * SAX interoperability test case.
@@ -74,9 +74,7 @@ class SaxInteropTest extends Suite {
   @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -210,9 +208,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -260,9 +256,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -348,9 +342,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseSchemaXsd(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     // One possible EntityResolver, namely one that tries to find the needed DTDs locally
     trait EntityResolverUsingLocalDtds extends EntityResolver {
@@ -599,9 +591,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -667,9 +657,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -718,9 +706,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithEscapedChars(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -799,9 +785,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseXmlWithSpecialChars(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -871,9 +855,7 @@ class SaxInteropTest extends Suite {
   @Test def testParseGeneratedHtml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
@@ -996,9 +978,7 @@ class SaxInteropTest extends Suite {
 
     val handlerCreator = () => new DefaultElemProducingSaxHandler with LoggingEntityResolver with SaxHandlerWithLocator with MyErrorHandler
 
-    val spf = SAXParserFactory.newInstance
-    spf.setFeature("http://xml.org/sax/features/namespaces", true)
-    spf.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+    val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
     val saxParser = DocumentParserUsingSax.newInstance(
       spf,
