@@ -18,18 +18,8 @@ package eu.cdevreeze.yaidom.print
 
 import java.{ io => jio }
 
-import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
-
-import eu.cdevreeze.yaidom.core.Declarations
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.convert.YaidomToSaxEventsConversions
 import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.EntityRef
-import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.ProcessingInstruction
-import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.sax.SAXTransformerFactory
@@ -55,6 +45,8 @@ import javax.xml.transform.stream.StreamResult
 final class DocumentPrinterUsingSax(
   val saxTransformerFactory: SAXTransformerFactory,
   val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler) extends AbstractDocumentPrinter {
+
+  private val yaidomToSaxEventsConversions = new YaidomToSaxEventsConversions {}
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val handler = transformerHandlerCreator(saxTransformerFactory)
@@ -98,112 +90,7 @@ final class DocumentPrinterUsingSax(
   }
 
   private def generateEventsForDocument(doc: Document, handler: TransformerHandler): Unit = {
-    handler.startDocument()
-
-    for (pi <- doc.processingInstructions) generateEventsForProcessingInstruction(pi, handler)
-    for (comment <- doc.comments) generateEventsForComment(comment, handler)
-    generateEventsForElem(doc.documentElement, Scope.Empty, handler)
-
-    handler.endDocument()
-  }
-
-  private def generateEventsForElem(elm: Elem, parentScope: Scope, handler: TransformerHandler): Unit = {
-    val namespaces: Declarations = parentScope.relativize(elm.scope)
-    val namespacesMap = namespaces.prefixNamespaceMap
-
-    for ((prefix, nsUri) <- namespacesMap) handler.startPrefixMapping(prefix, nsUri)
-
-    generateStartElementEvent(elm, parentScope, handler)
-
-    // Recursive calls. Not tail-recursive, but recursion depth should be limited.
-
-    for (node <- elm.children) {
-      generateEventsForNode(node, elm.scope, handler)
-    }
-
-    generateEndElementEvent(elm, parentScope, handler)
-
-    for ((prefix, nsUri) <- namespacesMap) handler.endPrefixMapping(prefix)
-  }
-
-  private def generateEventsForNode(node: Node, parentScope: Scope, handler: TransformerHandler): Unit = {
-    node match {
-      case elm: Elem => generateEventsForElem(elm, parentScope, handler)
-      case text: Text => generateEventsForText(text, handler)
-      case er: EntityRef => () // What can we do?
-      case pi: ProcessingInstruction => generateEventsForProcessingInstruction(pi, handler)
-      case comment: Comment => generateEventsForComment(comment, handler)
-    }
-  }
-
-  private def generateEventsForText(text: Text, handler: TransformerHandler): Unit = {
-    if (text.isCData) handler.startCDATA()
-
-    handler.characters(text.text.toCharArray, 0, text.text.length)
-
-    if (text.isCData) handler.endCDATA()
-  }
-
-  private def generateEventsForProcessingInstruction(processingInstruction: ProcessingInstruction, handler: TransformerHandler): Unit = {
-    handler.processingInstruction(processingInstruction.target, processingInstruction.data)
-  }
-
-  private def generateEventsForComment(comment: Comment, handler: TransformerHandler): Unit = {
-    handler.comment(comment.text.toCharArray, 0, comment.text.length)
-  }
-
-  private def generateStartElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler): Unit = {
-    val uri = elm.resolvedName.namespaceUriOption.getOrElse("")
-    val localName = elm.localName // Correct?
-    val qname = elm.qname.toString
-
-    val attrs: Attributes = getAttributesAndNamespaceDeclarations(elm, parentScope)
-
-    handler.startElement(uri, localName, qname, attrs)
-  }
-
-  private def generateEndElementEvent(elm: Elem, parentScope: Scope, handler: TransformerHandler): Unit = {
-    val uri = elm.resolvedName.namespaceUriOption.getOrElse("")
-    val localName = elm.localName // Correct?
-    val qname = elm.qname.toString
-
-    handler.endElement(uri, localName, qname)
-  }
-
-  private def getAttributesAndNamespaceDeclarations(elm: Elem, parentScope: Scope): Attributes = {
-    val attrs = new AttributesImpl
-
-    // 1. Normal attributes
-
-    val attrScope = elm.attributeScope
-
-    for ((attQName, attValue) <- elm.attributes) {
-      val attEName = attrScope.resolveQNameOption(attQName).getOrElse(sys.error(s"Corrupt non-resolvable attribute: $attQName"))
-      val uri = attEName.namespaceUriOption.getOrElse("")
-      val localName = attQName.localPart // Correct?
-      val qname = attQName.toString
-      val tpe = ""
-
-      attrs.addAttribute(uri, localName, qname, tpe, attValue)
-    }
-
-    // 2. Namespace declarations and undeclarations
-
-    val namespaces: Declarations = parentScope.relativize(elm.scope)
-    val namespacesMap = namespaces.prefixNamespaceMap
-
-    val tpe = ""
-
-    for ((prefix, nsUri) <- namespacesMap) {
-      if (prefix == "") {
-        attrs.addAttribute("", "xmlns", "xmlns", tpe, nsUri)
-      } else {
-        val qname = s"xmlns:$prefix"
-        attrs.addAttribute("", prefix, qname, tpe, nsUri)
-      }
-    }
-
-    attrs
+    yaidomToSaxEventsConversions.convertDocument(doc)(handler)
   }
 }
 
