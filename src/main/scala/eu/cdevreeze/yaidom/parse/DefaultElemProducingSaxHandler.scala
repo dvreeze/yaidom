@@ -124,10 +124,11 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
       val newPis = topLevelProcessingInstructions :+ pi
       topLevelProcessingInstructions = newPis
-    } else {
-      require(currentElem ne null)
-
+    } else if (currentElem ne null) {
       currentElem.children :+= pi
+    } else {
+      val newPis = topLevelProcessingInstructions :+ pi
+      topLevelProcessingInstructions = newPis
     }
   }
 
@@ -165,10 +166,11 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
       val newComments = topLevelComments :+ comment
       topLevelComments = newComments
-    } else {
-      require(currentElem ne null)
-
+    } else if (currentElem ne null) {
       currentElem.children :+= comment
+    } else {
+      val newComments = topLevelComments :+ comment
+      topLevelComments = newComments
     }
   }
 
