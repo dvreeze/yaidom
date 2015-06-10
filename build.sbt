@@ -35,16 +35,11 @@ libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) "org.scalatest" % "scalatest_2.11" % "2.1.3" % "test"
-  else if (version.contains("2.12.0-M1")) "org.scalatest" % "scalatest_2.12.0-M1" % "2.2.5-M1" % "test"
-  else "org.scalatest" %% "scalatest" % "2.2.2" % "test"
+  if (version.contains("2.12.0-M1")) "org.scalatest" % "scalatest_2.12.0-M1" % "2.2.5-M1" % "test"
+  else "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 }
 
-libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) "org.scalacheck" % "scalacheck_2.11" % "1.11.3" % "test"
-  else if (version.contains("2.12.0-M1")) "org.scalacheck" % "scalacheck_2.12.0-M1" % "1.11.6" % "test"
-  else "org.scalacheck" %% "scalacheck" % "1.11.6" % "test"
-}
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.6" % "test"
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
