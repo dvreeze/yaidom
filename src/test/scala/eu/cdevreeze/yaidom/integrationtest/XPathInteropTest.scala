@@ -50,20 +50,22 @@ class XPathInteropTest extends Suite with BeforeAndAfterAll {
     val scope = Scope.from("bk" -> ns)
     val namespaceContext = scope.toNamespaceContext
 
-    val xpath = XPathFactory.newInstance().newXPath()
+    val xpathFactory =
+      XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
+    val xpath = xpathFactory.newXPath()
     xpath.setNamespaceContext(namespaceContext)
 
-    val expr = "//bk:Book"
+    val expr = xpath.compile("//bk:Book")
 
     val is = classOf[XPathInteropTest].getResourceAsStream("books.xml")
     val docParser = parse.DocumentParserUsingSax.newInstance
     val doc = docParser.parse(is)
-    val db = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    val dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder()
     val domDoc = convert.DomConversions.convertDocument(doc)(db.newDocument())
 
-    // Passing a DOMSource, to make sure that a NodeList is returned (even for a Saxon XPathFactory)
-    val domSource = new javax.xml.transform.dom.DOMSource(domDoc)
-    val nodeList = xpath.evaluate(expr, domSource, XPathConstants.NODESET).asInstanceOf[NodeList]
+    val nodeList = expr.evaluate(domDoc, XPathConstants.NODESET).asInstanceOf[NodeList]
 
     // Converting NodeList to a Scala IndexedSeq of (DOM) Node instances.
     val domNodes = nodeListToIndexedSeq(nodeList)

@@ -604,13 +604,10 @@ object SaxonDomWrapperTest {
       if (!wrappedNode.hasChildNodes) Vector()
       else {
         val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
-        val buf = mutable.ArrayBuffer[NodeInfo]()
 
-        while (it.next() ne null) {
-          buf += it.current()
-        }
+        val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
-        buf.toVector.flatMap(nodeInfo => DomNode.wrapNodeOption(nodeInfo))
+        nodes.flatMap(nodeInfo => DomNode.wrapNodeOption(nodeInfo))
       }
     }
   }
@@ -637,26 +634,20 @@ object SaxonDomWrapperTest {
 
     override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
       val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
-      val buf = mutable.ArrayBuffer[NodeInfo]()
 
-      while (it.next() ne null) {
-        buf += it.current()
-      }
+      val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
-      buf.toVector map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
+      nodes map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
     }
 
     override def qname: QName = nodeInfo2QName(wrappedNode)
 
     override def attributes: immutable.IndexedSeq[(QName, String)] = {
       val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
-      val buf = mutable.ArrayBuffer[NodeInfo]()
 
-      while (it.next() ne null) {
-        buf += it.current()
-      }
+      val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
-      buf.toVector map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
+      nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
     }
 
     /** Returns the text children */
@@ -682,15 +673,12 @@ object SaxonDomWrapperTest {
 
     override def scope: Scope = {
       val it = wrappedNode.iterateAxis(AxisInfo.NAMESPACE)
-      val buf = mutable.ArrayBuffer[NodeInfo]()
 
-      while (it.next() ne null) {
-        buf += it.current()
-      }
+      val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
       val resultMap = {
         val result =
-          buf.toVector map { nodeInfo =>
+          nodes map { nodeInfo =>
             // Not very transparent: prefix is "display name" and namespace URI is "string value"
             val prefix = nodeInfo.getDisplayName
             val nsUri = nodeInfo.getStringValue
@@ -730,12 +718,12 @@ object SaxonDomWrapperTest {
 
     def wrapNodeOption(node: NodeInfo): Option[DomNode] = {
       node.getNodeKind match {
-        case Type.ELEMENT => Some(new DomElem(node))
-        case Type.TEXT => Some(new DomText(node))
-        case Type.WHITESPACE_TEXT => Some(new DomText(node))
+        case Type.ELEMENT                => Some(new DomElem(node))
+        case Type.TEXT                   => Some(new DomText(node))
+        case Type.WHITESPACE_TEXT        => Some(new DomText(node))
         case Type.PROCESSING_INSTRUCTION => Some(new DomProcessingInstruction(node))
-        case Type.COMMENT => Some(new DomComment(node))
-        case _ => None
+        case Type.COMMENT                => Some(new DomComment(node))
+        case _                           => None
       }
     }
 

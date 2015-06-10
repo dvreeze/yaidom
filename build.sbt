@@ -9,9 +9,9 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "1.3.7-SNAPSHOT"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
-crossScalaVersions := Seq("2.11.4", "2.10.4")
+crossScalaVersions := Seq("2.11.6", "2.10.5")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -26,13 +26,13 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 }
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2")
+  if (version.contains("2.11")) Seq("org.scala-lang.modules" % "scala-xml_2.11" % "1.0.4")
   else Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
-libraryDependencies += "junit" % "junit" % "4.11" % "test"
+libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
   if (version.contains("2.11")) "org.scalatest" % "scalatest_2.11" % "2.1.3" % "test"
@@ -50,9 +50,9 @@ libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
 libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
 
-libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.5.1-8" % "test"
+libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.6.0-6" % "test"
 
-libraryDependencies += ("joda-time" % "joda-time" % "2.5" % "test").intransitive()
+libraryDependencies += ("joda-time" % "joda-time" % "2.8" % "test").intransitive()
 
 libraryDependencies += ("org.joda" % "joda-convert" % "1.7" % "test").intransitive()
 
