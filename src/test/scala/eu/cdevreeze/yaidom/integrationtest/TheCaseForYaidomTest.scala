@@ -556,14 +556,33 @@ class TheCaseForYaidomTest extends Suite {
           QName("xl:type") -> "simple"),
         scope2)
 
+    val scope3 = Scope.from("xl" -> nsXLink, "" -> nsLink)
+
+    val elm3 =
+      emptyElem(
+        QName("linkbaseRef"),
+        Vector(
+          QName("xl:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
+          QName("xl:href") -> "my-lab-en.xml",
+          QName("xl:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
+          QName("xl:type") -> "simple"),
+        scope3)
+
     assertResult(false) {
       elm1 == elm2
     }
     assertResult(true) {
       resolved.Elem(elm1) == resolved.Elem(elm2)
     }
+
+    assertResult(false) {
+      elm1 == elm3
+    }
+    assertResult(true) {
+      resolved.Elem(elm1) == resolved.Elem(elm3)
+    }
   }
-  
+
   // TODO Pattern matching. See http://www.codecommit.com/blog/scala/working-with-scalas-xml-support.
   // Also see discussion http://scala-language.1934581.n4.nabble.com/Namespace-support-in-XML-patterns-td2006894.html.
 }
