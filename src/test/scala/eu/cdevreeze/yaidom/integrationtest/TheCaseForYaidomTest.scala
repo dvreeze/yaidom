@@ -39,12 +39,12 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.SAXParserFactory
 
 /**
- * Test case showing why using yaidom over the standard Scala XML library makes sense.
+ * Test case showing why preferring yaidom over the standard Scala XML library makes sense.
  *
  * Yaidom does not like non-namespace-well-formed XML, unlike Scala XML. This is one of
  * the reasons that yaidom is a better precision tool for XML processing than Scala XML.
  * Yaidom does not try to be as concise as possible, but precise namespace support is
- * considered more important. Yaidom is and is always meant to be a good basis for the
+ * considered more important. Yaidom is (and is (now and always) meant to be a good basis for the
  * kind of XML processing performed in XBRL processing and validation.
  *
  * This test case also shows how yaidom's namespace support is consistent with the existence
