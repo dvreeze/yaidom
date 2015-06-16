@@ -37,6 +37,7 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * Converter from DOM nodes to yaidom nodes, in particular from `org.w3c.dom.Element` to [[eu.cdevreeze.yaidom.simple.Elem]] and
@@ -58,8 +59,16 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4916415.
     val uriOption: Option[URI] = Option(v.getDocumentURI) orElse (Option(v.getBaseURI)) map { uriString => new URI(uriString) }
 
+    val xmlVersionOption = Option(v.getXmlVersion)
+    val xmlDeclOption = xmlVersionOption map { xmlVersion =>
+      XmlDeclaration.fromVersion(xmlVersion).
+        withEncodingOption(Option(v.getXmlEncoding)).
+        withStandaloneOption(Some(v.getXmlStandalone))
+    }
+
     Document(
       uriOption = uriOption,
+      xmlDeclarationOption = xmlDeclOption,
       documentElement = convertToElem(v.getDocumentElement, Scope.Empty),
       processingInstructions =
         nodeListToIndexedSeq(v.getChildNodes) collect { case pi: org.w3c.dom.ProcessingInstruction => convertToProcessingInstruction(pi) },
@@ -105,19 +114,19 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
    */
   final def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
     v match {
-      case e: Element => Some(convertToElem(e, parentScope))
-      case t: org.w3c.dom.Text => Some(convertToText(t))
+      case e: Element                            => Some(convertToElem(e, parentScope))
+      case t: org.w3c.dom.Text                   => Some(convertToText(t))
       case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
-      case er: org.w3c.dom.EntityReference => Some(convertToEntityRef(er))
-      case c: org.w3c.dom.Comment => Some(convertToComment(c))
-      case _ => None
+      case er: org.w3c.dom.EntityReference       => Some(convertToEntityRef(er))
+      case c: org.w3c.dom.Comment                => Some(convertToComment(c))
+      case _                                     => None
     }
   }
 
   /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.simple.Text]] */
   final def convertToText(v: org.w3c.dom.Text): Text = v match {
     case cdata: org.w3c.dom.CDATASection => Text(text = v.getData, isCData = true)
-    case _ => Text(text = v.getData, isCData = false)
+    case _                               => Text(text = v.getData, isCData = false)
   }
 
   /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.simple.ProcessingInstruction]] */

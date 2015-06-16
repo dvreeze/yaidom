@@ -194,7 +194,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     val docElem = resultingElem
     val pis = topLevelProcessingInstructions map { pi => pi.toNode }
     val comments = topLevelComments map { comment => comment.toNode }
-    new Document(None, docElem, pis, comments)
+    new Document(None, None, docElem, pis, comments)
   }
 
   private def pushContextIfNeeded(): Unit = {

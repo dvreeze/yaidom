@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * are irrelevant for Documents, unlike for "elements".</li>
  * </ul>
  *
- * A `Document` is constructed from an optional URI, a document element (as `Elem`), top-level processing instructions,
+ * A `Document` is constructed from an optional URI, an optional XML declaration, a document element (as `Elem`), top-level processing instructions,
  * if any, and top-level comments, if any.
  *
  * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ElemApi` does not
@@ -52,11 +52,13 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 @SerialVersionUID(1L)
 final class Document(
   val uriOption: Option[URI],
+  val xmlDeclarationOption: Option[XmlDeclaration],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable with Serializable {
 
   require(uriOption ne null)
+  require(xmlDeclarationOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -85,6 +87,7 @@ final class Document(
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
     uriOption = this.uriOption,
+    xmlDeclarationOption = this.xmlDeclarationOption,
     documentElement = newRoot,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -92,6 +95,15 @@ final class Document(
   /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
   def withUriOption(newUriOption: Option[URI]): Document = new Document(
     uriOption = newUriOption,
+    xmlDeclarationOption = this.xmlDeclarationOption,
+    documentElement = this.documentElement,
+    processingInstructions = this.processingInstructions,
+    comments = this.comments)
+
+  /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
+  def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): Document = new Document(
+    uriOption = this.uriOption,
+    xmlDeclarationOption = newXmlDeclarationOption,
     documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -194,33 +206,47 @@ final class Document(
 object Document {
 
   /**
-   * Creates a `Document` from an optional URI, the document element, and the top-level comments and processing
+   * Creates a `Document` from an optional URI, an optional XML declaration, the document element, and the top-level comments and processing
    * instructions, if any. Unlike the primary constructor, this factory method defaults the processing instructions and
    * comments to empty collections. In other words, only the optional URI and the document element are mandatory parameters.
    */
   def apply(
     uriOption: Option[URI],
+    xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(uriOption, documentElement, processingInstructions, comments)
+    new Document(uriOption, xmlDeclarationOption, documentElement, processingInstructions, comments)
+  }
+
+  /**
+   * Creates a `Document` from only the document element and optional URI. The collections of top-level
+   * comments and processing instructions are empty.
+   */
+  def apply(
+    uriOption: Option[URI],
+    documentElement: Elem): Document = {
+
+    apply(uriOption, None, documentElement)
   }
 
   /**
    * Creates a `Document` from only the document element. The URI is empty, and so are the collections of top-level
    * comments and processing instructions.
    */
-  def apply(documentElement: Elem): Document = apply(None, documentElement)
+  def apply(documentElement: Elem): Document = apply(None, None, documentElement)
 
   def document(
     uriOption: Option[String] = None,
+    xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
     comments: immutable.IndexedSeq[Comment] = Vector()): Document = {
 
     new Document(
       uriOption map { uriString => new URI(uriString) },
+      xmlDeclarationOption,
       documentElement,
       processingInstructions,
       comments)

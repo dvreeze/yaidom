@@ -24,6 +24,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 
 /**
@@ -32,10 +33,12 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * @author Chris de Vreeze
  */
 final class Document(
+  val xmlDeclarationOption: Option[XmlDeclaration],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable {
 
+  require(xmlDeclarationOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -43,7 +46,7 @@ final class Document(
   require(documentElement.path == Path.Root, "The document element must have the root Path")
 
   def document: simple.Document =
-    new simple.Document(uriOption, documentElement.elem, processingInstructions, comments)
+    new simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
 
   def uri: URI = documentElement.docUri
 
@@ -53,6 +56,7 @@ final class Document(
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
+    xmlDeclarationOption = this.xmlDeclarationOption,
     documentElement = newRoot,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -61,14 +65,18 @@ final class Document(
 object Document {
 
   def apply(
+    xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(documentElement, processingInstructions, comments)
+    new Document(xmlDeclarationOption, documentElement, processingInstructions, comments)
   }
 
+  def apply(documentElement: Elem): Document =
+    new Document(None, documentElement, Vector(), Vector())
+
   def apply(docUri: URI, d: simple.Document): Document = {
-    new Document(Elem(docUri, d.documentElement), d.processingInstructions, d.comments)
+    new Document(d.xmlDeclarationOption, Elem(docUri, d.documentElement), d.processingInstructions, d.comments)
   }
 }

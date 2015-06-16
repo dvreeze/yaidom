@@ -30,6 +30,7 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * Converter from Scala XML nodes to yaidom nodes, in particular from `scala.xml.Elem` to [[eu.cdevreeze.yaidom.simple.Elem]] and
@@ -58,8 +59,16 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     val pis = v.children collect { case pi: scala.xml.ProcInstr => pi }
     val comments = v.children collect { case com: scala.xml.Comment => com }
 
+    val xmlVersionOption = v.version
+    val xmlDeclOption = xmlVersionOption map { xmlVersion =>
+      XmlDeclaration.fromVersion(xmlVersion).
+        withEncodingOption(v.encoding).
+        withStandaloneOption(v.standAlone)
+    }
+
     Document(
       uriOption = None,
+      xmlDeclarationOption = xmlDeclOption,
       documentElement = convertToElem(v.docElem.asInstanceOf[scala.xml.Elem]),
       processingInstructions =
         pis.toIndexedSeq map { pi: scala.xml.ProcInstr => convertToProcessingInstruction(pi) },
@@ -92,16 +101,16 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
    */
   final def convertToNodeOption(v: scala.xml.Node): Option[Node] = {
     v match {
-      case e: scala.xml.Elem => Some(convertToElem(e))
+      case e: scala.xml.Elem       => Some(convertToElem(e))
       case cdata: scala.xml.PCData => Some(convertToCData(cdata))
-      case t: scala.xml.Text => Some(convertToText(t))
+      case t: scala.xml.Text       => Some(convertToText(t))
       case at: scala.xml.Atom[_] =>
         // Possibly an evaluated "parameter" in an XML literal
         Some(Text(text = at.data.toString, isCData = false))
       case pi: scala.xml.ProcInstr => Some(convertToProcessingInstruction(pi))
       case er: scala.xml.EntityRef => Some(convertToEntityRef(er))
-      case c: scala.xml.Comment => Some(convertToComment(c))
-      case _ => None
+      case c: scala.xml.Comment    => Some(convertToComment(c))
+      case _                       => None
     }
   }
 

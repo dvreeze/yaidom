@@ -25,6 +25,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * `Document`, containing an "indexed" document element.
@@ -37,11 +38,13 @@ import eu.cdevreeze.yaidom.simple.ProcessingInstruction
  */
 final class Document(
   val uriOption: Option[URI],
+  val xmlDeclarationOption: Option[XmlDeclaration],
   val documentElement: Elem,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
   val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable {
 
   require(uriOption ne null)
+  require(xmlDeclarationOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -49,13 +52,14 @@ final class Document(
   require(documentElement.path == Path.Root, "The document element must have the root Path")
 
   def document: simple.Document =
-    new simple.Document(uriOption, documentElement.elem, processingInstructions, comments)
+    new simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
 
   override def toString: String = document.toString
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
     uriOption = this.uriOption,
+    xmlDeclarationOption = this.xmlDeclarationOption,
     documentElement = newRoot,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -63,6 +67,15 @@ final class Document(
   /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
   def withUriOption(newUriOption: Option[URI]): Document = new Document(
     uriOption = newUriOption,
+    xmlDeclarationOption = this.xmlDeclarationOption,
+    documentElement = this.documentElement,
+    processingInstructions = this.processingInstructions,
+    comments = this.comments)
+
+  /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
+  def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): Document = new Document(
+    uriOption = this.uriOption,
+    xmlDeclarationOption = newXmlDeclarationOption,
     documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
@@ -72,15 +85,16 @@ object Document {
 
   def apply(
     uriOption: Option[URI],
+    xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(uriOption, documentElement, processingInstructions, comments)
+    new Document(uriOption, xmlDeclarationOption, documentElement, processingInstructions, comments)
   }
 
-  def apply(documentElement: Elem): Document = apply(None, documentElement)
+  def apply(documentElement: Elem): Document = apply(None, None, documentElement)
 
   def apply(d: simple.Document): Document =
-    new Document(d.uriOption, Elem(d.documentElement), d.processingInstructions, d.comments)
+    new Document(d.uriOption, d.xmlDeclarationOption, Elem(d.documentElement), d.processingInstructions, d.comments)
 }

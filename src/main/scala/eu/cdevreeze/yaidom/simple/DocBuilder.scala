@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * Builder of a yaidom Document. Called `DocBuilder` instead of `DocumentBuilder`, because often a JAXP `DocumentBuilder` is in scope too.
  * A `DocBuilder` is itself not a `NodeBuilder`.
  *
- * A `DocBuilder` is constructed from an optional URI, a document element (as `ElemBuilder`), top-level processing
+ * A `DocBuilder` is constructed from an optional URI, an optional XML declaration, a document element (as `ElemBuilder`), top-level processing
  * instruction builders, if any, and top-level comment builders, if any.
  *
  * @author Chris de Vreeze
@@ -38,11 +38,13 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 @SerialVersionUID(1L)
 final class DocBuilder(
   val uriOption: Option[URI],
+  val xmlDeclarationOption: Option[XmlDeclaration],
   val documentElement: ElemBuilder,
   val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
   val comments: immutable.IndexedSeq[CommentBuilder]) extends DocumentApi[ElemBuilder] with Immutable with Serializable { self =>
 
   require(uriOption ne null)
+  require(xmlDeclarationOption ne null)
   require(documentElement ne null)
   require(processingInstructions ne null)
   require(comments ne null)
@@ -61,7 +63,8 @@ final class DocBuilder(
     val parentScope = Scope.Empty
 
     Document(
-      uriOption = self.uriOption,
+      uriOption = uriOption,
+      xmlDeclarationOption = xmlDeclarationOption,
       documentElement = documentElement.build(parentScope),
       processingInstructions = processingInstructions map { (pi: ProcessingInstructionBuilder) => pi.build(parentScope) },
       comments = comments map { (c: CommentBuilder) => c.build(parentScope) })
@@ -86,6 +89,7 @@ object DocBuilder {
 
     new DocBuilder(
       uriOption = doc.uriOption,
+      xmlDeclarationOption = doc.xmlDeclarationOption,
       documentElement = fromElem(doc.documentElement)(parentScope),
       processingInstructions = doc.processingInstructions collect { case pi: ProcessingInstruction => fromProcessingInstruction(pi) },
       comments = doc.comments collect { case c => fromComment(c) })
@@ -93,12 +97,14 @@ object DocBuilder {
 
   def document(
     uriOption: Option[String] = None,
+    xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: ElemBuilder,
     processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] = Vector(),
     comments: immutable.IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
 
     new DocBuilder(
       uriOption map { uriString => new URI(uriString) },
+      xmlDeclarationOption,
       documentElement,
       processingInstructions,
       comments)

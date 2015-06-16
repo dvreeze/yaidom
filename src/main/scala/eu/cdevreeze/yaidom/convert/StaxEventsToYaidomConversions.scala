@@ -38,6 +38,7 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 import javax.xml.XMLConstants
 import javax.xml.namespace.{ QName => JQName }
 import javax.xml.stream.XMLEventReader
@@ -189,6 +190,13 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
       }
     }
 
+    val xmlVersionOption = Option(startDocument.getVersion)
+    val xmlDeclOption = xmlVersionOption map { xmlVersion =>
+      XmlDeclaration.fromVersion(xmlVersion).
+        withEncodingOption(if (startDocument.encodingSet()) Option(startDocument.getCharacterEncodingScheme) else None).
+        withStandaloneOption(if (startDocument.standaloneSet) Some(startDocument.isStandalone) else None)
+    }
+
     val pis = mutable.Buffer[ProcessingInstruction]()
     val comments = mutable.Buffer[Comment]()
     var docElement: Elem = null
@@ -229,6 +237,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
     val doc: Document = new Document(
       uriOption = uriOption,
+      xmlDeclarationOption = xmlDeclOption,
       documentElement = docElement,
       processingInstructions = pis.toIndexedSeq,
       comments = comments.toIndexedSeq)
@@ -337,7 +346,7 @@ object StaxEventsToYaidomConversions {
 
     def ancestorsOption: Option[List[ElemWithoutChildren]] = ancestorsOrSelf match {
       case Nil => None
-      case xs => Some(xs.tail)
+      case xs  => Some(xs.tail)
     }
 
     def currentScope: Scope = currentElemOption.map(_.scope).getOrElse(Scope.Empty)

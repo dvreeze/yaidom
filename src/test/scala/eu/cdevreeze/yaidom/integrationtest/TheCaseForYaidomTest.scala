@@ -585,4 +585,5 @@ class TheCaseForYaidomTest extends Suite {
 
   // TODO Pattern matching. See http://www.codecommit.com/blog/scala/working-with-scalas-xml-support.
   // Also see discussion http://scala-language.1934581.n4.nabble.com/Namespace-support-in-XML-patterns-td2006894.html.
+  // Or see http://alvinalexander.com/scala/using-match-expressions-with-xml-in-scala.
 }

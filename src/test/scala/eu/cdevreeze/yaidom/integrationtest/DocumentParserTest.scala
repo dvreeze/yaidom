@@ -30,6 +30,8 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * DocumentParser test.
@@ -43,27 +45,56 @@ class DocumentParserTest extends Suite {
     val parser = DocumentParserUsingSax.newInstance
 
     doTestParseWithEndingComments(parser)
+
+    // No XML declaration stored (yet?)
   }
 
   @Test def testParseWithEndingCommentsUsingStax(): Unit = {
     val parser = DocumentParserUsingStax.newInstance
 
-    doTestParseWithEndingComments(parser)
+    val doc = doTestParseWithEndingComments(parser)
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some("UTF-8")) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
   }
 
   @Test def testParseWithEndingCommentsUsingDom(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
-    doTestParseWithEndingComments(parser)
+    val doc = doTestParseWithEndingComments(parser)
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some("UTF-8")) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
   }
 
   @Test def testParseWithEndingCommentsUsingDomLS(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance
 
-    doTestParseWithEndingComments(parser)
+    val doc = doTestParseWithEndingComments(parser)
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some("UTF-8")) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
   }
 
-  private def doTestParseWithEndingComments(docParser: DocumentParser): Unit = {
+  private def doTestParseWithEndingComments(docParser: DocumentParser): Document = {
     val xml =
       """|<?xml version="1.0" encoding="UTF-8"?>
          |<prod:product xmlns:prod="http://datypic.com/prod">
@@ -82,5 +113,7 @@ class DocumentParserTest extends Suite {
     assertResult(List("Bogus comment at the end")) {
       doc.comments.map(_.text.trim)
     }
+
+    doc
   }
 }
