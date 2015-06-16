@@ -193,7 +193,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val xmlVersionOption = Option(startDocument.getVersion)
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
-        withEncodingOption(if (startDocument.encodingSet()) Option(startDocument.getCharacterEncodingScheme) else None).
+        withEncodingOption(if (startDocument.encodingSet()) Some(startDocument.getCharacterEncodingScheme) else None).
         withStandaloneOption(if (startDocument.standaloneSet) Some(startDocument.isStandalone) else None)
     }
 

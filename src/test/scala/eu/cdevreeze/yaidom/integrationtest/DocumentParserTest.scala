@@ -62,6 +62,9 @@ class DocumentParserTest extends Suite {
     assertResult(Some("UTF-8")) {
       xmlDeclOption.flatMap(_.encodingOption)
     }
+    assertResult(Some(true)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
   }
 
   @Test def testParseWithEndingCommentsUsingDom(): Unit = {
@@ -76,6 +79,9 @@ class DocumentParserTest extends Suite {
     }
     assertResult(Some("UTF-8")) {
       xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(true)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
     }
   }
 
@@ -92,11 +98,14 @@ class DocumentParserTest extends Suite {
     assertResult(Some("UTF-8")) {
       xmlDeclOption.flatMap(_.encodingOption)
     }
+    assertResult(Some(true)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
   }
 
   private def doTestParseWithEndingComments(docParser: DocumentParser): Document = {
     val xml =
-      """|<?xml version="1.0" encoding="UTF-8"?>
+      """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
          |<prod:product xmlns:prod="http://datypic.com/prod">
          |  <prod:number>557</prod:number>
          |  <prod:size system="US-DRESS">10</prod:size>
