@@ -18,20 +18,20 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.ByteArrayInputStream
 
+import scala.io.Codec
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.parse.DocumentParser
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * DocumentParser test.
@@ -59,7 +59,7 @@ class DocumentParserTest extends Suite {
     assertResult(Some("1.0")) {
       xmlDeclOption.map(_.version)
     }
-    assertResult(Some("UTF-8")) {
+    assertResult(Some(Codec.UTF8.charSet)) {
       xmlDeclOption.flatMap(_.encodingOption)
     }
     assertResult(Some(true)) {
@@ -77,7 +77,7 @@ class DocumentParserTest extends Suite {
     assertResult(Some("1.0")) {
       xmlDeclOption.map(_.version)
     }
-    assertResult(Some("UTF-8")) {
+    assertResult(Some(Codec.UTF8.charSet)) {
       xmlDeclOption.flatMap(_.encodingOption)
     }
     assertResult(Some(true)) {
@@ -95,7 +95,7 @@ class DocumentParserTest extends Suite {
     assertResult(Some("1.0")) {
       xmlDeclOption.map(_.version)
     }
-    assertResult(Some("UTF-8")) {
+    assertResult(Some(Codec.UTF8.charSet)) {
       xmlDeclOption.flatMap(_.encodingOption)
     }
     assertResult(Some(true)) {

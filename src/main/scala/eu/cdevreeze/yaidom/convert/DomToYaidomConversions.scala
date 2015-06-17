@@ -62,7 +62,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val xmlVersionOption = Option(v.getXmlVersion)
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
-        withEncodingOption(Option(v.getXmlEncoding)).
+        withUnparsedEncodingOption(Option(v.getXmlEncoding)).
         withStandaloneOption(Some(v.getXmlStandalone))
     }
 

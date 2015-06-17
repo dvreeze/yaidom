@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.simple
 
+import java.nio.charset.Charset
+
 /**
  * The XML Declaration, which can only occur as the first line in an XML document.
  *
@@ -23,18 +25,21 @@ package eu.cdevreeze.yaidom.simple
  */
 final case class XmlDeclaration(
   val version: String,
-  val encodingOption: Option[String],
+  val encodingOption: Option[Charset],
   val standaloneOption: Option[Boolean]) extends Immutable {
 
   require(version ne null)
   require(encodingOption ne null)
   require(standaloneOption ne null)
 
-  def withEncodingOption(encodingOption: Option[String]): XmlDeclaration =
+  def withEncodingOption(encodingOption: Option[Charset]): XmlDeclaration =
     this.copy(encodingOption = encodingOption)
 
   def withStandaloneOption(standaloneOption: Option[Boolean]): XmlDeclaration =
     this.copy(standaloneOption = standaloneOption)
+
+  def withUnparsedEncodingOption(encodingOption: Option[String]): XmlDeclaration =
+    withEncodingOption(encodingOption.map(cs => Charset.forName(cs)))
 }
 
 object XmlDeclaration {
@@ -47,4 +52,6 @@ object XmlDeclaration {
     case "no"  => false
     case _     => sys.error(s"Not a valid standalone vaue: $standalone")
   }
+
+  def parseCharset(charset: String): Charset = Charset.forName(charset)
 }

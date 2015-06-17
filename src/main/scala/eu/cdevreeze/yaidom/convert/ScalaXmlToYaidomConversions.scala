@@ -62,7 +62,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     val xmlVersionOption = v.version
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
-        withEncodingOption(v.encoding).
+        withUnparsedEncodingOption(v.encoding).
         withStandaloneOption(v.standAlone)
     }
 
