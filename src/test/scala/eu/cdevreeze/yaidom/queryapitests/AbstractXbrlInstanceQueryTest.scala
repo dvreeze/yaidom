@@ -20,10 +20,12 @@ import org.junit.Test
 import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.queryapi.ElemLike
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 
 /**
  * ElemLike-based query test case, using an XBRL instance as sample data.
@@ -32,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.HasText
  */
 abstract class AbstractXbrlInstanceQueryTest extends Suite {
 
-  type E <: ElemLike[E] with HasEName with HasText
+  type E <: ClarkElemLike[E] with IsNavigableApi[E]
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
   private val LinkNs = "http://www.xbrl.org/2003/linkbase"
@@ -134,6 +136,25 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
         xbrlInstance.filterChildElems(e => optNamespaces.contains(e.resolvedName.namespaceUriOption))
 
       topLevelNonFacts.map(e => toResolvedElem(e)).toSet.union(topLevelFacts.map(e => toResolvedElem(e)).toSet)
+    }
+  }
+
+  @Test def testBulkNavigation(): Unit = {
+    require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
+
+    val elemsWithPaths = xbrlInstance.findAllElemsOrSelfWithPaths
+    val paths = elemsWithPaths.map(_._2)
+
+    assertResult(xbrlInstance.findAllElemsOrSelf) {
+      xbrlInstance.filterElemsOrSelfByPaths(paths.toSet)
+    }
+
+    def isIdentifierPath(p: Path): Boolean = {
+      !p.isRoot && (p.elementNameOption.get == EName(XbrliNs, "identifier"))
+    }
+
+    assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier"))) {
+      xbrlInstance.filterElemsOrSelfByPaths(paths.filter(isIdentifierPath).toSet)
     }
   }
 

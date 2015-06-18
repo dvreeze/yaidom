@@ -196,6 +196,14 @@ object XbrlSchemaTest {
 
     override def findChildElemByPathEntry(entry: Path.Entry): Option[XsdElem] =
       wrappedElem.findChildElemByPathEntry(entry).map(elem => XsdElem(elem))
+
+    override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(XsdElem, Path.Entry)] = {
+      findAllChildElems.zip(wrappedElem.findAllChildElemsWithPathEntries) map {
+        case (che, (wrappedChe, entry)) =>
+          assert(che.wrappedElem == wrappedChe, s"Corrupted child element order")
+          (che, entry)
+      }
+    }
   }
 
   final class XsdRootElem(wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends XsdElem(wrappedElem) {

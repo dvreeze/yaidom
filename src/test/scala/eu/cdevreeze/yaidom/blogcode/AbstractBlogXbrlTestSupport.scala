@@ -91,9 +91,17 @@ trait AbstractBlogXbrlTestSupport {
     final def findChildElemByPathEntry(entry: Path.Entry): Option[XbrliElem] =
       childElems.find(e => e.localName == entry.elementName.localPart && e.indexedElem.path.lastEntry == entry)
 
+    final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(XbrliElem, Path.Entry)] = {
+      findAllChildElems.zip(indexedElem.findAllChildElemsWithPathEntries) map {
+        case (che, (wrappedChe, entry)) =>
+          assert(che.indexedElem == wrappedChe, s"Corrupted child element order")
+          (che, entry)
+      }
+    }
+
     final override def equals(other: Any): Boolean = other match {
       case e: XbrliElem => indexedElem == e.indexedElem
-      case _ => false
+      case _            => false
     }
 
     final override def hashCode: Int = indexedElem.hashCode
@@ -562,22 +570,22 @@ trait AbstractBlogXbrlTestSupport {
     }
 
     private[blogcode] def apply(elem: indexed.Elem, childElems: immutable.IndexedSeq[XbrliElem]): XbrliElem = elem.resolvedName match {
-      case XbrliXbrlEName => new XbrlInstance(elem, childElems)
-      case LinkSchemaRefEName => new SchemaRef(elem, childElems)
-      case LinkLinkbaseRefEName => new LinkbaseRef(elem, childElems)
-      case LinkRoleRefEName => new RoleRef(elem, childElems)
-      case LinkArcroleRefEName => new ArcroleRef(elem, childElems)
-      case XbrliContextEName => new XbrliContext(elem, childElems)
-      case XbrliUnitEName => new XbrliUnit(elem, childElems)
-      case LinkFootnoteLinkEName => new FootnoteLink(elem, childElems)
-      case XbrliEntityEName => new Entity(elem, childElems)
-      case XbrliPeriodEName => new Period(elem, childElems)
-      case XbrliScenarioEName => new Scenario(elem, childElems)
-      case XbrliSegmentEName => new Segment(elem, childElems)
-      case XbrliIdentifierEName => new Identifier(elem, childElems)
-      case XbrliDivideEName => new Divide(elem, childElems)
+      case XbrliXbrlEName          => new XbrlInstance(elem, childElems)
+      case LinkSchemaRefEName      => new SchemaRef(elem, childElems)
+      case LinkLinkbaseRefEName    => new LinkbaseRef(elem, childElems)
+      case LinkRoleRefEName        => new RoleRef(elem, childElems)
+      case LinkArcroleRefEName     => new ArcroleRef(elem, childElems)
+      case XbrliContextEName       => new XbrliContext(elem, childElems)
+      case XbrliUnitEName          => new XbrliUnit(elem, childElems)
+      case LinkFootnoteLinkEName   => new FootnoteLink(elem, childElems)
+      case XbrliEntityEName        => new Entity(elem, childElems)
+      case XbrliPeriodEName        => new Period(elem, childElems)
+      case XbrliScenarioEName      => new Scenario(elem, childElems)
+      case XbrliSegmentEName       => new Segment(elem, childElems)
+      case XbrliIdentifierEName    => new Identifier(elem, childElems)
+      case XbrliDivideEName        => new Divide(elem, childElems)
       case _ if Fact.accepts(elem) => Fact(elem, childElems)
-      case _ => new XbrliElem(elem, childElems)
+      case _                       => new XbrliElem(elem, childElems)
     }
   }
 

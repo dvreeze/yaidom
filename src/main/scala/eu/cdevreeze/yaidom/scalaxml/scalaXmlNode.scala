@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.scalaxml
 
 import scala.collection.immutable
+import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
@@ -134,6 +135,13 @@ final class ScalaXmlElem(
     result
   }
 
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ScalaXmlElem, Path.Entry)] = {
+    childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
+      case (entry, idx) =>
+        (children(idx).asInstanceOf[ScalaXmlElem], entry)
+    }
+  }
+
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }
 
@@ -147,6 +155,28 @@ final class ScalaXmlElem(
   override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
+  }
+
+  private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
+    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
+
+    val elementNameCounts = mutable.Map[EName, Int]()
+    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
+
+    for ((node, idx) <- self.children.zipWithIndex) {
+      node match {
+        case elm: ScalaXmlElem =>
+          val ename = elm.resolvedName
+          val countForName = elementNameCounts.getOrElse(ename, 0)
+          val entry = Path.Entry(ename, countForName)
+          elementNameCounts.update(ename, countForName + 1)
+          acc += ((entry, idx))
+        case _ => ()
+      }
+    }
+
+    val result = acc.toMap
+    result
   }
 }
 
@@ -209,16 +239,16 @@ object ScalaXmlNode {
 
   def wrapNodeOption(node: scala.xml.Node): Option[ScalaXmlNode] = {
     node match {
-      case e: scala.xml.Elem => Some(new ScalaXmlElem(e))
+      case e: scala.xml.Elem       => Some(new ScalaXmlElem(e))
       case cdata: scala.xml.PCData => Some(new ScalaXmlCData(cdata))
-      case t: scala.xml.Text => Some(new ScalaXmlText(t))
+      case t: scala.xml.Text       => Some(new ScalaXmlText(t))
       case at: scala.xml.Atom[_] =>
         // Possibly an evaluated "parameter" in an XML literal
         Some(new ScalaXmlAtom(at))
       case pi: scala.xml.ProcInstr => Some(new ScalaXmlProcessingInstruction(pi))
       case er: scala.xml.EntityRef => Some(new ScalaXmlEntityRef(er))
-      case c: scala.xml.Comment => Some(new ScalaXmlComment(c))
-      case _ => None
+      case c: scala.xml.Comment    => Some(new ScalaXmlComment(c))
+      case _                       => None
     }
   }
 

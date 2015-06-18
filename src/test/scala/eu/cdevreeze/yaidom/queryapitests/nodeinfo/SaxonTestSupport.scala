@@ -139,6 +139,13 @@ trait SaxonTestSupport {
       childOption
     }
 
+    override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(DomElem, Path.Entry)] = {
+      childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
+        case (entry, idx) =>
+          (children(idx).asInstanceOf[DomElem], entry)
+      }
+    }
+
     /** Returns the text children */
     def textChildren: immutable.IndexedSeq[DomText] = children collect { case t: DomText => t }
 
@@ -177,6 +184,28 @@ trait SaxonTestSupport {
       }
 
       Scope.from(resultMap - "xml")
+    }
+
+    private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
+      // This implementation is theoretically O(n), where n is the number of children, and uses mutable collections for speed
+
+      val elementNameCounts = mutable.Map[EName, Int]()
+      val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
+
+      for ((node, idx) <- self.children.zipWithIndex) {
+        node match {
+          case elm: DomElem =>
+            val ename = elm.resolvedName
+            val countForName = elementNameCounts.getOrElse(ename, 0)
+            val entry = Path.Entry(ename, countForName)
+            elementNameCounts.update(ename, countForName + 1)
+            acc += ((entry, idx))
+          case _ => ()
+        }
+      }
+
+      val result = acc.toMap
+      result
     }
   }
 

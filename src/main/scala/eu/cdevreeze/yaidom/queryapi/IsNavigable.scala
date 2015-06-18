@@ -16,12 +16,14 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import scala.collection.immutable
+
 import eu.cdevreeze.yaidom.core.Path
 
 /**
  * API and implementation trait for elements that can be navigated using paths.
  *
- * More precisely, this trait has the following abstract method: `findChildElemByPathEntry`.
+ * More precisely, this trait has the following abstract methods: `findChildElemByPathEntry` and `findAllChildElemsWithPathEntries`.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.IsNavigableApi]]. See the documentation of that trait
  * for more information.
@@ -33,6 +35,8 @@ import eu.cdevreeze.yaidom.core.Path
 trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 
   def findChildElemByPathEntry(entry: Path.Entry): Option[E]
+
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
   final def getChildElemByPathEntry(entry: Path.Entry): E =
     findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $self"))
@@ -61,4 +65,31 @@ trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 
   final def getElemOrSelfByPath(path: Path): E =
     findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
+
+  final def findAllElemsOrSelfWithPaths: immutable.IndexedSeq[(E, Path)] = {
+    (self, Path.Root) +: {
+      findAllChildElemsWithPathEntries flatMap {
+        case (elem, entry) =>
+          // Recursive calls
+          elem.findAllElemsOrSelfWithPaths map { case (e, p) => (e, p.prepend(entry)) }
+      }
+    }
+  }
+
+  final def filterElemsOrSelfByPaths(paths: Set[Path]): immutable.IndexedSeq[E] = {
+    val selfOption: Option[E] = if (paths.contains(Path.Root)) Some(this) else None
+
+    val remainingPathsByFirstEntries: Map[Path.Entry, Set[Path]] =
+      (paths - Path.Root).groupBy(_.firstEntry).mapValues(paths => paths.map(_.withoutFirstEntry))
+    val firstEntries = remainingPathsByFirstEntries.keySet
+
+    val descendants =
+      findAllChildElemsWithPathEntries filter { case (che, entry) => firstEntries.contains(entry) } flatMap {
+        case (che, entry) =>
+          // Recursive call
+          che.filterElemsOrSelfByPaths(remainingPathsByFirstEntries(entry))
+      }
+
+    selfOption.toIndexedSeq ++ descendants
+  }
 }

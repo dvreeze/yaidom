@@ -160,7 +160,7 @@ final case class Elem(
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
     val result =
       childNodeIndex(entry) match {
-        case -1 => None
+        case -1  => None
         case idx => Some(children(idx).asInstanceOf[Elem])
       }
     assert(result.forall(_.resolvedName == entry.elementName))
@@ -185,10 +185,7 @@ final case class Elem(
     withChildren(newChildren)
   }
 
-  /**
-   * Returns all child elements with `Path` entries, in the correct order.
-   */
-  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
     childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
       case (entry, idx) =>
         (children(idx).asInstanceOf[Elem], entry)
@@ -211,12 +208,12 @@ final case class Elem(
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
-      case _ => false
+      case _                                => false
     }
 
     def isElem(n: Node): Boolean = n match {
       case e: Elem => true
-      case _ => false
+      case _       => false
     }
 
     val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!findAllChildElems.isEmpty)
@@ -228,7 +225,7 @@ final case class Elem(
 
       remainder map {
         case e: Elem => e.removeAllInterElementWhitespace
-        case n => n
+        case n       => n
       }
     }
 
@@ -249,7 +246,7 @@ final case class Elem(
           case t: Text =>
             val (textNodes, remainder) = childNodes span {
               case t: Text => true
-              case _ => false
+              case _       => false
             }
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
@@ -268,7 +265,7 @@ final case class Elem(
     val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
       n match {
         case e: Elem => e.coalesceAllAdjacentText
-        case n => n
+        case n       => n
       }
     }
 
@@ -287,7 +284,7 @@ final case class Elem(
         n match {
           case e: Elem => e.normalizeAllText
           case t: Text => Text(t.normalizedText)
-          case n => n
+          case n       => n
         }
       }
     }
@@ -313,7 +310,7 @@ final case class Elem(
           case t: Text =>
             val (textNodes, remainder) = childNodes span {
               case t: Text => true
-              case _ => false
+              case _       => false
             }
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
@@ -332,7 +329,7 @@ final case class Elem(
     val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
       n match {
         case e: Elem => e.coalesceAndNormalizeAllText
-        case n => n
+        case n       => n
       }
     }
 
@@ -387,7 +384,7 @@ object Node {
   def apply(n: simple.Node): Node = n match {
     case e: simple.Elem => Elem(e)
     case t: simple.Text => Text(t)
-    case n => sys.error(s"Not an element or text node: $n")
+    case n              => sys.error(s"Not an element or text node: $n")
   }
 }
 
@@ -404,7 +401,7 @@ object Elem {
 
   def apply(e: simple.Elem): Elem = {
     val children = e.children collect {
-      case childElm: simple.Elem => childElm
+      case childElm: simple.Elem  => childElm
       case childText: simple.Text => childText
     }
     val resolvedChildren = children map { node => Node(node) }

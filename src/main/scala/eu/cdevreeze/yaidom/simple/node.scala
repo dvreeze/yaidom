@@ -226,7 +226,7 @@ final class Elem(
   override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
     val result =
       childNodeIndex(entry) match {
-        case -1 => None
+        case -1  => None
         case idx => Some(children(idx).asInstanceOf[Elem])
       }
     assert(result.forall(_.resolvedName == entry.elementName))
@@ -255,7 +255,7 @@ final class Elem(
    * Returns all child elements with `Path` entries, in the correct order.
    * This method is also needed for fast recursive construction of docaware/indexed Elems.
    */
-  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
     childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
       case (entry, idx) =>
         (children(idx).asInstanceOf[Elem], entry)
@@ -370,12 +370,12 @@ final class Elem(
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
-      case _ => false
+      case _                                => false
     }
 
     def isElem(n: Node): Boolean = n match {
       case e: Elem => true
-      case _ => false
+      case _       => false
     }
 
     val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!findAllChildElems.isEmpty)
@@ -387,7 +387,7 @@ final class Elem(
 
       remainder map {
         case e: Elem => e.removeAllInterElementWhitespace
-        case n => n
+        case n       => n
       }
     }
 
@@ -406,7 +406,7 @@ final class Elem(
 
     def isText(n: Node): Boolean = n match {
       case t: Text => true
-      case _ => false
+      case _       => false
     }
 
     val tabOrSpace = if (useTab) "\t" else " "
@@ -425,7 +425,7 @@ final class Elem(
 
         val prettifiedChildNodes = childNodes map {
           case e: Elem => prettify(e, newIndent)
-          case n => n
+          case n       => n
         }
 
         val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(indentText, n) }
@@ -440,7 +440,7 @@ final class Elem(
     def containsWhitespaceOnly(elem: Elem): Boolean = {
       elem.children forall {
         case t: Text if t.text.trim.isEmpty => true
-        case n => false
+        case n                              => false
       }
     }
 

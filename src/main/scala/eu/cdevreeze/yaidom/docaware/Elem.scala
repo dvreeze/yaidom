@@ -25,8 +25,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.simple
 
 /**
@@ -108,6 +108,14 @@ final class Elem private[docaware] (
     val childElemOption = filteredChildElems.drop(entry.index).headOption
     assert(childElemOption.forall(_.resolvedName == entry.elementName))
     childElemOption
+  }
+
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
+    findAllChildElems.zip(elem.findAllChildElemsWithPathEntries) map {
+      case (iche, (che, entry)) =>
+        assert(iche.elem == che, s"Corrupted child element order")
+        (iche, entry)
+    }
   }
 
   override def qname: QName = elem.qname

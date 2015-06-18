@@ -115,7 +115,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    * assemble these into concrete element implementations. Here we use abstract types, in order to make concrete element
    * implementations pluggable as "XML back-ends". The goal is different, and so is the mechanism (abstract types
    * instead of type parameters).
-   * 
+   *
    * This is a purely abstract universal trait, allowing for allocation-free value objects.
    */
   trait BridgeElem extends Any {
@@ -152,6 +152,8 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
     def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType]
 
+    def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(SelfType, Path.Entry)]
+
     // Extra method
 
     def toElem: eu.cdevreeze.yaidom.simple.Elem
@@ -159,7 +161,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
   /**
    * Bridge element that adds support for "indexed elements".
-   * 
+   *
    * This is a purely abstract universal trait, allowing for allocation-free value objects.
    */
   trait IndexedBridgeElem extends Any with BridgeElem {
@@ -202,13 +204,21 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     final def findChildElemByPathEntry(entry: Path.Entry): Option[SpreadsheetElem] =
       bridgeElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
 
+    final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(SpreadsheetElem, Path.Entry)] = {
+      findAllChildElems.zip(bridgeElem.findAllChildElemsWithPathEntries) map {
+        case (che, (wrappedChe, entry)) =>
+          assert(che.bridgeElem == wrappedChe, s"Corrupted child element order")
+          (che, entry)
+      }
+    }
+
     final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
       bridgeElem.rootElem.resolvedName +: bridgeElem.path.entries.map(_.elementName)
     }
 
     override def equals(other: Any): Boolean = other match {
       case e: SpreadsheetElem => bridgeElem.backingElem == e.bridgeElem.backingElem
-      case _ => false
+      case _                  => false
     }
 
     override def hashCode: Int = bridgeElem.backingElem.hashCode
