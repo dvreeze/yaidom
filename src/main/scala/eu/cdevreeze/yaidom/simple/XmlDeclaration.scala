@@ -37,9 +37,6 @@ final case class XmlDeclaration(
 
   def withStandaloneOption(standaloneOption: Option[Boolean]): XmlDeclaration =
     this.copy(standaloneOption = standaloneOption)
-
-  def withUnparsedEncodingOption(encodingOption: Option[String]): XmlDeclaration =
-    withEncodingOption(encodingOption.map(cs => Charset.forName(cs)))
 }
 
 object XmlDeclaration {
@@ -52,6 +49,4 @@ object XmlDeclaration {
     case "no"  => false
     case _     => sys.error(s"Not a valid standalone vaue: $standalone")
   }
-
-  def parseCharset(charset: String): Charset = Charset.forName(charset)
 }

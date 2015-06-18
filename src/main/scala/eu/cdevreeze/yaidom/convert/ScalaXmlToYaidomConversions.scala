@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.convert
 
+import java.nio.charset.Charset
+
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.QName
@@ -62,7 +64,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     val xmlVersionOption = v.version
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
-        withUnparsedEncodingOption(v.encoding).
+        withEncodingOption(v.encoding.map(cs => Charset.forName(cs))).
         withStandaloneOption(v.standAlone)
     }
 

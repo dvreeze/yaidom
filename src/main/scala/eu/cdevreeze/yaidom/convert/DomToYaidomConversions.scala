@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.convert
 
 import java.net.URI
+import java.nio.charset.Charset
 
 import scala.collection.immutable
 
@@ -62,7 +63,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val xmlVersionOption = Option(v.getXmlVersion)
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
-        withUnparsedEncodingOption(Option(v.getXmlEncoding)).
+        withEncodingOption(Option(v.getXmlEncoding).map(cs => Charset.forName(cs))).
         withStandaloneOption(Some(v.getXmlStandalone))
     }
 

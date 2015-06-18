@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.convert
 
 import java.net.URI
+import java.nio.charset.Charset
 import java.{ util => jutil }
 
 import scala.Vector
@@ -193,7 +194,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val xmlVersionOption = Option(startDocument.getVersion)
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
-        withUnparsedEncodingOption(if (startDocument.encodingSet()) Some(startDocument.getCharacterEncodingScheme) else None).
+        withEncodingOption(if (startDocument.encodingSet()) Some(Charset.forName(startDocument.getCharacterEncodingScheme)) else None).
         withStandaloneOption(if (startDocument.standaloneSet) Some(startDocument.isStandalone) else None)
     }
 
