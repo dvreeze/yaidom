@@ -17,19 +17,24 @@
 package eu.cdevreeze.yaidom.indexed
 
 import scala.collection.immutable
-import scala.collection.mutable
+
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
 
 /**
- * Element implementation that contains an underlying element as well as a Path.
- * It can be used for temporarily indexing underlying element trees (or parts thereof)
- * with Paths, relative to the root element. Therefore these IndexedElem objects
- * can be used for retrieving ancestor or sibling elements, provided the root element
- * is retained as starting point of "path-based" queries. They can also be used to
- * easily find elements that have a given ancestry.
+ * Element implementation that contains an underlying root element, a Path, and an underlying element
+ * found from the root element following the Path. It can be used for temporarily indexing underlying
+ * element trees (or parts thereof) with Paths, relative to the root element. Therefore these
+ * IndexedElem objects can be used for retrieving ancestor or sibling elements. They can also
+ * be used to easily find elements that have a given ancestry.
+ *
+ * Having an IndexedElem, it is always possible to re-create the root element as IndexedElem, because
+ * the underlying root element is always available. On the other hand, creating an IndexedElem
+ * is expensive. Class IndexedElem is optimized for fast querying, at the expense of
+ * expensive recursive creation.
  *
  * ==IndexedElem examples==
  *
@@ -54,7 +59,18 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
  *
  * The ``IndexedElem`` class can be understood in a precise <em>mathematical</em> sense, as shown below.
  *
- * For example:
+ * Some properties of IndexedElems are as follows:
+ * {{{
+ * // All elements (obtained from querying other elements) have the same rootElem
+ *
+ * iElem.findAllElemsOrSelf.map(_.rootElem).distinct == List(iElem.rootElem)
+ *
+ * // The correspondence between rootElem, path and elem
+ *
+ * iElem.findAllElemsOrSelf.forall(e => e.rootElem.findElemOrSelfByPath(e.path).get == e.elem)
+ * }}}
+ *
+ * The correspondence between queries on IndexedElems and the same queries on the underlying elements is as follows:
  * {{{
  * // Let p be a function from underlying element type E to Boolean
  *
@@ -68,32 +84,13 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
  *
  * @author Chris de Vreeze
  */
-final class IndexedElem[E <: ClarkElemApi[E]](val elem: E, val path: Path) extends ClarkElemLike[IndexedElem[E]] {
+final class IndexedElem[E <: NavigableClarkElemApi[E]] private (
+  val rootElem: E,
+  childElems: immutable.IndexedSeq[IndexedElem[E]],
+  val path: Path,
+  val elem: E) extends ClarkElemLike[IndexedElem[E]] with IsNavigable[IndexedElem[E]] {
 
-  /**
-   * '''Core method''' that returns '''all child elements''', in the correct order.
-   * Other operations can be defined in terms of this one.
-   *
-   * Typically this method is slower than the same method for the underlying element
-   * implementation. Therefore querying these elements is slower than querying the
-   * underlying elements. Hence, use class IndexedElem only if the benefits are
-   * greater than the costs.
-   *
-   * This method is a lot slower than the same method on the underlying element
-   * implementation if getting the expanded name of the underlying element is costly.
-   */
-  final def findAllChildElems: immutable.IndexedSeq[IndexedElem[E]] = {
-    val nextEntries = mutable.Map[EName, Int]()
-
-    elem.findAllChildElems map { elem =>
-      val ename = elem.resolvedName
-      val idx = nextEntries.getOrElse(ename, 0)
-      val pathEntry = Path.Entry(ename, idx)
-      nextEntries.put(ename, idx + 1)
-
-      new IndexedElem(elem, path.append(pathEntry))
-    }
-  }
+  final def findAllChildElems: immutable.IndexedSeq[IndexedElem[E]] = childElems
 
   final def resolvedName: EName = elem.resolvedName
 
@@ -101,19 +98,46 @@ final class IndexedElem[E <: ClarkElemApi[E]](val elem: E, val path: Path) exten
     elem.resolvedAttributes
 
   final def text: String = elem.text
+
+  final def findChildElemByPathEntry(entry: Path.Entry): Option[IndexedElem[E]] = {
+    findAllChildElems.find(_.path.lastEntry == entry)
+  }
+
+  final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(IndexedElem[E], Path.Entry)] = {
+    childElems.zip(elem.findAllChildElemsWithPathEntries) map {
+      case (che, (uche, entry)) =>
+        assert(che.elem == uche)
+        (che, entry)
+    }
+  }
 }
 
 object IndexedElem {
 
   /**
-   * Creates an IndexedElem with the given underlying element and path.
+   * Returns the same as `apply(rootElem, Path.Root)`.
    */
-  def apply[E <: ClarkElemApi[E]](elem: E, path: Path): IndexedElem[E] =
-    new IndexedElem[E](elem, path)
+  def apply[E <: NavigableClarkElemApi[E]](rootElem: E): IndexedElem[E] =
+    apply(rootElem, Path.Root)
 
   /**
-   * Returns `apply(elem, Path.Root)`.
+   * Expensive recursive factory method for "indexed elements".
    */
-  def apply[E <: ClarkElemApi[E]](elem: E): IndexedElem[E] =
-    apply(elem, Path.Root)
+  def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path): IndexedElem[E] = {
+    // Expensive call, so invoked only once
+    val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
+      sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
+
+    apply(rootElem, path, elem)
+  }
+
+  private def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedElem[E] = {
+    // Recursive calls
+    val childElems = elem.findAllChildElemsWithPathEntries map {
+      case (e, entry) =>
+        apply(rootElem, path.append(entry), e)
+    }
+
+    new IndexedElem(rootElem, childElems, path, elem)
+  }
 }
