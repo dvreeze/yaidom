@@ -55,15 +55,15 @@ class IndexedElemQueryTest extends AbstractElemLikeQueryTest {
         author <- bookstore.filterElems(withLocalName("Author"))
         bookPath <- author.path.findAncestorPath(_.elementNameOption.map(_.localPart) == Some("Book"))
         book <- bookstore.findElem(_.path == bookPath)
-        if book.getChildElem(withLocalName("Title")).elem.text.startsWith("Programming in Scala")
+        if book.getChildElem(withLocalName("Title")).elem.text.startsWith("A First Course in Database Systems")
       } yield author
     val elems = bookstore.findAllElemsOrSelf
 
-    assertResult(List("Odersky", "Spoon", "Venners")) {
+    assertResult(List("Ullman", "Widom")) {
       theBookAuthors.map(_.getChildElem(withLocalName("Last_Name")).text)
     }
 
-    assertResult(List("Martin", "Lex", "Bill")) {
+    assertResult(List("Jeffrey", "Jennifer")) {
       theBookAuthors.map(_.getChildElem(withLocalName("First_Name")).text)
     }
   }
