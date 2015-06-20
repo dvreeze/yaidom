@@ -27,11 +27,9 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
-import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * ElemLike-based query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat
@@ -45,7 +43,7 @@ import eu.cdevreeze.yaidom.queryapi.HasText
  */
 abstract class AbstractElemLikeQueryTest extends Suite {
 
-  type E <: ElemLike[E] with HasEName with HasText
+  type E <: ClarkElemLike[E]
 
   @Test def testQueryBookTitles(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title

@@ -28,10 +28,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
-import eu.cdevreeze.yaidom.queryapi.HasText
 
 /**
  * Alternative query test, with yaidom queries ported from XQuery examples.
@@ -43,7 +41,7 @@ import eu.cdevreeze.yaidom.queryapi.HasText
  */
 abstract class AbstractAlternativeQueryTest extends Suite {
 
-  type E <: ElemLike[E] with HasEName with HasText
+  type E <: ClarkElemLike[E]
 
   @Test def testFindAllCatalogProducts(): Unit = {
     // See example 1-4.

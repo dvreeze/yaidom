@@ -20,10 +20,8 @@ import scala.collection.immutable
 import scala.collection.mutable
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ElemApi
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 
 /**
  * Element implementation that contains an underlying element as well as a Path.
@@ -70,7 +68,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
  *
  * @author Chris de Vreeze
  */
-final class IndexedElem[E <: ElemApi[E] with HasENameApi](val elem: E, val path: Path) extends ElemLike[IndexedElem[E]] with HasEName {
+final class IndexedElem[E <: ClarkElemApi[E]](val elem: E, val path: Path) extends ClarkElemLike[IndexedElem[E]] {
 
   /**
    * '''Core method''' that returns '''all child elements''', in the correct order.
@@ -82,7 +80,7 @@ final class IndexedElem[E <: ElemApi[E] with HasENameApi](val elem: E, val path:
    * greater than the costs.
    *
    * This method is a lot slower than the same method on the underlying element
-   * implementation, if getting the expanded name of the underlying element is costly.
+   * implementation if getting the expanded name of the underlying element is costly.
    */
   final def findAllChildElems: immutable.IndexedSeq[IndexedElem[E]] = {
     val nextEntries = mutable.Map[EName, Int]()
@@ -101,6 +99,8 @@ final class IndexedElem[E <: ElemApi[E] with HasENameApi](val elem: E, val path:
 
   final def resolvedAttributes: immutable.Iterable[(EName, String)] =
     elem.resolvedAttributes
+
+  final def text: String = elem.text
 }
 
 object IndexedElem {
@@ -108,12 +108,12 @@ object IndexedElem {
   /**
    * Creates an IndexedElem with the given underlying element and path.
    */
-  def apply[E <: ElemApi[E] with HasENameApi](elem: E, path: Path): IndexedElem[E] =
+  def apply[E <: ClarkElemApi[E]](elem: E, path: Path): IndexedElem[E] =
     new IndexedElem[E](elem, path)
 
   /**
    * Returns `apply(elem, Path.Root)`.
    */
-  def apply[E <: ElemApi[E] with HasENameApi](elem: E): IndexedElem[E] =
+  def apply[E <: ClarkElemApi[E]](elem: E): IndexedElem[E] =
     apply(elem, Path.Root)
 }
