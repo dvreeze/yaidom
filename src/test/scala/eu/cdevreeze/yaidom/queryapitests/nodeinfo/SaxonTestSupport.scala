@@ -139,13 +139,6 @@ trait SaxonTestSupport {
       childOption
     }
 
-    override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(DomElem, Path.Entry)] = {
-      childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
-        case (entry, idx) =>
-          (children(idx).asInstanceOf[DomElem], entry)
-      }
-    }
-
     /** Returns the text children */
     def textChildren: immutable.IndexedSeq[DomText] = children collect { case t: DomText => t }
 

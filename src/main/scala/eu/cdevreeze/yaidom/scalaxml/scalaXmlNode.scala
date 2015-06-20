@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.scalaxml
 
 import scala.collection.immutable
-import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
@@ -135,13 +134,6 @@ final class ScalaXmlElem(
     result
   }
 
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ScalaXmlElem, Path.Entry)] = {
-    childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
-      case (entry, idx) =>
-        (children(idx).asInstanceOf[ScalaXmlElem], entry)
-    }
-  }
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }
 
@@ -155,28 +147,6 @@ final class ScalaXmlElem(
   override def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
-  }
-
-  private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-    for ((node, idx) <- self.children.zipWithIndex) {
-      node match {
-        case elm: ScalaXmlElem =>
-          val ename = elm.resolvedName
-          val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = Path.Entry(ename, countForName)
-          elementNameCounts.update(ename, countForName + 1)
-          acc += ((entry, idx))
-        case _ => ()
-      }
-    }
-
-    val result = acc.toMap
-    result
   }
 }
 

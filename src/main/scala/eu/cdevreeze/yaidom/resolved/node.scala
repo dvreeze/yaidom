@@ -26,8 +26,6 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 import eu.cdevreeze.yaidom.simple
@@ -185,13 +183,6 @@ final case class Elem(
     withChildren(newChildren)
   }
 
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
-      case (entry, idx) =>
-        (children(idx).asInstanceOf[Elem], entry)
-    }
-  }
-
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 
@@ -334,28 +325,6 @@ final case class Elem(
     }
 
     self.withChildren(resultChildren)
-  }
-
-  private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-    for ((node, idx) <- self.children.zipWithIndex) {
-      node match {
-        case elm: Elem =>
-          val ename = elm.resolvedName
-          val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = Path.Entry(ename, countForName)
-          elementNameCounts.update(ename, countForName + 1)
-          acc += ((entry, idx))
-        case _ => ()
-      }
-    }
-
-    val result = acc.toMap
-    result
   }
 }
 

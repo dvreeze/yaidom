@@ -152,8 +152,6 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
     def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType]
 
-    def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(SelfType, Path.Entry)]
-
     // Extra method
 
     def toElem: eu.cdevreeze.yaidom.simple.Elem
@@ -203,14 +201,6 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
     final def findChildElemByPathEntry(entry: Path.Entry): Option[SpreadsheetElem] =
       bridgeElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
-
-    final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(SpreadsheetElem, Path.Entry)] = {
-      findAllChildElems.zip(bridgeElem.findAllChildElemsWithPathEntries) map {
-        case (che, (wrappedChe, entry)) =>
-          assert(che.bridgeElem == wrappedChe, s"Corrupted child element order")
-          (che, entry)
-      }
-    }
 
     final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
       bridgeElem.rootElem.resolvedName +: bridgeElem.path.entries.map(_.elementName)

@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.dom
 import java.net.URI
 
 import scala.collection.immutable
-import scala.collection.mutable
 
 import org.w3c
 
@@ -177,13 +176,6 @@ final class DomElem(
     result
   }
 
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(DomElem, Path.Entry)] = {
-    childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
-      case (entry, idx) =>
-        (children(idx).asInstanceOf[DomElem], entry)
-    }
-  }
-
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   def attributeScope: Scope = scope.withoutDefaultNamespace
 
@@ -208,33 +200,6 @@ final class DomElem(
     val parentNodeOption = Option(wrappedNode.getParentNode)
     val parentElemOption = parentNodeOption collect { case e: w3c.dom.Element => e }
     parentElemOption map { e => DomNode.wrapElement(e) }
-  }
-
-  private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-    // This implementation is theoretically O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-    val thisScope = scope
-
-    for ((node, idx) <- self.children.zipWithIndex) {
-      node match {
-        case elm: DomElem =>
-          // Avoiding expensive repeated Scope computation, for getting the EName
-          val elmScope = thisScope.resolve(elm.declarations)
-          val ename: EName =
-            elmScope.resolveQNameOption(elm.qname).getOrElse(sys.error(s"Could not resolve QName ${elm.qname} in scope $elmScope"))
-          val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = Path.Entry(ename, countForName)
-          elementNameCounts.update(ename, countForName + 1)
-          acc += ((entry, idx))
-        case _ => ()
-      }
-    }
-
-    val result = acc.toMap
-    result
   }
 }
 

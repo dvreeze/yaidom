@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.indexed.{ Elem => IndexedElem }
+import eu.cdevreeze.yaidom.indexed.{ Elem => IElem }
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
@@ -445,7 +445,7 @@ class ElemLikeTest extends Suite {
 
     assertResult(Set(bookstore)) {
       val paths =
-        IndexedElem(bookstore) filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
+        IElem(bookstore) filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result
@@ -455,7 +455,7 @@ class ElemLikeTest extends Suite {
 
     assertResult(Set(EName(ns, "Author"))) {
       val paths =
-        IndexedElem(bookstore) filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
+        IElem(bookstore) filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result map { e => e.resolvedName }
@@ -469,7 +469,7 @@ class ElemLikeTest extends Suite {
     assertResult(cheapBookAuthorElms.toSet) {
       // Taking cheapBookElm as root! Finding parents of lastNameElms.
       val paths =
-        IndexedElem(cheapBookElm) filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
+        IElem(cheapBookElm) filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => cheapBookElm.getElemOrSelfByPath(path) }
       result
@@ -515,7 +515,8 @@ class ElemLikeTest extends Suite {
       bookstore.findElemOrSelfByPath(path) map { _.trimmedText }
     }
 
-    val bookstoreChildIndexes = bookstore.findAllChildElemsWithPathEntries.map(_._2)
+    val bookstoreChildIndexes =
+      Elem.findAllChildElemsWithPathEntries(bookstore).map(_._2)
 
     assertResult(8) {
       bookstoreChildIndexes.size

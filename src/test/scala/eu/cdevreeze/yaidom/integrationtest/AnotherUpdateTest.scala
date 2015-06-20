@@ -56,7 +56,7 @@ class AnotherUpdateTest extends Suite {
 
     val deleteMags: Elem => Vector[Node] = {
       case elem: Elem if elem.localName == "Magazine" => Vector[Node]()
-      case elem: Elem => Vector(elem)
+      case elem: Elem                                 => Vector(elem)
     }
 
     val docWithoutMags: Document = doc.transformElemsToNodeSeq(deleteMags)
@@ -265,7 +265,7 @@ class AnotherUpdateTest extends Suite {
 
     val insertBook: Elem => Elem = {
       case e: Elem if e.localName == "Bookstore" => e.plusChild(0, newBook)
-      case e: Elem => e
+      case e: Elem                               => e
     }
 
     val docWithScalaBook: Document = {
@@ -375,7 +375,7 @@ class AnotherUpdateTest extends Suite {
       resolved.Elem(elem.transformChildElems(f))
     }
 
-    val expectedResult2 = elem.findAllChildElemsWithPathEntries.map(_._2).reverse.foldLeft(elem) { (acc, pathEntry) =>
+    val expectedResult2 = Elem.findAllChildElemsWithPathEntries(elem).map(_._2).reverse.foldLeft(elem) { (acc, pathEntry) =>
       acc.updated(pathEntry)(f)
     }
 

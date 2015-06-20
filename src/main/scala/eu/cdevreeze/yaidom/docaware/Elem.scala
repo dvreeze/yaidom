@@ -110,14 +110,6 @@ final class Elem private[docaware] (
     childElemOption
   }
 
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    findAllChildElems.zip(elem.findAllChildElemsWithPathEntries) map {
-      case (iche, (che, entry)) =>
-        assert(iche.elem == che, s"Corrupted child element order")
-        (iche, entry)
-    }
-  }
-
   override def qname: QName = elem.qname
 
   override def attributes: immutable.IndexedSeq[(QName, String)] = elem.attributes
@@ -243,7 +235,7 @@ object Elem {
     val baseUri = explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
 
     // Recursive calls
-    val childElems = elem.findAllChildElemsWithPathEntries map {
+    val childElems = simple.Elem.findAllChildElemsWithPathEntries(elem) map {
       case (e, entry) =>
         apply(docUri, baseUri, rootElem, path.append(entry), e)
     }

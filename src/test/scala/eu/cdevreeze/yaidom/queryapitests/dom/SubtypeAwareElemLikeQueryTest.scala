@@ -89,14 +89,6 @@ object SubtypeAwareElemLikeQueryTest {
     final def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType] =
       backingElem.findChildElemByPathEntry(entry).map(e => new BridgeElemTakingDomElem(e))
 
-    final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(SelfType, Path.Entry)] = {
-      findAllChildElems.zip(backingElem.findAllChildElemsWithPathEntries) map {
-        case (iche, (che, entry)) =>
-          assert(iche.backingElem == che, s"Corrupted child element order")
-          (iche, entry)
-      }
-    }
-
     final def toElem: eu.cdevreeze.yaidom.simple.Elem = {
       DomConversions.convertToElem(backingElem.wrappedNode, Scope.Empty)
     }

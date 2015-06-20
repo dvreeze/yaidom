@@ -252,17 +252,6 @@ final class Elem(
   }
 
   /**
-   * Returns all child elements with `Path` entries, in the correct order.
-   * This method is also needed for fast recursive construction of docaware/indexed Elems.
-   */
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    childNodeIndexesByPathEntries.toVector.sortBy(_._2) map {
-      case (entry, idx) =>
-        (children(idx).asInstanceOf[Elem], entry)
-    }
-  }
-
-  /**
    * Creates a copy, altered with the explicitly passed parameters (for qname, attributes, scope and children).
    */
   def copy(
@@ -513,28 +502,6 @@ final class Elem(
       content,
       LineSeq(")")).mkLineSeq.shift(indent)
   }
-
-  private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-    // This implementation is O(n), where n is the number of children, and uses mutable collections for speed
-
-    val elementNameCounts = mutable.Map[EName, Int]()
-    val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-    for ((node, idx) <- self.children.zipWithIndex) {
-      node match {
-        case elm: Elem =>
-          val ename = elm.resolvedName
-          val countForName = elementNameCounts.getOrElse(ename, 0)
-          val entry = Path.Entry(ename, countForName)
-          elementNameCounts.update(ename, countForName + 1)
-          acc += ((entry, idx))
-        case _ => ()
-      }
-    }
-
-    val result = acc.toMap
-    result
-  }
 }
 
 @SerialVersionUID(1L)
@@ -621,6 +588,17 @@ object Elem {
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
+
+  def findAllChildElemsWithPathEntries(elem: Elem): immutable.IndexedSeq[(Elem, Path.Entry)] = {
+    val nextEntries = mutable.Map[EName, Int]()
+
+    elem.findAllChildElems map { e =>
+      val ename = e.resolvedName
+      val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
+      nextEntries.put(ename, entry.index + 1)
+      (e, entry)
+    }
+  }
 }
 
 /**

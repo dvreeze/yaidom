@@ -35,8 +35,7 @@ import eu.cdevreeze.yaidom.core.Path
  * <li>An element knows the <em>child node indexes</em> of the path entries of the child elements.</li>
  * </ul>
  * Obviously methods ``children``, ``withChildren`` and ``childNodeIndex`` must be consistent with
- * methods such as ``findAllChildElems`` and ``findAllChildElemsWithPathEntries``, if the corresponding traits are
- * mixed in.
+ * methods such as ``findAllChildElems``.
  *
  * Using this minimal knowledge alone, trait ``UpdatableElemLike`` not only offers the methods of its parent trait, but also:
  * <ul>

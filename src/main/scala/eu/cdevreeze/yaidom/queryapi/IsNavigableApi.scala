@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.Path
 
 /**
@@ -63,22 +61,4 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
 
   /** Returns (the equivalent of) `findElemOrSelfByPath(path).get` */
   def getElemOrSelfByPath(path: Path): E
-
-  /**
-   * Returns all child elements with Path entries, in the correct order (where this element is the root).
-   * Hence, the Path entries returned are relative to this element as root element.
-   */
-  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
-
-  /**
-   * Returns all descendant-or-self elements with Paths, in the correct order (where this element is the root).
-   * Hence, the Paths returned are relative to this element as root element.
-   */
-  def findAllElemsOrSelfWithPaths: immutable.IndexedSeq[(E, Path)]
-
-  /**
-   * Finds all descendant-or-self elements with the given paths (where this element is the root).
-   * Hence, the given Paths are followed from this element as root element.
-   */
-  def filterElemsOrSelfByPaths(paths: Set[Path]): immutable.IndexedSeq[E]
 }

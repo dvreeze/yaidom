@@ -21,6 +21,7 @@ import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.indexed.IndexedElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
@@ -142,11 +143,14 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
   @Test def testBulkNavigation(): Unit = {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
-    val elemsWithPaths = xbrlInstance.findAllElemsOrSelfWithPaths
+    val indexedInstance = IndexedElem(xbrlInstance)
+
+    val elemsWithPaths =
+      indexedInstance.findAllElemsOrSelf.map(p => (p.elem, p.path))
     val paths = elemsWithPaths.map(_._2)
 
     assertResult(xbrlInstance.findAllElemsOrSelf) {
-      xbrlInstance.filterElemsOrSelfByPaths(paths.toSet)
+      indexedInstance.filterElemsOrSelf(e => paths.toSet.contains(e.path)).map(_.elem)
     }
 
     def isIdentifierPath(p: Path): Boolean = {
@@ -154,7 +158,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     }
 
     assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier"))) {
-      xbrlInstance.filterElemsOrSelfByPaths(paths.filter(isIdentifierPath).toSet)
+      indexedInstance.filterElemsOrSelf(e => paths.filter(isIdentifierPath).toSet.contains(e.path)).map(_.elem)
     }
   }
 

@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.indexed
 
 import scala.collection.immutable
+import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
@@ -102,14 +103,6 @@ final class IndexedElem[E <: NavigableClarkElemApi[E]] private (
   final def findChildElemByPathEntry(entry: Path.Entry): Option[IndexedElem[E]] = {
     findAllChildElems.find(_.path.lastEntry == entry)
   }
-
-  final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(IndexedElem[E], Path.Entry)] = {
-    childElems.zip(elem.findAllChildElemsWithPathEntries) map {
-      case (che, (uche, entry)) =>
-        assert(che.elem == uche)
-        (che, entry)
-    }
-  }
 }
 
 object IndexedElem {
@@ -133,11 +126,22 @@ object IndexedElem {
 
   private def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedElem[E] = {
     // Recursive calls
-    val childElems = elem.findAllChildElemsWithPathEntries map {
+    val childElems = findAllChildElemsWithPathEntries(elem) map {
       case (e, entry) =>
         apply(rootElem, path.append(entry), e)
     }
 
     new IndexedElem(rootElem, childElems, path, elem)
+  }
+
+  private def findAllChildElemsWithPathEntries[E <: NavigableClarkElemApi[E]](elem: E): immutable.IndexedSeq[(E, Path.Entry)] = {
+    val nextEntries = mutable.Map[EName, Int]()
+
+    elem.findAllChildElems map { e =>
+      val ename = e.resolvedName
+      val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
+      nextEntries.put(ename, entry.index + 1)
+      (e, entry)
+    }
   }
 }

@@ -91,14 +91,6 @@ trait AbstractBlogXbrlTestSupport {
     final def findChildElemByPathEntry(entry: Path.Entry): Option[XbrliElem] =
       childElems.find(e => e.localName == entry.elementName.localPart && e.indexedElem.path.lastEntry == entry)
 
-    final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(XbrliElem, Path.Entry)] = {
-      findAllChildElems.zip(indexedElem.findAllChildElemsWithPathEntries) map {
-        case (che, (wrappedChe, entry)) =>
-          assert(che.indexedElem == wrappedChe, s"Corrupted child element order")
-          (che, entry)
-      }
-    }
-
     final override def equals(other: Any): Boolean = other match {
       case e: XbrliElem => indexedElem == e.indexedElem
       case _            => false

@@ -134,14 +134,6 @@ final class Elem private[indexed] (
     childElemOption
   }
 
-  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    findAllChildElems.zip(elem.findAllChildElemsWithPathEntries) map {
-      case (iche, (che, entry)) =>
-        assert(iche.elem == che, s"Corrupted child element order")
-        (iche, entry)
-    }
-  }
-
   override def qname: QName = elem.qname
 
   override def attributes: immutable.IndexedSeq[(QName, String)] = elem.attributes
@@ -225,7 +217,7 @@ object Elem {
 
   private def apply(rootElem: simple.Elem, path: Path, elem: simple.Elem): Elem = {
     // Recursive calls
-    val childElems = elem.findAllChildElemsWithPathEntries map {
+    val childElems = simple.Elem.findAllChildElemsWithPathEntries(elem) map {
       case (e, entry) =>
         apply(rootElem, path.append(entry), e)
     }
