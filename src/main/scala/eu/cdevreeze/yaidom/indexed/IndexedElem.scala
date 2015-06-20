@@ -28,8 +28,8 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
  * It can be used for temporarily indexing underlying element trees (or parts thereof)
  * with Paths, relative to the root element. Therefore these IndexedElem objects
  * can be used for retrieving ancestor or sibling elements, provided the root element
- * is retained. They can also be used to easily find elements that have a given
- * ancestry.
+ * is retained as starting point of "path-based" queries. They can also be used to
+ * easily find elements that have a given ancestry.
  *
  * ==IndexedElem examples==
  *

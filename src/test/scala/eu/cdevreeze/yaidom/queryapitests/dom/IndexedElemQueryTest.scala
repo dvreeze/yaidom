@@ -35,7 +35,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
+import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -45,30 +45,9 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class IndexedElemQueryTest extends AbstractElemLikeQueryTest {
+class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
-  final type E = IndexedElem[DomElem]
-
-  @Test def testQueryTheBookAuthors(): Unit = {
-    require(bookstore.localName == "Bookstore")
-
-    val theBookAuthors =
-      for {
-        author <- bookstore.filterElems(withLocalName("Author"))
-        bookPath <- author.path.findAncestorPath(_.elementNameOption.map(_.localPart) == Some("Book"))
-        book <- bookstore.findElem(_.path == bookPath)
-        if book.getChildElem(withLocalName("Title")).elem.text.startsWith("A First Course in Database Systems")
-      } yield author
-    val elems = bookstore.findAllElemsOrSelf
-
-    assertResult(List("Ullman", "Widom")) {
-      theBookAuthors.map(_.getChildElem(withLocalName("Last_Name")).text)
-    }
-
-    assertResult(List("Jeffrey", "Jennifer")) {
-      theBookAuthors.map(_.getChildElem(withLocalName("First_Name")).text)
-    }
-  }
+  final type U = DomElem
 
   private val book1Builder: ElemBuilder = {
     import NodeBuilder._

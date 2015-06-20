@@ -21,6 +21,12 @@ package eu.cdevreeze.yaidom.queryapi
  * corresponding to James Clark's "labelled element tree" abstraction, which is implemented as yaidom "resolved"
  * elements.
  *
+ * If a yaidom element implementation (whether in yaidom itself or a "yaidom extension")
+ * does not mix in the `ClarkElemApi` trait, it is probably not to be considered "XML".
+ * Indeed, in yaidom only the `ElemBuilder` class does not mix in this trait, and indeed
+ * it is not "XML" (lacking any knowledge about expanded names etc.), only a builder of "XML".
+ * Hence this trait is very important in yaidom, as the "minimal XML element query API".
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
