@@ -20,13 +20,13 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert
-import eu.cdevreeze.yaidom.indexed.IndexedElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
 /**
- * Query test case for Scala XML wrapper elements wrapped in an IndexedElem.
+ * Query test case for Scala XML wrapper elements wrapped in an IndexedClarkElem.
  *
  * @author Chris de Vreeze
  */
@@ -108,7 +108,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
         </Magazine>
       </Bookstore>
 
-    IndexedElem(ScalaXmlElem(scalaElem))
+    IndexedClarkElem(ScalaXmlElem(scalaElem))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.indexed.IndexedElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * Query test case for DOM wrapper elements wrapped in an IndexedElem.
+ * Query test case for DOM wrapper elements wrapped in an IndexedClarkElem.
  *
  * @author Chris de Vreeze
  */
@@ -198,7 +198,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
     val db = dbf.newDocumentBuilder
     val domDoc = db.newDocument()
 
-    IndexedElem(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
+    IndexedClarkElem(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

@@ -23,7 +23,7 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.indexed.IndexedElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 
 /**
- * Query test case for standard Elems wrapped in an IndexedElem.
+ * Query test case for standard Elems wrapped in an IndexedClarkElem.
  *
  * @author Chris de Vreeze
  */
@@ -183,7 +183,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
         children = Vector(
           book1Builder, book2Builder, book3Builder, book4Builder,
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
-    IndexedElem(resultElem)
+    IndexedClarkElem(resultElem)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)

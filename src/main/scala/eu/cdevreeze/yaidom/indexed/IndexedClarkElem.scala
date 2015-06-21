@@ -21,29 +21,27 @@ import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
 
 /**
  * Element implementation that contains an underlying root element, a Path, and an underlying element
  * found from the root element following the Path. It can be used for temporarily indexing underlying
  * element trees (or parts thereof) with Paths, relative to the root element. Therefore these
- * IndexedElem objects can be used for retrieving ancestor or sibling elements. They can also
+ * IndexedClarkElem objects can be used for retrieving ancestor or sibling elements. They can also
  * be used to easily find elements that have a given ancestry.
  *
- * Having an IndexedElem, it is always possible to re-create the root element as IndexedElem, because
- * the underlying root element is always available. On the other hand, creating an IndexedElem
- * is expensive. Class IndexedElem is optimized for fast querying, at the expense of
+ * Having an IndexedClarkElem, it is always possible to re-create the root element as IndexedClarkElem, because
+ * the underlying root element is always available. On the other hand, creating an IndexedClarkElem
+ * is expensive. Class IndexedClarkElem is optimized for fast querying, at the expense of
  * expensive recursive creation.
  *
- * ==IndexedElem examples==
+ * ==IndexedClarkElem examples==
  *
  * The following example code shows how to query for elements with a known ancestry,
  * regardless of the element implementation, if efficiency is not important:
  *
  * {{{
- * val iBookstore = IndexedElem(bookstore)
+ * val iBookstore = IndexedClarkElem(bookstore)
  *
  * val iTheBookAuthors =
  *   for {
@@ -54,13 +52,13 @@ import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
  *   } yield iAuthor
  * }}}
  *
- * ==IndexedElem more formally==
+ * ==IndexedClarkElem more formally==
  *
  * '''In order to use this class, this more formal section can safely be skipped.'''
  *
- * The ``IndexedElem`` class can be understood in a precise <em>mathematical</em> sense, as shown below.
+ * The ``IndexedClarkElem`` class can be understood in a precise <em>mathematical</em> sense, as shown below.
  *
- * Some properties of IndexedElems are as follows:
+ * Some properties of IndexedClarkElems are as follows:
  * {{{
  * // All elements (obtained from querying other elements) have the same rootElem
  *
@@ -71,11 +69,11 @@ import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
  * iElem.findAllElemsOrSelf.forall(e => e.rootElem.findElemOrSelfByPath(e.path).get == e.elem)
  * }}}
  *
- * The correspondence between queries on IndexedElems and the same queries on the underlying elements is as follows:
+ * The correspondence between queries on IndexedClarkElems and the same queries on the underlying elements is as follows:
  * {{{
  * // Let p be a function from underlying element type E to Boolean
  *
- * IndexedElem(rootElem).filterElemsOrSelf(e => p(e.elem)).map(_.elem) ==
+ * IndexedClarkElem(rootElem).filterElemsOrSelf(e => p(e.elem)).map(_.elem) ==
  *   rootElem.filterElemsOrSelf(p)
  * }}}
  *
@@ -85,38 +83,27 @@ import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
  *
  * @author Chris de Vreeze
  */
-final class IndexedElem[E <: NavigableClarkElemApi[E]] private (
+final class IndexedClarkElem[E <: NavigableClarkElemApi[E]] private (
   val rootElem: E,
-  childElems: immutable.IndexedSeq[IndexedElem[E]],
+  childElems: immutable.IndexedSeq[IndexedClarkElem[E]],
   val path: Path,
-  val elem: E) extends ClarkElemLike[IndexedElem[E]] with IsNavigable[IndexedElem[E]] {
+  val elem: E) extends IndexedElemLike[IndexedClarkElem[E], E] {
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedElem[E]] = childElems
-
-  final def resolvedName: EName = elem.resolvedName
-
-  final def resolvedAttributes: immutable.Iterable[(EName, String)] =
-    elem.resolvedAttributes
-
-  final def text: String = elem.text
-
-  final def findChildElemByPathEntry(entry: Path.Entry): Option[IndexedElem[E]] = {
-    findAllChildElems.find(_.path.lastEntry == entry)
-  }
+  final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[E]] = childElems
 }
 
-object IndexedElem {
+object IndexedClarkElem {
 
   /**
    * Returns the same as `apply(rootElem, Path.Root)`.
    */
-  def apply[E <: NavigableClarkElemApi[E]](rootElem: E): IndexedElem[E] =
+  def apply[E <: NavigableClarkElemApi[E]](rootElem: E): IndexedClarkElem[E] =
     apply(rootElem, Path.Root)
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path): IndexedElem[E] = {
+  def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path): IndexedClarkElem[E] = {
     // Expensive call, so invoked only once
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
@@ -124,17 +111,17 @@ object IndexedElem {
     apply(rootElem, path, elem)
   }
 
-  private def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedElem[E] = {
+  private def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedClarkElem[E] = {
     // Recursive calls
     val childElems = findAllChildElemsWithPathEntries(elem) map {
       case (e, entry) =>
         apply(rootElem, path.append(entry), e)
     }
 
-    new IndexedElem(rootElem, childElems, path, elem)
+    new IndexedClarkElem(rootElem, childElems, path, elem)
   }
 
-  private def findAllChildElemsWithPathEntries[E <: NavigableClarkElemApi[E]](elem: E): immutable.IndexedSeq[(E, Path.Entry)] = {
+  private def findAllChildElemsWithPathEntries[U <: NavigableClarkElemApi[U]](elem: U): immutable.IndexedSeq[(U, Path.Entry)] = {
     val nextEntries = mutable.Map[EName, Int]()
 
     elem.findAllChildElems map { e =>

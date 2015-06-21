@@ -21,7 +21,7 @@ import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.indexed.IndexedElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
@@ -143,7 +143,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
   @Test def testBulkNavigation(): Unit = {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
-    val indexedInstance = IndexedElem(xbrlInstance)
+    val indexedInstance = IndexedClarkElem(xbrlInstance)
 
     val elemsWithPaths =
       indexedInstance.findAllElemsOrSelf.map(p => (p.elem, p.path))

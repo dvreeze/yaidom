@@ -21,13 +21,13 @@ import scala.collection.immutable
 import org.junit.Test
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.indexed.IndexedElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 
 /**
- * ElemLike-based query test case, taking an IndexedElem.
+ * ElemLike-based query test case, taking an IndexedClarkElem.
  *
  * @author Chris de Vreeze
  */
@@ -35,7 +35,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
   type U <: NavigableClarkElemApi[U]
 
-  final override type E = IndexedElem[U]
+  final override type E = IndexedClarkElem[U]
 
   @Test def testQueryTheBookAuthors(): Unit = {
     require(bookstore.localName == "Bookstore")
