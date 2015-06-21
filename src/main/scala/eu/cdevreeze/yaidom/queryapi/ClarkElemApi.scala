@@ -16,8 +16,12 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.Path
+
 /**
- * Shorthand for `ElemApi[E] with HasENameApi with HasTextApi`. In other words, the minimal element query API
+ * Shorthand for `ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi`. In other words, the minimal element query API
  * corresponding to James Clark's "labelled element tree" abstraction, which is implemented as yaidom "resolved"
  * elements.
  *
@@ -31,5 +35,7 @@ package eu.cdevreeze.yaidom.queryapi
  *
  * @author Chris de Vreeze
  */
-trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with HasENameApi with HasTextApi { self: E =>
+trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi { self: E =>
+
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 }

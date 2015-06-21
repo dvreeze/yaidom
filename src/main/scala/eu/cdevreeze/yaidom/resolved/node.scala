@@ -155,16 +155,6 @@ final case class Elem(
     new Elem(resolvedName, resolvedAttributes, newChildren)
   }
 
-  override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    val result =
-      childNodeIndex(entry) match {
-        case -1  => None
-        case idx => Some(children(idx).asInstanceOf[Elem])
-      }
-    assert(result.forall(_.resolvedName == entry.elementName))
-    result
-  }
-
   override def transformChildElems(f: Elem => Elem): Elem = {
     val newChildren =
       children map {

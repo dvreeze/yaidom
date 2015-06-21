@@ -25,7 +25,6 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.simple
 
@@ -76,7 +75,7 @@ final class Elem private[docaware] (
   val rootElem: simple.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: simple.Elem) extends ScopedElemLike[Elem] with IsNavigable[Elem] with Immutable {
+  val elem: simple.Elem) extends ScopedElemLike[Elem] with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -101,14 +100,6 @@ final class Elem private[docaware] (
   override def resolvedName: EName = elem.resolvedName
 
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
-
-  override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    val filteredChildElems = childElems.toStream filter { e => e.resolvedName == entry.elementName }
-
-    val childElemOption = filteredChildElems.drop(entry.index).headOption
-    assert(childElemOption.forall(_.resolvedName == entry.elementName))
-    childElemOption
-  }
 
   override def qname: QName = elem.qname
 
@@ -235,7 +226,7 @@ object Elem {
     val baseUri = explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
 
     // Recursive calls
-    val childElems = simple.Elem.findAllChildElemsWithPathEntries(elem) map {
+    val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
         apply(docUri, baseUri, rootElem, path.append(entry), e)
     }

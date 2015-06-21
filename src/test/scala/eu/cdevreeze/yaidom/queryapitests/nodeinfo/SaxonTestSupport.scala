@@ -31,7 +31,6 @@ import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AxisInfo
@@ -102,7 +101,7 @@ trait SaxonTestSupport {
   }
 
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ScopedElemLike[DomElem] with IsNavigable[DomElem] with HasParent[DomElem] { self =>
+    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
@@ -127,16 +126,6 @@ trait SaxonTestSupport {
       val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
       nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
-    }
-
-    override def findChildElemByPathEntry(entry: Path.Entry): Option[DomElem] = {
-      val filteredChildren = findAllChildElems.toStream filter {
-        case e: DomElem if e.resolvedName == entry.elementName => true
-        case _ => false
-      }
-
-      val childOption = filteredChildren.drop(entry.index).headOption
-      childOption
     }
 
     /** Returns the text children */

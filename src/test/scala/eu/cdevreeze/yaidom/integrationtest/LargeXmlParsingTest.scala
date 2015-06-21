@@ -34,9 +34,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.resolved
 
 /**
@@ -147,7 +145,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement)
   }
 
-  private def doQueryTest[E <: ElemLike[E] with HasEName with HasText](elm: E): Unit = {
+  private def doQueryTest[E <: ClarkElemLike[E]](elm: E): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")

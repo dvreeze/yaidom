@@ -17,11 +17,9 @@
 package eu.cdevreeze.yaidom.indexed
 
 import scala.collection.immutable
-import scala.collection.mutable
 
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
 /**
  * Element implementation that contains an underlying root element, a Path, and an underlying element
@@ -83,11 +81,11 @@ import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
  *
  * @author Chris de Vreeze
  */
-final class IndexedClarkElem[E <: NavigableClarkElemApi[E]] private (
+final class IndexedClarkElem[E <: ClarkElemApi[E]] private (
   val rootElem: E,
   childElems: immutable.IndexedSeq[IndexedClarkElem[E]],
   val path: Path,
-  val elem: E) extends IndexedElemLike[IndexedClarkElem[E], E] {
+  val elem: E) extends IndexedClarkElemLike[IndexedClarkElem[E], E] {
 
   final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[E]] = childElems
 }
@@ -97,13 +95,13 @@ object IndexedClarkElem {
   /**
    * Returns the same as `apply(rootElem, Path.Root)`.
    */
-  def apply[E <: NavigableClarkElemApi[E]](rootElem: E): IndexedClarkElem[E] =
+  def apply[E <: ClarkElemApi[E]](rootElem: E): IndexedClarkElem[E] =
     apply(rootElem, Path.Root)
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path): IndexedClarkElem[E] = {
+  def apply[E <: ClarkElemApi[E]](rootElem: E, path: Path): IndexedClarkElem[E] = {
     // Expensive call, so invoked only once
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
@@ -111,24 +109,13 @@ object IndexedClarkElem {
     apply(rootElem, path, elem)
   }
 
-  private def apply[E <: NavigableClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedClarkElem[E] = {
+  private def apply[E <: ClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedClarkElem[E] = {
     // Recursive calls
-    val childElems = findAllChildElemsWithPathEntries(elem) map {
+    val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
         apply(rootElem, path.append(entry), e)
     }
 
     new IndexedClarkElem(rootElem, childElems, path, elem)
-  }
-
-  private def findAllChildElemsWithPathEntries[U <: NavigableClarkElemApi[U]](elem: U): immutable.IndexedSeq[(U, Path.Entry)] = {
-    val nextEntries = mutable.Map[EName, Int]()
-
-    elem.findAllChildElems map { e =>
-      val ename = e.resolvedName
-      val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
-      nextEntries.put(ename, entry.index + 1)
-      (e, entry)
-    }
   }
 }

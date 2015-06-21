@@ -26,7 +26,6 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 
 /**
  * ElemLike-based query test case, using an XBRL instance as sample data.
@@ -35,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
  */
 abstract class AbstractXbrlInstanceQueryTest extends Suite {
 
-  type E <: ClarkElemLike[E] with IsNavigableApi[E]
+  type E <: ClarkElemLike[E]
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
   private val LinkNs = "http://www.xbrl.org/2003/linkbase"

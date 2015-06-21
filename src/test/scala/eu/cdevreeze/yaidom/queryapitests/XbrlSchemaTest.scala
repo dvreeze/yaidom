@@ -28,8 +28,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
-import eu.cdevreeze.yaidom.queryapi.HasEName
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 
 /**
@@ -185,7 +184,7 @@ object XbrlSchemaTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase"
   val nsXLink = "http://www.w3.org/1999/xlink"
 
-  class XsdElem(val wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with HasEName with IsNavigable[XsdElem] {
+  class XsdElem(val wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with ClarkElemLike[XsdElem] {
 
     override def findAllChildElems: immutable.IndexedSeq[XsdElem] =
       wrappedElem.findAllChildElems.map(e => XsdElem(e))
@@ -194,8 +193,7 @@ object XbrlSchemaTest {
 
     override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = wrappedElem.resolvedAttributes
 
-    override def findChildElemByPathEntry(entry: Path.Entry): Option[XsdElem] =
-      wrappedElem.findChildElemByPathEntry(entry).map(elem => XsdElem(elem))
+    override def text: String = wrappedElem.text
   }
 
   final class XsdRootElem(wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends XsdElem(wrappedElem) {

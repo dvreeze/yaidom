@@ -26,7 +26,6 @@ import org.scalatest.Suite
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
 /**
@@ -39,9 +38,9 @@ abstract class AbstractXmlBaseTest extends Suite {
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"
 
-  type E <: ScopedElemApi[E] with IsNavigableApi[E]
+  type E <: ScopedElemApi[E]
 
-  type E2 <: ScopedElemApi[E2] with IsNavigableApi[E2]
+  type E2 <: ScopedElemApi[E2]
 
   protected def getDocument(path: String, docUri: URI): DocumentApi[E]
 

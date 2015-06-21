@@ -24,6 +24,8 @@ import scala.util.Try
 import org.scalatest.FunSuite
 import testtag.PerformanceTest
 import AbstractMemoryUsageSuite._
+import eu.cdevreeze.yaidom.core._
+import eu.cdevreeze.yaidom.queryapi._
 
 /**
  * Abstract memory usage suite super-class, for different yaidom element types.
@@ -41,7 +43,7 @@ import AbstractMemoryUsageSuite._
  */
 abstract class AbstractMemoryUsageSuite extends FunSuite {
 
-  type E <: ElemLike[E] with HasEName with HasText
+  type E <: ClarkElemLike[E]
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.perftest")
 

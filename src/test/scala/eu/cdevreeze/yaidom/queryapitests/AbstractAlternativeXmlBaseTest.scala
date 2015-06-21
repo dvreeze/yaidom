@@ -29,7 +29,6 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom
 
@@ -50,9 +49,9 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
   private val XLinkNs = "http://www.w3.org/1999/xlink"
   private val XLinkHrefEName = EName(XLinkNs, "href")
 
-  type E <: ScopedElemApi[E] with IsNavigableApi[E]
+  type E <: ScopedElemApi[E]
 
-  type E2 <: ScopedElemApi[E2] with IsNavigableApi[E2]
+  type E2 <: ScopedElemApi[E2]
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E]
 

@@ -26,9 +26,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ElemApi
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import AbstractSubtypeAwareElemLikeQueryTest._
@@ -106,7 +104,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
   val TextNs = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 
   /**
-   * Bridge element that enables the `ScopedElemLike with IsNavigableLike` API on the classes delegating to this bridge element.
+   * Bridge element that enables the `ScopedElemLike` API on the classes delegating to this bridge element.
    *
    * It offers pluggable DOM-like element implementations, without any "type gymnastics" and without paying any
    * "cake pattern tax".
@@ -169,7 +167,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     /**
      * The unwrapped backing element type, for example `simple.Elem`
      */
-    type UnwrappedBackingElem <: ElemApi[UnwrappedBackingElem] with HasENameApi
+    type UnwrappedBackingElem <: ClarkElemApi[UnwrappedBackingElem]
 
     def rootElem: UnwrappedBackingElem
 
@@ -182,7 +180,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    * Super-class of elements in an ODS spreadsheet content.xml file. It offers the `SubtypeAwareElemApi` API, among
    * other query API traits.
    */
-  sealed class SpreadsheetElem(val bridgeElem: IndexedBridgeElem) extends ScopedElemLike[SpreadsheetElem] with IsNavigable[SpreadsheetElem] with SubtypeAwareElemLike[SpreadsheetElem] {
+  sealed class SpreadsheetElem(val bridgeElem: IndexedBridgeElem) extends ScopedElemLike[SpreadsheetElem] with SubtypeAwareElemLike[SpreadsheetElem] {
 
     final def findAllChildElems: immutable.IndexedSeq[SpreadsheetElem] =
       bridgeElem.findAllChildElems.map(e => SpreadsheetElem(e))
@@ -198,9 +196,6 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     final def scope: Scope = bridgeElem.scope
 
     final def text: String = bridgeElem.text
-
-    final def findChildElemByPathEntry(entry: Path.Entry): Option[SpreadsheetElem] =
-      bridgeElem.findChildElemByPathEntry(entry).map(e => SpreadsheetElem(e))
 
     final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
       bridgeElem.rootElem.resolvedName +: bridgeElem.path.entries.map(_.elementName)

@@ -23,6 +23,11 @@ import scala.util.Try
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.parse._
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.simple.Node
 
 /**
  * Concrete AbstractMemoryUsageSuite sub-class using "indexed" yaidom Elems.

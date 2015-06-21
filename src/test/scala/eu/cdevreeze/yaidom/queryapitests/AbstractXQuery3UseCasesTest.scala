@@ -25,7 +25,6 @@ import org.scalatest.Suite
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
@@ -43,7 +42,7 @@ import eu.cdevreeze.yaidom.simple.Node
  */
 abstract class AbstractXQuery3UseCasesTest extends Suite {
 
-  type E <: ScopedElemLike[E] with IsNavigable[E]
+  type E <: ScopedElemLike[E]
 
   protected val ns = "http://www.w3.org/TR/xquery-30-use-cases/"
 

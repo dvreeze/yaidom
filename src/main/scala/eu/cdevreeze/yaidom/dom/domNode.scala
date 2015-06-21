@@ -24,16 +24,12 @@ import org.w3c
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
-import eu.cdevreeze.yaidom.convert.DomConversions.toQName
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
@@ -115,7 +111,7 @@ final class DomDocument(
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ScopedElemLike[DomElem] with IsNavigable[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -156,24 +152,6 @@ final class DomElem(
           accScope.resolve(decls)
       }
     resultScope
-  }
-
-  override def findChildElemByPathEntry(entry: Path.Entry): Option[DomElem] = {
-    import DomConversions._
-
-    // Expensive scope only computed once, for acceptable performance
-    val sc = scope
-    val childNodes = nodeListToIndexedSeq(wrappedNode.getChildNodes)
-
-    val filteredChildren = childNodes.toStream filter {
-      case e: w3c.dom.Element if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
-      case _ => false
-    }
-
-    val childOption = filteredChildren.drop(entry.index).headOption
-    val result = childOption.map(ch => DomElem(ch.asInstanceOf[w3c.dom.Element]))
-    assert(result.forall(_.resolvedName == entry.elementName))
-    result
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */

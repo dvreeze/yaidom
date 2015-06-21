@@ -25,7 +25,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
@@ -35,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractI18nQueryTest extends Suite {
 
-  type E <: ScopedElemLike[E] with IsNavigable[E]
+  type E <: ScopedElemLike[E]
 
   @Test def testI18n(): Unit = {
     val facts = rootElem.filterChildElems(e => e.qname.prefixOption == Some("tx"))

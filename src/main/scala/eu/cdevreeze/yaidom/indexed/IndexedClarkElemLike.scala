@@ -16,33 +16,35 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
-import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 
 /**
- * Abstract API for "indexed elements".
+ * Partial implementation of the abstract API for "indexed elements".
  *
  * @tparam E The element type itself
  * @tparam U The underlying element type
  *
  * @author Chris de Vreeze
  */
-trait IndexedElemApi[E <: IndexedElemApi[E, U], U <: NavigableClarkElemApi[U]] extends ClarkElemApi[E] with IsNavigableApi[E] { self: E =>
+trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]] extends IndexedClarkElemApi[E, U] with ClarkElemLike[E] { self: E =>
 
-  /**
-   * The root element of the underlying element type
-   */
   def rootElem: U
 
-  /**
-   * The path of this element, relative to the root element
-   */
   def path: Path
 
-  /**
-   * The underlying element, of the underlying element type
-   */
   def elem: U
+
+  def findAllChildElems: immutable.IndexedSeq[E]
+
+  final def resolvedName: EName = elem.resolvedName
+
+  final def resolvedAttributes: immutable.Iterable[(EName, String)] =
+    elem.resolvedAttributes
+
+  final def text: String = elem.text
 }

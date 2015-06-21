@@ -20,12 +20,9 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.toQName
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
@@ -74,7 +71,7 @@ sealed trait ScalaXmlNode {
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ScopedElemLike[ScalaXmlElem] with IsNavigable[ScalaXmlElem] { self =>
+  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with ScopedElemLike[ScalaXmlElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -116,23 +113,6 @@ final class ScalaXmlElem(
    * Returns the scope of the element. Note that there is no guarantee that this scope is complete!
    */
   override def scope: Scope = ScalaXmlConversions.extractScope(wrappedNode.scope)
-
-  override def findChildElemByPathEntry(entry: Path.Entry): Option[ScalaXmlElem] = {
-    import ScalaXmlConversions._
-
-    // Scope only computed once, for acceptable performance
-    val sc = scope
-
-    val filteredChildren = wrappedNode.child.toStream filter {
-      case e: scala.xml.Elem if sc.resolveQNameOption(toQName(e)).getOrElse(sys.error(s"Corrupt! Unresolved ${toQName(e)}")) == entry.elementName => true
-      case _ => false
-    }
-
-    val childOption = filteredChildren.drop(entry.index).headOption
-    val result = childOption.map(ch => ScalaXmlElem(ch.asInstanceOf[scala.xml.Elem]))
-    assert(result.forall(_.resolvedName == entry.elementName))
-    result
-  }
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[ScalaXmlText] = children collect { case t: ScalaXmlText => t }

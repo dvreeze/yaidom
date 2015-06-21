@@ -16,40 +16,34 @@
 
 package eu.cdevreeze.yaidom.indexed
 
-import scala.collection.immutable
-
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
-import eu.cdevreeze.yaidom.queryapi.NavigableClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
 /**
- * Partial implementation of the abstract API for "indexed elements".
+ * Abstract API for "indexed elements".
  *
  * @tparam E The element type itself
  * @tparam U The underlying element type
  *
  * @author Chris de Vreeze
  */
-trait IndexedElemLike[E <: IndexedElemLike[E, U], U <: NavigableClarkElemApi[U]] extends IndexedElemApi[E, U] with ClarkElemLike[E] with IsNavigable[E] { self: E =>
+trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] extends ClarkElemApi[E] { self: E =>
 
+  /**
+   * The root element of the underlying element type
+   */
   def rootElem: U
 
+  /**
+   * The path of this element, relative to the root element
+   */
   def path: Path
 
+  /**
+   * The underlying element, of the underlying element type. It must be equal to:
+   * {{{
+   * rootElem.getElemOrSelfByPath(path)
+   * }}}
+   */
   def elem: U
-
-  def findAllChildElems: immutable.IndexedSeq[E]
-
-  final def resolvedName: EName = elem.resolvedName
-
-  final def resolvedAttributes: immutable.Iterable[(EName, String)] =
-    elem.resolvedAttributes
-
-  final def text: String = elem.text
-
-  final def findChildElemByPathEntry(entry: Path.Entry): Option[E] = {
-    findAllChildElems.find(_.path.lastEntry == entry)
-  }
 }

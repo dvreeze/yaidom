@@ -26,7 +26,6 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.indexed
@@ -67,7 +66,7 @@ trait AbstractBlogXbrlTestSupport {
    */
   sealed class XbrliElem private[blogcode] (
     val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends ScopedElemLike[XbrliElem] with IsNavigable[XbrliElem] with SubtypeAwareElemLike[XbrliElem] {
+    childElems: immutable.IndexedSeq[XbrliElem]) extends ScopedElemLike[XbrliElem] with SubtypeAwareElemLike[XbrliElem] {
 
     require(childElems.map(_.indexedElem) == indexedElem.findAllChildElems)
 
@@ -87,9 +86,6 @@ trait AbstractBlogXbrlTestSupport {
     final def scope: Scope = indexedElem.scope
 
     final def text: String = indexedElem.text
-
-    final def findChildElemByPathEntry(entry: Path.Entry): Option[XbrliElem] =
-      childElems.find(e => e.localName == entry.elementName.localPart && e.indexedElem.path.lastEntry == entry)
 
     final override def equals(other: Any): Boolean = other match {
       case e: XbrliElem => indexedElem == e.indexedElem

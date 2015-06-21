@@ -223,16 +223,6 @@ final class Elem(
     copy(children = newChildren)
   }
 
-  override def findChildElemByPathEntry(entry: Path.Entry): Option[Elem] = {
-    val result =
-      childNodeIndex(entry) match {
-        case -1  => None
-        case idx => Some(children(idx).asInstanceOf[Elem])
-      }
-    assert(result.forall(_.resolvedName == entry.elementName))
-    result
-  }
-
   override def transformChildElems(f: Elem => Elem): Elem = {
     val newChildren =
       children map {
@@ -588,17 +578,6 @@ object Elem {
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
-
-  def findAllChildElemsWithPathEntries(elem: Elem): immutable.IndexedSeq[(Elem, Path.Entry)] = {
-    val nextEntries = mutable.Map[EName, Int]()
-
-    elem.findAllChildElems map { e =>
-      val ename = e.resolvedName
-      val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
-      nextEntries.put(ename, entry.index + 1)
-      (e, entry)
-    }
-  }
 }
 
 /**

@@ -48,13 +48,4 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-package object queryapi {
-
-  type NavigableClarkElemApi[E <: NavigableClarkElemApi[E]] = ClarkElemApi[E] with IsNavigableApi[E]
-
-  type NavigableClarkElemLike[E <: NavigableClarkElemLike[E]] = NavigableClarkElemApi[E] with ClarkElemLike[E] with IsNavigable[E]
-
-  type NavigableScopedElemApi[E <: NavigableScopedElemApi[E]] = ScopedElemApi[E] with IsNavigableApi[E]
-
-  type NavigableScopedElemLike[E <: NavigableScopedElemLike[E]] = NavigableScopedElemApi[E] with ScopedElemLike[E] with IsNavigable[E]
-}
+package object queryapi

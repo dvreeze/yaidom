@@ -25,7 +25,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
@@ -35,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractScopedElemLikeQueryTest extends Suite {
 
-  type E <: ScopedElemLike[E] with IsNavigable[E]
+  type E <: ScopedElemLike[E]
 
   val XsNamespace = "http://www.w3.org/2001/XMLSchema"
 

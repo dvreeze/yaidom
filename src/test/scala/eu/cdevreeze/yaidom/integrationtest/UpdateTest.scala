@@ -36,8 +36,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.Text
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
@@ -299,12 +298,12 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def attrNames[N, E <: N with ElemLike[E] with HasEName with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+  private def attrNames[N, E <: N with ClarkElemLike[E] with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
     result.toSet
   }
 
-  private def elemNames[N, E <: N with ElemLike[E] with HasEName with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+  private def elemNames[N, E <: N with ClarkElemLike[E] with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf map { e => e.resolvedName }
     result.toSet
   }

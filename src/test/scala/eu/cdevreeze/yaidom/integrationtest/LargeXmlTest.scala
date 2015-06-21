@@ -42,11 +42,8 @@ import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.ElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
+import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.queryapi.HasText
-import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.DocBuilder
@@ -501,7 +498,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doNavigationTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
-  private def doQueryTest[E <: ElemLike[E] with HasEName with HasText](elm: E, msg: String): Unit = {
+  private def doQueryTest[E <: ClarkElemLike[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -519,7 +516,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms ($msg)")
   }
 
-  private def doNavigationTest[E <: ElemLike[E] with HasEName with HasText with IsNavigable[E]](elm: E, msg: String): Unit = {
+  private def doNavigationTest[E <: ClarkElemLike[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
