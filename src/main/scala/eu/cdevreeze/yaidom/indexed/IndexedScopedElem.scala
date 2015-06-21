@@ -40,6 +40,17 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
+  /**
+   * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
+   * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this
+   * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
+   * class, it can be reasoned that these assertions must hold.)
+   */
+  private[yaidom] def assertConsistency(): Unit = {
+    assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
+    assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
+  }
+
   final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = childElems
 
   final override def equals(obj: Any): Boolean = obj match {

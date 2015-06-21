@@ -24,16 +24,27 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
 /**
- * Element implementation that contains an underlying root element, a Path, and an underlying element
- * found from the root element following the Path. It can be used for temporarily indexing underlying
- * element trees (or parts thereof) with Paths, relative to the root element. Therefore these
- * IndexedClarkElem objects can be used for retrieving ancestor or sibling elements. They can also
- * be used to easily find elements that have a given ancestry.
+ * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
+ * and a path (from that root element) to this element. More precisely, this element implementation contains an underlying root element,
+ * a Path, and an underlying element found from the root element following the Path.
+ *
+ * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
+ *
+ * An `IndexedClarkElem(rootElem)` can be seen as one '''immutable snapshot''' of an XML tree. All queries (using the `ElemApi` uniform
+ * query API) on that snapshot return results within the same snapshot. Take care not to mix up query results from different
+ * snapshots. (This could have been modeled in an alternative design of the class, using a member type, but such a design has
+ * not been chosen.)
+ *
+ * Using IndexedClarkElem objects, it is easy to get the ancestry or siblings of an element, as elements of the underlying element type.
+ *
+ * Be careful not to create any '''memory leaks'''. After all, an element, even a leaf element, typically keeps the entire underlying
+ * document element tree as state. Hence the underlying document element tree will always remain in memory if at least
+ * one indexed element contains it in its state. (Yet with mutable org.w3c.dom element trees, it is also easy to cause
+ * memory leaks. See http://apmblog.compuware.com/2011/04/20/the-top-java-memory-problems-part-1/.)
  *
  * Having an IndexedClarkElem, it is always possible to re-create the root element as IndexedClarkElem, because
- * the underlying root element is always available. On the other hand, creating an IndexedClarkElem
- * is expensive. Class IndexedClarkElem is optimized for fast querying, at the expense of
- * expensive recursive creation.
+ * the underlying root element is always available. On the other hand, creating an IndexedClarkElem is expensive. Class
+ * IndexedClarkElem is optimized for fast querying, at the expense of expensive recursive creation.
  *
  * ==IndexedClarkElem examples==
  *
@@ -90,6 +101,17 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   val elem: U) extends IndexedClarkElemLike[IndexedClarkElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
+
+  /**
+   * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
+   * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this
+   * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
+   * class, it can be reasoned that these assertions must hold.)
+   */
+  private[yaidom] def assertConsistency(): Unit = {
+    assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
+    assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
+  }
 
   final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = childElems
 

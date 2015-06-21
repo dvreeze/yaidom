@@ -16,140 +16,27 @@
 
 package eu.cdevreeze.yaidom.indexed
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.simple
 
 /**
- * An element within its context. In other words, an element as a pair containing the root element (as [[eu.cdevreeze.yaidom.simple.Elem]])
- * and a path (from that root element) to this element.
- *
- * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
- *
- * An `indexed.Elem(rootElem)` can be seen as one '''immutable snapshot''' of an XML tree. All queries (using the `ElemApi` uniform
- * query API) on that snapshot return results within the same snapshot. Take care not to mix up query results from different
- * snapshots. (This could have been modeled in an alternative design of the class, using a member type, but such a design has
- * not been chosen.)
- *
- * Be careful not to create any '''memory leaks'''. After all, an element, even a leaf element, typically keeps the entire underlying
- * document element tree as state. Hence the underlying document element tree will always remain in memory if at least
- * one indexed element contains it in its state. (Yet with mutable org.w3c.dom element trees, it is also easy to cause
- * memory leaks. See http://apmblog.compuware.com/2011/04/20/the-top-java-memory-problems-part-1/.)
- *
- * ==Example==
- *
- * Below follows an example. This example queries for all book elements having at least Jeffrey Ullman as author. It can be written as follows,
- * assuming a book store `Document` with the appropriate structure:
- * {{{
- * val bookstoreElm = indexed.Document(doc).documentElement
- * require(bookstoreElm.localName == "Bookstore")
- *
- * val ullmanBookElms =
- *   for {
- *     authorElm <- bookstoreElm filterElems { e =>
- *       (e.localName == "Author") &&
- *       ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
- *       ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
- *     }
- *     bookElm <- authorElm.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { path =>
- *       bookstoreElm.getElemOrSelfByPath(path)
- *     }
- *   } yield bookElm
- * }}}
- *
- * Note how we found an ancestor (Book) element of an Author element by first finding the appropriate ancestor path, and then
- * querying the bookstore element for the element at that path. So we remembered the document element (as indexed element),
- * and used that "snapshot" to navigate to elements at given ancestor paths of other elements. This is certainly more efficient
- * than re-indexing (using an indexed element factory method).
- *
- * ==Elem more formally==
- *
- * '''In order to get started using the class, this more formal section can safely be skipped. On the other hand, this section
- * may provide a deeper understanding of the class.'''
- *
- * Let `indexedRootElem` be a root element, so `indexedRootElem.path == Path.Root`.
- *
- * Then, first of all, we have:
- * {{{
- * indexedRootElem.elem == indexedRootElem.rootElem
- * }}}
- *
- * Given:
- * {{{
- * val elems = indexedRootElem.findAllElemsOrSelf
- * }}}
- * the following (rather obvious) properties hold for indexed elements:
- * {{{
- * elems forall (e => e.rootElem == indexedRootElem.rootElem)
- *
- * elems forall { e => e.rootElem.findElemOrSelfByPath(e.path) == Some(e.elem) }
- * }}}
- *
- * The properties above hold for `findAllElemsOrSelf`, so they certainly hold for the other child/descendant/descendant-or-self
- * element query methods.
+ * Factory object for `Elem` instances, where `Elem` is a type alias for `IndexedScopedElem[simple.Elem]`.
  *
  * @author Chris de Vreeze
  */
-final class Elem private[indexed] (
-  val rootElem: simple.Elem,
-  childElems: immutable.IndexedSeq[Elem],
-  val path: Path,
-  val elem: simple.Elem) extends IndexedScopedElemLike[Elem, simple.Elem] with Immutable {
-
-  /**
-   * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
-   * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this
-   * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
-   * class, it can be reasoned that these assertions must hold.)
-   */
-  private[yaidom] def assertConsistency(): Unit = {
-    assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
-    assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
-  }
-
-  /**
-   * Returns all child elements, in the correct order.
-   *
-   * These child elements share the same rootElem with this element, but differ in the paths, which have one more
-   * "path entry".
-   */
-  override def findAllChildElems: immutable.IndexedSeq[Elem] = childElems
-
-  override def equals(obj: Any): Boolean = obj match {
-    case other: Elem => (other.rootElem == this.rootElem) && (other.path == this.path)
-    case _           => false
-  }
-
-  override def hashCode: Int = (rootElem, path).hashCode
-}
-
 object Elem {
 
   /**
-   * Calls `apply(rootElem, Path.Root)`
+   * Calls `IndexedScopedElem[simple.Elem](rootElem)`
    */
   def apply(rootElem: simple.Elem): Elem = {
-    apply(rootElem, Path.Root)
+    IndexedScopedElem[simple.Elem](rootElem)
   }
 
   /**
-   * Expensive recursive factory method for "indexed elements".
+   * Calls `IndexedScopedElem[simple.Elem](rootElem, path)`
    */
   def apply(rootElem: simple.Elem, path: Path): Elem = {
-    // Expensive call, so invoked only once
-    val elem = rootElem.getElemOrSelfByPath(path)
-
-    apply(rootElem, path, elem)
-  }
-
-  private def apply(rootElem: simple.Elem, path: Path, elem: simple.Elem): Elem = {
-    // Recursive calls
-    val childElems = elem.findAllChildElemsWithPathEntries map {
-      case (e, entry) =>
-        apply(rootElem, path.append(entry), e)
-    }
-
-    new Elem(rootElem, childElems, path, elem)
+    IndexedScopedElem[simple.Elem](rootElem, path)
   }
 }

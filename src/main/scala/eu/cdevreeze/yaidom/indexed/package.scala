@@ -43,4 +43,7 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-package object indexed
+package object indexed {
+
+  type Elem = IndexedScopedElem[simple.Elem]
+}
