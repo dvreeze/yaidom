@@ -167,28 +167,6 @@ trait SaxonTestSupport {
 
       Scope.from(resultMap - "xml")
     }
-
-    private def childNodeIndexesByPathEntries: Map[Path.Entry, Int] = {
-      // This implementation is theoretically O(n), where n is the number of children, and uses mutable collections for speed
-
-      val elementNameCounts = mutable.Map[EName, Int]()
-      val acc = mutable.ArrayBuffer[(Path.Entry, Int)]()
-
-      for ((node, idx) <- self.children.zipWithIndex) {
-        node match {
-          case elm: DomElem =>
-            val ename = elm.resolvedName
-            val countForName = elementNameCounts.getOrElse(ename, 0)
-            val entry = Path.Entry(ename, countForName)
-            elementNameCounts.update(ename, countForName + 1)
-            acc += ((entry, idx))
-          case _ => ()
-        }
-      }
-
-      val result = acc.toMap
-      result
-    }
   }
 
   final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
