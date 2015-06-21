@@ -77,17 +77,17 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
  *
  * Analogous properties hold for the other query methods.
  *
- * @tparam E The underlying element type
+ * @tparam U The underlying element type
  *
  * @author Chris de Vreeze
  */
-final class IndexedClarkElem[E <: ClarkElemApi[E]] private (
-  val rootElem: E,
-  childElems: immutable.IndexedSeq[IndexedClarkElem[E]],
+final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
+  val rootElem: U,
+  childElems: immutable.IndexedSeq[IndexedClarkElem[U]],
   val path: Path,
-  val elem: E) extends IndexedClarkElemLike[IndexedClarkElem[E], E] {
+  val elem: U) extends IndexedClarkElemLike[IndexedClarkElem[U], U] {
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[E]] = childElems
+  final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = childElems
 }
 
 object IndexedClarkElem {
@@ -95,13 +95,13 @@ object IndexedClarkElem {
   /**
    * Returns the same as `apply(rootElem, Path.Root)`.
    */
-  def apply[E <: ClarkElemApi[E]](rootElem: E): IndexedClarkElem[E] =
+  def apply[U <: ClarkElemApi[U]](rootElem: U): IndexedClarkElem[U] =
     apply(rootElem, Path.Root)
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply[E <: ClarkElemApi[E]](rootElem: E, path: Path): IndexedClarkElem[E] = {
+  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
     // Expensive call, so invoked only once
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
@@ -109,7 +109,7 @@ object IndexedClarkElem {
     apply(rootElem, path, elem)
   }
 
-  private def apply[E <: ClarkElemApi[E]](rootElem: E, path: Path, elem: E): IndexedClarkElem[E] = {
+  private def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path, elem: U): IndexedClarkElem[U] = {
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>

@@ -26,17 +26,17 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  * a `ClarkElemApi`, it is and indexes a `ScopedElemApi`. Other than that, see the
  * documentation for `IndexedClarkElem`.
  *
- * @tparam E The underlying element type
+ * @tparam U The underlying element type
  *
  * @author Chris de Vreeze
  */
-final class IndexedScopedElem[E <: ScopedElemApi[E]] private (
-  val rootElem: E,
-  childElems: immutable.IndexedSeq[IndexedScopedElem[E]],
+final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
+  val rootElem: U,
+  childElems: immutable.IndexedSeq[IndexedScopedElem[U]],
   val path: Path,
-  val elem: E) extends IndexedScopedElemLike[IndexedScopedElem[E], E] {
+  val elem: U) extends IndexedScopedElemLike[IndexedScopedElem[U], U] {
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[E]] = childElems
+  final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = childElems
 }
 
 object IndexedScopedElem {
@@ -44,13 +44,13 @@ object IndexedScopedElem {
   /**
    * Returns the same as `apply(rootElem, Path.Root)`.
    */
-  def apply[E <: ScopedElemApi[E]](rootElem: E): IndexedScopedElem[E] =
+  def apply[U <: ScopedElemApi[U]](rootElem: U): IndexedScopedElem[U] =
     apply(rootElem, Path.Root)
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply[E <: ScopedElemApi[E]](rootElem: E, path: Path): IndexedScopedElem[E] = {
+  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
     // Expensive call, so invoked only once
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
@@ -58,7 +58,7 @@ object IndexedScopedElem {
     apply(rootElem, path, elem)
   }
 
-  private def apply[E <: ScopedElemApi[E]](rootElem: E, path: Path, elem: E): IndexedScopedElem[E] = {
+  private def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path, elem: U): IndexedScopedElem[U] = {
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
