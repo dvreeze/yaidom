@@ -18,20 +18,22 @@ package eu.cdevreeze.yaidom.indexed
 
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
- * Partial implementation of the abstract API for "indexed elements".
+ * Partial implementation of the abstract API for "indexed Scoped elements".
  *
  * @tparam E The element type itself
  * @tparam U The underlying element type
  *
  * @author Chris de Vreeze
  */
-trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]] extends IndexedClarkElemApi[E, U] with ClarkElemLike[E] { self: E =>
+trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi[U]] extends IndexedScopedElemApi[E, U] with IndexedClarkElemLike[E, U] with ScopedElemLike[E] { self: E =>
 
   def rootElem: U
 
@@ -41,18 +43,14 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
   def findAllChildElems: immutable.IndexedSeq[E]
 
-  final def resolvedName: EName = elem.resolvedName
+  final override def qname: QName = elem.qname
 
-  final def resolvedAttributes: immutable.Iterable[(EName, String)] =
-    elem.resolvedAttributes
+  final override def attributes: immutable.Iterable[(QName, String)] = elem.attributes
 
-  final def text: String = elem.text
+  final override def scope: Scope = this.elem.scope
 
-  final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
-    rootElem.resolvedName +: path.entries.map(_.elementName)
-  }
-
-  final def ancestryENames: immutable.IndexedSeq[EName] = {
-    ancestryOrSelfENames.dropRight(1)
+  final def namespaces: Declarations = {
+    val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
+    parentScope.relativize(this.elem.scope)
   }
 }

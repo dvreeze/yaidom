@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
@@ -46,4 +49,24 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
    * }}}
    */
   def elem: U
+
+  /**
+   * Returns the ENames of the ancestry-or-self, starting with the root element and ending with this element.
+   *
+   * That is, returns:
+   * {{{
+   * rootElem.resolvedName +: path.entries.map(_.elementName)
+   * }}}
+   */
+  def ancestryOrSelfENames: immutable.IndexedSeq[EName]
+
+  /**
+   * Returns the ENames of the ancestry, starting with the root element and ending with the parent of this element, if any.
+   *
+   * That is, returns:
+   * {{{
+   * ancestryOrSelfENames.dropRight(1)
+   * }}}
+   */
+  def ancestryENames: immutable.IndexedSeq[EName]
 }

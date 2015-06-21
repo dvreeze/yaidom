@@ -31,6 +31,9 @@ import eu.cdevreeze.yaidom.core.Path
  * it is not "XML" (lacking any knowledge about expanded names etc.), only a builder of "XML".
  * Hence this trait is very important in yaidom, as the "minimal XML element query API".
  *
+ * Generic code abstracting over yaidom element implementations should either use
+ * this trait, or sub-trait `ScopedElemApi`, depending on the abstraction level.
+ *
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze

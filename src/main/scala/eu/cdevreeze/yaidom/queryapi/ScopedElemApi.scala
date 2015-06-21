@@ -26,6 +26,9 @@ import eu.cdevreeze.yaidom.core.QName
  * supported by element implementations, because most element implementations know about scopes, QNames, ENames and
  * text content, as well as offering the `ElemApi` query API.
  *
+ * Generic code abstracting over yaidom element implementations should either use
+ * this trait, or super-trait `ClarkElemApi`, depending on the abstraction level.
+ *
  * ==ScopedElemApi more formally==
  *
  * Scopes resolve QNames as ENames, so some properties are expected to hold for the element "name":

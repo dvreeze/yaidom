@@ -46,7 +46,7 @@ private[utils] object XmlSchemas {
 
     final override def resolvedName: EName = elem.resolvedName
 
-    final override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
+    final override def resolvedAttributes: immutable.Iterable[(EName, String)] = elem.resolvedAttributes
 
     final override def text: String = elem.text
   }

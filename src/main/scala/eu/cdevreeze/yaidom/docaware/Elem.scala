@@ -20,12 +20,9 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.indexed.IndexedScopedElemLike
 import eu.cdevreeze.yaidom.simple
 
 /**
@@ -75,7 +72,7 @@ final class Elem private[docaware] (
   val rootElem: simple.Elem,
   childElems: immutable.IndexedSeq[Elem],
   val path: Path,
-  val elem: simple.Elem) extends ScopedElemLike[Elem] with Immutable {
+  val elem: simple.Elem) extends IndexedScopedElemLike[Elem, simple.Elem] with Immutable {
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -97,14 +94,6 @@ final class Elem private[docaware] (
    */
   override def findAllChildElems: immutable.IndexedSeq[Elem] = childElems
 
-  override def resolvedName: EName = elem.resolvedName
-
-  override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = elem.resolvedAttributes
-
-  override def qname: QName = elem.qname
-
-  override def attributes: immutable.IndexedSeq[(QName, String)] = elem.attributes
-
   override def equals(obj: Any): Boolean = obj match {
     case other: Elem =>
       (other.docUri == this.docUri) && (other.rootElem == this.rootElem) && (other.path == this.path)
@@ -112,56 +101,6 @@ final class Elem private[docaware] (
   }
 
   override def hashCode: Int = (docUri, rootElem, path).hashCode
-
-  /**
-   * Returns `this.elem.scope`
-   */
-  final override def scope: Scope = this.elem.scope
-
-  /**
-   * Returns the namespaces declared in this element.
-   *
-   * If the original parsed XML document contained duplicate namespace declarations (i.e. namespace declarations that are the same
-   * as some namespace declarations in their context), these duplicate namespace declarations were lost during parsing of the
-   * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
-   */
-  final def namespaces: Declarations = {
-    val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
-    parentScope.relativize(this.elem.scope)
-  }
-
-  /**
-   * Returns the concatenation of the texts of text children, including whitespace. Non-text children are ignored.
-   * If there are no text children, the empty string is returned.
-   */
-  override def text: String = {
-    val textStrings = elem.textChildren map { t => t.text }
-    textStrings.mkString
-  }
-
-  /**
-   * Returns the ENames of the ancestry-or-self, starting with the root element and ending with this element.
-   *
-   * That is, returns:
-   * {{{
-   * rootElem.resolvedName +: path.entries.map(_.elementName)
-   * }}}
-   */
-  final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
-    rootElem.resolvedName +: path.entries.map(_.elementName)
-  }
-
-  /**
-   * Returns the ENames of the ancestry, starting with the root element and ending with the parent of this element, if any.
-   *
-   * That is, returns:
-   * {{{
-   * ancestryOrSelfENames.dropRight(1)
-   * }}}
-   */
-  final def ancestryENames: immutable.IndexedSeq[EName] = {
-    ancestryOrSelfENames.dropRight(1)
-  }
 
   /**
    * Returns the base URI of the element. That is, returns:

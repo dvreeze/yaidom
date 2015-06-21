@@ -191,7 +191,7 @@ object XbrlSchemaTest {
 
     override def resolvedName: EName = wrappedElem.resolvedName
 
-    override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = wrappedElem.resolvedAttributes
+    override def resolvedAttributes: immutable.Iterable[(EName, String)] = wrappedElem.resolvedAttributes
 
     override def text: String = wrappedElem.text
   }
