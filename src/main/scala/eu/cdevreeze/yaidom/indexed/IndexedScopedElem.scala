@@ -17,6 +17,8 @@
 package eu.cdevreeze.yaidom.indexed
 
 import scala.collection.immutable
+import scala.reflect.ClassTag
+import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
@@ -36,7 +38,16 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
   val path: Path,
   val elem: U) extends IndexedScopedElemLike[IndexedScopedElem[U], U] {
 
+  private implicit val uTag: ClassTag[U] = classTag[U]
+
   final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = childElems
+
+  final override def equals(obj: Any): Boolean = obj match {
+    case other: IndexedScopedElem[U] => (other.rootElem == this.rootElem) && (other.path == this.path)
+    case _                           => false
+  }
+
+  final override def hashCode: Int = (rootElem, path).hashCode
 }
 
 object IndexedScopedElem {

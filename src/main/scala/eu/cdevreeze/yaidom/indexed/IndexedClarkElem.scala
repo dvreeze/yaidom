@@ -17,6 +17,8 @@
 package eu.cdevreeze.yaidom.indexed
 
 import scala.collection.immutable
+import scala.reflect.ClassTag
+import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
@@ -87,7 +89,16 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   val path: Path,
   val elem: U) extends IndexedClarkElemLike[IndexedClarkElem[U], U] {
 
+  private implicit val uTag: ClassTag[U] = classTag[U]
+
   final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = childElems
+
+  final override def equals(obj: Any): Boolean = obj match {
+    case other: IndexedClarkElem[U] => (other.rootElem == this.rootElem) && (other.path == this.path)
+    case _                          => false
+  }
+
+  final override def hashCode: Int = (rootElem, path).hashCode
 }
 
 object IndexedClarkElem {
