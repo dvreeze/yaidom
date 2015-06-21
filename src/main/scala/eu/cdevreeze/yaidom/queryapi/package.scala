@@ -20,6 +20,9 @@ package eu.cdevreeze.yaidom
  * This package contains the query API traits. It contains both the purely abstract API traits as well as the
  * partial implementation traits.
  *
+ * '''Generic code abstracting over yaidom element implementations should either use
+ * trait `ClarkElemApi` or sub-trait `ScopedElemApi`, depending on the abstraction level.'''
+ *
  * This package depends only on the core package in yaidom, but many other packages do depend on this one.
  *
  * ==Notes on migration from yaidom 1.0 to 1.1 and later==

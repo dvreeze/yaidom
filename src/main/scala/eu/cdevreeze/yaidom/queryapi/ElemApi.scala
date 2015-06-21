@@ -72,8 +72,7 @@ import scala.collection.immutable
  * }}}
  *
  * In summary, the extremely simple ``ElemApi`` query API is indeed a uniform query API, offered by many different
- * yaidom DOM-like element implementations. It should be noted that most of these element implementations offer the
- * ``ElemApi`` query API, which extends the ``ElemApi`` query API.
+ * yaidom DOM-like element implementations.
  *
  * ==ElemApi more formally==
  *
