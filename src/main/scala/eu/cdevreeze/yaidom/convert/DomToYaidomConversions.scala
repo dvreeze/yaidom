@@ -114,20 +114,32 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
    * unless they are a subset of the passed parent scope.
    */
   final def convertToNodeOption(v: org.w3c.dom.Node, parentScope: Scope): Option[Node] = {
-    v match {
-      case e: Element                            => Some(convertToElem(e, parentScope))
-      case t: org.w3c.dom.Text                   => Some(convertToText(t))
-      case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
-      case er: org.w3c.dom.EntityReference       => Some(convertToEntityRef(er))
-      case c: org.w3c.dom.Comment                => Some(convertToComment(c))
-      case _                                     => None
+    // Pattern matching on the DOM interface type alone does not work for Saxon DOM adapters such as TextOverNodeInfo.
+    // Hence the check on node type as well.
+
+    (v, v.getNodeType) match {
+      case (e: Element, org.w3c.dom.Node.ELEMENT_NODE) =>
+        Some(convertToElem(e, parentScope))
+      case (t: org.w3c.dom.Text, org.w3c.dom.Node.CDATA_SECTION_NODE) =>
+        Some(convertToText(t))
+      case (t: org.w3c.dom.Text, org.w3c.dom.Node.TEXT_NODE) =>
+        Some(convertToText(t))
+      case (pi: org.w3c.dom.ProcessingInstruction, org.w3c.dom.Node.PROCESSING_INSTRUCTION_NODE) =>
+        Some(convertToProcessingInstruction(pi))
+      case (er: org.w3c.dom.EntityReference, org.w3c.dom.Node.ENTITY_REFERENCE_NODE) =>
+        Some(convertToEntityRef(er))
+      case (c: org.w3c.dom.Comment, org.w3c.dom.Node.COMMENT_NODE) =>
+        Some(convertToComment(c))
+      case _ => None
     }
   }
 
   /** Converts an `org.w3c.dom.Text` to a [[eu.cdevreeze.yaidom.simple.Text]] */
   final def convertToText(v: org.w3c.dom.Text): Text = v match {
-    case cdata: org.w3c.dom.CDATASection => Text(text = v.getData, isCData = true)
-    case _                               => Text(text = v.getData, isCData = false)
+    case cdata: org.w3c.dom.CDATASection if v.getNodeType == org.w3c.dom.Node.CDATA_SECTION_NODE =>
+      Text(text = v.getData, isCData = true)
+    case _ =>
+      Text(text = v.getData, isCData = false)
   }
 
   /** Converts an `org.w3c.dom.ProcessingInstruction` to a [[eu.cdevreeze.yaidom.simple.ProcessingInstruction]] */

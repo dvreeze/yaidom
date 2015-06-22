@@ -218,14 +218,23 @@ final class DomComment(override val wrappedNode: w3c.dom.Comment) extends DomNod
 object DomNode {
 
   def wrapNodeOption(node: w3c.dom.Node): Option[DomNode] = {
-    node match {
-      case e: w3c.dom.Element                => Some(new DomElem(e))
-      case cdata: w3c.dom.CDATASection       => Some(new DomText(cdata))
-      case t: w3c.dom.Text                   => Some(new DomText(t))
-      case pi: w3c.dom.ProcessingInstruction => Some(new DomProcessingInstruction(pi))
-      case er: w3c.dom.EntityReference       => Some(new DomEntityRef(er))
-      case c: w3c.dom.Comment                => Some(new DomComment(c))
-      case _                                 => None
+    // Pattern matching on the DOM interface type alone does not work for Saxon DOM adapters such as TextOverNodeInfo.
+    // Hence the check on node type as well.
+
+    (node, node.getNodeType) match {
+      case (e: w3c.dom.Element, org.w3c.dom.Node.ELEMENT_NODE) =>
+        Some(new DomElem(e))
+      case (cdata: w3c.dom.CDATASection, org.w3c.dom.Node.CDATA_SECTION_NODE) =>
+        Some(new DomText(cdata))
+      case (t: w3c.dom.Text, org.w3c.dom.Node.TEXT_NODE) =>
+        Some(new DomText(t))
+      case (pi: w3c.dom.ProcessingInstruction, org.w3c.dom.Node.PROCESSING_INSTRUCTION_NODE) =>
+        Some(new DomProcessingInstruction(pi))
+      case (er: w3c.dom.EntityReference, org.w3c.dom.Node.ENTITY_REFERENCE_NODE) =>
+        Some(new DomEntityRef(er))
+      case (c: w3c.dom.Comment, org.w3c.dom.Node.COMMENT_NODE) =>
+        Some(new DomComment(c))
+      case _ => None
     }
   }
 
