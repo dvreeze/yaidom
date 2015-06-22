@@ -19,18 +19,22 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.io.ByteArrayInputStream
 
 import scala.Vector
+import scala.xml.NodeSeq.seqToNodeSeq
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.Suite
 import org.xml.sax.SAXParseException
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
@@ -76,12 +80,45 @@ class TheCaseForYaidomTest extends Suite {
   // They show that yaidom fails faster on non-namespace-well-formed XML than Scala XML.
 
   /**
-   * Tries to parse the XML into a yaidom Elem, but fails, as expected.
+   * Tries to parse the XML into a yaidom Elem (via SAX), but fails, as expected.
    */
-  @Test def testTryParsingWrongXml(): Unit = {
+  @Test def testTryParsingWrongXmlViaSax(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     intercept[SAXParseException] {
+      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the XML into a yaidom Elem (via StAX), but fails, as expected.
+   */
+  @Test def testTryParsingWrongXmlViaStax(): Unit = {
+    val parser = DocumentParserUsingStax.newInstance
+
+    intercept[Exception] {
+      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the XML into a yaidom Elem (via DOM), but fails, as expected.
+   */
+  @Test def testTryParsingWrongXmlViaDom(): Unit = {
+    val parser = DocumentParserUsingDom.newInstance
+
+    intercept[SAXParseException] {
+      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the XML into a yaidom Elem (via DOM LS), but fails, as expected.
+   */
+  @Test def testTryParsingWrongXmlViaDomLS(): Unit = {
+    val parser = DocumentParserUsingDomLS.newInstance
+
+    intercept[RuntimeException] {
       parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
     }
   }
@@ -99,6 +136,31 @@ class TheCaseForYaidomTest extends Suite {
     // SAX parsing succeeds, but yaidom Elem creation does not
     intercept[RuntimeException] {
       parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the XML using scala.xml.XML, but succeeds, unexpectedly.
+   *
+   * A fatal error is reported, but the exception is "eaten", returning a scala.xml.Elem, which is
+   * not namespace-well-formed.
+   */
+  @Test def testTryParsingWrongXmlUsingScalaXml(): Unit = {
+    val scalaElem = scala.xml.XML.load(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+
+    // Why null? Why not an Option?
+    assertResult(null) {
+      scalaElem.prefix
+    }
+    assertResult("root") {
+      scalaElem.label
+    }
+
+    assertResult("prefix") {
+      scalaElem.child.head.prefix
+    }
+    assertResult("element") {
+      scalaElem.child.head.label
     }
   }
 
@@ -270,12 +332,45 @@ class TheCaseForYaidomTest extends Suite {
   // The same test methods for the second non-namespace-well-formed XML.
 
   /**
-   * Tries to parse the 2nd XML into a yaidom Elem, but fails, as expected.
+   * Tries to parse the 2nd XML into a yaidom Elem (via SAX), but fails, as expected.
    */
-  @Test def testTryParsingWrongXml2(): Unit = {
+  @Test def testTryParsingWrongXml2ViaSax(): Unit = {
     val parser = DocumentParserUsingSax.newInstance
 
     intercept[SAXParseException] {
+      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the 2nd XML into a yaidom Elem (via StAX), but fails, as expected.
+   */
+  @Test def testTryParsingWrongXml2ViaStax(): Unit = {
+    val parser = DocumentParserUsingStax.newInstance
+
+    intercept[Exception] {
+      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the 2nd XML into a yaidom Elem (via DOM), but fails, as expected.
+   */
+  @Test def testTryParsingWrongXml2ViaDom(): Unit = {
+    val parser = DocumentParserUsingDom.newInstance
+
+    intercept[SAXParseException] {
+      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+    }
+  }
+
+  /**
+   * Tries to parse the 2nd XML into a yaidom Elem (via DOM LS), but fails, as expected.
+   */
+  @Test def testTryParsingWrongXml2ViaDomLS(): Unit = {
+    val parser = DocumentParserUsingDomLS.newInstance
+
+    intercept[RuntimeException] {
       parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
     }
   }
@@ -294,6 +389,29 @@ class TheCaseForYaidomTest extends Suite {
     intercept[RuntimeException] {
       parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
     }
+  }
+
+  /**
+   * Tries to parse the 2nd XML using scala.xml.XML, but succeeds, unexpectedly.
+   *
+   * A fatal error is reported, but the exception is "eaten", returning a scala.xml.Elem, which is
+   * not namespace-well-formed.
+   */
+  @Test def testTryParsingWrongXml2UsingScalaXml(): Unit = {
+    val scalaElem = scala.xml.XML.load(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+
+    assertResult("link") {
+      scalaElem.prefix
+    }
+    assertResult("linkbaseRef") {
+      scalaElem.label
+    }
+
+    assertResult(4) {
+      scalaElem.attributes.size
+    }
+    // Now try to query for the non-namespace-well-formed XLink attributes ...
+    // Also: The MetaData API is quite cumbersome, just like the Node and NodeSeq API
   }
 
   /**
