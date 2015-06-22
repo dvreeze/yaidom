@@ -44,7 +44,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
  *
  * Having an IndexedClarkElem, it is always possible to re-create the root element as IndexedClarkElem, because
  * the underlying root element is always available. On the other hand, creating an IndexedClarkElem is expensive. Class
- * IndexedClarkElem is optimized for fast querying, at the expense of expensive recursive creation.
+ * IndexedClarkElem is optimized for fast querying, at the expense of costly recursive creation.
  *
  * ==IndexedClarkElem examples==
  *

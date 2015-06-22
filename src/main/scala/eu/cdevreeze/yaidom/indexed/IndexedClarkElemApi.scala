@@ -25,6 +25,10 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 /**
  * Abstract API for "indexed elements".
  *
+ * Note how this API removes the need for an API which is like the `ElemApi` API, but taking and returning pairs
+ * of elements and paths. This could be seen as that API, re-using `ElemApi` instead of adding an extra API similar to it.
+ * These `IndexedClarkElemApi` objects "are" the above-mentioned pairs of elements and paths.
+ *
  * @tparam E The element type itself
  * @tparam U The underlying element type
  *
