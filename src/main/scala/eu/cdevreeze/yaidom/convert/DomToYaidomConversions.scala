@@ -120,7 +120,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     (v, v.getNodeType) match {
       case (e: Element, org.w3c.dom.Node.ELEMENT_NODE) =>
         Some(convertToElem(e, parentScope))
-      case (t: org.w3c.dom.Text, org.w3c.dom.Node.CDATA_SECTION_NODE) =>
+      case (t: org.w3c.dom.CDATASection, org.w3c.dom.Node.CDATA_SECTION_NODE) =>
         Some(convertToText(t))
       case (t: org.w3c.dom.Text, org.w3c.dom.Node.TEXT_NODE) =>
         Some(convertToText(t))

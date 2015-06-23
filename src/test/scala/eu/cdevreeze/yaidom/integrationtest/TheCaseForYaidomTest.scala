@@ -25,6 +25,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.Suite
+import org.w3c.dom.DOMException
 import org.xml.sax.SAXParseException
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
@@ -40,6 +41,7 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.SAXParserFactory
 
 /**
@@ -78,6 +80,23 @@ class TheCaseForYaidomTest extends Suite {
 
   // Some test methods for the first non-namespace-well-formed XML.
   // They show that yaidom fails faster on non-namespace-well-formed XML than Scala XML.
+
+  /**
+   * Tries to create a DOM tree for the (wrong) XML. It fails, as expected.
+   */
+  @Test def testTryCreatingDomForWrongXml(): Unit = {
+    val dbf = DocumentBuilderFactory.newInstance()
+    val db = dbf.newDocumentBuilder()
+    val d = db.newDocument()
+
+    val rootElm = d.createElementNS(null, "root")
+    d.appendChild(rootElm)
+
+    intercept[DOMException] {
+      val elmElm = d.createElementNS(null, "prefix:element")
+      rootElm.appendChild(elmElm)
+    }
+  }
 
   /**
    * Tries to parse the XML into a yaidom Elem (via SAX), but fails, as expected.
@@ -330,6 +349,20 @@ class TheCaseForYaidomTest extends Suite {
   }
 
   // The same test methods for the second non-namespace-well-formed XML.
+
+  /**
+   * Tries to create a DOM tree for the (wrong) 2nd XML. It fails, as expected.
+   */
+  @Test def testTryCreatingDomForWrongXml2(): Unit = {
+    val dbf = DocumentBuilderFactory.newInstance()
+    val db = dbf.newDocumentBuilder()
+    val d = db.newDocument()
+
+    intercept[DOMException] {
+      val linkbaseRefElm = d.createElementNS(null, "link:linkbaseRef")
+      d.appendChild(linkbaseRefElm)
+    }
+  }
 
   /**
    * Tries to parse the 2nd XML into a yaidom Elem (via SAX), but fails, as expected.
