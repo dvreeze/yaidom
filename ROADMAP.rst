@@ -3,6 +3,29 @@ ROAD MAP
 ========
 
 
+Towards version 1.4
+===================
+
+Version 1.3.6 is already meaner and cleaner than version 1.3. For example, there is no dependency anymore on
+the Apache Commons library. Performance has also improved.
+
+Version 1.4.0 tries to be even meaner and cleaner, while not sacrificing any performance. For example:
+
+* The "indexed" elements are generic, and can contain any backing ("scoped") element, not just "simple" elements.
+* While the query API traits are as much as possible orthogonal, there are 2 multiple-trait combinations that "stand out": ClarkElemApi and ScopedElemApi
+* ClarkElemApi is the query API for James Clark's minimal labeled element tree abstraction (implemented as "resolved" elements)
+* ScopedElemApi is the query API for practical element tree abstractions, as ClarkElemApi, but adding QNames and Scopes
+* XML dialect support should typically take "scoped" elements (or their "indexed" variants)
+* "Document-aware" elements can probably be phased out, and XML Base support can become a utility on top of "indexed" elements
+* Package dependencies are cleaner than before; e.g. "simple" elements depend on "resolved" elements and not vice versa
+* More consistency in method naming (especially for underlying elements), deprecating old names
+
+Despite the attempts to make yaidom still meaner and cleaner, XML declarations have been added to document implementations.
+
+
+Towards version 1.3
+===================
+
 After releasing version 1.0, the author of yaidom tried to write a blog post, showing the purpose and strength of
 the different query API traits. That turned out to be difficult, because the query API traits are not sufficiently
 **orthogonal**, and they depend on inheritance too much. For example, in yaidom 1.0 the inheritance relation from the
