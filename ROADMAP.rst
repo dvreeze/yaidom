@@ -17,6 +17,7 @@ Version 1.4.0 tries to be even meaner and cleaner, while not sacrificing any per
 * ScopedElemApi is the query API for practical element tree abstractions, as ClarkElemApi, but adding QNames and Scopes
 * XML dialect support should typically take "scoped" elements (or their "indexed" variants)
 * "Document-aware" elements can probably be phased out, and XML Base support can become a utility on top of "indexed" elements
+* Document URIs could then be stored throughout element trees (in any element implementation) using attributes in a "special" namespace
 * Package dependencies are cleaner than before; e.g. "simple" elements depend on "resolved" elements and not vice versa
 * More consistency in method naming (especially for underlying elements), deprecating old names
 
