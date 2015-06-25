@@ -26,9 +26,9 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
-import eu.cdevreeze.yaidom.simple
 
 /**
  * Immutable "resolved" Node. It is called "resolved" because the element trees in this package only contain resolved element and
@@ -70,7 +70,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends Immutable
+sealed trait Node extends Nodes.Node with Immutable
 
 /**
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
@@ -126,7 +126,7 @@ sealed trait Node extends Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem[Node] with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -318,7 +318,7 @@ final case class Elem(
   }
 }
 
-final case class Text(text: String) extends Node {
+final case class Text(text: String) extends Node with Nodes.Text {
   require(text ne null)
 
   /** Returns `text.trim`. */
@@ -331,19 +331,19 @@ final case class Text(text: String) extends Node {
 object Node {
 
   /**
-   * Converts a yaidom `Node` to a "resolved" `Node`.
-   * Note that the entity references, comments, processing instructions and top-level documents are lost.
+   * Converts any `Nodes.Node` to a "resolved" `Node`.
+   * Note that entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
-   * Losing the qualified names means that the prefixes are lost. Losing the prefixes not only affects serialization of
+   * Losing the qualified names means that prefixes are lost. Losing the prefixes not only affects serialization of
    * the `Node` to an XML string, but also affects attribute values and text nodes in which those prefixes are used.
    *
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
-  def apply(n: simple.Node): Node = n match {
-    case e: simple.Elem => Elem(e)
-    case t: simple.Text => Text(t)
-    case n              => sys.error(s"Not an element or text node: $n")
+  def apply(n: Nodes.Node): Node = n match {
+    case e: Nodes.Elem[_] => Elem(e)
+    case t: Nodes.Text    => Text(t)
+    case n                => sys.error(s"Not an element or text node: $n")
   }
 }
 
@@ -358,11 +358,12 @@ object Elem {
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
   }
 
-  def apply(e: simple.Elem): Elem = {
+  def apply(e: Nodes.Elem[_]): Elem = {
     val children = e.children collect {
-      case childElm: simple.Elem  => childElm
-      case childText: simple.Text => childText
+      case childElm: Nodes.Elem[_] => childElm
+      case childText: Nodes.Text   => childText
     }
+    // Recursion, with Node.apply and Elem.apply being mutually dependent
     val resolvedChildren = children map { node => Node(node) }
 
     Elem(e.resolvedName, e.resolvedAttributes.toMap, resolvedChildren)
@@ -371,5 +372,5 @@ object Elem {
 
 object Text {
 
-  def apply(t: simple.Text): Text = Text(t.text)
+  def apply(t: Nodes.Text): Text = Text(t.text)
 }
