@@ -86,6 +86,8 @@ final class Elem private[docaware] (
     assert(childElems.forall(_.docUri eq this.docUri), "Corrupt element!")
   }
 
+  override def docUriOption: Option[URI] = Some(docUri)
+
   /**
    * Returns all child elements, in the correct order.
    *

@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
@@ -26,7 +28,8 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 /**
  * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
  * and a path (from that root element) to this element. More precisely, this element implementation contains an underlying root element,
- * a Path, and an underlying element found from the root element following the Path.
+ * a Path, and an underlying element found from the root element following the Path. It also contains an optional URI
+ * of the containing document, if any.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
@@ -95,6 +98,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
  * @author Chris de Vreeze
  */
 final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
+  val docUriOption: Option[URI],
   val rootElem: U,
   childElems: immutable.IndexedSeq[IndexedClarkElem[U]],
   val path: Path,
@@ -116,39 +120,53 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = childElems
 
   final override def equals(obj: Any): Boolean = obj match {
-    case other: IndexedClarkElem[U] => (other.rootElem == this.rootElem) && (other.path == this.path)
-    case _                          => false
+    case other: IndexedClarkElem[U] =>
+      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) && (other.path == this.path)
+    case _ => false
   }
 
-  final override def hashCode: Int = (rootElem, path).hashCode
+  final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
 }
 
 object IndexedClarkElem {
 
   /**
-   * Returns the same as `apply(rootElem, Path.Root)`.
+   * Returns the same as `apply(None, rootElem)`.
    */
   def apply[U <: ClarkElemApi[U]](rootElem: U): IndexedClarkElem[U] =
-    apply(rootElem, Path.Root)
+    apply(None, rootElem)
+
+  /**
+   * Returns the same as `apply(docUriOption, rootElem, Path.Root)`.
+   */
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] =
+    apply(docUriOption, rootElem, Path.Root)
+
+  /**
+   * Returns the same as `apply(None, rootElem, path)`.
+   */
+  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
+    apply(None, rootElem, path)
+  }
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
     // Expensive call, so invoked only once
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
 
-    apply(rootElem, path, elem)
+    apply(docUriOption, rootElem, path, elem)
   }
 
-  private def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path, elem: U): IndexedClarkElem[U] = {
+  private def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path, elem: U): IndexedClarkElem[U] = {
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        apply(rootElem, path.append(entry), e)
+        apply(docUriOption, rootElem, path.append(entry), e)
     }
 
-    new IndexedClarkElem(rootElem, childElems, path, elem)
+    new IndexedClarkElem(docUriOption, rootElem, childElems, path, elem)
   }
 }

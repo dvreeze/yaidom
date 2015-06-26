@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -34,6 +36,8 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  * @author Chris de Vreeze
  */
 trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi[U]] extends IndexedScopedElemApi[E, U] with IndexedClarkElemLike[E, U] with ScopedElemLike[E] { self: E =>
+
+  def docUriOption: Option[URI]
 
   def rootElem: U
 

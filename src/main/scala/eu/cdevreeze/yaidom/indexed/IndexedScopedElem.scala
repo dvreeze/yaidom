@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
@@ -33,6 +35,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  * @author Chris de Vreeze
  */
 final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
+  val docUriOption: Option[URI],
   val rootElem: U,
   childElems: immutable.IndexedSeq[IndexedScopedElem[U]],
   val path: Path,
@@ -54,39 +57,53 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
   final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = childElems
 
   final override def equals(obj: Any): Boolean = obj match {
-    case other: IndexedScopedElem[U] => (other.rootElem == this.rootElem) && (other.path == this.path)
-    case _                           => false
+    case other: IndexedScopedElem[U] =>
+      (other.docUriOption == docUriOption) && (other.rootElem == this.rootElem) && (other.path == this.path)
+    case _ => false
   }
 
-  final override def hashCode: Int = (rootElem, path).hashCode
+  final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
 }
 
 object IndexedScopedElem {
 
   /**
-   * Returns the same as `apply(rootElem, Path.Root)`.
+   * Returns the same as `apply(None, rootElem)`.
    */
   def apply[U <: ScopedElemApi[U]](rootElem: U): IndexedScopedElem[U] =
-    apply(rootElem, Path.Root)
+    apply(None, rootElem)
+
+  /**
+   * Returns the same as `apply(docUriOption, rootElem, Path.Root)`.
+   */
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] =
+    apply(docUriOption, rootElem, Path.Root)
+
+  /**
+   * Returns the same as `apply(None, rootElem, path)`.
+   */
+  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
+    apply(None, rootElem, path)
+  }
 
   /**
    * Expensive recursive factory method for "indexed elements".
    */
-  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
     // Expensive call, so invoked only once
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
 
-    apply(rootElem, path, elem)
+    apply(docUriOption, rootElem, path, elem)
   }
 
-  private def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path, elem: U): IndexedScopedElem[U] = {
+  private def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path, elem: U): IndexedScopedElem[U] = {
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        apply(rootElem, path.append(entry), e)
+        apply(docUriOption, rootElem, path.append(entry), e)
     }
 
-    new IndexedScopedElem(rootElem, childElems, path, elem)
+    new IndexedScopedElem(docUriOption, rootElem, childElems, path, elem)
   }
 }

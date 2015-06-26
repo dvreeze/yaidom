@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
@@ -32,6 +34,8 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
  * @author Chris de Vreeze
  */
 trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]] extends IndexedClarkElemApi[E, U] with ClarkElemLike[E] { self: E =>
+
+  def docUriOption: Option[URI]
 
   def rootElem: U
 
