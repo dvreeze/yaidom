@@ -23,6 +23,7 @@ import scala.collection.immutable
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
@@ -35,6 +36,8 @@ import eu.cdevreeze.yaidom.simple
  */
 @RunWith(classOf[JUnitRunner])
 class XmlBaseTest extends AbstractXmlBaseTest {
+
+  private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
 
   type E = docaware.Elem
 
@@ -57,7 +60,13 @@ class XmlBaseTest extends AbstractXmlBaseTest {
   }
 
   protected def getParentBaseUri(elem: E): URI = {
-    elem.parentBaseUri
+    val reverseAncestryOrSelf = elem.rootElem.findReverseAncestryOrSelfByPath(elem.path).get
+
+    reverseAncestryOrSelf.init.foldLeft(elem.docUri) {
+      case (parentBaseUri, elm) =>
+        val explicitBaseUriOption = elm.attributeOption(XmlBaseEName).map(s => new URI(s))
+        explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
+    }
   }
 
   protected def getDocumentUri(elem: E): URI = {

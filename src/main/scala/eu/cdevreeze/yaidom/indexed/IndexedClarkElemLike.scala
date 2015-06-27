@@ -52,6 +52,21 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
   final def text: String = elem.text
 
+  final def baseUriOption: Option[URI] = {
+    val reverseAncestryOrSelf: immutable.IndexedSeq[U] =
+      rootElem.findReverseAncestryOrSelfByPath(path).getOrElse(
+        sys.error("Corrupt data. Could not get reverse ancestry-or-self of ${elem}"))
+
+    assert(reverseAncestryOrSelf.head == rootElem)
+    assert(reverseAncestryOrSelf.last == elem)
+
+    reverseAncestryOrSelf.foldLeft(docUriOption) {
+      case (parentBaseUriOption, elm) =>
+        val explicitBaseUriOption = elm.attributeOption(XmlBaseEName).map(s => new URI(s))
+        explicitBaseUriOption.flatMap(u => parentBaseUriOption.map(_.resolve(u)).orElse(Some(u))).orElse(parentBaseUriOption)
+    }
+  }
+
   final def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
     rootElem.resolvedName +: path.entries.map(_.elementName)
   }
@@ -59,4 +74,14 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
   final def reverseAncestryENames: immutable.IndexedSeq[EName] = {
     reverseAncestryOrSelfENames.dropRight(1)
   }
+
+  final def reverseAncestryOrSelf: immutable.IndexedSeq[U] = {
+    val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
+    assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    resultOption.get
+  }
+
+  private val XmlNs = "http://www.w3.org/XML/1998/namespace"
+
+  private val XmlBaseEName = EName(XmlNs, "base")
 }

@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom
 
+import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
+
 /**
  * This package contains element representations that contain the "context" of the element, including the URI of the containing
  * document. In other words, this package contains element representations like `indexed.Elem`, except that the document URI
@@ -40,4 +42,7 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-package object docaware
+package object docaware {
+
+  type Elem = IndexedScopedElem[simple.Elem]
+}

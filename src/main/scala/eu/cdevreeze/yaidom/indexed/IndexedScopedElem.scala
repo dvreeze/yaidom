@@ -64,6 +64,10 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
   }
 
   final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
+
+  final def docUri: URI = docUriOption.getOrElse(sys.error(s"Missing document URI in ${elem}"))
+
+  final def baseUri: URI = baseUriOption.getOrElse(sys.error(s"Missing base URI in ${elem}"))
 }
 
 object IndexedScopedElem {

@@ -62,11 +62,22 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
   def elem: U
 
   /**
+   * Returns the optional base URI, computed from the document URI, if any, and the XML base attributes of the
+   * ancestors, if any.
+   */
+  def baseUriOption: Option[URI]
+
+  /**
    * Returns the ENames of the ancestry-or-self reversed, starting with the root element and ending with this element.
    *
    * That is, returns:
    * {{{
    * rootElem.resolvedName +: path.entries.map(_.elementName)
+   * }}}
+   *
+   * This is equal to:
+   * {{{
+   * reverseAncestryOrSelf.map(_.resolvedName)
    * }}}
    */
   def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName]
@@ -80,4 +91,12 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
    * }}}
    */
   def reverseAncestryENames: immutable.IndexedSeq[EName]
+
+  /**
+   * Returns the reversed ancestor-or-self elements. That is, returns:
+   * {{{
+   * rootElem.findReverseAncestryOrSelfByPath(path).get
+   * }}}
+   */
+  def reverseAncestryOrSelf: immutable.IndexedSeq[U]
 }
