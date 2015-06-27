@@ -81,4 +81,7 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
    * This method comes in handy for (efficiently) computing base URIs, where the (reverse) ancestry-or-self is needed as input.
    */
   def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[E]]
+
+  /** Returns (the equivalent of) `findReverseAncestryOrSelfByPath(path).get` */
+  def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[E]
 }

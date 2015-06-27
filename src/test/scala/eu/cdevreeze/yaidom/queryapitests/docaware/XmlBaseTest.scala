@@ -60,7 +60,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
   }
 
   protected def getParentBaseUri(elem: E): URI = {
-    val reverseAncestryOrSelf = elem.rootElem.findReverseAncestryOrSelfByPath(elem.path).get
+    val reverseAncestryOrSelf = elem.rootElem.getReverseAncestryOrSelfByPath(elem.path)
 
     reverseAncestryOrSelf.init.foldLeft(elem.docUri) {
       case (parentBaseUri, elm) =>

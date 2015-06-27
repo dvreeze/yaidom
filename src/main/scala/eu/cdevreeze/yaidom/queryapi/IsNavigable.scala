@@ -69,4 +69,8 @@ trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 
     findReverseAncestryOrSelfByPath(self, 0, Vector())
   }
+
+  final def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[E] = {
+    findReverseAncestryOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
+  }
 }
