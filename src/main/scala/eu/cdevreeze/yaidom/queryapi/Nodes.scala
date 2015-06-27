@@ -36,9 +36,9 @@ object Nodes {
    * Arbitrary element node that offers the `HasENameApi` query API. Typical implementations offer the
    * `ScopedElemApi`, or at least the `ClarkElemApi`.
    */
-  trait Elem[N <: Node] extends Node with HasENameApi {
+  trait Elem extends Node with HasENameApi {
 
-    def children: immutable.IndexedSeq[N]
+    def children: immutable.IndexedSeq[Node]
   }
 
   /**

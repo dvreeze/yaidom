@@ -77,7 +77,11 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
   final def reverseAncestryOrSelf: immutable.IndexedSeq[U] = {
     val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
+
     assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    assert(!resultOption.get.isEmpty, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    assert(resultOption.get.last == self.elem)
+
     resultOption.get
   }
 

@@ -126,7 +126,7 @@ sealed trait Node extends Nodes.Node with Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem[Node] with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -341,9 +341,9 @@ object Node {
    * This is definitely something to keep in mind!
    */
   def apply(n: Nodes.Node): Node = n match {
-    case e: Nodes.Elem[_] => Elem(e)
-    case t: Nodes.Text    => Text(t)
-    case n                => sys.error(s"Not an element or text node: $n")
+    case e: Nodes.Elem => Elem(e)
+    case t: Nodes.Text => Text(t)
+    case n             => sys.error(s"Not an element or text node: $n")
   }
 }
 
@@ -358,10 +358,10 @@ object Elem {
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
   }
 
-  def apply(e: Nodes.Elem[_]): Elem = {
+  def apply(e: Nodes.Elem): Elem = {
     val children = e.children collect {
-      case childElm: Nodes.Elem[_] => childElm
-      case childText: Nodes.Text   => childText
+      case childElm: Nodes.Elem  => childElm
+      case childText: Nodes.Text => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val resolvedChildren = children map { node => Node(node) }

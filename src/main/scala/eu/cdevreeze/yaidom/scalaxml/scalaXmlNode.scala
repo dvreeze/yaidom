@@ -72,7 +72,7 @@ sealed trait ScalaXmlNode extends Nodes.Node {
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with Nodes.Elem[ScalaXmlNode] with ScopedElemLike[ScalaXmlElem] { self =>
+  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with Nodes.Elem with ScopedElemLike[ScalaXmlElem] { self =>
 
   require(wrappedNode ne null)
 

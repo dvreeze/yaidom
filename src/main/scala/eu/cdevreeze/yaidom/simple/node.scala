@@ -172,7 +172,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem[Node] with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)

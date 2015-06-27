@@ -112,7 +112,7 @@ final class DomDocument(
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with Nodes.Elem[DomNode] with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with Nodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
   require(wrappedNode ne null)
 

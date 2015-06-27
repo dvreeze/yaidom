@@ -474,7 +474,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookstoreWithoutPrices: Elem = {
       val f: eu.cdevreeze.yaidom.simple.Elem => eu.cdevreeze.yaidom.simple.Elem = {
         case e: eu.cdevreeze.yaidom.simple.Elem if e.resolvedName == EName("Book") => removePrice(e)
-        case e: eu.cdevreeze.yaidom.simple.Elem => e
+        case e: eu.cdevreeze.yaidom.simple.Elem                                    => e
       }
       val result = bookstore.elem.transformElemsOrSelf(f)
       Elem(result)
@@ -493,6 +493,23 @@ class QueryTest extends AbstractElemLikeQueryTest {
     assertResult(0) {
       val elms = bookstoreWithoutPrices findTopmostElems { e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined) }
       elms.size
+    }
+  }
+
+  @Test def testAncestryQueryingConsistency(): Unit = {
+    val reverseAncestryOrSelfENames = bookstore.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
+
+    assertResult(bookstore.findAllElemsOrSelf.map(_.resolvedName)) {
+      reverseAncestryOrSelfENames.map(_.last)
+    }
+    assertResult(List(bookstore.resolvedName)) {
+      reverseAncestryOrSelfENames.map(_.head).distinct
+    }
+
+    val reverseAncestryOrSelf = bookstore.findAllElemsOrSelf.map(_.reverseAncestryOrSelf)
+
+    assertResult(reverseAncestryOrSelfENames) {
+      reverseAncestryOrSelf.map(_.map(_.resolvedName))
     }
   }
 
