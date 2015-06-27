@@ -87,7 +87,7 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
    *
    * That is, returns:
    * {{{
-   * ancestryOrSelfENames.dropRight(1)
+   * reverseAncestryOrSelfENames.dropRight(1)
    * }}}
    */
   def reverseAncestryENames: immutable.IndexedSeq[EName]
