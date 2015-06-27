@@ -62,22 +62,22 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
   def elem: U
 
   /**
-   * Returns the ENames of the ancestry-or-self, starting with the root element and ending with this element.
+   * Returns the ENames of the ancestry-or-self reversed, starting with the root element and ending with this element.
    *
    * That is, returns:
    * {{{
    * rootElem.resolvedName +: path.entries.map(_.elementName)
    * }}}
    */
-  def ancestryOrSelfENames: immutable.IndexedSeq[EName]
+  def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName]
 
   /**
-   * Returns the ENames of the ancestry, starting with the root element and ending with the parent of this element, if any.
+   * Returns the ENames of the ancestry reversed, starting with the root element and ending with the parent of this element, if any.
    *
    * That is, returns:
    * {{{
    * ancestryOrSelfENames.dropRight(1)
    * }}}
    */
-  def ancestryENames: immutable.IndexedSeq[EName]
+  def reverseAncestryENames: immutable.IndexedSeq[EName]
 }

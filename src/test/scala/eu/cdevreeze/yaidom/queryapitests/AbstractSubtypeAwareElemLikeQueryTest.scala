@@ -57,7 +57,7 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
         EName(TableNs, "table"))
 
     assertResult(Set(expectedAncestryOrSelfENames)) {
-      tables.map(_.ancestryOrSelfENames).toSet
+      tables.map(_.reverseAncestryOrSelfENames).toSet
     }
 
     val firstTable = tables.head
@@ -87,7 +87,7 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
 
     assertResult(documentContent.findAllElemsOfType(classTag[Table]).flatMap(_.rows).flatMap(_.cells).flatMap(_.findAllElemsOfType(classTag[Paragraph]))) {
       documentContent.filterElemsOrSelfOfType(classTag[Paragraph]) { e =>
-        val ancestryOrSelfENames = e.ancestryOrSelfENames
+        val ancestryOrSelfENames = e.reverseAncestryOrSelfENames
         Set("table", "table-row", "table-cell", "p").subsetOf(ancestryOrSelfENames.map(_.localPart).toSet)
       }
     }
@@ -197,7 +197,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
     final def text: String = bridgeElem.text
 
-    final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
+    final def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
       bridgeElem.rootElem.resolvedName +: bridgeElem.path.entries.map(_.elementName)
     }
 

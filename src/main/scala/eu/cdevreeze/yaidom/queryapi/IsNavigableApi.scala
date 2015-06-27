@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import scala.collection.immutable
+
 import eu.cdevreeze.yaidom.core.Path
 
 /**
@@ -43,6 +45,8 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
+   *
+   * Typically this method must be very efficient, in order for methods like findElemOrSelfByPath to be efficient.
    */
   def findChildElemByPathEntry(entry: Path.Entry): Option[E]
 
@@ -51,6 +55,11 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
 
   /**
    * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
+   *
+   * That is, returns:
+   * {{{
+   * findReverseAncestryOrSelfByPath(path).map(_.last)
+   * }}}
    *
    * Note that for each non-empty Path, we have:
    * {{{
@@ -61,4 +70,15 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
 
   /** Returns (the equivalent of) `findElemOrSelfByPath(path).get` */
   def getElemOrSelfByPath(path: Path): E
+
+  /**
+   * Finds the reversed ancestry-or-self of the element with the given `Path` (where this element is the root),
+   * wrapped in an Option. None is returned if no element can be found at the given Path.
+   *
+   * Hence, the resulting element collection, if any, starts with this element and ends with the element at the given Path,
+   * relative to this element.
+   *
+   * This method comes in handy for (efficiently) computing base URIs, where the (reverse) ancestry-or-self is needed as input.
+   */
+  def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[E]]
 }

@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.simple
 
@@ -34,9 +36,23 @@ object Elem {
   }
 
   /**
+   * Calls `IndexedScopedElem[simple.Elem](docUriOption, rootElem)`
+   */
+  def apply(docUriOption: Option[URI], rootElem: simple.Elem): Elem = {
+    IndexedScopedElem[simple.Elem](docUriOption, rootElem)
+  }
+
+  /**
    * Calls `IndexedScopedElem[simple.Elem](rootElem, path)`
    */
   def apply(rootElem: simple.Elem, path: Path): Elem = {
     IndexedScopedElem[simple.Elem](rootElem, path)
+  }
+
+  /**
+   * Calls `IndexedScopedElem[simple.Elem](docUriOption, rootElem, path)`
+   */
+  def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
+    IndexedScopedElem[simple.Elem](docUriOption, rootElem, path)
   }
 }

@@ -115,6 +115,7 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   private[yaidom] def assertConsistency(): Unit = {
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
     assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
+    assert(childElems.forall(_.docUriOption eq this.docUriOption), "Corrupt element!")
   }
 
   final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = childElems

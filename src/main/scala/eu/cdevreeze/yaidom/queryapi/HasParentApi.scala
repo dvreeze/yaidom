@@ -40,7 +40,8 @@ trait HasParentApi[E <: HasParentApi[E]] { self: E =>
   def parent: E
 
   /**
-   * Returns all ancestor elements or self
+   * Returns all ancestor elements or self, starting with this element, then the parent, if any, and ending with
+   * the root element.
    */
   def ancestorsOrSelf: immutable.IndexedSeq[E]
 
@@ -50,12 +51,14 @@ trait HasParentApi[E <: HasParentApi[E]] { self: E =>
   def ancestors: immutable.IndexedSeq[E]
 
   /**
-   * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option
+   * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option.
+   * Searching starts with this element, then the parent, if applicable, and so on.
    */
   def findAncestorOrSelf(p: E => Boolean): Option[E]
 
   /**
-   * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option
+   * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option.
+   * Searching starts with the parent of this element, if applicable, then the grandparent, if applicable, and so on.
    */
   def findAncestor(p: E => Boolean): Option[E]
 }

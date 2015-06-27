@@ -52,11 +52,11 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
   final def text: String = elem.text
 
-  final def ancestryOrSelfENames: immutable.IndexedSeq[EName] = {
+  final def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
     rootElem.resolvedName +: path.entries.map(_.elementName)
   }
 
-  final def ancestryENames: immutable.IndexedSeq[EName] = {
-    ancestryOrSelfENames.dropRight(1)
+  final def reverseAncestryENames: immutable.IndexedSeq[EName] = {
+    reverseAncestryOrSelfENames.dropRight(1)
   }
 }

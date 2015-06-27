@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import scala.collection.immutable
+
 import eu.cdevreeze.yaidom.core.Path
 
 /**
@@ -37,28 +39,34 @@ trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
   final def getChildElemByPathEntry(entry: Path.Entry): E =
     findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $self"))
 
-  /**
-   * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
-   * This method must be very efficient, which depends on the efficiency of method `findChildElemByPathEntry`.
-   */
   final def findElemOrSelfByPath(path: Path): Option[E] = {
-    // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
-
-    val entryCount = path.entries.size
-
-    def findElemOrSelfByPath(currentRoot: E, entryIndex: Int): Option[E] = {
-      assert(entryIndex >= 0 && entryIndex <= entryCount)
-
-      if (entryIndex == entryCount) Some(currentRoot) else {
-        val newRootOption: Option[E] = currentRoot.findChildElemByPathEntry(path.entries(entryIndex))
-        // Recursive call. Not tail-recursive, but recursion depth should be limited.
-        newRootOption flatMap { newRoot => findElemOrSelfByPath(newRoot, entryIndex + 1) }
-      }
-    }
-
-    findElemOrSelfByPath(self, 0)
+    findReverseAncestryOrSelfByPath(path).map(_.last)
   }
 
   final def getElemOrSelfByPath(path: Path): E =
     findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
+
+  final def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[E]] = {
+    // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
+
+    val entryCount = path.entries.size
+
+    def findReverseAncestryOrSelfByPath(
+      currentRoot: E,
+      entryIndex: Int,
+      reverseAncestry: immutable.IndexedSeq[E]): Option[immutable.IndexedSeq[E]] = {
+
+      assert(entryIndex >= 0 && entryIndex <= entryCount)
+
+      if (entryIndex == entryCount) Some(reverseAncestry :+ currentRoot) else {
+        val newRootOption: Option[E] = currentRoot.findChildElemByPathEntry(path.entries(entryIndex))
+        // Recursive call. Not tail-recursive, but recursion depth should be limited.
+        newRootOption flatMap { newRoot =>
+          findReverseAncestryOrSelfByPath(newRoot, entryIndex + 1, reverseAncestry :+ currentRoot)
+        }
+      }
+    }
+
+    findReverseAncestryOrSelfByPath(self, 0, Vector())
+  }
 }
