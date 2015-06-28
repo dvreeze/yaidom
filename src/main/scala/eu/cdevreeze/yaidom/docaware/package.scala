@@ -45,4 +45,6 @@ import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 package object docaware {
 
   type Elem = IndexedScopedElem[simple.Elem]
+
+  type Document = indexed.Document
 }

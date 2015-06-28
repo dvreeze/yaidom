@@ -166,19 +166,31 @@ final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends Sc
   def text: String = wrappedNode.data.toString
 }
 
-final class ScalaXmlProcessingInstruction(override val wrappedNode: scala.xml.ProcInstr) extends ScalaXmlNode {
+final class ScalaXmlProcessingInstruction(
+  override val wrappedNode: scala.xml.ProcInstr) extends ScalaXmlNode with Nodes.ProcessingInstruction {
+
   require(wrappedNode ne null)
 
   override type DomType = scala.xml.ProcInstr
+
+  def target: String = wrappedNode.target
+
+  def data: String = wrappedNode.proctext
 }
 
-final class ScalaXmlEntityRef(override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode {
+final class ScalaXmlEntityRef(
+  override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode with Nodes.EntityRef {
+
   require(wrappedNode ne null)
 
   override type DomType = scala.xml.EntityRef
+
+  def entity: String = wrappedNode.entityName
 }
 
-final class ScalaXmlComment(override val wrappedNode: scala.xml.Comment) extends ScalaXmlNode {
+final class ScalaXmlComment(
+  override val wrappedNode: scala.xml.Comment) extends ScalaXmlNode with Nodes.Comment {
+
   require(wrappedNode ne null)
 
   override type DomType = scala.xml.Comment

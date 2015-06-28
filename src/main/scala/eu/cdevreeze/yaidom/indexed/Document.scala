@@ -16,65 +16,36 @@
 
 package eu.cdevreeze.yaidom.indexed
 
-import java.net.URI
-
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
- * `Document`, containing an "indexed" document element.
- *
- * Note that class `Document` does not have any query methods for `Elem` instances. In particular, the `ElemApi` does not
- * apply to documents. Therefore, given a document, querying for elements (other than the document element itself) always goes
- * via the document element.
+ * `IndexedDocument`, containing an "indexed" document element with simple elements as underlying elements.
  *
  * @author Chris de Vreeze
  */
 final class Document(
-  val uriOption: Option[URI],
-  val xmlDeclarationOption: Option[XmlDeclaration],
-  val documentElement: Elem,
-  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable {
-
-  require(uriOption ne null)
-  require(xmlDeclarationOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
-
-  require(documentElement.path == Path.Root, "The document element must have the root Path")
+  xmlDeclarationOption: Option[XmlDeclaration],
+  documentElement: Elem,
+  processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
+  comments: immutable.IndexedSeq[Comment]) extends IndexedDocument[simple.Node, simple.Elem](xmlDeclarationOption, documentElement, processingInstructions, comments) with Immutable {
 
   def document: simple.Document =
     new simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
 
-  override def toString: String = document.toString
-
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
-    uriOption = this.uriOption,
     xmlDeclarationOption = this.xmlDeclarationOption,
     documentElement = newRoot,
     processingInstructions = this.processingInstructions,
     comments = this.comments)
 
-  /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
-  def withUriOption(newUriOption: Option[URI]): Document = new Document(
-    uriOption = newUriOption,
-    xmlDeclarationOption = this.xmlDeclarationOption,
-    documentElement = this.documentElement,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
-
   /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
   def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): Document = new Document(
-    uriOption = this.uriOption,
     xmlDeclarationOption = newXmlDeclarationOption,
     documentElement = this.documentElement,
     processingInstructions = this.processingInstructions,
@@ -84,17 +55,16 @@ final class Document(
 object Document {
 
   def apply(
-    uriOption: Option[URI],
     xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(uriOption, xmlDeclarationOption, documentElement, processingInstructions, comments)
+    new Document(xmlDeclarationOption, documentElement, processingInstructions, comments)
   }
 
-  def apply(documentElement: Elem): Document = apply(None, None, documentElement)
+  def apply(documentElement: Elem): Document = apply(None, documentElement)
 
   def apply(d: simple.Document): Document =
-    new Document(d.uriOption, d.xmlDeclarationOption, Elem(d.documentElement), d.processingInstructions, d.comments)
+    new Document(d.xmlDeclarationOption, Elem(d.uriOption, d.documentElement), d.processingInstructions, d.comments)
 }

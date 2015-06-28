@@ -516,7 +516,7 @@ final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Te
 }
 
 @SerialVersionUID(1L)
-final case class ProcessingInstruction(target: String, data: String) extends Node {
+final case class ProcessingInstruction(target: String, data: String) extends Node with Nodes.ProcessingInstruction {
   require(target ne null)
   require(data ne null)
 
@@ -538,7 +538,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Nod
  * }}}
  */
 @SerialVersionUID(1L)
-final case class EntityRef(entity: String) extends Node {
+final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
   require(entity ne null)
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
@@ -548,7 +548,7 @@ final case class EntityRef(entity: String) extends Node {
 }
 
 @SerialVersionUID(1L)
-final case class Comment(text: String) extends Node {
+final case class Comment(text: String) extends Node with Nodes.Comment {
   require(text ne null)
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {

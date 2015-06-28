@@ -196,19 +196,31 @@ final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 }
 
-final class DomProcessingInstruction(override val wrappedNode: w3c.dom.ProcessingInstruction) extends DomNode {
+final class DomProcessingInstruction(
+  override val wrappedNode: w3c.dom.ProcessingInstruction) extends DomNode with Nodes.ProcessingInstruction {
+
   require(wrappedNode ne null)
 
   override type DomType = w3c.dom.ProcessingInstruction
+
+  def target: String = wrappedNode.getTarget
+
+  def data: String = wrappedNode.getData
 }
 
-final class DomEntityRef(override val wrappedNode: w3c.dom.EntityReference) extends DomNode {
+final class DomEntityRef(
+  override val wrappedNode: w3c.dom.EntityReference) extends DomNode with Nodes.EntityRef {
+
   require(wrappedNode ne null)
 
   override type DomType = w3c.dom.EntityReference
+
+  def entity: String = wrappedNode.getNodeName
 }
 
-final class DomComment(override val wrappedNode: w3c.dom.Comment) extends DomNode {
+final class DomComment(
+  override val wrappedNode: w3c.dom.Comment) extends DomNode with Nodes.Comment {
+
   require(wrappedNode ne null)
 
   override type DomType = w3c.dom.Comment

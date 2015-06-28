@@ -18,50 +18,19 @@ package eu.cdevreeze.yaidom.docaware
 
 import java.net.URI
 
+import scala.Vector
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.XmlDeclaration
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
 
 /**
- * `Document`, containing a "document-aware" document element.
+ * Factory object for `indexed.Document` instances.
  *
  * @author Chris de Vreeze
  */
-final class Document(
-  val xmlDeclarationOption: Option[XmlDeclaration],
-  val documentElement: Elem,
-  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable {
-
-  require(xmlDeclarationOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
-
-  require(documentElement.path == Path.Root, "The document element must have the root Path")
-
-  def document: simple.Document =
-    new simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
-
-  def uri: URI = documentElement.docUri
-
-  def uriOption: Option[URI] = Some(uri)
-
-  override def toString: String = document.toString
-
-  /** Creates a copy, but with the new documentElement passed as parameter newRoot */
-  def withDocumentElement(newRoot: Elem): Document = new Document(
-    xmlDeclarationOption = this.xmlDeclarationOption,
-    documentElement = newRoot,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
-}
-
 object Document {
 
   def apply(

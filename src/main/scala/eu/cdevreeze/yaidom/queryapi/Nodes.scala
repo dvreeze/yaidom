@@ -19,7 +19,9 @@ package eu.cdevreeze.yaidom.queryapi
 import scala.collection.immutable
 
 /**
- * Abstract node trait hierarchy. This minimal node abstraction is complete enough to create resolved nodes from them.
+ * Abstract node trait hierarchy. It offers a common minimal API for different kinds of nodes.
+ *
+ * This minimal node abstraction is complete enough to create resolved nodes from them.
  *
  * The down-side is that we have to consider mixing in these traits everywhere we create a node/element implementation.
  *
@@ -47,5 +49,31 @@ object Nodes {
   trait Text extends Node {
 
     def text: String
+  }
+
+  /**
+   * Arbitrary comment node
+   */
+  trait Comment extends Node {
+
+    def text: String
+  }
+
+  /**
+   * Arbitrary processing instruction node
+   */
+  trait ProcessingInstruction extends Node {
+
+    def target: String
+
+    def data: String
+  }
+
+  /**
+   * Arbitrary entity reference node
+   */
+  trait EntityRef extends Node {
+
+    def entity: String
   }
 }
