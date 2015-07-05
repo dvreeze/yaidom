@@ -59,6 +59,29 @@ class ClarkElemEditorTest extends Suite {
     assertResult(Set(instance.scope)) {
       instance.findAllElemsOrSelf.map(_.scope).toSet
     }
+
+    val uri = classOf[ClarkElemEditorTest].getResource("sample-xbrl-instance.xml").toURI
+
+    val parsedInstance = docParser.parse(uri).documentElement
+
+    val filteredInstance = parsedInstance.minusAttribute(QName("xsi:schemaLocation")) transformChildElemsToNodeSeq {
+      case e if e.localName == "schemaRef" =>
+        Vector(e)
+      case e if e.localName == "context" && e.attributeOption(EName("id")) == Some("I-2007") =>
+        Vector(e)
+      case e if e.localName == "unit" && e.attributeOption(EName("id")) == Some("U-Monetary") =>
+        Vector(e)
+      case e if e.localName == "CashAndCashEquivalents" &&
+        e.attributeOption(EName("contextRef")) == Some("I-2007") &&
+        e.attributeOption(EName("unitRef")) == Some("U-Monetary") =>
+        Vector(e)
+      case e =>
+        Vector()
+    }
+
+    assertResult(resolved.Elem(filteredInstance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem(instance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    }
   }
 
   private def createContext(): simple.Elem = {
@@ -77,10 +100,10 @@ class ClarkElemEditorTest extends Suite {
     val segment =
       editor.wrap(emptyElem(QName("segment"), scope)).
         plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain")).
+        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:BusinessSegmentAxis"), dimScope, "gaap:ConsolidatedGroupDomain")).
+        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:VerificationAxis"), dimScope, "gaap:UnqualifiedOpinionMember")).
+        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:PremiseAxis"), dimScope, "gaap:ActualMember")).
+        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:ReportDateAxis"), dimScope, "gaap:ReportedAsOfMarch182008Member")).
         toElem
 
     // No prefixed namespace undeclarations
@@ -99,9 +122,16 @@ class ClarkElemEditorTest extends Suite {
       NamespaceUtils.pushUpPrefixedNamespaces(segment).findAllElemsOrSelf.map(_.scope).toSet
     }
 
+    val entity =
+      elem(QName("entity"), scope, Vector(identifier, segment))
+
+    val period =
+      emptyElem(QName("period"), scope).plusChild(textElem(QName("instant"), scope, "2007-12-31"))
+
     val context =
-      editor.wrap(emptyElem(QName("context"), scope)).
-        plusChild(segment).
+      editor.wrap(emptyElem(QName("context"), scope).plusAttribute(QName("id"), "I-2007")).
+        plusChild(entity).
+        plusChild(period).
         toElem
 
     NamespaceUtils.pushUpPrefixedNamespaces(context)
