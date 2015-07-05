@@ -298,7 +298,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
     qname match {
       case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(getNoNsEName(unprefixedName.localPart))
-      case unprefixedName: UnprefixedName => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
+      case unprefixedName: UnprefixedName                                   => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
       case prefixedName: PrefixedName =>
         // The prefix scope (as Map), with the implicit "xml" namespace added
         val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
@@ -407,6 +407,38 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   }
 
   /**
+   * Returns one of the prefixes for the given namespace URI, if any, and otherwise falling back to a prefix (or exception)
+   * computed by the 2nd parameter. The result includes the empty string for the default namespace, if
+   * the default namespace is indeed equal to the passed namespace URI. The result does not include "xml" for the
+   * implicit "xml" namespace (with namespace URI http://www.w3.org/XML/1998/namespace).
+   *
+   * If the given namespace is the default namespace, but if there is also a non-empty prefix for the namespace, that
+   * non-empty prefix is returned. Otherwise, if the given namespace is the default namespace, the empty string is returned.
+   *
+   * This method can be handy when "inserting" an "element" into a parent tree, if one wants to reuse prefixes of the
+   * parent tree.
+   */
+  def prefixForNamespace(namespaceUri: String, getFallbackPrefix: () => String): String = {
+    val prefixes = prefixesForNamespace(namespaceUri)
+
+    if (prefixes.isEmpty) getFallbackPrefix()
+    else if (prefixes == Set("")) ""
+    else (prefixes - "").head
+  }
+
+  /**
+   * Convenience method, returning:
+   * {{{
+   * this.resolve(
+   *   Declarations.from(prefixForNamespace(namespaceUri, getFallbackPrefix) -> namespaceUri))
+   * }}}
+   */
+  def includingNamespace(namespaceUri: String, getFallbackPrefix: () => String): Scope = {
+    val prefix = prefixForNamespace(namespaceUri, getFallbackPrefix)
+    this.resolve(Declarations.from(prefix -> namespaceUri))
+  }
+
+  /**
    * Returns the Java NamespaceContext corresponding to this Scope. Note that this method is very useful if we want to create
    * a NamespaceContext in an easy manner. Indeed, yaidom Scopes make excellent NamespaceContext factories.
    */
@@ -417,9 +449,9 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
         require(prefix ne null)
 
         prefix match {
-          case XMLConstants.XML_NS_PREFIX => XMLConstants.XML_NS_URI
+          case XMLConstants.XML_NS_PREFIX   => XMLConstants.XML_NS_URI
           case XMLConstants.XMLNS_ATTRIBUTE => XMLConstants.XMLNS_ATTRIBUTE_NS_URI
-          case pref => prefixNamespaceMap.getOrElse(pref, XMLConstants.NULL_NS_URI)
+          case pref                         => prefixNamespaceMap.getOrElse(pref, XMLConstants.NULL_NS_URI)
         }
       }
 
@@ -442,9 +474,9 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
         val inverseMap = inverse
 
         namespaceURI match {
-          case XMLConstants.XML_NS_URI => Set(XMLConstants.XML_NS_PREFIX).iterator.asJava
+          case XMLConstants.XML_NS_URI             => Set(XMLConstants.XML_NS_PREFIX).iterator.asJava
           case XMLConstants.XMLNS_ATTRIBUTE_NS_URI => Set(XMLConstants.XMLNS_ATTRIBUTE).iterator.asJava
-          case nsUri => inverseMap.getOrElse(nsUri, Set[String]()).iterator.asJava
+          case nsUri                               => inverseMap.getOrElse(nsUri, Set[String]()).iterator.asJava
         }
       }
     }
