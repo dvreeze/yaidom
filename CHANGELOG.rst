@@ -3,6 +3,51 @@ CHANGELOG
 =========
 
 
+1.4.0-M1
+========
+
+Version 1.4.0-M1 made the core of yaidom meaner and cleaner, except for the addition of XML declaration support.
+There are breaking changes, but (with recompilation of code using yaidom) there should not be too many of them.
+
+The changes in this version are:
+
+* There are now 2 main query API abstractions, that combine several orthogonal query API traits:
+
+  * ``ClarkElemApi``, which reminds of the James Clark minimal XML element tree abstraction
+  * ``ScopedElemApi``, which extends ``ClarkElemApi``, forming the minimal practical XML element tree abstraction (with QNames and Scopes)
+  
+* ``ScopedElemApi`` now (indirectly) extends ``IsNavigableApi``:
+
+  * What's more, even ``ClarkElemApi`` extends ``IsNavigableApi``
+  * After all, this makes sense for "James Clark element trees", and 2 main query API abstractions suffice
+  * ``ClarkElemApi`` extends ``ElemApi``, ``IsNavigableApi``, ``HasENameApi`` and ``HasTextApi``
+  * ``ScopedElemApi`` extends ``ClarkElemApi``, ``HasQNameApi`` and ``HasScopeApi``
+  * So the net effect on ``ScopedElemApi`` is that it now (indirectly) mixes in ``IsNavigableApi``
+  * Also added method ``findReverseAncestryOrSelfByPath`` to ``IsNavigableApi`` (e.g. for fast XML Base computation)
+  
+* Made "indexed" elements much more generic, and removed the distinction between "indexed" and "docaware" documents:
+
+  * New trait ``IndexedClarkElemApi``, which extends ``ClarkElemApi``, abstracts over indexed elements
+  * New trait ``IndexedScopedElemApi`` is similar, but it extends ``ScopedElemApi`` as well as ``IndexedClarkElemApi``
+  * Classes ``IndexedClarkElem`` and ``IndexedScopedElem`` extend ``IndexedClarkElemApi`` and ``IndexedScopedElemApi``, respectively
+  * The old indexed elements are type ``IndexedScopedElem[simple.Elem]``
+  * And so are the old docaware elements, so they can be deprecated soon!
+  * Indeed indexed elements now have XML Base support
+  * The indexed and docaware Elem companion objects (currently) remained (as did the indexed Document classes/objects)
+  
+* Support for XML declarations in document classes
+* Added some convenience methods to ``Scope``, and used them in new element editor utilities
+* Conversions from yaidom to SAX events no longer internal to DocumentPrinterUsingSax
+
+* Added minimal node tree abstraction (``Nodes.Node`` and sub-types):
+
+  * This helped in removing the (wrong) dependency of the "simple" package on the "resolved" package
+  * What's more, resolved elements can now be created from other element implementations than just simple elements
+
+* Small bug fixes, such as improved SAX-based parsing and more reliable DOM to yaidom conversions
+* Many more tests
+
+
 1.3.6
 =====
 
