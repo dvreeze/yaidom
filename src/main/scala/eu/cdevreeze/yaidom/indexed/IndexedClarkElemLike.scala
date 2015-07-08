@@ -73,6 +73,9 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
   }
 }
 
+/**
+ * Some XML base support, used in trait `IndexedClarkElemLike`, for example, but also potentially useful in application code.
+ */
 object IndexedClarkElemLike {
 
   /**

@@ -114,7 +114,7 @@ object IndexedScopedElem {
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
 
     val parentBaseUriOption: Option[URI] =
-      path.parentPathOption.flatMap(p => IndexedClarkElemLike.computeBaseUriOption(docUriOption, rootElem, p)).orElse(docUriOption)
+      IndexedClarkElemLike.computeBaseUriOption(docUriOption, rootElem, path.parentPathOption.getOrElse(Path.Root))
 
     apply(docUriOption, parentBaseUriOption, rootElem, path, elem)
   }
@@ -126,9 +126,7 @@ object IndexedScopedElem {
     path: Path,
     elem: U): IndexedScopedElem[U] = {
 
-    val explicitBaseUriOption = elem.attributeOption(IndexedClarkElemLike.XmlBaseEName).map(s => new URI(s))
-    val baseUriOption: Option[URI] =
-      explicitBaseUriOption.flatMap(u => parentBaseUriOption.map(_.resolve(u))).orElse(parentBaseUriOption)
+    val baseUriOption = IndexedClarkElemLike.getNextBaseUriOption(parentBaseUriOption, elem)
 
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
