@@ -45,6 +45,8 @@ trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi
 
   def elem: U
 
+  def baseUriOption: Option[URI]
+
   def findAllChildElems: immutable.IndexedSeq[E]
 
   final override def qname: QName = elem.qname

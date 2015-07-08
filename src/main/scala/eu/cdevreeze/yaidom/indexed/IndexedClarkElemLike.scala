@@ -43,6 +43,8 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
   def elem: U
 
+  def baseUriOption: Option[URI]
+
   def findAllChildElems: immutable.IndexedSeq[E]
 
   final def resolvedName: EName = elem.resolvedName
@@ -51,21 +53,6 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
     elem.resolvedAttributes
 
   final def text: String = elem.text
-
-  final def baseUriOption: Option[URI] = {
-    val reverseAncestryOrSelf: immutable.IndexedSeq[U] =
-      rootElem.findReverseAncestryOrSelfByPath(path).getOrElse(
-        sys.error("Corrupt data. Could not get reverse ancestry-or-self of ${elem}"))
-
-    assert(reverseAncestryOrSelf.head == rootElem)
-    assert(reverseAncestryOrSelf.last == elem)
-
-    reverseAncestryOrSelf.foldLeft(docUriOption) {
-      case (parentBaseUriOption, elm) =>
-        val explicitBaseUriOption = elm.attributeOption(XmlBaseEName).map(s => new URI(s))
-        explicitBaseUriOption.flatMap(u => parentBaseUriOption.map(_.resolve(u)).orElse(Some(u))).orElse(parentBaseUriOption)
-    }
-  }
 
   final def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
     rootElem.resolvedName +: path.entries.map(_.elementName)
@@ -84,8 +71,36 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
     resultOption.get
   }
+}
 
-  private val XmlNs = "http://www.w3.org/XML/1998/namespace"
+object IndexedClarkElemLike {
 
-  private val XmlBaseEName = EName(XmlNs, "base")
+  /**
+   * Returns the optional base URI, given an optional document URI, the root element, and the Path from the root
+   * element to "this" element.
+   */
+  def computeBaseUriOption[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): Option[URI] = {
+    val reverseAncestryOrSelf: immutable.IndexedSeq[U] =
+      rootElem.findReverseAncestryOrSelfByPath(path).getOrElse(
+        sys.error(s"Corrupt data. Could not get reverse ancestry-or-self of ${rootElem.getElemOrSelfByPath(path)}"))
+
+    assert(reverseAncestryOrSelf.head == rootElem)
+
+    reverseAncestryOrSelf.foldLeft(docUriOption) {
+      case (parentBaseUriOption, elm) =>
+        getNextBaseUriOption(parentBaseUriOption, elm)
+    }
+  }
+
+  /**
+   * Returns the optional base URI, given an optional parent base URI, and "this" element.
+   */
+  def getNextBaseUriOption[U <: ClarkElemApi[U]](parentBaseUriOption: Option[URI], elem: U): Option[URI] = {
+    val explicitBaseUriOption = elem.attributeOption(IndexedClarkElemLike.XmlBaseEName).map(s => new URI(s))
+    explicitBaseUriOption.map(u => parentBaseUriOption.map(_.resolve(u)).getOrElse(u)).orElse(parentBaseUriOption)
+  }
+
+  val XmlNs = "http://www.w3.org/XML/1998/namespace"
+
+  val XmlBaseEName = EName(XmlNs, "base")
 }

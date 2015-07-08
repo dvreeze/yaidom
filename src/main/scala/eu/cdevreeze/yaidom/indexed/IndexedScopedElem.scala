@@ -30,12 +30,16 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  * a `ClarkElemApi`, it is and indexes a `ScopedElemApi`. Other than that, see the
  * documentation for `IndexedClarkElem`.
  *
+ * The optional parent base URI is stored for very fast (optional) base URI computation. This is helpful in
+ * an XBRL context, where URI resolution against a base URI is typically a very frequent operation.
+ *
  * @tparam U The underlying element type
  *
  * @author Chris de Vreeze
  */
 final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
   val docUriOption: Option[URI],
+  val parentBaseUriOption: Option[URI],
   val rootElem: U,
   childElems: immutable.IndexedSeq[IndexedScopedElem[U]],
   val path: Path,
@@ -65,9 +69,19 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
 
   final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
 
-  final def docUri: URI = docUriOption.getOrElse(sys.error(s"Missing document URI in ${elem}"))
+  final def baseUriOption: Option[URI] = {
+    IndexedClarkElemLike.getNextBaseUriOption(parentBaseUriOption, elem)
+  }
 
-  final def baseUri: URI = baseUriOption.getOrElse(sys.error(s"Missing base URI in ${elem}"))
+  /**
+   * Returns the document URI, falling back to the empty URI if absent.
+   */
+  final def docUri: URI = docUriOption.getOrElse(new URI(""))
+
+  /**
+   * Returns the base URI, falling back to the empty URI if absent.
+   */
+  final def baseUri: URI = baseUriOption.getOrElse(new URI(""))
 }
 
 object IndexedScopedElem {
@@ -99,16 +113,29 @@ object IndexedScopedElem {
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
 
-    apply(docUriOption, rootElem, path, elem)
+    val parentBaseUriOption: Option[URI] =
+      path.parentPathOption.flatMap(p => IndexedClarkElemLike.computeBaseUriOption(docUriOption, rootElem, p)).orElse(docUriOption)
+
+    apply(docUriOption, parentBaseUriOption, rootElem, path, elem)
   }
 
-  private def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path, elem: U): IndexedScopedElem[U] = {
+  private def apply[U <: ScopedElemApi[U]](
+    docUriOption: Option[URI],
+    parentBaseUriOption: Option[URI],
+    rootElem: U,
+    path: Path,
+    elem: U): IndexedScopedElem[U] = {
+
+    val explicitBaseUriOption = elem.attributeOption(IndexedClarkElemLike.XmlBaseEName).map(s => new URI(s))
+    val baseUriOption: Option[URI] =
+      explicitBaseUriOption.flatMap(u => parentBaseUriOption.map(_.resolve(u))).orElse(parentBaseUriOption)
+
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        apply(docUriOption, rootElem, path.append(entry), e)
+        apply(docUriOption, baseUriOption, rootElem, path.append(entry), e)
     }
 
-    new IndexedScopedElem(docUriOption, rootElem, childElems, path, elem)
+    new IndexedScopedElem(docUriOption, parentBaseUriOption, rootElem, childElems, path, elem)
   }
 }
