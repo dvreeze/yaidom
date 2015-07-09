@@ -3,6 +3,18 @@ CHANGELOG
 =========
 
 
+1.4.0-M2
+========
+
+Version 1.4.0-M2 mainly fixed a potential performance problem, introduced with version 1.4.0-M1.
+
+The main changes in this version are:
+
+* Indexed elements (formerly docaware elements) again store the parent base URI, for fast base URI computation
+* The docaware package is finally obsolete, in that it now only contains aliases to types of indexed elements and documents and their companion objects
+* Generic class IndexedDocument now only takes one type parameter (for the element) instead of two
+
+
 1.4.0-M1
 ========
 
