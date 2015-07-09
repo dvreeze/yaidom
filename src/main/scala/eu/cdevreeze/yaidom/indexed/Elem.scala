@@ -43,6 +43,13 @@ object Elem {
   }
 
   /**
+   * Calls `IndexedScopedElem[simple.Elem](Some(docUri), rootElem)`
+   */
+  def apply(docUri: URI, rootElem: simple.Elem): Elem = {
+    IndexedScopedElem[simple.Elem](Some(docUri), rootElem)
+  }
+
+  /**
    * Calls `IndexedScopedElem[simple.Elem](rootElem, path)`
    */
   def apply(rootElem: simple.Elem, path: Path): Elem = {
@@ -54,5 +61,12 @@ object Elem {
    */
   def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
     IndexedScopedElem[simple.Elem](docUriOption, rootElem, path)
+  }
+
+  /**
+   * Calls `IndexedScopedElem[simple.Elem](Some(docUri), rootElem, path)`
+   */
+  def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
+    IndexedScopedElem[simple.Elem](Some(docUri), rootElem, path)
   }
 }

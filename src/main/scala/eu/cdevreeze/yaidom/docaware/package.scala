@@ -19,26 +19,8 @@ package eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 
 /**
- * This package contains element representations that contain the "context" of the element, including the URI of the containing
- * document. In other words, this package contains element representations like `indexed.Elem`, except that the document URI
- * is stored as well in each element.
- *
- * Below follows a simple example query, using the uniform query API:
- * {{{
- * // Note the import of package docaware, and not of its members. That is indeed a best practice!
- * import eu.cdevreeze.yaidom.docaware
- *
- * val docawareBookstoreElem = docaware.Elem(bookstoreElem)
- *
- * val scalaBookAuthors =
- *   for {
- *     bookElem <- docawareBookstoreElem \ EName("{http://bookstore/book}Book")
- *     if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
- *     authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
- *   } yield authorElem
- * }}}
- * The query for Scala book authors would have been exactly the same if normal `Elem`s had been used instead of `docaware.Elem`s
- * (replacing `docawareBookstoreElem` by `bookstoreElem`)!
+ * This package used to contain element implementations like "indexed" elements, but with a mandatory URI as well.
+ * Now there are only "indexed" elements, so this package can be phased out.
  *
  * @author Chris de Vreeze
  */
@@ -46,5 +28,9 @@ package object docaware {
 
   type Elem = IndexedScopedElem[simple.Elem]
 
+  val Elem = indexed.Elem
+
   type Document = indexed.Document
+
+  val Document = indexed.Document
 }

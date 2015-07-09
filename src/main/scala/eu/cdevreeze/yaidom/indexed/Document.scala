@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.simple
@@ -63,7 +65,13 @@ object Document {
     new Document(xmlDeclarationOption, documentElement, processingInstructions, comments)
   }
 
-  def apply(documentElement: Elem): Document = apply(None, documentElement)
+  def apply(documentElement: Elem): Document = {
+    new Document(None, documentElement, Vector(), Vector())
+  }
+
+  def apply(docUri: URI, d: simple.Document): Document = {
+    new Document(d.xmlDeclarationOption, Elem(Some(docUri), d.documentElement), d.processingInstructions, d.comments)
+  }
 
   def apply(d: simple.Document): Document =
     new Document(d.xmlDeclarationOption, Elem(d.uriOption, d.documentElement), d.processingInstructions, d.comments)

@@ -442,7 +442,6 @@ package eu.cdevreeze
  * <li>Immutable class [[eu.cdevreeze.yaidom.indexed.Elem]], which offers views on default Elems that know the ancestry of
  * each element. It mixes in the `ElemLike` query API, but knows its ancestry, despite being immutable! This element implementation
  * is handy for querying XML schemas, for example, because in schemas the ancestry of queried elements typically matters.</li>
- * <li>Immutable class [[eu.cdevreeze.yaidom.docaware.Elem]], which is like `indexed.Elem`, but also stores the document URI.</li>
  * <li>Class [[eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem]], which wraps a Scala XML Elem. It mixes in the `ElemLike` query API.</li>
  * <li>Class [[eu.cdevreeze.yaidom.dom.DomElem]], which wraps a (mutable!) DOM Element. It mixes in both the `ElemLike` and `HasParent`
  * query APIs.</li>
@@ -466,7 +465,7 @@ package eu.cdevreeze
  * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi` and `simple` packages.</li>
  * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
  * the packages mentioned above.</li>
- * <li>The other packages: [[eu.cdevreeze.yaidom.dom]], [[eu.cdevreeze.yaidom.indexed]], [[eu.cdevreeze.yaidom.docaware]],
+ * <li>The other packages: [[eu.cdevreeze.yaidom.dom]], [[eu.cdevreeze.yaidom.indexed]],
  * [[eu.cdevreeze.yaidom.resolved]] and [[eu.cdevreeze.yaidom.scalaxml]]. They depend on (some of) the packages mentioned above,
  * and not on each other.</li>
  * </ol>
