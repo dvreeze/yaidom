@@ -35,11 +35,11 @@ import eu.cdevreeze.yaidom.simple.XmlDeclaration
  *
  * @author Chris de Vreeze
  */
-abstract class IndexedDocument[N <: Nodes.Node, U <: N with ScopedElemApi[U]](
+abstract class IndexedDocument[U <: ScopedElemApi[U]](
   val xmlDeclarationOption: Option[XmlDeclaration],
   val documentElement: IndexedScopedElem[U],
-  val processingInstructions: immutable.IndexedSeq[N with Nodes.ProcessingInstruction],
-  val comments: immutable.IndexedSeq[N with Nodes.Comment]) extends DocumentApi[IndexedScopedElem[U]] with Immutable {
+  val processingInstructions: immutable.IndexedSeq[Nodes.ProcessingInstruction],
+  val comments: immutable.IndexedSeq[Nodes.Comment]) extends DocumentApi[IndexedScopedElem[U]] with Immutable {
 
   require(xmlDeclarationOption ne null)
   require(documentElement ne null)
@@ -60,8 +60,8 @@ abstract class IndexedDocument[N <: Nodes.Node, U <: N with ScopedElemApi[U]](
   final override def toString: String = document.toString
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
-  def withDocumentElement(newRoot: IndexedScopedElem[U]): IndexedDocument[N, U]
+  def withDocumentElement(newRoot: IndexedScopedElem[U]): IndexedDocument[U]
 
   /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
-  def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): IndexedDocument[N, U]
+  def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): IndexedDocument[U]
 }

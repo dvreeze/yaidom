@@ -34,7 +34,7 @@ final class Document(
   xmlDeclarationOption: Option[XmlDeclaration],
   documentElement: Elem,
   processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  comments: immutable.IndexedSeq[Comment]) extends IndexedDocument[simple.Node, simple.Elem](xmlDeclarationOption, documentElement, processingInstructions, comments) with Immutable {
+  comments: immutable.IndexedSeq[Comment]) extends IndexedDocument[simple.Elem](xmlDeclarationOption, documentElement, processingInstructions, comments) with Immutable {
 
   def document: simple.Document =
     new simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
