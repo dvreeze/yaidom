@@ -31,6 +31,15 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike[E] with IsNavigable[E] with HasEName with HasText { self: E =>
 
+  /**
+   * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
+   *
+   * This method is final, so more efficient implementations for sub-types are not supported. This implementation
+   * is only efficient if finding all child elements as well as computing their resolved names is efficient.
+   * That is not the case for DOM wrappers or Scala XML Elem wrappers (due to their expensive Scope computations).
+   * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
+   * production. Hence, this method should typically be fast enough.
+   */
   final override def findChildElemByPathEntry(entry: Path.Entry): Option[E] = {
     val filteredChildElems = findAllChildElems.toStream filter { e => e.resolvedName == entry.elementName }
 
@@ -39,6 +48,15 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
     childElemOption
   }
 
+  /**
+   * Returns all child elements paired with their path entries.
+   *
+   * This method is final, so more efficient implementations for sub-types are not supported. This implementation
+   * is only efficient if finding all child elements as well as computing their resolved names is efficient.
+   * That is not the case for DOM wrappers or Scala XML Elem wrappers (due to their expensive Scope computations).
+   * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
+   * production. Hence, this method should typically be fast enough.
+   */
   final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)] = {
     val nextEntries = mutable.Map[EName, Int]()
 

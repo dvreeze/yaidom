@@ -50,6 +50,11 @@ abstract class IndexedDocument[N <: Nodes.Node, U <: N with ScopedElemApi[U]](
 
   final def uriOption: Option[URI] = documentElement.docUriOption
 
+  /**
+   * Returns the document URI, falling back to the empty URI if absent.
+   */
+  final def uri: URI = uriOption.getOrElse(new URI(""))
+
   def document: DocumentApi[U]
 
   final override def toString: String = document.toString
