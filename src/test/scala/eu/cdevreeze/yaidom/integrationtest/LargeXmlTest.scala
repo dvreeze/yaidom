@@ -149,12 +149,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doQueryTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
-  @Test def testQueryDocawareElem(): Unit = {
-    val indexedDoc = indexed.Document(new URI(""), doc)
-
-    doQueryTest(indexedDoc.documentElement, "indexed.Elem")
-  }
-
   @Test def testQueryResolvedElem(): Unit = {
     val resolvedElem = resolved.Elem(doc.documentElement)
 
@@ -473,12 +467,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
   @Test def testNavigationForIndexedElem(): Unit = {
     val indexedDoc = indexed.Document(doc)
-
-    doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
-  }
-
-  @Test def testNavigationForDocawareElem(): Unit = {
-    val indexedDoc = indexed.Document(new URI(""), doc)
 
     doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
   }
