@@ -26,11 +26,15 @@ import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
  */
 package object docaware {
 
+  @deprecated(message = "Use 'indexed.Elem' instead", since = "1.4.0")
   type Elem = IndexedScopedElem[simple.Elem]
 
+  @deprecated(message = "Use 'indexed.Elem' instead", since = "1.4.0")
   val Elem = indexed.Elem
 
+  @deprecated(message = "Use 'indexed.Document' instead", since = "1.4.0")
   type Document = indexed.Document
 
+  @deprecated(message = "Use 'indexed.Document' instead", since = "1.4.0")
   val Document = indexed.Document
 }

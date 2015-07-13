@@ -38,7 +38,6 @@ import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -151,9 +150,9 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testQueryDocawareElem(): Unit = {
-    val docawareDoc = docaware.Document(new URI(""), doc)
+    val indexedDoc = indexed.Document(new URI(""), doc)
 
-    doQueryTest(docawareDoc.documentElement, "docaware.Elem")
+    doQueryTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
   @Test def testQueryResolvedElem(): Unit = {
@@ -479,9 +478,9 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNavigationForDocawareElem(): Unit = {
-    val docawareDoc = docaware.Document(new URI(""), doc)
+    val indexedDoc = indexed.Document(new URI(""), doc)
 
-    doNavigationTest(docawareDoc.documentElement, "docaware.Elem")
+    doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
   @Test def testNavigationForResolvedElem(): Unit = {

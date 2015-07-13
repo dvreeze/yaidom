@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.docaware
+package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
@@ -24,29 +24,35 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
-import eu.cdevreeze.yaidom
+import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
+import eu.cdevreeze.yaidom.simple
 
 /**
- * Alternative XML Base test case for docaware Elems. This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
- *
- * Note the use of empty URIs in some places.
+ * XML Base test case for indexed Elems.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
+class XmlBaseTest extends AbstractXmlBaseTest {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
 
-  type E = yaidom.docaware.Elem
+  type E = indexed.Elem
 
-  type E2 = yaidom.simple.Elem
+  type E2 = simple.Elem
 
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E] = {
-    val doc = yaidom.docaware.Document(docUri, yaidom.simple.Document(elem))
-    doc
+  protected def getDocument(path: String, docUri: URI): indexed.Document = {
+    val docParser = DocumentParserUsingSax.newInstance
+    val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
+    val doc = docParser.parse(parsedDocUri)
+
+    indexed.Document(docUri, doc)
+  }
+
+  protected def getDocument(path: String): indexed.Document = {
+    getDocument(path, classOf[XmlBaseTest].getResource(path).toURI)
   }
 
   protected def getBaseUri(elem: E): URI = {
@@ -75,6 +81,4 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
     // Note the different behavior for resolving the empty URI!
     base.resolve(uri)
   }
-
-  protected def nullUri: URI = new URI("")
 }

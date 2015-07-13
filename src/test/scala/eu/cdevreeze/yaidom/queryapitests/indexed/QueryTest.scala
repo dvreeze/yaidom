@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
+import java.net.URI
+
 import scala.Vector
 import scala.collection.immutable
 
@@ -28,9 +30,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.fromElem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
@@ -82,7 +81,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     // Indexed Elems can be queried for the parent element!
 
-    val bookOrMagazineTitles2 =
+    val bookOrMagazineTitles =
       for {
         title <- bookstore filterElems { _.resolvedName == EName("Title") }
         if (title.path.parentPath.elementNameOption == Some(EName("Book"))) ||
@@ -96,7 +95,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = bookOrMagazineTitles2 map { _.trimmedText }
+      val result = bookOrMagazineTitles map { _.trimmedText }
       result.toSet
     }
   }
@@ -446,7 +445,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       }
 
     val invertedBookstore: Elem =
-      Elem(eu.cdevreeze.yaidom.simple.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
+      Elem(bookstore.docUri, eu.cdevreeze.yaidom.simple.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
 
     assertResult(3) {
       invertedBookstore.findAllChildElems.size
@@ -477,7 +476,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         case e: eu.cdevreeze.yaidom.simple.Elem                                    => e
       }
       val result = bookstore.elem.transformElemsOrSelf(f)
-      Elem(result)
+      Elem(bookstore.docUri, result)
     }
 
     assertResult(4) {
@@ -656,7 +655,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         children = Vector(
           book1Builder, book2Builder, book3Builder, book4Builder,
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
-    Elem(result)
+    Elem(new URI("http://bookstore.xml"), result)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)

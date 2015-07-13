@@ -43,7 +43,7 @@ class RobustQueryTest extends AbstractRobustQueryTest {
 
     val is = classOf[RobustQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/contacts.xml")
 
-    Elem(docParser.parse(is).documentElement)
+    Elem(new java.net.URI(""), docParser.parse(is).documentElement)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

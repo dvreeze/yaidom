@@ -49,14 +49,14 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = docParser.parse(docUri)
 
-    new BridgeElemTakingIndexedElem(eu.cdevreeze.yaidom.indexed.Document(doc).documentElement)
+    new BridgeElemTakingIndexedElem(eu.cdevreeze.yaidom.indexed.Document(docUri, doc).documentElement)
   }
 }
 
 object SubtypeAwareElemLikeQueryTest {
 
   /**
-   * Overridable bridge element taking an `indexed.Elem`. This is a value class instance, to prevent object creation.
+   * Overridable bridge element taking a `indexed.Elem`. This is a value class instance, to prevent object creation.
    */
   class BridgeElemTakingIndexedElem(val backingElem: eu.cdevreeze.yaidom.indexed.Elem) extends AnyVal with IndexedBridgeElem {
 

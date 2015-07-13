@@ -69,7 +69,7 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
     val domDoc = createDocumentBuilder(dbf).parse(is)
 
-    Elem(convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty))
+    Elem(new java.net.URI(""), convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
