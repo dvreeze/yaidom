@@ -119,7 +119,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
   trait BridgeElem extends Any {
 
     /**
-     * The backing element type, for example `docaware.Elem`
+     * The backing element type, for example `indexed.Elem`
      */
     type BackingElem
 
