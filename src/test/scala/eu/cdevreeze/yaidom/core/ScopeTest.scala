@@ -481,12 +481,101 @@ class ScopeTest extends Suite {
     }
   }
 
+  @Test def testIncludeNamespace(): Unit = {
+    val scope =
+      Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
+
+    def getPrefix(ns: String): String = ns match {
+      case "http://e" => "e"
+      case "http://f" => ""
+      case _          => sys.error(s"Unknown namespace: $ns")
+    }
+
+    assertResult("a") {
+      val ns = "http://a"
+      scope.prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(scope) {
+      val ns = "http://a"
+      scope.includingNamespace(ns, () => getPrefix(ns))
+    }
+
+    assertResult("") {
+      val ns = "http://a"
+      (scope -- Set("a")).prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(scope -- Set("a")) {
+      val ns = "http://a"
+      (scope -- Set("a")).includingNamespace(ns, () => getPrefix(ns))
+    }
+
+    assertResult("b") {
+      val ns = "http://b"
+      scope.prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(scope) {
+      val ns = "http://b"
+      scope.includingNamespace(ns, () => getPrefix(ns))
+    }
+
+    assertResult(true) {
+      val ns = "http://d"
+      Set("d", "dd").contains(scope.prefixForNamespace(ns, () => getPrefix(ns)))
+    }
+    assertResult(scope) {
+      val ns = "http://d"
+      scope.includingNamespace(ns, () => getPrefix(ns))
+    }
+
+    assertResult("e") {
+      val ns = "http://e"
+      scope.prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(scope ++ Scope.from("e" -> "http://e")) {
+      val ns = "http://e"
+      scope.includingNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(true) {
+      val ns = "http://e"
+      scope.subScopeOf(scope.includingNamespace(ns, () => getPrefix(ns)))
+    }
+
+    assertResult("") {
+      val ns = "http://f"
+      scope.withoutDefaultNamespace.prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(scope.withoutDefaultNamespace ++ Scope.from("" -> "http://f")) {
+      val ns = "http://f"
+      scope.withoutDefaultNamespace.includingNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(true) {
+      val ns = "http://f"
+      scope.withoutDefaultNamespace.subScopeOf(scope.withoutDefaultNamespace.includingNamespace(ns, () => getPrefix(ns)))
+    }
+
+    intercept[Exception] {
+      val ns = "http://f"
+      scope.prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    intercept[Exception] {
+      val ns = "http://f"
+      scope.includingNamespace(ns, () => getPrefix(ns))
+    }
+
+    assertResult("xml") {
+      val ns = Scope.XmlNamespace
+      scope.prefixForNamespace(ns, () => getPrefix(ns))
+    }
+    assertResult(scope) {
+      val ns = Scope.XmlNamespace
+      scope.includingNamespace(ns, () => getPrefix(ns))
+    }
+  }
+
   @Test def testConvertToNamespaceContext(): Unit = {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
     val namespaceContext = scope.toNamespaceContext
-
-    import scala.collection.JavaConverters._
 
     assertResult("http://a") {
       namespaceContext.getNamespaceURI("")

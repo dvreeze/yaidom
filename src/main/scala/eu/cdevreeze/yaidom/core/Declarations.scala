@@ -131,7 +131,7 @@ object Declarations {
           ns != "http://www.w3.org/2000/xmlns/",
           s"No 'http://www.w3.org/2000/xmlns/' namespace allowed in declarations $prefixNamespaceMap")
         require(
-          ns != "http://www.w3.org/XML/1998/namespace",
+          ns != XmlNamespace,
           s"No 'http://www.w3.org/XML/1998/namespace' namespace allowed in declarations $prefixNamespaceMap")
     }
   }
@@ -146,7 +146,7 @@ object Declarations {
   def from(m: Map[String, String]): Declarations = {
     if (m.contains("xml")) {
       require(
-        m("xml") == "http://www.w3.org/XML/1998/namespace",
+        m("xml") == XmlNamespace,
         "The 'xml' prefix must map to 'http://www.w3.org/XML/1998/namespace'")
     }
     Declarations(m - "xml")
@@ -162,4 +162,6 @@ object Declarations {
   }
 
   val DefaultNsPrefix = ""
+
+  val XmlNamespace = "http://www.w3.org/XML/1998/namespace"
 }

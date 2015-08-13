@@ -301,7 +301,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
       case unprefixedName: UnprefixedName                                   => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
       case prefixedName: PrefixedName =>
         // The prefix scope (as Map), with the implicit "xml" namespace added
-        val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> "http://www.w3.org/XML/1998/namespace")
+        val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> XmlNamespace)
         completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => getEName(nsUri, prefixedName.localPart) }
     }
   }
@@ -408,34 +408,65 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
   /**
    * Returns one of the prefixes for the given namespace URI, if any, and otherwise falling back to a prefix (or exception)
-   * computed by the 2nd parameter. The result includes the empty string for the default namespace, if
-   * the default namespace is indeed equal to the passed namespace URI. The result does not include "xml" for the
-   * implicit "xml" namespace (with namespace URI http://www.w3.org/XML/1998/namespace).
+   * computed by the 2nd parameter. The result may be the empty string for the default namespace, if
+   * the default namespace is indeed equal to the passed namespace URI. The result is "xml" if the
+   * namespace URI is "http://www.w3.org/XML/1998/namespace".
    *
    * If the given namespace is the default namespace, but if there is also a non-empty prefix for the namespace, that
    * non-empty prefix is returned. Otherwise, if the given namespace is the default namespace, the empty string is returned.
+   *
+   * The prefix fallback is only used if `prefixesForNamespace(namespaceUri).isEmpty`. If the fallback prefix conflicts
+   * with an already used prefix (including ""), an exception is thrown.
    *
    * This method can be handy when "inserting" an "element" into a parent tree, if one wants to reuse prefixes of the
    * parent tree.
    */
   def prefixForNamespace(namespaceUri: String, getFallbackPrefix: () => String): String = {
-    val prefixes = prefixesForNamespace(namespaceUri)
+    if (namespaceUri == XmlNamespace) {
+      "xml"
+    } else {
+      val prefixes = prefixesForNamespace(namespaceUri)
 
-    if (prefixes.isEmpty) getFallbackPrefix()
-    else if (prefixes == Set("")) ""
-    else (prefixes - "").head
+      if (prefixes.isEmpty) {
+        val pref = getFallbackPrefix()
+
+        val foundNs = prefixNamespaceMap.getOrElse(pref, namespaceUri)
+        if (foundNs != namespaceUri) {
+          sys.error(s"Prefix $pref already bound to namespace $foundNs, so cannot be bound to $namespaceUri in the same scope")
+        }
+
+        pref
+      } else if (prefixes == Set("")) ""
+      else (prefixes - "").head
+    }
   }
 
   /**
-   * Convenience method, returning:
+   * Convenience method, returning the equivalent of:
    * {{{
    * this.resolve(
    *   Declarations.from(prefixForNamespace(namespaceUri, getFallbackPrefix) -> namespaceUri))
    * }}}
+   *
+   * If the namespace is "http://www.w3.org/XML/1998/namespace", this Scope is returned.
+   *
+   * If the fallback prefix is used and conflicts with an already used prefix (including ""), an exception is thrown,
+   * as documented for method `prefixForNamespace`.
+   *
+   * The following property holds:
+   * {{{
+   * this.subScopeOf(this.includingNamespace(namespaceUri, getFallbackPrefix))
+   * }}}
    */
   def includingNamespace(namespaceUri: String, getFallbackPrefix: () => String): Scope = {
-    val prefix = prefixForNamespace(namespaceUri, getFallbackPrefix)
-    this.resolve(Declarations.from(prefix -> namespaceUri))
+    if (namespaceUri == XmlNamespace ||
+      prefixesForNamespace(namespaceUri).contains(namespaceUri)) {
+
+      this
+    } else {
+      val prefix = prefixForNamespace(namespaceUri, getFallbackPrefix)
+      this.resolve(Declarations.from(prefix -> namespaceUri))
+    }
   }
 
   /**
@@ -517,7 +548,7 @@ object Scope {
           ns != "http://www.w3.org/2000/xmlns/",
           s"No 'http://www.w3.org/2000/xmlns/' namespace allowed in scope $prefixNamespaceMap")
         require(
-          ns != "http://www.w3.org/XML/1998/namespace",
+          ns != XmlNamespace,
           s"No 'http://www.w3.org/XML/1998/namespace' namespace allowed in scope $prefixNamespaceMap")
     }
   }
@@ -532,7 +563,7 @@ object Scope {
   def from(m: Map[String, String]): Scope = {
     if (m.contains("xml")) {
       require(
-        m("xml") == "http://www.w3.org/XML/1998/namespace",
+        m("xml") == XmlNamespace,
         "The 'xml' prefix must map to 'http://www.w3.org/XML/1998/namespace'")
     }
     Scope(m - "xml")
@@ -542,4 +573,6 @@ object Scope {
   def from(m: (String, String)*): Scope = from(Map[String, String](m: _*))
 
   val DefaultNsPrefix = ""
+
+  val XmlNamespace = Declarations.XmlNamespace
 }
