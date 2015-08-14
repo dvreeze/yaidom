@@ -16,15 +16,11 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
 import scala.collection.immutable
-import org.junit.{ Test, Before }
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
-import eu.cdevreeze.yaidom.convert
-import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.core.EName
@@ -74,35 +70,30 @@ class TransformEdifactTest extends Suite {
           getSingleEdifactElem(
             edifactElem,
             ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "e1225"))),
-          EName(CNs, "e1225"),
           QName("FunctionCode"))).
         plusChild(
           makeTextElem(
             getSingleEdifactElem(
               edifactElem,
               ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154"))),
-            EName(CNs, "e1154"),
             QName("FunctionalReferenceID"))).
           plusChild(
             makeTextElem(
               getSingleEdifactElem(
                 edifactElem,
                 ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "DTM"), EName(CNs, "C507"), EName(CNs, "e2380"))),
-              EName(CNs, "e2380"),
               QName("IssueDateTime"))).
             plusChild(
               makeTextElem(
                 getSingleEdifactElem(
                   edifactElem,
                   ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C002"), EName(CNs, "e1001"))),
-                EName(CNs, "e1001"),
                 QName("TypeCode"))).
               plusChild(
                 makeTextElem(
                   getSingleEdifactElem(
                     edifactElem,
                     ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C106"), EName(CNs, "e1056"))),
-                  EName(CNs, "e1056"),
                   QName("VersionID"))).
                 plusChild(
                   makeBorderTransportMeans(
@@ -114,17 +105,13 @@ class TransformEdifactTest extends Suite {
   private def getSingleEdifactElem(contextEdifactElem: indexed.Elem, reverseAncestryOrSelfENames: Seq[EName], p: indexed.Elem => Boolean = { _ => true }): indexed.Elem = {
     val elems = contextEdifactElem.filterElemsOrSelf(e => e.reverseAncestryOrSelfENames == reverseAncestryOrSelfENames)
 
-    require(elems.size == 1, s"Expected precisely 1 element with reverse ancestry $reverseAncestryOrSelfENames (within the context element ${contextEdifactElem.resolvedName}) but found ${elems.size}")
+    require(elems.size == 1, s"Expected precisely 1 element (meeting the predicate) with reverse ancestry $reverseAncestryOrSelfENames (within the context element ${contextEdifactElem.resolvedName}) but found ${elems.size} ones")
 
     elems.head
   }
 
-  private def makeTextElem(edifactElem: indexed.Elem, sourceEName: EName, targetQName: QName): Elem = {
-    require(edifactElem.resolvedName == sourceEName)
-
-    val scope = TargetScope
-
-    Node.textElem(targetQName, scope, edifactElem.text)
+  private def makeTextElem(edifactElem: indexed.Elem, targetQName: QName): Elem = {
+    Node.textElem(targetQName, TargetScope, edifactElem.text)
   }
 
   private def makeBorderTransportMeans(edifactElem: indexed.Elem): Elem = {
@@ -140,28 +127,24 @@ class TransformEdifactTest extends Suite {
           getSingleEdifactElem(
             edifactElem,
             ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e8213"))),
-          EName(CNs, "e8213"),
           QName("ID"))).
         plusChild(
           makeTextElem(
             getSingleEdifactElem(
               edifactElem,
               ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e1131"))),
-            EName(CNs, "e1131"),
             QName("IdentificationTypeCode"))).
           plusChild(
             makeTextElem(
               getSingleEdifactElem(
                 edifactElem,
                 ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "TDT"), EName(CNs, "C001"), EName(CNs, "e8179"))),
-              EName(CNs, "e8179"),
               QName("TypeCode"))).
             plusChild(
               makeTextElem(
                 getSingleEdifactElem(
                   edifactElem,
                   ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154"))),
-                EName(CNs, "e1154"),
                 QName("StayID"))).
               plusChild(
                 makeBorderTransportMeansItinerary(
@@ -185,14 +168,13 @@ class TransformEdifactTest extends Suite {
           getSingleEdifactElem(
             edifactElem,
             ownReverseAncestryOrSelf ++ List(EName(GovcbrNs, "LOC"), EName(CNs, "C517"), EName(CNs, "e3225"))),
-          EName(CNs, "e3225"),
           QName("ID")))
   }
 
   private val EnvNs = "urn:org.milyn.edi.unedifact.v41"
   private val CNs = "urn:org.milyn.edi.unedifact:un:d15a:common"
   private val GovcbrNs = "urn:org.milyn.edi.unedifact:un:d15a:govcbr"
-  
+
   private val Tns = "urn:wco:datamodel:WCO:MAI:01A"
   private val TargetScope = Scope.from("" -> Tns)
 }

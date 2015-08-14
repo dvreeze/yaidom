@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Declaration>
+<Declaration xmlns="urn:wco:datamodel:WCO:MAI:01A">
     <FunctionCode>9</FunctionCode>
     <FunctionalReferenceID>CXC_2014_000123</FunctionalReferenceID>
     <IssueDateTime>20140415163000Z</IssueDateTime>
