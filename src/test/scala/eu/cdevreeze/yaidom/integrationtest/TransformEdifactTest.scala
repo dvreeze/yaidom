@@ -16,22 +16,25 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
+import scala.Vector
 import scala.collection.immutable
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.resolved
+
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.Node._
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Node.elem
+import eu.cdevreeze.yaidom.simple.Node.emptyElem
+import eu.cdevreeze.yaidom.simple.Node.textElem
 import TransformEdifactTest._
 
 /**
@@ -103,17 +106,21 @@ class TransformEdifactTest extends Suite {
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C106"), EName(CNs, "e1056")))).get.text)),
-        Vector(
-          makeBorderTransportMeans(
+        {
+          val elemOption =
             edifactElem.findElem(
-              nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_34")))).get)),
+              nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_34"))))
+
+          elemOption.toVector map { elm =>
+            makeBorderTransportMeans(elm)
+          }
+        },
         Vector(
           makeDeclarant(
             edifactElem.filterElems(
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_7")))).filter(e =>
                 e.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT").head)),
-        Vector(
-          makePreviousDocument(edifactElem.findElem(nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf)).get)))
+        makeOptPreviousDocument(edifactElem.findElem(nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf)).get).toVector)
     }
   }
 
@@ -140,12 +147,15 @@ class TransformEdifactTest extends Suite {
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C001"), EName(CNs, "e8179")))).get.text)),
-        Vector(
-          textElem(
-            QName("StayID"),
-            TargetScope,
+        {
+          val elemOption =
             edifactElem.findElem(
-              nestedIn(edifactElem).as(List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154")))).get.text)),
+              nestedIn(edifactElem).as(List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154"))))
+
+          elemOption.toVector map { elm =>
+            textElem(QName("StayID"), TargetScope, elm.text)
+          }
+        },
         Vector(
           makeBorderTransportMeansItinerary(
             edifactElem.filterElems(
@@ -175,11 +185,11 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("Declarant"), TargetScope) withChildSeqs {
       Vector(
-        {
-          val txt =
-            edifactElem.findElem(nestedIn(edifactElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C080"), EName(CNs, "e3036")))).map(_.text).getOrElse("")
-          Vector(textElem(QName("Name"), TargetScope, txt))
-        },
+        Vector(
+          textElem(
+            QName("Name"),
+            TargetScope,
+            edifactElem.findElem(nestedIn(edifactElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C080"), EName(CNs, "e3036")))).map(_.text).getOrElse(""))),
         Vector(
           textElem(
             QName("ID"),
@@ -246,7 +256,7 @@ class TransformEdifactTest extends Suite {
     }
   }
 
-  private def makePreviousDocument(edifactElem: indexed.Elem): Elem = {
+  private def makeOptPreviousDocument(edifactElem: indexed.Elem): Option[Elem] = {
     require(edifactElem.resolvedName == EName(GovcbrNs, "GOVCBR"))
 
     val sgElemOption =
@@ -258,13 +268,15 @@ class TransformEdifactTest extends Suite {
       sgElem.findElem(nestedIn(sgElem).as(List(EName(GovcbrNs, "DOC"), EName(CNs, "C503"), EName(CNs, "e1004"))))
     }
 
-    emptyElem(QName("PreviousDocument"), TargetScope) withChildSeqs {
-      Vector(
+    elemOption map { elm =>
+      emptyElem(QName("PreviousDocument"), TargetScope) withChildSeqs {
         Vector(
-          textElem(
-            QName("ID"),
-            TargetScope,
-            elemOption.map(_.text).getOrElse(""))))
+          Vector(
+            textElem(
+              QName("ID"),
+              TargetScope,
+              elm.text)))
+      }
     }
   }
 

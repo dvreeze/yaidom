@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:MAI_01A="urn:wco:datamodel:WCO:MAI:01A"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ds="urn:wco:datamodel:WCO:B2SW_DS:01A"
+    targetNamespace="urn:wco:datamodel:WCO:MAI:01A"
+    elementFormDefault="qualified">
+  <xs:import namespace="urn:wco:datamodel:WCO:B2SW_DS:01A" schemaLocation="B2SW_MetaData_01A_urn_wco_datamodel_WCO_B2SW_DS_01A.xsd"/>
+  <xs:element name="Declaration">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>
+          <SW_MessageVersionNumber>01A01</SW_MessageVersionNumber>
+          <SW_MessageVersionDate>2 February 2015</SW_MessageVersionDate>
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="FunctionCode" type="ds:DeclarationFunctionCodeType"/>
+        <xs:element name="FunctionalReferenceID" type="ds:DeclarationFunctionalReferenceIDType">
+          <xs:annotation>
+            <xs:documentation>
+              <SW_AttributeName>MAI_ID</SW_AttributeName>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="IssueDateTime" type="ds:DeclarationIssueDateTimeType">
+          <xs:annotation>
+            <xs:documentation>
+              <SW_AttributeName>IssuingDateTime</SW_AttributeName>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="TypeCode" type="ds:DeclarationTypeCodeType">
+          <xs:annotation>
+            <xs:documentation>
+              <SW_AttributeName>Type</SW_AttributeName>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="VersionID" type="ds:DeclarationVersionIDType">
+          <xs:annotation>
+            <xs:documentation>
+              <SW_AttributeName>ChainSeqNr</SW_AttributeName>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="BorderTransportMeans" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>
+              <Maritime_ClassName>VesselCall</Maritime_ClassName>
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" type="ds:BorderTransportMeansIdentificationIDType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <Maritime_ClassName>VesselCall</Maritime_ClassName>
+                    <Maritime_AttributeName>IdentificationOfShip</Maritime_AttributeName>
+                    <Air_AttributeName>Flight Number</Air_AttributeName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="IdentificationTypeCode" type="ds:BorderTransportMeansIdentificationTypeCodeType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <Maritime_ClassName>VesselCall</Maritime_ClassName>
+                    <Maritime_AttributeName>IdentificationTypeOfShip</Maritime_AttributeName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="TypeCode" type="ds:BorderTransportMeansTypeCodeType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <Maritime_ClassName>VesselCall</Maritime_ClassName>
+                    <Maritime_AttributeName>ModeOrTypeOfShip</Maritime_AttributeName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="StayID" type="ds:BorderTransportMeansStayIDType" minOccurs="0">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_AttributeName>Visit_ID</SW_AttributeName>
+                    <Maritime_ClassName>VesselCall</Maritime_ClassName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="Itinerary">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_ClassName>PortOfCall</SW_ClassName>
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ID" type="ds:ItineraryIdentificationIDType">
+                      <xs:annotation>
+                        <xs:documentation>
+                          <SW_ClassName>PortOfCall</SW_ClassName>
+                          <SW_AttributeName>CodeOfPort</SW_AttributeName>
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Declarant">
+          <xs:annotation>
+            <xs:documentation>
+              <SW_ClassName>ReportingParty</SW_ClassName>
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" type="ds:DeclarantNameTextType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_ClassName>ReportingParty</SW_ClassName>
+                    <SW_AttributeName>Name</SW_AttributeName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="ID" type="ds:DeclarantIdentificationIDType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_ClassName>ReportingParty</SW_ClassName>
+                    <SW_AttributeName>Identification</SW_AttributeName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="RoleCode" type="ds:DeclarantRoleCodeType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_ClassName>ReportingParty</SW_ClassName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="Contact">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_ClassName>ContactPerson</SW_ClassName>
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Name" type="ds:ContactNameTextType">
+                      <xs:annotation>
+                        <xs:documentation>
+                          <SW_ClassName>ContactPerson</SW_ClassName>
+                          <SW_AttributeName>NameOfPerson</SW_AttributeName>
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Communication" maxOccurs="99">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ID" type="ds:CommunicationIdentificationIDType"/>
+                    <xs:element name="TypeCode" type="ds:CommunicationTypeCodeType"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="PreviousDocument" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>
+              <SW_ClassName>PreviousMAI</SW_ClassName>
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" type="ds:PreviousDocumentIdentificationIDType">
+                <xs:annotation>
+                  <xs:documentation>
+                    <SW_ClassName>PreviousMAI</SW_ClassName>
+                    <SW_AttributeName>PrevMAI_ID</SW_AttributeName>
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
