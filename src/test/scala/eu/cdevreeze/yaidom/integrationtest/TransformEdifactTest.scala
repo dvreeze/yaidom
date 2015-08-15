@@ -38,7 +38,17 @@ import eu.cdevreeze.yaidom.simple.Node.textElem
 import TransformEdifactTest._
 
 /**
- * Transformation test for edifact messages.
+ * Transformation test for EDIFACT messages.
+ *
+ * The source of the transformation is a Smooks XML representation of a GOVCBR EDIFACT message, for declaration type
+ * MAI. The target of the transformation conforms to the WCO Data Model.
+ *
+ * Note that we could have written the entire transformation, regardless of the declaration type. Per declaration type,
+ * a simple check specific to that declaration type would suffice. On the other hand, this test case is just an XML
+ * transformation test case using an EDIFACT example.
+ *
+ * See MIG-NL_Single_Window_Section_2_B2SW_Data_Model_01A01.doc, and for declaration type MAI, see
+ * MIG-NL_Single_Window_Section_2_B2SW-MAI_01A01.doc.
  *
  * @author Chris de Vreeze
  */
