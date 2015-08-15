@@ -29,6 +29,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.Node._
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import TransformEdifactTest._
@@ -46,7 +47,7 @@ class TransformEdifactTest extends Suite {
 
   @Test def testTransform(): Unit = {
     val edifactDoc =
-      indexed.Document(docParser.parse(classOf[TransformEdifactTest].getResource("sample-edifact.xml").toURI))
+      indexed.Document(docParser.parse(classOf[TransformEdifactTest].getResource("edifact/sample-edifact.xml").toURI))
 
     val declarationElem = makeDeclaration(edifactDoc.documentElement)
 
@@ -54,7 +55,7 @@ class TransformEdifactTest extends Suite {
     println(declarationString)
 
     val expectedDeclarationElem =
-      docParser.parse(classOf[TransformEdifactTest].getResource("sample-declaration.xml").toURI).documentElement
+      docParser.parse(classOf[TransformEdifactTest].getResource("edifact/sample-declaration.xml").toURI).documentElement
 
     assertResult(expectedDeclarationElem.findAllElemsOrSelf.map(_.resolvedName)) {
       declarationElem.findAllElemsOrSelf.map(_.resolvedName)
@@ -70,34 +71,34 @@ class TransformEdifactTest extends Suite {
 
     val govcbrRelativeReverseAncestryOrSelf = List(EName(EnvNs, "interchangeMessage"), EName(GovcbrNs, "GOVCBR"))
 
-    Node.emptyElem(QName("Declaration"), TargetScope) withChildren {
+    emptyElem(QName("Declaration"), TargetScope) withChildSeqs {
       Vector(
         Vector(
-          Node.textElem(
+          textElem(
             QName("FunctionCode"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "e1225")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("FunctionalReferenceID"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("IssueDateTime"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "DTM"), EName(CNs, "C507"), EName(CNs, "e2380")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("TypeCode"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C002"), EName(CNs, "e1001")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("VersionID"),
             TargetScope,
             edifactElem.findElem(
@@ -112,35 +113,35 @@ class TransformEdifactTest extends Suite {
               nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_7")))).filter(e =>
                 e.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT").head)),
         Vector(
-          makePreviousDocument(edifactElem.findElem(nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf)).get))).flatten
+          makePreviousDocument(edifactElem.findElem(nestedIn(edifactElem).as(govcbrRelativeReverseAncestryOrSelf)).get)))
     }
   }
 
   private def makeBorderTransportMeans(edifactElem: indexed.Elem): Elem = {
     require(edifactElem.resolvedName == EName(GovcbrNs, "Segment_group_34"))
 
-    Node.emptyElem(QName("BorderTransportMeans"), TargetScope) withChildren {
+    emptyElem(QName("BorderTransportMeans"), TargetScope) withChildSeqs {
       Vector(
         Vector(
-          Node.textElem(
+          textElem(
             QName("ID"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e8213")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("IdentificationTypeCode"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e1131")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("TypeCode"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C001"), EName(CNs, "e8179")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("StayID"),
             TargetScope,
             edifactElem.findElem(
@@ -149,7 +150,7 @@ class TransformEdifactTest extends Suite {
           makeBorderTransportMeansItinerary(
             edifactElem.filterElems(
               nestedIn(edifactElem).as(List(EName(GovcbrNs, "Segment_group_36")))).filter(e =>
-                e.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153").head))).flatten
+                e.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153").head)))
     }
   }
 
@@ -157,14 +158,14 @@ class TransformEdifactTest extends Suite {
     require(edifactElem.resolvedName == EName(GovcbrNs, "Segment_group_36"))
     require(edifactElem.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153")
 
-    Node.emptyElem(QName("Itinerary"), TargetScope) withChildren {
+    emptyElem(QName("Itinerary"), TargetScope) withChildSeqs {
       Vector(
         Vector(
-          Node.textElem(
+          textElem(
             QName("ID"),
             TargetScope,
             edifactElem.findElem(
-              nestedIn(edifactElem).as(List(EName(GovcbrNs, "LOC"), EName(CNs, "C517"), EName(CNs, "e3225")))).get.text))).flatten
+              nestedIn(edifactElem).as(List(EName(GovcbrNs, "LOC"), EName(CNs, "C517"), EName(CNs, "e3225")))).get.text)))
     }
   }
 
@@ -172,21 +173,21 @@ class TransformEdifactTest extends Suite {
     require(edifactElem.resolvedName == EName(GovcbrNs, "Segment_group_7"))
     require(edifactElem.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT")
 
-    Node.emptyElem(QName("Declarant"), TargetScope) withChildren {
+    emptyElem(QName("Declarant"), TargetScope) withChildSeqs {
       Vector(
         {
           val txt =
             edifactElem.findElem(nestedIn(edifactElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C080"), EName(CNs, "e3036")))).map(_.text).getOrElse("")
-          Vector(Node.textElem(QName("Name"), TargetScope, txt))
+          Vector(textElem(QName("Name"), TargetScope, txt))
         },
         Vector(
-          Node.textElem(
+          textElem(
             QName("ID"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C082"), EName(CNs, "e3039")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("RoleCode"),
             TargetScope,
             edifactElem.findElem(
@@ -201,12 +202,14 @@ class TransformEdifactTest extends Suite {
             sgElem.findElem(nestedIn(sgElem).as(List(EName(GovcbrNs, "CTA"), EName(CNs, "C056"), EName(CNs, "e3412"))))
           }
 
-          val che =
-            Node.textElem(
-              QName("Name"),
+          Vector(
+            elem(
+              QName("Contact"),
               TargetScope,
-              elemOption.map(_.text).getOrElse(""))
-          Vector(Node.elem(QName("Contact"), TargetScope, Vector(che)))
+              Vector(textElem(
+                QName("Name"),
+                TargetScope,
+                elemOption.map(_.text).getOrElse("")))))
         },
         {
           val sgElemOption =
@@ -219,27 +222,27 @@ class TransformEdifactTest extends Suite {
           }
 
           elems map { elem => makeDeclarantCommunication(elem) }
-        }).flatten
+        })
     }
   }
 
   private def makeDeclarantCommunication(edifactElem: indexed.Elem): Elem = {
     require(edifactElem.resolvedName == EName(GovcbrNs, "COM"))
 
-    Node.emptyElem(QName("Communication"), TargetScope) withChildren {
+    emptyElem(QName("Communication"), TargetScope) withChildSeqs {
       Vector(
         Vector(
-          Node.textElem(
+          textElem(
             QName("ID"),
             TargetScope,
             edifactElem.findElem(
               nestedIn(edifactElem).as(List(EName(CNs, "C076"), EName(CNs, "e3148")))).get.text)),
         Vector(
-          Node.textElem(
+          textElem(
             QName("TypeCode"),
             TargetScope,
             edifactElem.findElem(
-              nestedIn(edifactElem).as(List(EName(CNs, "C076"), EName(CNs, "e3155")))).get.text))).flatten
+              nestedIn(edifactElem).as(List(EName(CNs, "C076"), EName(CNs, "e3155")))).get.text)))
     }
   }
 
@@ -255,13 +258,13 @@ class TransformEdifactTest extends Suite {
       sgElem.findElem(nestedIn(sgElem).as(List(EName(GovcbrNs, "DOC"), EName(CNs, "C503"), EName(CNs, "e1004"))))
     }
 
-    Node.emptyElem(QName("PreviousDocument"), TargetScope) withChildren {
+    emptyElem(QName("PreviousDocument"), TargetScope) withChildSeqs {
       Vector(
         Vector(
-          Node.textElem(
+          textElem(
             QName("ID"),
             TargetScope,
-            elemOption.map(_.text).getOrElse("")))).flatten
+            elemOption.map(_.text).getOrElse(""))))
     }
   }
 
@@ -278,8 +281,8 @@ object TransformEdifactTest {
 
   final class NestedIn(val contextElem: indexed.Elem) {
 
-    def as(relativeAncestryOrSelf: immutable.Seq[EName]): (indexed.Elem) => Boolean = {
-      elem => elem.reverseAncestryOrSelfENames == (contextElem.reverseAncestryOrSelfENames ++ relativeAncestryOrSelf)
+    def as(relativeReverseAncestryOrSelf: immutable.Seq[EName]): (indexed.Elem) => Boolean = {
+      elem => elem.reverseAncestryOrSelfENames == (contextElem.reverseAncestryOrSelfENames ++ relativeReverseAncestryOrSelf)
     }
   }
 

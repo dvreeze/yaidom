@@ -63,6 +63,9 @@ sealed trait EditableClarkElem extends Any {
    */
   def withChildren(newChildren: immutable.IndexedSeq[N]): EditableClarkElem
 
+  /** Shorthand for `withChildren(newChildSeqs.flatten)` */
+  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): EditableClarkElem
+
   /**
    * Functionally updates the resolved attributes by filtering. For scoped elements, this filters the (QName-keyed) attributes.
    */
@@ -139,6 +142,10 @@ final class EditableResolvedElem(val elem: resolved.Elem) extends AnyVal with Ed
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): EditableResolvedElem = {
     new EditableResolvedElem(elem.copy(children = newChildren))
+  }
+
+  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): EditableResolvedElem = {
+    withChildren(newChildSeqs.flatten)
   }
 
   def filteringResolvedAttributes(p: (EName, String) => Boolean): EditableResolvedElem = {
@@ -254,6 +261,10 @@ final class EditableSimpleElem(
     }
     val newElem = elem.copy(children = editedNewChildren)
     new EditableSimpleElem(newElem, getFallbackPrefixForNamespace)
+  }
+
+  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): EditableSimpleElem = {
+    withChildren(newChildSeqs.flatten)
   }
 
   def filteringResolvedAttributes(p: (EName, String) => Boolean): EditableSimpleElem = {

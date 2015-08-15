@@ -190,6 +190,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   /** Returns an element with the same name, attributes and scope as this element, but with the given child nodes */
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
+  /** Shorthand for `withChildren(newChildSeqs.flatten)` */
+  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): E
+
   /**
    * Returns the child node index of the child element at the given path entry, if any, and -1 otherwise.
    * The faster this method is, the better.

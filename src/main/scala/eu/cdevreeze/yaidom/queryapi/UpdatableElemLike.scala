@@ -46,6 +46,10 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
   def childNodeIndex(childPathEntry: Path.Entry): Int
 
+  final def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): E = {
+    withChildren(newChildSeqs.flatten)
+  }
+
   final def withUpdatedChildren(index: Int, newChild: N): E =
     withChildren(children.updated(index, newChild))
 
