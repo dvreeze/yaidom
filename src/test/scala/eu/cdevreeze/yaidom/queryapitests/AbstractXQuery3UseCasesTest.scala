@@ -134,9 +134,11 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
           val sum = salesGroup.map(_.getChildElem(withEName(ns, "qty")).text.toInt).sum
 
           emptyElem(QName("group"), scope).
-            plusChild(textElem(QName("state"), scope, state)).
-            plusChild(textElem(QName("category"), scope, category)).
-            plusChild(textElem(QName("total-qty"), scope, sum.toString))
+            plusChildren(
+              Vector(
+                textElem(QName("state"), scope, state),
+                textElem(QName("category"), scope, category),
+                textElem(QName("total-qty"), scope, sum.toString)))
         }
       }
 
@@ -217,9 +219,11 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
           val revenue = revenues.sum
 
           emptyElem(QName("group"), scope).
-            plusChild(textElem(QName("state"), scope, state)).
-            plusChild(textElem(QName("category"), scope, category)).
-            plusChild(textElem(QName("total-revenue"), scope, revenue.toString))
+            plusChildren(
+              Vector(
+                textElem(QName("state"), scope, state),
+                textElem(QName("category"), scope, category),
+                textElem(QName("total-revenue"), scope, revenue.toString)))
         }
       }
 

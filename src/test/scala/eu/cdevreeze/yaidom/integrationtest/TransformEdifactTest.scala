@@ -267,9 +267,7 @@ object TransformEdifactTest {
     val mapElems: immutable.IndexedSeq[indexed.Elem] => immutable.IndexedSeq[Elem]) extends (indexed.Elem => immutable.IndexedSeq[Elem]) {
 
     def apply(contextElem: indexed.Elem): immutable.IndexedSeq[Elem] = {
-      val sourceElems = sourceElemFinder(contextElem)
-
-      mapElems(sourceElems)
+      sourceElemFinder.andThen(mapElems).apply(contextElem)
     }
   }
 
@@ -286,7 +284,7 @@ object TransformEdifactTest {
       sourceElemFinder: indexed.Elem => immutable.IndexedSeq[indexed.Elem],
       mapElem: indexed.Elem => Elem): ElemSeqGenerator = {
 
-      val mapElems = { (elems: immutable.IndexedSeq[indexed.Elem]) => elems.map(e => mapElem(e)) }
+      val mapElems = { (elems: immutable.IndexedSeq[indexed.Elem]) => elems.map(mapElem) }
 
       new ElemSeqGenerator(sourceElemFinder, mapElems)
     }

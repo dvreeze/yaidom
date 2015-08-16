@@ -228,6 +228,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    */
   def plusChildOption(childOption: Option[N]): E
 
+  /** Returns a copy in which the given children have been inserted at the end */
+  def plusChildren(childSeq: immutable.IndexedSeq[N]): E
+
   /**
    * Returns a copy in which the child at the given position (0-based) has been removed.
    * Throws an exception if `index >= children.size`.

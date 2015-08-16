@@ -116,6 +116,12 @@ sealed trait EditableClarkElem extends Any {
   def plusChildOption(index: Int, newChildOption: Option[N]): EditableClarkElem
 
   /**
+   * Functionally adds some children. For scoped elements, it is ensured by the implementation that no prefixed namespace undeclarations are
+   * introduced. After all, they are illegal in XML 1.0.
+   */
+  def plusChildren(childSeq: immutable.IndexedSeq[N]): EditableClarkElem
+
+  /**
    * Functionally removes a child.
    */
   def minusChild(index: Int): EditableClarkElem
@@ -187,6 +193,10 @@ final class EditableResolvedElem(val elem: resolved.Elem) extends AnyVal with Ed
 
   def plusChildOption(index: Int, newChildOption: Option[N]): EditableResolvedElem = {
     new EditableResolvedElem(elem.plusChildOption(index, newChildOption))
+  }
+
+  def plusChildren(childSeq: immutable.IndexedSeq[N]): EditableResolvedElem = {
+    new EditableResolvedElem(elem.plusChildren(childSeq))
   }
 
   def minusChild(index: Int): EditableResolvedElem = {
@@ -325,6 +335,13 @@ final class EditableSimpleElem(
     }
     val newElem = elem.plusChildOption(index, editedNewChildOption)
     new EditableSimpleElem(newElem, getFallbackPrefixForNamespace)
+  }
+
+  def plusChildren(childSeq: immutable.IndexedSeq[N]): EditableSimpleElem = {
+    childSeq.foldLeft(this) {
+      case (accElem, ch) =>
+        accElem.plusChild(ch)
+    }
   }
 
   def minusChild(index: Int): EditableSimpleElem = {

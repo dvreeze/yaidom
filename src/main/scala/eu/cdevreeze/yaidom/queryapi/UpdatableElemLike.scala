@@ -75,6 +75,10 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     if (childOption.isEmpty) self else plusChild(childOption.get)
   }
 
+  final def plusChildren(childSeq: immutable.IndexedSeq[N]): E = {
+    withChildren(children ++ childSeq)
+  }
+
   final def minusChild(index: Int): E = {
     require(
       index < self.children.size,

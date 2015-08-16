@@ -99,11 +99,12 @@ class ClarkElemEditorTest extends Suite {
 
     val segment =
       editor.wrap(emptyElem(QName("segment"), scope)).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:BusinessSegmentAxis"), dimScope, "gaap:ConsolidatedGroupDomain")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:VerificationAxis"), dimScope, "gaap:UnqualifiedOpinionMember")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:PremiseAxis"), dimScope, "gaap:ActualMember")).
-        plusChild(textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:ReportDateAxis"), dimScope, "gaap:ReportedAsOfMarch182008Member")).
+        plusChildren(Vector(
+          textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:EntityAxis"), dimScope, "gaap:ABCCompanyDomain"),
+          textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:BusinessSegmentAxis"), dimScope, "gaap:ConsolidatedGroupDomain"),
+          textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:VerificationAxis"), dimScope, "gaap:UnqualifiedOpinionMember"),
+          textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:PremiseAxis"), dimScope, "gaap:ActualMember"),
+          textElem(QName("xbrldi:explicitMember"), Vector(QName("dimension") -> "gaap:ReportDateAxis"), dimScope, "gaap:ReportedAsOfMarch182008Member"))).
         toElem
 
     // No prefixed namespace undeclarations
@@ -130,8 +131,7 @@ class ClarkElemEditorTest extends Suite {
 
     val context =
       editor.wrap(emptyElem(QName("context"), scope).plusAttribute(QName("id"), "I-2007")).
-        plusChild(entity).
-        plusChild(period).
+        plusChildren(Vector(entity, period)).
         toElem
 
     NamespaceUtils.pushUpPrefixedNamespaces(context)
