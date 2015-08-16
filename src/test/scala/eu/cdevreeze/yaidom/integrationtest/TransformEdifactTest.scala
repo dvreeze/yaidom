@@ -107,23 +107,31 @@ class TransformEdifactTest extends Suite {
           { sourceElem => makeBorderTransportMeans(sourceElem) })(edifactElem),
         ElemSeqGenerator.mapEachElem(
           { contextElem =>
-            contextElem.filterElems(
-              nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_7")))).filter(e =>
-                e.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT").headOption.toVector
+            contextElem.findElem(
+              nestedIn(contextElem).as(
+                RichPath(
+                  Vector(
+                    RichPath.Entry(EName(EnvNs, "interchangeMessage")),
+                    RichPath.Entry(EName(GovcbrNs, "GOVCBR")),
+                    RichPath.Entry(
+                      EName(GovcbrNs, "Segment_group_7"),
+                      { e => e.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT" }))))).toVector
           },
           { sourceElem => makeDeclarant(sourceElem) })(edifactElem),
         ElemSeqGenerator.mapEachElem(
           { contextElem =>
-            val sgElemOption =
-              contextElem.filterElems(
-                nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_9")))).filter(e =>
-                  e.findElem(_.resolvedName == EName(CNs, "e1001")).map(_.text).getOrElse("") == "998").headOption
-
-            val elemOption = sgElemOption flatMap { sgElem =>
-              sgElem.findElem(nestedIn(sgElem).as(List(EName(GovcbrNs, "DOC"), EName(CNs, "C503"), EName(CNs, "e1004"))))
-            }
-
-            elemOption.toVector
+            contextElem.findElem(
+              nestedIn(contextElem).as(
+                RichPath(
+                  Vector(
+                    RichPath.Entry(EName(EnvNs, "interchangeMessage")),
+                    RichPath.Entry(EName(GovcbrNs, "GOVCBR")),
+                    RichPath.Entry(
+                      EName(GovcbrNs, "Segment_group_9"),
+                      { e => e.findElem(_.resolvedName == EName(CNs, "e1001")).map(_.text).getOrElse("") == "998" }),
+                    RichPath.Entry(EName(GovcbrNs, "DOC")),
+                    RichPath.Entry(EName(CNs, "C503")),
+                    RichPath.Entry(EName(CNs, "e1004")))))).toVector
           },
           { sourceElem => makePreviousDocument(sourceElem) })(edifactElem))
     }
@@ -148,9 +156,13 @@ class TransformEdifactTest extends Suite {
           { sourceElem => textElem(QName("StayID"), TargetScope, sourceElem.text) })(edifactElem),
         ElemSeqGenerator.mapEachElem(
           { contextElem =>
-            contextElem.filterElems(
-              nestedIn(contextElem).as(List(EName(GovcbrNs, "Segment_group_36")))).filter(e =>
-                e.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153").headOption.toVector
+            contextElem.findElem(
+              nestedIn(contextElem).as(
+                RichPath(
+                  Vector(
+                    RichPath.Entry(
+                      EName(GovcbrNs, "Segment_group_36"),
+                      { e => e.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153" }))))).toVector
           },
           { sourceElem => makeBorderTransportMeansItinerary(sourceElem) })(edifactElem))
     }
@@ -185,15 +197,16 @@ class TransformEdifactTest extends Suite {
           { sourceElem => textElem(QName("RoleCode"), TargetScope, sourceElem.text) })(edifactElem),
         ElemSeqGenerator.apply(
           { contextElem =>
-            val sgElemOption =
-              contextElem.filterElems(
-                nestedIn(contextElem).as(List(EName(GovcbrNs, "Segment_group_8")))).filter(e =>
-                  e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "IC").headOption
-
-            val elemOption = sgElemOption flatMap { sgElem =>
-              sgElem.findElem(nestedIn(sgElem).as(List(EName(GovcbrNs, "CTA"), EName(CNs, "C056"), EName(CNs, "e3412"))))
-            }
-            elemOption.toVector
+            contextElem.findElem(
+              nestedIn(contextElem).as(
+                RichPath(
+                  Vector(
+                    RichPath.Entry(
+                      EName(GovcbrNs, "Segment_group_8"),
+                      { e => e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "IC" }),
+                    RichPath.Entry(EName(GovcbrNs, "CTA")),
+                    RichPath.Entry(EName(CNs, "C056")),
+                    RichPath.Entry(EName(CNs, "e3412")))))).toVector
           },
           { sourceElems =>
             Vector(
@@ -207,15 +220,14 @@ class TransformEdifactTest extends Suite {
           })(edifactElem),
         ElemSeqGenerator.mapEachElem(
           { contextElem =>
-            val sgElemOption =
-              contextElem.filterElems(
-                nestedIn(contextElem).as(List(EName(GovcbrNs, "Segment_group_8")))).filter(e =>
-                  e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "AH").headOption
-
-            val elems = sgElemOption.toVector flatMap { sgElem =>
-              sgElem.filterElems(nestedIn(sgElem).as(List(EName(GovcbrNs, "COM"))))
-            }
-            elems
+            contextElem.filterElems(
+              nestedIn(contextElem).as(
+                RichPath(
+                  Vector(
+                    RichPath.Entry(
+                      EName(GovcbrNs, "Segment_group_8"),
+                      { e => e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "AH" }),
+                    RichPath.Entry(EName(GovcbrNs, "COM")))))).toVector
           },
           { sourceElem => makeDeclarantCommunication(sourceElem) })(edifactElem))
     }
@@ -290,10 +302,41 @@ object TransformEdifactTest {
     }
   }
 
+  final case class RichPath(val entries: immutable.IndexedSeq[RichPath.Entry]) {
+
+    def enames: immutable.IndexedSeq[EName] = entries.map(_.ename)
+  }
+
+  object RichPath {
+
+    final case class Entry(val ename: EName, val p: Elem => Boolean)
+
+    object Entry {
+
+      def apply(ename: EName): Entry = Entry(ename, { elm => true })
+    }
+
+    def apply(enames: immutable.Seq[EName]): RichPath = {
+      RichPath(enames.map(en => RichPath.Entry(en)).toVector)
+    }
+  }
+
   final class NestedIn(val contextElem: indexed.Elem) {
 
-    def as(relativeReverseAncestryOrSelf: immutable.Seq[EName]): (indexed.Elem) => Boolean = {
-      elem => elem.reverseAncestryOrSelfENames == (contextElem.reverseAncestryOrSelfENames ++ relativeReverseAncestryOrSelf)
+    def as(path: immutable.Seq[EName]): (indexed.Elem) => Boolean = {
+      as(RichPath(path))
+    }
+
+    def as(path: RichPath): (indexed.Elem) => Boolean = {
+      elem =>
+        elem.reverseAncestryOrSelfENames.dropRight(path.entries.size) == contextElem.reverseAncestryOrSelfENames && {
+          val partReverseAncestryOrSelf = elem.reverseAncestryOrSelf.takeRight(path.entries.size)
+
+          partReverseAncestryOrSelf.zip(path.entries) forall {
+            case (elem, entry) =>
+              elem.resolvedName == entry.ename && entry.p(elem)
+          }
+        }
     }
   }
 
