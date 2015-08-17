@@ -36,6 +36,7 @@ import eu.cdevreeze.yaidom.simple.Node.elem
 import eu.cdevreeze.yaidom.simple.Node.emptyElem
 import eu.cdevreeze.yaidom.simple.Node.textElem
 import TransformEdifactTest._
+import TransformEdifactTest.ElemSeqTransformers._
 
 /**
  * Transformation test for EDIFACT messages.
@@ -87,53 +88,43 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("Declaration"), TargetScope) withChildSeqs {
       Vector(
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "e1225")))).toVector },
-          { sourceElem => textElem(QName("FunctionCode"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154")))).toVector },
-          { sourceElem => textElem(QName("FunctionalReferenceID"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "DTM"), EName(CNs, "C507"), EName(CNs, "e2380")))).toVector },
-          { sourceElem => textElem(QName("IssueDateTime"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C002"), EName(CNs, "e1001")))).toVector },
-          { sourceElem => textElem(QName("TypeCode"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C106"), EName(CNs, "e1056")))).toVector },
-          { sourceElem => textElem(QName("VersionID"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_34")))).toVector },
-          { sourceElem => makeBorderTransportMeans(sourceElem) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem =>
-            contextElem.findElem(
-              nestedIn(contextElem).as(
-                RichPath(
-                  Vector(
-                    RichPath.Entry(EName(EnvNs, "interchangeMessage")),
-                    RichPath.Entry(EName(GovcbrNs, "GOVCBR")),
-                    RichPath.Entry(
-                      EName(GovcbrNs, "Segment_group_7"),
-                      { e => e.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT" }))))).toVector
-          },
-          { sourceElem => makeDeclarant(sourceElem) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem =>
-            contextElem.findElem(
-              nestedIn(contextElem).as(
-                RichPath(
-                  Vector(
-                    RichPath.Entry(EName(EnvNs, "interchangeMessage")),
-                    RichPath.Entry(EName(GovcbrNs, "GOVCBR")),
-                    RichPath.Entry(
-                      EName(GovcbrNs, "Segment_group_9"),
-                      { e => e.findElem(_.resolvedName == EName(CNs, "e1001")).map(_.text).getOrElse("") == "998" }),
-                    RichPath.Entry(EName(GovcbrNs, "DOC")),
-                    RichPath.Entry(EName(CNs, "C503")),
-                    RichPath.Entry(EName(CNs, "e1004")))))).toVector
-          },
-          { sourceElem => makePreviousDocument(sourceElem) })(edifactElem))
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "e1225")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("FunctionCode"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("FunctionalReferenceID"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "DTM"), EName(CNs, "C507"), EName(CNs, "e2380")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("IssueDateTime"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C002"), EName(CNs, "e1001")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("TypeCode"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "BGM"), EName(CNs, "C106"), EName(CNs, "e1056")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("VersionID"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(govcbrRelativeReverseAncestryOrSelf ++ List(EName(GovcbrNs, "Segment_group_34")))).toVector } andThen
+          mapEachElem({ sourceElem => makeBorderTransportMeans(sourceElem) }) apply edifactElem,
+        { contextElem: indexed.Elem =>
+          contextElem.findElem(
+            nestedIn(contextElem).as(
+              RichPath(
+                Vector(
+                  RichPath.Entry(EName(EnvNs, "interchangeMessage")),
+                  RichPath.Entry(EName(GovcbrNs, "GOVCBR")),
+                  RichPath.Entry(
+                    EName(GovcbrNs, "Segment_group_7"),
+                    { e => e.findElem(_.resolvedName == EName(CNs, "e3035")).map(_.text).getOrElse("") == "DT" }))))).toVector
+        } andThen mapEachElem({ sourceElem => makeDeclarant(sourceElem) }) apply edifactElem,
+        { contextElem: indexed.Elem =>
+          contextElem.findElem(
+            nestedIn(contextElem).as(
+              RichPath(
+                Vector(
+                  RichPath.Entry(EName(EnvNs, "interchangeMessage")),
+                  RichPath.Entry(EName(GovcbrNs, "GOVCBR")),
+                  RichPath.Entry(
+                    EName(GovcbrNs, "Segment_group_9"),
+                    { e => e.findElem(_.resolvedName == EName(CNs, "e1001")).map(_.text).getOrElse("") == "998" }),
+                  RichPath.Entry(EName(GovcbrNs, "DOC")),
+                  RichPath.Entry(EName(CNs, "C503")),
+                  RichPath.Entry(EName(CNs, "e1004")))))).toVector
+        } andThen mapEachElem({ sourceElem => makePreviousDocument(sourceElem) }) apply edifactElem)
     }
   }
 
@@ -142,29 +133,24 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("BorderTransportMeans"), TargetScope) withChildSeqs {
       Vector(
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e8213")))).toVector },
-          { sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e1131")))).toVector },
-          { sourceElem => textElem(QName("IdentificationTypeCode"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C001"), EName(CNs, "e8179")))).toVector },
-          { sourceElem => textElem(QName("TypeCode"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154")))).toVector },
-          { sourceElem => textElem(QName("StayID"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem =>
-            contextElem.findElem(
-              nestedIn(contextElem).as(
-                RichPath(
-                  Vector(
-                    RichPath.Entry(
-                      EName(GovcbrNs, "Segment_group_36"),
-                      { e => e.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153" }))))).toVector
-          },
-          { sourceElem => makeBorderTransportMeansItinerary(sourceElem) })(edifactElem))
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e8213")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C222"), EName(CNs, "e1131")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("IdentificationTypeCode"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "TDT"), EName(CNs, "C001"), EName(CNs, "e8179")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("TypeCode"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "RFF"), EName(CNs, "C506"), EName(CNs, "e1154")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("StayID"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem =>
+          contextElem.findElem(
+            nestedIn(contextElem).as(
+              RichPath(
+                Vector(
+                  RichPath.Entry(
+                    EName(GovcbrNs, "Segment_group_36"),
+                    { e => e.findElem(_.resolvedName == EName(CNs, "e3227")).map(_.text).getOrElse("") == "153" }))))).toVector
+        } andThen
+          mapEachElem({ sourceElem => makeBorderTransportMeansItinerary(sourceElem) }) apply edifactElem)
     }
   }
 
@@ -174,9 +160,8 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("Itinerary"), TargetScope) withChildSeqs {
       Vector(
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "LOC"), EName(CNs, "C517"), EName(CNs, "e3225")))).toVector },
-          { sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) })(edifactElem))
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "LOC"), EName(CNs, "C517"), EName(CNs, "e3225")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) }) apply edifactElem)
     }
   }
 
@@ -186,50 +171,44 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("Declarant"), TargetScope) withChildSeqs {
       Vector(
-        ElemSeqGenerator.apply(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C080"), EName(CNs, "e3036")))).toVector },
-          { sourceElems => Vector(textElem(QName("Name"), TargetScope, sourceElems.headOption.map(_.text).getOrElse(""))) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C082"), EName(CNs, "e3039")))).toVector },
-          { sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "e3035")))).toVector },
-          { sourceElem => textElem(QName("RoleCode"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.apply(
-          { contextElem =>
-            contextElem.findElem(
-              nestedIn(contextElem).as(
-                RichPath(
-                  Vector(
-                    RichPath.Entry(
-                      EName(GovcbrNs, "Segment_group_8"),
-                      { e => e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "IC" }),
-                    RichPath.Entry(EName(GovcbrNs, "CTA")),
-                    RichPath.Entry(EName(CNs, "C056")),
-                    RichPath.Entry(EName(CNs, "e3412")))))).toVector
-          },
-          { sourceElems =>
-            Vector(
-              elem(
-                QName("Contact"),
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C080"), EName(CNs, "e3036")))).toVector } andThen
+          mapOneOptionalElem({ sourceElemOption => textElem(QName("Name"), TargetScope, sourceElemOption.map(_.text).getOrElse("")) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "C082"), EName(CNs, "e3039")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(GovcbrNs, "NAD"), EName(CNs, "e3035")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("RoleCode"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem =>
+          contextElem.findElem(
+            nestedIn(contextElem).as(
+              RichPath(
+                Vector(
+                  RichPath.Entry(
+                    EName(GovcbrNs, "Segment_group_8"),
+                    { e => e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "IC" }),
+                  RichPath.Entry(EName(GovcbrNs, "CTA")),
+                  RichPath.Entry(EName(CNs, "C056")),
+                  RichPath.Entry(EName(CNs, "e3412")))))).toVector
+        } andThen
+          mapOneOptionalElem({ sourceElemOption =>
+            elem(
+              QName("Contact"),
+              TargetScope,
+              Vector(textElem(
+                QName("Name"),
                 TargetScope,
-                Vector(textElem(
-                  QName("Name"),
-                  TargetScope,
-                  sourceElems.headOption.map(_.text).getOrElse("")))))
-          })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem =>
-            contextElem.filterElems(
-              nestedIn(contextElem).as(
-                RichPath(
-                  Vector(
-                    RichPath.Entry(
-                      EName(GovcbrNs, "Segment_group_8"),
-                      { e => e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "AH" }),
-                    RichPath.Entry(EName(GovcbrNs, "COM")))))).toVector
-          },
-          { sourceElem => makeDeclarantCommunication(sourceElem) })(edifactElem))
+                sourceElemOption.map(_.text).getOrElse(""))))
+          }) apply edifactElem,
+        { contextElem: indexed.Elem =>
+          contextElem.filterElems(
+            nestedIn(contextElem).as(
+              RichPath(
+                Vector(
+                  RichPath.Entry(
+                    EName(GovcbrNs, "Segment_group_8"),
+                    { e => e.findElem(_.resolvedName == EName(CNs, "e3139")).map(_.text).getOrElse("") == "AH" }),
+                  RichPath.Entry(EName(GovcbrNs, "COM")))))).toVector
+        } andThen
+          mapEachElem({ sourceElem => makeDeclarantCommunication(sourceElem) }) apply edifactElem)
     }
   }
 
@@ -238,12 +217,10 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("Communication"), TargetScope) withChildSeqs {
       Vector(
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(CNs, "C076"), EName(CNs, "e3148")))).toVector },
-          { sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) })(edifactElem),
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => contextElem.findElem(nestedIn(contextElem).as(List(EName(CNs, "C076"), EName(CNs, "e3155")))).toVector },
-          { sourceElem => textElem(QName("TypeCode"), TargetScope, sourceElem.text) })(edifactElem))
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(CNs, "C076"), EName(CNs, "e3148")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) }) apply edifactElem,
+        { contextElem: indexed.Elem => contextElem.findElem(nestedIn(contextElem).as(List(EName(CNs, "C076"), EName(CNs, "e3155")))).toVector } andThen
+          mapEachElem({ sourceElem => textElem(QName("TypeCode"), TargetScope, sourceElem.text) }) apply edifactElem)
     }
   }
 
@@ -252,9 +229,8 @@ class TransformEdifactTest extends Suite {
 
     emptyElem(QName("PreviousDocument"), TargetScope) withChildSeqs {
       Vector(
-        ElemSeqGenerator.mapEachElem(
-          { contextElem => Vector(contextElem) },
-          { sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) })(edifactElem))
+        { contextElem: indexed.Elem => Vector(contextElem) } andThen
+          mapEachElem({ sourceElem => textElem(QName("ID"), TargetScope, sourceElem.text) }) apply edifactElem)
     }
   }
 
@@ -270,38 +246,37 @@ class TransformEdifactTest extends Suite {
 object TransformEdifactTest {
 
   /**
-   * Element sequence generator. It takes two functions. The first function turns a context source element
-   * into a collection of elements found from that context element. The second function turns these
-   * found elements into zero or more generated target elements.
+   * Transformer, mapping a sequence of indexed elements to a sequence of simple elements.
    */
-  final class ElemSeqGenerator(
-    val sourceElemFinder: indexed.Elem => immutable.IndexedSeq[indexed.Elem],
-    val mapElems: immutable.IndexedSeq[indexed.Elem] => immutable.IndexedSeq[Elem]) extends (indexed.Elem => immutable.IndexedSeq[Elem]) {
+  type ElemSeqTransformer = ((immutable.IndexedSeq[indexed.Elem]) => immutable.IndexedSeq[Elem])
 
-    def apply(contextElem: indexed.Elem): immutable.IndexedSeq[Elem] = {
-      sourceElemFinder.andThen(mapElems).apply(contextElem)
-    }
-  }
+  object ElemSeqTransformers {
 
-  object ElemSeqGenerator {
-
-    def apply(
-      sourceElemFinder: indexed.Elem => immutable.IndexedSeq[indexed.Elem],
-      mapElems: immutable.IndexedSeq[indexed.Elem] => immutable.IndexedSeq[Elem]): ElemSeqGenerator = {
-
-      new ElemSeqGenerator(sourceElemFinder, mapElems)
-    }
-
-    def mapEachElem(
-      sourceElemFinder: indexed.Elem => immutable.IndexedSeq[indexed.Elem],
-      mapElem: indexed.Elem => Elem): ElemSeqGenerator = {
-
+    def mapEachElem(mapElem: indexed.Elem => Elem): ElemSeqTransformer = {
       val mapElems = { (elems: immutable.IndexedSeq[indexed.Elem]) => elems.map(mapElem) }
+      mapElems
+    }
 
-      new ElemSeqGenerator(sourceElemFinder, mapElems)
+    def mapAtMostOneElem(mapElem: indexed.Elem => Elem): ElemSeqTransformer = {
+      val mapElems = { (elems: immutable.IndexedSeq[indexed.Elem]) => elems.headOption.map(mapElem).toVector }
+      mapElems
+    }
+
+    def mapOneElem(mapElem: indexed.Elem => Elem): ElemSeqTransformer = {
+      val mapElems = { (elems: immutable.IndexedSeq[indexed.Elem]) => Vector(mapElem(elems.head)) }
+      mapElems
+    }
+
+    def mapOneOptionalElem(mapOptionalElem: Option[indexed.Elem] => Elem): ElemSeqTransformer = {
+      val mapElems = { (elems: immutable.IndexedSeq[indexed.Elem]) => Vector(mapOptionalElem(elems.headOption)) }
+      mapElems
     }
   }
 
+  /**
+   * Path containing path entries that each contain an element EName as well as an element predicate.
+   * Note that such paths do not uniquely identify elements in a tree.
+   */
   final case class RichPath(val entries: immutable.IndexedSeq[RichPath.Entry]) {
 
     def enames: immutable.IndexedSeq[EName] = entries.map(_.ename)
@@ -321,6 +296,9 @@ object TransformEdifactTest {
     }
   }
 
+  /**
+   * Builder of indexed element predicates that use a RichPath in the predicate.
+   */
   final class NestedIn(val contextElem: indexed.Elem) {
 
     def as(path: immutable.Seq[EName]): (indexed.Elem) => Boolean = {
