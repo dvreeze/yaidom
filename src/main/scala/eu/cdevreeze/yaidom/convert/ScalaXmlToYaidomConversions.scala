@@ -57,10 +57,6 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
    * If the input Scala XML Document is not namespace-valid, an exception will be thrown.
    */
   final def convertToDocument(v: scala.xml.Document): Document = {
-    val docChildren = v.children
-    val pis = v.children collect { case pi: scala.xml.ProcInstr => pi }
-    val comments = v.children collect { case com: scala.xml.Comment => com }
-
     val xmlVersionOption = v.version
     val xmlDeclOption = xmlVersionOption map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
@@ -71,11 +67,12 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     Document(
       uriOption = None,
       xmlDeclarationOption = xmlDeclOption,
-      documentElement = convertToElem(v.docElem.asInstanceOf[scala.xml.Elem]),
-      processingInstructions =
-        pis.toIndexedSeq map { pi: scala.xml.ProcInstr => convertToProcessingInstruction(pi) },
-      comments =
-        comments.toIndexedSeq map { c: scala.xml.Comment => convertToComment(c) })
+      children = v.children.toVector flatMap {
+        case e: scala.xml.Elem       => Some(convertToElem(v.docElem.asInstanceOf[scala.xml.Elem]))
+        case pi: scala.xml.ProcInstr => Some(convertToProcessingInstruction(pi))
+        case c: scala.xml.Comment    => Some(convertToComment(c))
+        case _                       => None
+      })
   }
 
   /**

@@ -109,6 +109,9 @@ class DocumentParserTest extends Suite {
     assertResult(List("Bogus comment at the end")) {
       doc.comments.map(_.text.trim)
     }
+    assertResult(List(doc.documentElement, doc.comments.head)) {
+      doc.children
+    }
 
     val xmlDeclOption = doc.xmlDeclarationOption
 
@@ -126,6 +129,7 @@ class DocumentParserTest extends Suite {
   private def doTestParseXml11(docParser: DocumentParser): Unit = {
     val xml =
       """|<?xml version="1.1" encoding="iso-8859-1" standalone="no"?>
+         |<!-- Bogus comment at the beginning -->
          |<prod:product xmlns:prod="http://datypic.com/prod">
          |  <prod:number>557</prod:number>
          |  <prod:size system="US-DRESS">10</prod:size>
@@ -136,6 +140,13 @@ class DocumentParserTest extends Suite {
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
+    }
+
+    assertResult(List("Bogus comment at the beginning")) {
+      doc.comments.map(_.text.trim)
+    }
+    assertResult(List(doc.comments.head, doc.documentElement)) {
+      doc.children
     }
 
     val xmlDeclOption = doc.xmlDeclarationOption

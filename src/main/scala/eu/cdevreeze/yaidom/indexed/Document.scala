@@ -37,7 +37,7 @@ final class Document(
   comments: immutable.IndexedSeq[Comment]) extends IndexedDocument[simple.Elem](xmlDeclarationOption, documentElement, processingInstructions, comments) with Immutable {
 
   def document: simple.Document =
-    new simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
+    simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(

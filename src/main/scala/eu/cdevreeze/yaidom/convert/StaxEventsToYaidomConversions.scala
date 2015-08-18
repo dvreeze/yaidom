@@ -31,6 +31,8 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ConverterToDocument
 import eu.cdevreeze.yaidom.simple.Document
@@ -198,9 +200,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
         withStandaloneOption(if (startDocument.standaloneSet) Some(startDocument.isStandalone) else None)
     }
 
-    val pis = mutable.Buffer[ProcessingInstruction]()
-    val comments = mutable.Buffer[Comment]()
-    var docElement: Elem = null
+    val docChildren = mutable.Buffer[Node with Nodes.CanBeDocumentChild]()
 
     // Imperative code
     while (it.hasNext && !startsWithEndDocument(it)) {
@@ -208,25 +208,27 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
 
       nextHead.event match {
         case ev if ev.isStartElement => {
-          require(docElement eq null, "Only 1 document element allowed and required")
+          require(docChildren.collect({ case e: Elem => e }).isEmpty, "Only 1 document element allowed and required")
           val result = takeElem(it)
-          docElement = result.elem
+          val docElement = result.elem
+          docChildren += docElement
           it = result.remainder
         }
         case ev: javax.xml.stream.events.ProcessingInstruction => {
           val pi = convertToProcessingInstruction(ev)
-          pis += pi
+          docChildren += pi
+
           it.next()
         }
         case ev: javax.xml.stream.events.Comment => {
           val com = convertToComment(ev)
-          comments += com
+          docChildren += com
           it.next()
         }
         case _ => it.next()
       }
     }
-    require(docElement ne null, "There must be 1 document element")
+    require(docChildren.collect({ case e: Elem => e }).size == 1, "There must be 1 document element")
     require(startsWithEndDocument(it))
 
     it.next()
@@ -239,9 +241,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
     val doc: Document = new Document(
       uriOption = uriOption,
       xmlDeclarationOption = xmlDeclOption,
-      documentElement = docElement,
-      processingInstructions = pis.toIndexedSeq,
-      comments = comments.toIndexedSeq)
+      children = docChildren.toVector)
     new DocumentWithRemainingEventStates(doc, it)
   }
 

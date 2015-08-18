@@ -35,10 +35,15 @@ object Nodes {
   trait Node
 
   /**
+   * Potential document child, so an element, processing instruction or comment
+   */
+  trait CanBeDocumentChild extends Node
+
+  /**
    * Arbitrary element node that offers the `HasENameApi` query API. Typical implementations offer the
    * `ScopedElemApi`, or at least the `ClarkElemApi`.
    */
-  trait Elem extends Node with HasENameApi {
+  trait Elem extends CanBeDocumentChild with HasENameApi {
 
     def children: immutable.IndexedSeq[Node]
   }
@@ -54,7 +59,7 @@ object Nodes {
   /**
    * Arbitrary comment node
    */
-  trait Comment extends Node {
+  trait Comment extends CanBeDocumentChild {
 
     def text: String
   }
@@ -62,7 +67,7 @@ object Nodes {
   /**
    * Arbitrary processing instruction node
    */
-  trait ProcessingInstruction extends Node {
+  trait ProcessingInstruction extends CanBeDocumentChild {
 
     def target: String
 

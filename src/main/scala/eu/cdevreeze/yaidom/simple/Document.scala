@@ -27,6 +27,7 @@ import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteral
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
  * `Document`. Although at first sight the document root element seems to be the root node, this is not entirely true.
@@ -53,22 +54,23 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 final class Document(
   val uriOption: Option[URI],
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val documentElement: Elem,
-  val processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  val comments: immutable.IndexedSeq[Comment]) extends DocumentApi[Elem] with Immutable with Serializable {
+  val children: immutable.IndexedSeq[Node with Nodes.CanBeDocumentChild]) extends DocumentApi[Elem] with Immutable with Serializable {
 
   require(uriOption ne null)
   require(xmlDeclarationOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
+  require(children ne null)
 
-  /**
-   * Returns the immediate child nodes of the document. That includes at least the document element, but top-level
-   * comments and processing instructions are also returned.
-   */
-  def children: immutable.IndexedSeq[Node] =
-    processingInstructions ++ comments ++ immutable.IndexedSeq[Node](documentElement)
+  require(
+    children.collect({ case elm: Elem => elm }).size == 1,
+    s"A document must have exactly one child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
+
+  val documentElement: Elem = children.collect({ case elm: Elem => elm }).head
+
+  def processingInstructions: immutable.IndexedSeq[ProcessingInstruction] =
+    children.collect({ case pi: ProcessingInstruction => pi })
+
+  def comments: immutable.IndexedSeq[Comment] =
+    children.collect({ case c: Comment => c })
 
   /** Expensive method to obtain all processing instructions, throughout the tree */
   def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
@@ -88,25 +90,22 @@ final class Document(
   def withDocumentElement(newRoot: Elem): Document = new Document(
     uriOption = this.uriOption,
     xmlDeclarationOption = this.xmlDeclarationOption,
-    documentElement = newRoot,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
+    children = this.children map {
+      case elm: Elem                                => newRoot
+      case node: Node with Nodes.CanBeDocumentChild => node
+    })
 
   /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
   def withUriOption(newUriOption: Option[URI]): Document = new Document(
     uriOption = newUriOption,
     xmlDeclarationOption = this.xmlDeclarationOption,
-    documentElement = this.documentElement,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
+    children = this.children)
 
   /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
   def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): Document = new Document(
     uriOption = this.uriOption,
     xmlDeclarationOption = newXmlDeclarationOption,
-    documentElement = this.documentElement,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
+    children = this.children)
 
   /** Returns `withDocumentElement(this.documentElement.updated(path)(f))`. */
   def updated(path: Path)(f: Elem => Elem): Document = withDocumentElement(this.documentElement.updated(path)(f))
@@ -206,6 +205,19 @@ final class Document(
 object Document {
 
   /**
+   * Creates a `Document` from an optional URI, an optional XML declaration, and the document children.
+   * Precisely one of the document children must be an element. This factory method retains the order of
+   * document children, whether any comments are before or after the root element.
+   */
+  def apply(
+    uriOption: Option[URI],
+    xmlDeclarationOption: Option[XmlDeclaration],
+    children: immutable.IndexedSeq[Node with Nodes.CanBeDocumentChild]): Document = {
+
+    new Document(uriOption, xmlDeclarationOption, children)
+  }
+
+  /**
    * Creates a `Document` from an optional URI, an optional XML declaration, the document element, and the top-level comments and processing
    * instructions, if any. Unlike the primary constructor, this factory method defaults the processing instructions and
    * comments to empty collections. In other words, only the optional URI and the document element are mandatory parameters.
@@ -217,12 +229,15 @@ object Document {
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(uriOption, xmlDeclarationOption, documentElement, processingInstructions, comments)
+    new Document(
+      uriOption,
+      xmlDeclarationOption,
+      Vector(documentElement) ++ processingInstructions ++ comments)
   }
 
   /**
    * Creates a `Document` from only the document element and optional URI. The collections of top-level
-   * comments and processing instructions are empty.
+   * comments and processing instructions are empty, and the optional XML declaration is absent.
    */
   def apply(
     uriOption: Option[URI],
@@ -238,13 +253,21 @@ object Document {
   def apply(documentElement: Elem): Document = apply(None, None, documentElement)
 
   def document(
+    uriOption: Option[URI],
+    xmlDeclarationOption: Option[XmlDeclaration],
+    children: immutable.IndexedSeq[Node with Nodes.CanBeDocumentChild]): Document = {
+
+    apply(uriOption, xmlDeclarationOption, children)
+  }
+
+  def document(
     uriOption: Option[String] = None,
     xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
     comments: immutable.IndexedSeq[Comment] = Vector()): Document = {
 
-    new Document(
+    apply(
       uriOption map { uriString => new URI(uriString) },
       xmlDeclarationOption,
       documentElement,

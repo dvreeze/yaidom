@@ -31,6 +31,7 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
@@ -59,9 +60,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   // It is also a good fit for the implementation of "parsing state", because we need stable object identities,
   // but rapidly changing state of those objects. Hence old-fashioned mutable objects.
 
-  private var topLevelProcessingInstructions: immutable.IndexedSeq[InternalProcessingInstructionNode] = immutable.IndexedSeq()
-
-  private var topLevelComments: immutable.IndexedSeq[InternalCommentNode] = immutable.IndexedSeq()
+  private var docChildren: immutable.IndexedSeq[CanBeInternalDocumentChild] = immutable.IndexedSeq()
 
   private var currentRoot: InternalElemNode = _
 
@@ -90,6 +89,9 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
       currentRoot = elm
       currentElem = currentRoot
 
+      val newDocChildren = docChildren :+ currentRoot
+      docChildren = newDocChildren
+
       fillOptionalXmlDeclaration()
     } else {
       require(currentElem ne null)
@@ -97,22 +99,6 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
       currentElem.children :+= elm
       elm.parentOption = Some(currentElem)
       currentElem = elm
-    }
-  }
-
-  /**
-   * Tries to fill the optional XML declaration, without the standalone value.
-   */
-  private def fillOptionalXmlDeclaration(): Unit = {
-    val locator2Option: Option[Locator2] = Option(this.locator) match {
-      case Some(loc: Locator2) => Some(loc)
-      case _                   => None
-    }
-
-    this.xmlDeclarationOption = locator2Option flatMap { loc =>
-      Option(loc.getXMLVersion).map(version => XmlDeclaration.fromVersion(version)) map { xmlDecl =>
-        xmlDecl.withEncodingOption(Option(loc.getEncoding).map(enc => Charset.forName(enc)))
-      }
     }
   }
 
@@ -146,13 +132,13 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     if (currentRoot eq null) {
       require(currentElem eq null)
 
-      val newPis = topLevelProcessingInstructions :+ pi
-      topLevelProcessingInstructions = newPis
+      val newDocChildren = docChildren :+ pi
+      docChildren = newDocChildren
     } else if (currentElem ne null) {
       currentElem.children :+= pi
     } else {
-      val newPis = topLevelProcessingInstructions :+ pi
-      topLevelProcessingInstructions = newPis
+      val newDocChildren = docChildren :+ pi
+      docChildren = newDocChildren
     }
   }
 
@@ -188,13 +174,13 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     if (currentRoot eq null) {
       require(currentElem eq null)
 
-      val newComments = topLevelComments :+ comment
-      topLevelComments = newComments
+      val newDocChildren = docChildren :+ comment
+      docChildren = newDocChildren
     } else if (currentElem ne null) {
       currentElem.children :+= comment
     } else {
-      val newComments = topLevelComments :+ comment
-      topLevelComments = newComments
+      val newDocChildren = docChildren :+ comment
+      docChildren = newDocChildren
     }
   }
 
@@ -216,9 +202,23 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   final def resultingDocument: Document = {
     val docElem = resultingElem
-    val pis = topLevelProcessingInstructions map { pi => pi.toNode }
-    val comments = topLevelComments map { comment => comment.toNode }
-    new Document(None, xmlDeclarationOption, docElem, pis, comments)
+    new Document(None, xmlDeclarationOption, docChildren.map(n => n.toNode))
+  }
+
+  /**
+   * Tries to fill the optional XML declaration, without the standalone value.
+   */
+  private def fillOptionalXmlDeclaration(): Unit = {
+    val locator2Option: Option[Locator2] = Option(this.locator) match {
+      case Some(loc: Locator2) => Some(loc)
+      case _                   => None
+    }
+
+    this.xmlDeclarationOption = locator2Option flatMap { loc =>
+      Option(loc.getXMLVersion).map(version => XmlDeclaration.fromVersion(version)) map { xmlDecl =>
+        xmlDecl.withEncodingOption(Option(loc.getEncoding).map(enc => Charset.forName(enc)))
+      }
+    }
   }
 
   private def pushContextIfNeeded(): Unit = {
@@ -297,12 +297,16 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     def children: mutable.IndexedSeq[InternalNode]
   }
 
+  private[parse] trait CanBeInternalDocumentChild extends InternalNode {
+    override type NodeType <: Node with Nodes.CanBeDocumentChild
+  }
+
   private[parse] final class InternalElemNode(
     var parentOption: Option[InternalElemNode],
     val qname: QName,
     val attributes: immutable.IndexedSeq[(QName, String)],
     val scope: Scope,
-    var children: mutable.IndexedSeq[InternalNode]) extends InternalParentNode {
+    var children: mutable.IndexedSeq[InternalNode]) extends InternalParentNode with CanBeInternalDocumentChild {
 
     type NodeType = Elem
 
@@ -324,7 +328,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     def toNode: Text = Text(text, isCData)
   }
 
-  private[parse] final class InternalProcessingInstructionNode(target: String, data: String) extends InternalNode {
+  private[parse] final class InternalProcessingInstructionNode(target: String, data: String) extends CanBeInternalDocumentChild {
     type NodeType = ProcessingInstruction
 
     def toNode: ProcessingInstruction = ProcessingInstruction(target, data)
@@ -336,7 +340,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     def toNode: EntityRef = EntityRef(entity)
   }
 
-  private[parse] final class InternalCommentNode(text: String) extends InternalNode {
+  private[parse] final class InternalCommentNode(text: String) extends CanBeInternalDocumentChild {
     type NodeType = Comment
 
     def toNode: Comment = Comment(text)

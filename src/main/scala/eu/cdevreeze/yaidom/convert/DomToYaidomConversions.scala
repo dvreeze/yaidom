@@ -70,11 +70,12 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     Document(
       uriOption = uriOption,
       xmlDeclarationOption = xmlDeclOption,
-      documentElement = convertToElem(v.getDocumentElement, Scope.Empty),
-      processingInstructions =
-        nodeListToIndexedSeq(v.getChildNodes) collect { case pi: org.w3c.dom.ProcessingInstruction => convertToProcessingInstruction(pi) },
-      comments =
-        nodeListToIndexedSeq(v.getChildNodes) collect { case c: org.w3c.dom.Comment => convertToComment(c) })
+      children = nodeListToIndexedSeq(v.getChildNodes) flatMap {
+        case e: org.w3c.dom.Element                => Some(convertToElem(v.getDocumentElement, Scope.Empty))
+        case pi: org.w3c.dom.ProcessingInstruction => Some(convertToProcessingInstruction(pi))
+        case c: org.w3c.dom.Comment                => Some(convertToComment(c))
+        case _                                     => None
+      })
   }
 
   /**
