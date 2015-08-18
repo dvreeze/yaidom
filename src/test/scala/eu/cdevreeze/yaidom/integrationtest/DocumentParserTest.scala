@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.ByteArrayInputStream
+import java.nio.charset.Charset
 
 import scala.io.Codec
 
@@ -45,65 +46,51 @@ class DocumentParserTest extends Suite {
     val parser = DocumentParserUsingSax.newInstance
 
     doTestParseWithEndingComments(parser)
-
-    // No XML declaration stored (yet?)
   }
 
   @Test def testParseWithEndingCommentsUsingStax(): Unit = {
     val parser = DocumentParserUsingStax.newInstance
 
-    val doc = doTestParseWithEndingComments(parser)
-
-    val xmlDeclOption = doc.xmlDeclarationOption
-
-    assertResult(Some("1.0")) {
-      xmlDeclOption.map(_.version)
-    }
-    assertResult(Some(Codec.UTF8.charSet)) {
-      xmlDeclOption.flatMap(_.encodingOption)
-    }
-    assertResult(Some(true)) {
-      xmlDeclOption.flatMap(_.standaloneOption)
-    }
+    doTestParseWithEndingComments(parser)
   }
 
   @Test def testParseWithEndingCommentsUsingDom(): Unit = {
     val parser = DocumentParserUsingDom.newInstance
 
-    val doc = doTestParseWithEndingComments(parser)
-
-    val xmlDeclOption = doc.xmlDeclarationOption
-
-    assertResult(Some("1.0")) {
-      xmlDeclOption.map(_.version)
-    }
-    assertResult(Some(Codec.UTF8.charSet)) {
-      xmlDeclOption.flatMap(_.encodingOption)
-    }
-    assertResult(Some(true)) {
-      xmlDeclOption.flatMap(_.standaloneOption)
-    }
+    doTestParseWithEndingComments(parser)
   }
 
   @Test def testParseWithEndingCommentsUsingDomLS(): Unit = {
     val parser = DocumentParserUsingDomLS.newInstance
 
-    val doc = doTestParseWithEndingComments(parser)
-
-    val xmlDeclOption = doc.xmlDeclarationOption
-
-    assertResult(Some("1.0")) {
-      xmlDeclOption.map(_.version)
-    }
-    assertResult(Some(Codec.UTF8.charSet)) {
-      xmlDeclOption.flatMap(_.encodingOption)
-    }
-    assertResult(Some(true)) {
-      xmlDeclOption.flatMap(_.standaloneOption)
-    }
+    doTestParseWithEndingComments(parser)
   }
 
-  private def doTestParseWithEndingComments(docParser: DocumentParser): Document = {
+  @Test def testParseXml11UsingSax(): Unit = {
+    val parser = DocumentParserUsingSax.newInstance
+
+    doTestParseXml11(parser)
+  }
+
+  @Test def testParseXml11UsingStax(): Unit = {
+    val parser = DocumentParserUsingStax.newInstance
+
+    doTestParseXml11(parser)
+  }
+
+  @Test def testParseXml11UsingDom(): Unit = {
+    val parser = DocumentParserUsingDom.newInstance
+
+    doTestParseXml11(parser)
+  }
+
+  @Test def testParseXml11UsingDomLS(): Unit = {
+    val parser = DocumentParserUsingDomLS.newInstance
+
+    doTestParseXml11(parser)
+  }
+
+  private def doTestParseWithEndingComments(docParser: DocumentParser): Unit = {
     val xml =
       """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
          |<prod:product xmlns:prod="http://datypic.com/prod">
@@ -123,6 +110,44 @@ class DocumentParserTest extends Suite {
       doc.comments.map(_.text.trim)
     }
 
-    doc
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some(Codec.UTF8.charSet)) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(true)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
+  }
+
+  private def doTestParseXml11(docParser: DocumentParser): Unit = {
+    val xml =
+      """|<?xml version="1.1" encoding="iso-8859-1" standalone="no"?>
+         |<prod:product xmlns:prod="http://datypic.com/prod">
+         |  <prod:number>557</prod:number>
+         |  <prod:size system="US-DRESS">10</prod:size>
+         |</prod:product>
+         |""".stripMargin.trim
+
+    val doc = docParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")))
+
+    assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
+      doc.documentElement.findAllElemsOrSelf.map(_.qname)
+    }
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.1")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some(Charset.forName("iso-8859-1"))) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(false)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
   }
 }

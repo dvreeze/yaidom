@@ -23,6 +23,7 @@ import net.jcip.annotations.NotThreadSafe
 
 /**
  * Mixin extending `DefaultHandler` that contains a `Locator`. Typically this `Locator` is used by an `ErrorHandler` mixed in after this trait.
+ * It is also used by `DefaultElemProducingSaxHandler`, for example to get the XML declaration.
  *
  * @author Chris de Vreeze
  */

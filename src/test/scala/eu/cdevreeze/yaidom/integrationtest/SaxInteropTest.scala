@@ -976,7 +976,7 @@ class SaxInteropTest extends Suite {
       }
     }
 
-    val handlerCreator = () => new DefaultElemProducingSaxHandler with LoggingEntityResolver with SaxHandlerWithLocator with MyErrorHandler
+    val handlerCreator = () => new DefaultElemProducingSaxHandler with LoggingEntityResolver with MyErrorHandler
 
     val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 

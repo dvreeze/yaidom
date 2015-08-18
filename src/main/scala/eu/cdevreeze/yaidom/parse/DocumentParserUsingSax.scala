@@ -119,8 +119,14 @@ final class DocumentParserUsingSax(
       val inputSource = new InputSource(inputStream)
       sp.parse(inputSource, handler)
 
+      // Now all event handler methods have been called, including endDocument. The standalone value is still available.
+      val isStandalone = sp.getXMLReader().getFeature("http://xml.org/sax/features/is-standalone")
+
       val doc: Document = handler.resultingDocument
-      doc
+
+      val docWithStandaloneSet =
+        doc.withXmlDeclarationOption(doc.xmlDeclarationOption.map(_.withStandaloneOption(Some(isStandalone))))
+      docWithStandaloneSet
     } finally {
       if (inputStream ne null) inputStream.close()
     }

@@ -16,12 +16,15 @@
 
 package eu.cdevreeze.yaidom.parse
 
+import java.nio.charset.Charset
+
 import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 import scala.collection.immutable
 import scala.collection.mutable
 
 import org.xml.sax.Attributes
 import org.xml.sax.ext.LexicalHandler
+import org.xml.sax.ext.Locator2
 import org.xml.sax.helpers.NamespaceSupport
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -35,6 +38,7 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
+import eu.cdevreeze.yaidom.simple.XmlDeclaration
 import net.jcip.annotations.NotThreadSafe
 
 /**
@@ -45,7 +49,7 @@ import net.jcip.annotations.NotThreadSafe
  * @author Chris de Vreeze
  */
 @NotThreadSafe
-trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler {
+trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler with SaxHandlerWithLocator {
 
   // This content handler has a relatively simple state space, so is rather easy to reason about.
 
@@ -69,6 +73,8 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
   private var namespaceContextStarted = false
 
+  private var xmlDeclarationOption: Option[XmlDeclaration] = None
+
   final override def startDocument(): Unit = ()
 
   final override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
@@ -83,12 +89,30 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
       currentRoot = elm
       currentElem = currentRoot
+
+      fillOptionalXmlDeclaration()
     } else {
       require(currentElem ne null)
 
       currentElem.children :+= elm
       elm.parentOption = Some(currentElem)
       currentElem = elm
+    }
+  }
+
+  /**
+   * Tries to fill the optional XML declaration, without the standalone value.
+   */
+  private def fillOptionalXmlDeclaration(): Unit = {
+    val locator2Option: Option[Locator2] = Option(this.locator) match {
+      case Some(loc: Locator2) => Some(loc)
+      case _                   => None
+    }
+
+    this.xmlDeclarationOption = locator2Option flatMap { loc =>
+      Option(loc.getXMLVersion).map(version => XmlDeclaration.fromVersion(version)) map { xmlDecl =>
+        xmlDecl.withEncodingOption(Option(loc.getEncoding).map(enc => Charset.forName(enc)))
+      }
     }
   }
 
@@ -194,7 +218,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     val docElem = resultingElem
     val pis = topLevelProcessingInstructions map { pi => pi.toNode }
     val comments = topLevelComments map { comment => comment.toNode }
-    new Document(None, None, docElem, pis, comments)
+    new Document(None, xmlDeclarationOption, docElem, pis, comments)
   }
 
   private def pushContextIfNeeded(): Unit = {
