@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.simple.Comment
+import eu.cdevreeze.yaidom.simple.CanBeDocumentChild
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ConverterToDocument
 import eu.cdevreeze.yaidom.simple.Document
@@ -200,7 +200,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.Indexe
         withStandaloneOption(if (startDocument.standaloneSet) Some(startDocument.isStandalone) else None)
     }
 
-    val docChildren = mutable.Buffer[Node with Nodes.CanBeDocumentChild]()
+    val docChildren = mutable.Buffer[CanBeDocumentChild]()
 
     // Imperative code
     while (it.hasNext && !startsWithEndDocument(it)) {

@@ -93,11 +93,16 @@ sealed trait NodeBuilder extends Immutable with Serializable {
   final override def toString: String = {
     val prefixes: Set[String] = this match {
       case e: ElemBuilder => e.nonDeclaredPrefixes(Scope.Empty)
-      case _ => Set()
+      case _              => Set()
     }
     val parentScope = Scope.from(prefixes.map(pref => (pref -> "placeholder-for-namespace-uri")).toMap)
     toTreeRepr(parentScope)
   }
+}
+
+sealed trait CanBeDocBuilderChild extends NodeBuilder {
+
+  override type NodeType <: CanBeDocumentChild
 }
 
 /**
@@ -110,7 +115,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends NodeBuilder with ElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi with HasText { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi with HasText { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -221,7 +226,7 @@ final class ElemBuilder(
     val result = children.foldLeft(undeclaredPrefixesForThisElem) { (acc, child) =>
       child match {
         case e: ElemBuilder => acc union (e.nonDeclaredPrefixes(newScope))
-        case _ => acc
+        case _              => acc
       }
     }
     result
@@ -254,7 +259,7 @@ final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder
 }
 
 @SerialVersionUID(1L)
-final case class ProcessingInstructionBuilder(target: String, data: String) extends NodeBuilder {
+final case class ProcessingInstructionBuilder(target: String, data: String) extends CanBeDocBuilderChild {
   require(target ne null)
   require(data ne null)
 
@@ -274,7 +279,7 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
 }
 
 @SerialVersionUID(1L)
-final case class CommentBuilder(text: String) extends NodeBuilder {
+final case class CommentBuilder(text: String) extends CanBeDocBuilderChild {
   require(text ne null)
 
   type NodeType = Comment
@@ -388,10 +393,10 @@ object NodeBuilder {
    * The following must always hold: `fromNode(node)(parentScope).build(parentScope)` "is structurally equal to" `node`
    */
   def fromNode(node: Node)(parentScope: Scope): NodeBuilder = node match {
-    case t @ Text(_, _) => fromText(t)
+    case t @ Text(_, _)                   => fromText(t)
     case pi @ ProcessingInstruction(_, _) => fromProcessingInstruction(pi)
-    case er @ EntityRef(_) => fromEntityRef(er)
-    case c @ Comment(_) => fromComment(c)
+    case er @ EntityRef(_)                => fromEntityRef(er)
+    case c @ Comment(_)                   => fromComment(c)
     case e: Elem =>
       assert(parentScope.resolve(parentScope.relativize(e.scope)) == e.scope)
 
@@ -410,6 +415,12 @@ object NodeBuilder {
       attributes = elm.attributes,
       namespaces = parentScope.relativize(elm.scope),
       children = elm.children map { ch => fromNode(ch)(elm.scope) })
+  }
+
+  def fromCanBeDocumentChild(n: CanBeDocumentChild)(parentScope: Scope): CanBeDocBuilderChild = n match {
+    case e: Elem                   => fromElem(e)(parentScope)
+    case pi: ProcessingInstruction => fromProcessingInstruction(pi)
+    case c: Comment                => fromComment(c)
   }
 
   def fromText(txt: Text): TextBuilder = TextBuilder(txt.text, txt.isCData)

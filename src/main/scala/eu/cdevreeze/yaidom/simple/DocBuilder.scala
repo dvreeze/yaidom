@@ -39,22 +39,23 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 final class DocBuilder(
   val uriOption: Option[URI],
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val documentElement: ElemBuilder,
-  val processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder],
-  val comments: immutable.IndexedSeq[CommentBuilder]) extends DocumentApi[ElemBuilder] with Immutable with Serializable { self =>
+  val children: immutable.IndexedSeq[CanBeDocBuilderChild]) extends DocumentApi[ElemBuilder] with Immutable with Serializable { self =>
 
   require(uriOption ne null)
   require(xmlDeclarationOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
+  require(children ne null)
 
-  /**
-   * Returns the child node builders, that is, the "document element" and the top-level processing instructions and comments,
-   * if any.
-   */
-  def children: immutable.IndexedSeq[NodeBuilder] =
-    (processingInstructions ++ comments) :+ documentElement
+  require(
+    children.collect({ case elm: ElemBuilder => elm }).size == 1,
+    s"A document (builder) must have exactly one child element (builder) (${uriOption.map(_.toString).getOrElse("No URI found")})")
+
+  val documentElement: ElemBuilder = children.collect({ case elm: ElemBuilder => elm }).head
+
+  def processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] =
+    children.collect({ case pi: ProcessingInstructionBuilder => pi })
+
+  def comments: immutable.IndexedSeq[CommentBuilder] =
+    children.collect({ case c: CommentBuilder => c })
 
   /**
    * Creates a [[eu.cdevreeze.yaidom.simple.Document]] from this document builder.
@@ -65,9 +66,7 @@ final class DocBuilder(
     Document(
       uriOption = uriOption,
       xmlDeclarationOption = xmlDeclarationOption,
-      documentElement = documentElement.build(parentScope),
-      processingInstructions = processingInstructions map { (pi: ProcessingInstructionBuilder) => pi.build(parentScope) },
-      comments = comments map { (c: CommentBuilder) => c.build(parentScope) })
+      children = children map { n => n.build(parentScope) })
   }
 
   /** Returns the tree representation. See the corresponding method in [[eu.cdevreeze.yaidom.simple.Document]]. */
@@ -90,9 +89,15 @@ object DocBuilder {
     new DocBuilder(
       uriOption = doc.uriOption,
       xmlDeclarationOption = doc.xmlDeclarationOption,
-      documentElement = fromElem(doc.documentElement)(parentScope),
-      processingInstructions = doc.processingInstructions collect { case pi: ProcessingInstruction => fromProcessingInstruction(pi) },
-      comments = doc.comments collect { case c => fromComment(c) })
+      children = doc.children.map(n => fromCanBeDocumentChild(n)(parentScope)))
+  }
+
+  def document(
+    uriOption: Option[String],
+    xmlDeclarationOption: Option[XmlDeclaration],
+    children: immutable.IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
+
+    new DocBuilder(uriOption map { uriString => new URI(uriString) }, xmlDeclarationOption, children)
   }
 
   def document(
@@ -102,11 +107,6 @@ object DocBuilder {
     processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] = Vector(),
     comments: immutable.IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
 
-    new DocBuilder(
-      uriOption map { uriString => new URI(uriString) },
-      xmlDeclarationOption,
-      documentElement,
-      processingInstructions,
-      comments)
+    document(uriOption, xmlDeclarationOption, processingInstructions ++ comments ++ Vector(documentElement))
   }
 }

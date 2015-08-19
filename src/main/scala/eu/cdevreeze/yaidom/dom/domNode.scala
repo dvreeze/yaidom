@@ -65,6 +65,8 @@ sealed trait DomNode extends Nodes.Node {
   final override def hashCode: Int = wrappedNode.hashCode
 }
 
+sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
+
 /** `DomDocument` or `DomElem` node */
 trait DomParentNode extends DomNode {
 
@@ -112,7 +114,7 @@ final class DomDocument(
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with Nodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends DomParentNode with CanBeDomDocumentChild with Nodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -197,7 +199,7 @@ final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with
 }
 
 final class DomProcessingInstruction(
-  override val wrappedNode: w3c.dom.ProcessingInstruction) extends DomNode with Nodes.ProcessingInstruction {
+  override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
 
   require(wrappedNode ne null)
 
@@ -219,7 +221,7 @@ final class DomEntityRef(
 }
 
 final class DomComment(
-  override val wrappedNode: w3c.dom.Comment) extends DomNode with Nodes.Comment {
+  override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
 
   require(wrappedNode ne null)
 

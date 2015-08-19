@@ -28,10 +28,13 @@ import org.xml.sax.ext.Locator2
 import org.xml.sax.helpers.NamespaceSupport
 
 import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.simple.CanBeDocumentChild
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
@@ -286,19 +289,14 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     result
   }
 
-  private[parse] trait InternalNode {
+  private[parse] trait InternalNode extends Nodes.Node {
     type NodeType <: Node
 
     def toNode: NodeType
   }
 
-  private[parse] trait InternalParentNode extends InternalNode {
-
-    def children: mutable.IndexedSeq[InternalNode]
-  }
-
   private[parse] trait CanBeInternalDocumentChild extends InternalNode {
-    override type NodeType <: Node with Nodes.CanBeDocumentChild
+    override type NodeType <: CanBeDocumentChild
   }
 
   private[parse] final class InternalElemNode(
@@ -306,7 +304,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     val qname: QName,
     val attributes: immutable.IndexedSeq[(QName, String)],
     val scope: Scope,
-    var children: mutable.IndexedSeq[InternalNode]) extends InternalParentNode with CanBeInternalDocumentChild {
+    var children: mutable.IndexedSeq[InternalNode]) extends CanBeInternalDocumentChild {
 
     type NodeType = Elem
 
@@ -322,25 +320,25 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     }
   }
 
-  private[parse] final class InternalTextNode(text: String, isCData: Boolean) extends InternalNode {
+  private[parse] final class InternalTextNode(val text: String, val isCData: Boolean) extends InternalNode {
     type NodeType = Text
 
     def toNode: Text = Text(text, isCData)
   }
 
-  private[parse] final class InternalProcessingInstructionNode(target: String, data: String) extends CanBeInternalDocumentChild {
+  private[parse] final class InternalProcessingInstructionNode(val target: String, val data: String) extends CanBeInternalDocumentChild {
     type NodeType = ProcessingInstruction
 
     def toNode: ProcessingInstruction = ProcessingInstruction(target, data)
   }
 
-  private[parse] final class InternalEntityRefNode(entity: String) extends InternalNode {
+  private[parse] final class InternalEntityRefNode(val entity: String) extends InternalNode {
     type NodeType = EntityRef
 
     def toNode: EntityRef = EntityRef(entity)
   }
 
-  private[parse] final class InternalCommentNode(text: String) extends CanBeInternalDocumentChild {
+  private[parse] final class InternalCommentNode(val text: String) extends CanBeInternalDocumentChild {
     type NodeType = Comment
 
     def toNode: Comment = Comment(text)

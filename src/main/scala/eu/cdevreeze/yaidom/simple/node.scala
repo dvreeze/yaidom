@@ -78,6 +78,8 @@ sealed trait Node extends Nodes.Node with Immutable with Serializable {
   private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq
 }
 
+sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
+
 /**
  * <em>Immutable</em>, thread-safe <em>element node</em>. It is the <em>default</em> element implementation in yaidom. As the default
  * element implementation among several alternative element implementations, it strikes a balance between loss-less roundtripping
@@ -172,7 +174,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with Nodes.Elem with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -516,7 +518,7 @@ final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Te
 }
 
 @SerialVersionUID(1L)
-final case class ProcessingInstruction(target: String, data: String) extends Node with Nodes.ProcessingInstruction {
+final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
   require(target ne null)
   require(data ne null)
 
@@ -548,7 +550,7 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 }
 
 @SerialVersionUID(1L)
-final case class Comment(text: String) extends Node with Nodes.Comment {
+final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
   require(text ne null)
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {

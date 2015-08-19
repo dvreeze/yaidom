@@ -54,7 +54,7 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 final class Document(
   val uriOption: Option[URI],
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[Node with Nodes.CanBeDocumentChild]) extends DocumentApi[Elem] with Immutable with Serializable {
+  val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi[Elem] with Immutable with Serializable {
 
   require(uriOption ne null)
   require(xmlDeclarationOption ne null)
@@ -91,8 +91,8 @@ final class Document(
     uriOption = this.uriOption,
     xmlDeclarationOption = this.xmlDeclarationOption,
     children = this.children map {
-      case elm: Elem                                => newRoot
-      case node: Node with Nodes.CanBeDocumentChild => node
+      case elm: Elem                => newRoot
+      case node: CanBeDocumentChild => node
     })
 
   /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
@@ -154,45 +154,24 @@ final class Document(
         LineSeq(line)
       }
 
-    val documentElementLineSeq: LineSeq = {
-      val firstLine = LineSeq("documentElement =")
-      val contentLines = this.documentElement.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
-      firstLine ++ contentLines
+    val childrenLineSeq: LineSeq = {
+      val firstLine = LineSeq("children = Vector(")
+
+      val contentLines = {
+        val groups =
+          this.children map { ch =>
+            ch.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
+          }
+        val result = LineSeqSeq(groups: _*).mkLineSeq(",")
+        result
+      }
+
+      val lastLine = LineSeq(")")
+
+      LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq
     }
 
-    val piLineSeqOption: Option[LineSeq] =
-      if (this.processingInstructions.isEmpty) None else {
-        val firstLine = LineSeq("processingInstructions = Vector(")
-        val contentLines = {
-          val groups =
-            this.processingInstructions map { pi =>
-              pi.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
-            }
-          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
-          result
-        }
-        val lastLine = LineSeq(")")
-
-        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
-      }
-
-    val commentsLineSeqOption: Option[LineSeq] =
-      if (this.comments.isEmpty) None else {
-        val firstLine = LineSeq("comments = Vector(")
-        val contentLines = {
-          val groups =
-            this.comments map { comment =>
-              comment.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
-            }
-          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
-          result
-        }
-        val lastLine = LineSeq(")")
-
-        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
-      }
-
-    val contentParts: Vector[LineSeq] = Vector(Some(uriOptionLineSeq), Some(documentElementLineSeq), piLineSeqOption, commentsLineSeqOption).flatten
+    val contentParts: Vector[LineSeq] = Vector(uriOptionLineSeq, childrenLineSeq)
     val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
 
     LineSeqSeq(
@@ -212,7 +191,7 @@ object Document {
   def apply(
     uriOption: Option[URI],
     xmlDeclarationOption: Option[XmlDeclaration],
-    children: immutable.IndexedSeq[Node with Nodes.CanBeDocumentChild]): Document = {
+    children: immutable.IndexedSeq[CanBeDocumentChild]): Document = {
 
     new Document(uriOption, xmlDeclarationOption, children)
   }
@@ -232,7 +211,7 @@ object Document {
     new Document(
       uriOption,
       xmlDeclarationOption,
-      Vector(documentElement) ++ processingInstructions ++ comments)
+      processingInstructions ++ comments ++ Vector(documentElement))
   }
 
   /**
@@ -253,11 +232,11 @@ object Document {
   def apply(documentElement: Elem): Document = apply(None, None, documentElement)
 
   def document(
-    uriOption: Option[URI],
+    uriOption: Option[String],
     xmlDeclarationOption: Option[XmlDeclaration],
-    children: immutable.IndexedSeq[Node with Nodes.CanBeDocumentChild]): Document = {
+    children: immutable.IndexedSeq[CanBeDocumentChild]): Document = {
 
-    apply(uriOption, xmlDeclarationOption, children)
+    apply(uriOption map { uriString => new URI(uriString) }, xmlDeclarationOption, children)
   }
 
   def document(

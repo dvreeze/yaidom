@@ -58,6 +58,8 @@ sealed trait ScalaXmlNode extends Nodes.Node {
   final override def hashCode: Int = wrappedNode.hashCode
 }
 
+sealed trait CanBeScalaXmlDocumentChild extends ScalaXmlNode with Nodes.CanBeDocumentChild
+
 /**
  * Wrapper around `scala.xml.Elem`, conforming to the [[eu.cdevreeze.yaidom.queryapi.ElemApi]] API.
  *
@@ -72,7 +74,7 @@ sealed trait ScalaXmlNode extends Nodes.Node {
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends ScalaXmlNode with Nodes.Elem with ScopedElemLike[ScalaXmlElem] { self =>
+  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with Nodes.Elem with ScopedElemLike[ScalaXmlElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -167,7 +169,7 @@ final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends Sc
 }
 
 final class ScalaXmlProcessingInstruction(
-  override val wrappedNode: scala.xml.ProcInstr) extends ScalaXmlNode with Nodes.ProcessingInstruction {
+  override val wrappedNode: scala.xml.ProcInstr) extends CanBeScalaXmlDocumentChild with Nodes.ProcessingInstruction {
 
   require(wrappedNode ne null)
 
@@ -189,7 +191,7 @@ final class ScalaXmlEntityRef(
 }
 
 final class ScalaXmlComment(
-  override val wrappedNode: scala.xml.Comment) extends ScalaXmlNode with Nodes.Comment {
+  override val wrappedNode: scala.xml.Comment) extends CanBeScalaXmlDocumentChild with Nodes.Comment {
 
   require(wrappedNode ne null)
 
