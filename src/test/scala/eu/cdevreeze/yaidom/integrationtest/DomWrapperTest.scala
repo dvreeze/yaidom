@@ -68,7 +68,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -91,7 +91,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("strangeXml.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -105,7 +105,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXml.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -148,7 +148,7 @@ class DomWrapperTest extends Suite {
     val is = classOf[DomWrapperTest].getResourceAsStream("XMLSchema.xsd")
 
     val db = createDocumentBuilder(dbf)
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -331,7 +331,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -365,7 +365,7 @@ class DomWrapperTest extends Suite {
     dbf.setExpandEntityReferences(false)
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -406,7 +406,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -423,7 +423,7 @@ class DomWrapperTest extends Suite {
     dbf.setCoalescing(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -466,7 +466,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -498,7 +498,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 
@@ -553,7 +553,7 @@ class DomWrapperTest extends Suite {
     val htmlString = htmlFormatString.format(booksHtmlString)
 
     val htmlRoot: DomElem =
-      DomNode.wrapDocument(dbf.newDocumentBuilder.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8")))).documentElement
+      DomDocument.wrapDocument(dbf.newDocumentBuilder.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8")))).documentElement
 
     val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
 
@@ -630,7 +630,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("cars.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     assertResult("records") {
       domDoc.documentElement.localName
@@ -691,7 +691,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("gaap.xsd")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val elementDecls = domDoc.documentElement filterElems { e =>
       e.resolvedName == EName(nsXmlSchema, "element")
@@ -720,7 +720,7 @@ class DomWrapperTest extends Suite {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithDifferentKindsOfNodes.xml")
-    val domDoc: DomDocument = DomNode.wrapDocument(db.parse(is))
+    val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
 
     val root: DomElem = domDoc.documentElement
 

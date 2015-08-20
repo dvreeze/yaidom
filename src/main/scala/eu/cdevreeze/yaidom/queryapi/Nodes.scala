@@ -19,9 +19,13 @@ package eu.cdevreeze.yaidom.queryapi
 import scala.collection.immutable
 
 /**
- * Abstract node trait hierarchy. It offers a common minimal API for different kinds of nodes.
+ * Abstract node trait hierarchy. It offers a common minimal API for different kinds of nodes. It also shows
+ * what yaidom typically considers to be nodes, and what it does not consider to be nodes. For example, documents
+ * are not nodes in yaidom, so it is thus prevented to create documents as element children. Moreover, attributes
+ * are typically not nodes in yaidom, although custom element implementations may think otherwise.
  *
- * This minimal node abstraction is complete enough to create resolved nodes from them.
+ * This minimal node abstraction is complete enough to create resolved nodes from them. It also helps in providing
+ * common types for indexed document children.
  *
  * The down-side is that we have to consider mixing in these traits everywhere we create a node/element implementation.
  *

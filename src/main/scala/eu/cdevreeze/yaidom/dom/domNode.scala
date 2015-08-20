@@ -67,36 +67,6 @@ sealed trait DomNode extends Nodes.Node {
 
 sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
 
-/** `DomDocument` or `DomElem` node */
-trait DomParentNode extends DomNode {
-
-  final def children: immutable.IndexedSeq[DomNode] = {
-    val childrenNodeList = wrappedNode.getChildNodes
-
-    DomConversions.nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrapNodeOption(node) }
-  }
-}
-
-final class DomDocument(
-  override val wrappedNode: w3c.dom.Document) extends DomParentNode with DocumentApi[DomElem] {
-
-  require(wrappedNode ne null)
-
-  override type DomType = w3c.dom.Document
-
-  def documentElement: DomElem = DomNode.wrapElement(wrappedNode.getDocumentElement)
-
-  def uriOption: Option[URI] = Option(wrappedNode.getDocumentURI).map(s => new URI(s))
-
-  def comments: immutable.IndexedSeq[DomComment] = {
-    children.collect({ case c: DomComment => c })
-  }
-
-  def processingInstructions: immutable.IndexedSeq[DomProcessingInstruction] = {
-    children.collect({ case pi: DomProcessingInstruction => pi })
-  }
-}
-
 /**
  * Wrapper around `org.w3c.dom.Element`, conforming to the [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
  *
@@ -114,7 +84,7 @@ final class DomDocument(
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends DomParentNode with CanBeDomDocumentChild with Nodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with Nodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -155,6 +125,12 @@ final class DomElem(
           accScope.resolve(decls)
       }
     resultScope
+  }
+
+  def children: immutable.IndexedSeq[DomNode] = {
+    val childrenNodeList = wrappedNode.getChildNodes
+
+    DomConversions.nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrapNodeOption(node) }
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
@@ -253,14 +229,28 @@ object DomNode {
     }
   }
 
-  def wrapDocument(doc: w3c.dom.Document): DomDocument = new DomDocument(doc)
-
   def wrapElement(elm: w3c.dom.Element): DomElem = new DomElem(elm)
+
+  @deprecated(message = "Use 'DomDocument.wrapDocument' instead", since = "1.4.0")
+  def wrapDocument(doc: w3c.dom.Document): DomDocument = new DomDocument(doc)
 }
 
-object DomDocument {
+object CanBeDomDocumentChild {
 
-  def apply(wrappedNode: w3c.dom.Document): DomDocument = new DomDocument(wrappedNode)
+  def wrapNodeOption(node: w3c.dom.Node): Option[CanBeDomDocumentChild] = {
+    // Pattern matching on the DOM interface type alone does not work for Saxon DOM adapters such as TextOverNodeInfo.
+    // Hence the check on node type as well.
+
+    (node, node.getNodeType) match {
+      case (e: w3c.dom.Element, org.w3c.dom.Node.ELEMENT_NODE) =>
+        Some(new DomElem(e))
+      case (pi: w3c.dom.ProcessingInstruction, org.w3c.dom.Node.PROCESSING_INSTRUCTION_NODE) =>
+        Some(new DomProcessingInstruction(pi))
+      case (c: w3c.dom.Comment, org.w3c.dom.Node.COMMENT_NODE) =>
+        Some(new DomComment(c))
+      case _ => None
+    }
+  }
 }
 
 object DomElem {

@@ -28,8 +28,18 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * @author Chris de Vreeze
  */
 final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends DocumentApi[ScalaXmlElem] {
-
   require(wrappedDocument ne null)
+
+  final def children: immutable.IndexedSeq[CanBeScalaXmlDocumentChild] = {
+    wrappedDocument.children.toIndexedSeq flatMap { node =>
+      node match {
+        case e: scala.xml.Elem       => Some(ScalaXmlElem(e))
+        case pi: scala.xml.ProcInstr => Some(ScalaXmlProcessingInstruction(pi))
+        case c: scala.xml.Comment    => Some(ScalaXmlComment(c))
+        case _                       => None
+      }
+    }
+  }
 
   def documentElement: ScalaXmlElem = ScalaXmlNode.wrapElement(wrappedDocument.docElem.asInstanceOf[scala.xml.Elem])
 
@@ -45,6 +55,8 @@ final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends Do
 }
 
 object ScalaXmlDocument {
+
+  def apply(wrappedDoc: scala.xml.Document): ScalaXmlDocument = new ScalaXmlDocument(wrappedDoc)
 
   def wrapDocument(doc: scala.xml.Document): ScalaXmlDocument = new ScalaXmlDocument(doc)
 }
