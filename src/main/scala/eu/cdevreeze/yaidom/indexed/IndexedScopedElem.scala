@@ -24,6 +24,7 @@ import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
  * Indexed Scoped element. Like `IndexedClarkElem` but instead of being and indexing
@@ -43,7 +44,7 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
   val rootElem: U,
   childElems: immutable.IndexedSeq[IndexedScopedElem[U]],
   val path: Path,
-  val elem: U) extends IndexedScopedElemLike[IndexedScopedElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedScopedElemLike[IndexedScopedElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 

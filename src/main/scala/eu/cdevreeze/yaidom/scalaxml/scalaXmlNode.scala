@@ -25,6 +25,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
  * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
@@ -41,7 +42,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait ScalaXmlNode extends Nodes.Node {
+sealed trait ScalaXmlNode extends ResolvedNodes.Node {
 
   type DomType <: scala.xml.Node
 
@@ -74,7 +75,7 @@ sealed trait CanBeScalaXmlDocumentChild extends ScalaXmlNode with Nodes.CanBeDoc
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with Nodes.Elem with ScopedElemLike[ScalaXmlElem] { self =>
+  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemLike[ScalaXmlElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -133,7 +134,7 @@ final class ScalaXmlElem(
   }
 }
 
-final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode with Nodes.Text {
+final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode with ResolvedNodes.Text {
   require(wrappedNode ne null)
 
   override type DomType = scala.xml.Text

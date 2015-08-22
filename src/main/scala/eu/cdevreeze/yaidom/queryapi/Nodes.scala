@@ -19,13 +19,10 @@ package eu.cdevreeze.yaidom.queryapi
 import scala.collection.immutable
 
 /**
- * Abstract node trait hierarchy. It offers a common minimal API for different kinds of nodes. It also shows
+ * Abstract node (marker) trait hierarchy. It offers a common minimal API for different kinds of nodes. It also shows
  * what yaidom typically considers to be nodes, and what it does not consider to be nodes. For example, documents
  * are not nodes in yaidom, so it is thus prevented to create documents as element children. Moreover, attributes
  * are typically not nodes in yaidom, although custom element implementations may think otherwise.
- *
- * This minimal node abstraction is complete enough to create resolved nodes from them. It also helps in providing
- * common types for indexed document children.
  *
  * The down-side is that we have to consider mixing in these traits everywhere we create a node/element implementation.
  *
@@ -44,45 +41,27 @@ object Nodes {
   trait CanBeDocumentChild extends Node
 
   /**
-   * Arbitrary element node that offers the `HasENameApi` query API. Typical implementations offer the
-   * `ScopedElemApi`, or at least the `ClarkElemApi`.
+   * Arbitrary element node
    */
-  trait Elem extends CanBeDocumentChild with HasENameApi {
-
-    def children: immutable.IndexedSeq[Node]
-  }
+  trait Elem extends CanBeDocumentChild
 
   /**
    * Arbitrary text node
    */
-  trait Text extends Node {
-
-    def text: String
-  }
+  trait Text extends Node
 
   /**
    * Arbitrary comment node
    */
-  trait Comment extends CanBeDocumentChild {
-
-    def text: String
-  }
+  trait Comment extends CanBeDocumentChild
 
   /**
    * Arbitrary processing instruction node
    */
-  trait ProcessingInstruction extends CanBeDocumentChild {
-
-    def target: String
-
-    def data: String
-  }
+  trait ProcessingInstruction extends CanBeDocumentChild
 
   /**
    * Arbitrary entity reference node
    */
-  trait EntityRef extends Node {
-
-    def entity: String
-  }
+  trait EntityRef extends Node
 }

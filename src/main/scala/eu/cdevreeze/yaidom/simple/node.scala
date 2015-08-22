@@ -35,6 +35,7 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
  * Immutable XML Node. It is the default XML node type in yaidom. There are subclasses for different types of nodes,
@@ -43,7 +44,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends Nodes.Node with Immutable with Serializable {
+sealed trait Node extends ResolvedNodes.Node with Immutable with Serializable {
 
   /**
    * Returns the tree representation String, conforming to the tree representation DSL that creates `NodeBuilder`s.
@@ -174,7 +175,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with Nodes.Elem with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with ResolvedNodes.Elem with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(qname ne null)
   require(attributes ne null)
@@ -498,7 +499,7 @@ final class Elem(
 }
 
 @SerialVersionUID(1L)
-final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
+final case class Text(text: String, isCData: Boolean) extends Node with ResolvedNodes.Text {
   require(text ne null)
   if (isCData) require(!text.containsSlice("]]>"))
 

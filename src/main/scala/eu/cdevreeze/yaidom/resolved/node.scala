@@ -70,7 +70,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends Nodes.Node with Immutable
+sealed trait Node extends ResolvedNodes.Node with Immutable
 
 /**
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
@@ -126,7 +126,7 @@ sealed trait Node extends Nodes.Node with Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with Nodes.Elem with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -318,7 +318,7 @@ final case class Elem(
   }
 }
 
-final case class Text(text: String) extends Node with Nodes.Text {
+final case class Text(text: String) extends Node with ResolvedNodes.Text {
   require(text ne null)
 
   /** Returns `text.trim`. */
@@ -331,7 +331,7 @@ final case class Text(text: String) extends Node with Nodes.Text {
 object Node {
 
   /**
-   * Converts any `Nodes.Node` to a "resolved" `Node`.
+   * Converts any `ResolvedNodes.Node` to a "resolved" `Node`.
    * Note that entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
    * Losing the qualified names means that prefixes are lost. Losing the prefixes not only affects serialization of
@@ -340,10 +340,10 @@ object Node {
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
-  def apply(n: Nodes.Node): Node = n match {
-    case e: Nodes.Elem => Elem(e)
-    case t: Nodes.Text => Text(t)
-    case n             => sys.error(s"Not an element or text node: $n")
+  def apply(n: ResolvedNodes.Node): Node = n match {
+    case e: ResolvedNodes.Elem => Elem(e)
+    case t: ResolvedNodes.Text => Text(t)
+    case n                     => sys.error(s"Not an element or text node: $n")
   }
 }
 
@@ -358,10 +358,10 @@ object Elem {
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
   }
 
-  def apply(e: Nodes.Elem): Elem = {
+  def apply(e: ResolvedNodes.Elem): Elem = {
     val children = e.children collect {
-      case childElm: Nodes.Elem  => childElm
-      case childText: Nodes.Text => childText
+      case childElm: ResolvedNodes.Elem  => childElm
+      case childText: ResolvedNodes.Text => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val resolvedChildren = children map { node => Node(node) }
@@ -372,5 +372,5 @@ object Elem {
 
 object Text {
 
-  def apply(t: Nodes.Text): Text = Text(t.text)
+  def apply(t: ResolvedNodes.Text): Text = Text(t.text)
 }

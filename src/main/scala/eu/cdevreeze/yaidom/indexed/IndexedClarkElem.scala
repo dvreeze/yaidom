@@ -24,6 +24,7 @@ import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
  * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
@@ -106,7 +107,7 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   val rootElem: U,
   childElems: immutable.IndexedSeq[IndexedClarkElem[U]],
   val path: Path,
-  val elem: U) extends IndexedClarkElemLike[IndexedClarkElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedClarkElemLike[IndexedClarkElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 

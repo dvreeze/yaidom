@@ -32,6 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -48,7 +49,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait DomNode extends Nodes.Node {
+sealed trait DomNode extends ResolvedNodes.Node {
 
   type DomType <: w3c.dom.Node
 
@@ -84,7 +85,7 @@ sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with Nodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
   require(wrappedNode ne null)
 
@@ -160,7 +161,7 @@ final class DomElem(
   }
 }
 
-final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with Nodes.Text {
+final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with ResolvedNodes.Text {
   require(wrappedNode ne null)
 
   override type DomType = w3c.dom.Text
