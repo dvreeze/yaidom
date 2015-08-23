@@ -18,8 +18,10 @@ package eu.cdevreeze.yaidom.indexed
 
 import java.net.URI
 
+import scala.Vector
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
@@ -32,29 +34,47 @@ import eu.cdevreeze.yaidom.simple.XmlDeclaration
  */
 final class Document(
   xmlDeclarationOption: Option[XmlDeclaration],
-  documentElement: Elem,
-  processingInstructions: immutable.IndexedSeq[ProcessingInstruction],
-  comments: immutable.IndexedSeq[Comment]) extends IndexedDocument[simple.Elem](xmlDeclarationOption, documentElement, processingInstructions, comments) with Immutable {
+  children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends IndexedDocument[simple.Elem](xmlDeclarationOption, children) with Immutable {
+
+  require(children forall {
+    case e: Nodes.Elem                   => e.isInstanceOf[IndexedScopedElem[_]]
+    case pi: Nodes.ProcessingInstruction => pi.isInstanceOf[simple.ProcessingInstruction]
+    case c: Nodes.Comment                => c.isInstanceOf[simple.Comment]
+    case _                               => false
+  })
 
   def document: simple.Document =
-    simple.Document(uriOption, xmlDeclarationOption, documentElement.elem, processingInstructions, comments)
+    simple.Document(
+      uriOption,
+      xmlDeclarationOption,
+      children map {
+        case e: Nodes.Elem             => documentElement.elem
+        case pi: ProcessingInstruction => pi
+        case c: Comment                => c
+      })
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(
     xmlDeclarationOption = this.xmlDeclarationOption,
-    documentElement = newRoot,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
+    children = this.children map {
+      case elm: Nodes.Elem                => newRoot
+      case node: Nodes.CanBeDocumentChild => node
+    })
 
   /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
   def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): Document = new Document(
     xmlDeclarationOption = newXmlDeclarationOption,
-    documentElement = this.documentElement,
-    processingInstructions = this.processingInstructions,
-    comments = this.comments)
+    children = this.children)
 }
 
 object Document {
+
+  def apply(
+    xmlDeclarationOption: Option[XmlDeclaration],
+    children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]): Document = {
+
+    new Document(xmlDeclarationOption, children)
+  }
 
   def apply(
     xmlDeclarationOption: Option[XmlDeclaration],
@@ -62,17 +82,24 @@ object Document {
     processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
     comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
 
-    new Document(xmlDeclarationOption, documentElement, processingInstructions, comments)
+    new Document(
+      xmlDeclarationOption,
+      processingInstructions ++ comments ++ Vector(documentElement))
   }
 
   def apply(documentElement: Elem): Document = {
-    new Document(None, documentElement, Vector(), Vector())
+    new Document(None, Vector(documentElement))
   }
 
   def apply(docUri: URI, d: simple.Document): Document = {
-    new Document(d.xmlDeclarationOption, Elem(Some(docUri), d.documentElement), d.processingInstructions, d.comments)
+    apply(
+      d.xmlDeclarationOption,
+      d.processingInstructions ++ d.comments ++ Vector(Elem(Some(docUri), d.documentElement)))
   }
 
-  def apply(d: simple.Document): Document =
-    new Document(d.xmlDeclarationOption, Elem(d.uriOption, d.documentElement), d.processingInstructions, d.comments)
+  def apply(d: simple.Document): Document = {
+    apply(
+      d.xmlDeclarationOption,
+      d.processingInstructions ++ d.comments ++ Vector(Elem(d.uriOption, d.documentElement)))
+  }
 }

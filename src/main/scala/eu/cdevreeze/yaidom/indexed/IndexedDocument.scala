@@ -19,6 +19,7 @@ package eu.cdevreeze.yaidom.indexed
 import java.net.URI
 
 import scala.collection.immutable
+import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
@@ -37,16 +38,29 @@ import eu.cdevreeze.yaidom.simple.XmlDeclaration
  */
 abstract class IndexedDocument[U <: ScopedElemApi[U]](
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val documentElement: IndexedScopedElem[U],
-  val processingInstructions: immutable.IndexedSeq[Nodes.ProcessingInstruction],
-  val comments: immutable.IndexedSeq[Nodes.Comment]) extends DocumentApi[IndexedScopedElem[U]] with Immutable {
+  val children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends DocumentApi[IndexedScopedElem[U]] with Immutable {
 
   require(xmlDeclarationOption ne null)
-  require(documentElement ne null)
-  require(processingInstructions ne null)
-  require(comments ne null)
+  require(children ne null)
+
+  require(
+    children.collect({ case elm: Nodes.Elem => elm }).size == 1,
+    s"A document must have exactly one child element")
+
+  require(
+    children.collect({ case elm: IndexedScopedElem[U] => elm }).size == 1,
+    s"A document must have exactly one (IndexedScopedElem) child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
   require(documentElement.path == Path.Root, "The document element must have the root Path")
+
+  final def documentElement: IndexedScopedElem[U] =
+    children.collect({ case elm: IndexedScopedElem[U] => elm }).head
+
+  final def processingInstructions: immutable.IndexedSeq[Nodes.ProcessingInstruction] =
+    children.collect({ case pi: Nodes.ProcessingInstruction => pi })
+
+  final def comments: immutable.IndexedSeq[Nodes.Comment] =
+    children.collect({ case c: Nodes.Comment => c })
 
   final def uriOption: Option[URI] = documentElement.docUriOption
 
