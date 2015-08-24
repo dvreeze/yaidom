@@ -3,6 +3,22 @@ CHANGELOG
 =========
 
 
+1.4.0-M3
+========
+
+Version 1.4.0-M3 made some relatively small (but possibly breaking) changes compared to version 1.4.0-M2.
+
+The main changes in this version are:
+
+* Docaware elements now deprecated
+* Improved ``Scope.includingNamespace`` etc., and therefore "editable element support"
+* Added methods ``plusChildren`` and ``withChildSeqs``
+* Document child order is retained (for different document implementations)
+* DOM wrapper documents are no longer nodes, according to yaidom
+* SAX-based parsing now also parses the XML declaration, if any
+* Separated ``ResolvedNodes.Node`` (convertible to resolved elements) from ``Nodes.Node`` (little more than marker traits)
+
+
 1.4.0-M2
 ========
 
