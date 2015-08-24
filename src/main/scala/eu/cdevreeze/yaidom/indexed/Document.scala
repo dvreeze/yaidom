@@ -36,21 +36,14 @@ final class Document(
   xmlDeclarationOption: Option[XmlDeclaration],
   children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends IndexedDocument[simple.Elem](xmlDeclarationOption, children) with Immutable {
 
-  require(children forall {
-    case e: Nodes.Elem                   => e.isInstanceOf[IndexedScopedElem[_]]
-    case pi: Nodes.ProcessingInstruction => pi.isInstanceOf[simple.ProcessingInstruction]
-    case c: Nodes.Comment                => c.isInstanceOf[simple.Comment]
-    case _                               => false
-  })
-
   def document: simple.Document =
     simple.Document(
       uriOption,
       xmlDeclarationOption,
       children map {
-        case e: Nodes.Elem             => documentElement.elem
-        case pi: ProcessingInstruction => pi
-        case c: Comment                => c
+        case e: Nodes.Elem                   => documentElement.elem
+        case pi: Nodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
+        case c: Nodes.Comment                => Comment(c.text)
       })
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */

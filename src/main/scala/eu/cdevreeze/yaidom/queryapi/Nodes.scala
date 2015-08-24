@@ -48,20 +48,34 @@ object Nodes {
   /**
    * Arbitrary text node
    */
-  trait Text extends Node
+  trait Text extends Node {
+
+    def text: String
+  }
 
   /**
    * Arbitrary comment node
    */
-  trait Comment extends CanBeDocumentChild
+  trait Comment extends CanBeDocumentChild {
+
+    def text: String
+  }
 
   /**
    * Arbitrary processing instruction node
    */
-  trait ProcessingInstruction extends CanBeDocumentChild
+  trait ProcessingInstruction extends CanBeDocumentChild {
+
+    def target: String
+
+    def data: String
+  }
 
   /**
    * Arbitrary entity reference node
    */
-  trait EntityRef extends Node
+  trait EntityRef extends Node {
+
+    def entity: String
+  }
 }
