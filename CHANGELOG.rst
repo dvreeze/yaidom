@@ -46,14 +46,14 @@ When creating a new element implementation (with yaidom 1.4.0), consider the fol
 
 * what element query API traits do we want the element implementation to offer?
 
-  * is it a minimal element implementation offering just the ``ClarkElemApi`` (and ``ClarkElemLike`` implementation) query API?
+  * is it a minimal element implementation offering just the ``ClarkElemApi`` query API (and ``ClarkElemLike`` implementation)?
   * or is it a practical element implementation offering the ``ScopedElemApi`` query API?
   * do we want the element to be "indexed", thus using types like ``IndexedScopedElemApi`` (or even final class ``IndexedScopedElem``)?
   * do we want to mix in other traits for functional updates, transformations etc.?
 
-* what state does the element implementation hold?
+* what state does the element implementation have?
 
-  * if the element is a wrapper around elements from other libraries (especially if mutable), the state should be only the wrapped element
+  * if the element is a wrapper around an element from other libraries (especially if mutable), the state should be only the wrapped element
 
 
 1.4.0-M3
