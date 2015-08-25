@@ -19,8 +19,7 @@ Some of these features are supported by cleant up query API traits, without sign
 of the different element implementations. For example:
 
 * indexed documents contain child nodes of quite different types, but they now have a common useful super-type
-* traits ``ClarkElemApi`` and its sub-type ``ScopedElemApi`` are quite central query API traits; the latter is offered by
-all "practical" element implementations, and the former is also offered "minimal" element implementations such as resolved elements
+* traits ``ScopedElemApi`` (offered by all "practical" element implementations) and its super-type ``ClarkElemApi`` (also offered by "minimal" element implementations such as resolved elements) are quite central query API traits
 
 There are some breaking changes in this release, compared to version 1.3.6, but fixing compilation errors in code using
 yaidom should be rather straightforward. For example:
