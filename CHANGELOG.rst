@@ -18,9 +18,9 @@ Version 1.4.0 combines the changes in the 3 milestone releases leading up to thi
 Some of these features are supported by cleant up query API traits, without significantly altering the public query API
 of the different element implementations. For example:
 
-* Indexed documents contain child nodes of quite different types, but they now have a common useful super-type.
-* Traits ``ClarkElemApi`` and its sub-type ``ScopedElemApi`` are quite central query API traits. The latter is offered by
-all "practical" element implementations, and the former is also offered "minimal" element implementations such as resolved elements.
+* indexed documents contain child nodes of quite different types, but they now have a common useful super-type
+* traits ``ClarkElemApi`` and its sub-type ``ScopedElemApi`` are quite central query API traits; the latter is offered by
+all "practical" element implementations, and the former is also offered "minimal" element implementations such as resolved elements
 
 There are some breaking changes in this release, compared to version 1.3.6, but fixing compilation errors in code using
 yaidom should be rather straightforward. For example:
