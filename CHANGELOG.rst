@@ -3,6 +3,34 @@ CHANGELOG
 =========
 
 
+1.4.0
+=====
+
+Version 1.4.0 combines the changes in the 3 milestone releases leading up to this version. For example, it supports:
+
+* XML declarations
+* retained document child order
+* indexed elements with different underlying element types
+* easy conversion of different element types to resolved types
+* better functional update support
+* removing the distinction between indexed and docaware elements, and deprecation of docaware elements
+
+Some of these features are supported by cleant up query API traits, without significantly altering the public query API
+of the different element implementations. For example:
+* Indexed documents contain child nodes of quite different types, but they now have a common useful super-type.
+* Traits ``ClarkElemApi`` and its sub-type ``ScopedElemApi`` are quite central query API traits. The latter is offered by
+all "practical" element implementations, and the former is also offered "minimal" element implementations such as resolved elements.
+
+There are some breaking changes in this release, compared to version 1.3.6, but fixing compilation errors in code using
+yaidom should be rather straightforward. For example:
+
+* Method ``findChildElemByPathEntry`` no longer can nor needs to be overridden
+* Construction of indexed documents may need an extra parameter for the optional XML declaration
+* Sometimes conversions from ``Nodes.Comment`` to ``simple.Comment`` (or similar conversions for processing instructions) need to be inserted
+* Method ``ancestryENames`` is now called ``reverseAncestryENames``, etc.
+* There may be very many deprecation warnings for the use of docaware elements, but they can be fixed at any time
+
+
 1.4.0-M3
 ========
 
