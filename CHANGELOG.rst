@@ -30,6 +30,31 @@ yaidom should be rather straightforward. For example:
 * method ``ancestryENames`` is now called ``reverseAncestryENames``, etc.
 * there may be very many deprecation warnings for the use of docaware elements, but they can be fixed at any time
 
+When creating a new element implementation (with yaidom 1.4.0), consider the following design choices:
+
+* do we want to have a custom node hierarchy for these elements, including text nodes, comment nodes, etc.?
+
+  * if so, mix in the ``Nodes.Node`` sub-types throughout the custom node hierarchy
+  * and consider adding a custom ``CanBeDocumentChild`` sub-type that is also a node in this hierarchy
+  * if not, still mix in ``Nodes.Elem`` into the custom element type, thus promising that the element can be a document child
+  * for the custom element and text node types, even consider mixing in the ``ResolvedNode.Node`` sub-types (for easy conversions to resolved elements)
+
+* do we want to have a custom document type?
+
+  * if so, let it mix in ``DocumentApi``
+  * and let it have child nodes that at least have type ``CanBeDocumentChild`` (or a more appropriate sub-type) in common
+
+* what element query API traits do we want the element implementation to offer?
+
+  * is it a minimal element implementation offering just the ``ClarkElemApi`` (and ``ClarkElemLike`` implementation) query API?
+  * or is it a practical element implementation offering the ``ScopedElemApi`` query API?
+  * do we want the element to be "indexed", thus using types like ``IndexedScopedElemApi`` (or even final class ``IndexedScopedElem``)?
+  * do we want to mix in other traits for functional updates, transformations etc.?
+
+* what state does the element implementation hold?
+
+  * if the element is a wrapper around elements from other libraries (especially if mutable), the state should be only the wrapped element
+
 
 1.4.0-M3
 ========
