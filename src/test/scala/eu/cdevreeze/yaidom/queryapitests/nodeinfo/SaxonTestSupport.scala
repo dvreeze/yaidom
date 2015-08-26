@@ -31,7 +31,9 @@ import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.DocumentInfo
@@ -50,7 +52,7 @@ trait SaxonTestSupport {
   import ENameProvider.globalENameProvider._
   import QNameProvider.globalQNameProvider._
 
-  abstract class DomNode(val wrappedNode: NodeInfo) {
+  abstract class DomNode(val wrappedNode: NodeInfo) extends ResolvedNodes.Node {
 
     final override def toString: String = wrappedNode.toString
 
@@ -74,7 +76,14 @@ trait SaxonTestSupport {
     final override def hashCode: Int = this.wrappedNode.hashCode
   }
 
-  abstract class DomParentNode(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomDocument(val wrappedNode: DocumentInfo) extends DocumentApi[DomElem] {
+    require(wrappedNode ne null)
+    require(wrappedNode.getNodeKind == Type.DOCUMENT)
+
+    def uriOption: Option[URI] = Option(wrappedNode.getSystemId).map(s => URI.create(s))
+
+    def documentElement: DomElem =
+      (children collectFirst { case e: DomElem => e }).getOrElse(sys.error(s"Missing document element"))
 
     final def children: immutable.IndexedSeq[DomNode] = {
       if (!wrappedNode.hasChildNodes) Vector()
@@ -88,20 +97,8 @@ trait SaxonTestSupport {
     }
   }
 
-  final class DomDocument(
-    override val wrappedNode: DocumentInfo) extends DomParentNode(wrappedNode) with DocumentApi[DomElem] {
-
-    require(wrappedNode ne null)
-    require(wrappedNode.getNodeKind == Type.DOCUMENT)
-
-    def uriOption: Option[URI] = Option(wrappedNode.getSystemId).map(s => new URI(s))
-
-    def documentElement: DomElem =
-      (children collectFirst { case e: DomElem => e }).getOrElse(sys.error(s"Missing document element"))
-  }
-
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
@@ -126,6 +123,17 @@ trait SaxonTestSupport {
       val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
       nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
+    }
+
+    override def children: immutable.IndexedSeq[DomNode] = {
+      if (!wrappedNode.hasChildNodes) Vector()
+      else {
+        val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
+
+        val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+
+        nodes.flatMap(nodeInfo => DomNode.wrapNodeOption(nodeInfo))
+      }
     }
 
     /** Returns the text children */
@@ -169,7 +177,7 @@ trait SaxonTestSupport {
     }
   }
 
-  final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Text {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.TEXT || wrappedNode.getNodeKind == Type.WHITESPACE_TEXT)
 
@@ -180,12 +188,16 @@ trait SaxonTestSupport {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final class DomProcessingInstruction(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomProcessingInstruction(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with Nodes.ProcessingInstruction {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.PROCESSING_INSTRUCTION)
+
+    def target: String = wrappedNode.getDisplayName // ???
+
+    def data: String = wrappedNode.getStringValue // ???
   }
 
-  final class DomComment(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomComment(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with Nodes.Comment {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.COMMENT)
 

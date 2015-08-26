@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
+import java.net.URI
 import java.{ util => jutil }
 
 import scala.collection.immutable
@@ -33,9 +34,14 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.dom.DomDocument
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -65,7 +71,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("books.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -84,6 +91,8 @@ class XomWrapperTest extends Suite {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseStrangeXml(): Unit = {
@@ -91,7 +100,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("strangeXml.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -100,6 +110,8 @@ class XomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseDefaultNamespaceXml(): Unit = {
@@ -107,7 +119,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("trivialXml.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -124,6 +137,8 @@ class XomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf flatMap { e => e.commentChildren.map(_.text.trim) }
       result.mkString
     }
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseSchemaXsd(): Unit = {
@@ -152,7 +167,8 @@ class XomWrapperTest extends Suite {
     val is = classOf[XomWrapperTest].getResourceAsStream("XMLSchema.xsd")
 
     val db = createDocumentBuilder(dbf)
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -330,6 +346,8 @@ class XomWrapperTest extends Suite {
     }
 
     checkFieldPattern(root)
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
@@ -337,7 +355,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -365,6 +384,8 @@ class XomWrapperTest extends Suite {
     }
 
     checkChildText(root)
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
@@ -372,7 +393,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -383,6 +405,8 @@ class XomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseXmlWithEscapedChars(): Unit = {
@@ -391,7 +415,8 @@ class XomWrapperTest extends Suite {
     dbf.setCoalescing(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -429,6 +454,8 @@ class XomWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseXmlWithSpecialChars(): Unit = {
@@ -436,7 +463,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -463,6 +491,8 @@ class XomWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   @Test def testParseGeneratedHtml(): Unit = {
@@ -470,7 +500,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("books.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -553,6 +584,8 @@ class XomWrapperTest extends Suite {
       "Jennifer Widom")) {
       authors.toSet
     }
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   /**
@@ -564,7 +597,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("cars.xml")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val root: XomElem = domDoc.documentElement
@@ -619,6 +653,8 @@ class XomWrapperTest extends Suite {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
+
+    checkEqualityOfDomAndXomElems(d)
   }
 
   /**
@@ -629,7 +665,8 @@ class XomWrapperTest extends Suite {
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[XomWrapperTest].getResourceAsStream("gaap.xsd")
-    val doc = nu.xom.converters.DOMConverter.convert(db.parse(is))
+    val d = db.parse(is)
+    val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
 
     val elementDecls = domDoc.documentElement filterElems { e =>
@@ -650,6 +687,17 @@ class XomWrapperTest extends Suite {
     assertResult(Some("http://xasb.org/gaap")) {
       tnsOption
     }
+
+    checkEqualityOfDomAndXomElems(d)
+  }
+
+  private def checkEqualityOfDomAndXomElems(d: org.w3c.dom.Document): Unit = {
+    val rootElem1 = resolved.Elem(DomDocument(d).documentElement)
+    val rootElem2 = resolved.Elem(XomNode.wrapDocument(nu.xom.converters.DOMConverter.convert(d)).documentElement)
+
+    assertResult(rootElem1) {
+      rootElem2
+    }
   }
 
   class LoggingEntityResolver extends EntityResolver {
@@ -663,7 +711,7 @@ class XomWrapperTest extends Suite {
 
 object XomWrapperTest {
 
-  sealed trait XomNode {
+  sealed trait XomNode extends ResolvedNodes.Node {
 
     type DomType <: nu.xom.Node
 
@@ -672,27 +720,20 @@ object XomWrapperTest {
     final override def toString: String = wrappedNode.toString
   }
 
-  trait XomParentNode extends XomNode {
+  final class XomDocument(val wrappedNode: nu.xom.Document) extends DocumentApi[XomElem] {
+    require(wrappedNode ne null)
 
-    override type DomType <: nu.xom.ParentNode
+    def uriOption: Option[URI] = Option(wrappedNode.getBaseURI).map(s => URI.create(s))
+
+    def documentElement: XomElem = XomNode.wrapElement(wrappedNode.getRootElement)
 
     final def children: immutable.IndexedSeq[XomNode] = {
       (0 until wrappedNode.getChildCount).toIndexedSeq flatMap { (idx: Int) => XomNode.wrapNodeOption(wrappedNode.getChild(idx)) }
     }
   }
 
-  final class XomDocument(
-    val wrappedNode: nu.xom.Document) extends XomParentNode {
-
-    require(wrappedNode ne null)
-
-    override type DomType = nu.xom.Document
-
-    def documentElement: XomElem = XomNode.wrapElement(wrappedNode.getRootElement)
-  }
-
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomParentNode with ScopedElemLike[XomElem] with HasParent[XomElem] { self =>
+    override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemLike[XomElem] with HasParent[XomElem] { self =>
 
     require(wrappedNode ne null)
 
@@ -728,6 +769,10 @@ object XomWrapperTest {
 
       val result = attrs map { attr => (QName(attr.getQualifiedName) -> attr.getValue) }
       result.toIndexedSeq
+    }
+
+    override def children: immutable.IndexedSeq[XomNode] = {
+      (0 until wrappedNode.getChildCount).toIndexedSeq flatMap { (idx: Int) => XomNode.wrapNodeOption(wrappedNode.getChild(idx)) }
     }
 
     /** Returns the text children */
@@ -769,7 +814,7 @@ object XomWrapperTest {
     }
   }
 
-  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode {
+  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode with ResolvedNodes.Text {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.Text
@@ -781,13 +826,17 @@ object XomWrapperTest {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final class XomProcessingInstruction(override val wrappedNode: nu.xom.ProcessingInstruction) extends XomNode {
+  final class XomProcessingInstruction(override val wrappedNode: nu.xom.ProcessingInstruction) extends XomNode with Nodes.ProcessingInstruction {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.ProcessingInstruction
+
+    def target: String = wrappedNode.getTarget
+
+    def data: String = wrappedNode.getValue
   }
 
-  final class XomComment(override val wrappedNode: nu.xom.Comment) extends XomNode {
+  final class XomComment(override val wrappedNode: nu.xom.Comment) extends XomNode with Nodes.Comment {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.Comment
@@ -799,11 +848,11 @@ object XomWrapperTest {
 
     def wrapNodeOption(node: nu.xom.Node): Option[XomNode] = {
       node match {
-        case e: nu.xom.Element => Some(new XomElem(e))
-        case t: nu.xom.Text => Some(new XomText(t))
+        case e: nu.xom.Element                => Some(new XomElem(e))
+        case t: nu.xom.Text                   => Some(new XomText(t))
         case pi: nu.xom.ProcessingInstruction => Some(new XomProcessingInstruction(pi))
-        case c: nu.xom.Comment => Some(new XomComment(c))
-        case _ => None
+        case c: nu.xom.Comment                => Some(new XomComment(c))
+        case _                                => None
       }
     }
 
@@ -814,7 +863,7 @@ object XomWrapperTest {
     def getAncestorsOrSelf(elem: nu.xom.Element): List[nu.xom.Element] = {
       val parentElement: nu.xom.Element = elem.getParent match {
         case e: nu.xom.Element => e
-        case _ => null
+        case _                 => null
       }
 
       if (parentElement eq null) List(elem)

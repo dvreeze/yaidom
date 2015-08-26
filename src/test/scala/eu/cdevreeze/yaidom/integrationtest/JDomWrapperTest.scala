@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
+import java.net.URI
 import java.{ util => jutil }
 
 import scala.collection.JavaConverters._
@@ -35,8 +36,13 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.dom.DomDocument
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -65,7 +71,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("books.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -84,6 +91,8 @@ class JDomWrapperTest extends Suite {
       val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseStrangeXml(): Unit = {
@@ -92,7 +101,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("strangeXml.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -101,6 +111,8 @@ class JDomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseDefaultNamespaceXml(): Unit = {
@@ -109,7 +121,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXml.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -126,6 +139,8 @@ class JDomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf flatMap { e => e.commentChildren.map(_.text.trim) }
       result.mkString
     }
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseSchemaXsd(): Unit = {
@@ -155,7 +170,8 @@ class JDomWrapperTest extends Suite {
 
     val db = createDocumentBuilder(dbf)
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -333,6 +349,8 @@ class JDomWrapperTest extends Suite {
     }
 
     checkFieldPattern(root)
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
@@ -341,7 +359,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -369,6 +388,8 @@ class JDomWrapperTest extends Suite {
     }
 
     checkChildText(root)
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
@@ -378,7 +399,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -414,6 +436,8 @@ class JDomWrapperTest extends Suite {
     }
 
     checkChildTextAndEntityRef(root)
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
@@ -422,7 +446,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -433,6 +458,8 @@ class JDomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseXmlWithEscapedChars(): Unit = {
@@ -442,7 +469,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -480,6 +508,8 @@ class JDomWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseXmlWithSpecialChars(): Unit = {
@@ -488,7 +518,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -515,6 +546,8 @@ class JDomWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   @Test def testParseGeneratedHtml(): Unit = {
@@ -523,7 +556,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("books.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -609,6 +643,8 @@ class JDomWrapperTest extends Suite {
       "Jennifer Widom")) {
       authors.toSet
     }
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   /**
@@ -621,7 +657,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("cars.xml")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val root: JDomElem = domDoc.documentElement
@@ -676,6 +713,8 @@ class JDomWrapperTest extends Suite {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
+
+    checkEqualityOfDomAndJDomElems(d)
   }
 
   /**
@@ -687,7 +726,8 @@ class JDomWrapperTest extends Suite {
     val db = dbf.newDocumentBuilder
     val is = classOf[JDomWrapperTest].getResourceAsStream("gaap.xsd")
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val doc = domBuilder.build(db.parse(is))
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
     val elementDecls = domDoc.documentElement filterElems { e =>
@@ -708,6 +748,18 @@ class JDomWrapperTest extends Suite {
     assertResult(Some("http://xasb.org/gaap")) {
       tnsOption
     }
+
+    checkEqualityOfDomAndJDomElems(d)
+  }
+
+  private def checkEqualityOfDomAndJDomElems(d: org.w3c.dom.Document): Unit = {
+    val rootElem1 = resolved.Elem(DomDocument(d).documentElement)
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val rootElem2 = resolved.Elem(JDomNode.wrapDocument(domBuilder.build(d)).documentElement)
+
+    assertResult(rootElem1) {
+      rootElem2
+    }
   }
 
   class LoggingEntityResolver extends EntityResolver {
@@ -721,7 +773,7 @@ class JDomWrapperTest extends Suite {
 
 object JDomWrapperTest {
 
-  sealed trait JDomNode {
+  sealed trait JDomNode extends ResolvedNodes.Node {
 
     type DomType <: org.jdom2.Content
 
@@ -730,16 +782,21 @@ object JDomWrapperTest {
     final override def toString: String = wrappedNode.toString
   }
 
-  final class JDomDocument(
-    val wrappedNode: org.jdom2.Document) {
-
+  final class JDomDocument(val wrappedNode: org.jdom2.Document) extends DocumentApi[JDomElem] {
     require(wrappedNode ne null)
 
+    def uriOption: Option[URI] = Option(wrappedNode.getBaseURI).map(s => URI.create(s))
+
     def documentElement: JDomElem = JDomNode.wrapElement(wrappedNode.getRootElement)
+
+    def children: immutable.IndexedSeq[JDomNode] = {
+      val childList = wrappedNode.getContent.asScala.toIndexedSeq
+      childList flatMap { ch => JDomNode.wrapNodeOption(ch) }
+    }
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ScopedElemLike[JDomElem] with HasParent[JDomElem] { self =>
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with ScopedElemLike[JDomElem] with HasParent[JDomElem] { self =>
 
     require(wrappedNode ne null)
 
@@ -820,7 +877,7 @@ object JDomWrapperTest {
       Option(wrappedNode.getParentElement) map { e => JDomNode.wrapElement(e) }
   }
 
-  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode {
+  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode with ResolvedNodes.Text {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.Text
@@ -832,19 +889,25 @@ object JDomWrapperTest {
     def normalizedText: String = wrappedNode.getTextNormalize
   }
 
-  final class JDomProcessingInstruction(override val wrappedNode: org.jdom2.ProcessingInstruction) extends JDomNode {
+  final class JDomProcessingInstruction(override val wrappedNode: org.jdom2.ProcessingInstruction) extends JDomNode with Nodes.ProcessingInstruction {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.ProcessingInstruction
+
+    def target: String = wrappedNode.getTarget
+
+    def data: String = wrappedNode.getValue
   }
 
-  final class JDomEntityRef(override val wrappedNode: org.jdom2.EntityRef) extends JDomNode {
+  final class JDomEntityRef(override val wrappedNode: org.jdom2.EntityRef) extends JDomNode with Nodes.EntityRef {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.EntityRef
+
+    def entity: String = wrappedNode.getName
   }
 
-  final class JDomComment(override val wrappedNode: org.jdom2.Comment) extends JDomNode {
+  final class JDomComment(override val wrappedNode: org.jdom2.Comment) extends JDomNode with Nodes.Comment {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.Comment
@@ -856,13 +919,13 @@ object JDomWrapperTest {
 
     def wrapNodeOption(node: org.jdom2.Content): Option[JDomNode] = {
       node match {
-        case e: org.jdom2.Element => Some(new JDomElem(e))
-        case cdata: org.jdom2.CDATA => Some(new JDomText(cdata))
-        case t: org.jdom2.Text => Some(new JDomText(t))
+        case e: org.jdom2.Element                => Some(new JDomElem(e))
+        case cdata: org.jdom2.CDATA              => Some(new JDomText(cdata))
+        case t: org.jdom2.Text                   => Some(new JDomText(t))
         case pi: org.jdom2.ProcessingInstruction => Some(new JDomProcessingInstruction(pi))
-        case er: org.jdom2.EntityRef => Some(new JDomEntityRef(er))
-        case c: org.jdom2.Comment => Some(new JDomComment(c))
-        case _ => None
+        case er: org.jdom2.EntityRef             => Some(new JDomEntityRef(er))
+        case c: org.jdom2.Comment                => Some(new JDomComment(c))
+        case _                                   => None
       }
     }
 

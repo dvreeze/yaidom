@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
+import java.net.URI
 import java.{ util => jutil }
 
 import scala.Vector
@@ -35,12 +36,18 @@ import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.dom
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.`type`.Type
+import net.sf.saxon.dom.NodeOverNodeInfo
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.DocumentInfo
@@ -96,6 +103,8 @@ class SaxonDomWrapperTest extends Suite {
     assertResult(Set(Scope.from("" -> "http://bookstore", "books" -> "http://bookstore"))) {
       root.findAllElemsOrSelf.map(_.scope).toSet
     }
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseStrangeXml(): Unit = {
@@ -117,6 +126,8 @@ class SaxonDomWrapperTest extends Suite {
     assertResult(Scope.from("ns" -> "http://www.google.com")) {
       root.getChildElem(HasENameApi.withLocalName("foo")).scope
     }
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseDefaultNamespaceXml(): Unit = {
@@ -140,6 +151,8 @@ class SaxonDomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf flatMap { e => e.commentChildren.map(_.text.trim) }
       result.mkString
     }
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseSchemaXsd(): Unit = {
@@ -341,6 +354,8 @@ class SaxonDomWrapperTest extends Suite {
     }
 
     checkFieldPattern(root)
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
@@ -375,6 +390,8 @@ class SaxonDomWrapperTest extends Suite {
     }
 
     checkChildText(root)
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
@@ -392,6 +409,8 @@ class SaxonDomWrapperTest extends Suite {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
       result.toSet
     }
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseXmlWithEscapedChars(): Unit = {
@@ -437,6 +456,8 @@ class SaxonDomWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   @Test def testParseXmlWithSpecialChars(): Unit = {
@@ -470,6 +491,8 @@ class SaxonDomWrapperTest extends Suite {
     }
 
     doChecks(root)
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   /**
@@ -535,6 +558,8 @@ class SaxonDomWrapperTest extends Suite {
       val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
       result.toSet
     }
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
   /**
@@ -565,6 +590,18 @@ class SaxonDomWrapperTest extends Suite {
     assertResult(Some("http://xasb.org/gaap")) {
       tnsOption
     }
+
+    checkEqualityOfDomAndSaxonElems(domDoc)
+  }
+
+  private def checkEqualityOfDomAndSaxonElems(d: DomDocument): Unit = {
+    val rootElem1 = resolved.Elem(d.documentElement)
+    val rootElem2 =
+      resolved.Elem(dom.DomDocument(NodeOverNodeInfo.wrap(d.wrappedNode).asInstanceOf[org.w3c.dom.Document]).documentElement)
+
+    assertResult(rootElem1) {
+      rootElem2
+    }
   }
 
   class LoggingEntityResolver extends EntityResolver {
@@ -581,7 +618,7 @@ object SaxonDomWrapperTest {
   import ENameProvider.globalENameProvider._
   import QNameProvider.globalQNameProvider._
 
-  abstract class DomNode(val wrappedNode: NodeInfo) {
+  abstract class DomNode(val wrappedNode: NodeInfo) extends ResolvedNodes.Node {
 
     final override def toString: String = wrappedNode.toString
 
@@ -598,7 +635,14 @@ object SaxonDomWrapperTest {
     }
   }
 
-  abstract class DomParentNode(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomDocument(val wrappedNode: DocumentInfo) extends DocumentApi[DomElem] {
+    require(wrappedNode ne null)
+    require(wrappedNode.getNodeKind == Type.DOCUMENT)
+
+    def uriOption: Option[URI] = Option(wrappedNode.getBaseURI).map(s => URI.create(s))
+
+    def documentElement: DomElem =
+      (children collectFirst { case e: DomElem => e }).getOrElse(sys.error(s"Missing document element"))
 
     final def children: immutable.IndexedSeq[DomNode] = {
       if (!wrappedNode.hasChildNodes) Vector()
@@ -612,18 +656,8 @@ object SaxonDomWrapperTest {
     }
   }
 
-  final class DomDocument(
-    override val wrappedNode: DocumentInfo) extends DomParentNode(wrappedNode) {
-
-    require(wrappedNode ne null)
-    require(wrappedNode.getNodeKind == Type.DOCUMENT)
-
-    def documentElement: DomElem =
-      (children collectFirst { case e: DomElem => e }).getOrElse(sys.error(s"Missing document element"))
-  }
-
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomParentNode(wrappedNode) with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
@@ -648,6 +682,17 @@ object SaxonDomWrapperTest {
       val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
 
       nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
+    }
+
+    override def children: immutable.IndexedSeq[DomNode] = {
+      if (!wrappedNode.hasChildNodes) Vector()
+      else {
+        val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
+
+        val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+
+        nodes.flatMap(nodeInfo => DomNode.wrapNodeOption(nodeInfo))
+      }
     }
 
     /** Returns the text children */
@@ -691,7 +736,7 @@ object SaxonDomWrapperTest {
     }
   }
 
-  final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Text {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.TEXT || wrappedNode.getNodeKind == Type.WHITESPACE_TEXT)
 
@@ -702,12 +747,16 @@ object SaxonDomWrapperTest {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final class DomProcessingInstruction(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomProcessingInstruction(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with Nodes.ProcessingInstruction {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.PROCESSING_INSTRUCTION)
+
+    def target: String = wrappedNode.getDisplayName // ???
+
+    def data: String = wrappedNode.getStringValue // ???
   }
 
-  final class DomComment(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) {
+  final class DomComment(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with Nodes.Comment {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.COMMENT)
 
