@@ -133,6 +133,10 @@ class DocumentParserTest extends Suite {
     assertResult(xmlDeclOption) {
       xmlDeclOption2
     }
+
+    assertResult(List(doc2.documentElement, doc2.comments.head)) {
+      doc2.children
+    }
   }
 
   private def doTestParseXml11(docParser: DocumentParser): Unit = {
@@ -176,6 +180,10 @@ class DocumentParserTest extends Suite {
 
     assertResult(xmlDeclOption) {
       xmlDeclOption2
+    }
+
+    assertResult(List(doc2.comments.head, doc2.documentElement)) {
+      doc2.children
     }
   }
 }
