@@ -32,6 +32,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 
 /**
@@ -124,6 +125,14 @@ class DocumentParserTest extends Suite {
     assertResult(Some(true)) {
       xmlDeclOption.flatMap(_.standaloneOption)
     }
+
+    val doc2 = DocBuilder.fromDocument(doc).build()
+
+    val xmlDeclOption2 = doc2.xmlDeclarationOption
+
+    assertResult(xmlDeclOption) {
+      xmlDeclOption2
+    }
   }
 
   private def doTestParseXml11(docParser: DocumentParser): Unit = {
@@ -159,6 +168,14 @@ class DocumentParserTest extends Suite {
     }
     assertResult(Some(false)) {
       xmlDeclOption.flatMap(_.standaloneOption)
+    }
+
+    val doc2 = DocBuilder.fromDocument(doc).build()
+
+    val xmlDeclOption2 = doc2.xmlDeclarationOption
+
+    assertResult(xmlDeclOption) {
+      xmlDeclOption2
     }
   }
 }
