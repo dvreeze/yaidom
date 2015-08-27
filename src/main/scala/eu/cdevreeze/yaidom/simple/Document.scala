@@ -26,6 +26,7 @@ import eu.cdevreeze.yaidom.PrettyPrinting.LineSeqSeq
 import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteral
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
