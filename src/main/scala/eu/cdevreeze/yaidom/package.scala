@@ -50,12 +50,12 @@ package eu.cdevreeze
  * which is essential in facilitating a clear theory of namespaces</li>
  * </ul>
  *
- * Yaidom, and in particular the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and [[eu.cdevreeze.yaidom.simple]] sub-packages,
- * contains the following layers:
+ * Yaidom, and in particular the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]], [[eu.cdevreeze.yaidom.resolved]] and
+ * [[eu.cdevreeze.yaidom.simple]] sub-packages, contains the following layers:
  * <ol>
  * <li><em>basic concepts</em>, such as (qualified and expanded) names of elements and attributes (in the `core` package)</li>
  * <li>the <em>uniform query API traits</em>, to query elements for child, descendant and descendant-or-self elements (in the `queryapi` package)</li>
- * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits (e.g. in the `simple` package)</li>
+ * <li>some of the specific <em>element implementations</em>, mixing in those uniform query API traits (e.g. in the `resolved` and `simple` packages)</li>
  * </ol>
  *
  * It makes sense to read this documentation, because it helps in getting up-to-speed with yaidom.
@@ -456,18 +456,20 @@ package eu.cdevreeze
  *
  * ==Packages and dependencies==
  *
- * Yaidom has the following packages, and layering between packages:
+ * Yaidom has the following packages, and layering between packages (mentioning the lowest layers first):
  * <ol>
  * <li>Package [[eu.cdevreeze.yaidom.core]], with the core concepts described above. It depends on no other yaidom packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.queryapi]], with the query API traits described above. It only depends on the `core` package.</li>
- * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core` and `queryapi` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.resolved]], with a minimal "James Clark" element implementation. It only depends on the `core` and `queryapi` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core`, `queryapi` and `resolved` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.indexed]], supporting "indexed" elements. It only depends on the `core`, `queryapi`, `resolved` and `simple` packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.convert]]. It contains conversions between default yaidom nodes on the one hand and DOM,
- * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi` and `simple` packages.</li>
+ * Scala XML, etc. on the other hand. Like the `indexed` package, the `convert` package depends on the yaidom `core`, `queryapi`, `resolved` and `simple` packages.</li>
  * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
- * the packages mentioned above.</li>
- * <li>The other packages: [[eu.cdevreeze.yaidom.dom]], [[eu.cdevreeze.yaidom.indexed]],
- * [[eu.cdevreeze.yaidom.resolved]] and [[eu.cdevreeze.yaidom.scalaxml]]. They depend on (some of) the packages mentioned above,
- * and not on each other.</li>
+ * the packages mentioned above, except for `indexed`.</li>
+ * <li>The other packages (except `utils`), such as [[eu.cdevreeze.yaidom.dom]] and [[eu.cdevreeze.yaidom.scalaxml]]. They depend on (some of) the packages mentioned above,
+ * but not on each other.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.utils]], which depends on all the packages above.</li>
  * </ol>
  * Indeed, all yaidom package dependencies are uni-directional.
  *
