@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.simple.CanBeDocumentChild
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ConverterToDocument
@@ -41,7 +41,6 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
-import eu.cdevreeze.yaidom.simple.XmlDeclaration
 import javax.xml.XMLConstants
 import javax.xml.namespace.{ QName => JQName }
 import javax.xml.stream.XMLEventReader

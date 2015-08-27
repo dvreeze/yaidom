@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.simple
+package eu.cdevreeze.yaidom.core
 
 import java.nio.charset.Charset
 
@@ -47,6 +47,6 @@ object XmlDeclaration {
   def parseStandalone(standalone: String): Boolean = standalone match {
     case "yes" => true
     case "no"  => false
-    case _     => sys.error(s"Not a valid standalone vaue: $standalone")
+    case _     => sys.error(s"Not a valid standalone value: $standalone")
   }
 }

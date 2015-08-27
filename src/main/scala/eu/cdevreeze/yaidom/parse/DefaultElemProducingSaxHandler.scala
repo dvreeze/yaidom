@@ -28,10 +28,10 @@ import org.xml.sax.ext.Locator2
 import org.xml.sax.helpers.NamespaceSupport
 
 import eu.cdevreeze.yaidom.core.Declarations
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.simple.CanBeDocumentChild
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.Document
@@ -40,7 +40,6 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
-import eu.cdevreeze.yaidom.simple.XmlDeclaration
 import net.jcip.annotations.NotThreadSafe
 
 /**

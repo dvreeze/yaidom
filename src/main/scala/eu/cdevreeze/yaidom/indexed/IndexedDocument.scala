@@ -19,13 +19,12 @@ package eu.cdevreeze.yaidom.indexed
 import java.net.URI
 
 import scala.collection.immutable
-import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * Document, containing an "indexed" document element.

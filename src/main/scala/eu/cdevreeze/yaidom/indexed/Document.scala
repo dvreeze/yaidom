@@ -21,11 +21,11 @@ import java.net.URI
 import scala.Vector
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
-import eu.cdevreeze.yaidom.simple.XmlDeclaration
 
 /**
  * `IndexedDocument`, containing an "indexed" document element with simple elements as underlying elements.
