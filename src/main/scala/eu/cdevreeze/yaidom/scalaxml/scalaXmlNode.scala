@@ -146,7 +146,7 @@ final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends Scala
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 }
 
-final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends ScalaXmlNode with Nodes.Text {
+final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends ScalaXmlNode with ResolvedNodes.Text {
   require(wrappedNode ne null)
 
   override type DomType = scala.xml.PCData
