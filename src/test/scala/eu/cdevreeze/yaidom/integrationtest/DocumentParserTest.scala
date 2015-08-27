@@ -27,13 +27,16 @@ import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlDocument
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * DocumentParser test.
@@ -89,6 +92,156 @@ class DocumentParserTest extends Suite {
     val parser = DocumentParserUsingDomLS.newInstance
 
     doTestParseXml11(parser)
+  }
+
+  @Test def testParseScalaXmlWithEndingComments(): Unit = {
+    val xml =
+      """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+         |<prod:product xmlns:prod="http://datypic.com/prod">
+         |  <prod:number>557</prod:number>
+         |  <prod:size system="US-DRESS">10</prod:size>
+         |</prod:product>
+         |<!-- Bogus comment at the end -->
+         |""".stripMargin.trim
+
+    val doc = ScalaXmlDocument(
+      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), true).document)
+
+    assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
+      doc.documentElement.findAllElemsOrSelf.map(_.qname)
+    }
+
+    assertResult(List("Bogus comment at the end")) {
+      doc.comments.map(_.text.trim)
+    }
+    assertResult(List(doc.documentElement, doc.comments.head)) {
+      doc.children
+    }
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some(Codec.UTF8.charSet)) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(true)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
+  }
+
+  @Test def testParseScalaXmlWithStartingComments(): Unit = {
+    val xml =
+      """|<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+         |<!-- Bogus comment at the beginning -->
+         |<prod:product xmlns:prod="http://datypic.com/prod">
+         |  <prod:number>557</prod:number>
+         |  <prod:size system="US-DRESS">10</prod:size>
+         |</prod:product>
+         |""".stripMargin.trim
+
+    val doc = ScalaXmlDocument(
+      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), true).document)
+
+    assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
+      doc.documentElement.findAllElemsOrSelf.map(_.qname)
+    }
+
+    assertResult(List("Bogus comment at the beginning")) {
+      doc.comments.map(_.text.trim)
+    }
+    assertResult(List(doc.comments.head, doc.documentElement)) {
+      doc.children
+    }
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some(Charset.forName("iso-8859-1"))) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(false)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
+  }
+
+  @Test def testParseDomWithEndingComments(): Unit = {
+    val xml =
+      """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+         |<prod:product xmlns:prod="http://datypic.com/prod">
+         |  <prod:number>557</prod:number>
+         |  <prod:size system="US-DRESS">10</prod:size>
+         |</prod:product>
+         |<!-- Bogus comment at the end -->
+         |""".stripMargin.trim
+
+    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    val doc = DomDocument(
+      db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
+
+    assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
+      doc.documentElement.findAllElemsOrSelf.map(_.qname)
+    }
+
+    assertResult(List("Bogus comment at the end")) {
+      doc.comments.map(_.text.trim)
+    }
+    assertResult(List(doc.documentElement, doc.comments.head)) {
+      doc.children
+    }
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some(Codec.UTF8.charSet)) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(true)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
+  }
+
+  @Test def testParseDomWithStartingComments(): Unit = {
+    val xml =
+      """|<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+         |<!-- Bogus comment at the beginning -->
+         |<prod:product xmlns:prod="http://datypic.com/prod">
+         |  <prod:number>557</prod:number>
+         |  <prod:size system="US-DRESS">10</prod:size>
+         |</prod:product>
+         |""".stripMargin.trim
+
+    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    val doc = DomDocument(
+      db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
+
+    assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
+      doc.documentElement.findAllElemsOrSelf.map(_.qname)
+    }
+
+    assertResult(List("Bogus comment at the beginning")) {
+      doc.comments.map(_.text.trim)
+    }
+    assertResult(List(doc.comments.head, doc.documentElement)) {
+      doc.children
+    }
+
+    val xmlDeclOption = doc.xmlDeclarationOption
+
+    assertResult(Some("1.0")) {
+      xmlDeclOption.map(_.version)
+    }
+    assertResult(Some(Charset.forName("iso-8859-1"))) {
+      xmlDeclOption.flatMap(_.encodingOption)
+    }
+    assertResult(Some(false)) {
+      xmlDeclOption.flatMap(_.standaloneOption)
+    }
   }
 
   private def doTestParseWithEndingComments(docParser: DocumentParser): Unit = {

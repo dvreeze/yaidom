@@ -17,11 +17,13 @@
 package eu.cdevreeze.yaidom.dom
 
 import java.net.URI
+import java.nio.charset.Charset
 
 import scala.collection.immutable
 
 import org.w3c
 
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 
@@ -54,6 +56,16 @@ final class DomDocument(val wrappedDocument: w3c.dom.Document) extends DocumentA
 
   def processingInstructions: immutable.IndexedSeq[DomProcessingInstruction] = {
     children.collect({ case pi: DomProcessingInstruction => pi })
+  }
+
+  def xmlDeclarationOption: Option[XmlDeclaration] = {
+    val xmlVersionOption = Option(wrappedDocument.getXmlVersion)
+    val xmlDeclOption = xmlVersionOption map { xmlVersion =>
+      XmlDeclaration.fromVersion(xmlVersion).
+        withEncodingOption(Option(wrappedDocument.getXmlEncoding).map(cs => Charset.forName(cs))).
+        withStandaloneOption(Some(wrappedDocument.getXmlStandalone))
+    }
+    xmlDeclOption
   }
 }
 

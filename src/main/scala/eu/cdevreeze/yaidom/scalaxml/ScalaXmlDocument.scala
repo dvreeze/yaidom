@@ -17,9 +17,11 @@
 package eu.cdevreeze.yaidom.scalaxml
 
 import java.net.URI
+import java.nio.charset.Charset
 
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 
 /**
@@ -51,6 +53,16 @@ final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends Do
 
   def processingInstructions: immutable.IndexedSeq[ScalaXmlProcessingInstruction] = {
     wrappedDocument.children.toIndexedSeq.collect({ case pi: scala.xml.ProcInstr => ScalaXmlProcessingInstruction(pi) })
+  }
+
+  def xmlDeclarationOption: Option[XmlDeclaration] = {
+    val xmlVersionOption = wrappedDocument.version
+    val xmlDeclOption = xmlVersionOption map { xmlVersion =>
+      XmlDeclaration.fromVersion(xmlVersion).
+        withEncodingOption(wrappedDocument.encoding.map(cs => Charset.forName(cs))).
+        withStandaloneOption(wrappedDocument.standAlone)
+    }
+    xmlDeclOption
   }
 }
 
