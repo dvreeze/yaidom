@@ -178,7 +178,7 @@ object IndexedClarkElem {
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
 
     val parentBaseUriOption: Option[URI] =
-      IndexedClarkElemLike.computeBaseUriOption(docUriOption, rootElem, path.parentPathOption.getOrElse(Path.Root))
+      path.parentPathOption.flatMap(pp => IndexedClarkElemLike.computeBaseUriOption(docUriOption, rootElem, pp)).orElse(docUriOption)
 
     apply(docUriOption, parentBaseUriOption, rootElem, path, elem)
   }
