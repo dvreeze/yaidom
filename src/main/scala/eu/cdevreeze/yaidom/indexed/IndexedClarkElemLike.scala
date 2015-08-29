@@ -18,6 +18,8 @@ package eu.cdevreeze.yaidom.indexed
 
 import java.net.URI
 
+import scala.annotation.elidable
+import scala.annotation.elidable.ASSERTION
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
@@ -71,39 +73,4 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
 
     resultOption.get
   }
-}
-
-/**
- * Some XML base support, used in trait `IndexedClarkElemLike`, for example, but also potentially useful in application code.
- */
-object IndexedClarkElemLike {
-
-  /**
-   * Returns the optional base URI, given an optional document URI, the root element, and the Path from the root
-   * element to "this" element.
-   */
-  def computeBaseUriOption[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): Option[URI] = {
-    val reverseAncestryOrSelf: immutable.IndexedSeq[U] =
-      rootElem.findReverseAncestryOrSelfByPath(path).getOrElse(
-        sys.error(s"Corrupt data. Could not get reverse ancestry-or-self of ${rootElem.getElemOrSelfByPath(path)}"))
-
-    assert(reverseAncestryOrSelf.head == rootElem)
-
-    reverseAncestryOrSelf.foldLeft(docUriOption) {
-      case (parentBaseUriOption, elm) =>
-        getNextBaseUriOption(parentBaseUriOption, elm)
-    }
-  }
-
-  /**
-   * Returns the optional base URI, given an optional parent base URI, and "this" element.
-   */
-  def getNextBaseUriOption[U <: ClarkElemApi[U]](parentBaseUriOption: Option[URI], elem: U): Option[URI] = {
-    val explicitBaseUriOption = elem.attributeOption(IndexedClarkElemLike.XmlBaseEName).map(s => new URI(s))
-    explicitBaseUriOption.map(u => parentBaseUriOption.map(_.resolve(u)).getOrElse(u)).orElse(parentBaseUriOption)
-  }
-
-  val XmlNs = "http://www.w3.org/XML/1998/namespace"
-
-  val XmlBaseEName = EName(XmlNs, "base")
 }

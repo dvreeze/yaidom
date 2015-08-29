@@ -25,6 +25,7 @@ import scala.reflect.classTag
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
@@ -134,7 +135,8 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
 
   final def baseUriOption: Option[URI] = {
-    IndexedClarkElemLike.getNextBaseUriOption(parentBaseUriOption, elem)
+    // TODO Make URI resolution pluggable
+    XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(XmlBaseSupport.JdkUriResolver)
   }
 
   /**
@@ -177,8 +179,9 @@ object IndexedClarkElem {
     val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
       sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
 
+    // TODO Make URI resolution pluggable
     val parentBaseUriOption: Option[URI] =
-      path.parentPathOption.flatMap(pp => IndexedClarkElemLike.computeBaseUriOption(docUriOption, rootElem, pp)).orElse(docUriOption)
+      path.parentPathOption.flatMap(pp => XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, pp)(XmlBaseSupport.JdkUriResolver)).orElse(docUriOption)
 
     apply(docUriOption, parentBaseUriOption, rootElem, path, elem)
   }
@@ -190,7 +193,9 @@ object IndexedClarkElem {
     path: Path,
     elem: U): IndexedClarkElem[U] = {
 
-    val baseUriOption = IndexedClarkElemLike.getNextBaseUriOption(parentBaseUriOption, elem)
+    // TODO Make URI resolution pluggable
+    val baseUriOption =
+      XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(XmlBaseSupport.JdkUriResolver)
 
     // Recursive calls
     val childElems = elem.findAllChildElemsWithPathEntries map {
