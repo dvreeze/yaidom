@@ -41,6 +41,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
@@ -76,22 +77,22 @@ class IndexedElemTest extends Suite {
 
   @Test def testDoubleIndexing(): Unit = {
     val rootElem = docWithCommentAtEnd.documentElement
-    val strangeElem = IndexedScopedElem(IndexedScopedElem(rootElem))
+    val strangeElem = indexedElemBuilder.build(indexedElemBuilder.build(rootElem))
 
-    assertResult(IndexedScopedElem(rootElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem))) {
+    assertResult(indexedElemBuilder.build(rootElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem))) {
       strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem))
     }
 
-    assertResult(IndexedClarkElem(resolved.Elem(rootElem)).findAllElemsOrSelf.map(_.elem)) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem))
-    }
-
-    assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
+    assertResult(indexedClarkElemBuilder.build(resolved.Elem(rootElem)).findAllElemsOrSelf.map(_.elem)) {
       strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem))
     }
 
     assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
-      IndexedScopedElem(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem.elem))
+      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem))
+    }
+
+    assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
+      indexedElemBuilder.build(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem.elem))
     }
   }
 
@@ -100,7 +101,7 @@ class IndexedElemTest extends Suite {
       rootElem.findAllElemsOrSelf.map(_.qname)
     }
 
-    val indexedElem = IndexedScopedElem(rootElem)
+    val indexedElem = indexedElemBuilder.build(rootElem)
 
     assertResult(List(
       List(EName(ns, "product")),
@@ -115,7 +116,7 @@ class IndexedElemTest extends Suite {
     }
 
     val resolvedElem = resolved.Elem(rootElem)
-    val indexedClarkElem = IndexedClarkElem(resolvedElem)
+    val indexedClarkElem = indexedClarkElemBuilder.build(resolvedElem)
 
     assertResult(indexedElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)) {
       indexedClarkElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
@@ -157,6 +158,12 @@ class IndexedElemTest extends Suite {
   }
 
   private val ns = "http://datypic.com/prod"
+
+  private val uriResolver = XmlBaseSupport.JdkUriResolver
+
+  private val indexedElemBuilder = IndexedScopedElem.Builder(uriResolver)
+
+  private val indexedClarkElemBuilder = IndexedClarkElem.Builder(uriResolver)
 
   private val docWithCommentAtEnd: Document = {
     val docParser = DocumentParserUsingSax.newInstance

@@ -31,7 +31,9 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.indexed.Elem
+import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved
 
@@ -44,6 +46,8 @@ import eu.cdevreeze.yaidom.resolved
 class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
+
+  private val indexedElemBuilder = IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testInternalConsistency(): Unit = {
     require(bookstore.localName == "Bookstore")
@@ -445,7 +449,9 @@ class QueryTest extends AbstractElemLikeQueryTest {
       }
 
     val invertedBookstore: Elem =
-      Elem(bookstore.docUri, eu.cdevreeze.yaidom.simple.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
+      indexedElemBuilder.build(
+        Some(bookstore.docUri),
+        eu.cdevreeze.yaidom.simple.Elem(qname = QName("InvertedBookstore"), children = authorsWithBooks))
 
     assertResult(3) {
       invertedBookstore.findAllChildElems.size
@@ -476,7 +482,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         case e: eu.cdevreeze.yaidom.simple.Elem                                    => e
       }
       val result = bookstore.elem.transformElemsOrSelf(f)
-      Elem(bookstore.docUri, result)
+      indexedElemBuilder.build(Some(bookstore.docUri), result)
     }
 
     assertResult(4) {
@@ -655,7 +661,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         children = Vector(
           book1Builder, book2Builder, book3Builder, book4Builder,
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
-    Elem(new URI("http://bookstore.xml"), result)
+    indexedElemBuilder.build(Some(new URI("http://bookstore.xml")), result)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)

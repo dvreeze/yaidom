@@ -34,6 +34,7 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 
@@ -48,6 +49,8 @@ class AnotherUpdateTest extends Suite {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val docParser = DocumentParserUsingDom.newInstance()
+
+  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testDeleteMagazines(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
@@ -116,7 +119,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val lastBookPath: Path =
-      indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
+      indexedElemBuilder.build(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
@@ -124,7 +127,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val newLastBookPath: Path =
-      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
+      indexedElemBuilder.build(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
     val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
     assertResult("Programming in Scala") {
@@ -190,7 +193,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val lastBookPath: Path =
-      indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
+      indexedElemBuilder.build(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
       val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
@@ -198,7 +201,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val newLastBookPathButOne: Path =
-      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).init.last
+      indexedElemBuilder.build(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).init.last
     val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
     assertResult("Programming in Scala") {
@@ -274,7 +277,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val newFirstBookPath: Path =
-      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).head
+      indexedElemBuilder.build(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).head
     val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
     assertResult("Programming in Scala") {
@@ -367,7 +370,7 @@ class AnotherUpdateTest extends Suite {
 
   private def testPropertyAboutTransformChildElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
     val expectedResult =
-      indexed.Elem(elem).findAllChildElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
+      indexedElemBuilder.build(elem).findAllChildElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
         acc.updated(path)(f)
       }
 
@@ -386,7 +389,7 @@ class AnotherUpdateTest extends Suite {
 
   private def testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
     val expectedResult =
-      indexed.Elem(elem).findAllElemsOrSelf.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
+      indexedElemBuilder.build(elem).findAllElemsOrSelf.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
         acc.updated(path)(f)
       }
 
@@ -397,7 +400,7 @@ class AnotherUpdateTest extends Suite {
 
   private def testPropertyAboutTransformElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
     val expectedResult =
-      indexed.Elem(elem).findAllElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
+      indexedElemBuilder.build(elem).findAllElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
         acc.updated(path)(f)
       }
 

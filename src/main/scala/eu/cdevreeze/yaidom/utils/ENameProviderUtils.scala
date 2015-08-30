@@ -20,6 +20,7 @@ import scala.collection.immutable
 
 import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.ENameProvider
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.indexed
 
@@ -29,6 +30,8 @@ import eu.cdevreeze.yaidom.indexed
  * @author Chris de Vreeze
  */
 object ENameProviderUtils {
+
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   /**
    * Expensive method creating an ENameProvider.ENameProviderUsingImmutableCache from parsed schema roots. Each such schema root
@@ -41,7 +44,7 @@ object ENameProviderUtils {
   def newENameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): ENameProvider.ENameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem(e)))
+    val schemaRoots = schemaElems.map(e => SchemaRoot(indexedElemBuilder.build(e)))
 
     val globalElemDeclENames = schemaRoots.flatMap(e => e.findAllGlobalElementDeclarations.map(_.targetEName)).toSet
 

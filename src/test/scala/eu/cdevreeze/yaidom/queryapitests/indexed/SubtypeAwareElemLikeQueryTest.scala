@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest.IndexedBridgeElem
 import SubtypeAwareElemLikeQueryTest.BridgeElemTakingIndexedElem
@@ -49,7 +50,8 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = docParser.parse(docUri)
 
-    new BridgeElemTakingIndexedElem(eu.cdevreeze.yaidom.indexed.Document(docUri, doc).documentElement)
+    new BridgeElemTakingIndexedElem(
+      eu.cdevreeze.yaidom.indexed.Document.from(doc.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver).documentElement)
   }
 }
 

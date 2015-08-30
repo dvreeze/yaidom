@@ -34,6 +34,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
@@ -81,7 +82,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
     val docParser = DocumentParserUsingStax.newInstance
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
-    val indexedDoc = indexed.Document(doc)
+    val indexedDoc = indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
 
     XbrlInstance(indexedDoc.documentElement)
   }
@@ -221,7 +222,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
     // Introducing indexed elements, offering the same query API and more
-    val indexedDoc = indexed.Document(doc)
+    val indexedDoc = indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
 
     val namespaceUrisDeclared = indexedDoc.documentElement.scope.inverse.keySet
 
@@ -241,7 +242,8 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
     val paths = indexedDoc.documentElement.findAllElemsOrSelf.map(_.path)
 
     val editedIndexedRootElem =
-      indexed.Elem(stripUnusedNamespaces(indexedDoc.documentElement, xbrliDocumentENameExtractor))
+      indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(
+        stripUnusedNamespaces(indexedDoc.documentElement, xbrliDocumentENameExtractor))
 
     assertResult(true) {
       paths forall { path =>
@@ -274,28 +276,28 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
     val remainingChildElems =
       xbrlInstance.findAllChildElems dropWhile {
         case e: SchemaRef => true
-        case e => false
+        case e            => false
       } dropWhile {
         case e: LinkbaseRef => true
-        case e => false
+        case e              => false
       } dropWhile {
         case e: RoleRef => true
-        case e => false
+        case e          => false
       } dropWhile {
         case e: ArcroleRef => true
-        case e => false
+        case e             => false
       } dropWhile {
         case e: XbrliContext => true
-        case e => false
+        case e               => false
       } dropWhile {
         case e: XbrliUnit => true
-        case e => false
+        case e            => false
       } dropWhile {
         case e: Fact => true
-        case e => false
+        case e       => false
       } dropWhile {
         case e: FootnoteLink => true
-        case e => false
+        case e               => false
       }
 
     assertResult(true) {

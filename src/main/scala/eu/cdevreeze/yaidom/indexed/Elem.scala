@@ -19,6 +19,7 @@ package eu.cdevreeze.yaidom.indexed
 import java.net.URI
 
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple
 
 /**
@@ -29,44 +30,84 @@ import eu.cdevreeze.yaidom.simple
 object Elem {
 
   /**
-   * Calls `IndexedScopedElem[simple.Elem](rootElem)`
+   * Builder of `Elem` objects. Slightly more convenient than the corresponding `IndexedScopedElem` builder.
    */
+  final case class Builder(val uriResolver: XmlBaseSupport.UriResolver) {
+
+    final val wrappedBuilder = IndexedScopedElem.Builder(uriResolver)
+
+    /**
+     * Returns the same as `wrappedBuilder.build(rootElem)`.
+     */
+    def build(rootElem: simple.Elem): IndexedScopedElem[simple.Elem] =
+      wrappedBuilder.build(rootElem)
+
+    /**
+     * Returns the same as `wrappedBuilder.build(docUriOption, rootElem)`.
+     */
+    def build(docUriOption: Option[URI], rootElem: simple.Elem): IndexedScopedElem[simple.Elem] =
+      wrappedBuilder.build(docUriOption, rootElem)
+
+    /**
+     * Returns the same as `wrappedBuilder.build(rootElem, path)`.
+     */
+    def build(rootElem: simple.Elem, path: Path): IndexedScopedElem[simple.Elem] = {
+      wrappedBuilder.build(rootElem, path)
+    }
+
+    /**
+     * Returns the same as `wrappedBuilder.build(docUriOption, rootElem, path)`.
+     */
+    def build(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): IndexedScopedElem[simple.Elem] = {
+      wrappedBuilder.build(docUriOption, rootElem, path)
+    }
+  }
+
+  /**
+   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)`
+   */
+  @deprecated(message = "Use 'IndexedScopedElem.Builder.build' instead", since = "1.4.1")
   def apply(rootElem: simple.Elem): Elem = {
-    IndexedScopedElem[simple.Elem](rootElem)
+    IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)
   }
 
   /**
-   * Calls `IndexedScopedElem[simple.Elem](docUriOption, rootElem)`
+   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
    */
+  @deprecated(message = "Use 'IndexedScopedElem.Builder.build' instead", since = "1.4.1")
   def apply(docUriOption: Option[URI], rootElem: simple.Elem): Elem = {
-    IndexedScopedElem[simple.Elem](docUriOption, rootElem)
+    IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)
   }
 
   /**
-   * Calls `IndexedScopedElem[simple.Elem](Some(docUri), rootElem)`
+   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
    */
+  @deprecated(message = "Use 'IndexedScopedElem.Builder.build' instead", since = "1.4.1")
   def apply(docUri: URI, rootElem: simple.Elem): Elem = {
-    IndexedScopedElem[simple.Elem](Some(docUri), rootElem)
+    IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)
   }
 
   /**
-   * Calls `IndexedScopedElem[simple.Elem](rootElem, path)`
+   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
    */
+  @deprecated(message = "Use 'IndexedScopedElem.Builder.build' instead", since = "1.4.1")
   def apply(rootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem[simple.Elem](rootElem, path)
+    IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)
   }
 
   /**
-   * Calls `IndexedScopedElem[simple.Elem](docUriOption, rootElem, path)`
+   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
    */
+  @deprecated(message = "Use 'IndexedScopedElem.Builder.build' instead", since = "1.4.1")
   def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem[simple.Elem](docUriOption, rootElem, path)
+    IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)
   }
 
   /**
-   * Calls `IndexedScopedElem[simple.Elem](Some(docUri), rootElem, path)`
+   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
    */
+  @deprecated(message = "Use 'IndexedScopedElem.Builder.build' instead", since = "1.4.1")
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem[simple.Elem](Some(docUri), rootElem, path)
+    IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)
   }
 }

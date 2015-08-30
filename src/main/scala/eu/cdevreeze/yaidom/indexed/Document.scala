@@ -23,6 +23,7 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
@@ -84,15 +85,24 @@ object Document {
     new Document(None, Vector(documentElement))
   }
 
-  def apply(docUri: URI, d: simple.Document): Document = {
-    apply(
-      d.xmlDeclarationOption,
-      d.processingInstructions ++ d.comments ++ Vector(Elem(Some(docUri), d.documentElement)))
+  def from(d: simple.Document, uriResolver: XmlBaseSupport.UriResolver): Document = {
+    val elem = IndexedScopedElem.Builder(uriResolver).build(d.uriOption, d.documentElement)
+
+    val children = d.children map {
+      case elm: Nodes.Elem                => elem
+      case node: Nodes.CanBeDocumentChild => node
+    }
+
+    apply(d.xmlDeclarationOption, children)
   }
 
+  @deprecated(message = "Use another factory method instead", since = "1.4.1")
+  def apply(docUri: URI, d: simple.Document): Document = {
+    from(d.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)
+  }
+
+  @deprecated(message = "Use another factory method instead", since = "1.4.1")
   def apply(d: simple.Document): Document = {
-    apply(
-      d.xmlDeclarationOption,
-      d.processingInstructions ++ d.comments ++ Vector(Elem(d.uriOption, d.documentElement)))
+    from(d, XmlBaseSupport.JdkUriResolver)
   }
 }

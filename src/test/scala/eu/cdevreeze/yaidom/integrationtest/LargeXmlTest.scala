@@ -43,6 +43,7 @@ import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.DocBuilder
@@ -144,7 +145,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testQueryIndexedElem(): Unit = {
-    val indexedDoc = indexed.Document(doc)
+    val indexedDoc = indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
 
     doQueryTest(indexedDoc.documentElement, "indexed.Elem")
   }
@@ -466,7 +467,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   @Test def testNavigationForIndexedElem(): Unit = {
-    val indexedDoc = indexed.Document(doc)
+    val indexedDoc = indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
 
     doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
   }

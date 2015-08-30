@@ -33,6 +33,7 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 
@@ -47,6 +48,8 @@ class CreationTest extends Suite {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsBookstore = "http://bookstore"
+
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testCreation(): Unit = {
     // 1. Parse XML file into Elem
@@ -392,7 +395,7 @@ class CreationTest extends Suite {
 
     // Let's functionally insert the author
 
-    val authorsPath = indexed.Elem(booksElm).findElem(_.resolvedName == EName("{http://bookstore}Authors")).map(_.path).
+    val authorsPath = indexedElemBuilder.build(booksElm).findElem(_.resolvedName == EName("{http://bookstore}Authors")).map(_.path).
       getOrElse(sys.error("No 'Authors' element found"))
 
     val updatedBooksElm: simple.Elem = booksElm.updated(authorsPath) {
@@ -400,7 +403,7 @@ class CreationTest extends Suite {
     }
 
     assertResult(Some(authorsPath)) {
-      indexed.Elem(updatedBooksElm).findElemOrSelf(e => e.localName == "Author").flatMap(e => e.path.parentPathOption)
+      indexedElemBuilder.build(updatedBooksElm).findElemOrSelf(e => e.localName == "Author").flatMap(e => e.path.parentPathOption)
     }
     assertResult(true) {
       updatedBooksElm.findAllElemsOrSelf forall { e => e.scope == Scope.from("books" -> "http://bookstore") }

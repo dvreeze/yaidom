@@ -21,6 +21,7 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.resolved
 
@@ -40,7 +41,7 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
     val is = classOf[XbrlInstanceQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/sample-xbrl-instance.xml")
 
     val doc = docParser.parse(is)
-    Elem(doc.documentElement)
+    Elem.Builder(XmlBaseSupport.JdkUriResolver).build(doc.documentElement)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

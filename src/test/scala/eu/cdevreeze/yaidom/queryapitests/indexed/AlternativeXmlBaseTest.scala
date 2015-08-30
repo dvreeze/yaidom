@@ -25,6 +25,7 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
 import eu.cdevreeze.yaidom
 
@@ -45,7 +46,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
   type E2 = yaidom.simple.Elem
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E] = {
-    val doc = yaidom.indexed.Document(docUri, yaidom.simple.Document(elem))
+    val doc = yaidom.indexed.Document.from(yaidom.simple.Document(Some(docUri), elem), XmlBaseSupport.JdkUriResolver)
     doc
   }
 

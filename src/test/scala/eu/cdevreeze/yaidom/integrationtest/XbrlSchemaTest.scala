@@ -24,6 +24,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * Test case using yaidom in-context elements for XBRL schema processing.
@@ -38,7 +39,7 @@ class XbrlSchemaTest extends Suite {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
 
-    val xbrlSchemaDoc = indexed.Document(doc)
+    val xbrlSchemaDoc = indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
     val xbrlSchema: indexed.Elem = xbrlSchemaDoc.documentElement
 
     // Check concepts
@@ -70,7 +71,9 @@ class XbrlSchemaTest extends Suite {
 
     // Check equivalence of different ways to get the same concepts
 
-    val paths = indexed.Elem(xbrlSchema.elem).findAllElemsOrSelf.map(_.path)
+    val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+
+    val paths = indexedElemBuilder.build(xbrlSchema.elem).findAllElemsOrSelf.map(_.path)
 
     assertResult(paths) {
       xbrlSchema.findAllElemsOrSelf map { _.path }
@@ -78,7 +81,7 @@ class XbrlSchemaTest extends Suite {
 
     val elemsContainingPlus = xbrlSchema filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
     val pathsOfElemsContainingPlus =
-      indexed.Elem(xbrlSchema.elem).filterElems(e => e.attributeOption(EName("name")).getOrElse("").contains("Plus")).map(_.path)
+      indexedElemBuilder.build(xbrlSchema.elem).filterElems(e => e.attributeOption(EName("name")).getOrElse("").contains("Plus")).map(_.path)
 
     assertResult(pathsOfElemsContainingPlus) {
       elemsContainingPlus map (_.path)

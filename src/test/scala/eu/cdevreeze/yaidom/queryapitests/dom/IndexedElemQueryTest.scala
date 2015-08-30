@@ -36,6 +36,7 @@ import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -198,7 +199,10 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
     val db = dbf.newDocumentBuilder
     val domDoc = db.newDocument()
 
-    IndexedClarkElem(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
+    val uriResolver = XmlBaseSupport.JdkUriResolver
+    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+
+    indexedElemBuilder.build(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

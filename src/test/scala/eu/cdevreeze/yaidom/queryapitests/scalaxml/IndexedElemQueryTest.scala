@@ -22,6 +22,7 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
@@ -108,7 +109,10 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
         </Magazine>
       </Bookstore>
 
-    IndexedClarkElem(ScalaXmlElem(scalaElem))
+    val uriResolver = XmlBaseSupport.JdkUriResolver
+    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+
+    indexedElemBuilder.build(ScalaXmlElem(scalaElem))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

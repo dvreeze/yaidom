@@ -38,6 +38,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
@@ -55,6 +56,8 @@ class UpdateTest extends Suite {
   private val scope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
   private val docParser = DocumentParserUsingDom.newInstance()
+
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   private val docPrinter = {
     val dbf = DocumentBuilderFactory.newInstance
@@ -310,7 +313,7 @@ class UpdateTest extends Suite {
 
   private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
     val matchingPaths =
-      indexed.Elem(rootElm) filterElems { e =>
+      indexedElemBuilder.build(rootElm) filterElems { e =>
         e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
       } map (_.path)
 
@@ -323,7 +326,7 @@ class UpdateTest extends Suite {
 
   private def turnBookAttributeIntoElemUsingPathSet(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
     val matchingPaths =
-      indexed.Elem(rootElm) filterElems { e =>
+      indexedElemBuilder.build(rootElm) filterElems { e =>
         e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
       } map (_.path)
 

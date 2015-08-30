@@ -26,6 +26,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasText
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * ElemLike-based query test case, using an XBRL instance as sample data.
@@ -142,7 +143,10 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
   @Test def testBulkNavigation(): Unit = {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
-    val indexedInstance = IndexedClarkElem(xbrlInstance)
+    val uriResolver = XmlBaseSupport.JdkUriResolver
+    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+
+    val indexedInstance = indexedElemBuilder.build(xbrlInstance)
 
     val elemsWithPaths =
       indexedInstance.findAllElemsOrSelf.map(p => (p.elem, p.path))

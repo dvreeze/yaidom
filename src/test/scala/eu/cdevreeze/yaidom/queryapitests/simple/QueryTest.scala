@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.Node
@@ -46,6 +47,8 @@ import eu.cdevreeze.yaidom.resolved
 class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
+
+  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths(): Unit = {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
@@ -100,7 +103,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     val paths =
       for {
-        path <- indexed.Elem(bookstore).findAllElems.map(_.path)
+        path <- indexedElemBuilder.build(bookstore).findAllElems.map(_.path)
         parentPath = path.parentPath
         parent = bookstore.getElemOrSelfByPath(parentPath)
         if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
@@ -121,7 +124,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- indexed.Elem(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
+        bookOrMagazinePath <- indexedElemBuilder.build(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
         bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
@@ -151,7 +154,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- indexed.Elem(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
+        bookOrMagazinePath <- indexedElemBuilder.build(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
         bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
@@ -405,7 +408,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookstoreWithoutPrices: Elem =
       bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Book") => removePrice(e)
-        case e => e
+        case e                                    => e
       }
 
     assertResult(4) {
@@ -415,11 +418,11 @@ class QueryTest extends AbstractElemLikeQueryTest {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     assertResult(4) {
-      val paths = indexed.Elem(bookstore).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
+      val paths = indexedElemBuilder.build(bookstore).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
       paths.size
     }
     assertResult(0) {
-      val paths = indexed.Elem(bookstoreWithoutPrices).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
+      val paths = indexedElemBuilder.build(bookstoreWithoutPrices).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
       paths.size
     }
   }
@@ -453,7 +456,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookstoreWithCombinedNames: Elem =
       bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") => combineName(e)
-        case e => e
+        case e                                      => e
       }
 
     assertResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {

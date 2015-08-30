@@ -30,6 +30,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node.elem
@@ -62,7 +63,9 @@ class TransformEdifactTest extends Suite {
 
   @Test def testTransform(): Unit = {
     val edifactDoc =
-      indexed.Document(docParser.parse(classOf[TransformEdifactTest].getResource("edifact/sample-edifact.xml").toURI))
+      indexed.Document.from(
+        docParser.parse(classOf[TransformEdifactTest].getResource("edifact/sample-edifact.xml").toURI),
+        XmlBaseSupport.JdkUriResolver)
 
     val declarationElem = makeDeclaration(edifactDoc.documentElement)
 

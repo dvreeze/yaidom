@@ -21,6 +21,7 @@ import scala.collection.immutable
 import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.indexed
 
@@ -42,7 +43,7 @@ object QNameProviderUtils {
   def newQNameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): QNameProvider.QNameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem(e)))
+    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver).build(e)))
 
     require(
       schemaRoots forall (e => e.targetNamespacePrefixOption.isDefined),

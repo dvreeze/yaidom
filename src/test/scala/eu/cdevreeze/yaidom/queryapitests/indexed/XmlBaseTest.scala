@@ -26,6 +26,7 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
 import eu.cdevreeze.yaidom.simple
 
@@ -48,7 +49,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
     val doc = docParser.parse(parsedDocUri)
 
-    indexed.Document(docUri, doc)
+    indexed.Document.from(doc.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)
   }
 
   protected def getDocument(path: String): indexed.Document = {

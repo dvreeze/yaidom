@@ -24,7 +24,9 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.indexed.Elem
+import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 
 /**
@@ -36,6 +38,8 @@ import eu.cdevreeze.yaidom.resolved
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem
+
+  private val indexedElemBuilder = IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
 
   protected val catalogElem: E = {
     val xml =
@@ -61,7 +65,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    val result = Elem(new URI("http://catalog"), convertToElem(xml))
+    val result = indexedElemBuilder.build(Some(new URI("http://catalog")), convertToElem(xml))
 
     // Invoking some Document methods, but without altering the result
 
@@ -89,7 +93,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    Elem(new URI("http://prices"), convertToElem(xml))
+    indexedElemBuilder.build(Some(new URI("http://prices")), convertToElem(xml))
   }
 
   protected val orderElem: E = {
@@ -103,12 +107,12 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    Elem(new URI("http://order"), convertToElem(xml))
+    indexedElemBuilder.build(Some(new URI("http://order")), convertToElem(xml))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    Elem(new URI("http://bogus-uri"), convertToElem(elem))
+    indexedElemBuilder.build(Some(new URI("http://bogus-uri")), convertToElem(elem))
   }
 }
