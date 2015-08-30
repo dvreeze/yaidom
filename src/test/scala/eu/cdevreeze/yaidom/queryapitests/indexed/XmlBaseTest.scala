@@ -49,7 +49,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
     val doc = docParser.parse(parsedDocUri)
 
-    indexed.Document.from(doc.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)
+    indexed.Document.from(doc.withUriOption(Some(docUri)), resolveUri _)
   }
 
   protected def getDocument(path: String): indexed.Document = {
@@ -61,25 +61,20 @@ class XmlBaseTest extends AbstractXmlBaseTest {
   }
 
   protected def getParentBaseUri(elem: E): URI = {
-    val reverseAncestryOrSelf = elem.rootElem.getReverseAncestryOrSelfByPath(elem.path)
-
-    reverseAncestryOrSelf.init.foldLeft(elem.docUri) {
-      case (parentBaseUri, elm) =>
-        val explicitBaseUriOption = elm.attributeOption(XmlBaseEName).map(s => new URI(s))
-        explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
-    }
+    elem.parentBaseUriOption.getOrElse(new URI(""))
   }
 
   protected def getDocumentUri(elem: E): URI = {
     elem.docUri
   }
 
-  protected def getAncestorsOrSelfReversed(elem: E): immutable.IndexedSeq[E2] = {
-    elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+    elem.reverseAncestryOrSelf
   }
 
-  protected override def resolveUri(base: URI, uri: URI): URI = {
+  // Naive resolveUri method
+  protected override def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {
     // Note the different behavior for resolving the empty URI!
-    base.resolve(uri)
+    XmlBaseSupport.JdkUriResolver(uri, baseUriOption)
   }
 }

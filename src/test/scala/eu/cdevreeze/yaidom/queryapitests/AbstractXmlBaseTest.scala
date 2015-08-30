@@ -54,14 +54,14 @@ abstract class AbstractXmlBaseTest extends Suite {
 
   protected def getDocumentUri(elem: E): URI
 
-  protected def getAncestorsOrSelfReversed(elem: E): immutable.IndexedSeq[E2]
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2]
 
-  protected def resolveUri(base: URI, uri: URI): URI = {
-    if (uri.toString.isEmpty) base else base.resolve(uri)
+  // Naive resolveUri method
+  protected def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {
+    val baseUri = baseUriOption.getOrElse(new URI(""))
+
+    if (uri.toString.isEmpty) baseUri else baseUri.resolve(uri)
   }
-
-  protected def toUri(s: String): URI =
-    Option(s).map(s => new URI(s)).getOrElse(new URI(""))
 
   @Test def testXmlBase(): Unit = {
     val doc = getDocument("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
@@ -106,7 +106,7 @@ abstract class AbstractXmlBaseTest extends Suite {
   }
 
   @Test def testOtherXmlBase(): Unit = {
-    val elem = testElem
+    val elem = getTestElem
 
     assertResult(new URI("http://example.org/wine/")) {
       getBaseUri(elem)
@@ -139,7 +139,7 @@ abstract class AbstractXmlBaseTest extends Suite {
       val uris =
         elem.filterElems(EName("link")) map { e =>
           val href = new URI(e.attribute(EName(XLinkNs, "href")))
-          getBaseUri(e).resolve(href)
+          resolveUri(href, Some(getBaseUri(e)))
         }
       uris.toSet
     }
@@ -160,24 +160,27 @@ abstract class AbstractXmlBaseTest extends Suite {
       val uris =
         elem.filterElems(EName("link")) map { e =>
           val href = new URI(e.attribute(EName(XLinkNs, "href")))
-          getBaseUri(e).resolve(href)
+          resolveUri(href, Some(getBaseUri(e)))
         }
       uris.toSet
     }
   }
 
-  private def testElem: E = {
+  private def getTestElem: E = {
     val doc = getDocument("/eu/cdevreeze/yaidom/queryapitests/miniXmlBaseTestFile.xml", new URI(""))
     doc.documentElement
   }
 
+  /**
+   * Tests an XML Base property relating it to the document URI and the ancestry-or-self.
+   */
   private def testXmlBaseProperty1(elem: E): Unit = {
-    val ancestorsOrSelf = getAncestorsOrSelfReversed(elem)
+    val ancestorsOrSelf = getReverseAncestryOrSelf(elem)
 
     val expectedBaseUri =
       ancestorsOrSelf.foldLeft(getDocumentUri(elem)) {
         case (currBaseUri, e) =>
-          e.attributeOption(XmlBaseEName).map(s => resolveUri(currBaseUri, toUri(s))).getOrElse(currBaseUri)
+          e.attributeOption(XmlBaseEName).map(s => resolveUri(new URI(s), Some(currBaseUri))).getOrElse(currBaseUri)
       }
 
     assertResult(expectedBaseUri) {
@@ -185,11 +188,14 @@ abstract class AbstractXmlBaseTest extends Suite {
     }
   }
 
+  /**
+   * Tests an XML Base property relating it to the parent base URI and the element itself.
+   */
   private def testXmlBaseProperty2(elem: E): Unit = {
     val parentBaseUri = getParentBaseUri(elem)
 
     val expectedBaseUri =
-      elem.attributeOption(XmlBaseEName).map(s => resolveUri(parentBaseUri, toUri(s))).getOrElse(parentBaseUri)
+      elem.attributeOption(XmlBaseEName).map(s => resolveUri(new URI(s), Some(parentBaseUri))).getOrElse(parentBaseUri)
 
     assertResult(expectedBaseUri) {
       getBaseUri(elem)

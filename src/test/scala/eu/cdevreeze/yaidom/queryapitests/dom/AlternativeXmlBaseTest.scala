@@ -69,9 +69,12 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
     toUri(elem.wrappedNode.getOwnerDocument.getDocumentURI)
   }
 
-  protected def getAncestorsOrSelfReversed(elem: E): immutable.IndexedSeq[E2] = {
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
     elem.ancestorsOrSelf.reverse
   }
 
   protected def nullUri: URI = new URI("")
+
+  private def toUri(s: String): URI =
+    Option(s).map(s => new URI(s)).getOrElse(new URI(""))
 }

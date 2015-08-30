@@ -46,7 +46,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
   type E2 = yaidom.simple.Elem
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E] = {
-    val doc = yaidom.indexed.Document.from(yaidom.simple.Document(Some(docUri), elem), XmlBaseSupport.JdkUriResolver)
+    val doc = yaidom.indexed.Document.from(yaidom.simple.Document(Some(docUri), elem), resolveUri _)
     doc
   }
 
@@ -55,26 +55,21 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
   }
 
   protected def getParentBaseUri(elem: E): URI = {
-    val reverseAncestryOrSelf = elem.rootElem.getReverseAncestryOrSelfByPath(elem.path)
-
-    reverseAncestryOrSelf.init.foldLeft(elem.docUri) {
-      case (parentBaseUri, elm) =>
-        val explicitBaseUriOption = elm.attributeOption(XmlBaseEName).map(s => new URI(s))
-        explicitBaseUriOption.map(u => parentBaseUri.resolve(u)).getOrElse(parentBaseUri)
-    }
+    elem.parentBaseUriOption.getOrElse(new URI(""))
   }
 
   protected def getDocumentUri(elem: E): URI = {
     elem.docUri
   }
 
-  protected def getAncestorsOrSelfReversed(elem: E): immutable.IndexedSeq[E2] = {
-    elem.path.ancestorOrSelfPaths.reverse.map(p => elem.rootElem.getElemOrSelfByPath(p))
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+    elem.reverseAncestryOrSelf
   }
 
-  protected override def resolveUri(base: URI, uri: URI): URI = {
+  // Naive resolveUri method
+  protected override def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {
     // Note the different behavior for resolving the empty URI!
-    base.resolve(uri)
+    XmlBaseSupport.JdkUriResolver(uri, baseUriOption)
   }
 
   protected def nullUri: URI = new URI("")

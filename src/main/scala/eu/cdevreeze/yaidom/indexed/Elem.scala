@@ -54,7 +54,7 @@ object Elem {
   }
 
   /**
-   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)`
    */
   @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(rootElem: simple.Elem): Elem = {
@@ -62,7 +62,7 @@ object Elem {
   }
 
   /**
-   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
    */
   @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUriOption: Option[URI], rootElem: simple.Elem): Elem = {
@@ -70,7 +70,7 @@ object Elem {
   }
 
   /**
-   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
    */
   @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUri: URI, rootElem: simple.Elem): Elem = {
@@ -78,7 +78,7 @@ object Elem {
   }
 
   /**
-   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
    */
   @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(rootElem: simple.Elem, path: Path): Elem = {
@@ -86,7 +86,7 @@ object Elem {
   }
 
   /**
-   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
    */
   @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
@@ -94,7 +94,7 @@ object Elem {
   }
 
   /**
-   * Calls `IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
    */
   @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {

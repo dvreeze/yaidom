@@ -33,7 +33,10 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom
 
 /**
- * Alternative XML Base test case. This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
+ * Alternative XML Base test case. It tests some expectations about XML Base support for different element implementations.
+ * Hence, for DOM and Scala XML wrapper elements, it tests expectations about XML Base support for the underlying libraries.
+ *
+ * This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
  *
  * Note the use of empty URIs in some places.
  *
@@ -61,14 +64,14 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
 
   protected def getDocumentUri(elem: E): URI
 
-  protected def getAncestorsOrSelfReversed(elem: E): immutable.IndexedSeq[E2]
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2]
 
-  protected def resolveUri(base: URI, uri: URI): URI = {
-    if (uri.toString.isEmpty) base else base.resolve(uri)
+  // Naive resolveUri method
+  protected def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {
+    val baseUri = baseUriOption.getOrElse(new URI(""))
+
+    if (uri.toString.isEmpty) baseUri else baseUri.resolve(uri)
   }
-
-  protected def toUri(s: String): URI =
-    Option(s).map(s => new URI(s)).getOrElse(nullUri)
 
   protected def nullUri: URI
 
@@ -88,7 +91,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
     assertResult(new URI("http://www.zvon.org/a.xml")) {
       val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(doc.documentElement), href)
+      resolveUri(href, Some(getBaseUri(doc.documentElement)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -119,7 +122,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
     assertResult(new URI("http://www.zvon.org/a.xml")) {
       val href = new URI(doc1.documentElement.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(doc1.documentElement), href)
+      resolveUri(href, Some(getBaseUri(doc1.documentElement)))
     }
 
     assertResult(new URI("http://www.zvon.org/")) {
@@ -127,7 +130,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
     assertResult(new URI("http://www.zvon.org/a.xml")) {
       val href = new URI(doc2.documentElement.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(doc2.documentElement), href)
+      resolveUri(href, Some(getBaseUri(doc2.documentElement)))
     }
 
     doc1.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -153,7 +156,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
     assertResult(new URI("http://www.somewhere.com/a.xml")) {
       val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(doc.documentElement), href)
+      resolveUri(href, Some(getBaseUri(doc.documentElement)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -182,7 +185,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     assertResult(new URI("http://www.zvon.org/a.xml")) {
       val referenceElem = doc.documentElement.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(referenceElem), href)
+      resolveUri(href, Some(getBaseUri(referenceElem)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -221,7 +224,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
       val pElem = doc.documentElement.getChildElem(_.localName == "p")
       val referenceElem = pElem.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(referenceElem), href)
+      resolveUri(href, Some(getBaseUri(referenceElem)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -254,7 +257,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     assertResult(new URI("http://www.zvon.org/a/b.xml")) {
       val referenceElem = doc.documentElement.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(referenceElem), href)
+      resolveUri(href, Some(getBaseUri(referenceElem)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -293,7 +296,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
       val pElem = doc.documentElement.getChildElem(_.localName == "p")
       val referenceElem = pElem.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(referenceElem), href)
+      resolveUri(href, Some(getBaseUri(referenceElem)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -316,7 +319,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
     assertResult(new URI("a.xml")) {
       val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(doc.documentElement), href)
+      resolveUri(href, Some(getBaseUri(doc.documentElement)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -341,7 +344,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
     assertResult(new URI("http://www.somewhere.com/a.xml")) {
       val href = new URI(doc.documentElement.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(doc.documentElement), href)
+      resolveUri(href, Some(getBaseUri(doc.documentElement)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -385,7 +388,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
       val pElem = doc.documentElement.getChildElem(_.localName == "p")
       val referenceElem = pElem.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(referenceElem), href)
+      resolveUri(href, Some(getBaseUri(referenceElem)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
@@ -433,20 +436,23 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
       val pElem = doc.documentElement.getChildElem(_.localName == "p")
       val referenceElem = pElem.getChildElem(_.localName == "reference")
       val href = new URI(referenceElem.attribute(XLinkHrefEName))
-      resolveUri(getBaseUri(referenceElem), href)
+      resolveUri(href, Some(getBaseUri(referenceElem)))
     }
 
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty1(e))
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
+  /**
+   * Tests an XML Base property relating it to the document URI and the ancestry-or-self.
+   */
   private def testXmlBaseProperty1(elem: E): Unit = {
-    val ancestorsOrSelf = getAncestorsOrSelfReversed(elem)
+    val ancestorsOrSelf = getReverseAncestryOrSelf(elem)
 
     val expectedBaseUri =
       ancestorsOrSelf.foldLeft(getDocumentUri(elem)) {
         case (currBaseUri, e) =>
-          e.attributeOption(XmlBaseEName).map(s => resolveUri(currBaseUri, toUri(s))).getOrElse(currBaseUri)
+          e.attributeOption(XmlBaseEName).map(s => resolveUri(new URI(s), Some(currBaseUri))).getOrElse(currBaseUri)
       }
 
     assertResult(expectedBaseUri) {
@@ -454,11 +460,14 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     }
   }
 
+  /**
+   * Tests an XML Base property relating it to the parent base URI and the element itself.
+   */
   private def testXmlBaseProperty2(elem: E): Unit = {
     val parentBaseUri = getParentBaseUri(elem)
 
     val expectedBaseUri =
-      elem.attributeOption(XmlBaseEName).map(s => resolveUri(parentBaseUri, toUri(s))).getOrElse(parentBaseUri)
+      elem.attributeOption(XmlBaseEName).map(s => resolveUri(new URI(s), Some(parentBaseUri))).getOrElse(parentBaseUri)
 
     assertResult(expectedBaseUri) {
       getBaseUri(elem)
