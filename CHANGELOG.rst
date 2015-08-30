@@ -3,6 +3,19 @@ CHANGELOG
 =========
 
 
+1.4.1
+=====
+
+Version 1.4.1 fixes broken XML Base support, due to a regression. It contains some breaking changes, but only compared
+to version 1.4.0 (which is broken in its XML Base support). The most important changes are:
+
+* Fixed the bug in getting the parent base URI of an indexed element
+* URI resolution (in XML Base) is sensitive, so indexed element creation now requires a URI resolution strategy to be passed
+* Old indexed element factory methods have been deprecated (they use a default URI resolver)
+
+Indexed element creation now goes through a builder, which keeps a URI resolver. The builder could be a global long-lived object.
+
+
 1.4.0
 =====
 
