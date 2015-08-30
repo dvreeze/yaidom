@@ -27,9 +27,11 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
- * XML Base test case.
+ * XML Base test case. It tests some expectations about XML Base support for different element implementations.
+ * Hence, for DOM and Scala XML wrapper elements, it tests expectations about XML Base support for the underlying libraries.
  *
  * @author Chris de Vreeze
  */

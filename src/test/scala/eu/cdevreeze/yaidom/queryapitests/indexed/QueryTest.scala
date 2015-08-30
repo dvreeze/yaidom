@@ -47,7 +47,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
-  private val indexedElemBuilder = IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testInternalConsistency(): Unit = {
     require(bookstore.localName == "Bookstore")

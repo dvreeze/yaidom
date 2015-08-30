@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.queryapitests.dom
 
 import scala.Vector
 import scala.collection.immutable
+import scala.reflect.classTag
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -200,7 +201,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
     val domDoc = db.newDocument()
 
     val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+    val indexedElemBuilder = IndexedClarkElem.Builder(classTag[DomElem], uriResolver)
 
     indexedElemBuilder.build(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
   }

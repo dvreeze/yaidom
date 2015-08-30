@@ -36,7 +36,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   final type E = Elem
 
-  private val indexedElemBuilder = IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   protected val productsElem: E = {
     val xml =

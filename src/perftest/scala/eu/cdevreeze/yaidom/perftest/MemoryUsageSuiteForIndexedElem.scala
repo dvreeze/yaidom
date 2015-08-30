@@ -42,7 +42,7 @@ class MemoryUsageSuiteForIndexedElem extends AbstractMemoryUsageSuite {
 
   type E = indexed.Elem
 
-  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   protected def parseXmlFiles(files: Vector[File]): Vector[Try[indexed.Elem]] = {
     val docParser = getDocumentParser

@@ -71,7 +71,7 @@ class XbrlSchemaTest extends Suite {
 
     // Check equivalence of different ways to get the same concepts
 
-    val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+    val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
     val paths = indexedElemBuilder.build(xbrlSchema.elem).findAllElemsOrSelf.map(_.path)
 

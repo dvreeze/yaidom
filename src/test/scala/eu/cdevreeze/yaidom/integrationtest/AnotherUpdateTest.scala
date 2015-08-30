@@ -50,7 +50,7 @@ class AnotherUpdateTest extends Suite {
 
   private val docParser = DocumentParserUsingDom.newInstance()
 
-  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testDeleteMagazines(): Unit = {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")

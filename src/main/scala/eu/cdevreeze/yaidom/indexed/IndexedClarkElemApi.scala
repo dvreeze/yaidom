@@ -23,6 +23,7 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * Abstract API for "indexed elements".
@@ -99,4 +100,36 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
    * }}}
    */
   def reverseAncestryOrSelf: immutable.IndexedSeq[U]
+}
+
+object IndexedClarkElemApi {
+
+  /**
+   * API of builders of `IndexedClarkElemApi` objects. These builders keep a URI resolver for XML Base support.
+   * Builder instances should be thread-safe global objects, encapsulating one chosen URI resolver.
+   */
+  trait Builder[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] {
+
+    def uriResolver: XmlBaseSupport.UriResolver
+
+    /**
+     * Returns the same as `build(None, rootElem)`.
+     */
+    def build(rootElem: U): E
+
+    /**
+     * Returns the same as `build(docUriOption, rootElem, Path.Root)`.
+     */
+    def build(docUriOption: Option[URI], rootElem: U): E
+
+    /**
+     * Returns the same as `build(None, rootElem, path)`.
+     */
+    def build(rootElem: U, path: Path): E
+
+    /**
+     * Factory method for "indexed elements". Typical implementations are recursive and expensive.
+     */
+    def build(docUriOption: Option[URI], rootElem: U, path: Path): E
+  }
 }

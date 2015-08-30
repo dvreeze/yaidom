@@ -48,7 +48,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
-  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths(): Unit = {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]

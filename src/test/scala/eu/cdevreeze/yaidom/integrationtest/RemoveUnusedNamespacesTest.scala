@@ -51,7 +51,7 @@ import eu.cdevreeze.yaidom.utils.TextENameExtractor
 @RunWith(classOf[JUnitRunner])
 class RemoveUnusedNamespacesTest extends Suite {
 
-  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   /**
    * See http://stackoverflow.com/questions/23002655/xquery-how-to-remove-unused-namespace-in-xml-node.

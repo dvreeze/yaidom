@@ -18,6 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
+import scala.reflect.classTag
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -39,7 +41,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem
 
-  private val indexedElemBuilder = IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   protected val catalogElem: E = {
     val xml =

@@ -157,31 +157,24 @@ object IndexedClarkElem {
    * builders are long-lived global objects. Each element created with this builder will have the same URI resolver,
    * viz. the one passed as constructor argument of the builder.
    */
-  final case class Builder(val uriResolver: XmlBaseSupport.UriResolver) {
+  final case class Builder[U <: ClarkElemApi[U]](
+    val underlyingType: ClassTag[U],
+    override val uriResolver: XmlBaseSupport.UriResolver) extends IndexedClarkElemApi.Builder[IndexedClarkElem[U], U] {
 
-    /**
-     * Returns the same as `build(None, rootElem)`.
-     */
-    def build[U <: ClarkElemApi[U]](rootElem: U): IndexedClarkElem[U] =
+    override def build(rootElem: U): IndexedClarkElem[U] =
       build(None, rootElem)
 
-    /**
-     * Returns the same as `build(docUriOption, rootElem, Path.Root)`.
-     */
-    def build[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] =
+    override def build(docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] =
       build(docUriOption, rootElem, Path.Root)
 
-    /**
-     * Returns the same as `build(None, rootElem, path)`.
-     */
-    def build[U <: ClarkElemApi[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
+    override def build(rootElem: U, path: Path): IndexedClarkElem[U] = {
       build(None, rootElem, path)
     }
 
     /**
      * Expensive recursive factory method for "indexed elements".
      */
-    def build[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
+    override def build(docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
       // Expensive call, so invoked only once
       val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
         sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
@@ -192,7 +185,7 @@ object IndexedClarkElem {
       build(docUriOption, parentBaseUriOption, rootElem, path, elem)
     }
 
-    private def build[U <: ClarkElemApi[U]](
+    private def build(
       docUriOption: Option[URI],
       parentBaseUriOption: Option[URI],
       rootElem: U,

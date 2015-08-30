@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
+import scala.reflect.ClassTag
+import scala.reflect.classTag
+
 import org.junit.Test
 import org.scalatest.Suite
 
@@ -23,9 +26,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.HasEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
@@ -36,6 +37,8 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 abstract class AbstractXbrlInstanceQueryTest extends Suite {
 
   type E <: ClarkElemLike[E]
+
+  implicit val ttag: ClassTag[E] = classTag[E]
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
   private val LinkNs = "http://www.xbrl.org/2003/linkbase"
@@ -144,7 +147,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
     val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+    val indexedElemBuilder = IndexedClarkElem.Builder(ttag, uriResolver)
 
     val indexedInstance = indexedElemBuilder.build(xbrlInstance)
 

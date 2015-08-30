@@ -16,8 +16,11 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
 import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * Abstract API for "indexed Scoped elements".
@@ -37,4 +40,22 @@ trait IndexedScopedElemApi[E <: IndexedScopedElemApi[E, U], U <: ScopedElemApi[U
    * XML into an `Elem` tree. They therefore do not occur in the namespace declarations returned by this method.
    */
   def namespaces: Declarations
+}
+
+object IndexedScopedElemApi {
+
+  /**
+   * API of builders of `IndexedScopedElemApi` objects. These builders keep a URI resolver for XML Base support.
+   * Builder instances should be thread-safe global objects, encapsulating one chosen URI resolver.
+   */
+  trait Builder[E <: IndexedScopedElemApi[E, U], U <: ScopedElemApi[U]] extends IndexedClarkElemApi.Builder[E, U] {
+
+    override def build(rootElem: U): E
+
+    override def build(docUriOption: Option[URI], rootElem: U): E
+
+    override def build(rootElem: U, path: Path): E
+
+    override def build(docUriOption: Option[URI], rootElem: U, path: Path): E
+  }
 }

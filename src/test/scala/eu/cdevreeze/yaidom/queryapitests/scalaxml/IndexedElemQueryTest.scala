@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
+import scala.reflect.classTag
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -110,7 +112,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
       </Bookstore>
 
     val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+    val indexedElemBuilder = IndexedClarkElem.Builder(classTag[ScalaXmlElem], uriResolver)
 
     indexedElemBuilder.build(ScalaXmlElem(scalaElem))
   }

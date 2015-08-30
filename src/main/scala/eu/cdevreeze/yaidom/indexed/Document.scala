@@ -20,6 +20,7 @@ import java.net.URI
 
 import scala.Vector
 import scala.collection.immutable
+import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.Nodes
@@ -86,7 +87,7 @@ object Document {
   }
 
   def from(d: simple.Document, uriResolver: XmlBaseSupport.UriResolver): Document = {
-    val elem = IndexedScopedElem.Builder(uriResolver).build(d.uriOption, d.documentElement)
+    val elem = Elem.Builder(uriResolver).build(d.uriOption, d.documentElement)
 
     val children = d.children map {
       case elm: Nodes.Elem                => elem

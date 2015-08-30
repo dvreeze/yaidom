@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.queryapitests.simple
 
 import scala.Vector
+import scala.reflect.classTag
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -186,7 +187,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
 
     val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(uriResolver)
+    val indexedElemBuilder = IndexedClarkElem.Builder(classTag[Elem], uriResolver)
 
     indexedElemBuilder.build(resultElem)
   }

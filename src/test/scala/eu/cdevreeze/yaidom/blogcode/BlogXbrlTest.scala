@@ -242,7 +242,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
     val paths = indexedDoc.documentElement.findAllElemsOrSelf.map(_.path)
 
     val editedIndexedRootElem =
-      indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver).build(
+      indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver).build(
         stripUnusedNamespaces(indexedDoc.documentElement, xbrliDocumentENameExtractor))
 
     assertResult(true) {

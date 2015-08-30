@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
 
 import scala.io.Codec
+import scala.reflect.classTag
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +33,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.dom.DomDocument
+import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.parse.DocumentParser
@@ -46,6 +48,7 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * Indexed element test.
@@ -56,28 +59,36 @@ import eu.cdevreeze.yaidom.simple.Document
 class IndexedElemTest extends Suite {
 
   @Test def testIndexingForSimpleElem(): Unit = {
-    doTestIndexing(docWithCommentAtEnd.documentElement)
+    doTestIndexing(docWithCommentAtEnd.documentElement, indexedElemBuilder)
 
-    doTestIndexing(docUsingXml11.documentElement)
+    doTestIndexing(docUsingXml11.documentElement, indexedElemBuilder)
   }
 
   @Test def testIndexingForDomWrapperElem(): Unit = {
     val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement)
+    doTestIndexing(
+      DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement,
+      IndexedScopedElem.Builder(classTag[DomElem], uriResolver))
 
     val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement)
+    doTestIndexing(
+      DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement,
+      IndexedScopedElem.Builder(classTag[DomElem], uriResolver))
   }
 
   @Test def testIndexingForScalaXmlWrapperElem(): Unit = {
-    doTestIndexing(ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement)))
+    doTestIndexing(
+      ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement)),
+      IndexedScopedElem.Builder(classTag[ScalaXmlElem], uriResolver))
 
-    doTestIndexing(ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement)))
+    doTestIndexing(
+      ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement)),
+      IndexedScopedElem.Builder(classTag[ScalaXmlElem], uriResolver))
   }
 
   @Test def testDoubleIndexing(): Unit = {
     val rootElem = docWithCommentAtEnd.documentElement
-    val strangeElem = indexedElemBuilder.build(indexedElemBuilder.build(rootElem))
+    val strangeElem = indexedElemBuilder2.build(indexedElemBuilder.build(rootElem))
 
     assertResult(indexedElemBuilder.build(rootElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem))) {
       strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem))
@@ -92,16 +103,16 @@ class IndexedElemTest extends Suite {
     }
 
     assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
-      indexedElemBuilder.build(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem.elem))
+      indexedElemBuilder3.build(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem(e.elem.elem.elem))
     }
   }
 
-  private def doTestIndexing[E <: ResolvedNodes.Elem with ScopedElemApi[E]](rootElem: E): Unit = {
+  private def doTestIndexing[E <: ResolvedNodes.Elem with ScopedElemApi[E]](rootElem: E, iElemBuilder: IndexedScopedElem.Builder[E]): Unit = {
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       rootElem.findAllElemsOrSelf.map(_.qname)
     }
 
-    val indexedElem = indexedElemBuilder.build(rootElem)
+    val indexedElem = iElemBuilder.build(rootElem)
 
     assertResult(List(
       List(EName(ns, "product")),
@@ -161,9 +172,17 @@ class IndexedElemTest extends Suite {
 
   private val uriResolver = XmlBaseSupport.JdkUriResolver
 
-  private val indexedElemBuilder = IndexedScopedElem.Builder(uriResolver)
+  private val indexedElemBuilder =
+    IndexedScopedElem.Builder(classTag[Elem], uriResolver)
 
-  private val indexedClarkElemBuilder = IndexedClarkElem.Builder(uriResolver)
+  private val indexedClarkElemBuilder =
+    IndexedClarkElem.Builder(classTag[resolved.Elem], uriResolver)
+
+  private val indexedElemBuilder2 =
+    IndexedScopedElem.Builder(classTag[IndexedScopedElem[Elem]], uriResolver)
+
+  private val indexedElemBuilder3 =
+    IndexedScopedElem.Builder(classTag[IndexedScopedElem[IndexedScopedElem[Elem]]], uriResolver)
 
   private val docWithCommentAtEnd: Document = {
     val docParser = DocumentParserUsingSax.newInstance

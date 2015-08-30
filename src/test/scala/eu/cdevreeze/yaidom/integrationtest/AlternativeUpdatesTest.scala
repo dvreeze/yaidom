@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil, io => jio }
 import scala.collection.immutable
+import scala.reflect.classTag
 import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
 import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
@@ -46,7 +47,7 @@ class AlternativeUpdatesTest extends Suite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  private val indexedElemBuilder = indexed.IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testRetainFirstAuthorsUsingTransformElemsOrSelf(): Unit = {
     val updatedElem = bookstore transformElemsOrSelf {

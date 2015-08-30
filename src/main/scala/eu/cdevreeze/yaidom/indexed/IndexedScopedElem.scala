@@ -23,8 +23,8 @@ import scala.reflect.ClassTag
 import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
@@ -94,31 +94,24 @@ object IndexedScopedElem {
    * builders are long-lived global objects. Each element created with this builder will have the same URI resolver,
    * viz. the one passed as constructor argument of the builder.
    */
-  final case class Builder(val uriResolver: XmlBaseSupport.UriResolver) {
+  final case class Builder[U <: ScopedElemApi[U]](
+    val underlyingType: ClassTag[U],
+    override val uriResolver: XmlBaseSupport.UriResolver) extends IndexedScopedElemApi.Builder[IndexedScopedElem[U], U] {
 
-    /**
-     * Returns the same as `build(None, rootElem)`.
-     */
-    def build[U <: ScopedElemApi[U]](rootElem: U): IndexedScopedElem[U] =
+    override def build(rootElem: U): IndexedScopedElem[U] =
       build(None, rootElem)
 
-    /**
-     * Returns the same as `build(docUriOption, rootElem, Path.Root)`.
-     */
-    def build[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] =
+    override def build(docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] =
       build(docUriOption, rootElem, Path.Root)
 
-    /**
-     * Returns the same as `build(None, rootElem, path)`.
-     */
-    def build[U <: ScopedElemApi[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
+    override def build(rootElem: U, path: Path): IndexedScopedElem[U] = {
       build(None, rootElem, path)
     }
 
     /**
      * Expensive recursive factory method for "indexed elements".
      */
-    def build[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
+    override def build(docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
       // Expensive call, so invoked only once
       val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
         sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
@@ -129,7 +122,7 @@ object IndexedScopedElem {
       build(docUriOption, parentBaseUriOption, rootElem, path, elem)
     }
 
-    private def build[U <: ScopedElemApi[U]](
+    private def build(
       docUriOption: Option[URI],
       parentBaseUriOption: Option[URI],
       rootElem: U,

@@ -52,7 +52,7 @@ class ElemLikeTest extends Suite {
 
   private val ns = "http://bookstore"
 
-  private val indexedElemBuilder = IndexedScopedElem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = IElem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testChildElems(): Unit = {
     require(bookstore.localName == "Bookstore")
