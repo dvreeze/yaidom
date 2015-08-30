@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.indexed
 
 import java.net.URI
 
-import scala.annotation.elidable
-import scala.annotation.elidable.ASSERTION
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName

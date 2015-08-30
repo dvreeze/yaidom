@@ -21,9 +21,9 @@ import scala.collection.immutable
 import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.indexed
 
 /**
  * Utility for creating QNameProviders by parsing XML schema files.

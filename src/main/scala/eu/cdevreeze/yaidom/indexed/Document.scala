@@ -20,7 +20,6 @@ import java.net.URI
 
 import scala.Vector
 import scala.collection.immutable
-import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.Nodes

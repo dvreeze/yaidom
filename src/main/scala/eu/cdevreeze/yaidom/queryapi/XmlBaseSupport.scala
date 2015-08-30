@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.queryapi
 
 import java.net.URI
 
-import scala.annotation.elidable
-import scala.annotation.elidable.ASSERTION
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
@@ -28,10 +26,10 @@ import eu.cdevreeze.yaidom.core.Path
 /**
  * XML Base support, for elements implementing the `ClarkElemApi` query API.
  *
- * XML Base is very simple in its algorithm. Base URI computation for an element starts with the document URI, if any,
- * and processes all XML Base attributes in the reverse ancestry-or-self of the element, resolving each XML Base attribute
- * against the base URI computed so far. According to the XML Base specification, same-document references do not alter
- * this algorithm.
+ * XML Base is very simple in its algorithm, given an optional start "document URI". Base URI computation for an element then starts
+ * with the optional document URI, and processes all XML Base attributes in the reverse ancestry-or-self of the element,
+ * resolving each XML Base attribute against the base URI computed so far. According to the XML Base specification,
+ * same-document references do not alter this algorithm.
  *
  * What is sensitive in XML Base processing is the resolution of an URI against an optional base URI. For example, resolving
  * an empty URI using the `java.net.URI.resolve` method does not conform to RFC 3986
@@ -39,7 +37,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * This is why the user of this XML Base support must supply a strategy for resolving URIs against optional base URIs.
  *
- * Default attributes are out of scope for this XML Base support.
+ * Default attributes and entity resolution are out of scope for this XML Base support.
  *
  * @author Chris de Vreeze
  */
