@@ -22,7 +22,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.simple
 
@@ -35,8 +34,6 @@ import eu.cdevreeze.yaidom.simple
 class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   final type E = Elem
-
-  private val indexedElemBuilder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   protected val productsElem: E = {
     val xml =
@@ -73,7 +70,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
         </product>
       </products>
 
-    indexedElemBuilder.build(convertToElem(xml))
+    Elem(convertToElem(xml))
   }
 
   protected val salesElem: E = {
@@ -126,7 +123,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
         </record>
       </sales>
 
-    indexedElemBuilder.build(convertToElem(xml))
+    Elem(convertToElem(xml))
   }
 
   protected val storesElem: E = {
@@ -150,11 +147,11 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
         </store>
       </stores>
 
-    indexedElemBuilder.build(convertToElem(xml))
+    Elem(convertToElem(xml))
   }
 
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem =
     eu.cdevreeze.yaidom.resolved.Elem(elem.elem)
 
-  protected def fromSimpleElem(elem: simple.Elem): E = indexedElemBuilder.build(elem)
+  protected def fromSimpleElem(elem: simple.Elem): E = Elem(elem)
 }

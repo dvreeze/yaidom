@@ -22,7 +22,6 @@ import org.scalatest.{ Suite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from the coursera course Introduction to Databases,
@@ -198,7 +197,7 @@ class Blog1Test extends Suite {
 
     // "Indexed" elements
 
-    val indexedDoc = indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
+    val indexedDoc = indexed.Document(doc)
 
     val bookAuthors4 =
       findAllBookAuthors(indexedDoc.documentElement)

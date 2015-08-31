@@ -28,7 +28,6 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
@@ -50,8 +49,6 @@ import eu.cdevreeze.yaidom.utils.TextENameExtractor
  */
 @RunWith(classOf[JUnitRunner])
 class RemoveUnusedNamespacesTest extends Suite {
-
-  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   /**
    * See http://stackoverflow.com/questions/23002655/xquery-how-to-remove-unused-namespace-in-xml-node.
@@ -94,7 +91,7 @@ class RemoveUnusedNamespacesTest extends Suite {
 
     val enameExtractor = DocumentENameExtractor.NoOp
 
-    val usedNamespaces = findAllNamespaces(indexedElemBuilder.build(rootElem), enameExtractor)
+    val usedNamespaces = findAllNamespaces(indexed.Elem(rootElem), enameExtractor)
 
     assertResult(Set("", "xsi")) {
       rootElem.scope.filter(kv => usedNamespaces.contains(kv._2)).keySet
@@ -102,7 +99,7 @@ class RemoveUnusedNamespacesTest extends Suite {
 
     // Now remove the unused namespaces
 
-    val editedRootElem = stripUnusedNamespaces(indexedElemBuilder.build(rootElem), enameExtractor)
+    val editedRootElem = stripUnusedNamespaces(indexed.Elem(rootElem), enameExtractor)
 
     assertResult(Set("", "xsi")) {
       editedRootElem.scope.prefixNamespaceMap.keySet
@@ -180,7 +177,7 @@ class RemoveUnusedNamespacesTest extends Suite {
     }
 
     assertResult(Set("http://www.test.org", "http://schemas.xmlsoap.org/soap/envelope/")) {
-      findAllNamespaces(indexedElemBuilder.build(rootElem), enameExtractor)
+      findAllNamespaces(indexed.Elem(rootElem), enameExtractor)
     }
 
     val newScope = (rootElem.scope -- Set("t")) ++ Scope.from("" -> "http://www.test.org")
@@ -191,7 +188,7 @@ class RemoveUnusedNamespacesTest extends Suite {
           if (e.qname.prefixOption.getOrElse("") == "t") QName(e.qname.localPart) else e.qname
         e.copy(qname = newQName, scope = newScope)
       }
-      stripUnusedNamespaces(indexedElemBuilder.build(elem), enameExtractor)
+      stripUnusedNamespaces(indexed.Elem(elem), enameExtractor)
     }
 
     assertResult(Scope.from("" -> "http://www.test.org", "soap" -> "http://schemas.xmlsoap.org/soap/envelope/")) {
@@ -274,7 +271,7 @@ class RemoveUnusedNamespacesTest extends Suite {
 
     val newElem2 =
       newElem1 transformChildElems {
-        e => stripUnusedNamespaces(indexedElemBuilder.build(e), enameExtractor)
+        e => stripUnusedNamespaces(indexed.Elem(e), enameExtractor)
       }
 
     assertResult(Set(Scope.Empty)) {

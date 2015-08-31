@@ -24,7 +24,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.Elem
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractI18nQueryTest
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
@@ -54,8 +53,7 @@ class I18nQueryTest extends AbstractI18nQueryTest {
 
     val domDoc = createDocumentBuilder(dbf).parse(is)
 
-    val builder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
-    builder.build(
+    Elem(
       Some(new java.net.URI("")),
       convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty))
   }

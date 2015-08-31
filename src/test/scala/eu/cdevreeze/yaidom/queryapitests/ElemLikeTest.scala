@@ -32,7 +32,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.indexed.{ Elem => IElem }
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
@@ -51,8 +50,6 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 class ElemLikeTest extends Suite {
 
   private val ns = "http://bookstore"
-
-  private val indexedElemBuilder = IElem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testChildElems(): Unit = {
     require(bookstore.localName == "Bookstore")
@@ -449,7 +446,7 @@ class ElemLikeTest extends Suite {
 
     assertResult(Set(bookstore)) {
       val paths =
-        indexedElemBuilder.build(bookstore) filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
+        IElem(bookstore) filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result
@@ -459,7 +456,7 @@ class ElemLikeTest extends Suite {
 
     assertResult(Set(EName(ns, "Author"))) {
       val paths =
-        indexedElemBuilder.build(bookstore) filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
+        IElem(bookstore) filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result map { e => e.resolvedName }
@@ -473,7 +470,7 @@ class ElemLikeTest extends Suite {
     assertResult(cheapBookAuthorElms.toSet) {
       // Taking cheapBookElm as root! Finding parents of lastNameElms.
       val paths =
-        indexedElemBuilder.build(cheapBookElm) filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
+        IElem(cheapBookElm) filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => cheapBookElm.getElemOrSelfByPath(path) }
       result

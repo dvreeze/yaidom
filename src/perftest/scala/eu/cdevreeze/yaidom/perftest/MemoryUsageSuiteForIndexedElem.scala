@@ -27,7 +27,6 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Node
 
 /**
@@ -42,16 +41,14 @@ class MemoryUsageSuiteForIndexedElem extends AbstractMemoryUsageSuite {
 
   type E = indexed.Elem
 
-  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
-
   protected def parseXmlFiles(files: Vector[File]): Vector[Try[indexed.Elem]] = {
     val docParser = getDocumentParser
-    files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => indexedElemBuilder.build(e)) }
+    files map { f => Try(docParser.parse(f)).map(_.documentElement).map(e => indexed.Elem(e)) }
   }
 
   protected def createCommonRootParent(rootElems: Vector[indexed.Elem]): indexed.Elem = {
     val result = Node.elem(qname = QName("root"), scope = Scope.Empty, children = rootElems.map(_.elem))
-    indexedElemBuilder.build(result)
+    indexed.Elem(result)
   }
 
   protected def maxMemoryToFileLengthRatio: Int = 14

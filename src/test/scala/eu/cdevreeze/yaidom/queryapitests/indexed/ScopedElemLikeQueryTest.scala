@@ -25,7 +25,6 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.indexed.Elem
@@ -70,8 +69,7 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
     val domDoc = createDocumentBuilder(dbf).parse(is)
 
-    val builder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
-    builder.build(Some(new java.net.URI("")), convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty))
+    Elem(Some(new java.net.URI("")), convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

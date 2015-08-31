@@ -30,7 +30,6 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * Test case using yaidom sub-type-aware elements for XBRL schema processing.
@@ -49,7 +48,7 @@ class XbrlSchemaTest extends Suite {
     val doc: eu.cdevreeze.yaidom.simple.Document =
       parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
 
-    val xbrlSchemaDoc = eu.cdevreeze.yaidom.indexed.Document.from(doc, XmlBaseSupport.JdkUriResolver)
+    val xbrlSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(doc)
     val xbrlSchema: XsdRootElem = new XsdRootElem(xbrlSchemaDoc.documentElement)
 
     // Check concepts
@@ -127,10 +126,10 @@ class XbrlSchemaTest extends Suite {
     val addressDoc: Document =
       parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("address.xsd"))
 
-    val ipoSchemaDoc = eu.cdevreeze.yaidom.indexed.Document.from(ipoDoc, XmlBaseSupport.JdkUriResolver)
+    val ipoSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(ipoDoc)
     val ipoSchema: XsdRootElem = new XsdRootElem(ipoSchemaDoc.documentElement)
 
-    val addressSchemaDoc = eu.cdevreeze.yaidom.indexed.Document.from(addressDoc, XmlBaseSupport.JdkUriResolver)
+    val addressSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(addressDoc)
     val addressSchema: XsdRootElem = new XsdRootElem(addressSchemaDoc.documentElement)
 
     val tns = ipoSchema.targetNamespaceOption.getOrElse("")

@@ -33,7 +33,6 @@ import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
@@ -83,7 +82,7 @@ class XmlSchemasTest extends Suite {
 
     val root: Elem = domParser.parse(is).documentElement
 
-    val schemaRoot = SchemaRoot(indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver).build(root))
+    val schemaRoot = SchemaRoot(indexed.Elem(root))
 
     // Global element declarations
 

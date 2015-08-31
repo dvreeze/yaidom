@@ -23,7 +23,6 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractRobustQueryTest
 import eu.cdevreeze.yaidom.resolved
 
@@ -44,7 +43,7 @@ class RobustQueryTest extends AbstractRobustQueryTest {
 
     val is = classOf[RobustQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/contacts.xml")
 
-    Elem.Builder(XmlBaseSupport.JdkUriResolver).build(Some(new java.net.URI("")), docParser.parse(is).documentElement)
+    Elem(Some(new java.net.URI("")), docParser.parse(is).documentElement)
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

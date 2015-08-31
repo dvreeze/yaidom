@@ -34,7 +34,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 
@@ -49,8 +48,6 @@ class NamespaceUtilsTest extends Suite {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.utils")
 
   private val docParser = DocumentParserUsingSax.newInstance
-
-  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   @Test def testPushUpNamespacesInFeed1(): Unit = {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("feed1.txt"))
@@ -163,7 +160,7 @@ class NamespaceUtilsTest extends Suite {
 
   @Test def testStripNamespaces(): Unit = {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("content.xml"))
-    val rootElem = indexedElemBuilder.build(doc.documentElement)
+    val rootElem = indexed.Elem(doc.documentElement)
 
     assertResult(11) {
       rootElem.scope.prefixNamespaceMap.size
@@ -197,7 +194,7 @@ class NamespaceUtilsTest extends Suite {
 
   @Test def testFindUsedNamespaces(): Unit = {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("HelloWorld.xml"))
-    val rootElem = indexedElemBuilder.build(doc.documentElement)
+    val rootElem = indexed.Elem(doc.documentElement)
 
     val xbrliENameExtractor = new XbrliDocumentENameExtractor
 
