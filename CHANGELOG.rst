@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+1.4.2
+=====
+
+Version 1.4.2 undid the deprecation warnings on indexed element and document apply (factory) methods. This version is what version
+1.4.0 should have been, and it is advisable to prefer this version over 1.4.0 and 1.4.1.
+
+
 1.4.1
 =====
 
