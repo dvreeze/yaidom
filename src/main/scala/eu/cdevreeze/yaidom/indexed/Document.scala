@@ -96,12 +96,16 @@ object Document {
     apply(d.xmlDeclarationOption, children)
   }
 
-  @deprecated(message = "Use another factory method instead", since = "1.4.1")
+  /**
+   * Returns `from(d.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)`.
+   */
   def apply(docUri: URI, d: simple.Document): Document = {
     from(d.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)
   }
 
-  @deprecated(message = "Use another factory method instead", since = "1.4.1")
+  /**
+   * Returns `from(d, XmlBaseSupport.JdkUriResolver)`.
+   */
   def apply(d: simple.Document): Document = {
     from(d, XmlBaseSupport.JdkUriResolver)
   }

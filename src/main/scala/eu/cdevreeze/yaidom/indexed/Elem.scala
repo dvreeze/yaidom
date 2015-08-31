@@ -56,7 +56,6 @@ object Elem {
   /**
    * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)`
    */
-  @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(rootElem: simple.Elem): Elem = {
     Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)
   }
@@ -64,7 +63,6 @@ object Elem {
   /**
    * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
    */
-  @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUriOption: Option[URI], rootElem: simple.Elem): Elem = {
     Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)
   }
@@ -72,7 +70,6 @@ object Elem {
   /**
    * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
    */
-  @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUri: URI, rootElem: simple.Elem): Elem = {
     Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)
   }
@@ -80,7 +77,6 @@ object Elem {
   /**
    * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
    */
-  @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(rootElem: simple.Elem, path: Path): Elem = {
     Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)
   }
@@ -88,7 +84,6 @@ object Elem {
   /**
    * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
    */
-  @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
     Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)
   }
@@ -96,7 +91,6 @@ object Elem {
   /**
    * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
    */
-  @deprecated(message = "Use 'Builder.build' instead", since = "1.4.1")
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
     Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)
   }
