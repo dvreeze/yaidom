@@ -402,6 +402,8 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * parent tree.
    */
   def prefixesForNamespace(namespaceUri: String): Set[String] = {
+    require(!namespaceUri.isEmpty, s"Empty namespace URI not allowed")
+
     val prefixes = this.prefixNamespaceMap.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
     prefixes.toSet
   }
