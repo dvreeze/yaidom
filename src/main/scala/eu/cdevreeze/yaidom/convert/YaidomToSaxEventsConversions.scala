@@ -162,8 +162,15 @@ trait YaidomToSaxEventsConversions extends ElemConverter[SaxEventsProducer] with
   private def getAttributes(elm: Elem): Attributes = {
     val attrs = new AttributesImpl
 
-    // Normal attributes
+    addNormalAttributes(elm, attrs)
+    attrs
+  }
 
+  /**
+   * Gets the normal (non-namespace-declaration) attributes, and adds them to the passed Attributes object.
+   * This method is called internally, providing the attributes that are passed to the startElement call.
+   */
+  final def addNormalAttributes(elm: Elem, attrs: AttributesImpl): Attributes = {
     val attrScope = elm.attributeScope
 
     for ((attrQName, attrValue) <- elm.attributes) {
@@ -172,6 +179,29 @@ trait YaidomToSaxEventsConversions extends ElemConverter[SaxEventsProducer] with
       val tpe = "CDATA"
 
       attrs.addAttribute(uri, attrQName.localPart, attrQName.toString, tpe, attrValue)
+    }
+
+    attrs
+  }
+
+  /**
+   * Gets the namespace-declaration attributes, and adds them to the passed Attributes object.
+   * This method is not called internally.
+   */
+  final def addNamespaceDeclarationAttributes(elm: Elem, parentScope: Scope, attrs: AttributesImpl): Attributes = {
+    val namespaces: Declarations = parentScope.relativize(elm.scope)
+    val namespacesMap = namespaces.prefixNamespaceMap
+
+    val tpe = "CDATA"
+    val xmlNs = "http://www.w3.org/XML/1998/namespace"
+
+    for ((prefix, nsUri) <- namespacesMap) {
+      if (prefix == "") {
+        attrs.addAttribute(xmlNs, "xmlns", "xmlns", tpe, nsUri)
+      } else {
+        val qname = s"xmlns:$prefix"
+        attrs.addAttribute(xmlNs, prefix, qname, tpe, nsUri)
+      }
     }
 
     attrs

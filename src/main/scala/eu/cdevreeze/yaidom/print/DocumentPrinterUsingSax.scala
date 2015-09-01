@@ -18,13 +18,17 @@ package eu.cdevreeze.yaidom.print
 
 import java.{ io => jio }
 
+import org.xml.sax.ContentHandler
+
 import eu.cdevreeze.yaidom.convert.YaidomToSaxEventsConversions
 import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.DocumentConverter
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.sax.SAXTransformerFactory
 import javax.xml.transform.sax.TransformerHandler
 import javax.xml.transform.stream.StreamResult
+import DocumentPrinterUsingSax.SaxEventsProducer
 
 /**
  * SAX-based `Document` printer. It should be the fastest of the `DocumentPrinter` implementations, and use the least memory.
@@ -44,9 +48,18 @@ import javax.xml.transform.stream.StreamResult
  */
 final class DocumentPrinterUsingSax(
   val saxTransformerFactory: SAXTransformerFactory,
-  val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler) extends AbstractDocumentPrinter {
+  val transformerHandlerCreator: SAXTransformerFactory => TransformerHandler,
+  val documentConverter: DocumentConverter[SaxEventsProducer]) extends AbstractDocumentPrinter {
 
-  private val yaidomToSaxEventsConversions = new YaidomToSaxEventsConversions {}
+  /**
+   * Returns an adapted copy having the passed DocumentConverter.
+   */
+  def withDocumentConverter(newDocumentConverter: DocumentConverter[SaxEventsProducer]): DocumentPrinterUsingSax = {
+    new DocumentPrinterUsingSax(
+      saxTransformerFactory,
+      transformerHandlerCreator,
+      newDocumentConverter)
+  }
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val handler = transformerHandlerCreator(saxTransformerFactory)
@@ -86,20 +99,27 @@ final class DocumentPrinterUsingSax(
 
     new DocumentPrinterUsingSax(
       saxTransformerFactory,
-      newTransformerHandlerCreator)
+      newTransformerHandlerCreator,
+      documentConverter)
   }
 
   private def generateEventsForDocument(doc: Document, handler: TransformerHandler): Unit = {
-    yaidomToSaxEventsConversions.convertDocument(doc)(handler)
+    documentConverter.convertDocument(doc)(handler)
   }
 }
 
 object DocumentPrinterUsingSax {
 
+  /** Producer of SAX events, given a `ContentHandler` on which the SAX event handlers are invoked */
+  type SaxEventsProducer = (ContentHandler => Unit)
+
   /** Returns `newInstance(TransformerFactory.newInstance().asInstanceOf[SAXTransformerFactory])` */
   def newInstance(): DocumentPrinterUsingSax = {
     val tf = TransformerFactory.newInstance()
-    assert(tf.getFeature(SAXTransformerFactory.FEATURE), s"The TransformerFactory ${tf.getClass} is not a SAXTransformerFactory")
+
+    assert(
+      tf.getFeature(SAXTransformerFactory.FEATURE),
+      s"The TransformerFactory ${tf.getClass} is not a SAXTransformerFactory")
     val stf = tf.asInstanceOf[SAXTransformerFactory]
 
     newInstance(stf)
@@ -116,6 +136,9 @@ object DocumentPrinterUsingSax {
     saxTransformerFactory: SAXTransformerFactory,
     transformerHandlerCreator: SAXTransformerFactory => TransformerHandler): DocumentPrinterUsingSax = {
 
-    new DocumentPrinterUsingSax(saxTransformerFactory, transformerHandlerCreator)
+    new DocumentPrinterUsingSax(
+      saxTransformerFactory,
+      transformerHandlerCreator,
+      new YaidomToSaxEventsConversions {})
   }
 }
