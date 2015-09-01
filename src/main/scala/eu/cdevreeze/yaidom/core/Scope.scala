@@ -422,6 +422,8 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * parent tree.
    */
   def prefixForNamespace(namespaceUri: String, getFallbackPrefix: () => String): String = {
+    require(!namespaceUri.isEmpty, s"Empty namespace URI not allowed")
+
     if (namespaceUri == XmlNamespace) {
       "xml"
     } else {
@@ -429,6 +431,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
       if (prefixes.isEmpty) {
         val pref = getFallbackPrefix()
+        require(pref != "xml", s"Fallback prefix $pref for namespace $namespaceUri not allowed")
 
         val foundNs = prefixNamespaceMap.getOrElse(pref, namespaceUri)
         if (foundNs != namespaceUri) {
@@ -459,11 +462,14 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * }}}
    */
   def includingNamespace(namespaceUri: String, getFallbackPrefix: () => String): Scope = {
-    if (namespaceUri == XmlNamespace ||
-      prefixesForNamespace(namespaceUri).contains(namespaceUri)) {
+    require(!namespaceUri.isEmpty, s"Empty namespace URI not allowed")
 
+    if (namespaceUri == XmlNamespace || !prefixesForNamespace(namespaceUri).isEmpty) {
       this
     } else {
+      assert(namespaceUri != XmlNamespace)
+
+      // Throws an exception if the prefix has already been bound to another namespace
       val prefix = prefixForNamespace(namespaceUri, getFallbackPrefix)
       this.resolve(Declarations.from(prefix -> namespaceUri))
     }
