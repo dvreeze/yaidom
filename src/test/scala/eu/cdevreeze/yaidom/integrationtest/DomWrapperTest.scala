@@ -133,9 +133,9 @@ class DomWrapperTest extends Suite {
           logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
-            new InputSource(classOf[DomInteropTest].getResourceAsStream("XMLSchema.dtd"))
+            new InputSource(classOf[DomWrapperTest].getResourceAsStream("XMLSchema.dtd"))
           } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
-            new InputSource(classOf[DomInteropTest].getResourceAsStream("datatypes.dtd"))
+            new InputSource(classOf[DomWrapperTest].getResourceAsStream("datatypes.dtd"))
           } else {
             // Default behaviour
             null
