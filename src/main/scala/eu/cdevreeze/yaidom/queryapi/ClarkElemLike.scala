@@ -67,4 +67,24 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
       (e, entry)
     }
   }
+
+  final def findAllElemsOrSelfWithPaths: immutable.IndexedSeq[(E, Path)] = {
+    val selfWithPath = (self, Path.Root)
+
+    val descendantResult: immutable.IndexedSeq[(E, Path)] = {
+      findAllChildElemsWithPathEntries flatMap {
+        case (che, pathEntry) =>
+          // Recursive call
+          che.findAllElemsOrSelfWithPaths map { case (e, p) => (e, p.prepend(pathEntry)) }
+      }
+    }
+
+    selfWithPath +: descendantResult
+  }
+
+  final def findAllElemsWithPaths: immutable.IndexedSeq[(E, Path)] = {
+    val elemsOrSelfWithPaths = findAllElemsOrSelfWithPaths
+    assert(elemsOrSelfWithPaths.headOption.map(_._2) == Some(Path.Root))
+    elemsOrSelfWithPaths.drop(1)
+  }
 }

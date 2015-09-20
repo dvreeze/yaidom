@@ -100,12 +100,13 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
 
-      require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
+      require(indexesByPathEntries.forall(_._2 >= 0), "Expected only non-negative child node indexes")
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries
       val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
         case (acc, (pathEntry, idx)) =>
           val che = acc(idx).asInstanceOf[E]
+          // Expensive assertion
           assert(findChildElemByPathEntry(pathEntry) == Some(che))
           val updatedChe = f(che, pathEntry)
           acc.updated(idx, updatedChe)
@@ -156,6 +157,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
+  // TODO Rename to updatedWithNodeSeqIfNonEmptyPath, deprecating the old name
   final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
     if (path == Path.Root) self
     else {
@@ -175,6 +177,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
+  // TODO Rename to updatedWithNodeSeqIfNonEmptyPath, deprecating the old name
   final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E =
     updatedWithNodeSeq(path) { e => newNodes }
 
@@ -184,40 +187,53 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
 
-      require(indexesByPathEntries.size == pathEntries.size, "Expected only non-negative child node indexes")
+      require(indexesByPathEntries.forall(_._2 >= 0), "Expected only non-negative child node indexes")
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries
-      val newChildGroups: immutable.IndexedSeq[immutable.IndexedSeq[N]] =
-        indexesByPathEntries.reverse.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
-          case (acc, (pathEntry, idx)) =>
-            val nodesAtIdx = acc(idx)
-            assert(nodesAtIdx.size == 1)
-            val che = nodesAtIdx.head.asInstanceOf[E]
-            assert(findChildElemByPathEntry(pathEntry) == Some(che))
-            val newNodes = f(che, pathEntry)
-            acc.updated(idx, newNodes)
-        }
-      self.withChildren(newChildGroups.flatten)
+      val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
+        case (acc, (pathEntry, idx)) =>
+          val che = acc(idx).asInstanceOf[E]
+          // Expensive assertion
+          assert(findChildElemByPathEntry(pathEntry) == Some(che))
+          val newNodes = f(che, pathEntry)
+          acc.patch(idx, newNodes, 1)
+      }
+      self.withChildren(newChildren)
     }
   }
 
+  // TODO Rename to updatedWithNodeSeqAtNonEmptyPaths, deprecating the old name
   final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
     if (paths.isEmpty) self
     else {
-      val pathsByParentPaths: Map[Path, Set[Path]] =
-        paths.filter(path => !path.isRoot).groupBy(path => path.parentPath)
+      val pathsByPathEntries: Map[Path.Entry, Set[Path]] =
+        paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
 
-      self.updatedAtPaths(pathsByParentPaths.keySet) { (elem, path) =>
-        val childPathsOption = pathsByParentPaths.get(path)
-        assert(childPathsOption.isDefined)
-        val childPaths = childPathsOption.get
-        assert(childPaths.forall(p => p.parentPathOption == Some(path)))
-        val childPathEntries = childPaths.map(_.lastEntry)
+      val resultsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
+        pathsByPathEntries map {
+          case (pathEntry, pathSet) =>
+            val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error(s"Incorrect path entry $pathEntry"))
 
-        elem.updatedWithNodeSeqAtPathEntries(childPathEntries) { (che, pathEntry) =>
-          f(che, path.append(pathEntry))
+            val relativePaths = pathSet.map(_.withoutFirstEntry)
+
+            // Recursive call, but not tail-recursive
+
+            val newChe = che.updatedWithNodeSeqAtPaths(relativePaths) { (elem, relativePath) =>
+              val path = relativePath.prepend(pathEntry)
+              f(elem, path)
+            }
+            val path = Path(Vector(pathEntry))
+            val newNodes: immutable.IndexedSeq[N] =
+              if (paths.contains(path)) f(newChe, path) else Vector(newChe)
+            (pathEntry -> newNodes)
         }
+
+      val resultWithoutSelf = self.updatedWithNodeSeqAtPathEntries(resultsByPathEntries.keySet) { (che, pathEntry) =>
+        assert(resultsByPathEntries.contains(pathEntry))
+        resultsByPathEntries(pathEntry)
       }
+
+      resultWithoutSelf
     }
   }
 }

@@ -27,8 +27,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.RichUpdatableElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
-import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
 /**
  * Immutable "resolved" Node. It is called "resolved" because the element trees in this package only contain resolved element and
@@ -126,7 +126,7 @@ sealed trait Node extends ResolvedNodes.Node with Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike[Elem] with RichUpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
