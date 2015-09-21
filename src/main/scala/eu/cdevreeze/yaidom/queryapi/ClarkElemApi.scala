@@ -44,14 +44,4 @@ trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with IsNavigableApi[
    * Returns all child elements paired with their path entries.
    */
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
-
-  /**
-   * Returns all descendant-or-self elements paired with their paths.
-   */
-  def findAllElemsOrSelfWithPaths: immutable.IndexedSeq[(E, Path)]
-
-  /**
-   * Returns all descendant elements paired with their paths.
-   */
-  def findAllElemsWithPaths: immutable.IndexedSeq[(E, Path)]
 }

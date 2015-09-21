@@ -43,6 +43,7 @@ trait RichUpdatableElemLike[N, E <: N with RichUpdatableElemLike[N, E]] extends 
 
           newNodeSeqOpt.map(nodeSeq => (pathEntry -> nodeSeq))
       }
+
     val newNodeSeqsByPathEntry: Map[Path.Entry, immutable.IndexedSeq[N]] =
       pathEntriesWithNewNodeSeqs.toMap
 
@@ -54,22 +55,19 @@ trait RichUpdatableElemLike[N, E <: N with RichUpdatableElemLike[N, E]] extends 
   }
 
   final def withUpdatedElems(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E = {
-    val elemsWithPaths = findAllElemsWithPaths
+    def g(che: E, pathEntry: Path.Entry): Option[immutable.IndexedSeq[N]] = {
+      // Recursive call
+      val newChe =
+        che withUpdatedElems { case (e, p) => f(e, p.prepend(pathEntry)) }
 
-    val pathsWithNewNodeSeqs =
-      elemsWithPaths flatMap {
-        case (elm, path) =>
-          val newNodeSeqOpt = f(elm, path)
+      val newNodesOption = f(newChe, Path(Vector(pathEntry)))
 
-          newNodeSeqOpt.map(nodeSeq => (path -> nodeSeq))
-      }
-    val newNodeSeqsByPath: Map[Path, immutable.IndexedSeq[N]] =
-      pathsWithNewNodeSeqs.toMap
+      val pathEntryUpdated = (newChe != che) || (newNodesOption.isDefined)
 
-    val resultElem = updatedWithNodeSeqAtPaths(newNodeSeqsByPath.keySet) {
-      case (elm, path) =>
-        newNodeSeqsByPath(path)
+      if (pathEntryUpdated) newNodesOption.orElse(Some(Vector(newChe))) else None
     }
+
+    val resultElem = withUpdatedChildElems(g)
     resultElem
   }
 }

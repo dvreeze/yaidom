@@ -123,7 +123,7 @@ class AlternativeUpdatesTest extends Suite {
   @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths(): Unit = {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Author").map(_.path).toSet
 
-    val updatedElem = bookstore.updatedWithNodeSeqAtPaths(paths) { (elem, path) =>
+    val updatedElem = bookstore.updatedWithNodeSeqAtNonEmptyPaths(paths) { (elem, path) =>
       require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")
       if (path.lastEntry.index == 0) Vector(elem) else Vector()
     }

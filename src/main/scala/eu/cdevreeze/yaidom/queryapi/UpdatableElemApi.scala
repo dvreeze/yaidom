@@ -257,11 +257,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val newChildren = pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2).reverse.foldLeft(children) {
-   *   case (acc, (pathEntry, idx)) =>
-   *     acc.updated(idx, f(acc(idx).asInstanceOf[E], pathEntry))
-   * }
-   * withChildren(newChildren)
+   * def g(e: E, entry: Path.Entry): immutable.IndexedSeq[N] = Vector(f(e, entry))
+   *
+   * updatedWithNodeSeqAtPathEntries(pathEntries)(g)
    * }}}
    */
   def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
@@ -336,9 +334,15 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * The method throws an exception if no element is found with the given path.
    */
+  def updatedWithNodeSeqAtNonEmptyPath(path: Path)(f: E => immutable.IndexedSeq[N]): E
+
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
   def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
 
-  /** Returns `updatedWithNodeSeq(path) { e => newNodes }` */
+  /** Returns `updatedWithNodeSeqAtNonEmptyPath(path) { e => newNodes }` */
+  def updatedWithNodeSeqAtNonEmptyPath(path: Path, newNodes: immutable.IndexedSeq[N]): E
+
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
   def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
   /**
@@ -347,13 +351,11 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val indexesByPathEntries = pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2).reverse
-   * val newChildGroups =
-   *   indexesByPathEntries.foldLeft(self.children.map(n => immutable.IndexedSeq(n))) {
-   *     case (acc, (pathEntry, idx)) =>
-   *       acc.updated(idx, f(acc(idx).head.asInstanceOf[E], pathEntry))
-   *   }
-   * withChildren(newChildGroups.flatten)
+   * val newChildren = pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2).reverse.foldLeft(children) {
+   *   case (acc, (pathEntry, idx)) =>
+   *     acc.patch(idx, f(acc(idx).asInstanceOf[E], pathEntry), 1)
+   * }
+   * withChildren(newChildren)
    * }}}
    */
   def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
@@ -364,14 +366,22 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * It can be defined as follows (ignoring exceptions):
    * {{{
-   * val pathsByParentPaths = paths.filter(path => !path.isRoot).groupBy(path => path.parentPath)
-   * self.updatedAtPaths(pathsByParentPaths.keySet) { (elem, path) =>
-   *   val childPathEntries = pathsByParentPaths(path).map(_.lastEntry)
-   *   elem.updatedWithNodeSeqAtPathEntries(childPathEntries) { (che, pathEntry) =>
-   *     f(che, path.append(pathEntry))
+   * def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
+   *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
+   *   val resultWithoutSelf = self.updatedWithNodeSeqAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
+   *     val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(paths.map(_.withoutFirstEntry)) { (elem, relativePath) =>
+   *       f(elem, relativePath.prepend(pathEntry))
+   *     }
+   *     val path = Path(Vector(pathEntry))
+   *     val newNodes = if (paths.contains(path)) f(newChe, path) else Vector(newChe)
+   *     newNodes
    *   }
+   *   resultWithoutSelf
    * }
    * }}}
    */
+  def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
+
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPaths'", since = "1.5.0")
   def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 }

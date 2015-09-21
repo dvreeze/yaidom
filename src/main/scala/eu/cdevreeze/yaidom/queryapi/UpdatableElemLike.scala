@@ -95,24 +95,9 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
-    if (pathEntries.isEmpty) self
-    else {
-      val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-        pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
+    def g(e: E, entry: Path.Entry): immutable.IndexedSeq[N] = Vector(f(e, entry))
 
-      require(indexesByPathEntries.forall(_._2 >= 0), "Expected only non-negative child node indexes")
-
-      // Updating in reverse order of indexes, in order not to invalidate the path entries
-      val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
-        case (acc, (pathEntry, idx)) =>
-          val che = acc(idx).asInstanceOf[E]
-          // Expensive assertion
-          assert(findChildElemByPathEntry(pathEntry) == Some(che))
-          val updatedChe = f(che, pathEntry)
-          acc.updated(idx, updatedChe)
-      }
-      self.withChildren(newChildren)
-    }
+    updatedWithNodeSeqAtPathEntries(pathEntries)(g)
   }
 
   final def updated(path: Path)(f: E => E): E = {
@@ -157,8 +142,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
-  // TODO Rename to updatedWithNodeSeqIfNonEmptyPath, deprecating the old name
-  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
+  final def updatedWithNodeSeqAtNonEmptyPath(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
     if (path == Path.Root) self
     else {
       assert(path.parentPathOption.isDefined)
@@ -177,9 +161,14 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
-  // TODO Rename to updatedWithNodeSeqIfNonEmptyPath, deprecating the old name
-  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E =
-    updatedWithNodeSeq(path) { e => newNodes }
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
+  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = updatedWithNodeSeqAtNonEmptyPath(path)(f)
+
+  final def updatedWithNodeSeqAtNonEmptyPath(path: Path, newNodes: immutable.IndexedSeq[N]): E =
+    updatedWithNodeSeqAtNonEmptyPath(path) { e => newNodes }
+
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
+  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E = updatedWithNodeSeqAtNonEmptyPath(path, newNodes)
 
   final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {
     if (pathEntries.isEmpty) self
@@ -202,8 +191,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
-  // TODO Rename to updatedWithNodeSeqAtNonEmptyPaths, deprecating the old name
-  final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
+  final def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
     if (paths.isEmpty) self
     else {
       val pathsByPathEntries: Map[Path.Entry, Set[Path]] =
@@ -218,7 +206,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
             // Recursive call, but not tail-recursive
 
-            val newChe = che.updatedWithNodeSeqAtPaths(relativePaths) { (elem, relativePath) =>
+            val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(relativePaths) { (elem, relativePath) =>
               val path = relativePath.prepend(pathEntry)
               f(elem, path)
             }
@@ -236,4 +224,8 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
       resultWithoutSelf
     }
   }
+
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPaths'", since = "1.5.0")
+  def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E =
+    updatedWithNodeSeqAtNonEmptyPaths(paths)(f)
 }
