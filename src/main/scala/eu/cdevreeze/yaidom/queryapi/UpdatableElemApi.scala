@@ -290,7 +290,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
    *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
    *   val resultWithoutSelf = self.updatedAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
-   *     val newChe = che.updatedAtPaths(paths.map(_.withoutFirstEntry)) { (elem, relativePath) =>
+   *     val newChe = che.updatedAtPaths(pathsByPathEntries(pathEntry).map(_.withoutFirstEntry)) { (elem, relativePath) =>
    *       f(elem, relativePath.prepend(pathEntry))
    *     }
    *     newChe
@@ -369,7 +369,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
    *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
    *   val resultWithoutSelf = self.updatedWithNodeSeqAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
-   *     val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(paths.map(_.withoutFirstEntry)) { (elem, relativePath) =>
+   *     val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(pathsByPathEntries(pathEntry).map(_.withoutFirstEntry)) { (elem, relativePath) =>
    *       f(elem, relativePath.prepend(pathEntry))
    *     }
    *     val path = Path(Vector(pathEntry))

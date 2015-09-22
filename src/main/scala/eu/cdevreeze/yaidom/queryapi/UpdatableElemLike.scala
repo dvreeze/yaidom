@@ -114,28 +114,16 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   final def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
     if (paths.isEmpty) self
     else {
-      val pathsByPathEntries: Map[Path.Entry, Set[Path]] =
-        paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
+      val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
 
-      val resultsByPathEntries: Map[Path.Entry, E] =
-        pathsByPathEntries map {
-          case (pathEntry, paths) =>
-            val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error(s"Incorrect path entry $pathEntry"))
+      val resultWithoutSelf = self.updatedAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
+        val relativePaths = pathsByPathEntries(pathEntry).map(_.withoutFirstEntry)
 
-            val relativePaths = paths.map(_.withoutFirstEntry)
-
-            // Recursive call, but not tail-recursive
-
-            val newChe = che.updatedAtPaths(relativePaths) { (elem, relativePath) =>
-              val path = relativePath.prepend(pathEntry)
-              f(elem, path)
-            }
-            (pathEntry -> newChe)
+        // Recursive call, but not tail-recursive
+        val newChe = che.updatedAtPaths(relativePaths) { (elem, relativePath) =>
+          f(elem, relativePath.prepend(pathEntry))
         }
-
-      val resultWithoutSelf = self.updatedAtPathEntries(resultsByPathEntries.keySet) { (che, pathEntry) =>
-        assert(resultsByPathEntries.contains(pathEntry))
-        resultsByPathEntries(pathEntry)
+        newChe
       }
 
       if (paths.contains(Path.Root)) f(resultWithoutSelf, Path.Root) else resultWithoutSelf
@@ -194,33 +182,19 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   final def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
     if (paths.isEmpty) self
     else {
-      val pathsByPathEntries: Map[Path.Entry, Set[Path]] =
-        paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
+      val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
 
-      val resultsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
-        pathsByPathEntries map {
-          case (pathEntry, pathSet) =>
-            val che = self.findChildElemByPathEntry(pathEntry).getOrElse(sys.error(s"Incorrect path entry $pathEntry"))
+      val resultWithoutSelf = self.updatedWithNodeSeqAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
+        val relativePaths = pathsByPathEntries(pathEntry).map(_.withoutFirstEntry)
 
-            val relativePaths = pathSet.map(_.withoutFirstEntry)
-
-            // Recursive call, but not tail-recursive
-
-            val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(relativePaths) { (elem, relativePath) =>
-              val path = relativePath.prepend(pathEntry)
-              f(elem, path)
-            }
-            val path = Path(Vector(pathEntry))
-            val newNodes: immutable.IndexedSeq[N] =
-              if (paths.contains(path)) f(newChe, path) else Vector(newChe)
-            (pathEntry -> newNodes)
+        // Recursive call, but not tail-recursive
+        val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(relativePaths) { (elem, relativePath) =>
+          f(elem, relativePath.prepend(pathEntry))
         }
-
-      val resultWithoutSelf = self.updatedWithNodeSeqAtPathEntries(resultsByPathEntries.keySet) { (che, pathEntry) =>
-        assert(resultsByPathEntries.contains(pathEntry))
-        resultsByPathEntries(pathEntry)
+        val path = Path(Vector(pathEntry))
+        val newNodes = if (paths.contains(path)) f(newChe, path) else Vector(newChe)
+        newNodes
       }
-
       resultWithoutSelf
     }
   }
