@@ -361,7 +361,7 @@ class AnotherUpdateTest extends Suite {
     val updatedElem = elem.updated(path.parentPathOption.getOrElse(Path.Root))(g)
 
     assertResult(resolved.Elem(updatedElem)) {
-      resolved.Elem(elem.updatedWithNodeSeqAtNonEmptyPath(path)(f))
+      resolved.Elem(elem.updatedWithNodeSeqIfPathNonEmpty(path)(f))
     }
   }
 

@@ -334,15 +334,15 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * The method throws an exception if no element is found with the given path.
    */
-  def updatedWithNodeSeqAtNonEmptyPath(path: Path)(f: E => immutable.IndexedSeq[N]): E
+  def updatedWithNodeSeqIfPathNonEmpty(path: Path)(f: E => immutable.IndexedSeq[N]): E
 
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
   def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
 
-  /** Returns `updatedWithNodeSeqAtNonEmptyPath(path) { e => newNodes }` */
-  def updatedWithNodeSeqAtNonEmptyPath(path: Path, newNodes: immutable.IndexedSeq[N]): E
+  /** Returns `updatedWithNodeSeqIfPathNonEmpty(path) { e => newNodes }` */
+  def updatedWithNodeSeqIfPathNonEmpty(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
   def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
   /**

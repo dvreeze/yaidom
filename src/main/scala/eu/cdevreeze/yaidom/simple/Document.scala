@@ -114,13 +114,13 @@ final class Document(
   /** Returns `updated(path) { e => newElem }` */
   def updated(path: Path, newElem: Elem): Document = updated(path) { e => newElem }
 
-  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeqAtNonEmptyPath(path)(f))` */
+  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeqIfPathNonEmpty(path)(f))` */
   def updatedWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
-    withDocumentElement(this.documentElement.updatedWithNodeSeqAtNonEmptyPath(path)(f))
+    withDocumentElement(this.documentElement.updatedWithNodeSeqIfPathNonEmpty(path)(f))
 
-  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeqAtNonEmptyPath(path, newNodes))` */
+  /** Returns `withDocumentElement(this.documentElement.updatedWithNodeSeqIfPathNonEmpty(path, newNodes))` */
   def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
-    withDocumentElement(this.documentElement.updatedWithNodeSeqAtNonEmptyPath(path, newNodes))
+    withDocumentElement(this.documentElement.updatedWithNodeSeqIfPathNonEmpty(path, newNodes))
 
   /** Returns `withDocumentElement(this.documentElement.updatedAtPaths(paths)(f))` */
   def updatedAtPaths(paths: Set[Path])(f: (Elem, Path) => Elem): Document =

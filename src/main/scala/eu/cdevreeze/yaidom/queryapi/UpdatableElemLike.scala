@@ -142,7 +142,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
-  final def updatedWithNodeSeqAtNonEmptyPath(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
+  final def updatedWithNodeSeqIfPathNonEmpty(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
     if (path == Path.Root) self
     else {
       assert(path.parentPathOption.isDefined)
@@ -161,14 +161,14 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     }
   }
 
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
-  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = updatedWithNodeSeqAtNonEmptyPath(path)(f)
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
+  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = updatedWithNodeSeqIfPathNonEmpty(path)(f)
 
-  final def updatedWithNodeSeqAtNonEmptyPath(path: Path, newNodes: immutable.IndexedSeq[N]): E =
-    updatedWithNodeSeqAtNonEmptyPath(path) { e => newNodes }
+  final def updatedWithNodeSeqIfPathNonEmpty(path: Path, newNodes: immutable.IndexedSeq[N]): E =
+    updatedWithNodeSeqIfPathNonEmpty(path) { e => newNodes }
 
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPath'", since = "1.5.0")
-  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E = updatedWithNodeSeqAtNonEmptyPath(path, newNodes)
+  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
+  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E = updatedWithNodeSeqIfPathNonEmpty(path, newNodes)
 
   final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {
     if (pathEntries.isEmpty) self
