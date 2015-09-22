@@ -411,6 +411,62 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
+  @Test def testUpdateUsingBulkUpdate(): Unit = {
+    val rootElm = doc.documentElement
+    val allElms = rootElm.findAllElemsOrSelf
+    assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
+
+    val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
+    // Arbitrarily adding root path as extra (ignored) update path
+    val paths = Set(path, Path.Root)
+
+    val newPhone = "012-34567890"
+
+    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    assertResult(false) {
+      oldPhoneElm.text == newPhone
+    }
+
+    // Update, using a fixed path.
+
+    val start2Ms = System.currentTimeMillis()
+    val newDocElem = doc.documentElement withUpdatedElems { (elem, p) =>
+      if (p == path) Some(Vector(elem.withChildren(Vector(Text(newPhone, false))))) else None
+    }
+    val updatedDoc: Document = doc.withDocumentElement(newDocElem)
+    val end2Ms = System.currentTimeMillis()
+    logger.info(s"Updating an element in the document (using bulk updates) took ${end2Ms - start2Ms} ms")
+
+    val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+
+    assertResult(true) {
+      newPhoneElm.text == newPhone
+    }
+
+    // Comparing the corresponding resolved elements
+
+    val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
+
+    val resolvedDocElm = resolved.Elem(doc.documentElement)
+    val resolvedElm2: resolved.Elem = resolvedDocElm withUpdatedElems { (elem, p) =>
+      if (p == path) Some(Vector(elem.withChildren(Vector(resolved.Text(newPhone))))) else None
+    }
+
+    val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
+
+    assertResult(false) {
+      resolvedElm1 == resolvedElm2
+    }
+    assertResult(false) {
+      resolvedElm1 == resolvedElm3
+    }
+
+    assertResult(true) {
+      resolvedElm2 == resolvedElm3
+    }
+  }
+
   @Test def testTransform(): Unit = {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
