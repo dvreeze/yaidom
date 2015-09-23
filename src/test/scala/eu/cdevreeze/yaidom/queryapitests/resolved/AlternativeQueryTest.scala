@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitest.resolved
+package eu.cdevreeze.yaidom.queryapitests.resolved
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
