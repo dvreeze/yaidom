@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait RichUpdatableElemLike[N, E <: N with RichUpdatableElemLike[N, E]] extends UpdatableElemLike[N, E] with ClarkElemLike[E] { self: E =>
+trait RichUpdatableElemLike[N, E <: N with RichUpdatableElemLike[N, E]] extends RichUpdatableElemApi[N, E] with UpdatableElemLike[N, E] with ClarkElemLike[E] { self: E =>
 
   final def withUpdatedChildElems(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E = {
     val childElemsWithPathEntries = findAllChildElemsWithPathEntries
