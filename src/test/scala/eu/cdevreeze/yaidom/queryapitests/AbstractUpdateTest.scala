@@ -26,11 +26,10 @@ import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
+import eu.cdevreeze.yaidom.indexed.PathAwareClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.RichUpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport.JdkUriResolver
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.simple.Elem
 
@@ -77,10 +76,10 @@ abstract class AbstractUpdateTest extends Suite {
   }
 
   @Test def testUpdatedAtPaths(): Unit = {
-    val indexedClarkElem = indexedClarkElemBuilder.build(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = new PathAwareClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
-      indexedClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
+      pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
 
     val newRootElem = rootElem.updatedAtPaths(paths) {
       case (e, p) => updateMeasure(e)
@@ -90,10 +89,10 @@ abstract class AbstractUpdateTest extends Suite {
   }
 
   @Test def testUpdatedWithNodeSeqAtNonEmptyPaths(): Unit = {
-    val indexedClarkElem = indexedClarkElemBuilder.build(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = new PathAwareClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
-      indexedClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
+      pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
 
     val newRootElem = rootElem.updatedWithNodeSeqAtNonEmptyPaths(paths) {
       case (e, p) => Vector(updateMeasure(e))
@@ -117,9 +116,6 @@ abstract class AbstractUpdateTest extends Suite {
 
   private val resolvedExpectedRootElemAfterMeasureUpdate: yaidom.resolved.Elem =
     yaidom.resolved.Elem(rootElem.transformElems(updateMeasure))
-
-  private val indexedClarkElemBuilder =
-    IndexedClarkElem.Builder(classTag[yaidom.resolved.Elem], JdkUriResolver)
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
 
