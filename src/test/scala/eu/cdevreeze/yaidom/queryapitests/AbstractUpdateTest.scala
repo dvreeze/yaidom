@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.queryapitests
 
 import scala.Vector
-import scala.reflect.classTag
 
 import org.junit.Test
 import org.scalatest.Suite
@@ -25,12 +24,10 @@ import org.scalatest.Suite
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
+import eu.cdevreeze.yaidom.indexed.PathAwareClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.RichUpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport.JdkUriResolver
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.simple.Elem
 
@@ -53,7 +50,7 @@ abstract class AbstractUpdateTest extends Suite {
       case e => e
     }
 
-    checkEquality(newRootElem)
+    checkElemAfterMeasureUpdate(newRootElem)
   }
 
   @Test def testTransformElemsToNodeSeq(): Unit = {
@@ -63,7 +60,7 @@ abstract class AbstractUpdateTest extends Suite {
       case e => Vector(e)
     }
 
-    checkEquality(newRootElem)
+    checkElemAfterMeasureUpdate(newRootElem)
   }
 
   @Test def testWithUpdatedElems(): Unit = {
@@ -73,37 +70,37 @@ abstract class AbstractUpdateTest extends Suite {
       case (e, p) => None
     }
 
-    checkEquality(newRootElem)
+    checkElemAfterMeasureUpdate(newRootElem)
   }
 
   @Test def testUpdatedAtPaths(): Unit = {
-    val indexedClarkElem = indexedClarkElemBuilder.build(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = new PathAwareClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
-      indexedClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
+      pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
 
     val newRootElem = rootElem.updatedAtPaths(paths) {
       case (e, p) => updateMeasure(e)
     }
 
-    checkEquality(newRootElem)
+    checkElemAfterMeasureUpdate(newRootElem)
   }
 
   @Test def testUpdatedWithNodeSeqAtNonEmptyPaths(): Unit = {
-    val indexedClarkElem = indexedClarkElemBuilder.build(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = new PathAwareClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
-      indexedClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
+      pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
 
     val newRootElem = rootElem.updatedWithNodeSeqAtNonEmptyPaths(paths) {
       case (e, p) => Vector(updateMeasure(e))
     }
 
-    checkEquality(newRootElem)
+    checkElemAfterMeasureUpdate(newRootElem)
   }
 
-  private def checkEquality(elm: E): Unit = {
-    assertResult(resolvedExpectedRootElem) {
+  private def checkElemAfterMeasureUpdate(elm: E): Unit = {
+    assertResult(resolvedExpectedRootElemAfterMeasureUpdate) {
       yaidom.resolved.Elem(elm)
     }
   }
@@ -115,11 +112,8 @@ abstract class AbstractUpdateTest extends Suite {
     fromSimpleElem(doc.documentElement)
   }
 
-  private val resolvedExpectedRootElem: yaidom.resolved.Elem =
+  private val resolvedExpectedRootElemAfterMeasureUpdate: yaidom.resolved.Elem =
     yaidom.resolved.Elem(rootElem.transformElems(updateMeasure))
-
-  private val indexedClarkElemBuilder =
-    IndexedClarkElem.Builder(classTag[yaidom.resolved.Elem], JdkUriResolver)
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
 
