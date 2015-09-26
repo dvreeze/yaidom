@@ -34,13 +34,18 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.dom.DomElem
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
+import eu.cdevreeze.yaidom.indexed.PathAwareClarkElem
+import eu.cdevreeze.yaidom.indexed.PathAwareScopedElem
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
@@ -59,31 +64,71 @@ import eu.cdevreeze.yaidom.simple.Elem
 class IndexedElemTest extends Suite {
 
   @Test def testIndexingForSimpleElem(): Unit = {
-    doTestIndexing(docWithCommentAtEnd.documentElement, indexedElemBuilder)
+    doTestIndexing[Elem, indexed.Elem](indexedElemBuilder.build(docWithCommentAtEnd.documentElement))
 
-    doTestIndexing(docUsingXml11.documentElement, indexedElemBuilder)
+    doTestIndexing[Elem, indexed.Elem](indexedElemBuilder.build(docUsingXml11.documentElement))
   }
 
   @Test def testIndexingForDomWrapperElem(): Unit = {
+    val builder = IndexedScopedElem.Builder(classTag[DomElem], uriResolver)
+
     val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing(
-      DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement,
-      IndexedScopedElem.Builder(classTag[DomElem], uriResolver))
+    doTestIndexing[DomElem, IndexedScopedElem[DomElem]](
+      builder.build(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
 
     val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing(
-      DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement,
-      IndexedScopedElem.Builder(classTag[DomElem], uriResolver))
+    doTestIndexing[DomElem, IndexedScopedElem[DomElem]](
+      builder.build(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
+  }
+
+  @Test def testClarkElemIndexingForDomWrapperElem(): Unit = {
+    val builder = IndexedClarkElem.Builder(classTag[DomElem], uriResolver)
+
+    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    doTestIndexing[DomElem, IndexedClarkElem[DomElem]](
+      builder.build(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
+
+    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    doTestIndexing[DomElem, IndexedClarkElem[DomElem]](
+      builder.build(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
+  }
+
+  @Test def testPathAwareScopedElemIndexingForDomWrapperElem(): Unit = {
+    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    doTestIndexing[DomElem, PathAwareScopedElem[DomElem]](
+      PathAwareScopedElem(None, DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
+
+    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    doTestIndexing[DomElem, PathAwareScopedElem[DomElem]](
+      PathAwareScopedElem(None, DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
+  }
+
+  @Test def testPathAwareClarkElemIndexingForDomWrapperElem(): Unit = {
+    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    doTestIndexing[DomElem, PathAwareClarkElem[DomElem]](
+      PathAwareClarkElem(None, DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
+
+    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+    doTestIndexing[DomElem, PathAwareClarkElem[DomElem]](
+      PathAwareClarkElem(None, DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
   }
 
   @Test def testIndexingForScalaXmlWrapperElem(): Unit = {
-    doTestIndexing(
-      ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement)),
-      IndexedScopedElem.Builder(classTag[ScalaXmlElem], uriResolver))
+    val builder = IndexedScopedElem.Builder(classTag[ScalaXmlElem], uriResolver)
 
-    doTestIndexing(
-      ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement)),
-      IndexedScopedElem.Builder(classTag[ScalaXmlElem], uriResolver))
+    doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
+      builder.build(ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement))))
+
+    doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
+      builder.build(ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement))))
+  }
+
+  @Test def testPathAwareScopedElemIndexingForScalaXmlWrapperElem(): Unit = {
+    doTestIndexing[ScalaXmlElem, PathAwareScopedElem[ScalaXmlElem]](
+      PathAwareScopedElem(None, ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement))))
+
+    doTestIndexing[ScalaXmlElem, PathAwareScopedElem[ScalaXmlElem]](
+      PathAwareScopedElem(None, ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement))))
   }
 
   @Test def testDoubleIndexing(): Unit = {
@@ -107,42 +152,40 @@ class IndexedElemTest extends Suite {
     }
   }
 
-  private def doTestIndexing[E <: ResolvedNodes.Elem with ScopedElemApi[E]](rootElem: E, iElemBuilder: IndexedScopedElem.Builder[E]): Unit = {
-    assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
-      rootElem.findAllElemsOrSelf.map(_.qname)
+  private def doTestIndexing[U <: ResolvedNodes.Elem with ClarkElemApi[U], E <: IndexedClarkElemApi[E, U]](rootElem: E): Unit = {
+    assertResult(List(QName("product"), QName("number"), QName("size"))) {
+      rootElem.findAllElemsOrSelf.map(_.localName)
     }
-
-    val indexedElem = iElemBuilder.build(rootElem)
 
     assertResult(List(
       List(EName(ns, "product")),
       List(EName(ns, "product"), EName(ns, "number")),
       List(EName(ns, "product"), EName(ns, "size")))) {
 
-      indexedElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
+      rootElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
     }
 
-    assertResult(indexedElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames).map(_.init)) {
-      indexedElem.findAllElemsOrSelf.map(_.reverseAncestryENames)
+    assertResult(rootElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames).map(_.init)) {
+      rootElem.findAllElemsOrSelf.map(_.reverseAncestryENames)
     }
 
-    val resolvedElem = resolved.Elem(rootElem)
+    val resolvedElem = resolved.Elem(rootElem.elem)
     val indexedClarkElem = indexedClarkElemBuilder.build(resolvedElem)
 
-    assertResult(indexedElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)) {
+    assertResult(rootElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)) {
       indexedClarkElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
     }
 
-    assertResult(indexedElem.findAllElemsOrSelf.map(_.reverseAncestryENames)) {
+    assertResult(rootElem.findAllElemsOrSelf.map(_.reverseAncestryENames)) {
       indexedClarkElem.findAllElemsOrSelf.map(_.reverseAncestryENames)
     }
 
     assertResult(List(List(EName(ns, "product"), EName(ns, "size")))) {
-      indexedElem.filterElems(e =>
+      rootElem.filterElems(e =>
         e.resolvedName == EName(ns, "size") && e.path == Path.from(EName(ns, "size") -> 0)).map(_.reverseAncestryOrSelfENames)
     }
 
-    assertResult(indexedElem.filterElems(e =>
+    assertResult(rootElem.filterElems(e =>
       e.resolvedName == EName(ns, "size") && e.path == Path.from(EName(ns, "size") -> 0)).map(_.reverseAncestryOrSelfENames)) {
 
       indexedClarkElem.filterElems(e =>
@@ -156,7 +199,7 @@ class IndexedElemTest extends Suite {
     }
 
     assertResult(indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem))) {
-      indexedElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem))
+      rootElem.findAllElemsOrSelf.map(e => resolved.Elem(e.elem))
     }
 
     assertResult(resolvedElem.findAllElemsOrSelf) {
@@ -164,7 +207,7 @@ class IndexedElemTest extends Suite {
     }
 
     assertResult(resolvedElem.findAllElemsOrSelf) {
-      indexedElem.findAllElemsOrSelf.map(e => resolved.Elem(e.rootElem.getElemOrSelfByPath(e.path)))
+      rootElem.findAllElemsOrSelf.map(e => resolved.Elem(e.rootElem.getElemOrSelfByPath(e.path)))
     }
   }
 

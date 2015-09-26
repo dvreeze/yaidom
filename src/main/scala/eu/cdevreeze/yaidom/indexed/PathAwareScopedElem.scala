@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
- * Very lightweight path-aware element implementation. It offers the `ScopedElemApi` query API. It is optimized
+ * Very lightweight path-aware element implementation. It offers the `IndexedScopedElemApi` query API. It is optimized
  * for fast (just-in-time) element creation, not for fast querying. Use this whenever wanting to query for (pairs of
  * elements and) paths, for example to collect the paths before using them to functionally update the element tree.
  *
@@ -61,11 +61,12 @@ final class PathAwareScopedElem[U <: ScopedElemApi[U]] private (
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: PathAwareScopedElem[U] =>
-      (other.rootElem == this.rootElem) && (other.path == this.path) && (other.elem == this.elem)
+      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
+        (other.path == this.path) && (other.elem == this.elem)
     case _ => false
   }
 
-  final override def hashCode: Int = (rootElem, path, elem).hashCode
+  final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
 }
 
 object PathAwareScopedElem {
