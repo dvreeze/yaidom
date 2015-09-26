@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
@@ -24,6 +26,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
@@ -35,32 +38,41 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
  *
  * @author Chris de Vreeze
  */
-final class PathAwareClarkElem[U <: ClarkElemApi[U]](
+final class PathAwareClarkElem[U <: ClarkElemApi[U]] private (
+  val docUriOption: Option[URI],
+  val rootElem: U,
   val path: Path,
-  val elem: U) extends Nodes.Elem with ClarkElemLike[PathAwareClarkElem[U]] {
-
-  def this(elem: U) = this(Path.Root, elem)
+  val elem: U) extends Nodes.Elem with IndexedClarkElemLike[PathAwareClarkElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
   final def findAllChildElems: immutable.IndexedSeq[PathAwareClarkElem[U]] = {
     elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        new PathAwareClarkElem(path.append(entry), e)
+        new PathAwareClarkElem(docUriOption, rootElem, path.append(entry), e)
     }
   }
 
-  final def resolvedName: EName = elem.resolvedName
-
-  final def resolvedAttributes: immutable.Iterable[(EName, String)] = elem.resolvedAttributes
-
-  final def text: String = elem.text
+  final def baseUriOption: Option[URI] = {
+    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
+  }
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: PathAwareClarkElem[U] =>
-      (other.path == this.path) && (other.elem == this.elem)
+      (other.rootElem == this.rootElem) && (other.path == this.path) && (other.elem == this.elem)
     case _ => false
   }
 
-  final override def hashCode: Int = (path, elem).hashCode
+  final override def hashCode: Int = (rootElem, path, elem).hashCode
+}
+
+object PathAwareClarkElem {
+
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): PathAwareClarkElem[U] = {
+    new PathAwareClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  }
+
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): PathAwareClarkElem[U] = {
+    apply(docUriOption, rootElem, Path.Root)
+  }
 }

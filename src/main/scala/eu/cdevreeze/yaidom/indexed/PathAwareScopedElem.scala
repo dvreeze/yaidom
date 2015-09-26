@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.indexed
 
+import java.net.URI
+
 import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
@@ -26,6 +28,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
@@ -37,38 +40,41 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
  *
  * @author Chris de Vreeze
  */
-final class PathAwareScopedElem[U <: ScopedElemApi[U]](
+final class PathAwareScopedElem[U <: ScopedElemApi[U]] private (
+  val docUriOption: Option[URI],
+  val rootElem: U,
   val path: Path,
-  val elem: U) extends Nodes.Elem with ScopedElemLike[PathAwareScopedElem[U]] {
-
-  def this(elem: U) = this(Path.Root, elem)
+  val elem: U) extends Nodes.Elem with IndexedScopedElemLike[PathAwareScopedElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
   final def findAllChildElems: immutable.IndexedSeq[PathAwareScopedElem[U]] = {
     elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        new PathAwareScopedElem(path.append(entry), e)
+        new PathAwareScopedElem(docUriOption, rootElem, path.append(entry), e)
     }
   }
 
-  final def resolvedName: EName = elem.resolvedName
-
-  final def resolvedAttributes: immutable.Iterable[(EName, String)] = elem.resolvedAttributes
-
-  final def text: String = elem.text
-
-  final def qname: QName = elem.qname
-
-  final def attributes: immutable.Iterable[(QName, String)] = elem.attributes
-
-  final def scope: Scope = elem.scope
+  final def baseUriOption: Option[URI] = {
+    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
+  }
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: PathAwareScopedElem[U] =>
-      (other.path == this.path) && (other.elem == this.elem)
+      (other.rootElem == this.rootElem) && (other.path == this.path) && (other.elem == this.elem)
     case _ => false
   }
 
-  final override def hashCode: Int = (path, elem).hashCode
+  final override def hashCode: Int = (rootElem, path, elem).hashCode
+}
+
+object PathAwareScopedElem {
+
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): PathAwareScopedElem[U] = {
+    new PathAwareScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  }
+
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): PathAwareScopedElem[U] = {
+    apply(docUriOption, rootElem, Path.Root)
+  }
 }

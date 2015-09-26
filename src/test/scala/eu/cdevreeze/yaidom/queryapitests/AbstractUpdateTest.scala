@@ -76,7 +76,7 @@ abstract class AbstractUpdateTest extends Suite {
   }
 
   @Test def testUpdatedAtPaths(): Unit = {
-    val pathAwareClarkElem = new PathAwareClarkElem(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = PathAwareClarkElem(None, yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
@@ -89,7 +89,7 @@ abstract class AbstractUpdateTest extends Suite {
   }
 
   @Test def testUpdatedWithNodeSeqAtNonEmptyPaths(): Unit = {
-    val pathAwareClarkElem = new PathAwareClarkElem(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = PathAwareClarkElem(None, yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
