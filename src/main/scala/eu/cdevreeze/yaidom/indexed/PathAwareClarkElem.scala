@@ -73,7 +73,15 @@ object PathAwareClarkElem {
     new PathAwareClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
+  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): PathAwareClarkElem[U] = {
+    new PathAwareClarkElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  }
+
   def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): PathAwareClarkElem[U] = {
     apply(docUriOption, rootElem, Path.Root)
+  }
+
+  def apply[U <: ClarkElemApi[U]](rootElem: U): PathAwareClarkElem[U] = {
+    apply(None, rootElem, Path.Root)
   }
 }

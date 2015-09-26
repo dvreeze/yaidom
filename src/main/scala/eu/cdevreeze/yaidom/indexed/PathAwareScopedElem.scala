@@ -75,7 +75,15 @@ object PathAwareScopedElem {
     new PathAwareScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
+  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): PathAwareScopedElem[U] = {
+    new PathAwareScopedElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  }
+
   def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): PathAwareScopedElem[U] = {
     apply(docUriOption, rootElem, Path.Root)
+  }
+
+  def apply[U <: ScopedElemApi[U]](rootElem: U): PathAwareScopedElem[U] = {
+    apply(None, rootElem, Path.Root)
   }
 }

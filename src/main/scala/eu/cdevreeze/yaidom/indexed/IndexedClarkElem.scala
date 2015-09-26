@@ -204,4 +204,46 @@ object IndexedClarkElem {
       new IndexedClarkElem(docUriOption, parentBaseUriOption, rootElem, childElems, path, elem, uriResolver)
     }
   }
+
+  /**
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem)`
+   */
+  def apply[U <: ClarkElemApi[U]: ClassTag](rootElem: U): IndexedClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem)
+  }
+
+  /**
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
+   */
+  def apply[U <: ClarkElemApi[U]: ClassTag](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)
+  }
+
+  /**
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
+   */
+  def apply[U <: ClarkElemApi[U]: ClassTag](docUri: URI, rootElem: U): IndexedClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)
+  }
+
+  /**
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
+   */
+  def apply[U <: ClarkElemApi[U]: ClassTag](rootElem: U, path: Path): IndexedClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem, path)
+  }
+
+  /**
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
+   */
+  def apply[U <: ClarkElemApi[U]: ClassTag](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)
+  }
+
+  /**
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
+   */
+  def apply[U <: ClarkElemApi[U]: ClassTag](docUri: URI, rootElem: U, path: Path): IndexedClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)
+  }
 }
