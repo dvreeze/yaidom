@@ -24,14 +24,14 @@ import eu.cdevreeze.yaidom.core.Path
 /**
  * Easy-to-use API and implementation trait for functionally updatable elements.
  *
- * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.RichUpdatableElemApi]].
+ * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.SimpleUpdatableElemApi]].
  *
  * @tparam N The node supertype of the element subtype
  * @tparam E The captured element subtype
  *
  * @author Chris de Vreeze
  */
-trait RichUpdatableElemLike[N, E <: N with RichUpdatableElemLike[N, E]] extends RichUpdatableElemApi[N, E] with UpdatableElemLike[N, E] with ClarkElemLike[E] { self: E =>
+trait SimpleUpdatableElemLike[N, E <: N with SimpleUpdatableElemLike[N, E]] extends SimpleUpdatableElemApi[N, E] with UpdatableElemLike[N, E] with ClarkElemLike[E] { self: E =>
 
   final def withUpdatedChildElems(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E = {
     val childElemsWithPathEntries = findAllChildElemsWithPathEntries

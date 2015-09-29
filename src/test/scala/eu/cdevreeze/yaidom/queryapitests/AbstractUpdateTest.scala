@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.indexed.PathAwareClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
-import eu.cdevreeze.yaidom.queryapi.RichUpdatableElemApi
+import eu.cdevreeze.yaidom.queryapi.SimpleUpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.simple.Elem
@@ -41,7 +41,7 @@ import eu.cdevreeze.yaidom.simple.Elem
 abstract class AbstractUpdateTest extends Suite {
 
   type N <: ResolvedNodes.Node
-  type E <: N with ResolvedNodes.Elem with RichUpdatableElemApi[N, E] with TransformableElemApi[N, E]
+  type E <: N with ResolvedNodes.Elem with SimpleUpdatableElemApi[N, E] with TransformableElemApi[N, E]
 
   // Below, we update the measure elements, replacing the unprefixed measures with prefixed ones (using prefix xbrli)
 

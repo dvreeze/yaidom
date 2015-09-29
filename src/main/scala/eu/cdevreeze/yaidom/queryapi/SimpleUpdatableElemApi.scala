@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait RichUpdatableElemApi[N, E <: N with RichUpdatableElemApi[N, E]] extends UpdatableElemApi[N, E] with ClarkElemApi[E] { self: E =>
+trait SimpleUpdatableElemApi[N, E <: N with SimpleUpdatableElemApi[N, E]] extends UpdatableElemApi[N, E] with ClarkElemApi[E] { self: E =>
 
   /**
    * Functionally updates the child elements for which the passed function returns a non-empty result.
