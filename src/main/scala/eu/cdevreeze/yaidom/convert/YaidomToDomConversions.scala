@@ -77,11 +77,11 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
    */
   final def convertNode(node: Node, doc: org.w3c.dom.Document, parentScope: Scope): org.w3c.dom.Node = {
     node match {
-      case e: Elem => convertElem(e, doc, parentScope)
-      case t: Text => convertText(t, doc)
+      case e: Elem                   => convertElem(e, doc, parentScope)
+      case t: Text                   => convertText(t, doc)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, doc)
-      case er: EntityRef => convertEntityRef(er, doc)
-      case c: Comment => convertComment(c, doc)
+      case er: EntityRef             => convertEntityRef(er, doc)
+      case c: Comment                => convertComment(c, doc)
     }
   }
 
@@ -164,7 +164,10 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
 
     for ((attrQName, attrValue) <- elm.attributes) {
       if (attrQName.prefixOption.isEmpty) {
-        element.setAttribute(attrQName.localPart, attrValue)
+        // We use setAttributeNS and not setAttribute here.
+        // According to Johan Walters, when using setAttribute, schema validation may fail in sufficiently
+        // recent Xerces distributions, which is related to the distinction between implementation types Attr and AttrNS.
+        element.setAttributeNS(null, attrQName.localPart, attrValue)
       } else {
         val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
           s"Attribute name '${attrQName}' should resolve to an EName in scope [${attrScope}]"))
