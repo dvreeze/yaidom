@@ -64,7 +64,7 @@ import javax.xml.stream.events.XMLEvent
  *
  * @author Chris de Vreeze
  */
-trait StaxEventsToYaidomConversions extends ConverterToDocument[immutable.IndexedSeq[XMLEvent]] {
+trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEvent]] {
   import StaxEventsToYaidomConversions.EventEndState
   import StaxEventsToYaidomConversions.EventWithEndState
   import StaxEventsToYaidomConversions.DocumentWithRemainingEventStates

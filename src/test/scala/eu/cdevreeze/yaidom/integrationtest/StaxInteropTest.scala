@@ -26,6 +26,7 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.convert.StaxConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
@@ -68,7 +69,7 @@ class StaxInteropTest extends Suite {
   @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance().withConverterToDocument(StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -89,7 +90,7 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance().withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(Document(None, root))
 
@@ -197,7 +198,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance().withConverterToDocument(StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("strangeXml.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -209,7 +210,7 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance.withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(Document(None, root))
 
@@ -240,7 +241,7 @@ class StaxInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance().withConverterToDocument(StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXml.xml")
 
     val document: Document = staxParser.parse(is)
@@ -265,7 +266,7 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance.withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(document)
 
@@ -327,7 +328,7 @@ class StaxInteropTest extends Suite {
     // With an IBM JRE, the DtdSuppressionResolver as implemented below does not work
     xmlInputFactory.setXMLResolver(new EntityResolverUsingLocalDtds)
 
-    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory, StaxConversions)
 
     val is = classOf[StaxInteropTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -511,7 +512,7 @@ class StaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance.withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(Document(None, root))
 
@@ -564,7 +565,7 @@ class StaxInteropTest extends Suite {
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory, StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -632,7 +633,7 @@ class StaxInteropTest extends Suite {
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, java.lang.Boolean.FALSE)
-    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory, StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -708,7 +709,7 @@ class StaxInteropTest extends Suite {
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory, StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -755,7 +756,7 @@ class StaxInteropTest extends Suite {
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, java.lang.Boolean.TRUE)
-    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory, StaxConversions)
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -991,7 +992,7 @@ class StaxInteropTest extends Suite {
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setXMLResolver(new LoggingResolver)
 
-    val staxParser = new DocumentParserUsingStax(xmlInputFactory)
+    val staxParser = new DocumentParserUsingStax(xmlInputFactory, StaxConversions)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 

@@ -31,6 +31,7 @@ import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 
+import eu.cdevreeze.yaidom.convert.YaidomToSaxEventsConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
@@ -100,7 +101,7 @@ class SaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance().withDocumentConverter(new YaidomToSaxEventsConversions {})
 
     val xmlString = printer.print(Document(root))
 
@@ -225,7 +226,7 @@ class SaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance().withDocumentConverter(new YaidomToSaxEventsConversions {})
 
     val xmlString = printer.print(Document(root))
 
@@ -286,7 +287,7 @@ class SaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance().withDocumentConverter(new YaidomToSaxEventsConversions {})
 
     val xmlString = printer.print(document)
 
@@ -549,7 +550,7 @@ class SaxInteropTest extends Suite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance().withDocumentConverter(new YaidomToSaxEventsConversions {})
 
     val xmlString = printer.print(Document(None, root))
 

@@ -21,6 +21,7 @@ import java.{ io => jio }
 import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.simple.ConverterToDocument
 import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -92,7 +93,19 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 final class DocumentParserUsingDom(
   val docBuilderFactory: DocumentBuilderFactory,
-  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder) extends AbstractDocumentParser {
+  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
+  val converterToDocument: ConverterToDocument[org.w3c.dom.Document]) extends AbstractDocumentParser {
+
+  /**
+   * Returns an adapted copy having the passed ConverterToDocument. This method makes it possible to use an adapted
+   * converter, which may be needed depending on the JAXP implementation used.
+   */
+  def withConverterToDocument(newConverterToDocument: ConverterToDocument[org.w3c.dom.Document]): DocumentParserUsingDom = {
+    new DocumentParserUsingDom(
+      docBuilderFactory,
+      docBuilderCreator,
+      newConverterToDocument)
+  }
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
@@ -103,7 +116,7 @@ final class DocumentParserUsingDom(
       val inputSource = new InputSource(inputStream)
       val domDoc: org.w3c.dom.Document = db.parse(inputSource)
 
-      DomConversions.convertToDocument(domDoc)
+      converterToDocument.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
     }
@@ -136,6 +149,6 @@ object DocumentParserUsingDom {
     docBuilderFactory: DocumentBuilderFactory,
     docBuilderCreator: DocumentBuilderFactory => DocumentBuilder): DocumentParserUsingDom = {
 
-    new DocumentParserUsingDom(docBuilderFactory, docBuilderCreator)
+    new DocumentParserUsingDom(docBuilderFactory, docBuilderCreator, DomConversions)
   }
 }

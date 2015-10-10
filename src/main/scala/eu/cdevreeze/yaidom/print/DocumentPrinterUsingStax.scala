@@ -20,12 +20,14 @@ import java.{ io => jio }
 
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.convert.YaidomToStaxEventsConversions
+import eu.cdevreeze.yaidom.convert.StaxConversions
 import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.DocumentConverter
 import javax.xml.stream.XMLEventFactory
 import javax.xml.stream.XMLEventWriter
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.events.XMLEvent
+import DocumentPrinterUsingStax.XmlEventsProducer
 
 /**
  * StAX-based `Document` printer.
@@ -45,24 +47,37 @@ import javax.xml.stream.events.XMLEvent
  */
 sealed class DocumentPrinterUsingStax(
   val eventFactory: XMLEventFactory,
-  val outputFactory: XMLOutputFactory) extends AbstractDocumentPrinter {
+  val outputFactory: XMLOutputFactory,
+  val documentConverter: DocumentConverter[XmlEventsProducer]) extends AbstractDocumentPrinter {
 
   val omitXmlDeclaration: Boolean = false
 
+  /**
+   * Returns an adapted copy having the passed DocumentConverter. This method makes it possible to use an adapted
+   * document converter, which may be needed depending on the JAXP implementation used.
+   *
+   * Depending on the StAX implementation used, it may be needed to use a specific document converter for a given
+   * output encoding. See for example http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6452107.
+   *
+   * In that case, consider passing the following document converter, for encoding `enc`:
+   * {{{
+   * new YaidomToStaxEventsConversions {
+   *   override def encoding: String = enc
+   * }
+   * }}}
+   *
+   * For a nice StAX tutorial, see http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/stax.html.
+   */
+  def withDocumentConverter(newDocumentConverter: DocumentConverter[XmlEventsProducer]): DocumentPrinterUsingStax = {
+    new DocumentPrinterUsingStax(
+      eventFactory,
+      outputFactory,
+      newDocumentConverter)
+  }
+
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
-    // The following conversion (causing a CreateStartDocument event with encoding) is needed to hopefully prevent the following exception:
-    // javax.xml.stream.XMLStreamException: Underlying stream encoding 'ISO8859_1' and input parameter for writeStartDocument() method 'UTF-8' do not match.
-    // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6452107.
-    // Alas, it still does not work, leading to an empty byte array below.
-
-    // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/stax.html#1105345 for a nice StAX tutorial.
-
-    val enc = encoding
-    val converterToStax = new YaidomToStaxEventsConversions {
-      override def encoding: String = enc
-    }
     val events: immutable.IndexedSeq[XMLEvent] = {
-      val result = converterToStax.convertDocument(doc)(eventFactory)
+      val result = documentConverter.convertDocument(doc)(eventFactory)
 
       if (omitXmlDeclaration) result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
       else result
@@ -82,9 +97,8 @@ sealed class DocumentPrinterUsingStax(
   }
 
   def print(doc: Document): String = {
-    val converterToStax = new YaidomToStaxEventsConversions {}
     val events: immutable.IndexedSeq[XMLEvent] = {
-      val result = converterToStax.convertDocument(doc)(eventFactory)
+      val result = documentConverter.convertDocument(doc)(eventFactory)
 
       if (omitXmlDeclaration) result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
       else result
@@ -107,13 +121,16 @@ sealed class DocumentPrinterUsingStax(
   }
 
   def omittingXmlDeclaration: DocumentPrinterUsingStax = {
-    new DocumentPrinterUsingStax(eventFactory, outputFactory) {
+    new DocumentPrinterUsingStax(eventFactory, outputFactory, documentConverter) {
       override val omitXmlDeclaration: Boolean = true
     }
   }
 }
 
 object DocumentPrinterUsingStax {
+
+  /** Producer of an `IndexedSeq[XMLEvent]`, given a `XMLEventFactory` as factory of StAX events */
+  type XmlEventsProducer = (XMLEventFactory => immutable.IndexedSeq[XMLEvent])
 
   /** Returns `newInstance(XMLEventFactory.newFactory, XMLOutputFactory.newFactory)` */
   def newInstance(): DocumentPrinterUsingStax = {
@@ -130,6 +147,6 @@ object DocumentPrinterUsingStax {
     eventFactory: XMLEventFactory,
     outputFactory: XMLOutputFactory): DocumentPrinterUsingStax = {
 
-    new DocumentPrinterUsingStax(eventFactory, outputFactory)
+    new DocumentPrinterUsingStax(eventFactory, outputFactory, StaxConversions)
   }
 }

@@ -76,7 +76,7 @@ class XmlSchemasTest extends Suite {
       db
     }
 
-    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+    val domParser = DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder _)
 
     val is = classOf[XmlSchemasTest].getResourceAsStream("XMLSchema.xsd")
 

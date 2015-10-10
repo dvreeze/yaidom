@@ -71,7 +71,7 @@ class NameProvidersTest extends Suite {
       db
     }
 
-    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+    val domParser = DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder _)
 
     val is = classOf[NameProvidersTest].getResourceAsStream("XMLSchema.xsd")
 

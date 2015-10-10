@@ -27,9 +27,11 @@ import org.w3c.dom.ls.LSSerializer
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.DocumentConverter
 import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import DocumentPrinterUsingDomLS.DocumentProducer
 
 /**
  * DOM-LS-based `Document` printer.
@@ -58,11 +60,25 @@ final class DocumentPrinterUsingDomLS(
   val docBuilderFactory: DocumentBuilderFactory,
   val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
   val domImplementation: DOMImplementationLS,
-  val serializerCreator: DOMImplementationLS => LSSerializer) extends AbstractDocumentPrinter { self =>
+  val serializerCreator: DOMImplementationLS => LSSerializer,
+  val documentConverter: DocumentConverter[DocumentProducer]) extends AbstractDocumentPrinter { self =>
+
+  /**
+   * Returns an adapted copy having the passed DocumentConverter. This method makes it possible to use an adapted
+   * document converter, which may be needed depending on the JAXP implementation used.
+   */
+  def withDocumentConverter(newDocumentConverter: DocumentConverter[DocumentProducer]): DocumentPrinterUsingDomLS = {
+    new DocumentPrinterUsingDomLS(
+      docBuilderFactory,
+      docBuilderCreator,
+      domImplementation,
+      serializerCreator,
+      newDocumentConverter)
+  }
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = documentConverter.convertDocument(doc)(docBuilder.newDocument)
 
     val serializer: LSSerializer = serializerCreator(domImplementation)
 
@@ -80,7 +96,7 @@ final class DocumentPrinterUsingDomLS(
 
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = documentConverter.convertDocument(doc)(docBuilder.newDocument)
 
     val serializer: LSSerializer = serializerCreator(domImplementation)
 
@@ -112,11 +128,15 @@ final class DocumentPrinterUsingDomLS(
       docBuilderFactory,
       docBuilderCreator,
       domImplementation,
-      newSerializerCreator)
+      newSerializerCreator,
+      documentConverter)
   }
 }
 
 object DocumentPrinterUsingDomLS {
+
+  /** Producer of a DOM `Document`, given the DOM `Document` as factory of DOM objects */
+  type DocumentProducer = (org.w3c.dom.Document => org.w3c.dom.Document)
 
   /** Returns `newInstance(DocumentBuilderFactory.newInstance, domImplLS)`, for an appropriate `DOMImplementationLS` */
   def newInstance(): DocumentPrinterUsingDomLS = {
@@ -150,6 +170,11 @@ object DocumentPrinterUsingDomLS {
     domImplementation: DOMImplementationLS,
     serializerCreator: DOMImplementationLS => LSSerializer): DocumentPrinterUsingDomLS = {
 
-    new DocumentPrinterUsingDomLS(docBuilderFactory, docBuilderCreator, domImplementation, serializerCreator)
+    new DocumentPrinterUsingDomLS(
+      docBuilderFactory,
+      docBuilderCreator,
+      domImplementation,
+      serializerCreator,
+      DomConversions)
   }
 }

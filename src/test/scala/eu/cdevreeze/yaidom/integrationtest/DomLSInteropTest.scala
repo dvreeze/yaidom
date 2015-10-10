@@ -31,6 +31,7 @@ import org.w3c.dom.ls.LSInput
 import org.w3c.dom.ls.LSParser
 import org.w3c.dom.ls.LSResourceResolver
 
+import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.DomConversions.convertDocument
 import eu.cdevreeze.yaidom.convert.DomConversions.convertElem
 import eu.cdevreeze.yaidom.convert.DomConversions.convertToDocument
@@ -75,7 +76,7 @@ class DomLSInteropTest extends Suite {
   @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDomLS.newInstance
+    val domParser = DocumentParserUsingDomLS.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomLSInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -96,7 +97,7 @@ class DomLSInteropTest extends Suite {
 
     // 2. Convert Elem to a DOM element
 
-    val printer = DocumentPrinterUsingDomLS.newInstance
+    val printer = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions)
 
     val db2 = printer.docBuilderCreator(printer.docBuilderFactory)
     val domDoc2: org.w3c.dom.Document = db2.newDocument
@@ -276,7 +277,7 @@ class DomLSInteropTest extends Suite {
   @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDomLS.newInstance
+    val domParser = DocumentParserUsingDomLS.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomLSInteropTest].getResourceAsStream("strangeXml.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -319,7 +320,7 @@ class DomLSInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDomLS.newInstance
+    val domParser = DocumentParserUsingDomLS.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomLSInteropTest].getResourceAsStream("trivialXml.xml")
 
     val document: Document = domParser.parse(is)
@@ -962,7 +963,7 @@ class DomLSInteropTest extends Suite {
 
     // 3. Show the output with different output encodings
 
-    val printer = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+    val printer = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions) withSerializerCreator { domImpl =>
       val serializer = domImpl.createLSSerializer()
       // This configuration fixes the following exception:
       // org.w3c.dom.ls.LSException: Attribute "xmlns" was already specified for element "root"
@@ -1369,13 +1370,13 @@ class DomLSInteropTest extends Suite {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
     }
 
-    val printer1 = DocumentPrinterUsingDomLS.newInstance withSerializerCreator { domImpl =>
+    val printer1 = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions) withSerializerCreator { domImpl =>
       val writer = domImpl.createLSSerializer()
       writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
       writer
     }
 
-    val printer2 = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+    val printer2 = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions) withSerializerCreator { domImpl =>
       val writer = domImpl.createLSSerializer()
       writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
       writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)

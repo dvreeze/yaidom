@@ -18,9 +18,9 @@ package eu.cdevreeze.yaidom.print
 
 import java.{ io => jio }
 
-import DocumentPrinterUsingDom.transformerCreatorForHtml
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.DocumentConverter
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -28,6 +28,8 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import DocumentPrinterUsingDom.transformerCreatorForHtml
+import DocumentPrinterUsingDom.DocumentProducer
 
 /**
  * DOM-based `Document` printer.
@@ -82,11 +84,25 @@ final class DocumentPrinterUsingDom(
   val docBuilderFactory: DocumentBuilderFactory,
   val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
   val transformerFactory: TransformerFactory,
-  val transformerCreator: TransformerFactory => Transformer) extends AbstractDocumentPrinter {
+  val transformerCreator: TransformerFactory => Transformer,
+  val documentConverter: DocumentConverter[DocumentProducer]) extends AbstractDocumentPrinter {
+
+  /**
+   * Returns an adapted copy having the passed DocumentConverter. This method makes it possible to use an adapted
+   * document converter, which may be needed depending on the JAXP implementation used.
+   */
+  def withDocumentConverter(newDocumentConverter: DocumentConverter[DocumentProducer]): DocumentPrinterUsingDom = {
+    new DocumentPrinterUsingDom(
+      docBuilderFactory,
+      docBuilderCreator,
+      transformerFactory,
+      transformerCreator,
+      newDocumentConverter)
+  }
 
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = documentConverter.convertDocument(doc)(docBuilder.newDocument)
 
     val transformer = transformerCreator(transformerFactory)
     transformer.setOutputProperty(OutputKeys.ENCODING, encoding)
@@ -106,7 +122,7 @@ final class DocumentPrinterUsingDom(
 
   def print(doc: Document): String = {
     val docBuilder = docBuilderCreator(docBuilderFactory)
-    val domDocument: org.w3c.dom.Document = DomConversions.convertDocument(doc)(docBuilder.newDocument)
+    val domDocument: org.w3c.dom.Document = documentConverter.convertDocument(doc)(docBuilder.newDocument)
 
     val transformer = transformerCreator(transformerFactory)
 
@@ -134,7 +150,8 @@ final class DocumentPrinterUsingDom(
       docBuilderFactory,
       docBuilderCreator,
       transformerFactory,
-      newTransformerCreator)
+      newTransformerCreator,
+      documentConverter)
   }
 
   def withDocumentBuilderCreator(newDocBuilderCreator: DocumentBuilderFactory => DocumentBuilder): DocumentPrinterUsingDom = {
@@ -142,7 +159,8 @@ final class DocumentPrinterUsingDom(
       docBuilderFactory,
       newDocBuilderCreator,
       transformerFactory,
-      transformerCreator)
+      transformerCreator,
+      documentConverter)
   }
 
   def withTransformerCreator(newTransformerCreator: TransformerFactory => Transformer): DocumentPrinterUsingDom = {
@@ -150,13 +168,17 @@ final class DocumentPrinterUsingDom(
       docBuilderFactory,
       docBuilderCreator,
       transformerFactory,
-      newTransformerCreator)
+      newTransformerCreator,
+      documentConverter)
   }
 
   def withTransformerCreatorForHtml: DocumentPrinterUsingDom = withTransformerCreator(transformerCreatorForHtml)
 }
 
 object DocumentPrinterUsingDom {
+
+  /** Producer of a DOM `Document`, given the DOM `Document` as factory of DOM objects */
+  type DocumentProducer = (org.w3c.dom.Document => org.w3c.dom.Document)
 
   /** Returns `newInstance(DocumentBuilderFactory.newInstance, TransformerFactory.newInstance)` */
   def newInstance(): DocumentPrinterUsingDom = {
@@ -188,7 +210,12 @@ object DocumentPrinterUsingDom {
     transformerFactory: TransformerFactory,
     transformerCreator: TransformerFactory => Transformer): DocumentPrinterUsingDom = {
 
-    new DocumentPrinterUsingDom(docBuilderFactory, docBuilderCreator, transformerFactory, transformerCreator)
+    new DocumentPrinterUsingDom(
+      docBuilderFactory,
+      docBuilderCreator,
+      transformerFactory,
+      transformerCreator,
+      DomConversions)
   }
 
   val transformerCreatorForHtml: (TransformerFactory => Transformer) = { (tf: TransformerFactory) =>

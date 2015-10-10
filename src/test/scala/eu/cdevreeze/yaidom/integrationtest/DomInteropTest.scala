@@ -30,6 +30,7 @@ import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 
+import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.DomConversions.convertDocument
 import eu.cdevreeze.yaidom.convert.DomConversions.convertElem
 import eu.cdevreeze.yaidom.convert.DomConversions.convertToDocument
@@ -75,7 +76,7 @@ class DomInteropTest extends Suite {
   @Test def testParse(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -149,7 +150,7 @@ class DomInteropTest extends Suite {
 
     val doc = Document(root3)
 
-    val printer = DocumentPrinterUsingDom.newInstance
+    val printer = DocumentPrinterUsingDom.newInstance().withDocumentConverter(DomConversions)
     val xmlString2 = printer.print(doc)
 
     val xmlString3 = printer.print(doc.documentElement)
@@ -276,7 +277,7 @@ class DomInteropTest extends Suite {
   @Test def testParseStrangeXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomInteropTest].getResourceAsStream("strangeXml.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -318,7 +319,7 @@ class DomInteropTest extends Suite {
   @Test def testParseDefaultNamespaceXml(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXml.xml")
 
     val document: Document = domParser.parse(is)
@@ -417,7 +418,7 @@ class DomInteropTest extends Suite {
       db
     }
 
-    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _, DomConversions)
 
     val is = classOf[DomInteropTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -648,7 +649,7 @@ class DomInteropTest extends Suite {
   @Test def testParseXmlWithExpandedEntityRef(): Unit = {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -1082,7 +1083,7 @@ class DomInteropTest extends Suite {
       db
     }
 
-    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _)
+    val domParser = new DocumentParserUsingDom(dbf, createDocumentBuilder _, DomConversions)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 

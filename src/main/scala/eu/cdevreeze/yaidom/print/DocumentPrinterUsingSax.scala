@@ -52,7 +52,8 @@ final class DocumentPrinterUsingSax(
   val documentConverter: DocumentConverter[SaxEventsProducer]) extends AbstractDocumentPrinter {
 
   /**
-   * Returns an adapted copy having the passed DocumentConverter.
+   * Returns an adapted copy having the passed DocumentConverter. This method makes it possible to use an adapted
+   * document converter, which may be needed depending on the JAXP implementation used.
    */
   def withDocumentConverter(newDocumentConverter: DocumentConverter[SaxEventsProducer]): DocumentPrinterUsingSax = {
     new DocumentPrinterUsingSax(

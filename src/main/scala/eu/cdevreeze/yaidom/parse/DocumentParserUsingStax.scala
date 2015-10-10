@@ -24,6 +24,7 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.util.control.Exception.ignoring
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
+import eu.cdevreeze.yaidom.simple.ConverterToDocument
 import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.stream.XMLEventReader
 import javax.xml.stream.XMLInputFactory
@@ -76,7 +77,19 @@ import javax.xml.transform.stream.StreamSource
  *
  * @author Chris de Vreeze
  */
-final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends AbstractDocumentParser {
+final class DocumentParserUsingStax(
+  val inputFactory: XMLInputFactory,
+  val converterToDocument: ConverterToDocument[Iterator[XMLEvent]]) extends AbstractDocumentParser {
+
+  /**
+   * Returns an adapted copy having the passed ConverterToDocument. This method makes it possible to use an adapted
+   * converter, which may be needed depending on the JAXP implementation used.
+   */
+  def withConverterToDocument(newConverterToDocument: ConverterToDocument[Iterator[XMLEvent]]): DocumentParserUsingStax = {
+    new DocumentParserUsingStax(
+      inputFactory,
+      newConverterToDocument)
+  }
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
@@ -85,7 +98,7 @@ final class DocumentParserUsingStax(val inputFactory: XMLInputFactory) extends A
       val streamSource = new StreamSource(inputStream)
       xmlEventReader = inputFactory.createXMLEventReader(streamSource)
 
-      StaxConversions.convertToDocument(StaxConversions.asIterator(xmlEventReader))
+      converterToDocument.convertToDocument(StaxConversions.asIterator(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
         if (xmlEventReader ne null) xmlEventReader.close()
@@ -113,5 +126,6 @@ object DocumentParserUsingStax {
    * Returns a new instance, by invoking the primary constructor.
    * Do not turn off namespace awareness on the `XMLInputFactory` (by default, it is on).
    */
-  def newInstance(inputFactory: XMLInputFactory): DocumentParserUsingStax = new DocumentParserUsingStax(inputFactory)
+  def newInstance(inputFactory: XMLInputFactory): DocumentParserUsingStax =
+    new DocumentParserUsingStax(inputFactory, StaxConversions)
 }

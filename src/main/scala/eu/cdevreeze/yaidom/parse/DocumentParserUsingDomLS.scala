@@ -24,6 +24,7 @@ import org.w3c.dom.ls.LSInput
 import org.w3c.dom.ls.LSParser
 
 import eu.cdevreeze.yaidom.convert.DomConversions
+import eu.cdevreeze.yaidom.simple.ConverterToDocument
 import eu.cdevreeze.yaidom.simple.Document
 
 /**
@@ -79,7 +80,19 @@ import eu.cdevreeze.yaidom.simple.Document
  */
 final class DocumentParserUsingDomLS(
   val domImplementation: DOMImplementationLS,
-  val parserCreator: DOMImplementationLS => LSParser) extends AbstractDocumentParser {
+  val parserCreator: DOMImplementationLS => LSParser,
+  val converterToDocument: ConverterToDocument[org.w3c.dom.Document]) extends AbstractDocumentParser {
+
+  /**
+   * Returns an adapted copy having the passed ConverterToDocument. This method makes it possible to use an adapted
+   * converter, which may be needed depending on the JAXP implementation used.
+   */
+  def withConverterToDocument(newConverterToDocument: ConverterToDocument[org.w3c.dom.Document]): DocumentParserUsingDomLS = {
+    new DocumentParserUsingDomLS(
+      domImplementation,
+      parserCreator,
+      newConverterToDocument)
+  }
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
@@ -91,14 +104,14 @@ final class DocumentParserUsingDomLS(
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
 
-      DomConversions.convertToDocument(domDoc)
+      converterToDocument.convertToDocument(domDoc)
     } finally {
       if (inputStream ne null) inputStream.close()
     }
   }
 
   def withParserCreator(newParserCreator: DOMImplementationLS => LSParser): DocumentParserUsingDomLS = {
-    new DocumentParserUsingDomLS(domImplementation, newParserCreator)
+    new DocumentParserUsingDomLS(domImplementation, newParserCreator, converterToDocument)
   }
 }
 
@@ -131,6 +144,6 @@ object DocumentParserUsingDomLS {
     domImplementation: DOMImplementationLS,
     parserCreator: DOMImplementationLS => LSParser): DocumentParserUsingDomLS = {
 
-    new DocumentParserUsingDomLS(domImplementation, parserCreator)
+    new DocumentParserUsingDomLS(domImplementation, parserCreator, DomConversions)
   }
 }
