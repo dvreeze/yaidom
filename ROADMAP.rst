@@ -3,6 +3,20 @@ ROAD MAP
 ========
 
 
+Towards version 1.6
+===================
+
+Version 1.6.0 must offer a general element creation API.
+
+
+Towards version 1.5
+===================
+
+Version 1.5.0 must have well-defined functional update support. Its functional update API must be consistent, and
+analogous to the transformation API and the core element query API. It must also be useful, and more efficient than
+the transformation API while being almost as easy to use. An update API for indexed elements must also be offered.
+
+
 Towards version 1.4
 ===================
 
