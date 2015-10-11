@@ -431,7 +431,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Update, using a fixed path.
 
     val start2Ms = System.currentTimeMillis()
-    val newDocElem = doc.documentElement withUpdatedElems { (elem, p) =>
+    val newDocElem = doc.documentElement updateElemsWithNodeSeq { (elem, p) =>
       if (p == path) Some(Vector(elem.withChildren(Vector(Text(newPhone, false))))) else None
     }
     val updatedDoc: Document = doc.withDocumentElement(newDocElem)
@@ -449,7 +449,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
 
     val resolvedDocElm = resolved.Elem(doc.documentElement)
-    val resolvedElm2: resolved.Elem = resolvedDocElm withUpdatedElems { (elem, p) =>
+    val resolvedElm2: resolved.Elem = resolvedDocElm updateElemsWithNodeSeq { (elem, p) =>
       if (p == path) Some(Vector(elem.withChildren(Vector(resolved.Text(newPhone))))) else None
     }
 

@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom.queryapitests.resolved
 
+import scala.reflect.classTag
+import scala.reflect.ClassTag
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -35,6 +38,8 @@ class UpdateTest extends AbstractUpdateTest {
 
   final type N = Node
   final type E = Elem
+
+  implicit val clsTag: ClassTag[E] = classTag[Elem]
 
   protected def fromSimpleElem(e: eu.cdevreeze.yaidom.simple.Elem): E = Elem(e)
 
