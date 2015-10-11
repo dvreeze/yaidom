@@ -182,7 +182,9 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigableApi[E] { self: E =>
+trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemApi[E] { self: E =>
+
+  // TODO Rename to UpdatableClarkElemApi
 
   /** Returns the child nodes of this element, in the correct order */
   def children: immutable.IndexedSeq[N]
@@ -252,14 +254,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updated(pathEntry: Path.Entry)(f: E => E): E
 
   /**
-   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to all child elements with the given path entries (compared to this element as root).
-   *
-   * It can be defined as follows (ignoring exceptions):
+   * Returns:
    * {{{
-   * def g(e: E, entry: Path.Entry): immutable.IndexedSeq[N] = Vector(f(e, entry))
-   *
-   * updatedWithNodeSeqAtPathEntries(pathEntries)(g)
+   * updateChildElems(pathEntries)(f)
    * }}}
    */
   def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
@@ -282,27 +279,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updated(path: Path, newElem: E): E
 
   /**
-   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to all descendant-or-self elements with the given paths (compared to this element as root).
-   *
-   * It can be defined (recursively) as follows (ignoring exceptions):
+   * Returns:
    * {{{
-   * def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
-   *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
-   *   val resultWithoutSelf = self.updatedAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
-   *     val newChe = che.updatedAtPaths(pathsByPathEntries(pathEntry).map(_.withoutFirstEntry)) { (elem, relativePath) =>
-   *       f(elem, relativePath.prepend(pathEntry))
-   *     }
-   *     newChe
-   *   }
-   *   if (paths.contains(Path.Root)) f(resultWithoutSelf, Path.Root) else resultWithoutSelf
-   * }
-   * }}}
-   *
-   * For simple elements, it is also equivalent to:
-   * {{{
-   * val pathsReversed = indexed.Elem(this).findAllElemsOrSelf.map(_.path).filter(p => paths.contains(p)).reverse
-   * pathsReversed.foldLeft(self) { case (acc, path) => acc.updated(path) { e => f(e, path) } }
+   * updateElemsOrSelf(paths)(f)
    * }}}
    */
   def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
@@ -346,42 +325,234 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
   /**
-   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to all child elements with the given path entries (compared to this element as root).
-   *
-   * It can be defined as follows (ignoring exceptions):
+   * Returns:
    * {{{
-   * val newChildren = pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2).reverse.foldLeft(children) {
-   *   case (acc, (pathEntry, idx)) =>
-   *     acc.patch(idx, f(acc(idx).asInstanceOf[E], pathEntry), 1)
-   * }
-   * withChildren(newChildren)
+   * updateChildElemsWithNodeSeq(pathEntries)(f)
    * }}}
    */
   def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
 
   /**
-   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
-   * to all descendant elements with the given paths (compared to this element as root), but ignoring the root path.
-   *
-   * It can be defined as follows (ignoring exceptions):
+   * Returns:
    * {{{
-   * def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
-   *   val pathsByPathEntries = paths.filter(path => !path.isRoot).groupBy(path => path.firstEntry)
-   *   val resultWithoutSelf = self.updatedWithNodeSeqAtPathEntries(pathsByPathEntries.keySet) { (che, pathEntry) =>
-   *     val newChe = che.updatedWithNodeSeqAtNonEmptyPaths(pathsByPathEntries(pathEntry).map(_.withoutFirstEntry)) { (elem, relativePath) =>
-   *       f(elem, relativePath.prepend(pathEntry))
-   *     }
-   *     val path = Path(Vector(pathEntry))
-   *     val newNodes = if (paths.contains(path)) f(newChe, path) else Vector(newChe)
-   *     newNodes
-   *   }
-   *   resultWithoutSelf
-   * }
+   * updateElemsWithNodeSeq(paths)(f)
    * }}}
    */
   def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
   @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPaths'", since = "1.5.0")
   def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
+
+  /**
+   * Returns:
+   * {{{
+   * updateChildElems { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }
+   * }}}
+   */
+  def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
+
+  /**
+   * Returns:
+   * {{{
+   * updateChildElemsWithNodeSeq { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }
+   * }}}
+   */
+  def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
+
+  /**
+   * Returns:
+   * {{{
+   * updateElemsOrSelf { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+   * }}}
+   */
+  def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E
+
+  /**
+   * Returns:
+   * {{{
+   * updateElems { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+   * }}}
+   */
+  def updateElems(paths: Set[Path])(f: (E, Path) => E): E
+
+  /**
+   * Returns:
+   * {{{
+   * updateElemsOrSelfWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+   * }}}
+   */
+  def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+
+  /**
+   * Returns:
+   * {{{
+   * updateElemsWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+   * }}}
+   */
+  def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
+
+  /**
+   * Returns `optionallyUpdateChildElems(f).getOrElse(self)`.
+   */
+  def updateChildElems(f: (E, Path.Entry) => Option[E]): E
+
+  /**
+   * Returns `optionallyUpdateChildElemsWithNodeSeq(f).getOrElse(self)`.
+   */
+  def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E
+
+  /**
+   * Returns `optionallyUpdateElemsOrSelf(f).getOrElse(self)`.
+   */
+  def updateElemsOrSelf(f: (E, Path) => Option[E]): E
+
+  /**
+   * Returns `optionallyUpdateElems(f).getOrElse(self)`.
+   */
+  def updateElems(f: (E, Path) => Option[E]): E
+
+  /**
+   * Returns `optionallyUpdateElemsOrSelfWithNodeSeq(f).getOrElse(Vector(self))`.
+   */
+  def updateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N]
+
+  /**
+   * Returns `optionallyUpdateElemsWithNodeSeq(f).getOrElse(self)`.
+   */
+  def updateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E
+
+  /**
+   * Returns the same element, except that child elements have optionally been replaced by applying the given function. Non-element
+   * child nodes occur in the result element unaltered.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * optionallyUpdateChildElemsWithNodeSeq { case (che, pe) => f(che, pe).map(e => Vector(e)) }
+   * }}}
+   */
+  def optionallyUpdateChildElems(f: (E, Path.Entry) => Option[E]): Option[E]
+
+  /**
+   * Returns the same element, except that child elements have optionally been replaced by applying the given function. Non-element
+   * child nodes occur in the result element unaltered.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * val nodeSeqsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
+   *   findAllChildElemsWithPathEntries.map({ case (che, pe) => (pe, f(che, pe)) }).
+   *     filter(_._2.isDefined).map({ case (pe, Some(nodes)) => (pe, nodes) }).toMap
+   *
+   * if (nodeSeqsByPathEntries.isEmpty) None
+   * else {
+   *   val indexesByPathEntries: Seq[(Path.Entry, Int)] =
+   *     nodeSeqsByPathEntries.keySet.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
+   *
+   *   require(indexesByPathEntries.forall(_._2 >= 0), "Expected only non-negative child node indexes")
+   *
+   *   // Updating in reverse order of indexes, in order not to invalidate the path entries
+   *   val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
+   *     case (accChildNodes, (pathEntry, idx)) =>
+   *       val che = accChildNodes(idx).asInstanceOf[E]
+   *       // Expensive assertion
+   *       assert(findChildElemByPathEntry(pathEntry) == Some(che))
+   *       val newNodesOption = f(che, pathEntry)
+   *       assert(newNodesOption.isDefined)
+   *       accChildNodes.patch(idx, newNodesOption.get, 1)
+   *   }
+   *   Some(self.withChildren(newChildren))
+   * }
+   * }}}
+   */
+  def optionallyUpdateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): Option[E]
+
+  /**
+   * Optionally updates the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * val descendantUpdateResult =
+   *   optionallyUpdateChildElems {
+   *     case (che, pathEntry) =>
+   *       // Recursive (but non-tail-recursive) call
+   *       che optionallyUpdateElemsOrSelf {
+   *         case (elm, path) =>
+   *           f(elm, path.prepend(pathEntry))
+   *       }
+   *   }
+   *
+   * descendantUpdateResult.map(e => f(e, Path.Root).getOrElse(e)).orElse(f(self, Path.Root))
+   * }}}
+   *
+   * In other words, returns the equivalent of:
+   * {{{
+   * optionallyUpdateElems(f).map(e => f(e, Path.Root).getOrElse(e)).orElse(f(self, Path.Root))
+   * }}}
+   */
+  def optionallyUpdateElemsOrSelf(f: (E, Path) => Option[E]): Option[E]
+
+  /**
+   * Optionally updates the element by applying the given function to all its descendant elements, in a bottom-up manner.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * optionallyUpdateChildElems {
+   *   case (che, pathEntry) =>
+   *     che optionallyUpdateElemsOrSelf {
+   *       case (elm, path) =>
+   *         f(elm, path.prepend(pathEntry))
+   *     }
+   * }
+   * }}}
+   */
+  def optionallyUpdateElems(f: (E, Path) => Option[E]): Option[E]
+
+  /**
+   * Optionally updates each descendant element with a node sequence by applying the given function to all its descendant-or-self elements,
+   * in a bottom-up manner.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * val descendantUpdateResult =
+   *   optionallyUpdateChildElemsWithNodeSeq {
+   *     case (che, pathEntry) =>
+   *       // Recursive (but non-tail-recursive) call
+   *       che optionallyUpdateElemsOrSelfWithNodeSeq {
+   *         case (elm, path) =>
+   *           f(elm, path.prepend(pathEntry))
+   *       }
+   *   }
+   *
+   * descendantUpdateResult.map(e => f(e, Path.Root).getOrElse(Vector(e))).orElse(f(self, Path.Root))
+   * }}}
+   *
+   * In other words, returns the equivalent of:
+   * {{{
+   * optionallyUpdateElemsWithNodeSeq(f).map(e => f(e, Path.Root).getOrElse(Vector(e))).orElse(f(self, Path.Root))
+   * }}}
+   */
+  def optionallyUpdateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): Option[immutable.IndexedSeq[N]]
+
+  /**
+   * Optionally updates each descendant element with a node sequence by applying the given function to all its descendant elements,
+   * in a bottom-up manner. The function is not applied to this element itself.
+   *
+   * That is, returns the equivalent of:
+   * {{{
+   * optionallyUpdateChildElemsWithNodeSeq {
+   *   case (che, pathEntry) =>
+   *     che optionallyUpdateElemsOrSelfWithNodeSeq {
+   *       case (elm, path) =>
+   *         f(elm, path.prepend(pathEntry))
+   *     }
+   * }
+   * }}}
+   *
+   * It is equivalent to the following expression:
+   * {{{
+   * optionallyUpdateElemsOrSelf { case (e, path) =>
+   *   e optionallyUpdateChildElemsWithNodeSeq { case (che, entry) => f(che, path.append(entry)) }
+   * }
+   * }}}
+   */
+  def optionallyUpdateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): Option[E]
 }

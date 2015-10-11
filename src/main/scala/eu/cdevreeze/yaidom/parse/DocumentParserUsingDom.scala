@@ -142,7 +142,7 @@ object DocumentParserUsingDom {
   }
 
   /**
-   * Returns a new instance, by invoking the primary constructor
+   * Returns a new instance, by invoking the primary constructor.
    * Do not forget to set namespace awareness to true on the `DocumentBuilderFactory`!
    */
   def newInstance(
