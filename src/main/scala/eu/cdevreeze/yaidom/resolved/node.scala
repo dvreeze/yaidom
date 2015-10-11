@@ -27,8 +27,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
+import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
 /**
  * Immutable "resolved" Node. It is called "resolved" because the element trees in this package only contain resolved element and

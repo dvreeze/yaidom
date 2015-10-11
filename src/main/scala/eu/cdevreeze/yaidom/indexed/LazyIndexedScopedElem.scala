@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
- * Very lightweight path-aware element implementation. It offers the `IndexedScopedElemApi` query API. It is optimized
+ * Very lightweight lazy indexed element implementation. It offers the `IndexedScopedElemApi` query API. It is optimized
  * for fast (just-in-time) element creation, not for fast querying. Use this whenever wanting to query for (pairs of
  * elements and) paths, for example to collect the paths before using them to functionally update the element tree.
  *
@@ -40,18 +40,18 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
  *
  * @author Chris de Vreeze
  */
-final class PathAwareScopedElem[U <: ScopedElemApi[U]] private (
+final class LazyIndexedScopedElem[U <: ScopedElemApi[U]] private (
   val docUriOption: Option[URI],
   val rootElem: U,
   val path: Path,
-  val elem: U) extends Nodes.Elem with IndexedScopedElemLike[PathAwareScopedElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedScopedElemLike[LazyIndexedScopedElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
-  final def findAllChildElems: immutable.IndexedSeq[PathAwareScopedElem[U]] = {
+  final def findAllChildElems: immutable.IndexedSeq[LazyIndexedScopedElem[U]] = {
     elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        new PathAwareScopedElem(docUriOption, rootElem, path.append(entry), e)
+        new LazyIndexedScopedElem(docUriOption, rootElem, path.append(entry), e)
     }
   }
 
@@ -60,7 +60,7 @@ final class PathAwareScopedElem[U <: ScopedElemApi[U]] private (
   }
 
   final override def equals(obj: Any): Boolean = obj match {
-    case other: PathAwareScopedElem[U] =>
+    case other: LazyIndexedScopedElem[U] =>
       (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
         (other.path == this.path) && (other.elem == this.elem)
     case _ => false
@@ -69,21 +69,21 @@ final class PathAwareScopedElem[U <: ScopedElemApi[U]] private (
   final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
 }
 
-object PathAwareScopedElem {
+object LazyIndexedScopedElem {
 
-  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): PathAwareScopedElem[U] = {
-    new PathAwareScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): LazyIndexedScopedElem[U] = {
+    new LazyIndexedScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): PathAwareScopedElem[U] = {
-    new PathAwareScopedElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): LazyIndexedScopedElem[U] = {
+    new LazyIndexedScopedElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): PathAwareScopedElem[U] = {
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): LazyIndexedScopedElem[U] = {
     apply(docUriOption, rootElem, Path.Root)
   }
 
-  def apply[U <: ScopedElemApi[U]](rootElem: U): PathAwareScopedElem[U] = {
+  def apply[U <: ScopedElemApi[U]](rootElem: U): LazyIndexedScopedElem[U] = {
     apply(None, rootElem, Path.Root)
   }
 }

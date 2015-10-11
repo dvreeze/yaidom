@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
- * Very lightweight path-aware element implementation. It offers the `IndexedClarkElemApi` query API. It is optimized
+ * Very lightweight lazy indexed element implementation. It offers the `IndexedClarkElemApi` query API. It is optimized
  * for fast (just-in-time) element creation, not for fast querying. Use this whenever wanting to query for (pairs of
  * elements and) paths, for example to collect the paths before using them to functionally update the element tree.
  *
@@ -38,18 +38,18 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
  *
  * @author Chris de Vreeze
  */
-final class PathAwareClarkElem[U <: ClarkElemApi[U]] private (
+final class LazyIndexedClarkElem[U <: ClarkElemApi[U]] private (
   val docUriOption: Option[URI],
   val rootElem: U,
   val path: Path,
-  val elem: U) extends Nodes.Elem with IndexedClarkElemLike[PathAwareClarkElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedClarkElemLike[LazyIndexedClarkElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
-  final def findAllChildElems: immutable.IndexedSeq[PathAwareClarkElem[U]] = {
+  final def findAllChildElems: immutable.IndexedSeq[LazyIndexedClarkElem[U]] = {
     elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        new PathAwareClarkElem(docUriOption, rootElem, path.append(entry), e)
+        new LazyIndexedClarkElem(docUriOption, rootElem, path.append(entry), e)
     }
   }
 
@@ -58,7 +58,7 @@ final class PathAwareClarkElem[U <: ClarkElemApi[U]] private (
   }
 
   final override def equals(obj: Any): Boolean = obj match {
-    case other: PathAwareClarkElem[U] =>
+    case other: LazyIndexedClarkElem[U] =>
       (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
         (other.path == this.path) && (other.elem == this.elem)
     case _ => false
@@ -67,21 +67,21 @@ final class PathAwareClarkElem[U <: ClarkElemApi[U]] private (
   final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
 }
 
-object PathAwareClarkElem {
+object LazyIndexedClarkElem {
 
-  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): PathAwareClarkElem[U] = {
-    new PathAwareClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): LazyIndexedClarkElem[U] = {
+    new LazyIndexedClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): PathAwareClarkElem[U] = {
-    new PathAwareClarkElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): LazyIndexedClarkElem[U] = {
+    new LazyIndexedClarkElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): PathAwareClarkElem[U] = {
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): LazyIndexedClarkElem[U] = {
     apply(docUriOption, rootElem, Path.Root)
   }
 
-  def apply[U <: ClarkElemApi[U]](rootElem: U): PathAwareClarkElem[U] = {
+  def apply[U <: ClarkElemApi[U]](rootElem: U): LazyIndexedClarkElem[U] = {
     apply(None, rootElem, Path.Root)
   }
 }

@@ -23,31 +23,10 @@ package eu.cdevreeze.yaidom
  * '''Generic code abstracting over yaidom element implementations should either use
  * trait `ClarkElemApi` or sub-trait `ScopedElemApi`, depending on the abstraction level.'''
  *
+ * Most API traits are orthogonal, but some API traits are useful combinations of other ones. Examples include
+ * the above-mentioned `ClarkElemApi` and `ScopedElemApi` traits.
+ *
  * This package depends only on the core package in yaidom, but many other packages do depend on this one.
- *
- * ==Notes on migration from yaidom 1.0 to 1.1 and later==
- *
- * When migrating from yaidom 1.0 to 1.1 or later, there are many breaking changes in the query API traits to deal
- * with. Not only was the query API moved to its own package, but also was the inheritance hierarchy (of 1.0)
- * abandoned, and were some traits renamed. The most important renaming was from `ParentElemApi` to `ElemApi`,
- * where the 1.0 `ElemApi` became `ElemApi with HasENameApi` (where the `HasENameApi` companion object contains
- * an implicit class converting ENames to element predicates).
- *
- * Also, trait `PathAwareElemApi` has been removed. Typically, "indexed elements" are more powerful.
- *
- * The query API traits in 1.1 and later are more orthogonal (after all, the inheritance hierarchy is no longer there).
- * We can even simulate the 1.0 query API traits by combining 1.1 traits, keeping renaming in mind:
- * <ul>
- * <li>`ParentElemApi` (1.0) ==> `ElemApi` (1.1)</li>
- * <li>`ElemApi` (1.0) ==> `ElemApi with HasENameApi` (1.1)</li>
- * <li>`NavigableElemApi` (1.0) ==> `ElemApi with HasENameApi with IsNavigableApi` (1.1)</li>
- * <li>`UpdatableElemApi` minus `PathAwareElemApi` (1.0) ==> `ElemApi with HasENameApi with UpdatableElemApi` (1.1)</li>
- * <li>`TransformableElemApi` (1.0) ==> `TransformableElemApi` (1.1)</li>
- * <li>`SubtypeAwareParentElemApi` (1.0) ==> `SubtypeAwareElemApi` (1.1)</li>
- * </ul>
- *
- * The fact that the 1.0 query API traits can be simulated by (combinations of) 1.1 query API traits shows how
- * orthogonality of the query API has improved in version 1.1.
  *
  * @author Chris de Vreeze
  */
