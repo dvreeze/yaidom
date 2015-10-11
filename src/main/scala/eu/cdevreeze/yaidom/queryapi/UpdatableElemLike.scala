@@ -213,7 +213,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
           val che = accChildNodes(idx).asInstanceOf[E]
           // Expensive assertion
           assert(findChildElemByPathEntry(pathEntry) == Some(che))
-          val newNodesOption = f(che, pathEntry)
+          val newNodesOption = nodeSeqsByPathEntries.get(pathEntry)
           assert(newNodesOption.isDefined)
           accChildNodes.patch(idx, newNodesOption.get, 1)
       }

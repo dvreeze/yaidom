@@ -254,10 +254,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updated(pathEntry: Path.Entry)(f: E => E): E
 
   /**
-   * Returns:
-   * {{{
-   * updateChildElems(pathEntries)(f)
-   * }}}
+   * Returns `updateChildElems(pathEntries)(f)`
    */
   def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
 
@@ -279,10 +276,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updated(path: Path, newElem: E): E
 
   /**
-   * Returns:
-   * {{{
-   * updateElemsOrSelf(paths)(f)
-   * }}}
+   * Returns `updateElemsOrSelf(paths)(f)`
    */
   def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
 
@@ -325,18 +319,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
   /**
-   * Returns:
-   * {{{
-   * updateChildElemsWithNodeSeq(pathEntries)(f)
-   * }}}
+   * Returns `updateChildElemsWithNodeSeq(pathEntries)(f)`
    */
   def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns:
-   * {{{
-   * updateElemsWithNodeSeq(paths)(f)
-   * }}}
+   * Returns `updateElemsWithNodeSeq(paths)(f)`
    */
   def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
@@ -344,50 +332,32 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns:
-   * {{{
-   * updateChildElems { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }
-   * }}}
+   * Returns `updateChildElems { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }`
    */
   def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
 
   /**
-   * Returns:
-   * {{{
-   * updateChildElemsWithNodeSeq { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }
-   * }}}
+   * Returns `updateChildElemsWithNodeSeq { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }`
    */
   def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns:
-   * {{{
-   * updateElemsOrSelf { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
-   * }}}
+   * Returns `updateElemsOrSelf { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
    */
   def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E
 
   /**
-   * Returns:
-   * {{{
-   * updateElems { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
-   * }}}
+   * Returns `updateElems { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
    */
   def updateElems(paths: Set[Path])(f: (E, Path) => E): E
 
   /**
-   * Returns:
-   * {{{
-   * updateElemsOrSelfWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
-   * }}}
+   * Returns `updateElemsOrSelfWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
    */
   def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
 
   /**
-   * Returns:
-   * {{{
-   * updateElemsWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
-   * }}}
+   * Returns `updateElemsWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
    */
   def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
@@ -440,7 +410,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
    * {{{
    * val nodeSeqsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
    *   findAllChildElemsWithPathEntries.map({ case (che, pe) => (pe, f(che, pe)) }).
-   *     filter(_._2.isDefined).map({ case (pe, Some(nodes)) => (pe, nodes) }).toMap
+   *     collect({ case (pe, Some(nodes)) => (pe, nodes) }).toMap
    *
    * if (nodeSeqsByPathEntries.isEmpty) None
    * else {
@@ -455,7 +425,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
    *       val che = accChildNodes(idx).asInstanceOf[E]
    *       // Expensive assertion
    *       assert(findChildElemByPathEntry(pathEntry) == Some(che))
-   *       val newNodesOption = f(che, pathEntry)
+   *       val newNodesOption = nodeSeqsByPathEntries.get(pathEntry)
    *       assert(newNodesOption.isDefined)
    *       accChildNodes.patch(idx, newNodesOption.get, 1)
    *   }
