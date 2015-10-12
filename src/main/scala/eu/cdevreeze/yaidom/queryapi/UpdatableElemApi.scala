@@ -240,15 +240,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def minusChild(index: Int): E
 
   /**
-   * '''Core method''' that "functionally updates" the tree with this element as root element, by applying the passed function
+   * Functionally updates the tree with this element as root element, by applying the passed function
    * to the element that has the given [[eu.cdevreeze.yaidom.core.Path.Entry]] (compared to this element as root).
-   *
-   * The method throws an exception if no element is found with the given path entry.
    *
    * It can be defined as follows:
    * {{{
-   * val idx = self.childNodeIndex(pathEntry)
-   * self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
+   * updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
    * }}}
    */
   def updated(pathEntry: Path.Entry)(f: E => E): E
@@ -259,15 +256,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
 
   /**
-   * Method that "functionally updates" the tree with this element as root element, by applying the passed function
+   * Functionally updates the tree with this element as root element, by applying the passed function
    * to the element that has the given [[eu.cdevreeze.yaidom.core.Path]] (compared to this element as root).
    *
-   * The method throws an exception if no element is found with the given path.
-   *
-   * It can be defined (recursively) as follows:
+   * It can be defined as follows:
    * {{{
-   * if (path == Path.Root) f(self)
-   * else updated(path.firstEntry) { e => e.updated(path.withoutFirstEntry)(f) }
+   * updateElemsOrSelf(Set(path)) { case (e, path) => f(e) }
    * }}}
    */
   def updated(path: Path)(f: E => E): E
@@ -281,31 +275,14 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
 
   /**
-   * "Functionally updates" the tree with this element as root element, by applying the passed function to the element
+   * Functionally updates the tree with this element as root element, by applying the passed function to the element
    * that has the given [[eu.cdevreeze.yaidom.core.Path]] (compared to this element as root). If the given path is the
    * root path, this element itself is returned unchanged.
    *
    * This function could be defined as follows:
    * {{{
-   * // First define function g as follows:
-   *
-   * def g(e: Elem): Elem = {
-   *   if (path == Path.Root) e
-   *   else {
-   *     e.withPatchedChildren(
-   *       e.childNodeIndex(path.lastEntry),
-   *       f(e.findChildElemByPathEntry(path.lastEntry).get),
-   *       1)
-   *   }
-   * }
-   *
-   * // Then the function updatedWithNodeSeq(path)(f) could be defined as:
-   *
-   * updated(path.parentPathOption.getOrElse(Path.Root))(g)
+   * updateElemsWithNodeSeq(Set(path)) { case (e, path) => f(e) }
    * }}}
-   * After all, this is just a functional update that replaces the parent element, if it exists.
-   *
-   * The method throws an exception if no element is found with the given path.
    */
   def updatedWithNodeSeqIfPathNonEmpty(path: Path)(f: E => immutable.IndexedSeq[N]): E
 
@@ -332,32 +309,138 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns `updateChildElems { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }`
+   * Updates the child elements with the given path entries, applying the passed update function.
+   *
+   * That is, returns:
+   * {{{
+   * updateChildElemsWithNodeSeq(pathEntries) { case (che, pe) => Vector(f(che, pe)) }
+   * }}}
+   *
+   * If the set of path entries is small, this method is rather efficient.
    */
   def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
 
   /**
-   * Returns `updateChildElemsWithNodeSeq { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }`
+   * Updates the child elements with the given path entries, applying the passed update function.
+   *
+   * That is, returns:
+   * {{{
+   * if (pathEntries.isEmpty) self
+   * else {
+   *   val indexesByPathEntries: Seq[(Path.Entry, Int)] =
+   *     pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).filter(_._2 >= 0).sortBy(_._2)
+   *
+   *   // Updating in reverse order of indexes, in order not to invalidate the path entries
+   *   val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
+   *     case (accChildNodes, (pathEntry, idx)) =>
+   *       val che = accChildNodes(idx).asInstanceOf[E]
+   *       accChildNodes.patch(idx, f(che, pathEntry), 1)
+   *   }
+   *   self.withChildren(newChildren)
+   * }
+   * }}}
+   *
+   * If the set of path entries is small, this method is rather efficient.
    */
   def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns `updateElemsOrSelf { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
+   * Updates the descendant-or-self elements with the given paths, applying the passed update function.
+   *
+   * That is, returns:
+   * {{{
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   *
+   * val descendantUpdateResult =
+   *   updateChildElems(pathsByFirstEntry.keySet) {
+   *     case (che, pathEntry) =>
+   *       // Recursive (but non-tail-recursive) call
+   *       che.updateElemsOrSelf(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *         case (elm, path) =>
+   *           f(elm, path.prepend(pathEntry))
+   *       }
+   *   }
+   *
+   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else descendantUpdateResult
+   * }}}
+   *
+   * In other words, returns:
+   * {{{
+   * val descendantUpdateResult = updateElems(paths)(f)
+   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else descendantUpdateResult
+   * }}}
+   *
+   * If the set of paths is small, this method is rather efficient.
    */
   def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E
 
   /**
-   * Returns `updateElems { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
+   * Updates the descendant elements with the given paths, applying the passed update function.
+   *
+   * That is, returns:
+   * {{{
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   *
+   * updateChildElems(pathsByFirstEntry.keySet) {
+   *   case (che, pathEntry) =>
+   *     che.updateElemsOrSelf(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *       case (elm, path) =>
+   *         f(elm, path.prepend(pathEntry))
+   *     }
+   * }
+   * }}}
+   *
+   * If the set of paths is small, this method is rather efficient.
    */
   def updateElems(paths: Set[Path])(f: (E, Path) => E): E
 
   /**
-   * Returns `updateElemsOrSelfWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
+   * Updates the descendant-or-self elements with the given paths, applying the passed update function.
+   *
+   * That is, returns:
+   * {{{
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   *
+   * val descendantUpdateResult =
+   *   updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
+   *     case (che, pathEntry) =>
+   *       // Recursive (but non-tail-recursive) call
+   *       che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *         case (elm, path) =>
+   *           f(elm, path.prepend(pathEntry))
+   *       }
+   *   }
+   *
+   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else Vector(descendantUpdateResult)
+   * }}}
+   *
+   * In other words, returns:
+   * {{{
+   * val descendantUpdateResult = updateElemsWithNodeSeq(paths)(f)
+   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else Vector(descendantUpdateResult)
+   * }}}
+   *
+   * If the set of paths is small, this method is rather efficient.
    */
   def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
 
   /**
-   * Returns `updateElemsWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }`
+   * Updates the descendant elements with the given paths, applying the passed update function.
+   *
+   * That is, returns:
+   * {{{
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   *
+   * updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
+   *   case (che, pathEntry) =>
+   *     che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *       case (elm, path) =>
+   *         f(elm, path.prepend(pathEntry))
+   *     }
+   * }
+   * }}}
+   *
+   * If the set of paths is small, this method is rather efficient.
    */
   def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 

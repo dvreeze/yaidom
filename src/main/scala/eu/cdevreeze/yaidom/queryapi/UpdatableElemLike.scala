@@ -90,10 +90,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
   }
 
   final def updated(pathEntry: Path.Entry)(f: E => E): E = {
-    val idx = self.childNodeIndex(pathEntry)
-    require(idx >= 0, "Expected non-negative child node index")
-
-    self.withUpdatedChildren(idx, f(children(idx).asInstanceOf[E]))
+    updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
   }
 
   final def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
@@ -101,12 +98,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
   }
 
   final def updated(path: Path)(f: E => E): E = {
-    if (path == Path.Root) f(self)
-    else {
-      // Recursive, but not tail-recursive
-
-      updated(path.firstEntry) { e => e.updated(path.withoutFirstEntry)(f) }
-    }
+    updateElemsOrSelf(Set(path)) { case (e, path) => f(e) }
   }
 
   final def updated(path: Path, newElem: E): E = updated(path) { e => newElem }
@@ -116,22 +108,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
   }
 
   final def updatedWithNodeSeqIfPathNonEmpty(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
-    if (path == Path.Root) self
-    else {
-      assert(path.parentPathOption.isDefined)
-      val parentPath = path.parentPath
-      val parentElem = findElemOrSelfByPath(parentPath).getOrElse(sys.error(s"Incorrect parent path $parentPath"))
-
-      val lastEntry = path.lastEntry
-      val childNodeIndex = parentElem.childNodeIndex(lastEntry)
-      require(childNodeIndex >= 0, s"Incorrect path entry $lastEntry")
-
-      val childElemOption = parentElem.findChildElemByPathEntry(lastEntry)
-      assert(childElemOption.isDefined)
-      val childElem = childElemOption.get
-
-      updated(parentPath, parentElem.withPatchedChildren(childNodeIndex, f(childElem), 1))
-    }
+    updateElemsWithNodeSeq(Set(path)) { case (e, path) => f(e) }
   }
 
   @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
@@ -155,23 +132,81 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
   final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E =
     updatedWithNodeSeqAtNonEmptyPaths(paths)(f)
 
-  final def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E =
-    updateChildElems { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }
+  final def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
+    updateChildElemsWithNodeSeq(pathEntries) { case (che, pe) => Vector(f(che, pe)) }
+  }
 
-  final def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E =
-    updateChildElemsWithNodeSeq { case (che, pathEntry) => if (pathEntries.contains(pathEntry)) Some(f(che, pathEntry)) else None }
+  final def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {
+    if (pathEntries.isEmpty) self
+    else {
+      val indexesByPathEntries: Seq[(Path.Entry, Int)] =
+        pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).filter(_._2 >= 0).sortBy(_._2)
 
-  final def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E =
-    updateElemsOrSelf { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+      // Updating in reverse order of indexes, in order not to invalidate the path entries
+      val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
+        case (accChildNodes, (pathEntry, idx)) =>
+          val che = accChildNodes(idx).asInstanceOf[E]
+          accChildNodes.patch(idx, f(che, pathEntry), 1)
+      }
+      self.withChildren(newChildren)
+    }
+  }
 
-  final def updateElems(paths: Set[Path])(f: (E, Path) => E): E =
-    updateElems { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+  final def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E = {
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
 
-  final def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] =
-    updateElemsOrSelfWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+    val descendantUpdateResult =
+      updateChildElems(pathsByFirstEntry.keySet) {
+        case (che, pathEntry) =>
+          // Recursive (but non-tail-recursive) call
+          che.updateElemsOrSelf(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+            case (elm, path) =>
+              f(elm, path.prepend(pathEntry))
+          }
+      }
 
-  final def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E =
-    updateElemsWithNodeSeq { case (e, path) => if (paths.contains(path)) Some(f(e, path)) else None }
+    if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else descendantUpdateResult
+  }
+
+  final def updateElems(paths: Set[Path])(f: (E, Path) => E): E = {
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+
+    updateChildElems(pathsByFirstEntry.keySet) {
+      case (che, pathEntry) =>
+        che.updateElemsOrSelf(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+          case (elm, path) =>
+            f(elm, path.prepend(pathEntry))
+        }
+    }
+  }
+
+  final def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+
+    val descendantUpdateResult =
+      updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
+        case (che, pathEntry) =>
+          // Recursive (but non-tail-recursive) call
+          che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+            case (elm, path) =>
+              f(elm, path.prepend(pathEntry))
+          }
+      }
+
+    if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else Vector(descendantUpdateResult)
+  }
+
+  final def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+
+    updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
+      case (che, pathEntry) =>
+        che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+          case (elm, path) =>
+            f(elm, path.prepend(pathEntry))
+        }
+    }
+  }
 
   final def updateChildElems(f: (E, Path.Entry) => Option[E]): E =
     optionallyUpdateChildElems(f).getOrElse(self)
