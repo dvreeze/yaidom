@@ -56,7 +56,7 @@ class AnotherUpdateTest extends Suite {
 
     val deleteMags: Elem => Vector[Node] = {
       case elem: Elem if elem.localName == "Magazine" => Vector[Node]()
-      case elem: Elem => Vector(elem)
+      case elem: Elem                                 => Vector(elem)
     }
 
     val docWithoutMags: Document = doc.transformElemsToNodeSeq(deleteMags)
@@ -119,7 +119,7 @@ class AnotherUpdateTest extends Suite {
       indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
-      val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
+      val result = doc.updateElemWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -193,7 +193,7 @@ class AnotherUpdateTest extends Suite {
       indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
-      val result = doc.updatedWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
+      val result = doc.updateElemWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
@@ -265,7 +265,7 @@ class AnotherUpdateTest extends Suite {
 
     val insertBook: Elem => Elem = {
       case e: Elem if e.localName == "Bookstore" => e.plusChild(0, newBook)
-      case e: Elem => e
+      case e: Elem                               => e
     }
 
     val docWithScalaBook: Document = {
@@ -358,17 +358,17 @@ class AnotherUpdateTest extends Suite {
       }
     }
 
-    val updatedElem = elem.updated(path.parentPathOption.getOrElse(Path.Root))(g)
+    val updatedElem = elem.updateElemOrSelf(path.parentPathOption.getOrElse(Path.Root))(g)
 
     assertResult(resolved.Elem(updatedElem)) {
-      resolved.Elem(elem.updatedWithNodeSeqIfPathNonEmpty(path)(f))
+      resolved.Elem(elem.updateElemWithNodeSeq(path)(f))
     }
   }
 
   private def testPropertyAboutTransformChildElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
     val expectedResult =
       indexed.Elem(elem).findAllChildElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
-        acc.updated(path)(f)
+        acc.updateElemOrSelf(path)(f)
       }
 
     assertResult(resolved.Elem(expectedResult)) {
@@ -376,7 +376,7 @@ class AnotherUpdateTest extends Suite {
     }
 
     val expectedResult2 = elem.findAllChildElemsWithPathEntries.map(_._2).reverse.foldLeft(elem) { (acc, pathEntry) =>
-      acc.updated(pathEntry)(f)
+      acc.updateChildElem(pathEntry)(f)
     }
 
     assertResult(resolved.Elem(expectedResult2)) {
@@ -387,7 +387,7 @@ class AnotherUpdateTest extends Suite {
   private def testPropertyAboutTransformElemsOrSelfInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
     val expectedResult =
       indexed.Elem(elem).findAllElemsOrSelf.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
-        acc.updated(path)(f)
+        acc.updateElemOrSelf(path)(f)
       }
 
     assertResult(resolved.Elem(expectedResult)) {
@@ -398,7 +398,7 @@ class AnotherUpdateTest extends Suite {
   private def testPropertyAboutTransformElemsInTermsOfUpdated(elem: Elem, f: Elem => Elem): Unit = {
     val expectedResult =
       indexed.Elem(elem).findAllElems.map(_.path).reverse.foldLeft(elem) { (acc, path) =>
-        acc.updated(path)(f)
+        acc.updateElemOrSelf(path)(f)
       }
 
     assertResult(resolved.Elem(expectedResult)) {

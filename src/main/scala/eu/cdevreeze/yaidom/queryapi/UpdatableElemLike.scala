@@ -89,48 +89,24 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
     withPatchedChildren(index, Vector(), 1)
   }
 
-  final def updated(pathEntry: Path.Entry)(f: E => E): E = {
+  final def updateChildElem(pathEntry: Path.Entry)(f: E => E): E = {
     updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
   }
 
-  final def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
-    updateChildElems(pathEntries)(f)
-  }
-
-  final def updated(path: Path)(f: E => E): E = {
+  final def updateElemOrSelf(path: Path)(f: E => E): E = {
     updateElemsOrSelf(Set(path)) { case (e, path) => f(e) }
   }
 
-  final def updated(path: Path, newElem: E): E = updated(path) { e => newElem }
+  final def updateElemOrSelf(path: Path, newElem: E): E =
+    updateElemOrSelf(path) { e => newElem }
 
-  final def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
-    updateElemsOrSelf(paths)(f)
-  }
-
-  final def updatedWithNodeSeqIfPathNonEmpty(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
+  final def updateElemWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
     updateElemsWithNodeSeq(Set(path)) { case (e, path) => f(e) }
   }
 
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
-  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = updatedWithNodeSeqIfPathNonEmpty(path)(f)
-
-  final def updatedWithNodeSeqIfPathNonEmpty(path: Path, newNodes: immutable.IndexedSeq[N]): E =
-    updatedWithNodeSeqIfPathNonEmpty(path) { e => newNodes }
-
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
-  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E = updatedWithNodeSeqIfPathNonEmpty(path, newNodes)
-
-  final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {
-    updateChildElemsWithNodeSeq(pathEntries)(f)
+  final def updateElemWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E = {
+    updateElemWithNodeSeq(path) { e => newNodes }
   }
-
-  final def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
-    updateElemsWithNodeSeq(paths)(f)
-  }
-
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPaths'", since = "1.5.0")
-  final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E =
-    updatedWithNodeSeqAtNonEmptyPaths(paths)(f)
 
   final def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
     updateChildElemsWithNodeSeq(pathEntries) { case (che, pe) => Vector(f(che, pe)) }
@@ -302,5 +278,50 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
             f(elm, path.prepend(pathEntry))
         }
     }
+  }
+
+  @deprecated(message = "Renamed to 'updateChildElem'", since = "1.5.0")
+  final def updated(pathEntry: Path.Entry)(f: E => E): E = {
+    updateChildElem(pathEntry)(f)
+  }
+
+  @deprecated(message = "Renamed to 'updateChildElems'", since = "1.5.0")
+  final def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
+    updateChildElems(pathEntries)(f)
+  }
+
+  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
+  final def updated(path: Path)(f: E => E): E = {
+    updateElemOrSelf(path)(f)
+  }
+
+  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
+  final def updated(path: Path, newElem: E): E = {
+    updateElemOrSelf(path, newElem)
+  }
+
+  @deprecated(message = "Renamed to 'updateElemsOrSelf'", since = "1.5.0")
+  final def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E = {
+    updateElemsOrSelf(paths)(f)
+  }
+
+  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
+  final def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E = {
+    updateElemWithNodeSeq(path)(f)
+  }
+
+  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
+  final def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E = {
+    updateElemWithNodeSeq(path, newNodes)
+  }
+
+  @deprecated(message = "Renamed to 'updateChildElemsWithNodeSeq'", since = "1.5.0")
+  final def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {
+    updateChildElemsWithNodeSeq(pathEntries)(f)
+  }
+
+  @deprecated(message = "Renamed to 'updateElemsWithNodeSeq'", since = "1.5.0")
+  final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
+    updateElemsWithNodeSeq(paths)(f)
   }
 }

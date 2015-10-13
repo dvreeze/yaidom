@@ -267,7 +267,7 @@ class EqualityTest extends Suite {
 
     val path = PathBuilder.from(QName("foobar:child") -> 0).build(scope)
 
-    val root3 = root2.updated(path) {
+    val root3 = root2.updateElemOrSelf(path) {
       e =>
         val newChildren: immutable.IndexedSeq[Node] = e.children flatMap { (n: Node) =>
           n match {

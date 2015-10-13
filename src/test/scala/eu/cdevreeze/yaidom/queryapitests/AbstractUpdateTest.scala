@@ -85,7 +85,7 @@ abstract class AbstractUpdateTest extends Suite {
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
 
-    val newRootElem = rootElem.updatedAtPaths(paths) {
+    val newRootElem = rootElem.updateElemsOrSelf(paths) {
       case (e, p) => updateMeasure(e)
     }
 
@@ -98,7 +98,7 @@ abstract class AbstractUpdateTest extends Suite {
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
 
-    val newRootElem = rootElem.updatedWithNodeSeqAtNonEmptyPaths(paths) {
+    val newRootElem = rootElem.updateElemsWithNodeSeq(paths) {
       case (e, p) => Vector(updateMeasure(e))
     }
 

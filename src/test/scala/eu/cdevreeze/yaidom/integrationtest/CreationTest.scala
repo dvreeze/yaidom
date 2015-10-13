@@ -395,7 +395,7 @@ class CreationTest extends Suite {
     val authorsPath = indexed.Elem(booksElm).findElem(_.resolvedName == EName("{http://bookstore}Authors")).map(_.path).
       getOrElse(sys.error("No 'Authors' element found"))
 
-    val updatedBooksElm: simple.Elem = booksElm.updated(authorsPath) {
+    val updatedBooksElm: simple.Elem = booksElm.updateElemOrSelf(authorsPath) {
       e => e.plusChild(authorElm)
     }
 

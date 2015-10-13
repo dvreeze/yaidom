@@ -192,14 +192,14 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
   /** Returns an element with the same name, attributes and scope as this element, but with the given child nodes */
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
-  /** Shorthand for `withChildren(newChildSeqs.flatten)` */
-  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): E
-
   /**
    * Returns the child node index of the child element at the given path entry, if any, and -1 otherwise.
    * The faster this method is, the better.
    */
   def childNodeIndex(childPathEntry: Path.Entry): Int
+
+  /** Shorthand for `withChildren(newChildSeqs.flatten)` */
+  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): E
 
   /** Shorthand for `withChildren(children.updated(index, newChild))` */
   def withUpdatedChildren(index: Int, newChild: N): E
@@ -248,12 +248,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
    * updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
    * }}}
    */
-  def updated(pathEntry: Path.Entry)(f: E => E): E
-
-  /**
-   * Returns `updateChildElems(pathEntries)(f)`
-   */
-  def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
+  def updateChildElem(pathEntry: Path.Entry)(f: E => E): E
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -264,15 +259,10 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
    * updateElemsOrSelf(Set(path)) { case (e, path) => f(e) }
    * }}}
    */
-  def updated(path: Path)(f: E => E): E
+  def updateElemOrSelf(path: Path)(f: E => E): E
 
-  /** Returns `updated(path) { e => newElem }` */
-  def updated(path: Path, newElem: E): E
-
-  /**
-   * Returns `updateElemsOrSelf(paths)(f)`
-   */
-  def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
+  /** Returns `updateElemOrSelf(path) { e => newElem }` */
+  def updateElemOrSelf(path: Path, newElem: E): E
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function to the element
@@ -284,29 +274,10 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
    * updateElemsWithNodeSeq(Set(path)) { case (e, path) => f(e) }
    * }}}
    */
-  def updatedWithNodeSeqIfPathNonEmpty(path: Path)(f: E => immutable.IndexedSeq[N]): E
+  def updateElemWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
 
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
-
-  /** Returns `updatedWithNodeSeqIfPathNonEmpty(path) { e => newNodes }` */
-  def updatedWithNodeSeqIfPathNonEmpty(path: Path, newNodes: immutable.IndexedSeq[N]): E
-
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqIfPathNonEmpty'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
-
-  /**
-   * Returns `updateChildElemsWithNodeSeq(pathEntries)(f)`
-   */
-  def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
-
-  /**
-   * Returns `updateElemsWithNodeSeq(paths)(f)`
-   */
-  def updatedWithNodeSeqAtNonEmptyPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
-
-  @deprecated(message = "Renamed to 'updatedWithNodeSeqAtNonEmptyPaths'", since = "1.5.0")
-  def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
+  /** Returns `updateElemWithNodeSeq(path) { e => newNodes }` */
+  def updateElemWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
 
   /**
    * Updates the child elements with the given path entries, applying the passed update function.
@@ -608,4 +579,31 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
    * }}}
    */
   def optionallyUpdateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): Option[E]
+
+  @deprecated(message = "Renamed to 'updateChildElem'", since = "1.5.0")
+  def updated(pathEntry: Path.Entry)(f: E => E): E
+
+  @deprecated(message = "Renamed to 'updateChildElems'", since = "1.5.0")
+  def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
+
+  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
+  def updated(path: Path)(f: E => E): E
+
+  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
+  def updated(path: Path, newElem: E): E
+
+  @deprecated(message = "Renamed to 'updateElemsOrSelf'", since = "1.5.0")
+  def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
+
+  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
+  def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
+
+  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
+  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
+
+  @deprecated(message = "Renamed to 'updateChildElemsWithNodeSeq'", since = "1.5.0")
+  def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
+
+  @deprecated(message = "Renamed to 'updateElemsWithNodeSeq'", since = "1.5.0")
+  def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 }

@@ -317,7 +317,7 @@ class UpdateTest extends Suite {
     matchingPaths.reverse.foldLeft(rootElm) { (acc, path) =>
       require(rootElm.findElemOrSelfByPath(path).isDefined)
 
-      acc.updated(path) { case e => upd(e, attrName) }
+      acc.updateElemOrSelf(path) { case e => upd(e, attrName) }
     }
   }
 
@@ -327,7 +327,7 @@ class UpdateTest extends Suite {
         e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
       } map (_.path)
 
-    rootElm.updatedAtPaths(matchingPaths.toSet) { (elem, path) =>
+    rootElm.updateElemsOrSelf(matchingPaths.toSet) { (elem, path) =>
       require(rootElm.findElemOrSelfByPath(path).isDefined)
       upd(elem, attrName)
     }

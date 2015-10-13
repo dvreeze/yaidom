@@ -75,7 +75,7 @@ class AlternativeUpdatesTest extends Suite {
   @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths(): Unit = {
     val paths = indexed.Elem(bookstore).findAllElemsOrSelf.map(_.path).toSet
 
-    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+    val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
       elem match {
         case e: Elem if e.localName == "Authors" =>
           val authors = e.filterChildElems(che => che.localName == "Author")
@@ -92,7 +92,7 @@ class AlternativeUpdatesTest extends Suite {
   @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths(): Unit = {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
 
-    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+    val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
       elem match {
         case e: Elem if e.localName == "Authors" =>
           val authors = e.filterChildElems(che => che.localName == "Author")
@@ -109,7 +109,7 @@ class AlternativeUpdatesTest extends Suite {
   @Test def testRetainFirstAuthorsUsingUpdatedAtPaths(): Unit = {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
 
-    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+    val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
       require(elem.localName == "Authors")
       val authors = elem.filterChildElems(che => che.localName == "Author")
       elem.withChildren(authors.take(1))
@@ -123,7 +123,7 @@ class AlternativeUpdatesTest extends Suite {
   @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths(): Unit = {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Author").map(_.path).toSet
 
-    val updatedElem = bookstore.updatedWithNodeSeqAtNonEmptyPaths(paths) { (elem, path) =>
+    val updatedElem = bookstore.updateElemsWithNodeSeq(paths) { (elem, path) =>
       require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")
       if (path.lastEntry.index == 0) Vector(elem) else Vector()
     }
@@ -165,7 +165,7 @@ class AlternativeUpdatesTest extends Suite {
     var foundPaths = Vector[Path]()
     var foundElemsWithoutChildren = Vector[Elem]()
 
-    val updatedElem = bookstore.updatedAtPaths(paths) { (elem, path) =>
+    val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
       foundPaths = foundPaths :+ path
       foundElemsWithoutChildren = foundElemsWithoutChildren :+ elem.withChildren(Vector())
 

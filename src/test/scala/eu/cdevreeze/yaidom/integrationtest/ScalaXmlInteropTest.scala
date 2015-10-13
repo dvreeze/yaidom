@@ -459,7 +459,7 @@ class ScalaXmlInteropTest extends Suite {
 
     val countryPath = PathBuilder.from(QName("car") -> 0, QName("country") -> 0).build(Scope.Empty)
     val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
-    val updatedDoc = doc.updated(countryPath, updatedCountryElm)
+    val updatedDoc = doc.updateElemOrSelf(countryPath, updatedCountryElm)
 
     assertResult("New Zealand") {
       updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).getChildElem(_.localName == "country").trimmedText

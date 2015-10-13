@@ -319,7 +319,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Update, using a fixed path.
 
     val start2Ms = System.currentTimeMillis()
-    val updatedDoc: Document = doc.updated(path) { e =>
+    val updatedDoc: Document = doc.updateElemOrSelf(path) { e =>
       e.withChildren(Vector(Text(newPhone, false)))
     }
     val end2Ms = System.currentTimeMillis()
@@ -336,7 +336,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
 
     val resolvedDocElm = resolved.Elem(doc.documentElement)
-    val resolvedElm2: resolved.Elem = resolvedDocElm.updated(path) { e =>
+    val resolvedElm2: resolved.Elem = resolvedDocElm.updateElemOrSelf(path) { e =>
       e.withChildren(Vector(resolved.Text(newPhone)))
     }
 
@@ -374,7 +374,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     // Update, using a fixed path.
 
     val start2Ms = System.currentTimeMillis()
-    val updatedDoc: Document = doc.updatedAtPaths(paths) { (e, p) =>
+    val updatedDoc: Document = doc.updateElemsOrSelf(paths) { (e, p) =>
       if (p == path) e.withChildren(Vector(Text(newPhone, false)))
       else e
     }
@@ -392,7 +392,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
 
     val resolvedDocElm = resolved.Elem(doc.documentElement)
-    val resolvedElm2: resolved.Elem = resolvedDocElm.updatedAtPaths(paths) { (e, p) =>
+    val resolvedElm2: resolved.Elem = resolvedDocElm.updateElemsOrSelf(paths) { (e, p) =>
       if (p == path) e.withChildren(Vector(resolved.Text(newPhone)))
       else e
     }
