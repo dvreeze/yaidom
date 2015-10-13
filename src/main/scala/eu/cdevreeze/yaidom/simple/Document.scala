@@ -112,39 +112,21 @@ final class Document(
   def updateElemOrSelf(path: Path)(f: Elem => Elem): Document =
     withDocumentElement(this.documentElement.updateElemOrSelf(path)(f))
 
-  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
-  def updated(path: Path)(f: Elem => Elem): Document = updateElemOrSelf(path)(f)
-
   /** Returns `updateElemOrSelf(path) { e => newElem }` */
-  def updateElemOrSelf(path: Path, newElem: Elem): Document = updateElemOrSelf(path) { e => newElem }
-
-  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
-  def updated(path: Path, newElem: Elem): Document =
-    updateElemOrSelf(path, newElem)
+  def updateElemOrSelf(path: Path, newElem: Elem): Document =
+    updateElemOrSelf(path) { e => newElem }
 
   /** Returns `withDocumentElement(this.documentElement.updateElemWithNodeSeq(path)(f))` */
   def updateElemWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updateElemWithNodeSeq(path)(f))
 
-  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
-    updateElemWithNodeSeq(path)(f)
-
   /** Returns `withDocumentElement(this.documentElement.updateElemWithNodeSeq(path, newNodes))` */
   def updateElemWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updateElemWithNodeSeq(path, newNodes))
 
-  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
-    updateElemWithNodeSeq(path, newNodes)
-
   /** Returns `withDocumentElement(this.documentElement.updateElemsOrSelf(paths)(f))` */
   def updateElemsOrSelf(paths: Set[Path])(f: (Elem, Path) => Elem): Document =
     withDocumentElement(this.documentElement.updateElemsOrSelf(paths)(f))
-
-  @deprecated(message = "Renamed to 'updateElemsOrSelf'", since = "1.5.0")
-  def updatedAtPaths(paths: Set[Path])(f: (Elem, Path) => Elem): Document =
-    updateElemsOrSelf(paths)(f)
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */
   def transformElemsOrSelf(f: Elem => Elem): Document =
@@ -200,6 +182,26 @@ final class Document(
       content,
       LineSeq(")")).mkLineSeq.shift(indent)
   }
+
+  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
+  def updated(path: Path)(f: Elem => Elem): Document =
+    updateElemOrSelf(path)(f)
+
+  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
+  def updated(path: Path, newElem: Elem): Document =
+    updateElemOrSelf(path, newElem)
+
+  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
+  def updatedWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
+    updateElemWithNodeSeq(path)(f)
+
+  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
+  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
+    updateElemWithNodeSeq(path, newNodes)
+
+  @deprecated(message = "Renamed to 'updateElemsOrSelf'", since = "1.5.0")
+  def updatedAtPaths(paths: Set[Path])(f: (Elem, Path) => Elem): Document =
+    updateElemsOrSelf(paths)(f)
 }
 
 object Document {
