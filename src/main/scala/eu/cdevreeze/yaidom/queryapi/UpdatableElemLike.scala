@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.queryapi
 
 import scala.Vector
 import scala.collection.immutable
+import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.core.Path
 
@@ -41,6 +42,8 @@ import eu.cdevreeze.yaidom.core.Path
 trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkElemLike[E] with UpdatableElemApi[N, E] { self: E =>
 
   // TODO Rename to UpdatableClarkElemLike
+
+  import UpdatableElemLike.ElemWithPath
 
   def children: immutable.IndexedSeq[N]
 
@@ -184,100 +187,96 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
     }
   }
 
-  final def updateChildElems(f: (E, Path.Entry) => Option[E]): E =
-    optionallyUpdateChildElems(f).getOrElse(self)
+  final def updateChildElems(f: (E, Path.Entry) => Option[E]): E = {
+    var resultsByPathEntries: mutable.Map[Path.Entry, E] = mutable.Map()
 
-  final def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E =
-    optionallyUpdateChildElemsWithNodeSeq(f).getOrElse(self)
+    val pathEntries =
+      (ElemWithPath(self) filterChildElems { e =>
+        assert(e.path.entries.size == 1)
+        val elmOption = f(e.elm, e.path.firstEntry)
+        if (elmOption.isDefined) resultsByPathEntries.put(e.path.firstEntry, elmOption.get)
+        elmOption.isDefined
+      }).map(_.path.firstEntry).toSet
 
-  final def updateElemsOrSelf(f: (E, Path) => Option[E]): E =
-    optionallyUpdateElemsOrSelf(f).getOrElse(self)
+    val resultMap = resultsByPathEntries.toMap
 
-  final def updateElems(f: (E, Path) => Option[E]): E =
-    optionallyUpdateElems(f).getOrElse(self)
-
-  final def updateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N] =
-    optionallyUpdateElemsOrSelfWithNodeSeq(f).getOrElse(Vector(self))
-
-  final def updateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E =
-    optionallyUpdateElemsWithNodeSeq(f).getOrElse(self)
-
-  final def optionallyUpdateChildElems(f: (E, Path.Entry) => Option[E]): Option[E] = {
-    optionallyUpdateChildElemsWithNodeSeq { case (che, pe) => f(che, pe).map(e => Vector(e)) }
+    updateChildElems(pathEntries) { case (elm, pathEntry) => resultMap(pathEntry) }
   }
 
-  final def optionallyUpdateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): Option[E] = {
-    val nodeSeqsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
-      findAllChildElemsWithPathEntries.map({ case (che, pe) => (pe, f(che, pe)) }).
-        collect({ case (pe, Some(nodes)) => (pe, nodes) }).toMap
+  final def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E = {
+    var resultsByPathEntries: mutable.Map[Path.Entry, immutable.IndexedSeq[N]] = mutable.Map()
 
-    if (nodeSeqsByPathEntries.isEmpty) None
-    else {
-      val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-        nodeSeqsByPathEntries.keySet.toSeq.map(entry => (entry -> childNodeIndex(entry))).sortBy(_._2)
+    val pathEntries =
+      (ElemWithPath(self) filterChildElems { e =>
+        assert(e.path.entries.size == 1)
+        val nodesOption = f(e.elm, e.path.firstEntry)
+        if (nodesOption.isDefined) resultsByPathEntries.put(e.path.firstEntry, nodesOption.get)
+        nodesOption.isDefined
+      }).map(_.path.firstEntry).toSet
 
-      require(indexesByPathEntries.forall(_._2 >= 0), "Expected only non-negative child node indexes")
+    val resultMap = resultsByPathEntries.toMap
 
-      // Updating in reverse order of indexes, in order not to invalidate the path entries
-      val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
-        case (accChildNodes, (pathEntry, idx)) =>
-          val che = accChildNodes(idx).asInstanceOf[E]
-          // Expensive assertion
-          assert(findChildElemByPathEntry(pathEntry) == Some(che))
-          val newNodesOption = nodeSeqsByPathEntries.get(pathEntry)
-          assert(newNodesOption.isDefined)
-          accChildNodes.patch(idx, newNodesOption.get, 1)
-      }
-      Some(self.withChildren(newChildren))
-    }
+    updateChildElemsWithNodeSeq(pathEntries) { case (elm, pathEntry) => resultMap(pathEntry) }
   }
 
-  final def optionallyUpdateElemsOrSelf(f: (E, Path) => Option[E]): Option[E] = {
-    val descendantUpdateResult =
-      optionallyUpdateChildElems {
-        case (che, pathEntry) =>
-          // Recursive (but non-tail-recursive) call
-          che optionallyUpdateElemsOrSelf {
-            case (elm, path) =>
-              f(elm, path.prepend(pathEntry))
-          }
-      }
+  final def updateElemsOrSelf(f: (E, Path) => Option[E]): E = {
+    var resultsByPaths: mutable.Map[Path, E] = mutable.Map()
 
-    descendantUpdateResult.map(e => f(e, Path.Root).getOrElse(e)).orElse(f(self, Path.Root))
+    val paths =
+      (ElemWithPath(self) filterElemsOrSelf { e =>
+        val elmOption = f(e.elm, e.path)
+        if (elmOption.isDefined) resultsByPaths.put(e.path, elmOption.get)
+        elmOption.isDefined
+      }).map(_.path).toSet
+
+    val resultMap = resultsByPaths.toMap
+
+    updateElemsOrSelf(paths) { case (elm, path) => resultMap(path) }
   }
 
-  final def optionallyUpdateElems(f: (E, Path) => Option[E]): Option[E] = {
-    optionallyUpdateChildElems {
-      case (che, pathEntry) =>
-        che optionallyUpdateElemsOrSelf {
-          case (elm, path) =>
-            f(elm, path.prepend(pathEntry))
-        }
-    }
+  final def updateElems(f: (E, Path) => Option[E]): E = {
+    var resultsByPaths: mutable.Map[Path, E] = mutable.Map()
+
+    val paths =
+      (ElemWithPath(self) filterElems { e =>
+        val elmOption = f(e.elm, e.path)
+        if (elmOption.isDefined) resultsByPaths.put(e.path, elmOption.get)
+        elmOption.isDefined
+      }).map(_.path).toSet
+
+    val resultMap = resultsByPaths.toMap
+
+    updateElems(paths) { case (elm, path) => resultMap(path) }
   }
 
-  final def optionallyUpdateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): Option[immutable.IndexedSeq[N]] = {
-    val descendantUpdateResult =
-      optionallyUpdateChildElemsWithNodeSeq {
-        case (che, pathEntry) =>
-          // Recursive (but non-tail-recursive) call
-          che optionallyUpdateElemsOrSelfWithNodeSeq {
-            case (elm, path) =>
-              f(elm, path.prepend(pathEntry))
-          }
-      }
+  final def updateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N] = {
+    var resultsByPaths: mutable.Map[Path, immutable.IndexedSeq[N]] = mutable.Map()
 
-    descendantUpdateResult.map(e => f(e, Path.Root).getOrElse(Vector(e))).orElse(f(self, Path.Root))
+    val paths =
+      (ElemWithPath(self) filterElemsOrSelf { e =>
+        val nodesOption = f(e.elm, e.path)
+        if (nodesOption.isDefined) resultsByPaths.put(e.path, nodesOption.get)
+        nodesOption.isDefined
+      }).map(_.path).toSet
+
+    val resultMap = resultsByPaths.toMap
+
+    updateElemsOrSelfWithNodeSeq(paths) { case (elm, path) => resultMap(path) }
   }
 
-  final def optionallyUpdateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): Option[E] = {
-    optionallyUpdateChildElemsWithNodeSeq {
-      case (che, pathEntry) =>
-        che optionallyUpdateElemsOrSelfWithNodeSeq {
-          case (elm, path) =>
-            f(elm, path.prepend(pathEntry))
-        }
-    }
+  final def updateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E = {
+    var resultsByPaths: mutable.Map[Path, immutable.IndexedSeq[N]] = mutable.Map()
+
+    val paths =
+      (ElemWithPath(self) filterElems { e =>
+        val nodesOption = f(e.elm, e.path)
+        if (nodesOption.isDefined) resultsByPaths.put(e.path, nodesOption.get)
+        nodesOption.isDefined
+      }).map(_.path).toSet
+
+    val resultMap = resultsByPaths.toMap
+
+    updateElemsWithNodeSeq(paths) { case (elm, path) => resultMap(path) }
   }
 
   @deprecated(message = "Renamed to 'updateChildElem'", since = "1.5.0")
@@ -323,5 +322,28 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
   @deprecated(message = "Renamed to 'updateElemsWithNodeSeq'", since = "1.5.0")
   final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
     updateElemsWithNodeSeq(paths)(f)
+  }
+}
+
+private[queryapi] object UpdatableElemLike {
+
+  /**
+   * Pair of an element and a Path. These pairs themselves offer the ElemApi query API.
+   */
+  final class ElemWithPath[E <: ClarkElemApi[E]](val elm: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
+
+    final override def findAllChildElems: immutable.IndexedSeq[ElemWithPath[E]] = {
+      elm.findAllChildElemsWithPathEntries map {
+        case (che, pathEntry) =>
+          new ElemWithPath[E](che, path.append(pathEntry))
+      }
+    }
+  }
+
+  object ElemWithPath {
+
+    def apply[E <: ClarkElemApi[E]](elm: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elm, path)
+
+    def apply[E <: ClarkElemApi[E]](elm: E): ElemWithPath[E] = new ElemWithPath[E](elm, Path.Root)
   }
 }
