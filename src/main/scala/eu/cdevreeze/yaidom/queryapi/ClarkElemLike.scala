@@ -57,7 +57,7 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
    * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
    * production. Hence, this method should typically be fast enough.
    */
-  final def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)] = {
+  final override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)] = {
     val nextEntries = mutable.Map[EName, Int]()
 
     findAllChildElems map { e =>

@@ -23,7 +23,7 @@ import eu.cdevreeze.yaidom.core.Path
 /**
  * API and implementation trait for elements that can be navigated using paths.
  *
- * More precisely, this trait has only the following abstract method: `findChildElemByPathEntry.
+ * More precisely, this trait has only the following abstract methods: `findChildElemByPathEntry` and `findAllChildElemsWithPathEntries`.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.IsNavigableApi]]. See the documentation of that trait
  * for more information.
@@ -33,6 +33,8 @@ import eu.cdevreeze.yaidom.core.Path
  * @author Chris de Vreeze
  */
 trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
+
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
   def findChildElemByPathEntry(entry: Path.Entry): Option[E]
 

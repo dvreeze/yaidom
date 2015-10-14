@@ -182,9 +182,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemApi[E] { self: E =>
-
-  // TODO Rename to UpdatableClarkElemApi
+trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigableApi[E] { self: E =>
 
   /** Returns the child nodes of this element, in the correct order */
   def children: immutable.IndexedSeq[N]

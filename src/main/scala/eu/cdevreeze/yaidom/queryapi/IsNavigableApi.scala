@@ -44,6 +44,11 @@ import eu.cdevreeze.yaidom.core.Path
 trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
 
   /**
+   * Returns all child elements paired with their path entries.
+   */
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
+
+  /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
    *
    * Typically this method must be very efficient, in order for methods like findElemOrSelfByPath to be efficient.

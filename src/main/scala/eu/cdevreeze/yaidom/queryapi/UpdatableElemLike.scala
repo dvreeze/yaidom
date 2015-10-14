@@ -39,9 +39,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkElemLike[E] with UpdatableElemApi[N, E] { self: E =>
-
-  // TODO Rename to UpdatableClarkElemLike
+trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNavigable[E] with UpdatableElemApi[N, E] { self: E =>
 
   def children: immutable.IndexedSeq[N]
 

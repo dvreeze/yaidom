@@ -39,9 +39,4 @@ import eu.cdevreeze.yaidom.core.Path
  * @author Chris de Vreeze
  */
 trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi { self: E =>
-
-  /**
-   * Returns all child elements paired with their path entries.
-   */
-  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 }

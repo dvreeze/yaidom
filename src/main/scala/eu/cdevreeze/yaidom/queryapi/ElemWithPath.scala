@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-final class ElemWithPath[E <: ClarkElemApi[E]](val elm: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
+final class ElemWithPath[E <: IsNavigableApi[E]](val elm: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
 
   final override def findAllChildElems: immutable.IndexedSeq[ElemWithPath[E]] = {
     elm.findAllChildElemsWithPathEntries map {
@@ -41,7 +41,7 @@ final class ElemWithPath[E <: ClarkElemApi[E]](val elm: E, val path: Path) exten
 
 object ElemWithPath {
 
-  def apply[E <: ClarkElemApi[E]](elm: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elm, path)
+  def apply[E <: IsNavigableApi[E]](elm: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elm, path)
 
-  def apply[E <: ClarkElemApi[E]](elm: E): ElemWithPath[E] = new ElemWithPath[E](elm, Path.Root)
+  def apply[E <: IsNavigableApi[E]](elm: E): ElemWithPath[E] = new ElemWithPath[E](elm, Path.Root)
 }
