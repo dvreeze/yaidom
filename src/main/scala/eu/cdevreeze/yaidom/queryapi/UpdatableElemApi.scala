@@ -425,67 +425,67 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns `updateChildElems(filteredPathEntries)(f)`. More precisely, is equivalent to:
+   * Returns `updateChildElems(filteredPathEntries)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPathEntries =
    *   ElemWithPath(self).filterChildElems(e => f(e.elm, e.path.firstEntry).isDefined).
    *     map(_.path.firstEntry).toSet
-   * updateChildElems(filteredPathEntries)(f)
+   * updateChildElems(filteredPathEntries)(f andThen (_.get))
    * }}}
    */
   def updateChildElems(f: (E, Path.Entry) => Option[E]): E
 
   /**
-   * Returns `updateChildElemsWithNodeSeq(filteredPathEntries)(f)`. More precisely, is equivalent to:
+   * Returns `updateChildElemsWithNodeSeq(filteredPathEntries)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPathEntries =
    *   ElemWithPath(self).filterChildElems(e => f(e.elm, e.path.firstEntry).isDefined).
    *     map(_.path.firstEntry).toSet
-   * updateChildElemsWithNodeSeq(filteredPathEntries)(f)
+   * updateChildElemsWithNodeSeq(filteredPathEntries)(f andThen (_.get))
    * }}}
    */
   def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E
 
   /**
-   * Returns `updateElemsOrSelf(filteredPaths)(f)`. More precisely, is equivalent to:
+   * Returns `updateElemsOrSelf(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
    *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elm, e.path).isDefined).
    *     map(_.path).toSet
-   * updateElemsOrSelf(filteredPaths)(f)
+   * updateElemsOrSelf(filteredPaths)(f andThen (_.get))
    * }}}
    */
   def updateElemsOrSelf(f: (E, Path) => Option[E]): E
 
   /**
-   * Returns `updateElems(filteredPaths)(f)`. More precisely, is equivalent to:
+   * Returns `updateElems(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
    *   ElemWithPath(self).filterElems(e => f(e.elm, e.path).isDefined).
    *     map(_.path).toSet
-   * updateElems(filteredPaths)(f)
+   * updateElems(filteredPaths)(f andThen (_.get))
    * }}}
    */
   def updateElems(f: (E, Path) => Option[E]): E
 
   /**
-   * Returns `updateElemsOrSelfWithNodeSeq(filteredPaths)(f)`. More precisely, is equivalent to:
+   * Returns `updateElemsOrSelfWithNodeSeq(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
    *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elm, e.path).isDefined).
    *     map(_.path).toSet
-   * updateElemsOrSelfWithNodeSeq(filteredPaths)(f)
+   * updateElemsOrSelfWithNodeSeq(filteredPaths)(f andThen (_.get))
    * }}}
    */
   def updateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N]
 
   /**
-   * Returns `updateElemsWithNodeSeq(filteredPaths)(f)`. More precisely, is equivalent to:
+   * Returns `updateElemsWithNodeSeq(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
    *   ElemWithPath(self).filterElems(e => f(e.elm, e.path).isDefined).
    *     map(_.path).toSet
-   * updateElemsWithNodeSeq(filteredPaths)(f)
+   * updateElemsWithNodeSeq(filteredPaths)(f andThen (_.get))
    * }}}
    */
   def updateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E
