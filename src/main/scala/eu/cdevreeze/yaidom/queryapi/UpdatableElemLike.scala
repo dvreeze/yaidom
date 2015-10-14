@@ -43,8 +43,6 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
 
   // TODO Rename to UpdatableClarkElemLike
 
-  import UpdatableElemLike.ElemWithPath
-
   def children: immutable.IndexedSeq[N]
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
@@ -322,28 +320,5 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
   @deprecated(message = "Renamed to 'updateElemsWithNodeSeq'", since = "1.5.0")
   final def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
     updateElemsWithNodeSeq(paths)(f)
-  }
-}
-
-private[queryapi] object UpdatableElemLike {
-
-  /**
-   * Pair of an element and a Path. These pairs themselves offer the ElemApi query API.
-   */
-  final class ElemWithPath[E <: ClarkElemApi[E]](val elm: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
-
-    final override def findAllChildElems: immutable.IndexedSeq[ElemWithPath[E]] = {
-      elm.findAllChildElemsWithPathEntries map {
-        case (che, pathEntry) =>
-          new ElemWithPath[E](che, path.append(pathEntry))
-      }
-    }
-  }
-
-  object ElemWithPath {
-
-    def apply[E <: ClarkElemApi[E]](elm: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elm, path)
-
-    def apply[E <: ClarkElemApi[E]](elm: E): ElemWithPath[E] = new ElemWithPath[E](elm, Path.Root)
   }
 }
