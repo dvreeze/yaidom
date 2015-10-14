@@ -94,6 +94,10 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends ClarkEle
     updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
   }
 
+  final def updateChildElemWithNodeSeq(pathEntry: Path.Entry)(f: E => immutable.IndexedSeq[N]): E = {
+    updateChildElemsWithNodeSeq(Set(pathEntry)) { case (che, pe) => f(che) }
+  }
+
   final def updateElemOrSelf(path: Path)(f: E => E): E = {
     updateElemsOrSelf(Set(path)) { case (e, path) => f(e) }
   }

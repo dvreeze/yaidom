@@ -252,6 +252,17 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends ClarkElemA
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
+   * to the element that has the given [[eu.cdevreeze.yaidom.core.Path.Entry]] (compared to this element as root).
+   *
+   * It can be defined as follows:
+   * {{{
+   * updateChildElemsWithNodeSeq(Set(pathEntry)) { case (che, pe) => f(che) }
+   * }}}
+   */
+  def updateChildElemWithNodeSeq(pathEntry: Path.Entry)(f: E => immutable.IndexedSeq[N]): E
+
+  /**
+   * Functionally updates the tree with this element as root element, by applying the passed function
    * to the element that has the given [[eu.cdevreeze.yaidom.core.Path]] (compared to this element as root).
    *
    * It can be defined as follows:
