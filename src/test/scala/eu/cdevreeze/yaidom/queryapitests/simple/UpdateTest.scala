@@ -22,6 +22,7 @@ import scala.reflect.ClassTag
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.queryapitests.AbstractUpdateTest
 import eu.cdevreeze.yaidom.simple.Elem
@@ -47,6 +48,38 @@ class UpdateTest extends AbstractUpdateTest {
     if (e.localName == "measure" && e.text.indexOf(':') < 0) {
       val newQName = QName("xbrli", QName(e.text).localPart)
       e.copy(children = Vector(Text(newQName.toString, false)))
+    } else {
+      e
+    }
+  }
+
+  protected def updateUnitId(e: E): E = {
+    if (e.localName == "unit" && e.attribute(EName("id")) == "U-Monetary") {
+      e.plusAttribute(QName("id"), "U-USD")
+    } else {
+      e
+    }
+  }
+
+  protected def updateUnitRef(e: E): E = {
+    if (e.attributeOption(EName("unitRef")) == Some("U-Monetary")) {
+      e.plusAttribute(QName("unitRef"), "U-USD")
+    } else {
+      e
+    }
+  }
+
+  protected def updateContextId(e: E): E = {
+    if (e.localName == "context" && e.attribute(EName("id")) == "D-2007-PPE-Other") {
+      e.plusAttribute(QName("id"), "D-2007-Other-PPE")
+    } else {
+      e
+    }
+  }
+
+  protected def updateContextRef(e: E): E = {
+    if (localNamesForContextUpdate.contains(e.localName) && e.attributeOption(EName("contextRef")) == Some("D-2007-PPE-Other")) {
+      e.plusAttribute(QName("contextRef"), "D-2007-Other-PPE")
     } else {
       e
     }
