@@ -162,8 +162,8 @@ abstract class AbstractUpdateTest extends Suite {
 
     val elems =
       pathAwareClarkElem filterElems {
-        case e if e.elm.resolvedName == EName(XbrliNs, "unit") => true
-        case e if e.elm.attributeOption(EName("unitRef")) == Some("U-Monetary") => true
+        case e if e.elem.resolvedName == EName(XbrliNs, "unit") => true
+        case e if e.elem.attributeOption(EName("unitRef")) == Some("U-Monetary") => true
         case e => false
       }
     val paths: Set[Path] = elems.map(_.path).toSet
@@ -233,8 +233,8 @@ abstract class AbstractUpdateTest extends Suite {
 
     val elems =
       pathAwareClarkElem filterElems {
-        case e if e.elm.resolvedName == EName(XbrliNs, "context") => true
-        case e if localNamesForContextUpdate.contains(e.elm.localName) => true
+        case e if e.elem.resolvedName == EName(XbrliNs, "context") => true
+        case e if localNamesForContextUpdate.contains(e.elem.localName) => true
         case e => false
       }
     val paths: Set[Path] = elems.map(_.path).toSet

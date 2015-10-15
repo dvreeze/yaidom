@@ -428,7 +428,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * Returns `updateChildElems(filteredPathEntries)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPathEntries =
-   *   ElemWithPath(self).filterChildElems(e => f(e.elm, e.path.firstEntry).isDefined).
+   *   ElemWithPath(self).filterChildElems(e => f(e.elem, e.path.firstEntry).isDefined).
    *     map(_.path.firstEntry).toSet
    * updateChildElems(filteredPathEntries)(f andThen (_.get))
    * }}}
@@ -439,7 +439,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * Returns `updateChildElemsWithNodeSeq(filteredPathEntries)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPathEntries =
-   *   ElemWithPath(self).filterChildElems(e => f(e.elm, e.path.firstEntry).isDefined).
+   *   ElemWithPath(self).filterChildElems(e => f(e.elem, e.path.firstEntry).isDefined).
    *     map(_.path.firstEntry).toSet
    * updateChildElemsWithNodeSeq(filteredPathEntries)(f andThen (_.get))
    * }}}
@@ -450,7 +450,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * Returns `updateElemsOrSelf(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
-   *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elm, e.path).isDefined).
+   *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elem, e.path).isDefined).
    *     map(_.path).toSet
    * updateElemsOrSelf(filteredPaths)(f andThen (_.get))
    * }}}
@@ -461,7 +461,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * Returns `updateElems(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
-   *   ElemWithPath(self).filterElems(e => f(e.elm, e.path).isDefined).
+   *   ElemWithPath(self).filterElems(e => f(e.elem, e.path).isDefined).
    *     map(_.path).toSet
    * updateElems(filteredPaths)(f andThen (_.get))
    * }}}
@@ -472,7 +472,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * Returns `updateElemsOrSelfWithNodeSeq(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
-   *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elm, e.path).isDefined).
+   *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elem, e.path).isDefined).
    *     map(_.path).toSet
    * updateElemsOrSelfWithNodeSeq(filteredPaths)(f andThen (_.get))
    * }}}
@@ -483,7 +483,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * Returns `updateElemsWithNodeSeq(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
    * {{{
    * val filteredPaths =
-   *   ElemWithPath(self).filterElems(e => f(e.elm, e.path).isDefined).
+   *   ElemWithPath(self).filterElems(e => f(e.elem, e.path).isDefined).
    *     map(_.path).toSet
    * updateElemsWithNodeSeq(filteredPaths)(f andThen (_.get))
    * }}}

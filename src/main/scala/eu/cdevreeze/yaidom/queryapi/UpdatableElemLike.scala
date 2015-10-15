@@ -193,7 +193,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     val pathEntries =
       (ElemWithPath(self) filterChildElems { e =>
         assert(e.path.entries.size == 1)
-        val elmOption = f(e.elm, e.path.firstEntry)
+        val elmOption = f(e.elem, e.path.firstEntry)
         if (elmOption.isDefined) resultsByPathEntries.put(e.path.firstEntry, elmOption.get)
         elmOption.isDefined
       }).map(_.path.firstEntry).toSet
@@ -209,7 +209,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     val pathEntries =
       (ElemWithPath(self) filterChildElems { e =>
         assert(e.path.entries.size == 1)
-        val nodesOption = f(e.elm, e.path.firstEntry)
+        val nodesOption = f(e.elem, e.path.firstEntry)
         if (nodesOption.isDefined) resultsByPathEntries.put(e.path.firstEntry, nodesOption.get)
         nodesOption.isDefined
       }).map(_.path.firstEntry).toSet
@@ -224,7 +224,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
     val paths =
       (ElemWithPath(self) filterElemsOrSelf { e =>
-        val elmOption = f(e.elm, e.path)
+        val elmOption = f(e.elem, e.path)
         if (elmOption.isDefined) resultsByPaths.put(e.path, elmOption.get)
         elmOption.isDefined
       }).map(_.path).toSet
@@ -239,7 +239,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
     val paths =
       (ElemWithPath(self) filterElems { e =>
-        val elmOption = f(e.elm, e.path)
+        val elmOption = f(e.elem, e.path)
         if (elmOption.isDefined) resultsByPaths.put(e.path, elmOption.get)
         elmOption.isDefined
       }).map(_.path).toSet
@@ -254,7 +254,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
     val paths =
       (ElemWithPath(self) filterElemsOrSelf { e =>
-        val nodesOption = f(e.elm, e.path)
+        val nodesOption = f(e.elem, e.path)
         if (nodesOption.isDefined) resultsByPaths.put(e.path, nodesOption.get)
         nodesOption.isDefined
       }).map(_.path).toSet
@@ -269,7 +269,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
     val paths =
       (ElemWithPath(self) filterElems { e =>
-        val nodesOption = f(e.elm, e.path)
+        val nodesOption = f(e.elem, e.path)
         if (nodesOption.isDefined) resultsByPaths.put(e.path, nodesOption.get)
         nodesOption.isDefined
       }).map(_.path).toSet
