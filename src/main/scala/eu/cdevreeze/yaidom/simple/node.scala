@@ -204,6 +204,21 @@ final class Elem(
     }
   }
 
+  override def childNodeIndexes: Map[Path.Entry, Int] = {
+    val indexesOfElems = children.zipWithIndex collect { case (che: Elem, idx) => (che, idx) }
+    val childElemsWithPathEntries = findAllChildElemsWithPathEntries
+
+    assert(indexesOfElems.size == childElemsWithPathEntries.size)
+
+    val result =
+      childElemsWithPathEntries.zip(indexesOfElems) collect {
+        case ((che1, pe), (che2, idx)) =>
+          assert(che1 == che2, s"Fatal error. Finding child nodes and child elements mutually inconsistent!")
+          (pe -> idx)
+      }
+    result.toMap
+  }
+
   override def childNodeIndex(childPathEntry: Path.Entry): Int = {
     val filteredChildrenWithChildIndex = children.toStream.zipWithIndex filter {
       case (e: Elem, idx) if e.resolvedName == childPathEntry.elementName => true

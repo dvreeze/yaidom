@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.core.Path
  * <li>An element has <em>child nodes</em>, which may or may not be elements. Hence the extra type parameter for nodes.</li>
  * <li>An element knows the <em>child node indexes</em> of the path entries of the child elements.</li>
  * </ul>
- * Obviously methods ``children``, ``withChildren`` and ``childNodeIndex`` must be consistent with
+ * Obviously methods ``children``, ``withChildren``, ``childNodeIndex`` and ``childNodeIndexes`` must be consistent with
  * methods such as ``findAllChildElems``.
  *
  * Using this minimal knowledge alone, trait ``UpdatableElemLike`` not only offers the methods of its parent trait, but also:
@@ -191,6 +191,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
   /**
+   * Returns the child node indexes of the child elements, as Map from path entries to child node indexes (0-based).
+   * The faster this method is, the better.
+   */
+  def childNodeIndexes: Map[Path.Entry, Int]
+
+  /**
    * Returns the child node index of the child element at the given path entry, if any, and -1 otherwise.
    * The faster this method is, the better.
    */
@@ -301,14 +307,16 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
 
   /**
-   * Updates the child elements with the given path entries, applying the passed update function.
+   * '''Updates the child elements with the given path entries''', applying the passed update function.
+   * This is the '''core''' method of the update API, and the other methods have implementations that
+   * directly or indirectly depend on this method.
    *
    * That is, returns:
    * {{{
    * if (pathEntries.isEmpty) self
    * else {
    *   val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-   *     pathEntries.toSeq.map(entry => (entry -> childNodeIndex(entry))).filter(_._2 >= 0).sortBy(_._2)
+   *     childNodeIndexes.filterKeys(pathEntries).toSeq.sortBy(_._2)
    *
    *   // Updating in reverse order of indexes, in order not to invalidate the path entries
    *   val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
