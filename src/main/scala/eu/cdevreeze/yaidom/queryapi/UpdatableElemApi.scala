@@ -257,6 +257,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    */
   def updateChildElem(pathEntry: Path.Entry)(f: E => E): E
 
+  /** Returns `updateChildElem(pathEntry) { e => newElem }` */
+  def updateChildElem(pathEntry: Path.Entry, newElem: E): E
+
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
    * to the element that has the given [[eu.cdevreeze.yaidom.core.Path.Entry]] (compared to this element as root).
@@ -267,6 +270,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }}}
    */
   def updateChildElemWithNodeSeq(pathEntry: Path.Entry)(f: E => immutable.IndexedSeq[N]): E
+
+  /** Returns `updateChildElemWithNodeSeq(pathEntry) { e => newNodes }` */
+  def updateChildElemWithNodeSeq(pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[N]): E
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function

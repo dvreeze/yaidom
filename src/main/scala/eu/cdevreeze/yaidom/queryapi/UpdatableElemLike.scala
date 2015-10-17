@@ -96,8 +96,16 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
   }
 
+  final def updateChildElem(pathEntry: Path.Entry, newElem: E): E = {
+    updateChildElem(pathEntry) { e => newElem }
+  }
+
   final def updateChildElemWithNodeSeq(pathEntry: Path.Entry)(f: E => immutable.IndexedSeq[N]): E = {
     updateChildElemsWithNodeSeq(Set(pathEntry)) { case (che, pe) => f(che) }
+  }
+
+  final def updateChildElemWithNodeSeq(pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[N]): E = {
+    updateChildElemWithNodeSeq(pathEntry) { e => newNodes }
   }
 
   final def updateElemOrSelf(path: Path)(f: E => E): E = {
