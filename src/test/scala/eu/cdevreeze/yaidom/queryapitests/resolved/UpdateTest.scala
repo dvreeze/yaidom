@@ -84,4 +84,10 @@ class UpdateTest extends AbstractUpdateTest {
       e
     }
   }
+
+  protected def reorderSegmentChildren(e: E): E = {
+    require(e.localName == "segment")
+
+    e.withChildren(e.findAllChildElems.sortBy(_.attributeOption(EName("dimension")).getOrElse("")))
+  }
 }

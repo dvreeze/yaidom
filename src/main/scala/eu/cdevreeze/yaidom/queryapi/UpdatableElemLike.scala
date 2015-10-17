@@ -124,7 +124,21 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E = {
-    updateChildElemsWithNodeSeq(pathEntries) { case (che, pe) => Vector(f(che, pe)) }
+    // For efficiency, not delegating to updateChildElemsWithNodeSeq
+
+    if (pathEntries.isEmpty) self
+    else {
+      val indexesByPathEntries: Seq[(Path.Entry, Int)] =
+        collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
+
+      // Updating in reverse order of indexes, in order not to invalidate the path entries
+      val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
+        case (accChildNodes, (pathEntry, idx)) =>
+          val che = accChildNodes(idx).asInstanceOf[E]
+          accChildNodes.updated(idx, f(che, pathEntry))
+      }
+      self.withChildren(newChildren)
+    }
   }
 
   final def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E = {

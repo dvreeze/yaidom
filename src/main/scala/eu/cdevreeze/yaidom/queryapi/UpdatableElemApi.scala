@@ -306,7 +306,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   /**
    * Updates the child elements with the given path entries, applying the passed update function.
    *
-   * That is, returns:
+   * That is, returns the equivalent of:
    * {{{
    * updateChildElemsWithNodeSeq(pathEntries) { case (che, pe) => Vector(f(che, pe)) }
    * }}}
@@ -458,7 +458,9 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
    *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
    *
-   * updateChildElemsWithNodeSeq(editsByPathEntries.keySet) { case (che, pe) => editsByPathEntries.getOrElse(pe, immutable.IndexedSeq(che)) }
+   * updateChildElemsWithNodeSeq(editsByPathEntries.keySet) { case (che, pe) =>
+   *   editsByPathEntries.getOrElse(pe, immutable.IndexedSeq(che))
+   * }
    * }}}
    */
   def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E

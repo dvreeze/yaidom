@@ -262,6 +262,39 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
+  // Reorder all explicit members in context entities
+
+  @Test def testReorderExplicitMembers(): Unit = {
+    // Easy to express using updateTopmostElems method
+
+    val newRootElem = rootElem updateTopmostElems { (e, path) =>
+      if (e.localName == "segment" &&
+        path.entries.map(_.elementName.localPart) == List("context", "entity", "segment")) {
+
+        Some(reorderSegmentChildren(e))
+      } else {
+        None
+      }
+    }
+
+    assertResult(false) {
+      rootElem.filterElems(_.localName == "explicitMember") ==
+        newRootElem.filterElems(_.localName == "explicitMember")
+    }
+
+    assertResult(rootElem.filterElems(_.localName == "explicitMember").toSet) {
+      newRootElem.filterElems(_.localName == "explicitMember").toSet
+    }
+
+    def makeSegmentEmpty(elm: E): E = {
+      elm.transformElems(e => if (e.localName == "segment") e.withChildren(Vector()) else e)
+    }
+
+    assertResult(yaidom.resolved.Elem(makeSegmentEmpty(rootElem))) {
+      yaidom.resolved.Elem(makeSegmentEmpty(newRootElem))
+    }
+  }
+
   // Helper methods
 
   private def checkElemAfterMeasureUpdate(elm: E): Unit = {
@@ -323,4 +356,6 @@ abstract class AbstractUpdateTest extends Suite {
   protected def updateContextId(e: E): E
 
   protected def updateContextRef(e: E): E
+
+  protected def reorderSegmentChildren(e: E): E
 }
