@@ -442,7 +442,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
   /**
-   * Invokes `updateChildElems` on the path entries for which the passed function is defined. It is equivalent to:
+   * Invokes `updateChildElems`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
    * val editsByPathEntries: Map[Path.Entry, E] =
    *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
@@ -453,7 +453,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateChildElems(f: (E, Path.Entry) => Option[E]): E
 
   /**
-   * Invokes `updateChildElemsWithNodeSeq` on the path entries for which the passed function is defined. It is equivalent to:
+   * Invokes `updateChildElemsWithNodeSeq`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
    * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
    *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
@@ -464,7 +464,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E
 
   /**
-   * Invokes `updateElemsOrSelf` on the topmost paths for which the passed function is defined. It is equivalent to:
+   * Invokes `updateElemsOrSelf`, passing the topmost paths for which the passed function is defined. It is equivalent to:
    * {{{
    * val mutableEditsByPaths = mutable.Map[Path, E]()
    *
@@ -487,7 +487,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateTopmostElemsOrSelf(f: (E, Path) => Option[E]): E
 
   /**
-   * Invokes `updateElems` on the topmost non-empty paths for which the passed function is defined. It is equivalent to:
+   * Invokes `updateElems`, passing the topmost non-empty paths for which the passed function is defined. It is equivalent to:
    * {{{
    * val mutableEditsByPaths = mutable.Map[Path, E]()
    *
@@ -510,7 +510,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateTopmostElems(f: (E, Path) => Option[E]): E
 
   /**
-   * Invokes `updateElemsOrSelfWithNodeSeq` on the topmost paths for which the passed function is defined. It is equivalent to:
+   * Invokes `updateElemsOrSelfWithNodeSeq`, passing the topmost paths for which the passed function is defined. It is equivalent to:
    * {{{
    * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
    *
@@ -533,7 +533,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateTopmostElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N]
 
   /**
-   * Invokes `updateElemsWithNodeSeq` on the topmost non-empty paths for which the passed function is defined. It is equivalent to:
+   * Invokes `updateElemsWithNodeSeq`, passing the topmost non-empty paths for which the passed function is defined. It is equivalent to:
    * {{{
    * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
    *
