@@ -204,31 +204,8 @@ final class Elem(
     }
   }
 
-  override def childNodeIndexes: Map[Path.Entry, Int] = {
-    val childElemsWithNodeIndexes = children.zipWithIndex collect { case (che: Elem, idx) => (che, idx) }
-    val childElemsWithPathEntries = findAllChildElemsWithPathEntries
-
-    assert(childElemsWithNodeIndexes.size == childElemsWithPathEntries.size)
-
-    val result =
-      childElemsWithPathEntries.zip(childElemsWithNodeIndexes) collect {
-        case ((che1, pe), (che2, idx)) =>
-          assert(che1 == che2, s"Fatal error. Finding child nodes and child elements mutually inconsistent!")
-          (pe -> idx)
-      }
-    result.toMap
-  }
-
-  override def childNodeIndex(childPathEntry: Path.Entry): Int = {
-    val filteredChildrenWithChildIndex = children.toStream.zipWithIndex filter {
-      case (e: Elem, idx) if e.resolvedName == childPathEntry.elementName => true
-      case _ => false
-    }
-
-    val childWithIndexOption = filteredChildrenWithChildIndex.drop(childPathEntry.index).headOption
-    val result = childWithIndexOption collect { case (e: Elem, idx) => (e, idx) }
-    assert(result.forall(_._1.resolvedName == childPathEntry.elementName))
-    result.map(_._2).getOrElse(-1)
+  override def filterChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
+    filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries).map(triple => (triple._2, triple._3)).toMap
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
@@ -510,6 +487,28 @@ final class Elem(
       LineSeq("elem("),
       content,
       LineSeq(")")).mkLineSeq.shift(indent)
+  }
+
+  private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {
+    // Implementation inspired by findAllChildElemsWithPathEntries.
+    // The fewer path entries passed, the more efficient this method is.
+
+    val resolvedNames = pathEntries.map(_.elementName)
+    val nextEntries = mutable.Map[EName, Int]()
+
+    children.zipWithIndex flatMap {
+      case (e: Elem, idx) =>
+        val ename = e.resolvedName
+
+        if (resolvedNames.contains(ename)) {
+          val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
+          nextEntries.put(ename, entry.index + 1)
+
+          if (pathEntries.contains(entry)) Some(e, entry, idx) else None
+        } else None
+      case (n: Node, idx) =>
+        None
+    }
   }
 }
 
