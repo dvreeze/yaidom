@@ -205,13 +205,13 @@ final class Elem(
   }
 
   override def childNodeIndexes: Map[Path.Entry, Int] = {
-    val indexesOfElems = children.zipWithIndex collect { case (che: Elem, idx) => (che, idx) }
+    val childElemsWithNodeIndexes = children.zipWithIndex collect { case (che: Elem, idx) => (che, idx) }
     val childElemsWithPathEntries = findAllChildElemsWithPathEntries
 
-    assert(indexesOfElems.size == childElemsWithPathEntries.size)
+    assert(childElemsWithNodeIndexes.size == childElemsWithPathEntries.size)
 
     val result =
-      childElemsWithPathEntries.zip(indexesOfElems) collect {
+      childElemsWithPathEntries.zip(childElemsWithNodeIndexes) collect {
         case ((che1, pe), (che2, idx)) =>
           assert(che1 == che2, s"Fatal error. Finding child nodes and child elements mutually inconsistent!")
           (pe -> idx)
