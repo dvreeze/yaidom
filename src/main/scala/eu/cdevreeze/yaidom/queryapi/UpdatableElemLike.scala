@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.core.Path
  * indexes.
  *
  * More precisely, this trait adds the following abstract methods to the abstract methods required by its super-trait:
- * `children`, `withChildren` and `filterChildNodeIndexes`. Based on these abstract methods (and the super-trait), this
+ * `children`, `withChildren` and `collectChildNodeIndexes`. Based on these abstract methods (and the super-trait), this
  * trait offers a rich API for functionally updating elements.
  *
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]]. See the documentation of that trait
@@ -45,10 +45,10 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
 
   def withChildren(newChildren: immutable.IndexedSeq[N]): E
 
-  def filterChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int]
+  def collectChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int]
 
   final def childNodeIndex(pathEntry: Path.Entry): Int = {
-    filterChildNodeIndexes(Set(pathEntry)).getOrElse(pathEntry, -1)
+    collectChildNodeIndexes(Set(pathEntry)).getOrElse(pathEntry, -1)
   }
 
   final def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): E = {
@@ -123,7 +123,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
     if (pathEntries.isEmpty) self
     else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-        filterChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
+        collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries
       val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {

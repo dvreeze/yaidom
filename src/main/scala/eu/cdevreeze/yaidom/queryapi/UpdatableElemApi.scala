@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.core.Path
  * <li>An element has <em>child nodes</em>, which may or may not be elements. Hence the extra type parameter for nodes.</li>
  * <li>An element knows the <em>child node indexes</em> of the path entries of the child elements.</li>
  * </ul>
- * Obviously methods ``children``, ``withChildren`` and ``filterChildNodeIndexes`` must be consistent with
+ * Obviously methods ``children``, ``withChildren`` and ``collectChildNodeIndexes`` must be consistent with
  * methods such as ``findAllChildElems``.
  *
  * Using this minimal knowledge alone, trait ``UpdatableElemLike`` not only offers the methods of its parent trait, but also:
@@ -195,12 +195,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * elements to the child node indexes. The result Map has no entries for path entries that cannot be resolved.
    * This method should be fast, especially if the passed path entry set is small.
    */
-  def filterChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int]
+  def collectChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int]
 
   /**
    * Finds the child node index of the given path entry, or -1 if not found. More precisely, returns:
    * {{{
-   * filterChildNodeIndexes(Set(pathEntry)).getOrElse(pathEntry, -1)
+   * collectChildNodeIndexes(Set(pathEntry)).getOrElse(pathEntry, -1)
    * }}}
    */
   def childNodeIndex(pathEntry: Path.Entry): Int
@@ -319,7 +319,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * if (pathEntries.isEmpty) self
    * else {
    *   val indexesByPathEntries: Seq[(Path.Entry, Int)] =
-   *     filterChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
+   *     collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
    *
    *   // Updating in reverse order of indexes, in order not to invalidate the path entries
    *   val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {

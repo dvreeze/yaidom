@@ -135,7 +135,7 @@ final case class Elem(
   @throws(classOf[java.io.ObjectStreamException])
   private[resolved] def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
 
-  override def filterChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
+  override def collectChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
     filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries).map(triple => (triple._2, triple._3)).toMap
   }
 

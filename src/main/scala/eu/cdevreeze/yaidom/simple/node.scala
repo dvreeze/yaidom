@@ -204,7 +204,7 @@ final class Elem(
     }
   }
 
-  override def filterChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
+  override def collectChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
     filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries).map(triple => (triple._2, triple._3)).toMap
   }
 
