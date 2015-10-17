@@ -313,19 +313,28 @@ final case class Elem(
     // Implementation inspired by findAllChildElemsWithPathEntries.
     // The fewer path entries passed, the more efficient this method is.
 
-    val resolvedNames = pathEntries.map(_.elementName)
+    var remainingPathEntries = pathEntries
     val nextEntries = mutable.Map[EName, Int]()
 
     children.zipWithIndex flatMap {
+      case (n: Node, idx) if remainingPathEntries.isEmpty =>
+        None
       case (e: Elem, idx) =>
         val ename = e.resolvedName
 
-        if (resolvedNames.contains(ename)) {
+        if (remainingPathEntries.exists(_.elementName == ename)) {
           val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
           nextEntries.put(ename, entry.index + 1)
 
-          if (pathEntries.contains(entry)) Some(e, entry, idx) else None
-        } else None
+          if (pathEntries.contains(entry)) {
+            remainingPathEntries -= entry
+            Some(e, entry, idx)
+          } else {
+            None
+          }
+        } else {
+          None
+        }
       case (n: Node, idx) =>
         None
     }
