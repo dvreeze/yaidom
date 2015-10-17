@@ -442,70 +442,118 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
 
   /**
-   * Returns `updateChildElems(filteredPathEntries)(f andThen (_.get))`. More precisely, is equivalent to:
+   * Invokes `updateChildElems` on the path entries for which the passed function is defined. It is equivalent to:
    * {{{
-   * val filteredPathEntries =
-   *   ElemWithPath(self).filterChildElems(e => f(e.elem, e.path.firstEntry).isDefined).
-   *     map(_.path.firstEntry).toSet
-   * updateChildElems(filteredPathEntries)(f andThen (_.get))
+   * val editsByPathEntries: Map[Path.Entry, E] =
+   *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
+   *
+   * updateChildElems(editsByPathEntries.keySet) { case (che, pe) => editsByPathEntries.getOrElse(pe, che) }
    * }}}
    */
   def updateChildElems(f: (E, Path.Entry) => Option[E]): E
 
   /**
-   * Returns `updateChildElemsWithNodeSeq(filteredPathEntries)(f andThen (_.get))`. More precisely, is equivalent to:
+   * Invokes `updateChildElemsWithNodeSeq` on the path entries for which the passed function is defined. It is equivalent to:
    * {{{
-   * val filteredPathEntries =
-   *   ElemWithPath(self).filterChildElems(e => f(e.elem, e.path.firstEntry).isDefined).
-   *     map(_.path.firstEntry).toSet
-   * updateChildElemsWithNodeSeq(filteredPathEntries)(f andThen (_.get))
+   * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
+   *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
+   *
+   * updateChildElemsWithNodeSeq(editsByPathEntries.keySet) { case (che, pe) => editsByPathEntries.getOrElse(pe, immutable.IndexedSeq(che)) }
    * }}}
    */
   def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E
 
   /**
-   * Returns `updateElemsOrSelf(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
+   * Invokes `updateElemsOrSelf` on the topmost paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val filteredPaths =
-   *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elem, e.path).isDefined).
-   *     map(_.path).toSet
-   * updateElemsOrSelf(filteredPaths)(f andThen (_.get))
+   * val mutableEditsByPaths = mutable.Map[Path, E]()
+   *
+   * val foundElems =
+   *   ElemWithPath(self) findTopmostElemsOrSelf { elm =>
+   *     val optResult = f(elm.elem, elm.path)
+   *     if (optResult.isDefined) {
+   *       mutableEditsByPaths += (elm.path -> optResult.get)
+   *     }
+   *     optResult.isDefined
+   *   }
+   *
+   * val editsByPaths = mutableEditsByPaths.toMap
+   *
+   * updateElemsOrSelf(editsByPaths.keySet) {
+   *   case (elm, path) => editsByPaths.getOrElse(path, elm)
+   * }
    * }}}
    */
-  def updateElemsOrSelf(f: (E, Path) => Option[E]): E
+  def updateTopmostElemsOrSelf(f: (E, Path) => Option[E]): E
 
   /**
-   * Returns `updateElems(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
+   * Invokes `updateElems` on the topmost non-empty paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val filteredPaths =
-   *   ElemWithPath(self).filterElems(e => f(e.elem, e.path).isDefined).
-   *     map(_.path).toSet
-   * updateElems(filteredPaths)(f andThen (_.get))
+   * val mutableEditsByPaths = mutable.Map[Path, E]()
+   *
+   * val foundElems =
+   *   ElemWithPath(self) findTopmostElems { elm =>
+   *     val optResult = f(elm.elem, elm.path)
+   *     if (optResult.isDefined) {
+   *       mutableEditsByPaths += (elm.path -> optResult.get)
+   *     }
+   *     optResult.isDefined
+   *   }
+   *
+   * val editsByPaths = mutableEditsByPaths.toMap
+   *
+   * updateElems(editsByPaths.keySet) {
+   *   case (elm, path) => editsByPaths.getOrElse(path, elm)
+   * }
    * }}}
    */
-  def updateElems(f: (E, Path) => Option[E]): E
+  def updateTopmostElems(f: (E, Path) => Option[E]): E
 
   /**
-   * Returns `updateElemsOrSelfWithNodeSeq(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
+   * Invokes `updateElemsOrSelfWithNodeSeq` on the topmost paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val filteredPaths =
-   *   ElemWithPath(self).filterElemsOrSelf(e => f(e.elem, e.path).isDefined).
-   *     map(_.path).toSet
-   * updateElemsOrSelfWithNodeSeq(filteredPaths)(f andThen (_.get))
+   * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
+   *
+   * val foundElems =
+   *   ElemWithPath(self) findTopmostElemsOrSelf { elm =>
+   *     val optResult = f(elm.elem, elm.path)
+   *     if (optResult.isDefined) {
+   *       mutableEditsByPaths += (elm.path -> optResult.get)
+   *     }
+   *     optResult.isDefined
+   *   }
+   *
+   * val editsByPaths = mutableEditsByPaths.toMap
+   *
+   * updateElemsOrSelfWithNodeSeq(editsByPaths.keySet) {
+   *   case (elm, path) => editsByPaths.getOrElse(path, immutable.IndexedSeq(elm))
+   * }
    * }}}
    */
-  def updateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N]
+  def updateTopmostElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N]
 
   /**
-   * Returns `updateElemsWithNodeSeq(filteredPaths)(f andThen (_.get))`. More precisely, is equivalent to:
+   * Invokes `updateElemsWithNodeSeq` on the topmost non-empty paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val filteredPaths =
-   *   ElemWithPath(self).filterElems(e => f(e.elem, e.path).isDefined).
-   *     map(_.path).toSet
-   * updateElemsWithNodeSeq(filteredPaths)(f andThen (_.get))
+   * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
+   *
+   * val foundElems =
+   *   ElemWithPath(self) findTopmostElems { elm =>
+   *     val optResult = f(elm.elem, elm.path)
+   *     if (optResult.isDefined) {
+   *       mutableEditsByPaths += (elm.path -> optResult.get)
+   *     }
+   *     optResult.isDefined
+   *   }
+   *
+   * val editsByPaths = mutableEditsByPaths.toMap
+   *
+   * updateElemsWithNodeSeq(editsByPaths.keySet) {
+   *   case (elm, path) => editsByPaths.getOrElse(path, immutable.IndexedSeq(elm))
+   * }
    * }}}
    */
-  def updateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E
+  def updateTopmostElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E
 
   @deprecated(message = "Renamed to 'updateChildElem'", since = "1.5.0")
   def updated(pathEntry: Path.Entry)(f: E => E): E

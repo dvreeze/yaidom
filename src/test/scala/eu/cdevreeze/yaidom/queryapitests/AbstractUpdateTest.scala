@@ -82,8 +82,8 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterMeasureUpdate(newRootElems.head.asInstanceOf[E])
   }
 
-  @Test def testUpdateElemsWithNodeSeq(): Unit = {
-    val newRootElem = rootElem updateElemsWithNodeSeq { (e: E, p: Path) =>
+  @Test def testUpdateTopmostElemsWithNodeSeq(): Unit = {
+    val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "measure") =>
           Some(Vector(updateMeasure(e)))
@@ -143,8 +143,8 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsWithNodeSeqForUnitUpdate(): Unit = {
-    val newRootElem = rootElem updateElemsWithNodeSeq { (e: E, p: Path) =>
+  @Test def testUpdateTopmostElemsWithNodeSeqForUnitUpdate(): Unit = {
+    val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
           Some(Vector(updateUnitId(e)))
@@ -177,8 +177,8 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsOrSelfForUnitUpdate(): Unit = {
-    val newRootElem = rootElem updateElemsOrSelf { (e: E, p: Path) =>
+  @Test def testUpdateTopmostElemsOrSelfForUnitUpdate(): Unit = {
+    val newRootElem = rootElem updateTopmostElemsOrSelf { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
           Some(updateUnitId(e))
@@ -214,8 +214,8 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsWithNodeSeqForContextUpdate(): Unit = {
-    val newRootElem = rootElem updateElemsWithNodeSeq { (e: E, p: Path) =>
+  @Test def testUpdateTopmostElemsWithNodeSeqForContextUpdate(): Unit = {
+    val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "context") =>
           Some(Vector(updateContextId(e)))
@@ -248,8 +248,8 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsOrSelfForContextUpdate(): Unit = {
-    val newRootElem = rootElem updateElemsOrSelf { (e: E, p: Path) =>
+  @Test def testUpdateTopmostElemsOrSelfForContextUpdate(): Unit = {
+    val newRootElem = rootElem updateTopmostElemsOrSelf { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "context") =>
           Some(updateContextId(e))

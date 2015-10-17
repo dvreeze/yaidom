@@ -200,95 +200,103 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updateChildElems(f: (E, Path.Entry) => Option[E]): E = {
-    var resultsByPathEntries: mutable.Map[Path.Entry, E] = mutable.Map()
+    val editsByPathEntries: Map[Path.Entry, E] =
+      findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
 
-    val pathEntries =
-      (ElemWithPath(self) filterChildElems { e =>
-        assert(e.path.entries.size == 1)
-        val elmOption = f(e.elem, e.path.firstEntry)
-        if (elmOption.isDefined) resultsByPathEntries.put(e.path.firstEntry, elmOption.get)
-        elmOption.isDefined
-      }).map(_.path.firstEntry).toSet
-
-    val resultMap = resultsByPathEntries.toMap
-
-    updateChildElems(pathEntries) { case (elm, pathEntry) => resultMap(pathEntry) }
+    updateChildElems(editsByPathEntries.keySet) {
+      case (che, pe) =>
+        editsByPathEntries.getOrElse(pe, che)
+    }
   }
 
   final def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E = {
-    var resultsByPathEntries: mutable.Map[Path.Entry, immutable.IndexedSeq[N]] = mutable.Map()
+    val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
+      findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
 
-    val pathEntries =
-      (ElemWithPath(self) filterChildElems { e =>
-        assert(e.path.entries.size == 1)
-        val nodesOption = f(e.elem, e.path.firstEntry)
-        if (nodesOption.isDefined) resultsByPathEntries.put(e.path.firstEntry, nodesOption.get)
-        nodesOption.isDefined
-      }).map(_.path.firstEntry).toSet
-
-    val resultMap = resultsByPathEntries.toMap
-
-    updateChildElemsWithNodeSeq(pathEntries) { case (elm, pathEntry) => resultMap(pathEntry) }
+    updateChildElemsWithNodeSeq(editsByPathEntries.keySet) {
+      case (che, pe) =>
+        editsByPathEntries.getOrElse(pe, immutable.IndexedSeq(che))
+    }
   }
 
-  final def updateElemsOrSelf(f: (E, Path) => Option[E]): E = {
-    var resultsByPaths: mutable.Map[Path, E] = mutable.Map()
+  final def updateTopmostElemsOrSelf(f: (E, Path) => Option[E]): E = {
+    // Code repetition, but clear
+    val mutableEditsByPaths = mutable.Map[Path, E]()
 
-    val paths =
-      (ElemWithPath(self) filterElemsOrSelf { e =>
-        val elmOption = f(e.elem, e.path)
-        if (elmOption.isDefined) resultsByPaths.put(e.path, elmOption.get)
-        elmOption.isDefined
-      }).map(_.path).toSet
+    val foundElems =
+      ElemWithPath(self) findTopmostElemsOrSelf { elm =>
+        val optResult = f(elm.elem, elm.path)
+        if (optResult.isDefined) {
+          mutableEditsByPaths += (elm.path -> optResult.get)
+        }
+        optResult.isDefined
+      }
 
-    val resultMap = resultsByPaths.toMap
+    val editsByPaths = mutableEditsByPaths.toMap
 
-    updateElemsOrSelf(paths) { case (elm, path) => resultMap(path) }
+    updateElemsOrSelf(editsByPaths.keySet) {
+      case (elm, path) => editsByPaths.getOrElse(path, elm)
+    }
   }
 
-  final def updateElems(f: (E, Path) => Option[E]): E = {
-    var resultsByPaths: mutable.Map[Path, E] = mutable.Map()
+  final def updateTopmostElems(f: (E, Path) => Option[E]): E = {
+    // Code repetition, but clear
+    val mutableEditsByPaths = mutable.Map[Path, E]()
 
-    val paths =
-      (ElemWithPath(self) filterElems { e =>
-        val elmOption = f(e.elem, e.path)
-        if (elmOption.isDefined) resultsByPaths.put(e.path, elmOption.get)
-        elmOption.isDefined
-      }).map(_.path).toSet
+    val foundElems =
+      ElemWithPath(self) findTopmostElems { elm =>
+        val optResult = f(elm.elem, elm.path)
+        if (optResult.isDefined) {
+          mutableEditsByPaths += (elm.path -> optResult.get)
+        }
+        optResult.isDefined
+      }
 
-    val resultMap = resultsByPaths.toMap
+    val editsByPaths = mutableEditsByPaths.toMap
 
-    updateElems(paths) { case (elm, path) => resultMap(path) }
+    updateElems(editsByPaths.keySet) {
+      case (elm, path) => editsByPaths.getOrElse(path, elm)
+    }
   }
 
-  final def updateElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N] = {
-    var resultsByPaths: mutable.Map[Path, immutable.IndexedSeq[N]] = mutable.Map()
+  final def updateTopmostElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N] = {
+    // Code repetition, but clear
+    val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
 
-    val paths =
-      (ElemWithPath(self) filterElemsOrSelf { e =>
-        val nodesOption = f(e.elem, e.path)
-        if (nodesOption.isDefined) resultsByPaths.put(e.path, nodesOption.get)
-        nodesOption.isDefined
-      }).map(_.path).toSet
+    val foundElems =
+      ElemWithPath(self) findTopmostElemsOrSelf { elm =>
+        val optResult = f(elm.elem, elm.path)
+        if (optResult.isDefined) {
+          mutableEditsByPaths += (elm.path -> optResult.get)
+        }
+        optResult.isDefined
+      }
 
-    val resultMap = resultsByPaths.toMap
+    val editsByPaths = mutableEditsByPaths.toMap
 
-    updateElemsOrSelfWithNodeSeq(paths) { case (elm, path) => resultMap(path) }
+    updateElemsOrSelfWithNodeSeq(editsByPaths.keySet) {
+      case (elm, path) => editsByPaths.getOrElse(path, immutable.IndexedSeq(elm))
+    }
   }
 
-  final def updateElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E = {
-    var resultsByPaths: mutable.Map[Path, immutable.IndexedSeq[N]] = mutable.Map()
+  final def updateTopmostElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E = {
+    // Code repetition, but clear
+    val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
 
-    val paths =
-      (ElemWithPath(self) filterElems { e =>
-        val nodesOption = f(e.elem, e.path)
-        if (nodesOption.isDefined) resultsByPaths.put(e.path, nodesOption.get)
-        nodesOption.isDefined
-      }).map(_.path).toSet
+    val foundElems =
+      ElemWithPath(self) findTopmostElems { elm =>
+        val optResult = f(elm.elem, elm.path)
+        if (optResult.isDefined) {
+          mutableEditsByPaths += (elm.path -> optResult.get)
+        }
+        optResult.isDefined
+      }
 
-    val resultMap = resultsByPaths.toMap
+    val editsByPaths = mutableEditsByPaths.toMap
 
-    updateElemsWithNodeSeq(paths) { case (elm, path) => resultMap(path) }
+    updateElemsWithNodeSeq(editsByPaths.keySet) {
+      case (elm, path) => editsByPaths.getOrElse(path, immutable.IndexedSeq(elm))
+    }
   }
 
   @deprecated(message = "Renamed to 'updateChildElem'", since = "1.5.0")
