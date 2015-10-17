@@ -27,6 +27,9 @@ import eu.cdevreeze.yaidom.core.Path
  * These "elements" are used in the implementation of bulk update methods in trait ``UpdatableElemLike``, but they
  * can also be used in application code.
  *
+ * Note that this class renders a separate query API for element-path pairs obsolete. It takes a `IsNavigableApi`, using
+ * its `findAllChildElemsWithPathEntries` method, and offers the equivalent of an `ElemApi` for element-path pairs.
+ *
  * @author Chris de Vreeze
  */
 final class ElemWithPath[E <: IsNavigableApi[E]](val elem: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
