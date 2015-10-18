@@ -23,7 +23,9 @@ The main changes in this version are:
 * Removal of previously deprecated code
 
 Upgrading from version 1.4.2 to this version requires recompilation of code using yaidom. Other than that, successful
-compilation is likely, but deprecation warnings will occur for much of the old functional update API.
+compilation is likely, but deprecation warnings will occur for much of the old functional update API. The document
+parsers and printers now have an extra conversion strategy primary constructor parameter, so if these constructors are
+used instead of the factory methods, compilation errors will occur, but they are easy to fix (prefer the factory methods).
 
 
 1.4.2
