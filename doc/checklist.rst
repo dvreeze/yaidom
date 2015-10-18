@@ -74,8 +74,8 @@ yaidom is quite conservative w.r.t. genericity. For example:
 * Yaidom's query API offers mostly "element filtering" methods (no map-like operations, no need for CanBuildFrom, and elements are more central than nodes in general).
 * The query API mainly offers only 3 "axes" for element nodes (child elements, descendant elements, and descendant-or-self elements).
 
-Yaidom also uses no "generic tree API". After all, each domain may have a somewhat different idea about (general) trees.
-For example, in the domain of XML there are different kinds of nodes, and element nodes take a very central position.
+Yaidom also uses no "generic tree API". After all, each domain may have somewhat different needs from such a generic tree API.
+For example, in the domain of XML there are different kinds of nodes, and element nodes have a very central position.
 Moreover, for XML DOM-like trees it is natural to assume finite (and typically even limited) tree depths, whereas in
 many other domains the tree query API should let the user choose a maximum tree depth. Another example is the choice
 of how to represent immutable trees that still know about their context (ancestor nodes). Yaidom made a specific choice
@@ -115,7 +115,7 @@ be compatible with versions 1.X.Y). Minor version bumps correspond to "themes", 
 
 During this evolution it is tried to make yaidom meaner and cleaner. Much of it is discovered, rather than designed up-front.
 Discovering the "core of yaidom" requires experimentation, lots of it. For example, the functional update support of
-version 1.5 required many committed (!) attempts to make it a worthy companion to the query and transformation APIs.
+version 1.5 required many committed (!) attempts to have it evolve into a worthy companion to the query and transformation APIs.
 The constant need for experimentation makes evolving yaidom without frequent backwards-incompatible changes impractical.
 
 On the other hand, the public API of yaidom 1.X is getting more and more stable. The query API and transformation API
@@ -141,7 +141,7 @@ Yaidom's versioning strategy is as follows:
 * Yaidom bumps patch versions mostly for backwards-compatible additions and bug fixes, although currently this backwards-compatibility is not guaranteed.
 
 The change log should make the impact of yaidom version bumps clear, however. Typical non-backwards-compatible changes
-in patch versions fix problems introduced in the preceding patch version. This means that a change in yaidom becomes more
+in patch versions fix problems introduced in the preceding version. This means that a change in yaidom becomes more
 stable if it survives one patch version bump (unless overridden by the next minor version bump).
 
 .. _`Semantic Versioning 2.0.0`: http://semver.org/
