@@ -102,9 +102,10 @@ Notes on versioning
 Libraries should have a clear versioning strategy. Ideally there would be one versioning strategy adopted by all software
 projects. Many developers consider `Semantic Versioning 2.0.0`_ to be that universal strategy.
 
-Yaidom has not adopted Semantic Versioning. After all, not all incompatible API changes are the same. Upgrading the major version
-number (from 1 to 2) would be the result of a complete rethink of the entire library (even if the result would largely
-be compatible with versions 1.X.Y). Minor version bumps correspond to "themes", or to deprecations or removal of deprecations:
+Yaidom has not adopted Semantic Versioning. After all, not all incompatible API changes are the same. I would like to
+think of yaidom 2 as a complete rethink of the library, so for that I would like to use versions 2.X.Y. So now yaidom
+1.X.Y is evolving, sometimes introducing breaking changes. Minor version bumps correspond to "themes", or to deprecations
+or removal of deprecations:
 
 * Version 1.1 improves orthogonality (much of it under the hood for typical uses of the library)
 * Version 1.2 deprecates some code
@@ -116,7 +117,9 @@ be compatible with versions 1.X.Y). Minor version bumps correspond to "themes", 
 During this evolution it is tried to make yaidom meaner and cleaner. Much of it is discovered, rather than designed up-front.
 Discovering the "core of yaidom" requires experimentation, lots of it. For example, the functional update support of
 version 1.5 required many committed (!) attempts to have it evolve into a worthy companion to the query and transformation APIs.
-The constant need for experimentation makes evolving yaidom without frequent backwards-incompatible changes impractical.
+The constant need for experimentation makes evolving yaidom without sufficiently frequent backwards-incompatible changes
+quite hard to achieve. Of course, in spite of the experimentation, once a new version is released, the impact should be
+clear and no larger than needed. Deprecation may help, but not always.
 
 On the other hand, the public API of yaidom 1.X is getting more and more stable. The query API and transformation API
 have been reasonably stable from the user point of view for quite some time. The update API is also getting more stable.
@@ -126,8 +129,17 @@ The world according to `Semantic Versioning 2.0.0`_ does not really exist. In an
 libraries still requires conscious decisions, and can not be left to tools alone. These libraries should at least have a clear
 change log, and some versioning strategy that users come to rely on.
 
-For a critique of semantic versioning, see `Why Semantic Versioning Isn't`_. Alas, sometimes dependencies get very messy.
-As a well-known example, consider the `Xerces version hell`_.
+For a critique of semantic versioning, see `Why Semantic Versioning Isn't`_. After all, if I would like to speak of
+yaidom 2.0 at some point, why do I have to call it yaidom 48.0 instead? That does not convey any semantics at all.
+The impact of the version is invisible when using just another major version bump.
+
+Not all breaking changes are equal. If in yaidom a query method is moved from one query API trait to another, it is
+likely that yaidom users will not notice this in the use of the API, because using the query API traits directly is
+not a typical use of the library. Still, it would be a breaking change, requiring recompilation of code using yaidom.
+With Scala it is very easy to cause such "innocent" breaking changes. Deprecation does not help either in this case.
+I would like the user to know, via the change log, but I would not like to increase the marjor version number in this case.
+
+What's more, sometimes dependencies get very messy. As a well-known example, consider the `Xerces version hell`_.
 
 Yaidom does adopt some underlying ideas of Semantic Versioning, such as:
 
