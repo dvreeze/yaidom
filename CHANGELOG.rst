@@ -3,6 +3,29 @@ CHANGELOG
 =========
 
 
+1.5.0-M1
+========
+
+Version 1.5.0-M1 improves the functional query API. It is now more consistent with the query API and transformation API.
+It is hopefully useful and easy to use (especially methods like updateTopmostElemsOrSelf), and should have good runtime performance.
+Update support for indexed elements is also planned for version 1.5.0, but is not yet available in version 1.5.0-M1.
+
+The main changes in this version are:
+
+* Trait ``UpdatableElemApi`` has been enhanced with many new functional update methods, deprecating the old updatedXXX methods
+* The simple ``Document`` class has been enhanced with several of these new update methods too (using delegation)
+* Method ``findAllChildElemsWithPathEntries`` is now in trait ``IsNavigableApi`` (for the user this makes no difference)
+* Class ``ElemWithPath`` has been added as a very lightweight "indexed element", and is used in the new update support
+* Added lazy indexed elements, trading query performance for construction time performance
+* Easy creation of ``IndexedClarkElem`` and ``IndexedScopedElem`` instances
+* Document parsers and printers can now be configured with a custom conversion strategy
+* Bug fix for yaidom-0003, and partial bug fix for yaidom-0002
+* Removal of previously deprecated code
+
+Upgrading from version 1.4.2 to this version requires recompilation of code using yaidom. Other than that, successful
+compilation is likely, but deprecation warnings will occur for much of the old functional update API.
+
+
 1.4.2
 =====
 
