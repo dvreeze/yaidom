@@ -137,7 +137,7 @@ Not all breaking changes are equal. If in yaidom a query method is moved from on
 likely that yaidom users will not notice this in the use of the API, because using the query API traits directly is
 not a typical use of the library. Still, it would be a breaking change, requiring recompilation of code using yaidom.
 With Scala it is very easy to cause such "innocent" breaking changes. Deprecation does not help either in this case.
-I would like the user to know, via the change log, but I would not like to increase the marjor version number in this case.
+I would like the user to know, via the change log, but I would not like to increase the major version number in this case.
 
 What's more, sometimes dependencies get very messy. As a well-known example, consider the `Xerces version hell`_.
 
