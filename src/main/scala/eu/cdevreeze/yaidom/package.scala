@@ -17,7 +17,7 @@
 package eu.cdevreeze
 
 /**
- * <em>Yaidom</em> is yet another Scala immutable DOM-like XML API. The other well-known Scala immutable DOM-like APIs are
+ * <em>Yaidom</em> is yet another Scala immutable DOM-like XML API. Some other well-known Scala immutable DOM-like APIs are
  * the standard scala.xml API and Anti-XML. The latter API is considered by many to be an improvement over the former, but both APIs:
  * <ul>
  * <li>attempt to offer an XPath-like querying experience, thus somewhat blurring the distinction between nodes and node collections</li>

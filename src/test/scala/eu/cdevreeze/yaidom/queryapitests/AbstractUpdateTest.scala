@@ -262,7 +262,9 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  // Reorder all explicit members in context entities
+  // Reorder all explicit members in context entities.
+  // This example shows how method updateTopmostElems helps in updating elements with specific ancestries.
+  // It appears that the updateTopmostXXX methods can do a lot that otherwise could be done using XSLT.
 
   @Test def testReorderExplicitMembers(): Unit = {
     // Easy to express using updateTopmostElems method

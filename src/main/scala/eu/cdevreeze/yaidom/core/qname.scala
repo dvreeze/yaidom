@@ -20,7 +20,8 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 
 /**
  * Qualified name. See http://www.w3.org/TR/xml-names11/.
- * Semantically like a `QName` in Anti-XML, and not like a `QName` in Java.
+ * It is the combination of an optional prefix and a mandatory local part. It is not like a `QName` in Java, which
+ * is more like what yaidom calls an expanded name.
  *
  * There are 2 types of `QName`s:
  * <ul>
