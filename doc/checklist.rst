@@ -114,6 +114,13 @@ be compatible with versions 1.X.Y). Minor version bumps correspond to "themes", 
 * Version 1.6 improves element creation APIs
 
 During this evolution it is tried to make yaidom meaner and cleaner. Much of it is discovered, rather than designed up-front.
+Discovering the "core of yaidom" requires experimentation, lots of it. For example, the functional update support of
+version 1.5 required many committed (!) attempts to make it a worthy companion to the query and transformation APIs.
+The constant need for experimentation makes evolving yaidom without frequent backwards-incompatible changes impractical.
+
+On the other hand, the public API of yaidom 1.X is getting more and more stable. The query API and transformation API
+have been reasonably stable from the user point of view for quite some time. The update API is also getting more stable.
+Yet it does not follow Semantic Versioning.
 
 The world according to `Semantic Versioning 2.0.0`_ does not really exist. In any case, upgrading dependencies on other
 libraries still requires conscious decisions, and can not be left to tools alone. These libraries should at least have a clear
