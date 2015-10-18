@@ -49,7 +49,8 @@ Other checks
 
 Other checks (w.r.t. documentation and bookkeeping) are:
 
-* Road map, and sensible versioning strategy.
+* Road map.
+* Sensible versioning strategy.
 * Proper dependency management (e.g., supporting use of the library in an sbt or Maven build).
 * Issue tracking.
 * Test coverage.
@@ -62,3 +63,80 @@ Other checks (w.r.t. documentation and bookkeeping) are:
 * No sufficiently urgent TODOs are left.
 * Running a diff against the preceding release (using diff or meld).
 
+
+Notes on genericity
+===================
+
+How generic should a library be? Yaidom is by design generic in its support for "arbitrary" DOM-like trees, but other than that
+yaidom is quite conservative w.r.t. genericity. For example:
+
+* The collections are all immutable IndexedSeq collections.
+* Yaidom's query API offers mostly "element filtering" methods (no map-like operations, no need for CanBuildFrom, and elements are more central than nodes in general).
+* The query API mainly offers only 3 "axes" for element nodes (child elements, descendant elements, and descendant-or-self elements).
+
+Yaidom also uses no "generic tree API". After all, each domain may have a somewhat different idea about (general) trees.
+For example, in the domain of XML there are different kinds of nodes, and element nodes take a very central position.
+Moreover, for XML DOM-like trees it is natural to assume finite (and typically even limited) tree depths, whereas in
+many other domains the tree query API should let the user choose a maximum tree depth. Another example is the choice
+of how to represent immutable trees that still know about their context (ancestor nodes). Yaidom made a specific choice
+in this regard ("indexed" elements).
+
+Yaidom's conservative approach towards genericity for example means that streams are not first-class citizens in the
+query API. So in theory yaidom is not a powerful API (w.r.t. genericity). In practice things are not that bad:
+
+* Yaidom is simple, easy to understand, and has a small conceptual surface area.
+* While yaidom keeps evolving, this small conceptual surface area is retained as much as possible.
+* It is easy to reason about performance of the library.
+* It is easy to maintain the library, staying within a low "complexity budget", as long as yaidom sticks to its philosophy (see above).
+* With a little effort on the part of the user of the API, a lot is still possible (such as streaming scenarios).
+* Yaidom interoperates well with other powerful libraries, such as the Scala Collections API and JAXP for bootstrapping.
+
+Maybe not generalizing too much is indeed not such a bad thing. For example, maybe Scala's Collections API
+took genericity a bit too far, offering much of the same API for immutable and mutable collections (and for strictly
+and lazily evaluated collections).
+
+
+Notes on versioning
+===================
+
+Libraries should have a clear versioning strategy. Ideally there would be one versioning strategy adopted by all software
+projects. Many developers consider `Semantic Versioning 2.0.0`_ to be that universal strategy.
+
+Yaidom has not adopted Semantic Versioning. After all, not all incompatible API changes are the same. Upgrading the major version
+number (from 1 to 2) would be the result of a complete rethink of the entire library (even if the result would largely
+be compatible with versions 1.X.Y). Minor version bumps correspond to "themes", or to deprecations or removal of deprecations:
+
+* Version 1.1 improves orthogonality (much of it under the hood for typical uses of the library)
+* Version 1.2 deprecates some code
+* Version 1.3 removes these deprecations
+* Version 1.4 makes yaidom still meaner and cleaner w.r.t. indexed elements and 2 main query APIs: "clark" and "scoped"
+* Version 1.5 improves functional updates (and makes them more consistent with the rest of the API)
+* Version 1.6 improves element creation APIs
+
+During this evolution it is tried to make yaidom meaner and cleaner. Much of it is discovered, rather than designed up-front.
+
+The world according to `Semantic Versioning 2.0.0`_ does not really exist. In any case, upgrading dependencies on other
+libraries still requires conscious decisions, and can not be left to tools alone. These libraries should at least have a clear
+change log, and some versioning strategy that users come to rely on.
+
+For a critique of semantic versioning, see `Why Semantic Versioning Isn't`_. Alas, sometimes dependencies get very messy.
+As a well-known example, consider the `Xerces version hell`_.
+
+Yaidom does adopt some underlying ideas of Semantic Versioning, such as:
+
+* For each version, have and communicate an explicit public API of the library
+* Have and communicate an explicit versioning strategy
+
+Yaidom's versioning strategy is as follows:
+
+* Yaidom bumps major versions only for entire rethinks of the library.
+* Yaidom bumps minor versions where semantic versioning requires major version bumps.
+* Yaidom bumps patch versions mostly for backwards-compatible additions and bug fixes, although currently this backwards-compatibility is not guaranteed.
+
+The change log should make the impact of yaidom version bumps clear, however. Typical non-backwards-compatible changes
+in patch versions fix problems introduced in the preceding patch version. This means that a change in yaidom becomes more
+stable if it survives one patch version bump (unless overridden by the next minor version bump).
+
+.. _`Semantic Versioning 2.0.0`: http://semver.org/
+.. _`Why Semantic Versioning Isn't`: https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e
+.. _`Xerces version hell`: http://stackoverflow.com/questions/11677572/dealing-with-xerces-hell-in-java-maven
