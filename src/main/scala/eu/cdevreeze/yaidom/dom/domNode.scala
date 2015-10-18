@@ -231,9 +231,6 @@ object DomNode {
   }
 
   def wrapElement(elm: w3c.dom.Element): DomElem = new DomElem(elm)
-
-  @deprecated(message = "Use 'DomDocument.wrapDocument' instead", since = "1.4.0")
-  def wrapDocument(doc: w3c.dom.Document): DomDocument = new DomDocument(doc)
 }
 
 object CanBeDomDocumentChild {
