@@ -31,8 +31,7 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
  * Very lightweight lazy indexed element implementation. It offers the `IndexedClarkElemApi` query API. It is optimized
- * for fast (just-in-time) element creation, not for fast querying. Use this whenever wanting to query for (pairs of
- * elements and) paths, for example to collect the paths before using them to functionally update the element tree.
+ * for fast (just-in-time) element creation, not for fast querying.
  *
  * @tparam U The underlying element type
  *
