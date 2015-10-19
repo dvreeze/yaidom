@@ -103,7 +103,7 @@ Libraries should have a clear versioning strategy. Ideally there would be one ve
 projects. Many developers consider `Semantic Versioning 2.0.0`_ to be that universal strategy.
 
 Yaidom has not adopted Semantic Versioning. After all, not all incompatible API changes are the same. I would like to
-think of yaidom 2 as a complete rethink of the library, so for that I would like to use versions 2.X.Y. So now yaidom
+think of yaidom 2 as a complete rethink of the library, so for that I would like to use versions 2.X.Y. Currently (2015) yaidom
 1.X.Y is evolving, sometimes introducing breaking changes. Minor version bumps correspond to "themes", or to deprecations
 or removal of deprecations:
 
@@ -121,11 +121,11 @@ The constant need for experimentation makes evolving yaidom without sufficiently
 quite hard to achieve. Of course, in spite of the experimentation, once a new version is released, the impact should be
 clear and no larger than needed. Deprecation may help, but not always.
 
-On the other hand, the public API of yaidom 1.X is getting more and more stable. The query API and transformation API
+Fortunately, the public API of yaidom 1.X is getting more and more stable. The query API and transformation API
 have been reasonably stable from the user point of view for quite some time. The update API is also getting more stable.
 Yet it does not follow Semantic Versioning.
 
-The world according to `Semantic Versioning 2.0.0`_ does not really exist. In any case, upgrading dependencies on other
+The world according to `Semantic Versioning 2.0.0`_ does not really exist. Upgrading dependencies on other
 libraries still requires conscious decisions, and can not be left to tools alone. These libraries should at least have a clear
 change log, and some versioning strategy that users come to rely on.
 
