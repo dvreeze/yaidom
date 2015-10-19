@@ -11,7 +11,7 @@ version := "1.4.3-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.11.7", "2.10.5") // ++ Seq("2.12.0-M1")
+crossScalaVersions := Seq("2.11.7", "2.10.6") // ++ Seq("2.12.0-M3")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -26,7 +26,7 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 }
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (!version.contains("2.10")) Seq("org.scala-lang.modules" %% "scala-xml" % "1.0.4")
+  if (!version.contains("2.10")) Seq("org.scala-lang.modules" %% "scala-xml" % "1.0.5")
   else Seq()
 }
 
@@ -35,7 +35,7 @@ libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12.0-M1")) "org.scalatest" % "scalatest_2.12.0-M1" % "2.2.5-M1" % "test"
+  if (version.contains("2.12.0-M3")) "org.scalatest" % "scalatest_2.12.0-M3" % "2.2.5-M3" % "test"
   else "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 }
 
@@ -47,17 +47,17 @@ libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
 libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
 
-libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.6.0-6" % "test"
+libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.6.0-7" % "test"
 
-libraryDependencies += ("joda-time" % "joda-time" % "2.8" % "test").intransitive()
+libraryDependencies += ("joda-time" % "joda-time" % "2.8.2" % "test").intransitive()
 
-libraryDependencies += ("org.joda" % "joda-convert" % "1.7" % "test").intransitive()
+libraryDependencies += ("org.joda" % "joda-convert" % "1.8.1" % "test").intransitive()
 
 libraryDependencies += "com.google.guava" % "guava" % "18.0" % "test"
 
-libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0" % "test"
+libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1" % "test"
 
-libraryDependencies += ("org.codehaus.woodstox" % "woodstox-core-asl" % "4.4.1" % "test").intransitive()
+libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.0.1" % "test").intransitive()
 
 libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "3.1.4" % "test"
 
