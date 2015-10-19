@@ -90,4 +90,8 @@ class UpdateTest extends AbstractUpdateTest {
 
     e.withChildren(e.findAllChildElems.sortBy(_.attributeOption(EName("dimension")).getOrElse("")))
   }
+
+  protected def updateFactValue(e: E): E = {
+    e.withChildren(Vector(Text("235")))
+  }
 }

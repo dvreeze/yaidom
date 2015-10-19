@@ -34,6 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Text
 
 /**
  * Update test, using different yaidom methods of updating.
@@ -297,6 +298,34 @@ abstract class AbstractUpdateTest extends Suite {
     }
   }
 
+  // Update the value of a specific fact
+
+  @Test def testUpdateFact(): Unit = {
+    val gaapNs = "http://xasb.org/gaap"
+
+    val elems =
+      ElemWithPath(rootElem) filterChildElems { e =>
+        e.elem.resolvedName == EName(gaapNs, "AverageNumberEmployees") &&
+          e.elem.attributeOption(EName("contextRef")) == Some("D-2003") &&
+          e.elem.attributeOption(EName("unitRef")) == Some("U-Pure")
+      }
+    val paths = elems.map(_.path)
+
+    assertResult(List(Path.from(EName(gaapNs, "AverageNumberEmployees") -> 2))) {
+      paths
+    }
+
+    val newRootElem = rootElem.updateElemsOrSelf(paths.toSet) { (e, p) =>
+      require(e.resolvedName == EName(gaapNs, "AverageNumberEmployees"))
+
+      updateFactValue(e)
+    }
+
+    assertResult(Set("100", "200", "235", "240", "250", "300")) {
+      newRootElem.filterChildElems(_.resolvedName == EName(gaapNs, "AverageNumberEmployees")).map(_.text).toSet
+    }
+  }
+
   // Helper methods
 
   private def checkElemAfterMeasureUpdate(elm: E): Unit = {
@@ -360,4 +389,6 @@ abstract class AbstractUpdateTest extends Suite {
   protected def updateContextRef(e: E): E
 
   protected def reorderSegmentChildren(e: E): E
+
+  protected def updateFactValue(e: E): E
 }
