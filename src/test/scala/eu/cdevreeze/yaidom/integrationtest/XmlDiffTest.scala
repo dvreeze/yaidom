@@ -92,10 +92,10 @@ class XmlDiffTest extends Suite {
 
     val diffs = XmlDiffTest.findDiffs(doc1.documentElement, editedDoc2.documentElement)
 
-    assertResult(Set(Path.Root, Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0))) {
+    assertResult(Set(Path.Empty, Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0))) {
       diffs.allDiffs
     }
-    assertResult(Set(Path.Root, Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0))) {
+    assertResult(Set(Path.Empty, Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0))) {
       diffs.inBothElemsButDiffering
     }
   }
@@ -118,12 +118,12 @@ class XmlDiffTest extends Suite {
     val diffs = XmlDiffTest.findDiffs(doc1.documentElement, editedDoc2.documentElement)
 
     assertResult(Set(
-      Path.Root,
+      Path.Empty,
       Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0),
       Path.from(EName("{http://www.w3.org/2005/Atom}Title") -> 0))) {
       diffs.allDiffs
     }
-    assertResult(Set(Path.Root)) {
+    assertResult(Set(Path.Empty)) {
       diffs.inBothElemsButDiffering
     }
     assertResult(Set(Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0))) {

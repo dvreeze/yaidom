@@ -165,7 +165,7 @@ object IndexedClarkElem {
       build(None, rootElem)
 
     override def build(docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] =
-      build(docUriOption, rootElem, Path.Root)
+      build(docUriOption, rootElem, Path.Empty)
 
     override def build(rootElem: U, path: Path): IndexedClarkElem[U] = {
       build(None, rootElem, path)

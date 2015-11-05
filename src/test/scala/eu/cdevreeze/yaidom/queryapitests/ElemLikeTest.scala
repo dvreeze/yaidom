@@ -502,7 +502,7 @@ class ElemLikeTest extends Suite {
     require(bookstore.localName == "Bookstore")
 
     assertResult(Some(bookstore)) {
-      bookstore.findElemOrSelfByPath(Path.Root)
+      bookstore.findElemOrSelfByPath(Path.Empty)
     }
 
     val scope = Scope.from(Map("b" -> ns.toString))

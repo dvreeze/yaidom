@@ -64,7 +64,10 @@ final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) ex
 
 object PathBuilder {
 
-  val Root: PathBuilder = PathBuilder(immutable.IndexedSeq())
+  val Empty: PathBuilder = PathBuilder(immutable.IndexedSeq())
+
+  @deprecated(message = "Use 'Empty' instead", since = "1.5.0")
+  val Root: PathBuilder = Empty
 
   def apply(entries: immutable.IndexedSeq[PathBuilder.Entry]): PathBuilder = new PathBuilder(entries)
 

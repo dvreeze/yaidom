@@ -77,10 +77,10 @@ object LazyIndexedClarkElem {
   }
 
   def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): LazyIndexedClarkElem[U] = {
-    apply(docUriOption, rootElem, Path.Root)
+    apply(docUriOption, rootElem, Path.Empty)
   }
 
   def apply[U <: ClarkElemApi[U]](rootElem: U): LazyIndexedClarkElem[U] = {
-    apply(None, rootElem, Path.Root)
+    apply(None, rootElem, Path.Empty)
   }
 }

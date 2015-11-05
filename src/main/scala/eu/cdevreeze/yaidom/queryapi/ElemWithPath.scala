@@ -46,5 +46,5 @@ object ElemWithPath {
 
   def apply[E <: IsNavigableApi[E]](elem: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elem, path)
 
-  def apply[E <: IsNavigableApi[E]](elem: E): ElemWithPath[E] = new ElemWithPath[E](elem, Path.Root)
+  def apply[E <: IsNavigableApi[E]](elem: E): ElemWithPath[E] = new ElemWithPath[E](elem, Path.Empty)
 }

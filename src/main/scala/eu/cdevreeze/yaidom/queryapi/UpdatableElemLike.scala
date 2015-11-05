@@ -170,7 +170,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
           }
       }
 
-    if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else descendantUpdateResult
+    if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
   }
 
   final def updateElems(paths: Set[Path])(f: (E, Path) => E): E = {
@@ -198,7 +198,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
           }
       }
 
-    if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else Vector(descendantUpdateResult)
+    if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
   }
 
   final def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {

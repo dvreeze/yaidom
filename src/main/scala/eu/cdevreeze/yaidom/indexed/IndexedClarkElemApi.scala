@@ -118,7 +118,7 @@ object IndexedClarkElemApi {
     def build(rootElem: U): E
 
     /**
-     * Returns the same as `build(docUriOption, rootElem, Path.Root)`.
+     * Returns the same as `build(docUriOption, rootElem, Path.Empty)`.
      */
     def build(docUriOption: Option[URI], rootElem: U): E
 

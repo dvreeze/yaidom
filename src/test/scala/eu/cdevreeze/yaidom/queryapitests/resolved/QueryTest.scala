@@ -74,7 +74,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
 
     // Not using method Elem.updated here
-    val bookStoreWithPaths = addElemPaths(bookstore, Path.Root, Scope.Empty)
+    val bookStoreWithPaths = addElemPaths(bookstore, Path.Empty, Scope.Empty)
 
     val elms =
       for {
@@ -319,7 +319,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookstoreWithoutPrices: Elem =
       bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Book") => removePrice(e)
-        case e => e
+        case e                                    => e
       }
 
     assertResult(4) {
@@ -356,7 +356,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookstoreWithCombinedNames: Elem =
       bookstore transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") => combineName(e)
-        case e => e
+        case e                                      => e
       }
 
     assertResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {

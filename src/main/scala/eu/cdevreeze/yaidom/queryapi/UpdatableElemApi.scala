@@ -358,13 +358,13 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *       }
    *   }
    *
-   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else descendantUpdateResult
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
    * }}}
    *
    * In other words, returns:
    * {{{
    * val descendantUpdateResult = updateElems(paths)(f)
-   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else descendantUpdateResult
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
    * }}}
    *
    * If the set of paths is small, this method is rather efficient.
@@ -408,13 +408,13 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *       }
    *   }
    *
-   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else Vector(descendantUpdateResult)
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
    * }}}
    *
    * In other words, returns:
    * {{{
    * val descendantUpdateResult = updateElemsWithNodeSeq(paths)(f)
-   * if (paths.contains(Path.Root)) f(descendantUpdateResult, Path.Root) else Vector(descendantUpdateResult)
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
    * }}}
    *
    * If the set of paths is small, this method is rather efficient.

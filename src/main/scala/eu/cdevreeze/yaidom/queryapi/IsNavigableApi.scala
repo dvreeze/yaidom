@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * Some properties are expected to hold for "navigable elements":
  * {{{
- * getElemOrSelfByPath(Path.Root) == self
+ * getElemOrSelfByPath(Path.Empty) == self
  *
  * findElemOrSelfByPath(path1).flatMap(e => e.findElemOrSelfByPath(path2)) == findElemOrSelfByPath(path1.append(path2))
  * }}}

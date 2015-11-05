@@ -79,10 +79,10 @@ object LazyIndexedScopedElem {
   }
 
   def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): LazyIndexedScopedElem[U] = {
-    apply(docUriOption, rootElem, Path.Root)
+    apply(docUriOption, rootElem, Path.Empty)
   }
 
   def apply[U <: ScopedElemApi[U]](rootElem: U): LazyIndexedScopedElem[U] = {
-    apply(None, rootElem, Path.Root)
+    apply(None, rootElem, Path.Empty)
   }
 }

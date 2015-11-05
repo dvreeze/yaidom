@@ -114,7 +114,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   /** Returns the `Path` with the first path entry (if any) removed, wrapped in an `Option`. */
   def withoutFirstEntryOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
-    case _ => Some(Path(entries.tail))
+    case _                => Some(Path(entries.tail))
   }
 
   /** Like `withoutFirstEntryOption`, but unwrapping the result (or throwing an exception otherwise) */
@@ -138,7 +138,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
    */
   def parentPathOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
-    case _ => Some(Path(entries.dropRight(1)))
+    case _                => Some(Path(entries.dropRight(1)))
   }
 
   /** Like `parentPathOption`, but unwrapping the result (or throwing an exception otherwise) */
@@ -215,7 +215,10 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
 
 object Path {
 
-  val Root: Path = Path(immutable.IndexedSeq())
+  val Empty: Path = Path(immutable.IndexedSeq())
+
+  @deprecated(message = "Use 'Empty' instead", since = "1.5.0")
+  val Root: Path = Empty
 
   def apply(entries: immutable.IndexedSeq[Path.Entry]): Path = new Path(entries)
 

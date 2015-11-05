@@ -102,7 +102,7 @@ object IndexedScopedElem {
       build(None, rootElem)
 
     override def build(docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] =
-      build(docUriOption, rootElem, Path.Root)
+      build(docUriOption, rootElem, Path.Empty)
 
     override def build(rootElem: U, path: Path): IndexedScopedElem[U] = {
       build(None, rootElem, path)

@@ -160,7 +160,7 @@ class Blog2XbrlTest extends Suite {
     assertResult(EName(GaapNs, "AverageNumberEmployees")) {
       conceptAspect(fact)
     }
-    assertResult(Path.Root) {
+    assertResult(Path.Empty) {
       locationAspect(fact)
     }
     assertResult(Some(("http://regulator.gov/id", "1234567890"))) {
@@ -191,7 +191,7 @@ class Blog2XbrlTest extends Suite {
     assertResult(facts.map(_.resolvedName).toSet) {
       altInstanceElem.filterElems(withEName(None, "conceptAspect")).map(e => EName.parse(e.text)).toSet
     }
-    assertResult(Set(Path.Root)) {
+    assertResult(Set(Path.Empty)) {
       altInstanceElem.filterElems(withEName(None, "locationAspect")).map(e => Path.fromCanonicalXPath(e.text)(Scope.Empty)).toSet
     }
     assertResult(Set("http://regulator.gov/id")) {
@@ -343,7 +343,7 @@ class Blog2XbrlTest extends Suite {
   // Yaidom Paths wijzen een element binnen een element tree aan.
 
   def locationAspect(fact: indexed.Elem): Path =
-    fact.path.parentPathOption.getOrElse(Path.Root)
+    fact.path.parentPathOption.getOrElse(Path.Empty)
 
   def entityIdentifierAspectOption(fact: indexed.Elem): Option[(String, String)] = {
     val contextOption =

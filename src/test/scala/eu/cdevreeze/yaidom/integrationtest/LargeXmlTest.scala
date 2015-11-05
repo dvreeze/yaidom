@@ -361,7 +361,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
     // Arbitrarily adding root path as extra (ignored) update path
-    val paths = Set(path, Path.Root)
+    val paths = Set(path, Path.Empty)
 
     val newPhone = "012-34567890"
 
@@ -418,7 +418,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
     // Arbitrarily adding root path as extra (ignored) update path
-    val paths = Set(path, Path.Root)
+    val paths = Set(path, Path.Empty)
 
     val newPhone = "012-34567890"
 

@@ -349,7 +349,7 @@ class AnotherUpdateTest extends Suite {
 
   private def testPropertyAboutUpdatedWithNodeSeq(elem: Elem, path: Path, f: Elem => immutable.IndexedSeq[Node]): Unit = {
     def g(e: Elem): Elem = {
-      if (path == Path.Root) e
+      if (path == Path.Empty) e
       else {
         e.withPatchedChildren(
           e.childNodeIndex(path.lastEntry),
@@ -358,7 +358,7 @@ class AnotherUpdateTest extends Suite {
       }
     }
 
-    val updatedElem = elem.updateElemOrSelf(path.parentPathOption.getOrElse(Path.Root))(g)
+    val updatedElem = elem.updateElemOrSelf(path.parentPathOption.getOrElse(Path.Empty))(g)
 
     assertResult(resolved.Elem(updatedElem)) {
       resolved.Elem(elem.updateElemWithNodeSeq(path)(f))

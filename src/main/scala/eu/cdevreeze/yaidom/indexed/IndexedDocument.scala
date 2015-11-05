@@ -50,7 +50,7 @@ abstract class IndexedDocument[U <: ScopedElemApi[U]](
     children.collect({ case elm: IndexedScopedElem[U] => elm }).size == 1,
     s"A document must have exactly one (IndexedScopedElem) child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
-  require(documentElement.path == Path.Root, "The document element must have the root Path")
+  require(documentElement.path == Path.Empty, "The document element must have the root Path")
 
   final def documentElement: IndexedScopedElem[U] =
     children.collect({ case elm: IndexedScopedElem[U] => elm }).head
