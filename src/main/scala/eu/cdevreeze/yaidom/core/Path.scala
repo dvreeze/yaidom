@@ -96,11 +96,13 @@ import scala.collection.mutable
  * @author Chris de Vreeze
  */
 final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutable { self =>
-
   require(entries ne null)
 
-  /** Returns true if this is the root `Path`, so if it has no entries */
-  def isRoot: Boolean = entries.isEmpty
+  /** Returns true if this is the empty `Path`, so if it has no entries */
+  def isEmpty: Boolean = entries.isEmpty
+
+  @deprecated(message = "Use 'isEmpty' instead", since = "1.5.0")
+  def isRoot: Boolean = isEmpty
 
   /** Returns the element name (as EName) of the last path entry, if any, wrapped in an Option */
   def elementNameOption: Option[EName] = lastEntryOption.map(_.elementName)
@@ -149,7 +151,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
     @tailrec
     def accumulate(path: Path, acc: mutable.ArrayBuffer[Path]): mutable.ArrayBuffer[Path] = {
       acc += path
-      if (path.isRoot) acc else accumulate(path.parentPath, acc)
+      if (path.isEmpty) acc else accumulate(path.parentPath, acc)
     }
 
     accumulate(self, mutable.ArrayBuffer[Path]()).toIndexedSeq

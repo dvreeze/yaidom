@@ -160,7 +160,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     }
 
     def isIdentifierPath(p: Path): Boolean = {
-      !p.isRoot && (p.elementNameOption.get == EName(XbrliNs, "identifier"))
+      !p.isEmpty && (p.elementNameOption.get == EName(XbrliNs, "identifier"))
     }
 
     assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier"))) {

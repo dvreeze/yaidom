@@ -158,7 +158,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E = {
-    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     val descendantUpdateResult =
       updateChildElems(pathsByFirstEntry.keySet) {
@@ -174,7 +174,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updateElems(paths: Set[Path])(f: (E, Path) => E): E = {
-    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     updateChildElems(pathsByFirstEntry.keySet) {
       case (che, pathEntry) =>
@@ -186,7 +186,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
-    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     val descendantUpdateResult =
       updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
@@ -202,7 +202,7 @@ trait UpdatableElemLike[N, E <: N with UpdatableElemLike[N, E]] extends IsNaviga
   }
 
   final def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E = {
-    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+    val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
       case (che, pathEntry) =>

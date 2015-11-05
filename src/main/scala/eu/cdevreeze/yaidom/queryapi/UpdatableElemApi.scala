@@ -346,7 +346,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * val descendantUpdateResult =
    *   updateChildElems(pathsByFirstEntry.keySet) {
@@ -376,7 +376,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * updateChildElems(pathsByFirstEntry.keySet) {
    *   case (che, pathEntry) =>
@@ -396,7 +396,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * val descendantUpdateResult =
    *   updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
@@ -426,7 +426,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isRoot).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
    *   case (che, pathEntry) =>

@@ -593,7 +593,7 @@ trait AbstractBlogXbrlTestSupport {
       if (ItemFact.accepts(elem)) ItemFact(elem, childElems) else TupleFact(elem, childElems)
 
     def isFactPath(path: Path): Boolean = {
-      !path.isRoot &&
+      !path.isEmpty &&
         !Set(Option(LinkNs), Option(XbrliNs)).contains(path.firstEntry.elementName.namespaceUriOption)
     }
   }

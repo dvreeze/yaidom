@@ -198,7 +198,7 @@ object XbrlSchemaTest {
 
   final class XsdRootElem(wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends XsdElem(wrappedElem) {
     require(resolvedName == EName(nsSchema, "schema"))
-    require(wrappedElem.path.isRoot)
+    require(wrappedElem.path.isEmpty)
 
     def targetNamespaceOption: Option[String] = attributeOption(EName("targetNamespace"))
   }

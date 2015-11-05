@@ -35,7 +35,10 @@ final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) ex
   require(entries ne null)
 
   /** Returns true if this is the root `Path`, so if it has no entries */
-  def isRoot: Boolean = entries.isEmpty
+  def isEmpty: Boolean = entries.isEmpty
+
+  @deprecated(message = "Use 'isEmpty' instead", since = "1.5.0")
+  def isRoot: Boolean = isEmpty
 
   /** Prepends a given `Entry` to this `PathBuilder` */
   def prepend(entry: PathBuilder.Entry): PathBuilder = PathBuilder(entry +: self.entries)
