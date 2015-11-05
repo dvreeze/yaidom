@@ -1,0 +1,2581 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by Charles Hoffman, CPA, UBmatrix: 2011-07-15 -->
+<xbrl xmlns='http://www.xbrl.org/2003/instance'
+	   xmlns:xbrli='http://www.xbrl.org/2003/instance'
+	   xmlns:link='http://www.xbrl.org/2003/linkbase'
+	   xmlns:xlink='http://www.w3.org/1999/xlink'
+	   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	   xmlns:xbrldi="http://xbrl.org/2006/xbrldi" 
+	   xmlns:iso4217='http://www.xbrl.org/2003/iso4217'
+	   xmlns:brm="http://www.xbrlsite.com/Schemas/brm"
+	   xmlns:frm="http://www.xbrlsite.com/Schemas/frm"
+	   xmlns:gaap='http://xasb.org/gaap'
+	  	xmlns:company="http://www.ABCCompany.com/company"
+	   xsi:schemaLocation="http://xbrl.org/2006/xbrldi http://www.xbrl.org/2006/xbrldi-2006.xsd">
+
+
+   <link:schemaRef xlink:type="simple" xlink:href="company.xsd" />
+
+
+   <!-- General Contexts -->
+   <context id='I-2010'>
+      <!-- Consolidated Group, Current Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2009'>
+      <!-- Consolodated Group, Prior Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2009-OrigionallyReported'>
+      <!-- Consolodated Group, Prior Period (Origionally Reported), As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfFebruary222010Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2008'>
+      <!-- Consolodated Group, Prior Period Beginning Balances, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2008-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2007'>
+      <!-- Consolodated Group, Financial Highlights, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2007-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2006'>
+      <!-- Consolodated Group, Financial Highlights, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2006-12-31</instant>
+      </period>
+   </context>
+   <context id='D-2010'>
+      <!-- Consolodated Group, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <context id='D-2010-DI'>
+      <!-- Consolodated Group, Current Period, For Period, Document Information (No reporting scenario axis) -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <context id='D-2010-PSA'>
+      <!-- Preferred Stock Class A, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfPreferredStockDescriptionAxis">company:ClassAPreferredStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-CSA'>
+      <!-- Common Stock Class A, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassACommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <context id='D-2009'>
+      <!-- Consolodated Group, Prior Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2009-01-01</startDate>
+         <endDate>2009-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2009-PSA'>
+      <!-- Preferred Stock Class A, Prior Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfPreferredStockDescriptionAxis">company:ClassAPreferredStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2009-01-01</startDate>
+         <endDate>2009-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2009-CSA'>
+      <!-- Common Stock Class A, Prior Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassACommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2009-01-01</startDate>
+         <endDate>2009-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2008'>
+      <!-- Consolodated Group, Financial Highlights, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2008-01-01</startDate>
+         <endDate>2008-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2007'>
+      <!-- Consolodated Group, Financial Highlights, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2007-01-01</startDate>
+         <endDate>2007-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2006'>
+      <!-- Consolodated Group, Financial Highlights, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2006-01-01</startDate>
+         <endDate>2006-12-31</endDate>
+      </period>
+   </context>
+
+
+<!-- Classes of Preferred Stock -->
+   <context id="I-2010-PSA">
+      <!-- Classes of Preferred Stock, Class A, Current Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfPreferredStockDescriptionAxis">company:ClassAPreferredStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-PSA">
+      <!-- Classes of Preferred Stock, Class A, Prior Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfPreferredStockDescriptionAxis">company:ClassAPreferredStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2008-PSA">
+      <!-- Classes of Preferred Stock, Class A, Prior Prior Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfPreferredStockDescriptionAxis">company:ClassAPreferredStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2008-12-31</instant>
+      </period>
+   </context>
+
+   <!-- Classes of Common Stock -->
+   <context id="I-2010-CSA">
+      <!-- Classes of Common Stock, Class A, Current Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassACommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-CSA">
+      <!-- Classes of Common Stock, Class A, Prior Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassACommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2008-CSA">
+      <!-- Classes of Common Stock, Class A, Prior Prior Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassACommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2008-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2010-CSB">
+      <!-- Classes of Common Stock, Class B, Current Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassBCommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-CSB">
+      <!-- Classes of Common Stock, Class B, Prior Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ClassOfCommonStockDescriptionAxis">company:ClassBCommonStockMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+
+   <!-- Leaseholds -->
+   <context id="D-2010-LIA">
+      <!-- Leasehold Improvements, Leasehold A, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis">company:LeaseholdAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-LIA">
+      <!-- Leasehold Improvements, Leasehold A, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis">company:LeaseholdAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-LIA">
+      <!-- Leasehold Improvements, Leasehold A, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis">company:LeaseholdAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="D-2010-LIB">
+      <!-- Leasehold Improvements, Leasehold B, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis">company:LeaseholdBMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-LIB">
+      <!-- Leasehold Improvements, Leasehold B, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis">company:LeaseholdBMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-LIB">
+      <!-- Leasehold Improvements, Leasehold B, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis">company:LeaseholdBMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="D-2010-LI-ALL">
+      <!-- Leasehold Improvements, All Leaseholds, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <!-- xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis" gaap:AllLeaseholdIdentifiersMember -->
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-LI-ALL">
+      <!-- Leasehold Improvements, All Leaseholds, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <!-- xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis" gaap:AllLeaseholdIdentifiersMember -->
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-LI-ALL">
+      <!-- Leasehold Improvements, All Leaseholds, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <!-- xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingIdentifierAxis" gaap:AllLeaseholdIdentifiersMember -->
+           <xbrldi:explicitMember dimension="gaap:LeaseholdLandAndBuildingStateAxis">gaap:WashingtonMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+
+   <!-- Debt Instruments -->
+   <context id="D-2010-DIA">
+      <!-- Debt Instrument, Instrument A, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-DIA">
+      <!-- Debt Instrument, Instrument A, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-DIA">
+      <!-- Debt Instrument, Instrument A, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="D-2010-DIB">
+      <!-- Debt Instrument, Instrument B, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-DIB">
+      <!-- Debt Instrument, Instrument B, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-DIB">
+      <!-- Debt Instrument, Instrument B, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="D-2010-DIC">
+      <!-- Debt Instrument, Instrument C, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentCMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-DIC">
+      <!-- Debt Instrument, Instrument C, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentCMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-DIC">
+      <!-- Debt Instrument, Instrument C, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DebtInstrumentIdentifierAxis">company:DebtInstrumentCMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+
+
+   <!-- Business Segments -->
+   <context id='D-2010-ALL'>
+      <!-- All Operations, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">gaap:AllOperationsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-CON'>
+      <!-- Continuing Operations, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">gaap:ContinuingOperationsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-E'>
+      <!-- Consolidating Eliminations, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">gaap:EliminationsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='I-2010-E'>
+      <!-- Consolidating Eliminations, Current Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">gaap:EliminationsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id='D-2010-BS1'>
+      <!-- Business Segment 1, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">company:BusinessSegmentOneMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-BS2'>
+      <!-- Business Segment 2, Current Period, For Period -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">company:BusinessSegmentTwoMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='I-2010-BS1'>
+      <!-- Business Segment 1, Current Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">company:BusinessSegmentOneMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2010-BS2'>
+      <!-- Business Segment 2, Current Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">company:BusinessSegmentTwoMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2010-CON'>
+      <!-- Continuing Operations, Current Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">gaap:ContinuingOperationsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id='I-2010-ALL'>
+      <!-- All Operations, Current Period, As of -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+           <xbrldi:explicitMember dimension="frm:BusinessSegmentAxis">gaap:AllOperationsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+
+
+<!-- Share Ownership Plans -->
+   <context id="D-2010-SOP1">
+      <!-- Share Ownership Plans, Plan 1, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ShareOwnershipPlanIdentifierAxis">company:ShareOwnershipPlan1Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-SOP1">
+      <!-- Share Ownership Plans, Plan 1, Current Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ShareOwnershipPlanIdentifierAxis">company:ShareOwnershipPlan1Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-SOP1">
+      <!-- Share Ownership Plans, Plan 1, Prior Period, As of -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ShareOwnershipPlanIdentifierAxis">company:ShareOwnershipPlan1Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+
+   <!-- Subsequent Events -->
+   <context id="D-2010-SE-1">
+      <!-- Subsequent Events, Loss of Uncollectable Receivable, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:SubsequentEventCategoryAxis">gaap:SubsequentEventRelatingToLossOfUncollectableReceivableMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-SE-2">
+      <!-- Subsequent Events, Purchase of Business, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:SubsequentEventCategoryAxis">gaap:SubsequentEventRelatingToPurchaseOfBusinessMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+
+   <!-- Related Parties -->
+   <context id="D-2010-RP1">
+      <!-- Related Party 1, Related Party Transactions, All Transactions, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyNameAxis">company:RelatedParty1Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-RP2">
+      <!-- Related Party 2, Related Party Transactions, All Transactions, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyNameAxis">company:RelatedParty2Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <!-- Related Party Transactions -->
+   <context id="D-2010-RP1T1">
+      <!-- Related Party 1, Related Party Transactions, Transaction 1, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyNameAxis">company:RelatedParty1Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyTransactionTypeAxis">gaap:PurchaseOrSaleOfGoodsWithRelatedPartyMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-RP1T2">
+      <!-- Related Party 1, Related Party Transactions, Transaction 2, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyNameAxis">company:RelatedParty1Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyTransactionTypeAxis">gaap:PurchaseOrSaleOfPropertyOrOtherAssetsWithRelatedPartyMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-RP2T1">
+      <!-- Related Party 2, Related Party Transactions, Transaction 1, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyNameAxis">company:RelatedParty2Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyTransactionTypeAxis">gaap:PurchaseOrSaleOfGoodsWithRelatedPartyMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-RP2T2">
+      <!-- Related Party 2, Related Party Transactions, Transaction 2, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyNameAxis">company:RelatedParty2Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:RelatedPartyTransactionTypeAxis">gaap:TransfersOfResearchAndDevelopmentWithRelatedPartyMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <!-- Director Compensation -->
+   <context id="D-2010-DIR1">
+      <!-- Director Compensation, Director 1, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DirectorNameAxis">company:Director1Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-DIR2">
+      <!-- Director Compensation, Director 2, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:DirectorNameAxis">company:Director2Member</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-DIR-ALL">
+      <!-- Director Compensation, All Directors, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <!-- xbrldi:explicitMember dimension="gaap:DirectorNameAxis" gaap:AllDirectorsMember -->
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+
+   <!-- Reconciliation of Cash -->
+   <context id="D-2010-CREC-A">
+      <!-- Reconciliation of Cash, Reconciling Item Type A, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ReconcilingItemTypeAxis">company:ReconcilingItemTypeAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-CREC-A">
+      <!-- Reconciliation of Cash, Reconciling Item Type A, Current Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ReconcilingItemTypeAxis">company:ReconcilingItemTypeAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-CREC-A">
+      <!-- Reconciliation of Cash, Reconciling Item Type A, Prior Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ReconcilingItemTypeAxis">company:ReconcilingItemTypeAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+   <context id="D-2010-CREC-B">
+      <!-- Reconciliation of Cash, Reconciling Item Type B, Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ReconcilingItemTypeAxis">company:ReconcilingItemTypeBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="I-2010-CREC-B">
+      <!-- Reconciliation of Cash, Reconciling Item Type B, Current Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ReconcilingItemTypeAxis">company:ReconcilingItemTypeBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-CREC-B">
+      <!-- Reconciliation of Cash, Reconciling Item Type B, Prior Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:ReconcilingItemTypeAxis">company:ReconcilingItemTypeBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+
+
+<!-- Portfolio of Investments -->
+   <context id="I-2010-INV1">
+      <!-- Investments, T-Bill A, Current Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:InvestmentDescriptionAxis">company:TreasuryBills3.4712010Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTermAxis">gaap:ShortTermMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentCountryAxis">gaap:USAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTypeAxis">gaap:InvestmentInGovernmentalEntitiesMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentEntityAxis">gaap:USFederalGovernmentMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentMoodysRatingAxis">gaap:APlusPlusPlusMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentSPRatingAxis">gaap:AAAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2010-INV2">
+      <!-- Investments, T-Bill B, Current Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:InvestmentDescriptionAxis">company:TreasuryBills3.3712011Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTermAxis">gaap:ShortTermMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentCountryAxis">gaap:USAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTypeAxis">gaap:InvestmentInGovernmentalEntitiesMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentEntityAxis">gaap:USFederalGovernmentMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentMoodysRatingAxis">gaap:APlusPlusPlusMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentSPRatingAxis">gaap:AAAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2010-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-INV3">
+      <!-- Investments, T-Bill C, Prior Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:InvestmentDescriptionAxis">company:TreasuryBills3.4712010Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTermAxis">gaap:ShortTermMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentCountryAxis">gaap:USAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTypeAxis">gaap:InvestmentInGovernmentalEntitiesMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentEntityAxis">gaap:USFederalGovernmentMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentMoodysRatingAxis">gaap:APlusPlusPlusMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentSPRatingAxis">gaap:AAAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+   <context id="I-2009-INV4">
+      <!-- Investments, T-Bill D, Prior Period, As At -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:InvestmentDescriptionAxis">company:TreasuryBills3.3712011Member</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTermAxis">gaap:ShortTermMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentCountryAxis">gaap:USAMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentTypeAxis">gaap:InvestmentInGovernmentalEntitiesMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentEntityAxis">gaap:USFederalGovernmentMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentMoodysRatingAxis">gaap:APlusPlusPlusMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="gaap:InvestmentSPRatingAxis">gaap:AAAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <instant>2009-12-31</instant>
+      </period>
+   </context>
+
+
+   <!-- Sales Analysis -->
+   <context id="D-2010-ABC1">
+      <!-- Sales Analysis, Customer ABC1 -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:CustomerAxis">company:CustomerAMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-ABC2">
+      <!-- Sales Analysis, Customer ABC2 -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:CustomerAxis">company:CustomerBMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id="D-2010-ABC3">
+      <!-- Sales Analysis, Customer ABC3 -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:CustomerAxis">company:CustomerCMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+
+   <!-- PPE Classes -->
+   <context id='D-2010-PPE-Land'>
+      <!-- Land [Member], Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:PropertyPlantAndEquipmentDescriptionOfMajorClassAxis">gaap:LandMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-PPE-Buildings'>
+      <!-- Buildings [Member], Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:PropertyPlantAndEquipmentDescriptionOfMajorClassAxis">gaap:BuildingsMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-PPE-FurnitureFixtures'>
+      <!-- FurnitureAndFixtures [Member], Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:PropertyPlantAndEquipmentDescriptionOfMajorClassAxis">gaap:FurnitureAndFixturesMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+   <context id='D-2010-PPE-Other'>
+      <!-- Other [Member], Current Period, For Period -->
+      <entity>
+         <identifier scheme="http://regulator.gov/id">1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:PropertyPlantAndEquipmentDescriptionOfMajorClassAxis">gaap:OtherPropertyPlantAndEquipmentMember</xbrldi:explicitMember>
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ActualMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+
+
+
+   <!-- Variance Analysis -->
+   <context id='D-2010-Bud'>
+      <!-- Consolodated Group, Current Period, For Period, Budgeted -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:BudgetedMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <context id='D-2010-Var'>
+      <!-- Consolodated Group, Current Period, For Period, Variance -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="frm:ReportingScenarioAxis">frm:ReportingScenariosAllMember</xbrldi:explicitMember>
+           <xbrldi:explicitMember dimension="frm:ReportDateAxis">company:ReportedAsOfMarch182011Member</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+
+   <context id='D-2010-Address'>
+      <!-- Consolodated Group, Current Period, For Period (No reporting scenario axis) -->
+      <entity>
+         <identifier scheme='http://regulator.gov/id'>1234567890</identifier>
+         <segment>
+             
+             
+           <xbrldi:explicitMember dimension="gaap:AddressTypeAxis">gaap:CompanyAddressMember</xbrldi:explicitMember>
+         </segment>
+      </entity>
+      <period>
+         <startDate>2010-01-01</startDate>
+         <endDate>2010-12-31</endDate>
+      </period>
+   </context>
+
+   <!-- Units -->
+   <unit id='U-Monetary'>
+      <!-- US Dollars -->
+      <measure>iso4217:USD</measure>
+   </unit>
+   <unit id="U-Shares">
+      <!-- Shares -->
+     <measure>shares</measure>
+   </unit>
+   <unit id="U-Pure">
+      <!-- Pure; no measure, pure number -->
+     <measure>pure</measure>
+   </unit>
+
+
+
+
+
+
+  <!-- Financial Highlights -->
+  <gaap:RevenuesNet contextRef="D-2008" unitRef="U-Monetary" decimals="INF">4000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2007" unitRef="U-Monetary" decimals="INF">4000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2006" unitRef="U-Monetary" decimals="INF">4000</gaap:RevenuesNet>
+
+  <gaap:IncomeLossFromContinuingOperations contextRef="D-2008" unitRef="U-Monetary" decimals="INF">-4000</gaap:IncomeLossFromContinuingOperations>
+  <gaap:IncomeLossFromContinuingOperations contextRef="D-2007" unitRef="U-Monetary" decimals="INF">-4000</gaap:IncomeLossFromContinuingOperations>
+  <gaap:IncomeLossFromContinuingOperations contextRef="D-2006" unitRef="U-Monetary" decimals="INF">-4000</gaap:IncomeLossFromContinuingOperations>
+
+  <gaap:NetIncomeLoss contextRef="D-2008" unitRef="U-Monetary" decimals="INF">-4000</gaap:NetIncomeLoss>
+  <gaap:NetIncomeLoss contextRef="D-2007" unitRef="U-Monetary" decimals="INF">-4000</gaap:NetIncomeLoss>
+  <gaap:NetIncomeLoss contextRef="D-2006" unitRef="U-Monetary" decimals="INF">-4000</gaap:NetIncomeLoss>
+
+  <gaap:CashFlowProvidedByUsedInOperatingActivitiesNet contextRef="D-2008" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowProvidedByUsedInOperatingActivitiesNet>
+  <gaap:CashFlowProvidedByUsedInOperatingActivitiesNet contextRef="D-2007" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowProvidedByUsedInOperatingActivitiesNet>
+  <gaap:CashFlowProvidedByUsedInOperatingActivitiesNet contextRef="D-2006" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowProvidedByUsedInOperatingActivitiesNet>
+
+  <gaap:CapitalAdditions contextRef="D-2009" unitRef="U-Monetary" decimals="INF">650</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2008" unitRef="U-Monetary" decimals="INF">550</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2007" unitRef="U-Monetary" decimals="INF">450</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2006" unitRef="U-Monetary" decimals="INF">350</gaap:CapitalAdditions>
+
+  <gaap:AverageNumberEmployees contextRef="D-2008" unitRef="U-Pure" decimals="INF">250</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2007" unitRef="U-Pure" decimals="INF">240</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2006" unitRef="U-Pure" decimals="INF">220</gaap:AverageNumberEmployees>
+
+
+  <!-- Balance Sheet -->
+  <gaap:CashAndCashEquivalents id="Item-01" contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:CashAndCashEquivalents>
+  <gaap:ReceivablesNetCurrent id="Item-02" contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ReceivablesNetCurrent>
+
+  <gaap:Inventory contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:Inventory>
+  <gaap:PrepaidExpenses contextRef="I-2010" unitRef="U-Monetary" decimals="INF">500</gaap:PrepaidExpenses>
+  <gaap:InvestmentsAtCost contextRef="I-2010" unitRef="U-Monetary" decimals="INF">500</gaap:InvestmentsAtCost>
+  <gaap:OtherAssetsCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherAssetsCurrent>
+  <gaap:AssetsCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">5000</gaap:AssetsCurrent>
+  <gaap:Land contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:Land>
+  <gaap:BuildingsNet contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNet>
+  <gaap:FurnitureAndFixturesNet contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNet>
+  <gaap:OtherPropertyPlantAndEquipmentNet contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNet>
+  <gaap:PropertyPlantAndEquipmentNet contextRef="I-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNet>
+  <gaap:InvestmentInAffiliates contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:InvestmentInAffiliates>
+  <gaap:OtherAssetsNoncurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">3000</gaap:OtherAssetsNoncurrent>
+  <gaap:AssetsNoncurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">7000</gaap:AssetsNoncurrent>
+  <gaap:Assets contextRef="I-2010" unitRef="U-Monetary" decimals="INF">12000</gaap:Assets>
+
+  <gaap:PayablesAndAccruals contextRef="I-2010" unitRef="U-Monetary" decimals="INF">3000</gaap:PayablesAndAccruals>
+  <gaap:AccountsPayable contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AccountsPayable>
+  <gaap:AccruedInterestPayable contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AccruedInterestPayable>
+  <gaap:AccruedExpenses contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AccruedExpenses>
+  <gaap:OtherPayablesAndAccruals contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherPayablesAndAccruals>
+  <gaap:LongTermDebtCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:LongTermDebtCurrent>
+  <gaap:OtherLiabilitiesCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherLiabilitiesCurrent>
+  <gaap:LiabilitiesCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">5000</gaap:LiabilitiesCurrent>
+  <gaap:LongTermDebtNoncurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebtNoncurrent>
+  <gaap:OtherLiabilitiesNoncurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">500</gaap:OtherLiabilitiesNoncurrent>
+  <gaap:LiabilitiesNoncurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:LiabilitiesNoncurrent>
+  <gaap:Liabilities contextRef="I-2010" unitRef="U-Monetary" decimals="INF">6000</gaap:Liabilities>
+  <gaap:PreferredStock contextRef="I-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:PreferredStock>
+  <gaap:CommonStock contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStock>
+  <gaap:AdditionalPaidInCapital contextRef="I-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:AdditionalPaidInCapital>
+  <gaap:RetainedEarningsAccumulatedLosses contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:RetainedEarningsAccumulatedLosses>
+  <gaap:Equity contextRef="I-2010" unitRef="U-Monetary" decimals="INF">6000</gaap:Equity>
+  <gaap:LiabilitiesAndEquity contextRef="I-2010" unitRef="U-Monetary" decimals="INF">12000</gaap:LiabilitiesAndEquity>
+
+  <gaap:CashAndCashEquivalents contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:CashAndCashEquivalents>
+  <gaap:ReceivablesNetCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:ReceivablesNetCurrent>
+  <gaap:Inventory contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:Inventory>
+  <gaap:PrepaidExpenses contextRef="I-2009" unitRef="U-Monetary" decimals="INF">500</gaap:PrepaidExpenses>
+  <gaap:InvestmentsAtCost contextRef="I-2009" unitRef="U-Monetary" decimals="INF">500</gaap:InvestmentsAtCost>
+  <gaap:OtherAssetsCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherAssetsCurrent>
+  <gaap:AssetsCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">5000</gaap:AssetsCurrent>
+  <gaap:Land contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:Land>
+  <gaap:BuildingsNet contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNet>
+  <gaap:FurnitureAndFixturesNet contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNet>
+  <gaap:OtherPropertyPlantAndEquipmentNet contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNet>
+  <gaap:PropertyPlantAndEquipmentNet contextRef="I-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNet>
+  <gaap:InvestmentInAffiliates contextRef="I-2009" unitRef="U-Monetary" decimals="INF">0</gaap:InvestmentInAffiliates>
+  <gaap:OtherAssetsNoncurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherAssetsNoncurrent>
+  <gaap:AssetsNoncurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">5000</gaap:AssetsNoncurrent>
+  <gaap:Assets contextRef="I-2009" unitRef="U-Monetary" decimals="INF">10000</gaap:Assets>
+
+  <!-- Note the IDs which indicate reclassification. -->
+
+  <gaap:PayablesAndAccruals contextRef="I-2009" unitRef="U-Monetary" decimals="INF">3000</gaap:PayablesAndAccruals>
+  <gaap:AccountsPayable id="Reclassification-01" contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AccountsPayable>
+  <gaap:AccruedInterestPayable id="Reclassification-02" contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AccruedInterestPayable>
+  <gaap:AccruedExpenses id="Reclassification-03" contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AccruedExpenses>
+  <gaap:OtherPayablesAndAccruals id="Reclassification-04" contextRef="I-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherPayablesAndAccruals>
+
+  <gaap:LongTermDebtCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:LongTermDebtCurrent>
+  <gaap:OtherLiabilitiesCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherLiabilitiesCurrent>
+  <gaap:LiabilitiesCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">5000</gaap:LiabilitiesCurrent>
+  <gaap:LongTermDebtNoncurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebtNoncurrent>
+  <gaap:OtherLiabilitiesNoncurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">500</gaap:OtherLiabilitiesNoncurrent>
+  <gaap:LiabilitiesNoncurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:LiabilitiesNoncurrent>
+  <gaap:Liabilities contextRef="I-2009" unitRef="U-Monetary" decimals="INF">6000</gaap:Liabilities>
+  <gaap:PreferredStock contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStock>
+  <gaap:CommonStock contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStock>
+  <gaap:AdditionalPaidInCapital contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapital>
+  <gaap:RetainedEarningsAccumulatedLosses contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:RetainedEarningsAccumulatedLosses>
+  <gaap:Equity contextRef="I-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:Equity>
+  <gaap:LiabilitiesAndEquity contextRef="I-2009" unitRef="U-Monetary" decimals="INF">10000</gaap:LiabilitiesAndEquity>
+
+  <gaap:LongTermDebt contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1500</gaap:LongTermDebt>
+  <gaap:LongTermDebt contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1500</gaap:LongTermDebt>
+
+  <gaap:OtherAssets contextRef="I-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:OtherAssets>
+  <gaap:OtherAssets contextRef="I-2009" unitRef="U-Monetary" decimals="INF">2000</gaap:OtherAssets>
+
+  <gaap:OtherLiabilities contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1500</gaap:OtherLiabilities>
+  <gaap:OtherLiabilities contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1500</gaap:OtherLiabilities>
+
+  <gaap:Land contextRef="I-2008" unitRef="U-Monetary" decimals="INF">1000</gaap:Land>
+  <gaap:BuildingsNet contextRef="I-2008" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNet>
+  <gaap:FurnitureAndFixturesNet contextRef="I-2008" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNet>
+  <gaap:OtherPropertyPlantAndEquipmentNet contextRef="I-2008" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNet>
+  <gaap:PropertyPlantAndEquipmentNet contextRef="I-2008" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNet>
+
+  <gaap:Equity contextRef="I-2008" unitRef="U-Monetary" decimals="INF">1000</gaap:Equity>
+  <gaap:CommonStock contextRef="I-2008" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStock>
+  <gaap:PreferredStock contextRef="I-2008" unitRef="U-Monetary" decimals="INF">0</gaap:PreferredStock>
+  <gaap:AdditionalPaidInCapital contextRef="I-2008" unitRef="U-Monetary" decimals="INF">0</gaap:AdditionalPaidInCapital>
+  <gaap:RetainedEarningsAccumulatedLosses contextRef="I-2008" unitRef="U-Monetary" decimals="INF">0</gaap:RetainedEarningsAccumulatedLosses>
+
+
+
+
+
+  <!-- Balance Sheet, Classes of Stock -->
+
+  <!-- Preferred -->
+
+  <gaap:PreferredStock contextRef="I-2010-PSA" unitRef="U-Monetary" decimals="INF">2000</gaap:PreferredStock>
+  <gaap:PreferredStockParValuePerShare contextRef="I-2010-PSA" unitRef="U-Pure" decimals="INF">1</gaap:PreferredStockParValuePerShare>
+  <gaap:PreferredStockShareSubscriptions contextRef="I-2010-PSA" unitRef="U-Shares" decimals="INF">20000</gaap:PreferredStockShareSubscriptions>
+  <gaap:PreferredStockSharesAuthorized contextRef="I-2010-PSA" unitRef="U-Shares" decimals="INF">20000</gaap:PreferredStockSharesAuthorized>
+  <gaap:PreferredStockSharesIssued contextRef="I-2010-PSA" unitRef="U-Shares" decimals="INF">20000</gaap:PreferredStockSharesIssued>
+  <gaap:PreferredStockShares contextRef="I-2010-PSA" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockShares>
+
+  <gaap:PreferredStock contextRef="I-2009-PSA" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStock>
+  <gaap:PreferredStockParValuePerShare contextRef="I-2009-PSA" unitRef="U-Pure" decimals="INF">1</gaap:PreferredStockParValuePerShare>
+  <gaap:PreferredStockShareSubscriptions contextRef="I-2009-PSA" unitRef="U-Shares" decimals="INF">10000</gaap:PreferredStockShareSubscriptions>
+  <gaap:PreferredStockSharesAuthorized contextRef="I-2009-PSA" unitRef="U-Shares" decimals="INF">10000</gaap:PreferredStockSharesAuthorized>
+  <gaap:PreferredStockSharesIssued contextRef="I-2009-PSA" unitRef="U-Shares" decimals="INF">10000</gaap:PreferredStockSharesIssued>
+  <gaap:PreferredStockShares contextRef="I-2009-PSA" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockShares>
+
+
+  <!-- Common -->
+
+  <gaap:CommonStock contextRef="I-2010-CSA" unitRef="U-Monetary" decimals="INF">500</gaap:CommonStock>
+  <gaap:CommonStockParValuePerShare contextRef="I-2010-CSA" unitRef="U-Pure" decimals="INF">1</gaap:CommonStockParValuePerShare>
+  <gaap:CommonStockShareSubscriptions contextRef="I-2010-CSA" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockShareSubscriptions>
+  <gaap:CommonStockSharesAuthorized contextRef="I-2010-CSA" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesAuthorized>
+  <gaap:CommonStockSharesIssued contextRef="I-2010-CSA" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesIssued>
+  <gaap:CommonStockShares contextRef="I-2010-CSA" unitRef="U-Shares" decimals="INF">3000</gaap:CommonStockShares>
+
+  <gaap:CommonStock contextRef="I-2010-CSB" unitRef="U-Monetary" decimals="INF">500</gaap:CommonStock>
+  <gaap:CommonStockParValuePerShare contextRef="I-2010-CSB" unitRef="U-Pure" decimals="INF">1</gaap:CommonStockParValuePerShare>
+  <gaap:CommonStockShareSubscriptions contextRef="I-2010-CSB" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockShareSubscriptions>
+  <gaap:CommonStockSharesAuthorized contextRef="I-2010-CSB" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesAuthorized>
+  <gaap:CommonStockSharesIssued contextRef="I-2010-CSB" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesIssued>
+  <gaap:CommonStockShares contextRef="I-2010-CSB" unitRef="U-Shares" decimals="INF">3000</gaap:CommonStockShares>
+
+
+  <gaap:CommonStock contextRef="I-2009-CSA" unitRef="U-Monetary" decimals="INF">500</gaap:CommonStock>
+  <gaap:CommonStockParValuePerShare contextRef="I-2009-CSA" unitRef="U-Pure" decimals="INF">1</gaap:CommonStockParValuePerShare>
+  <gaap:CommonStockShareSubscriptions contextRef="I-2009-CSA" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockShareSubscriptions>
+  <gaap:CommonStockSharesAuthorized contextRef="I-2009-CSA" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesAuthorized>
+  <gaap:CommonStockSharesIssued contextRef="I-2009-CSA" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesIssued>
+  <gaap:CommonStockShares contextRef="I-2009-CSA" unitRef="U-Shares" decimals="INF">3000</gaap:CommonStockShares>
+
+  <gaap:CommonStock contextRef="I-2009-CSB" unitRef="U-Monetary" decimals="INF">500</gaap:CommonStock>
+  <gaap:CommonStockParValuePerShare contextRef="I-2009-CSB" unitRef="U-Pure" decimals="INF">1</gaap:CommonStockParValuePerShare>
+  <gaap:CommonStockShareSubscriptions contextRef="I-2009-CSB" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockShareSubscriptions>
+  <gaap:CommonStockSharesAuthorized contextRef="I-2009-CSB" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesAuthorized>
+  <gaap:CommonStockSharesIssued contextRef="I-2009-CSB" unitRef="U-Shares" decimals="INF">10000</gaap:CommonStockSharesIssued>
+  <gaap:CommonStockShares contextRef="I-2009-CSB" unitRef="U-Shares" decimals="INF">3000</gaap:CommonStockShares>
+
+
+
+
+
+  <!-- Income Statement -->
+  <gaap:RevenuesGross contextRef="D-2010" unitRef="U-Monetary" decimals="INF">5000</gaap:RevenuesGross>
+  <gaap:ReturnsAndAllowances contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ReturnsAndAllowances>
+  <gaap:RevenuesNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:RevenuesNet>
+  <gaap:CostOfSales contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:CostOfSales>
+  <gaap:GrossProfitLoss contextRef="D-2010" unitRef="U-Monetary" decimals="INF">3000</gaap:GrossProfitLoss>
+  <gaap:OperatingExpenses contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OperatingExpenses>
+  <gaap:OperatingIncome contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OperatingIncome>
+  <gaap:OperatingIncomeLoss contextRef="D-2010" unitRef="U-Monetary" decimals="INF">3000</gaap:OperatingIncomeLoss>
+  <gaap:InterestExpenseIncome contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:InterestExpenseIncome>
+  <gaap:OtherNonoperatingExpensesIncome contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherNonoperatingExpensesIncome>
+  <gaap:NonoperatingIncomeLoss contextRef="D-2010" unitRef="U-Monetary" decimals="INF">-2000</gaap:NonoperatingIncomeLoss>
+  <gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxes contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxes>
+  <gaap:IncomeTaxExpenseBenefit contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:IncomeTaxExpenseBenefit>
+  <gaap:IncomeLossFromContinuingOperations contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:IncomeLossFromContinuingOperations>
+  <gaap:IncomeLossFromDiscontinuedOperationsNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:IncomeLossFromDiscontinuedOperationsNet>
+
+  <gaap:NetIncomeLoss contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:NetIncomeLoss>
+
+  <gaap:RevenuesGross contextRef="D-2009" unitRef="U-Monetary" decimals="INF">6000</gaap:RevenuesGross>
+  <gaap:ReturnsAndAllowances contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:ReturnsAndAllowances>
+  <gaap:RevenuesNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">5000</gaap:RevenuesNet>
+  <gaap:CostOfSales contextRef="D-2009" unitRef="U-Monetary" decimals="INF">6000</gaap:CostOfSales>
+  <gaap:GrossProfitLoss contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-1000</gaap:GrossProfitLoss>
+  <gaap:OperatingExpenses contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OperatingExpenses>
+  <gaap:OperatingIncome contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OperatingIncome>
+  <gaap:OperatingIncomeLoss contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-1000</gaap:OperatingIncomeLoss>
+  <gaap:InterestExpenseIncome contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:InterestExpenseIncome>
+  <gaap:OtherNonoperatingExpensesIncome contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherNonoperatingExpensesIncome>
+  <gaap:NonoperatingIncomeLoss contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-2000</gaap:NonoperatingIncomeLoss>
+  <gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxes contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-3000</gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxes>
+  <gaap:IncomeTaxExpenseBenefit contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:IncomeTaxExpenseBenefit>
+
+  <gaap:IncomeLossFromContinuingOperations contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-4000</gaap:IncomeLossFromContinuingOperations>
+  <gaap:IncomeLossFromDiscontinuedOperationsNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:IncomeLossFromDiscontinuedOperationsNet>
+
+  <gaap:NetIncomeLoss contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-4000</gaap:NetIncomeLoss>
+
+  <gaap:EarningsLossPerShare contextRef="D-2010" unitRef="U-Monetary" decimals="INF">.08</gaap:EarningsLossPerShare>
+  <gaap:EarningsLossPerShare contextRef="D-2009" unitRef="U-Monetary" decimals="INF">.67</gaap:EarningsLossPerShare>
+
+  <gaap:WeightedAverageCommonShares contextRef="D-2010" unitRef="U-Shares" decimals="INF">6000</gaap:WeightedAverageCommonShares>
+  <gaap:WeightedAverageCommonShares contextRef="D-2009" unitRef="U-Shares" decimals="INF">6000</gaap:WeightedAverageCommonShares>
+
+
+
+
+  <!-- Cash Flows, impacts all cash flow statements -->
+  <gaap:CashAndCashEquivalentsPerCashFlowStatement contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:CashAndCashEquivalentsPerCashFlowStatement>
+  <gaap:CashAndCashEquivalentsPerCashFlowStatement contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:CashAndCashEquivalentsPerCashFlowStatement>
+  <gaap:CashAndCashEquivalentsPerCashFlowStatement contextRef="I-2008" unitRef="U-Monetary" decimals="INF">-3000</gaap:CashAndCashEquivalentsPerCashFlowStatement>
+
+
+  <!-- Cash Flows, Direct -->
+  <gaap:ProceedsFromCollectionOfRevenues contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ProceedsFromCollectionOfRevenues>
+  <gaap:PaymentsOfOperatingExpenses contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsOfOperatingExpenses>
+  <gaap:PaymentsOfInterest contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsOfInterest>
+  <gaap:CashFlowProvidedByUsedInOperatingActivitiesNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">-1000</gaap:CashFlowProvidedByUsedInOperatingActivitiesNet>
+
+  <gaap:PaymentsForPurchasesOfPropertyPlantAndEquipment contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsForPurchasesOfPropertyPlantAndEquipment>
+  <gaap:ProceedsFromSaleOfPropertyPlantAndEquipment contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ProceedsFromSaleOfPropertyPlantAndEquipment>
+  <gaap:CashFlowsProvidedByUsedInInvestingActivitiesNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowsProvidedByUsedInInvestingActivitiesNet>
+
+  <gaap:PaymentsOfLongTermDebt contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsOfLongTermDebt>
+  <gaap:ProceedsFromAdditionalLongTermDebt contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ProceedsFromAdditionalLongTermDebt>
+  <gaap:CashFlowsProvidedByUsedInFinancingActivitiesNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowsProvidedByUsedInFinancingActivitiesNet>
+
+  <gaap:CashFlowNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">-1000</gaap:CashFlowNet>
+
+  <gaap:ProceedsFromCollectionOfRevenues contextRef="D-2009" unitRef="U-Monetary" decimals="INF">6000</gaap:ProceedsFromCollectionOfRevenues>
+  <gaap:PaymentsOfOperatingExpenses contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsOfOperatingExpenses>
+  <gaap:PaymentsOfInterest contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsOfInterest>
+  <gaap:CashFlowProvidedByUsedInOperatingActivitiesNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:CashFlowProvidedByUsedInOperatingActivitiesNet>
+
+  <gaap:PaymentsForPurchasesOfPropertyPlantAndEquipment contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsForPurchasesOfPropertyPlantAndEquipment>
+  <gaap:ProceedsFromSaleOfPropertyPlantAndEquipment contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:ProceedsFromSaleOfPropertyPlantAndEquipment>
+  <gaap:CashFlowsProvidedByUsedInInvestingActivitiesNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowsProvidedByUsedInInvestingActivitiesNet>
+
+  <gaap:PaymentsOfLongTermDebt contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PaymentsOfLongTermDebt>
+  <gaap:ProceedsFromAdditionalLongTermDebt contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:ProceedsFromAdditionalLongTermDebt>
+  <gaap:CashFlowsProvidedByUsedInFinancingActivitiesNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:CashFlowsProvidedByUsedInFinancingActivitiesNet>
+
+  <gaap:CashFlowNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:CashFlowNet>
+
+
+
+
+  <!-- Statement of Changes in Equity -->
+
+  <!-- Preferred Stock Shares -->
+  <gaap:PreferredStockShares contextRef="I-2008" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockShares>
+  <gaap:PreferredStockShares contextRef="I-2009" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockShares>
+  <gaap:PreferredStockShares contextRef="I-2010" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockShares>
+
+  <gaap:PreferredStockSharesAdditionalSharesIssued contextRef="D-2009" unitRef="U-Shares" decimals="INF">7000</gaap:PreferredStockSharesAdditionalSharesIssued>
+  <gaap:PreferredStockSharesBuybacks contextRef="D-2009" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockSharesBuybacks>
+  <gaap:OtherIncreaseDecreaseInPreferredStockShares contextRef="D-2009" unitRef="U-Shares" decimals="INF">-1000</gaap:OtherIncreaseDecreaseInPreferredStockShares>
+  <gaap:PreferredStockSharesPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Shares" decimals="INF">0</gaap:PreferredStockSharesPeriodIncreaseDecrease>
+
+  <gaap:PreferredStockSharesAdditionalSharesIssued contextRef="D-2010" unitRef="U-Shares" decimals="INF">7000</gaap:PreferredStockSharesAdditionalSharesIssued>
+  <gaap:PreferredStockSharesBuybacks contextRef="D-2010" unitRef="U-Shares" decimals="INF">6000</gaap:PreferredStockSharesBuybacks>
+  <gaap:OtherIncreaseDecreaseInPreferredStockShares contextRef="D-2010" unitRef="U-Shares" decimals="INF">-1000</gaap:OtherIncreaseDecreaseInPreferredStockShares>
+  <gaap:PreferredStockSharesPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Shares" decimals="INF">0</gaap:PreferredStockSharesPeriodIncreaseDecrease>
+
+  <!-- Common Stock Shares -->
+  <gaap:CommonStockShares contextRef="I-2008" unitRef="U-Shares" decimals="INF">6000</gaap:CommonStockShares>
+  <gaap:CommonStockShares contextRef="I-2009" unitRef="U-Shares" decimals="INF">6000</gaap:CommonStockShares>
+  <gaap:CommonStockShares contextRef="I-2010" unitRef="U-Shares" decimals="INF">6000</gaap:CommonStockShares>
+
+  <gaap:CommonStockSharesAdditionalSharesIssued contextRef="D-2009" unitRef="U-Shares" decimals="INF">5000</gaap:CommonStockSharesAdditionalSharesIssued>
+  <gaap:CommonStockSharesOptionsExercised contextRef="D-2009" unitRef="U-Shares" decimals="INF">6000</gaap:CommonStockSharesOptionsExercised>
+  <gaap:OtherIncreaseDecreaseInCommonStockShares contextRef="D-2009" unitRef="U-Shares" decimals="INF">-11000</gaap:OtherIncreaseDecreaseInCommonStockShares>
+  <gaap:CommonStockSharesPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Shares" decimals="INF">0</gaap:CommonStockSharesPeriodIncreaseDecrease>
+
+  <gaap:CommonStockSharesAdditionalSharesIssued contextRef="D-2010" unitRef="U-Shares" decimals="INF">5000</gaap:CommonStockSharesAdditionalSharesIssued>
+  <gaap:CommonStockSharesOptionsExercised contextRef="D-2010" unitRef="U-Shares" decimals="INF">6000</gaap:CommonStockSharesOptionsExercised>
+  <gaap:OtherIncreaseDecreaseInCommonStockShares contextRef="D-2010" unitRef="U-Shares" decimals="INF">-11000</gaap:OtherIncreaseDecreaseInCommonStockShares>
+  <gaap:CommonStockSharesPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Shares" decimals="INF">0</gaap:CommonStockSharesPeriodIncreaseDecrease>
+
+
+  <!-- Preferred Stock Amount -->
+  <gaap:PreferredStockIssued contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockIssued>
+  <gaap:PreferredStockBuybacks contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockBuybacks>
+  <gaap:OtherIncreaseDecreaseInPreferredStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherIncreaseDecreaseInPreferredStock>
+  <gaap:PreferredStockPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockPeriodIncreaseDecrease>
+
+  <gaap:PreferredStockIssued contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockIssued>
+  <gaap:PreferredStockBuybacks contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockBuybacks>
+  <gaap:OtherIncreaseDecreaseInPreferredStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherIncreaseDecreaseInPreferredStock>
+  <gaap:PreferredStockPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockPeriodIncreaseDecrease>
+
+  <!-- Common Stock Amount -->
+  <gaap:CommonStockIssued contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStockIssued>
+  <gaap:CommonStockOptionsExercised contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStockOptionsExercised>
+  <gaap:OtherIncreaseDecreaseInCommonStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">-2000</gaap:OtherIncreaseDecreaseInCommonStock>
+  <gaap:CommonStockPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:CommonStockPeriodIncreaseDecrease>
+
+  <gaap:CommonStockIssued contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStockIssued>
+  <gaap:CommonStockOptionsExercised contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:CommonStockOptionsExercised>
+  <gaap:OtherIncreaseDecreaseInCommonStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">-2000</gaap:OtherIncreaseDecreaseInCommonStock>
+  <gaap:CommonStockPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:CommonStockPeriodIncreaseDecrease>
+
+
+  <!-- Additional Paid in Capital -->
+  <gaap:AdditionalPaidInCapitalAddedFromIssuanceOfCommonStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapitalAddedFromIssuanceOfCommonStock>
+  <gaap:AdditionalPaidInCapitalRemovedFromBuybacksOfPreferredStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapitalRemovedFromBuybacksOfPreferredStock>
+  <gaap:OtherIncreaseDecreaseInAdditionalPaidInCapital contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherIncreaseDecreaseInAdditionalPaidInCapital>
+  <gaap:AdditionalPaidInCapitalPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapitalPeriodIncreaseDecrease>
+
+  <gaap:AdditionalPaidInCapitalAddedFromIssuanceOfCommonStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapitalAddedFromIssuanceOfCommonStock>
+  <gaap:AdditionalPaidInCapitalRemovedFromBuybacksOfPreferredStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapitalRemovedFromBuybacksOfPreferredStock>
+  <gaap:OtherIncreaseDecreaseInAdditionalPaidInCapital contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherIncreaseDecreaseInAdditionalPaidInCapital>
+  <gaap:AdditionalPaidInCapitalPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AdditionalPaidInCapitalPeriodIncreaseDecrease>
+
+
+  <!-- Retained Earnings -->
+  <gaap:OtherIncreaseDecreaseInRetainedEarningsAccumulatedLosses contextRef="D-2009" unitRef="U-Monetary" decimals="INF">6000</gaap:OtherIncreaseDecreaseInRetainedEarningsAccumulatedLosses>
+  <gaap:RetainedEarningsAccumulatedLossesPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:RetainedEarningsAccumulatedLossesPeriodIncreaseDecrease>
+
+  <!-- Note the IDs which indicate restatement. -->
+  <gaap:RetainedEarningsAccumulatedLosses contextRef="I-2009-OrigionallyReported" unitRef="U-Monetary" decimals="INF">1000</gaap:RetainedEarningsAccumulatedLosses>
+
+  <!-- What should the period of the restatement adjustment concepts be? -->
+  <gaap:RetainedEarningsAccumulatedLossesPriorPeriodErrors id="Restated-01" contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:RetainedEarningsAccumulatedLossesPriorPeriodErrors>
+  <gaap:RetainedEarningsAccumulatedLossesChangesInAccountingPolicies id="Restated-02" contextRef="D-2010" unitRef="U-Monetary" decimals="INF">-500</gaap:RetainedEarningsAccumulatedLossesChangesInAccountingPolicies>
+  <gaap:RetainedEarningsAccumulatedLossesPriorPeriodAdjustments id="Restated-03" contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:RetainedEarningsAccumulatedLossesPriorPeriodAdjustments>
+
+  <gaap:OtherIncreaseDecreaseInRetainedEarningsAccumulatedLosses contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:OtherIncreaseDecreaseInRetainedEarningsAccumulatedLosses>
+  <gaap:RetainedEarningsAccumulatedLossesPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:RetainedEarningsAccumulatedLossesPeriodIncreaseDecrease>
+
+
+  <!-- Equity, Total -->
+  <gaap:DividendsPaid contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:DividendsPaid>
+  <gaap:PreferredStockAndAdditionalPaidInCapitalIssuanceOfPreferredStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockAndAdditionalPaidInCapitalIssuanceOfPreferredStock>
+  <gaap:CommonStockAndAdditionalPaidInCapitalIssuanceOfCommonStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">2000</gaap:CommonStockAndAdditionalPaidInCapitalIssuanceOfCommonStock>
+  <gaap:PreferredStockAndAdditionalPaidInCapitalRemovedBuybacksOfPreferredStock contextRef="D-2009" unitRef="U-Monetary" decimals="INF">2000</gaap:PreferredStockAndAdditionalPaidInCapitalRemovedBuybacksOfPreferredStock>
+  <gaap:OtherIncreaseDecreaseInEquity contextRef="D-2009" unitRef="U-Monetary" decimals="INF">6000</gaap:OtherIncreaseDecreaseInEquity>
+  <gaap:EquityPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">3000</gaap:EquityPeriodIncreaseDecrease>
+
+
+  <gaap:DividendsPaid contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:DividendsPaid>
+  <gaap:PreferredStockAndAdditionalPaidInCapitalIssuanceOfPreferredStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:PreferredStockAndAdditionalPaidInCapitalIssuanceOfPreferredStock>
+  <gaap:CommonStockAndAdditionalPaidInCapitalIssuanceOfCommonStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:CommonStockAndAdditionalPaidInCapitalIssuanceOfCommonStock>
+  <gaap:PreferredStockAndAdditionalPaidInCapitalRemovedBuybacksOfPreferredStock contextRef="D-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:PreferredStockAndAdditionalPaidInCapitalRemovedBuybacksOfPreferredStock>
+  <gaap:OtherIncreaseDecreaseInEquity contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:OtherIncreaseDecreaseInEquity>
+  <gaap:EquityPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:EquityPeriodIncreaseDecrease>
+
+
+
+  <!-- Other Overall Financial Reporting Presentation and Display -->
+
+  <gaap:NatureBusiness contextRef="D-2010">The consolidated financial statements include the accounts of ABC Company, Inc. and its subsidiaries, all wholly owned.  All significant intercompany balances and transactions have been eliminated in consolidation.</gaap:NatureBusiness>
+  <gaap:ReclassificationOfFinancialStatementItems contextRef="D-2010">Some prior period classifications have been changed to conform to current period classifications.</gaap:ReclassificationOfFinancialStatementItems>
+
+  <gaap:AverageNumberEmployees contextRef="D-2010" unitRef="U-Pure" decimals="INF">300</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2009" unitRef="U-Pure" decimals="INF">250</gaap:AverageNumberEmployees>
+
+
+  <!-- Policies and Disclosures -->
+
+  <gaap:CashAndCashEquivalentsPolicy contextRef="D-2010">Sed mauris. Nulla facilisi. Fusce tristique posuere ipsum. Nulla facilisi. Aliquam viverra risus vitae ante. Sed rhoncus mi in wisi. Nullam nibh dui, molestie vitae, imperdiet non, ornare at, elit. Aenean nec justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis sodales.</gaap:CashAndCashEquivalentsPolicy>
+  <gaap:ReceivablesPolicy contextRef="D-2010">Etiam viverra neque non sem. Nullam lacinia sem. Duis sapien diam, dapibus sed, dictum quis, interdum ac, erat. Suspendisse urna. Proin non mauris. Proin sed odio. Phasellus sagittis orci quis orci. Aliquam erat volutpat. Mauris commodo ultrices elit. Sed id orci. In ultrices urna volutpat wisi.</gaap:ReceivablesPolicy>
+
+  <gaap:InventoryPolicy contextRef="D-2010">Proin elit sem, ornare non, ullamcorper vel, sollicitudin a, lacus. Mauris tincidunt cursus est. Nulla sit amet nibh. Sed elementum feugiat augue. Nam non tortor non leo porta bibendum. Morbi eu pede. In eu erat et est feugiat fermentum. Praesent accumsan. Nulla convallis, lorem nec aliquet dapibus, libero felis sagittis augue, ut adipiscing nisl eros in quam. Fusce eleifend. Sed justo nibh, placerat a, malesuada nec, condimentum ac, magna.</gaap:InventoryPolicy>
+  <gaap:InventoryValuationMethod contextRef="D-2010">Cost</gaap:InventoryValuationMethod>
+  <gaap:InventoryCostMethod contextRef="D-2010">Suspendisse vestibulum augue eu justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce suscipit pede ut erat. Sed rutrum. Pellentesque eget mi. In enim. Praesent nec eros. Aenean convallis sem condimentum justo. Integer quam. Ut ultrices, purus sit amet pretium bibendum, risus est facilisis purus, quis suscipit leo ipsum fringilla ligula. Lum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam erat volutpat.</gaap:InventoryCostMethod>
+  <gaap:InvestmentsPolicy contextRef="D-2010">Sed justo nibh, placerat a, malesuada nec, condimentum ac, magna. Cras consectetuer justo at urna rutrum ultrices. Vestibulum bibendum aliquet augue. In vel orci non lorem. Proin venenatis ultricies risus. Aliquam erat volutpat. Donec tempus ligula a risus. Nam porttitor. Aliquam mattis erat aliquet mi. Sed commodo, ante adipiscing porttitor sollicitudin, sapien wisi ullamcorper ante, nec ultricies orci tellus id justo.</gaap:InvestmentsPolicy>
+  <gaap:PrepaidExpensesPolicy contextRef="D-2010">Donec pulvinar nonummy erat. In vel justo at urna rutrum ultrices. Cras consectetuer orci non lorem. Vestibulum bibendum aliquet augue. Proin venenatis ultricies risus. Aliquam erat volutpat. Donec tempus ligula a risus. Nam porttitor. Aliquam mattis erat aliquet mi. Sed commodo, ante adipiscing porttitor sollicitudin, sapien wisi ullamcorper ante, nec ultricies orci tellus id justo.</gaap:PrepaidExpensesPolicy>
+
+  <!-- FIX: Need to do for each class, use class properties -->
+  <gaap:PropertyPlantAndEquipmentPolicy contextRef="D-2010">Proin feugiat lobortis mi. Nunc congue. Fusce venenatis. Maecenas tincidunt, ipsum in fringilla hendrerit, dolor metus eleifend neque, vel tincidunt mi nunc a purus. Curabitur porta dapibus odio. Proin commodo. Vestibulum odio mi, varius sit amet, adipiscing id, semper non, elit. Integer hendrerit placerat sem. Duis adipiscing urna ac wisi. Cras sapien.</gaap:PropertyPlantAndEquipmentPolicy>
+  <gaap:PropertyPlantAndEquipmentMeasurementBasis contextRef="D-2010">Nam rhoncus mi. Nunc eu dui non mauris interdum tincidunt. Sed magna felis, accumsan a, fermentum quis, varius sed, ipsum. Nullam leo.</gaap:PropertyPlantAndEquipmentMeasurementBasis>
+
+  <gaap:MeasurementBasisBuildings contextRef="D-2010">Curabitur fermentum mattis eros. Pellentesque pede felis, rhoncus accumsan, luctus ut, facilisis vitae, tortor.</gaap:MeasurementBasisBuildings>
+  <gaap:MeasurementBasisFurnitureAndFixtures contextRef="D-2010">Praesent id mauris. Sed dapibus dui quis lectus.</gaap:MeasurementBasisFurnitureAndFixtures>
+  <gaap:MeasurementBasisOtherPropertyPlantAndEquipment contextRef="D-2010">In vel justo at urna rutrum ultrices.</gaap:MeasurementBasisOtherPropertyPlantAndEquipment>
+  
+  <gaap:PropertyPlantAndEquipmentDepreciationMethod contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus.</gaap:PropertyPlantAndEquipmentDepreciationMethod>
+
+  <gaap:DepreciationMethodBuildings contextRef="D-2010">Duis metus. Donec pulvinar nonummy erat. In vel justo at urna rutrum ultrices. Cras consectetuer orci non lorem.</gaap:DepreciationMethodBuildings>
+  <gaap:DepreciationMethodFurnitureAndFixtures contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:DepreciationMethodFurnitureAndFixtures>
+  <gaap:DepreciationMethodOtherPropertyPlantAndEquipment contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:DepreciationMethodOtherPropertyPlantAndEquipment>
+  
+  
+  <gaap:PropertyPlantAndEquipmentEstimatedUsefulLife contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:PropertyPlantAndEquipmentEstimatedUsefulLife>
+
+  <gaap:EstimatedUsefulLifeBuildings contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:EstimatedUsefulLifeBuildings>
+  <gaap:EstimatedUsefulLifeFurnitureAndFixtures contextRef="D-2010">Curabitur fermentum mattis eros. Pellentesque pede felis, rhoncus accumsan, luctus ut, facilisis vitae, tortor.</gaap:EstimatedUsefulLifeFurnitureAndFixtures>
+  <gaap:EstimatedUsefulLifeOtherPropertyPlantAndEquipment contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:EstimatedUsefulLifeOtherPropertyPlantAndEquipment>
+   
+  <gaap:OtherAssetsPolicy contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.</gaap:OtherAssetsPolicy>
+
+  <gaap:PayablesAndAccrualsPolicy contextRef="D-2010">Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:PayablesAndAccrualsPolicy>
+  <gaap:AccountsPayablePolicy contextRef="D-2010">Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:AccountsPayablePolicy>
+  <gaap:AccruedInterestPolicy contextRef="D-2010">Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.  Duis metus. Donec pulvinar nonummy erat. In vel justo at urna rutrum ultrices. Cras consectetuer orci non lorem.</gaap:AccruedInterestPolicy>
+  <gaap:AccruedExpensesPolicy contextRef="D-2010">Curabitur fermentum mattis eros. Pellentesque pede felis, rhoncus accumsan, luctus ut, facilisis vitae, tortor.</gaap:AccruedExpensesPolicy>
+  <gaap:OtherPayablesAndAccrualsPolicy contextRef="D-2010">Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna. Nullam wisi lectus, rutrum sit amet, fermentum et, venenatis hendrerit, magna.</gaap:OtherPayablesAndAccrualsPolicy>
+  <gaap:DebtPolicy contextRef="D-2010">Etiam viverra neque non sem. Nullam lacinia sem. Duis sapien diam, dapibus sed, dictum quis, interdum ac, erat. Suspendisse urna. Proin non mauris. Proin sed odio.</gaap:DebtPolicy>
+  <gaap:LongTermDebtPolicy contextRef="D-2010">Proin feugiat lobortis mi. Nunc congue. Fusce venenatis. Maecenas tincidunt, ipsum in fringilla hendrerit, dolor metus eleifend neque, vel tincidunt mi nunc a purus. Curabitur porta dapibus odio. Proin commodo. Vestibulum odio mi, varius sit amet, adipiscing id, semper non, elit. Integer hendrerit placerat sem. Duis adipiscing urna ac wisi. Cras sapien. Sed faucibus consequat pede.</gaap:LongTermDebtPolicy>
+  <gaap:OtherLiabilitiesPolicy contextRef="D-2010">Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna. Nullam wisi lectus, rutrum sit amet, fermentum et, venenatis hendrerit, magna.</gaap:OtherLiabilitiesPolicy>
+
+  <gaap:EquityPolicies contextRef="D-2010">Proin feugiat lobortis mi. Nunc congue. Fusce venenatis. Maecenas tincidunt, ipsum in fringilla hendrerit, dolor metus eleifend neque, vel tincidunt mi nunc a purus. Curabitur porta dapibus odio. Proin commodo. Vestibulum odio mi, varius sit amet, adipiscing id, semper non, elit. Integer hendrerit placerat sem. Duis adipiscing urna ac wisi. Cras sapien. Sed faucibus consequat pede.</gaap:EquityPolicies>
+  <gaap:CommonStockPolicies contextRef="D-2010">Etiam viverra neque non sem. Nullam lacinia sem. Duis sapien diam, dapibus sed, dictum quis, interdum ac, erat. Suspendisse urna. Proin non mauris. Proin sed odio.</gaap:CommonStockPolicies>
+  <gaap:PreferredStockPolicies contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:PreferredStockPolicies>
+  <gaap:AdditionalPaidInCapitalPolicies contextRef="D-2010">Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna. Nullam wisi lectus, rutrum sit amet, fermentum et, venenatis hendrerit, magna.</gaap:AdditionalPaidInCapitalPolicies>
+  <gaap:RetainedEarningsAccumulatedLossesPolicies contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:RetainedEarningsAccumulatedLossesPolicies>
+
+  <gaap:IncomeTaxesPolicy contextRef="D-2010">Fusce venenatis. Maecenas tincidunt, ipsum in fringilla hendrerit, dolor metu adipiscing urna ac wisi. Cras sapien. Sed faucibus consequat pede.</gaap:IncomeTaxesPolicy>
+
+  <gaap:OtherAccountingPolicies contextRef="D-2010">Proin feugiat lobortis mi. Nunc congue. Fusce venenatis. Maecenas tincidunt, ipsum in fringilla hendrerit, dolor metus eleifend neque, vel tincidunt mi nunc a purus. Curabitur porta dapibus odio. Proin commodo. Vestibulum odio mi, varius sit amet, adipiscing id, semper non, elit. Integer hendrerit placerat sem. Duis adipiscing urna ac wisi. Cras sapien. Sed faucibus consequat pede.</gaap:OtherAccountingPolicies>
+
+
+  <!-- Cash and Cash Equivalents -->
+  <gaap:CashCashEquivalentsHTML contextRef="D-2010">Etiam viverra neque non sem. Nullam lacinia sem. Duis sapien diam, dapibus sed, dictum quis, interdum ac, erat. Suspendisse urna. Proin non mauris. Proin sed odio.</gaap:CashCashEquivalentsHTML>
+
+  <gaap:CashAndCashEquivalentsDisclosures contextRef="D-2010">Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis magna.</gaap:CashAndCashEquivalentsDisclosures>
+
+  <gaap:CashUnrestricted contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:CashUnrestricted>
+  <gaap:CashRestricted contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:CashRestricted>
+  <gaap:PettyCash contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:PettyCash>
+  <gaap:OtherCashAndCashEquivalents contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:OtherCashAndCashEquivalents>
+
+  <gaap:CashUnrestricted contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:CashUnrestricted>
+  <gaap:CashRestricted contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:CashRestricted>
+  <gaap:PettyCash contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:PettyCash>
+  <gaap:OtherCashAndCashEquivalents contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:OtherCashAndCashEquivalents>
+
+
+
+  <!-- Receivables -->
+  <gaap:ReceivablesDisclosures contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:ReceivablesDisclosures>
+  <gaap:NotesReceivablesDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante.</gaap:NotesReceivablesDisclosures>
+  <gaap:OtherReceivablesDisclosures contextRef="D-2010">Integer hendrerit placerat sem. Duis adipiscing urna ac wisi. Cras sapien. Sed faucibus consequat pede. Proin id nibh. </gaap:OtherReceivablesDisclosures>
+
+
+  <gaap:TradeReceivablesNetCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">500</gaap:TradeReceivablesNetCurrent>
+  <gaap:FinanceLeaseReceivablesNetCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">400</gaap:FinanceLeaseReceivablesNetCurrent>
+  <gaap:OtherReceivablesNetCurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">100</gaap:OtherReceivablesNetCurrent>
+
+  <gaap:TradeReceivablesNetCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">500</gaap:TradeReceivablesNetCurrent>
+  <gaap:FinanceLeaseReceivablesNetCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">400</gaap:FinanceLeaseReceivablesNetCurrent>
+  <gaap:OtherReceivablesNetCurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">100</gaap:OtherReceivablesNetCurrent>
+
+
+  <gaap:ReceivablesGross contextRef="I-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:ReceivablesGross>
+  <gaap:AllowanceForDoubtfulAccountsReceivables contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:AllowanceForDoubtfulAccountsReceivables>
+
+  <gaap:ReceivablesGross contextRef="I-2009" unitRef="U-Monetary" decimals="INF">2000</gaap:ReceivablesGross>
+  <gaap:AllowanceForDoubtfulAccountsReceivables contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:AllowanceForDoubtfulAccountsReceivables>
+
+  <gaap:ReceivablesNet contextRef="I-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ReceivablesNet>
+  <gaap:ReceivablesNetNoncurrent contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:ReceivablesNetNoncurrent>
+
+  <gaap:ReceivablesNet contextRef="I-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:ReceivablesNet>
+  <gaap:ReceivablesNetNoncurrent contextRef="I-2009" unitRef="U-Monetary" decimals="INF">0</gaap:ReceivablesNetNoncurrent>
+
+
+  <!-- Inventory -->
+  <gaap:InventoryDisclosures contextRef="D-2010">Integer hendrerit placerat sem. Duis adipiscing urna ac wisi. Cras sapien. Sed faucibus consequat pede. Proin id nibh. </gaap:InventoryDisclosures>
+  <gaap:InventoryDescriptionOfComponents contextRef="D-2010">Phasellus venenatis enim tempus elit. Ut tristique, leo sed consequat consequat, lorem ipsum pretium odio, sit amet ultricies dui nulla ac wisi. Praesent wisi erat, placerat eu, posuere tincidunt, laoreet ac, nibh. Etiam ut augue. Maecenas eget lectus vel metus vehicula consectetuer. Aliquam erat volutpat. In faucibus. Donec ac arcu. Curabitur purus risus, hendrerit lacinia, lacinia eget, placerat quis, turpis. Nulla aliquam ligula at libero.</gaap:InventoryDescriptionOfComponents>
+  <gaap:InventoryDescriptionOfCalculationOfNetRealizableValue contextRef="D-2010">Ut tristique, leo sed consequat consequat, lorem ipsum pretium odio, sit amet ultricies dui nulla ac wisi. Praesent wisi erat, placerat eu, posuere tincidunt, laoreet ac, nibh. Etiam ut augue. Maecenas eget lectus vel metus vehicula consectetuer. Aliquam erat volutpat. In faucibus. Donec ac arcu. Curabitur purus risus, hendrerit lacinia, lacinia eget, placerat quis, turpis. Nulla aliquam ligula at libero.</gaap:InventoryDescriptionOfCalculationOfNetRealizableValue>
+
+
+  <!-- Prepaid Expenses -->
+  <gaap:PrepaidExpensesDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Aaecenas eget metusonec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna.</gaap:PrepaidExpensesDisclosures>
+
+
+  <!-- Property, Plant, and Equipment -->
+  <gaap:PropertyPlantAndEquipmentDisclosures contextRef="D-2010"> Nullam wisi lectus, rutrum sit amet, fermentum et, venenatis hendrerit, magna. Suspendisse convallis urna elementum elit. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna.</gaap:PropertyPlantAndEquipmentDisclosures>
+
+  <!-- FIX: Need to do for each class, use class properties -->
+  <gaap:PropertyPlantAndEquipmentMeasurementBasis contextRef="D-2010-PPE-Land">This is information about the measurement basis for LAND.</gaap:PropertyPlantAndEquipmentMeasurementBasis>
+  <gaap:PropertyPlantAndEquipmentDepreciationMethod contextRef="D-2010-PPE-Land">This is information relating to depreciation method for LAND.</gaap:PropertyPlantAndEquipmentDepreciationMethod>
+  <gaap:PropertyPlantAndEquipmentEstimatedUsefulLife contextRef="D-2010-PPE-Land">This is information relating to the estimated useful life for LAND.</gaap:PropertyPlantAndEquipmentEstimatedUsefulLife>
+
+  <gaap:PropertyPlantAndEquipmentMeasurementBasis contextRef="D-2010-PPE-Buildings">This is information about the measurement basis for Buildings.</gaap:PropertyPlantAndEquipmentMeasurementBasis>
+  <gaap:PropertyPlantAndEquipmentDepreciationMethod contextRef="D-2010-PPE-Buildings">This is information relating to depreciation method for Buildings.</gaap:PropertyPlantAndEquipmentDepreciationMethod>
+  <gaap:PropertyPlantAndEquipmentEstimatedUsefulLife contextRef="D-2010-PPE-Buildings">This is information relating to the estimated useful life for Buildings.</gaap:PropertyPlantAndEquipmentEstimatedUsefulLife>
+
+  <gaap:PropertyPlantAndEquipmentMeasurementBasis contextRef="D-2010-PPE-FurnitureFixtures">This is information about the measurement basis for Furniture and Fixtures.</gaap:PropertyPlantAndEquipmentMeasurementBasis>
+  <gaap:PropertyPlantAndEquipmentDepreciationMethod contextRef="D-2010-PPE-FurnitureFixtures">This is information relating to depreciation method for Furniture and Fixtures.</gaap:PropertyPlantAndEquipmentDepreciationMethod>
+  <gaap:PropertyPlantAndEquipmentEstimatedUsefulLife contextRef="D-2010-PPE-FurnitureFixtures">This is information relating to the estimated useful life for Furniture and Fixtures.</gaap:PropertyPlantAndEquipmentEstimatedUsefulLife>
+
+  <gaap:PropertyPlantAndEquipmentMeasurementBasis contextRef="D-2010-PPE-Other">This is information about the measurement basis for Other.</gaap:PropertyPlantAndEquipmentMeasurementBasis>
+  <gaap:PropertyPlantAndEquipmentDepreciationMethod contextRef="D-2010-PPE-Other">This is information relating to depreciation method for Other.</gaap:PropertyPlantAndEquipmentDepreciationMethod>
+  <gaap:PropertyPlantAndEquipmentEstimatedUsefulLife contextRef="D-2010-PPE-Other">This is information relating to the estimated useful life for Other.</gaap:PropertyPlantAndEquipmentEstimatedUsefulLife>
+
+  
+  <gaap:PropertyPlantAndEquipmentDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna. Nullam wisi lectus, rutrum sit amet, fermentum et, venenatis hendrerit, magna. Suspendisse convallis urna elementum elit. </gaap:PropertyPlantAndEquipmentDisclosures>
+  <gaap:PropertyPlantAndEquipmentUnderFinanceTypeLeases contextRef="I-2010" unitRef="U-Monetary" decimals="INF">10000</gaap:PropertyPlantAndEquipmentUnderFinanceTypeLeases>
+  <gaap:PropertyPlantAndEquipmentNetProforma contextRef="I-2010" unitRef="U-Monetary" decimals="INF">10000</gaap:PropertyPlantAndEquipmentNetProforma>
+
+  <gaap:PropertyPlantAndEquipmentUnderFinanceTypeLeases contextRef="I-2009" unitRef="U-Monetary" decimals="INF">10000</gaap:PropertyPlantAndEquipmentUnderFinanceTypeLeases>
+  <gaap:PropertyPlantAndEquipmentNetProforma contextRef="I-2009" unitRef="U-Monetary" decimals="INF">10000</gaap:PropertyPlantAndEquipmentNetProforma>
+
+
+
+  <!-- Property, Plant, and Equipment: Schedule, Movement Analysis -->
+
+  <gaap:LandAdditions contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:LandAdditions>
+  <gaap:LandDisposals contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:LandDisposals>
+  <gaap:LandTranslationDifference contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LandTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInLand contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInLand>
+  <gaap:LandPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LandPeriodIncreaseDecrease>
+
+  <gaap:BuildingsNetAdditions contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNetAdditions>
+  <gaap:BuildingsNetDisposals contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNetDisposals>
+  <gaap:BuildingsNetTranslationDifference contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:BuildingsNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInBuildingsNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInBuildingsNet>
+  <gaap:BuildingsNetPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:BuildingsNetPeriodIncreaseDecrease>
+
+  <gaap:FurnitureAndFixturesNetAdditions contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNetAdditions>
+  <gaap:FurnitureAndFixturesNetDisposals contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNetDisposals>
+  <gaap:FurnitureAndFixturesNetTranslationDifference contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:FurnitureAndFixturesNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInFurnitureAndFixturesNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInFurnitureAndFixturesNet>
+  <gaap:FurnitureAndFixturesNetPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:FurnitureAndFixturesNetPeriodIncreaseDecrease>
+
+  <gaap:OtherPropertyPlantAndEquipmentNetAdditions contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNetAdditions>
+  <gaap:OtherPropertyPlantAndEquipmentNetDisposals contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNetDisposals>
+  <gaap:OtherPropertyPlantAndEquipmentNetTranslationDifference contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherPropertyPlantAndEquipmentNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInOtherPropertyPlantAndEquipmentNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInOtherPropertyPlantAndEquipmentNet>
+  <gaap:OtherPropertyPlantAndEquipmentNetPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherPropertyPlantAndEquipmentNetPeriodIncreaseDecrease>
+
+  <gaap:PropertyPlantAndEquipmentNetAdditions contextRef="D-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNetAdditions>
+  <gaap:PropertyPlantAndEquipmentNetDisposals contextRef="D-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNetDisposals>
+  <gaap:PropertyPlantAndEquipmentNetTranslationDifference contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:PropertyPlantAndEquipmentNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInPropertyPlantAndEquipmentNet contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInPropertyPlantAndEquipmentNet>
+  <gaap:PropertyPlantAndEquipmentNetPeriodIncreaseDecrease contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:PropertyPlantAndEquipmentNetPeriodIncreaseDecrease>
+
+
+  <gaap:LandAdditions contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:LandAdditions>
+  <gaap:LandDisposals contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:LandDisposals>
+  <gaap:LandTranslationDifference contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:LandTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInLand contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInLand>
+  <gaap:LandPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:LandPeriodIncreaseDecrease>
+
+  <gaap:BuildingsNetAdditions contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNetAdditions>
+  <gaap:BuildingsNetDisposals contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:BuildingsNetDisposals>
+  <gaap:BuildingsNetTranslationDifference contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:BuildingsNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInBuildingsNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInBuildingsNet>
+  <gaap:BuildingsNetPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:BuildingsNetPeriodIncreaseDecrease>
+
+  <gaap:FurnitureAndFixturesNetAdditions contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNetAdditions>
+  <gaap:FurnitureAndFixturesNetDisposals contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:FurnitureAndFixturesNetDisposals>
+  <gaap:FurnitureAndFixturesNetTranslationDifference contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:FurnitureAndFixturesNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInFurnitureAndFixturesNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInFurnitureAndFixturesNet>
+  <gaap:FurnitureAndFixturesNetPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:FurnitureAndFixturesNetPeriodIncreaseDecrease>
+
+  <gaap:OtherPropertyPlantAndEquipmentNetAdditions contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNetAdditions>
+  <gaap:OtherPropertyPlantAndEquipmentNetDisposals contextRef="D-2009" unitRef="U-Monetary" decimals="INF">1000</gaap:OtherPropertyPlantAndEquipmentNetDisposals>
+  <gaap:OtherPropertyPlantAndEquipmentNetTranslationDifference contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherPropertyPlantAndEquipmentNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInOtherPropertyPlantAndEquipmentNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInOtherPropertyPlantAndEquipmentNet>
+  <gaap:OtherPropertyPlantAndEquipmentNetPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherPropertyPlantAndEquipmentNetPeriodIncreaseDecrease>
+
+  <gaap:PropertyPlantAndEquipmentNetAdditions contextRef="D-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNetAdditions>
+  <gaap:PropertyPlantAndEquipmentNetDisposals contextRef="D-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:PropertyPlantAndEquipmentNetDisposals>
+  <gaap:PropertyPlantAndEquipmentNetTranslationDifference contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:PropertyPlantAndEquipmentNetTranslationDifference>
+  <gaap:OtherIncreaseDecreaseInPropertyPlantAndEquipmentNet contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:OtherIncreaseDecreaseInPropertyPlantAndEquipmentNet>
+  <gaap:PropertyPlantAndEquipmentNetPeriodIncreaseDecrease contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:PropertyPlantAndEquipmentNetPeriodIncreaseDecrease>
+
+
+  <!-- Property, Plant, and Equipment: Schedule of Leasholod Land and Buildings -->
+
+  <gaap:LeaseholdLandAndBuildingLandArea contextRef="I-2010-LI-ALL" unitRef="U-Pure" decimals="INF">101000</gaap:LeaseholdLandAndBuildingLandArea>
+  <gaap:LeaseholdLandAndBuildingValueAtCost contextRef="I-2010-LI-ALL" unitRef="U-Monetary" decimals="INF">55000</gaap:LeaseholdLandAndBuildingValueAtCost>
+  <gaap:LeaseholdLandAndBuildingValueAtCost contextRef="I-2009-LI-ALL" unitRef="U-Monetary" decimals="INF">44000</gaap:LeaseholdLandAndBuildingValueAtCost>
+
+  <gaap:LeaseholdLandAndBuildingLocation contextRef="D-2010-LIA">Tacoma, Washington</gaap:LeaseholdLandAndBuildingLocation>
+  <gaap:LeaseholdLandAndBuildingDescriptionOfFacility contextRef="D-2010-LIA">Warehouse</gaap:LeaseholdLandAndBuildingDescriptionOfFacility>
+  <gaap:LeaseholdLandAndBuildingTenure contextRef="D-2010-LIA">Fifteen year lease</gaap:LeaseholdLandAndBuildingTenure>
+  <gaap:LeaseholdLandAndBuildingTenureStartDate contextRef="D-2010-LIA">2000-01-01</gaap:LeaseholdLandAndBuildingTenureStartDate>
+  <gaap:LeaseholdLandAndBuildingLandArea contextRef="I-2010-LIA" unitRef="U-Pure" decimals="INF">1000</gaap:LeaseholdLandAndBuildingLandArea>
+  <gaap:LeaseholdLandAndBuildingValueAtCost contextRef="I-2010-LIA" unitRef="U-Monetary" decimals="INF">5000</gaap:LeaseholdLandAndBuildingValueAtCost>
+  <gaap:LeaseholdLandAndBuildingValueAtCost contextRef="I-2009-LIA" unitRef="U-Monetary" decimals="INF">4000</gaap:LeaseholdLandAndBuildingValueAtCost>
+
+  <gaap:LeaseholdLandAndBuildingLocation contextRef="D-2010-LIB">Seattle, Washington</gaap:LeaseholdLandAndBuildingLocation>
+  <gaap:LeaseholdLandAndBuildingDescriptionOfFacility contextRef="D-2010-LIB">Warehouse</gaap:LeaseholdLandAndBuildingDescriptionOfFacility>
+  <gaap:LeaseholdLandAndBuildingTenure contextRef="D-2010-LIB">Twenty year lease</gaap:LeaseholdLandAndBuildingTenure>
+  <gaap:LeaseholdLandAndBuildingTenureStartDate contextRef="D-2010-LIB">2000-01-01</gaap:LeaseholdLandAndBuildingTenureStartDate>
+  <gaap:LeaseholdLandAndBuildingLandArea contextRef="I-2010-LIB" unitRef="U-Pure" decimals="INF">100000</gaap:LeaseholdLandAndBuildingLandArea>
+  <gaap:LeaseholdLandAndBuildingValueAtCost contextRef="I-2010-LIB" unitRef="U-Monetary" decimals="INF">50000</gaap:LeaseholdLandAndBuildingValueAtCost>
+  <gaap:LeaseholdLandAndBuildingValueAtCost contextRef="I-2009-LIB" unitRef="U-Monetary" decimals="INF">40000</gaap:LeaseholdLandAndBuildingValueAtCost>
+
+
+
+  <!-- Other Assets -->
+  <gaap:OtherAssetsDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Curabitur non magna. Nullam wisi lectus, rutrum sit amet, fermentum et, venenatis hendrerit, magna. Suspendisse convallis urna elementum elit.</gaap:OtherAssetsDisclosures>
+  <gaap:OtherAssetsCurrentDisclosures contextRef="D-2010">Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis erat. Suspendisse convallis urna elementum elit.</gaap:OtherAssetsCurrentDisclosures>
+  <gaap:OtherAssetsNoncurrentDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Ut ipsum mauris, pellentesque ut, tristique eget, fringilla id, ante. Vestibulum ante ipsum primis in faucibus.</gaap:OtherAssetsNoncurrentDisclosures>
+
+
+  <!-- Payables and Accruals -->
+
+  <gaap:PayablesAndAccrualsDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.</gaap:PayablesAndAccrualsDisclosures>
+  <gaap:AccountsPayableDisclosures contextRef="D-2010">Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui. Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris.</gaap:AccountsPayableDisclosures>
+  <gaap:AccruedInterestPayableDisclosures contextRef="D-2010">Etiam ipsum orci, gravida nec, feugiat ut, malesuada quis, mauris. Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.</gaap:AccruedInterestPayableDisclosures>
+  <gaap:AccruedExpensesDisclosures contextRef="D-2010">Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.</gaap:AccruedExpensesDisclosures>
+  <gaap:OtherPayablesAndAccrualsDisclosures contextRef="D-2010">Etiam porttitor. Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.</gaap:OtherPayablesAndAccrualsDisclosures>
+
+
+  <!-- Debt -->
+
+  <gaap:LongTermDebtSecured contextRef="I-2010" unitRef="U-Monetary" decimals="INF">750</gaap:LongTermDebtSecured>
+  <gaap:LongTermDebtUnsecured contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:LongTermDebtUnsecured>
+  <gaap:LongTermDebtSubordinated contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:LongTermDebtSubordinated>
+  <gaap:OtherLongTermDebt contextRef="I-2010" unitRef="U-Monetary" decimals="INF">250</gaap:OtherLongTermDebt>
+
+  <gaap:LongTermDebtSecured contextRef="I-2009" unitRef="U-Monetary" decimals="INF">750</gaap:LongTermDebtSecured>
+  <gaap:LongTermDebtUnsecured contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:LongTermDebtUnsecured>
+  <gaap:LongTermDebtSubordinated contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:LongTermDebtSubordinated>
+  <gaap:OtherLongTermDebt contextRef="I-2009" unitRef="U-Monetary" decimals="INF">250</gaap:OtherLongTermDebt>
+
+  <gaap:DebtDisclosures contextRef="D-2010">Ut venenatis, velit a accumsan interdum, odio metus mollis mauris, non pharetra augue arcu eu felis. Ut eget felis. Mauris leo nulla, sodales et, pharetra quis, fermentum nec, diam. Maecenas eget metus. Donec ultricies risus non dui.</gaap:DebtDisclosures>
+  <gaap:LongTermDebtDisclosures contextRef="D-2010">Aliquam viverra risus vitae ante. Sed rhoncus mi in wisi. Nullam nibh dui, molestie vitae, imperdiet non, ornare at, elit. Aenean nec justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis sodales.</gaap:LongTermDebtDisclosures>
+
+  <!-- Maturities -->
+  <gaap:LongTermDebtMaturingInTwoAndThreeYears contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LongTermDebtMaturingInTwoAndThreeYears>
+  <gaap:LongTermDebtMaturingInTwoYears contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LongTermDebtMaturingInTwoYears>
+  <gaap:LongTermDebtMaturingInThreeYears contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LongTermDebtMaturingInThreeYears>
+  <gaap:LongTermDebtMaturingInFourAndFiveYears contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LongTermDebtMaturingInFourAndFiveYears>
+  <gaap:LongTermDebtMaturingInFourYears contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LongTermDebtMaturingInFourYears>
+  <gaap:LongTermDebtMaturingInFiveYears contextRef="I-2010" unitRef="U-Monetary" decimals="INF">0</gaap:LongTermDebtMaturingInFiveYears>
+  <gaap:LongTermDebtMaturingThereafter contextRef="I-2010" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebtMaturingThereafter>
+
+  <!-- This fact value is added to make a calculation not show an inconsistency. -->
+  <gaap:LongTermDebtMaturingThereafter contextRef="I-2009" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebtMaturingThereafter>
+
+
+  <!-- Debt Instruments -->
+  <gaap:DebtInstrumentDescription contextRef="D-2010-DIA">Debt Instrument A in metus augue, euismod nec, luctus eu, egestas sed</gaap:DebtInstrumentDescription>
+  <gaap:LongTermDebt contextRef="I-2010-DIA" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebt>
+  <gaap:LongTermDebt contextRef="I-2009-DIA" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebt>
+
+  <gaap:DebtInstrumentDescription contextRef="D-2010-DIB">Debt Instrument B luctus eu, egestas sed</gaap:DebtInstrumentDescription>
+  <gaap:LongTermDebt contextRef="I-2010-DIB" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebt>
+  <gaap:LongTermDebt contextRef="I-2009-DIB" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebt>
+
+  <gaap:DebtInstrumentDescription contextRef="D-2010-DIC">Debt Instrument C velit lobortis dictum. In metus augue, euismod nec, luctus eu</gaap:DebtInstrumentDescription>
+  <gaap:LongTermDebt contextRef="I-2010-DIC" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebt>
+  <gaap:LongTermDebt contextRef="I-2009-DIC" unitRef="U-Monetary" decimals="INF">500</gaap:LongTermDebt>
+
+
+  <!-- Other Liabilities -->
+  <gaap:OtherLiabilitiesDisclosures contextRef="D-2010">Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:OtherLiabilitiesDisclosures>
+  <gaap:OtherLiabilitiesCurrentDisclosures contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus.</gaap:OtherLiabilitiesCurrentDisclosures>
+  <gaap:OtherLiabilitiesNoncurrentDisclosures contextRef="D-2010">Sed eu nibh. Fusce vitae mi. Sed dapibus venenatis ipsum. Sed in purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.</gaap:OtherLiabilitiesNoncurrentDisclosures>
+
+
+  <!-- Equity -->
+
+  <gaap:EquityDisclosures contextRef="D-2010">Sed elementum feugiat augue. Nam non tortor non leo porta bibendum. Integer sit amet diam ac nibh consequat vestibulum. Proin elit sem, ornare non, ullamcorper vel, sollicitudin a, lacus. Mauris tincidunt cursus est. Nulla sit amet nibh.</gaap:EquityDisclosures>
+  <gaap:CommonStockDisclosures contextRef="D-2010">Aliquam viverra risus vitae ante. Sed rhoncus mi in wisi. Nullam nibh dui, molestie vitae, imperdiet non, ornare at, elit. Aenean nec justo.</gaap:CommonStockDisclosures>
+  <gaap:PreferredStockDisclosures contextRef="D-2010">Praesent id mauris. Sed dapibus dui quis lectus. Donec id sem. Integer sit amet diam ac nibh consequat vestibulum. Sed eget augue malesuada quam adipiscing mattis.</gaap:PreferredStockDisclosures>
+  <gaap:AdditionalPaidInCapitalDisclosures contextRef="D-2010">Suspendisse et lorem eu risus convallis placerat. Suspendisse potenti. Donec malesuada lorem id mi. Nunc ut purus ac nisl tempus accumsan.</gaap:AdditionalPaidInCapitalDisclosures>
+  <gaap:RetainedEarningsAccumulatedLossesDisclosures contextRef="D-2010">Proin elit sem, ornare non, ullamcorper vel, sollicitudin a, lacus. Mauris tincidunt cursus est. Nulla sit amet nibh. Sed elementum feugiat augue. Nam non tortor non leo porta bibendum.</gaap:RetainedEarningsAccumulatedLossesDisclosures>
+
+
+
+  <!-- Income Taxes -->
+
+  <gaap:IncomeTaxesDisclosures contextRef="D-2010">Sed elementum feugiat augue. Nam non tortor non leo porta bibendum. Integer sit amet diam ac nibh consequat vestibulum. Proin elit sem, ornare non, ullamcorper vel, sollicitudin a, lacus. Mauris tincidunt cursus est. Nulla sit amet nibh.</gaap:IncomeTaxesDisclosures>
+
+  <gaap:IncomeTaxExpenseBenefitCurrentForeign contextRef="D-2010" unitRef="U-Monetary" decimals="INF">200</gaap:IncomeTaxExpenseBenefitCurrentForeign>
+  <gaap:IncomeTaxExpenseBenefitCurrentDomestic contextRef="D-2010" unitRef="U-Monetary" decimals="INF">50</gaap:IncomeTaxExpenseBenefitCurrentDomestic>
+  <gaap:IncomeTaxExpenseBenefitCurrent contextRef="D-2010" unitRef="U-Monetary" decimals="INF">250</gaap:IncomeTaxExpenseBenefitCurrent>
+  <gaap:IncomeTaxExpenseBenefitDeferredForeign contextRef="D-2010" unitRef="U-Monetary" decimals="INF">200</gaap:IncomeTaxExpenseBenefitDeferredForeign>
+  <gaap:IncomeTaxExpenseBenefitDeferredDomestic contextRef="D-2010" unitRef="U-Monetary" decimals="INF">50</gaap:IncomeTaxExpenseBenefitDeferredDomestic>
+  <gaap:IncomeTaxExpenseBenefitDeferred contextRef="D-2010" unitRef="U-Monetary" decimals="INF">250</gaap:IncomeTaxExpenseBenefitDeferred>
+
+  <gaap:IncomeTaxExpenseBenefitCurrentForeign contextRef="D-2009" unitRef="U-Monetary" decimals="INF">250</gaap:IncomeTaxExpenseBenefitCurrentForeign>
+  <gaap:IncomeTaxExpenseBenefitCurrentDomestic contextRef="D-2009" unitRef="U-Monetary" decimals="INF">250</gaap:IncomeTaxExpenseBenefitCurrentDomestic>
+  <gaap:IncomeTaxExpenseBenefitCurrent contextRef="D-2009" unitRef="U-Monetary" decimals="INF">500</gaap:IncomeTaxExpenseBenefitCurrent>
+  <gaap:IncomeTaxExpenseBenefitDeferredForeign contextRef="D-2009" unitRef="U-Monetary" decimals="INF">250</gaap:IncomeTaxExpenseBenefitDeferredForeign>
+  <gaap:IncomeTaxExpenseBenefitDeferredDomestic contextRef="D-2009" unitRef="U-Monetary" decimals="INF">250</gaap:IncomeTaxExpenseBenefitDeferredDomestic>
+  <gaap:IncomeTaxExpenseBenefitDeferred contextRef="D-2009" unitRef="U-Monetary" decimals="INF">500</gaap:IncomeTaxExpenseBenefitDeferred>
+
+
+
+  <!-- Business Segments -->
+
+  <!-- Current period -->
+  <gaap:ExternalSales contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">2000</gaap:ExternalSales>
+  <gaap:ExternalSales contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">2000</gaap:ExternalSales>
+  <gaap:ExternalSales contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">4000</gaap:ExternalSales>
+  <gaap:ExternalSales contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">4000</gaap:ExternalSales>
+  <gaap:ExternalSales contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">0</gaap:ExternalSales>
+  <gaap:ExternalSales contextRef="D-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:ExternalSales>
+
+  <gaap:IntersegmentalSales contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">1000</gaap:IntersegmentalSales>
+  <gaap:IntersegmentalSales contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">1000</gaap:IntersegmentalSales>
+  <gaap:IntersegmentalSales contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">2000</gaap:IntersegmentalSales>
+  <gaap:IntersegmentalSales contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">2000</gaap:IntersegmentalSales>
+  <gaap:IntersegmentalSales contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">-2000</gaap:IntersegmentalSales>
+  <gaap:IntersegmentalSales contextRef="D-2010" unitRef="U-Monetary" decimals="INF">0</gaap:IntersegmentalSales>
+
+  <gaap:RevenuesNet contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">3000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">3000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">6000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">6000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">-2000</gaap:RevenuesNet>
+  <!-- NOTE that the total of this is consolidated revenu in the context D-2010, needs default dimensions declared. -->
+
+  <gaap:SegmentResult contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">2000</gaap:SegmentResult>
+  <gaap:SegmentResult contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">2000</gaap:SegmentResult>
+  <gaap:SegmentResult contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">4000</gaap:SegmentResult>
+  <gaap:SegmentResult contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">4000</gaap:SegmentResult>
+  <gaap:SegmentResult contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">-1000</gaap:SegmentResult>
+  <gaap:SegmentResult contextRef="D-2010" unitRef="U-Monetary" decimals="INF">3000</gaap:SegmentResult>
+
+
+  <gaap:UnallocatedCorporateExpenses contextRef="D-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:UnallocatedCorporateExpenses>
+
+  <gaap:IncomeLossFromAffiliates contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:IncomeLossFromAffiliates>
+  <gaap:IncomeLossFromInvestments contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:IncomeLossFromInvestments>
+
+  <gaap:CapitalAdditions contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">750</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">750</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">1500</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">1500</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">-500</gaap:CapitalAdditions>
+  <gaap:CapitalAdditions contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:CapitalAdditions>
+
+  <gaap:Depreciation contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">250</gaap:Depreciation>
+  <gaap:Depreciation contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">250</gaap:Depreciation>
+  <gaap:Depreciation contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">500</gaap:Depreciation>
+  <gaap:Depreciation contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">500</gaap:Depreciation>
+  <gaap:Depreciation contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">0</gaap:Depreciation>
+  <gaap:Depreciation contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:Depreciation>
+
+  <gaap:Amortization contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">250</gaap:Amortization>
+  <gaap:Amortization contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">250</gaap:Amortization>
+  <gaap:Amortization contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">500</gaap:Amortization>
+  <gaap:Amortization contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">500</gaap:Amortization>
+  <gaap:Amortization contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">0</gaap:Amortization>
+  <gaap:Amortization contextRef="D-2010" unitRef="U-Monetary" decimals="INF">500</gaap:Amortization>
+
+  <gaap:DepreciationAndAmortization contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">500</gaap:DepreciationAndAmortization>
+  <gaap:DepreciationAndAmortization contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">500</gaap:DepreciationAndAmortization>
+  <gaap:DepreciationAndAmortization contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">1000</gaap:DepreciationAndAmortization>
+  <gaap:DepreciationAndAmortization contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">1000</gaap:DepreciationAndAmortization>
+  <gaap:DepreciationAndAmortization contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">0</gaap:DepreciationAndAmortization>
+  <gaap:DepreciationAndAmortization contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:DepreciationAndAmortization>
+
+  <gaap:ImpairmentLossesReversalsRecognizedInIncome contextRef="D-2010-BS1" unitRef="U-Monetary" decimals="INF">2000</gaap:ImpairmentLossesReversalsRecognizedInIncome>
+  <gaap:ImpairmentLossesReversalsRecognizedInIncome contextRef="D-2010-BS2" unitRef="U-Monetary" decimals="INF">2000</gaap:ImpairmentLossesReversalsRecognizedInIncome>
+  <gaap:ImpairmentLossesReversalsRecognizedInIncome contextRef="D-2010-CON" unitRef="U-Monetary" decimals="INF">4000</gaap:ImpairmentLossesReversalsRecognizedInIncome>
+  <gaap:ImpairmentLossesReversalsRecognizedInIncome contextRef="D-2010-ALL" unitRef="U-Monetary" decimals="INF">4000</gaap:ImpairmentLossesReversalsRecognizedInIncome>
+  <gaap:ImpairmentLossesReversalsRecognizedInIncome contextRef="D-2010-E" unitRef="U-Monetary" decimals="INF">-3000</gaap:ImpairmentLossesReversalsRecognizedInIncome>
+  <gaap:ImpairmentLossesReversalsRecognizedInIncome contextRef="D-2010" unitRef="U-Monetary" decimals="INF">1000</gaap:ImpairmentLossesReversalsRecognizedInIncome>
+
+  <gaap:AssetsSegmental contextRef="I-2010-BS1" unitRef="U-Monetary" decimals="INF">5000</gaap:AssetsSegmental>
+  <gaap:AssetsSegmental contextRef="I-2010-BS2" unitRef="U-Monetary" decimals="INF">5000</gaap:AssetsSegmental>
+  <gaap:AssetsSegmental contextRef="I-2010-CON" unitRef="U-Monetary" decimals="INF">10000</gaap:AssetsSegmental>
+  <gaap:AssetsSegmental contextRef="I-2010-ALL" unitRef="U-Monetary" decimals="INF">10000</gaap:AssetsSegmental>
+  <gaap:AssetsSegmental contextRef="I-2010-E" unitRef="U-Monetary" decimals="INF">-2000</gaap:AssetsSegmental>
+  <gaap:AssetsSegmental contextRef="I-2010" unitRef="U-Monetary" decimals="INF">8000</gaap:AssetsSegmental>
+
+  <gaap:AssetsUnallocatedCorporate contextRef="I-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:AssetsUnallocatedCorporate>
+
+  <gaap:LiabilitiesSegmental contextRef="I-2010-BS1" unitRef="U-Monetary" decimals="INF">3000</gaap:LiabilitiesSegmental>
+  <gaap:LiabilitiesSegmental contextRef="I-2010-BS2" unitRef="U-Monetary" decimals="INF">3000</gaap:LiabilitiesSegmental>
+  <gaap:LiabilitiesSegmental contextRef="I-2010-CON" unitRef="U-Monetary" decimals="INF">6000</gaap:LiabilitiesSegmental>
+  <gaap:LiabilitiesSegmental contextRef="I-2010-ALL" unitRef="U-Monetary" decimals="INF">6000</gaap:LiabilitiesSegmental>
+  <gaap:LiabilitiesSegmental contextRef="I-2010-E" unitRef="U-Monetary" decimals="INF">-2000</gaap:LiabilitiesSegmental>
+  <gaap:LiabilitiesSegmental contextRef="I-2010" unitRef="U-Monetary" decimals="INF">4000</gaap:LiabilitiesSegmental>
+
+  <gaap:LiabilitiesUnallocatedCorporate contextRef="I-2010" unitRef="U-Monetary" decimals="INF">2000</gaap:LiabilitiesUnallocatedCorporate>
+
+  <gaap:AverageNumberEmployees contextRef="D-2010-BS1" unitRef="U-Pure" decimals="INF">200</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2010-BS2" unitRef="U-Pure" decimals="INF">100</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2010-CON" unitRef="U-Pure" decimals="INF">300</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2010-E" unitRef="U-Pure" decimals="INF">0</gaap:AverageNumberEmployees>
+  <gaap:AverageNumberEmployees contextRef="D-2010-ALL" unitRef="U-Pure" decimals="INF">300</gaap:AverageNumberEmployees>
+
+
+  <!-- Prior period -->
+  <gaap:AssetsSegmental contextRef="I-2009" unitRef="U-Monetary" decimals="INF">8000</gaap:AssetsSegmental>
+  <gaap:AssetsUnallocatedCorporate contextRef="I-2009" unitRef="U-Monetary" decimals="INF">2000</gaap:AssetsUnallocatedCorporate>
+
+
+  <gaap:LiabilitiesSegmental contextRef="I-2009" unitRef="U-Monetary" decimals="INF">4000</gaap:LiabilitiesSegmental>
+  <gaap:LiabilitiesUnallocatedCorporate contextRef="I-2009" unitRef="U-Monetary" decimals="INF">2000</gaap:LiabilitiesUnallocatedCorporate>
+
+  <gaap:Depreciation contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:Depreciation>
+  <gaap:Amortization contextRef="D-2009" unitRef="U-Monetary" decimals="INF">0</gaap:Amortization>
+
+
+
+
+  <!-- Share Ownership Plans -->
+
+  <gaap:ShareOwnershipPlanDescriptionGeneralTermsAndConditions contextRef="D-2010-SOP1">These are the description, general conditions, and terms of share ownership plan 1. Fusce tristique posuere ipsum. Nulla facilisi. Aliquam viverra risus vitae ante. Sed rhoncus mi in wisi. Nullam nibh dui, molestie vitae, imperdiet non, ornare at, elit. Aenean nec justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis sodales.</gaap:ShareOwnershipPlanDescriptionGeneralTermsAndConditions>
+  <gaap:ShareOwnershipPlanShareOptionsOutstanding contextRef="I-2009-SOP1" unitRef="U-Shares" decimals="INF">0</gaap:ShareOwnershipPlanShareOptionsOutstanding>
+  <gaap:ShareOwnershipPlanShareOptionsOutstanding contextRef="I-2010-SOP1" unitRef="U-Shares" decimals="INF">1000</gaap:ShareOwnershipPlanShareOptionsOutstanding>
+  <gaap:ShareOwnershipPlanShareOptionsGranted contextRef="D-2010-SOP1" unitRef="U-Shares" decimals="INF">4000</gaap:ShareOwnershipPlanShareOptionsGranted>
+  <gaap:ShareOwnershipPlanShareOptionsForfeited contextRef="D-2010-SOP1" unitRef="U-Shares" decimals="INF">1000</gaap:ShareOwnershipPlanShareOptionsForfeited>
+  <gaap:ShareOwnershipPlanShareOptionsExercised contextRef="D-2010-SOP1" unitRef="U-Shares" decimals="INF">1000</gaap:ShareOwnershipPlanShareOptionsExercised>
+  <gaap:ShareOwnershipPlanShareOptionsExpired contextRef="D-2010-SOP1" unitRef="U-Shares" decimals="INF">1000</gaap:ShareOwnershipPlanShareOptionsExpired>
+  <gaap:ShareOwnershipPlanShareOptionsOutstandingPeriodIncreaseDecrease contextRef="D-2010-SOP1" unitRef="U-Shares" decimals="INF">1000</gaap:ShareOwnershipPlanShareOptionsOutstandingPeriodIncreaseDecrease>
+
+
+
+  <!-- Subsequent Events -->
+
+  <gaap:SubsequentEventDescription contextRef="D-2010-SE-1">Description of subsequent event number 1 which relates to the loss of an uncollectable receivable. Aliquam viverra risus vitae ante. Sed rhoncus mi in wisi. Nullam nibh dui, molestie vitae, imperdiet non, ornare at, elit. Aenean nec justo. Aliquam viverra risus vitae ante. Sed rhoncus mi in wisi. Nullam nibh dui, molestie vitae, imperdiet non, ornare at, elit. Aenean nec justo.</gaap:SubsequentEventDescription>
+  <gaap:SubsequentEventDate contextRef="D-2010-SE-1">2011-01-15</gaap:SubsequentEventDate>
+
+  <gaap:SubsequentEventDescription contextRef="D-2010-SE-2">Description of subsequent event number 2 which relates to the purchase of a business. Etiam viverra neque non sem. Nullam lacinia sem. Duis sapien diam, dapibus sed, dictum quis, interdum ac, erat. Suspendisse urna. Proin non mauris. Proin sed odio. Phasellus sagittis orci quis orci. Aliquam erat volutpat. Mauris commodo ultrices elit. Sed id orci. In ultrices urna volutpat wisi.</gaap:SubsequentEventDescription>
+  <gaap:SubsequentEventDate contextRef="D-2010-SE-2">2011-01-20</gaap:SubsequentEventDate>
+
+
+
+
+
+  <!-- Related Parties -->
+
+  <gaap:RelatedPartyTypeOfRelationship contextRef="D-2010-RP1">Parent</gaap:RelatedPartyTypeOfRelationship>
+  <gaap:RelatedPartyNatureOfRelationship contextRef="D-2010-RP1">This is other descriptive information about the relationship.</gaap:RelatedPartyNatureOfRelationship>
+
+  <gaap:RelatedPartyTypeOfRelationship contextRef="D-2010-RP2">JointVenture</gaap:RelatedPartyTypeOfRelationship>
+  <gaap:RelatedPartyNatureOfRelationship contextRef="D-2010-RP2">This is other descriptive information about the relationship.</gaap:RelatedPartyNatureOfRelationship>
+
+  <gaap:RelatedPartyTransactionDescription contextRef="D-2010-RP1T1">Transaction 1 description</gaap:RelatedPartyTransactionDescription>
+  <gaap:RelatedPartyTransactionPricingPolicy contextRef="D-2010-RP1T1">Cost</gaap:RelatedPartyTransactionPricingPolicy>
+  <gaap:RelatedPartyTransactionAmount contextRef="D-2010-RP1T1" unitRef="U-Monetary" decimals="INF">1000</gaap:RelatedPartyTransactionAmount>
+
+  <gaap:RelatedPartyTransactionDescription contextRef="D-2010-RP1T2">Transaction 2 description</gaap:RelatedPartyTransactionDescription>
+  <gaap:RelatedPartyTransactionPricingPolicy contextRef="D-2010-RP1T2">Cost</gaap:RelatedPartyTransactionPricingPolicy>
+  <gaap:RelatedPartyTransactionAmount contextRef="D-2010-RP1T2" unitRef="U-Monetary" decimals="INF">1000</gaap:RelatedPartyTransactionAmount>
+
+
+  <gaap:RelatedPartyTransactionDescription contextRef="D-2010-RP2T1">Transaction 1 description</gaap:RelatedPartyTransactionDescription>
+  <gaap:RelatedPartyTransactionPricingPolicy contextRef="D-2010-RP2T1">Cost</gaap:RelatedPartyTransactionPricingPolicy>
+  <gaap:RelatedPartyTransactionAmount contextRef="D-2010-RP2T1" unitRef="U-Monetary" decimals="INF">1000</gaap:RelatedPartyTransactionAmount>
+
+  <gaap:RelatedPartyTransactionDescription contextRef="D-2010-RP2T2">Transaction 2 description</gaap:RelatedPartyTransactionDescription>
+  <gaap:RelatedPartyTransactionPricingPolicy contextRef="D-2010-RP2T2">Cost</gaap:RelatedPartyTransactionPricingPolicy>
+  <gaap:RelatedPartyTransactionAmount contextRef="D-2010-RP2T2" unitRef="U-Monetary" decimals="INF">1000</gaap:RelatedPartyTransactionAmount>
+
+
+  <!-- Director's Compensation -->
+
+  <gaap:DirectorSalary contextRef="D-2010-DIR1" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorSalary>
+  <gaap:DirectorBonuses contextRef="D-2010-DIR1" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorBonuses>
+  <gaap:DirectorFees contextRef="D-2010-DIR1" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorFees>
+  <gaap:DirectorSalaryBonusesAndFees contextRef="D-2010-DIR1" unitRef="U-Monetary" decimals="INF">3000</gaap:DirectorSalaryBonusesAndFees>
+  <gaap:DirectorOptionsGrantedAtFairValue contextRef="D-2010-DIR1" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorOptionsGrantedAtFairValue>
+
+  <gaap:DirectorSalary contextRef="D-2010-DIR2" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorSalary>
+  <gaap:DirectorBonuses contextRef="D-2010-DIR2" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorBonuses>
+  <gaap:DirectorFees contextRef="D-2010-DIR2" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorFees>
+  <gaap:DirectorSalaryBonusesAndFees contextRef="D-2010-DIR2" unitRef="U-Monetary" decimals="INF">3000</gaap:DirectorSalaryBonusesAndFees>
+  <gaap:DirectorOptionsGrantedAtFairValue contextRef="D-2010-DIR2" unitRef="U-Monetary" decimals="INF">1000</gaap:DirectorOptionsGrantedAtFairValue>
+
+  <gaap:DirectorSalary contextRef="D-2010-DIR-ALL" unitRef="U-Monetary" decimals="INF">2000</gaap:DirectorSalary>
+  <gaap:DirectorBonuses contextRef="D-2010-DIR-ALL" unitRef="U-Monetary" decimals="INF">2000</gaap:DirectorBonuses>
+  <gaap:DirectorFees contextRef="D-2010-DIR-ALL" unitRef="U-Monetary" decimals="INF">2000</gaap:DirectorFees>
+  <gaap:DirectorSalaryBonusesAndFees contextRef="D-2010-DIR-ALL" unitRef="U-Monetary" decimals="INF">6000</gaap:DirectorSalaryBonusesAndFees>
+  <gaap:DirectorOptionsGrantedAtFairValue contextRef="D-2010-DIR-ALL" unitRef="U-Monetary" decimals="INF">2000</gaap:DirectorOptionsGrantedAtFairValue>
+
+
+  <!-- Reconciliation of Cash -->
+  <gaap:ReconcilingItemAmount contextRef="I-2010" unitRef="U-Monetary" decimals="INF">-1000</gaap:ReconcilingItemAmount>
+  <gaap:ReconcilingItemAmount contextRef="I-2009" unitRef="U-Monetary" decimals="INF">0</gaap:ReconcilingItemAmount>
+
+  <!-- ReconcilingItemAmount could be changed to ReconcilingItem potentially -->
+  <gaap:ReconcilingItemDescription contextRef="D-2010-CREC-A">Reconciling Item A</gaap:ReconcilingItemDescription>
+  <gaap:ReconcilingItemAmount contextRef="I-2010-CREC-A" unitRef="U-Monetary" decimals="INF">-500</gaap:ReconcilingItemAmount>
+  <gaap:ReconcilingItemAmount contextRef="I-2009-CREC-A" unitRef="U-Monetary" decimals="INF">500</gaap:ReconcilingItemAmount>
+
+  <gaap:ReconcilingItemDescription contextRef="D-2010-CREC-B">Reconciling Item B</gaap:ReconcilingItemDescription>
+  <gaap:ReconcilingItemAmount contextRef="I-2010-CREC-B" unitRef="U-Monetary" decimals="INF">-500</gaap:ReconcilingItemAmount>
+  <gaap:ReconcilingItemAmount contextRef="I-2009-CREC-B" unitRef="U-Monetary" decimals="INF">-500</gaap:ReconcilingItemAmount>
+
+
+  <!-- Portfolio of Investments -->
+  <gaap:InvestmentShares contextRef="I-2010-INV1" unitRef="U-Shares" decimals="INF">10</gaap:InvestmentShares>
+  <gaap:InvestmentsAtCost contextRef="I-2010-INV1" unitRef="U-Monetary" decimals="INF">250</gaap:InvestmentsAtCost>
+
+  <gaap:InvestmentShares contextRef="I-2010-INV2" unitRef="U-Shares" decimals="INF">10</gaap:InvestmentShares>
+  <gaap:InvestmentsAtCost contextRef="I-2010-INV2" unitRef="U-Monetary" decimals="INF">250</gaap:InvestmentsAtCost>
+
+
+  <gaap:InvestmentShares contextRef="I-2009-INV3" unitRef="U-Shares" decimals="INF">10</gaap:InvestmentShares>
+  <gaap:InvestmentsAtCost contextRef="I-2009-INV3" unitRef="U-Monetary" decimals="INF">250</gaap:InvestmentsAtCost>
+
+  <gaap:InvestmentShares contextRef="I-2009-INV4" unitRef="U-Shares" decimals="INF">10</gaap:InvestmentShares>
+  <gaap:InvestmentsAtCost contextRef="I-2009-INV4" unitRef="U-Monetary" decimals="INF">250</gaap:InvestmentsAtCost>
+
+  <!-- Totals on balance sheet -->
+
+  <!-- Total shares, does NOT tie to balance sheet. These are NOT ON REPORT currently.  Either (a) add them some where or (b) delete concepts from XBRL instance. -->
+  <gaap:InvestmentShares contextRef="I-2010" unitRef="U-Shares" decimals="INF">20</gaap:InvestmentShares>
+  <gaap:InvestmentShares contextRef="I-2009" unitRef="U-Shares" decimals="INF">20</gaap:InvestmentShares>
+
+
+
+  <!-- Sales Analysis -->
+
+  <gaap:RevenuesNet contextRef="D-2010-ABC1" unitRef="U-Monetary" decimals="INF">2000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2010-ABC2" unitRef="U-Monetary" decimals="INF">1000</gaap:RevenuesNet>
+  <gaap:RevenuesNet contextRef="D-2010-ABC3" unitRef="U-Monetary" decimals="INF">1000</gaap:RevenuesNet>
+
+
+  <!-- Variance Analysis -->
+  <gaap:RevenuesNet contextRef="D-2010-Bud" unitRef="U-Monetary" decimals="INF">4005</gaap:RevenuesNet>
+  <gaap:CostOfSales contextRef="D-2010-Bud" unitRef="U-Monetary" decimals="INF">999</gaap:CostOfSales>
+  <gaap:GrossProfitLoss contextRef="D-2010-Bud" unitRef="U-Monetary" decimals="INF">3006</gaap:GrossProfitLoss>
+
+  <gaap:RevenuesNet contextRef="D-2010-Var" unitRef="U-Monetary" decimals="INF">5</gaap:RevenuesNet>
+  <gaap:CostOfSales contextRef="D-2010-Var" unitRef="U-Monetary" decimals="INF">-1</gaap:CostOfSales>
+  <gaap:GrossProfitLoss contextRef="D-2010-Var" unitRef="U-Monetary" decimals="INF">6</gaap:GrossProfitLoss>
+
+
+  <!-- Document Information -->
+  <gaap:DocumentTitle contextRef="D-2010-DI">Financial Statement</gaap:DocumentTitle>
+  <gaap:DocumentIdentifier contextRef="D-2010-DI">XXXX</gaap:DocumentIdentifier>
+  <gaap:DocumentLanguage contextRef="D-2010-DI">English</gaap:DocumentLanguage>
+
+  <!-- Address -->
+  <gaap:Street1 contextRef="D-2010-Address">1234 North Street</gaap:Street1>
+  <gaap:City contextRef="D-2010-Address">New York</gaap:City>
+
+
+
+
+
+
+
+
+  <!-- General Comments -->
+  <link:footnoteLink xlink:title='General Comment' xlink:type="extended" xlink:role="http://www.xbrl.org/2003/role/link">
+    <link:loc xlink:type="locator" xlink:href="#Item-01" xlink:label="Item-01" />
+    <link:loc xlink:type="locator" xlink:href="#Item-02" xlink:label="Item-02" />
+    <link:footnoteArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/fact-footnote" xlink:from="Item-01" xlink:to="Footnote-01" order="1" />
+    <link:footnoteArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/fact-footnote" xlink:from="Item-02" xlink:to="Footnote-01" order="2" />
+    <link:footnote xlink:type="resource" xlink:role="http://www.xbrl.org/2003/role/footnote" xlink:label="Footnote-01" xml:lang="en">GENERAL: This is a footnote making general comments.</link:footnote>
+  </link:footnoteLink>
+
+  <!-- Restatement -->
+  <link:footnoteLink xlink:title='Restatement Comment' xlink:type="extended" xlink:role="http://www.xbrl.org/2003/role/link">
+    <link:loc xlink:type="locator" xlink:href="#Restated-01" xlink:label="Restated-01" />
+    <link:loc xlink:type="locator" xlink:href="#Restated-02" xlink:label="Restated-02" />
+    <link:loc xlink:type="locator" xlink:href="#Restated-03" xlink:label="Restated-03" />
+    <link:footnoteArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/fact-footnote" xlink:from="Restated-01" xlink:to="Footnote-02" order="1" />
+    <link:footnoteArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/fact-footnote" xlink:from="Restated-02" xlink:to="Footnote-02" order="2" />
+    <link:footnoteArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/fact-footnote" xlink:from="Restated-03" xlink:to="Footnote-02" order="3" />
+    <link:footnote xlink:type="resource" xlink:role="http://www.xbrl.org/2003/role/footnote" xlink:label="Footnote-02" xml:lang="en">RESTATEMENT: This is a footnote relating to a restatement.</link:footnote>
+  </link:footnoteLink>
+
+</xbrl>
