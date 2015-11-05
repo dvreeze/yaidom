@@ -121,4 +121,15 @@ object QName {
       case _ => sys.error(s"Did not expect more than 1 colon in QName '${s}'")
     }
   }
+
+  /**
+   * Extractor turning a QName into a pair of an optional prefix, and a local part.
+   *
+   * With this extractor one can pattern match on arbitrary QNames, and not just on prefixed or unprefixed names.
+   */
+  def unapply(qname: QName): Option[(Option[String], String)] = qname match {
+    case UnprefixedName(localPart)       => Some((None, localPart))
+    case PrefixedName(prefix, localPart) => Some((Some(prefix), localPart))
+    case _                               => None
+  }
 }

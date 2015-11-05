@@ -114,6 +114,15 @@ class QNameTest extends Suite {
     intercept[Exception] {
       QName.parse(":").validated
     }
+
+    val qnOption = qname match {
+      case qn @ QName(None, localPart) => Some(qn)
+      case _                           => None
+    }
+
+    assertResult(Some(qname)) {
+      qnOption
+    }
   }
 
   @Test def testPrefixedName(): Unit = {
@@ -230,6 +239,15 @@ class QNameTest extends Suite {
     }
     intercept[Exception] {
       QName.parse(":b").validated
+    }
+
+    val qnOption = qname match {
+      case qn @ QName(Some(prefix), localPart) => Some(qn)
+      case _                                   => None
+    }
+
+    assertResult(Some(qname)) {
+      qnOption
     }
   }
 }
