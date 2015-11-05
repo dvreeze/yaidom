@@ -34,7 +34,7 @@ import scala.collection.immutable
 final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) extends Immutable { self =>
   require(entries ne null)
 
-  /** Returns true if this is the root `Path`, so if it has no entries */
+  /** Returns true if this is the empty `PathBuilder`, so if it has no entries */
   def isEmpty: Boolean = entries.isEmpty
 
   @deprecated(message = "Use 'isEmpty' instead", since = "1.5.0")
@@ -78,6 +78,13 @@ object PathBuilder {
   def from(entries: (QName, Int)*): PathBuilder = {
     val entrySeq: Seq[PathBuilder.Entry] = entries map { p => Entry(p._1, p._2) }
     new PathBuilder(entrySeq.toIndexedSeq)
+  }
+
+  /**
+   * Extractor turning a PathBuilder into a sequence of entries.
+   */
+  def unapply(pathBuilder: PathBuilder): Option[immutable.IndexedSeq[PathBuilder.Entry]] = {
+    Some(pathBuilder.entries)
   }
 
   /** An entry in an `PathBuilder`, as an qname plus zero-based index of the elem as child (with that name) of the parent. */

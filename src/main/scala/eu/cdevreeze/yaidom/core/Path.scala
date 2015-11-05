@@ -264,6 +264,13 @@ object Path {
     Path(entries)
   }
 
+  /**
+   * Extractor turning a Path into a sequence of entries.
+   */
+  def unapply(path: Path): Option[immutable.IndexedSeq[Path.Entry]] = {
+    Some(path.entries)
+  }
+
   /** An entry in an `Path`, as an expanded element name plus zero-based index of the elem as child element (with that name) of the parent. */
   final case class Entry(elementName: EName, index: Int) extends Immutable {
     require(elementName ne null)

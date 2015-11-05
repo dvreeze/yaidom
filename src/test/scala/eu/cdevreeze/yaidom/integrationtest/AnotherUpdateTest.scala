@@ -55,8 +55,8 @@ class AnotherUpdateTest extends Suite {
     val doc: Document = docParser.parse(is)
 
     val deleteMags: Elem => Vector[Node] = {
-      case elem: Elem if elem.localName == "Magazine" => Vector[Node]()
-      case elem: Elem                                 => Vector(elem)
+      case Elem(QName(_, "Magazine"), _, _, _) => Vector[Node]()
+      case elem: Elem                          => Vector(elem)
     }
 
     val docWithoutMags: Document = doc.transformElemsToNodeSeq(deleteMags)
@@ -74,8 +74,8 @@ class AnotherUpdateTest extends Suite {
     }
 
     val deleteMagsResolved: resolved.Elem => Vector[resolved.Node] = {
-      case elem: resolved.Elem if elem.resolvedName.localPart == "Magazine" => Vector[resolved.Node]()
-      case elem: resolved.Elem => Vector(elem)
+      case resolved.Elem(EName(_, "Magazine"), _, _) => Vector[resolved.Node]()
+      case elem: resolved.Elem                       => Vector(elem)
     }
 
     assertResult(resolved.Elem(docWithoutMags.documentElement)) {

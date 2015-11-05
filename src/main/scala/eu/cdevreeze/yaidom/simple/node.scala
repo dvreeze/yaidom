@@ -605,6 +605,13 @@ object Elem {
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
     scope: Scope = Scope.Empty,
     children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
+
+  /**
+   * Extractor of Elems, to be used for pattern matching.
+   */
+  def unapply(e: Elem): Option[(QName, immutable.IndexedSeq[(QName, String)], Scope, immutable.IndexedSeq[Node])] = {
+    Some((e.qname, e.attributes, e.scope, e.children))
+  }
 }
 
 /**

@@ -176,7 +176,7 @@ class UpdateTest extends Suite {
     // 4. Element salary added (with value 10000)
 
     val f: Elem => Elem = {
-      case e: Elem if e.localName == "Employee" =>
+      case e @ Elem(QName(_, "Employee"), _, _, _) =>
         val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
         val newId = genderPrefix + (e \@ EName("id")).head
@@ -185,7 +185,7 @@ class UpdateTest extends Suite {
         val salaryElem = textElem(QName("salary"), "10000").build(scope)
         val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
-      case e: Elem if e.localName == "name" =>
+      case e @ Elem(QName(_, "name"), _, _, _) =>
         e.withChildren(Vector(Text(e.text.toUpperCase, false)))
       case e: Elem => e
     }
@@ -243,7 +243,7 @@ class UpdateTest extends Suite {
     // 4. Element salary added (with value 10000)
 
     val f: Elem => Elem = {
-      case e: Elem if e.localName == "Employee" =>
+      case e @ Elem(QName(_, "Employee"), _, _, _) =>
         val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
         val newId = genderPrefix + (e \@ EName("id")).head
@@ -252,7 +252,7 @@ class UpdateTest extends Suite {
         val salaryElem = textElem(QName("salary"), "10000").build(scope)
         val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
-      case e: Elem if e.localName == "name" =>
+      case e @ Elem(QName(_, "name"), _, _, _) =>
         e.withChildren(Vector(Text(e.text.toUpperCase, false)))
       case e: Elem => e
     }
