@@ -42,6 +42,19 @@ package eu.cdevreeze.yaidom
  * The query for Scala book authors would have been exactly the same if normal `Elem`s had been used instead of `indexed.Elem`s
  * (replacing `indexedBookstoreElem` by `bookstoreElem`)!
  *
+ * There is no explicit functional update support for the indexed elements in this package. Of course the underlying
+ * elements can be functionally updated (for element implementations that offer such update support), and indexed
+ * elements can be created from the update results, but this is hardly efficient functional update support.
+ *
+ * One problem with efficient functional updates for indexed elements is that updating just one child element means
+ * that all subsequent child elements may have to be updated as well, adapting the stored paths. In comparison, simple
+ * elements do not have this restriction, and can be updated in isolation. Hence the functional update support for
+ * simple elements but not for the different indexed element implementations.
+ *
+ * If efficient functional updates on indexed elements are required, consider using the "lazy" indexed elements
+ * such as `LazyIndexedClarkElem` and `LazyIndexedScopedElem` instead of the "eager" indexed elements `IndexedClarkElem`
+ * and `IndexedScopedElem`. After all, creation of the lazy indexed elements is fast.
+ *
  * @author Chris de Vreeze
  */
 package object indexed {
