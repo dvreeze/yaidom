@@ -18,6 +18,8 @@ package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
 
+import scala.util.Try
+
 import org.xml.sax.InputSource
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.DefaultHandler
@@ -120,7 +122,8 @@ final class DocumentParserUsingSax(
       sp.parse(inputSource, handler)
 
       // Now all event handler methods have been called, including endDocument. The standalone value is still available.
-      val isStandalone = sp.getXMLReader().getFeature("http://xml.org/sax/features/is-standalone")
+      val isStandalone =
+        Try(sp.getXMLReader().getFeature("http://xml.org/sax/features/is-standalone")).toOption.getOrElse(false)
 
       val doc: Document = handler.resultingDocument
 
