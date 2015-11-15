@@ -359,10 +359,16 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   }
 
   /** Returns `Scope(this.prefixNamespaceMap ++ scope.prefixNamespaceMap)` */
-  def ++(scope: Scope): Scope = Scope(this.prefixNamespaceMap ++ scope.prefixNamespaceMap)
+  def append(scope: Scope): Scope = Scope(this.prefixNamespaceMap ++ scope.prefixNamespaceMap)
 
   /** Returns `Scope(this.prefixNamespaceMap -- prefixes)` */
-  def --(prefixes: Set[String]): Scope = Scope(this.prefixNamespaceMap -- prefixes)
+  def minus(prefixes: Set[String]): Scope = Scope(this.prefixNamespaceMap -- prefixes)
+
+  /** Alias for `append` */
+  def ++(scope: Scope): Scope = append(scope)
+
+  /** Alias for `minus` */
+  def --(prefixes: Set[String]): Scope = minus(prefixes)
 
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {

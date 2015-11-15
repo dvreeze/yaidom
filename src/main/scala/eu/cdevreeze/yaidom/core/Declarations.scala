@@ -85,10 +85,16 @@ final case class Declarations(prefixNamespaceMap: Map[String, String]) extends I
   }
 
   /** Returns `Declarations(this.prefixNamespaceMap ++ declarations.prefixNamespaceMap)` */
-  def ++(declarations: Declarations): Declarations = Declarations(this.prefixNamespaceMap ++ declarations.prefixNamespaceMap)
+  def append(declarations: Declarations): Declarations = Declarations(this.prefixNamespaceMap ++ declarations.prefixNamespaceMap)
 
   /** Returns `Declarations(this.prefixNamespaceMap -- prefixes)` */
-  def --(prefixes: Set[String]): Declarations = Declarations(this.prefixNamespaceMap -- prefixes)
+  def minus(prefixes: Set[String]): Declarations = Declarations(this.prefixNamespaceMap -- prefixes)
+
+  /** Alias for `append` */
+  def ++(declarations: Declarations): Declarations = append(declarations)
+
+  /** Alias for `minus` */
+  def --(prefixes: Set[String]): Declarations = minus(prefixes)
 
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {

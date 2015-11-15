@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.utils
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.resolved
@@ -59,6 +61,7 @@ final class SimpleElemEditor(val getFallbackPrefixForNamespace: String => String
 object SimpleElemEditor {
 
   def newInstanceUsingScopeAndPrefixGenerator(fallbackScope: Scope, generatePrefix: String => String): SimpleElemEditor = {
+
     def getPrefixForNamespace(nsUri: String): String = {
       fallbackScope.prefixForNamespace(nsUri, () => {
         generatePrefix(nsUri)
@@ -69,21 +72,21 @@ object SimpleElemEditor {
   }
 
   def newInstanceUsingScopeAndDefaultPrefixGenerator(fallbackScope: Scope): SimpleElemEditor = {
-    @volatile var generator = new PrefixGenerator(0)
 
-    def generatePrefix(nsUri: String): String = {
-      val prefix = generator(nsUri)
-      generator = generator.next
-      prefix
-    }
+    val generator = DefaultPrefixGenerator
+
+    def generatePrefix(nsUri: String): String = generator(nsUri)
 
     newInstanceUsingScopeAndPrefixGenerator(fallbackScope, generatePrefix _)
   }
 
-  private case class PrefixGenerator(i: Int) extends ((String) => String) {
+  /**
+   * Prefix generator that generates prefixes ns0, ns1, ns2 etc.
+   */
+  object DefaultPrefixGenerator extends ((String) => String) {
 
-    def apply(nsUri: String): String = s"ns${i}"
+    private val i = new AtomicInteger(0)
 
-    def next: PrefixGenerator = new PrefixGenerator(i + 1)
+    def apply(nsUri: String): String = s"ns${i.getAndIncrement()}"
   }
 }
