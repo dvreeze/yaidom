@@ -105,6 +105,10 @@ abstract class AbstractUpdateTest extends Suite {
       case (e, p) => updateMeasure(e)
     }
 
+    assertResult(newRootElem) {
+      LazyIndexedClarkElem(newRootElem).elem
+    }
+
     checkElemAfterMeasureUpdate(newRootElem)
   }
 
@@ -116,6 +120,10 @@ abstract class AbstractUpdateTest extends Suite {
 
     val newRootElem = rootElem.updateElemsWithNodeSeq(paths) {
       case (e, p) => Vector(updateMeasure(e))
+    }
+
+    assertResult(newRootElem) {
+      LazyIndexedClarkElem(newRootElem).elem
     }
 
     checkElemAfterMeasureUpdate(newRootElem)
