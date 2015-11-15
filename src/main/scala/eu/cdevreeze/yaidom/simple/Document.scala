@@ -133,11 +133,11 @@ final class Document(
     withDocumentElement(this.documentElement.updateElemsWithNodeSeq(paths)(f))
 
   /** Returns `withDocumentElement(this.documentElement.updateTopmostElemsOrSelf(f))` */
-  final def updateTopmostElemsOrSelf(f: (Elem, Path) => Option[Elem]): Document =
+  def updateTopmostElemsOrSelf(f: (Elem, Path) => Option[Elem]): Document =
     withDocumentElement(this.documentElement.updateTopmostElemsOrSelf(f))
 
   /** Returns `withDocumentElement(this.documentElement.updateTopmostElemsWithNodeSeq(f))` */
-  final def updateTopmostElemsWithNodeSeq(f: (Elem, Path) => Option[immutable.IndexedSeq[Node]]): Document =
+  def updateTopmostElemsWithNodeSeq(f: (Elem, Path) => Option[immutable.IndexedSeq[Node]]): Document =
     withDocumentElement(this.documentElement.updateTopmostElemsWithNodeSeq(f))
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */
@@ -148,14 +148,14 @@ final class Document(
   def transformElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))
 
-  final def toTreeRepr(): String = {
+  def toTreeRepr(): String = {
     val sb = new StringBuilder
     toTreeReprAsLineSeq(0)(2).addToStringBuilder(sb)
     sb.toString
   }
 
   /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
-  final override def toString: String = toTreeRepr
+  override def toString: String = toTreeRepr
 
   private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): LineSeq = {
     val parentScope = Scope.Empty
