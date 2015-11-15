@@ -3,12 +3,33 @@ CHANGELOG
 =========
 
 
+1.5.0-M2
+========
+
+Version 1.5.0-M2 is almost like version 1.5.0-M1, but has a few small differences:
+
+* Renamed ``Path.Root`` to ``Path.Empty`` and ``Path.isRoot`` to ``Path.isEmpty`` (with deprecation)
+* Added some extractors for QNames, Paths and simple elements, for use in pattern matching
+* Documented the reasons for not having any functional update support for indexed elements
+* Added Java-friendly aliases (``plus`` and ``minus``) for symbolic Scope and Declarations operations
+* Some bug fixes (such as exception handling around sensitive getFeature call)
+* More tests, for example showing yaidom used for implementing custom XPath functions
+
+Indexed elements have no support for functional updates, because these functional updates are expensive, due to
+the required re-computation of Paths of many sibling elements, causing updates to their ancestors as well. So, if
+we want to use indexed elements, and at the same time need to do a lot of functional updates, consider using the
+lazy indexed element variants, such as ``IndexedScopeElem``, due to their low creation costs.
+
+Yaidom now offers some more patterns to match on, offered by some added extractors. This was an idea of Johan Walters,
+who even went a lot further in showing several elegant "chains of pattern matches".
+
+
 1.5.0-M1
 ========
 
 Version 1.5.0-M1 improves the functional query API. It is now more consistent with the query API and transformation API.
 It is hopefully useful and easy to use (especially methods like updateTopmostElemsOrSelf), and should have good runtime performance.
-Update support for indexed elements is also planned for version 1.5.0, but is not yet available in version 1.5.0-M1.
+Update support for indexed elements is also considered for version 1.5.0, but is not yet available in version 1.5.0-M1.
 
 The main changes in this version are:
 
