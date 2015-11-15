@@ -18,7 +18,7 @@ Version 1.5.0-M2 is almost like version 1.5.0-M1, but has a few small difference
 Indexed elements have no support for functional updates, because these functional updates are expensive, due to
 the required re-computation of Paths of many sibling elements, causing updates to their ancestors as well. So, if
 we want to use indexed elements, and at the same time need to do a lot of functional updates, consider using the
-lazy indexed element variants, such as ``IndexedScopeElem``, due to their low creation costs.
+lazy indexed element variants, such as ``LazyIndexedScopeElem``, due to their low creation costs.
 
 Yaidom now offers some more patterns to match on, offered by some added extractors. This was an idea of Johan Walters,
 who even went a lot further in showing several elegant "chains of pattern matches".
