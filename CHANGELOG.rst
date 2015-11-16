@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+1.5.0
+=====
+
+Version 1.5.0 is the same as version 1.5.0-M2. The main contribution of version 1.5.0 compared to version 1.4.2 is
+a more stable and consistent functional update API for elements. It is now consistent with the yaidom query API
+as well as the transformation API.
+
+
 1.5.0-M2
 ========
 
