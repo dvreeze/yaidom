@@ -508,7 +508,7 @@ final class Elem(
 
           if (pathEntries.contains(entry)) {
             remainingPathEntries -= entry
-            Some(e, entry, idx)
+            Some((e, entry, idx))
           } else {
             None
           }

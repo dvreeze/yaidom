@@ -13,7 +13,10 @@ scalaVersion := "2.11.7"
 
 crossScalaVersions := Seq("2.11.7", "2.10.6") // ++ Seq("2.12.0-M3")
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+// See: Toward a safer Scala
+// http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
+
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
 (unmanagedSourceDirectories in Compile) <++= scalaBinaryVersion apply { version =>
   val newSourceDirs = Seq() // Not yet used

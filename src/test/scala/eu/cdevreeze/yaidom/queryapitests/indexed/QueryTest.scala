@@ -162,7 +162,8 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookTitles2 =
       for {
         authorElem <- bookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
-        if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+        (lastName, firstName) = authorLastAndFirstName(authorElem.elem)
+        if lastName == "Ullman" && firstName == "Jeffrey"
         bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
           bookstore.getElemOrSelfByPath(p)
         }
@@ -179,7 +180,8 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookTitles3 =
       for {
         authorElem <- bookstore \\ EName("Author")
-        if authorLastAndFirstName(authorElem.elem) == ("Ullman", "Jeffrey")
+        (lastName, firstName) = authorLastAndFirstName(authorElem.elem)
+        if lastName == "Ullman" && firstName == "Jeffrey"
         bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
           bookstore.getElemOrSelfByPath(p)
         }
@@ -476,7 +478,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookstoreWithoutPrices: Elem = {
       val f: eu.cdevreeze.yaidom.simple.Elem => eu.cdevreeze.yaidom.simple.Elem = {
         case e: eu.cdevreeze.yaidom.simple.Elem if e.resolvedName == EName("Book") => removePrice(e)
-        case e: eu.cdevreeze.yaidom.simple.Elem => e
+        case e: eu.cdevreeze.yaidom.simple.Elem                                    => e
       }
       val result = bookstore.elem.transformElemsOrSelf(f)
       Elem(Some(bookstore.docUri), result)

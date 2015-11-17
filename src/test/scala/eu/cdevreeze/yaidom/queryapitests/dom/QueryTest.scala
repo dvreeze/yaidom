@@ -159,7 +159,8 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookTitles2 =
       for {
         authorElem <- bookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
-        if authorLastAndFirstName(authorElem) == ("Ullman", "Jeffrey")
+        (lastName, firstName) = authorLastAndFirstName(authorElem)
+        if lastName == "Ullman" && firstName == "Jeffrey"
         bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
         if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield bookElem.getChildElem(EName("Title"))
@@ -174,7 +175,8 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookTitles3 =
       for {
         authorElem <- bookstore \\ EName("Author")
-        if authorLastAndFirstName(authorElem) == ("Ullman", "Jeffrey")
+        (lastName, firstName) = authorLastAndFirstName(authorElem)
+        if lastName == "Ullman" && firstName == "Jeffrey"
         bookElem <- authorElem findAncestor { _.resolvedName == EName("Book") }
         if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90
       } yield (bookElem \ EName("Title")).head
