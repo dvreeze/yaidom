@@ -41,9 +41,21 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
    * production. Hence, this method should typically be fast enough.
    */
   final override def findChildElemByPathEntry(entry: Path.Entry): Option[E] = {
-    val filteredChildElems = findAllChildElems.toStream filter { e => e.resolvedName == entry.elementName }
+    // The previous implementation used immutable.IndexedSeq.toStream, which turned out to be surprisingly inefficient.
+    // This inefficiency was noticed when calling method IsNavigable.findReverseAncestryOrSelfByPath
+    // (and therefore this method) many times. Thanks to Johan Walters for pointing out this performance issue.
 
-    val childElemOption = filteredChildElems.drop(entry.index).headOption
+    var sameENameIdx = 0
+    val childElemOption = findAllChildElems find { e =>
+      val ename = e.resolvedName
+      if (ename == entry.elementName) {
+        if (entry.index == sameENameIdx) true
+        else {
+          sameENameIdx += 1
+          false
+        }
+      } else false
+    }
     assert(childElemOption.forall(_.resolvedName == entry.elementName))
     childElemOption
   }
