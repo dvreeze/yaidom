@@ -110,15 +110,20 @@ object QName {
   /** Shorthand for `parse(s)` */
   def apply(s: String): QName = parse(s)
 
-  /** Parses a `String` into a `QName`. The `String` must conform to the `toString` format of a `PrefixedName` or `UnprefixedName` */
+  /**
+   * Parses a `String` into a `QName`. The `String` (after trimming) must conform to the `toString` format of
+   * a `PrefixedName` or `UnprefixedName`.
+   */
   def parse(s: String): QName = {
-    val arr = s.split(':')
-    require(arr.size <= 2, s"Expected at most 1 colon in QName '${s}'")
+    val st = s.trim
+
+    val arr = st.split(':')
+    require(arr.size <= 2, s"Expected at most 1 colon in QName '${st}'")
 
     arr.size match {
-      case 1 => UnprefixedName(s)
+      case 1 => UnprefixedName(st)
       case 2 => PrefixedName(arr(0), arr(1))
-      case _ => sys.error(s"Did not expect more than 1 colon in QName '${s}'")
+      case _ => sys.error(s"Did not expect more than 1 colon in QName '${st}'")
     }
   }
 

@@ -73,7 +73,7 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
 
   /** The `String` representation, in the format of the `javax.xml.namespace.QName.toString` method */
   override def toString: String = namespaceUriOption match {
-    case None => localPart
+    case None        => localPart
     case Some(nsUri) => "{" + nsUri + "}" + localPart
   }
 
@@ -104,18 +104,22 @@ object EName {
   /** Creates an `EName` from a `javax.xml.namespace.QName` */
   def fromJavaQName(jqname: JQName): EName = EName(jqname.toString)
 
-  /** Parses a `String` into an `EName`. The `String` must conform to the `toString` format of an `EName` */
+  /**
+   * Parses a `String` into an `EName`. The `String` (after trimming) must conform to the `toString` format of an `EName`.
+   */
   def parse(s: String): EName = {
-    if (s.startsWith("{")) {
-      val idx = s.indexOf('}')
-      require(idx >= 2 && idx < s.length - 1, s"Opening brace not closed or at incorrect location in EName '${s}'")
-      val ns = s.substring(1, idx)
-      val localPart = s.substring(idx + 1)
+    val st = s.trim
+
+    if (st.startsWith("{")) {
+      val idx = st.indexOf('}')
+      require(idx >= 2 && idx < st.length - 1, s"Opening brace not closed or at incorrect location in EName '${st}'")
+      val ns = st.substring(1, idx)
+      val localPart = st.substring(idx + 1)
       EName(Some(ns), localPart)
     } else {
-      require(s.indexOf("{") < 0, s"No opening brace allowed unless at the beginning in EName '${s}'")
-      require(s.indexOf("}") < 0, s"Closing brace without matching opening brace not allowed in EName '${s}'")
-      EName(None, s)
+      require(st.indexOf("{") < 0, s"No opening brace allowed unless at the beginning in EName '${st}'")
+      require(st.indexOf("}") < 0, s"Closing brace without matching opening brace not allowed in EName '${st}'")
+      EName(None, st)
     }
   }
 }

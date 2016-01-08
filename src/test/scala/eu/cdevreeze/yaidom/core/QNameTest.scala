@@ -99,6 +99,12 @@ class QNameTest extends Suite {
       qname5.hashCode
     }
 
+    val qname6 = QName(" Bookstore  ")
+
+    assertResult(qname) {
+      qname6
+    }
+
     intercept[Exception] {
       UnprefixedName(null)
     }
@@ -210,6 +216,12 @@ class QNameTest extends Suite {
       qname5.hashCode
     }
 
+    val qname6 = QName("  books:Bookstore   ").asInstanceOf[PrefixedName]
+
+    assertResult(qname) {
+      qname6
+    }
+
     intercept[Exception] {
       PrefixedName(null, null)
     }
@@ -239,6 +251,9 @@ class QNameTest extends Suite {
     }
     intercept[Exception] {
       QName.parse(":b").validated
+    }
+    intercept[Exception] {
+      QName.parse("books: Bookstore").validated
     }
 
     val qnOption = qname match {
