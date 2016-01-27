@@ -3,6 +3,19 @@ CHANGELOG
 =========
 
 
+1.5.1
+=====
+
+Version 1.5.1 is a minor bug fix release, containing no breaking changes. It is a drop-in replacement for version 1.5.0.
+
+The fixes are as follows:
+
+* Method ``findChildElemByPathEntry`` has been made more efficient (so finding element ancestors has become more efficient)
+* Parsing QNames and ENames from a string now first trims whitespace
+
+Thanks to Johan Walters for pointing out both issues.
+
+
 1.5.0
 =====
 
