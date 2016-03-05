@@ -368,6 +368,32 @@ object Node {
     case t: ResolvedNodes.Text => Text(t)
     case n                     => sys.error(s"Not an element or text node: $n")
   }
+
+  def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
+    elem(ename, Map(), children)
+  }
+
+  def elem(ename: EName, attributes: Map[EName, String], children: immutable.IndexedSeq[Node]): Elem = {
+    Elem(ename, attributes, children)
+  }
+
+  def text(textValue: String): Text = Text(textValue)
+
+  def textElem(ename: EName, txt: String): Elem = {
+    textElem(ename, Map(), txt)
+  }
+
+  def textElem(ename: EName, attributes: Map[EName, String], txt: String): Elem = {
+    Elem(ename, attributes, Vector(text(txt)))
+  }
+
+  def emptyElem(ename: EName): Elem = {
+    emptyElem(ename, Map())
+  }
+
+  def emptyElem(ename: EName, attributes: Map[EName, String]): Elem = {
+    Elem(ename, attributes, Vector())
+  }
 }
 
 object Elem {
