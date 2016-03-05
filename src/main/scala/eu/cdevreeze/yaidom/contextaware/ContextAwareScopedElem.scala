@@ -200,10 +200,11 @@ object ContextAwareScopedElem {
         val entry = ContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
         parentContextPathOption.map(pcp => pcp.append(entry)).getOrElse(ContextPath(entry))
       }
+      val contextPathOption = Some(contextPath)
 
       // Recursive calls
       val childElems = elem.findAllChildElems map { e =>
-        build(docUriOption, baseUriOption, Some(contextPath), e)
+        build(docUriOption, baseUriOption, contextPathOption, e)
       }
 
       new ContextAwareScopedElem(docUriOption, parentBaseUriOption, parentContextPathOption, elem, childElems, uriResolver)

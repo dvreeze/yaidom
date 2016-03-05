@@ -25,22 +25,26 @@ import scala.collection.mutable
  * Context path, representing the ancestry(-or-self) path of an element. Although the context path of an element
  * contains the ancestry-or-self, it does not contain any siblings of the ancestry.
  *
- * Each context path has at least one entry.
+ * Each context path has at least one entry, namely a root entry.
  *
  * @author Chris de Vreeze
  */
-final case class ContextPath(val entries: immutable.IndexedSeq[ContextPath.Entry]) extends Immutable { self =>
-  require(entries ne null)
-  require(entries.nonEmpty, s"Each context path must have at least one entry")
+final case class ContextPath(val rootEntry: ContextPath.Entry, val nonRootEntries: immutable.IndexedSeq[ContextPath.Entry]) extends Immutable { self =>
+  require(rootEntry ne null)
+  require(nonRootEntries ne null)
+
+  def entries: immutable.IndexedSeq[ContextPath.Entry] = rootEntry +: nonRootEntries
 
   /** Returns true if this context path has only 1 entry */
-  def isRootContextPath: Boolean = entries.size == 1
+  def isRootContextPath: Boolean = nonRootEntries.isEmpty
 
   /** Appends a given `Entry` to this `ContextPath` */
-  def append(entry: ContextPath.Entry): ContextPath = ContextPath(self.entries :+ entry)
+  def append(entry: ContextPath.Entry): ContextPath = ContextPath(rootEntry, self.nonRootEntries :+ entry)
 
   /** Appends a given relative `ContextPath` to this `ContextPath` */
-  def append(other: ContextPath): ContextPath = ContextPath(self.entries ++ other.entries)
+  def append(other: ContextPath): ContextPath = {
+    ContextPath(self.rootEntry, self.nonRootEntries ++ other.entries)
+  }
 
   /** Appends a given relative `ContextPath` to this `ContextPath`. Alias for `append(other)`. */
   def ++(other: ContextPath): ContextPath = append(other)
@@ -50,7 +54,7 @@ final case class ContextPath(val entries: immutable.IndexedSeq[ContextPath.Entry
    */
   def parentContextPathOption: Option[ContextPath] = {
     if (isRootContextPath) None
-    else Some(ContextPath(entries.dropRight(1)))
+    else Some(ContextPath(rootEntry, nonRootEntries.dropRight(1)))
   }
 
   /** Like `parentContextPathOption`, but unwrapping the result (or throwing an exception otherwise) */
@@ -93,5 +97,5 @@ object ContextPath {
     require(resolvedAttributes ne null)
   }
 
-  def apply(entry: ContextPath.Entry): ContextPath = ContextPath(Vector(entry))
+  def apply(rootEntry: ContextPath.Entry): ContextPath = ContextPath(rootEntry, Vector())
 }

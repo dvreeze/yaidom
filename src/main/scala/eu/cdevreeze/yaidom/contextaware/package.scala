@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom
 
 /**
  * This package contains element representations that contain the "context" of the element. That is, the elements
- * in this package mix in the `ContextAwareElemApi` trait. Unlike "indexed" elements, they do not wrap entire
+ * in this package mix in the `ContextAwareApi` trait. Unlike "indexed" elements, they do not wrap entire
  * element trees of an underlying element type, but contain a `ContextPath` as context only. That makes them
  * easier to construct in an ad-hoc manner, easier to use in streaming and update scenarios, and more light-weight than
  * "indexed" elements. Therefore "indexed" elements can be deprecated.
