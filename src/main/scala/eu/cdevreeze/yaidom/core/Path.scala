@@ -132,7 +132,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   def ++(other: Path): Path = append(other)
 
   /**
-   * Gets the parent path (if any, because the root path has no parent) wrapped in an `Option`.
+   * Gets the parent path (if any, because the empty path has no parent) wrapped in an `Option`.
    *
    * This method shows much of the reason why class `Path` exists. If we know an element's `Path`, and therefore its
    * parent `Path` (using this method), then we can obtain the parent element by following the parent path from the

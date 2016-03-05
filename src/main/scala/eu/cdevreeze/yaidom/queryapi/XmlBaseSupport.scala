@@ -20,6 +20,7 @@ import java.net.URI
 
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.core.ContextPath
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 
@@ -66,10 +67,29 @@ object XmlBaseSupport {
   }
 
   /**
+   * Computes the optional base URI, given an optional document URI and ContextPath.
+   * A URI resolution strategy must be provided as well.
+   */
+  def findBaseUriByDocUriAndContextPath[E <: ClarkElemApi[E]](docUriOption: Option[URI], contextPath: ContextPath)(resolveUri: UriResolver): Option[URI] = {
+    contextPath.entries.foldLeft(docUriOption) {
+      case (parentBaseUriOption, contextPathEntry) =>
+        findBaseUriByParentBaseUri(parentBaseUriOption, contextPathEntry)(resolveUri)
+    }
+  }
+
+  /**
    * Returns the optional base URI, given an optional parent base URI, and "this" element. A URI resolution strategy must be provided as well.
    */
   def findBaseUriByParentBaseUri[E <: ClarkElemApi[E]](parentBaseUriOption: Option[URI], elem: E)(resolveUri: UriResolver): Option[URI] = {
     val baseUriAttributeOption = elem.attributeOption(XmlBaseEName).map(s => new URI(s))
+    baseUriAttributeOption.map(bu => resolveUri(bu, parentBaseUriOption)).orElse(parentBaseUriOption)
+  }
+
+  /**
+   * Returns the optional base URI, given an optional parent base URI, and "this" element as ContextPath.Entry. A URI resolution strategy must be provided as well.
+   */
+  def findBaseUriByParentBaseUri[E <: ClarkElemApi[E]](parentBaseUriOption: Option[URI], contextPathEntry: ContextPath.Entry)(resolveUri: UriResolver): Option[URI] = {
+    val baseUriAttributeOption = contextPathEntry.resolvedAttributes.get(XmlBaseEName).map(s => new URI(s))
     baseUriAttributeOption.map(bu => resolveUri(bu, parentBaseUriOption)).orElse(parentBaseUriOption)
   }
 
