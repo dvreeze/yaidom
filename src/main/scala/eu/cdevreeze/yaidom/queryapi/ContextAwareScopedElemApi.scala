@@ -24,4 +24,9 @@ package eu.cdevreeze.yaidom.queryapi
  * @author Chris de Vreeze
  */
 trait ContextAwareScopedElemApi[E <: ContextAwareScopedElemApi[E]] extends ScopedElemApi[E] with ContextAwareApi { self: E =>
+
+  /**
+   * The Scoped context path of this element. The last entry corresponds with this element.
+   */
+  def contextPath: ScopedContextPath
 }

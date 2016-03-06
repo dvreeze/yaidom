@@ -49,7 +49,7 @@ abstract class ContextAwareDocument[U <: ScopedElemApi[U]](
     children.collect({ case elm: ContextAwareScopedElem[U] => elm }).size == 1,
     s"A document must have exactly one (ContextAwareScopedElem) child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
-  require(documentElement.contextPath.isRootContextPath, "The document element must have a root ContextPath")
+  require(documentElement.parentContextPath.isEmpty, "The document element must have the empty parent ContextPath")
 
   final def documentElement: ContextAwareScopedElem[U] =
     children.collect({ case elm: ContextAwareScopedElem[U] => elm }).head

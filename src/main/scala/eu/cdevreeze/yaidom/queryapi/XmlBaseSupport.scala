@@ -18,9 +18,10 @@ package eu.cdevreeze.yaidom.queryapi
 
 import java.net.URI
 
+import scala.annotation.elidable
+import scala.annotation.elidable.ASSERTION
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.core.ContextPath
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 
@@ -89,7 +90,7 @@ object XmlBaseSupport {
    * Returns the optional base URI, given an optional parent base URI, and "this" element as ContextPath.Entry. A URI resolution strategy must be provided as well.
    */
   def findBaseUriByParentBaseUri[E <: ClarkElemApi[E]](parentBaseUriOption: Option[URI], contextPathEntry: ContextPath.Entry)(resolveUri: UriResolver): Option[URI] = {
-    val baseUriAttributeOption = contextPathEntry.resolvedAttributes.get(XmlBaseEName).map(s => new URI(s))
+    val baseUriAttributeOption = contextPathEntry.attributeOption(XmlBaseEName).map(s => new URI(s))
     baseUriAttributeOption.map(bu => resolveUri(bu, parentBaseUriOption)).orElse(parentBaseUriOption)
   }
 

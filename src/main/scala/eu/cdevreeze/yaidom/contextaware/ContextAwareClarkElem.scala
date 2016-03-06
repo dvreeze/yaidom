@@ -22,8 +22,8 @@ import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
-import eu.cdevreeze.yaidom.core.ContextPath
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.queryapi.ClarkContextPath
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.ContextAwareClarkElemApi
@@ -70,7 +70,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * {{{
  * // All child elements have the optional context path of the parent element as optional parent context path
  *
- * iElem.findAllChildElems.map(_.parentContextPathOption).distinct == List(Some(iElem.contextPath))
+ * iElem.findAllChildElems.map(_.parentContextPath).distinct == List(iElem.contextPath)
  * }}}
  *
  * The correspondence between queries on ContextAwareClarkElem and the same queries on the underlying elements is as follows:
@@ -90,7 +90,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 final class ContextAwareClarkElem[U <: ClarkElemApi[U]] private (
   val docUriOption: Option[URI],
   val parentBaseUriOption: Option[URI],
-  val parentContextPathOption: Option[ContextPath],
+  val parentContextPath: ClarkContextPath,
   val elem: U,
   childElems: immutable.IndexedSeq[ContextAwareClarkElem[U]],
   val uriResolver: XmlBaseSupport.UriResolver) extends Nodes.Elem with ClarkElemLike[ContextAwareClarkElem[U]] with ContextAwareClarkElemApi[ContextAwareClarkElem[U]] {
@@ -108,9 +108,9 @@ final class ContextAwareClarkElem[U <: ClarkElemApi[U]] private (
     assert(childElems.forall(_.docUriOption eq this.docUriOption), "Corrupt element!")
   }
 
-  final def contextPath: ContextPath = {
-    val entry = ContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
-    parentContextPathOption.map(pcp => pcp.append(entry)).getOrElse(ContextPath(entry))
+  final def contextPath: ClarkContextPath = {
+    val entry = ClarkContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
+    parentContextPath.append(entry)
   }
 
   final def findAllChildElems: immutable.IndexedSeq[ContextAwareClarkElem[U]] = childElems
@@ -126,11 +126,11 @@ final class ContextAwareClarkElem[U <: ClarkElemApi[U]] private (
     case other: ContextAwareClarkElem[U] =>
       (other.docUriOption == this.docUriOption) &&
         (other.elem == this.elem) &&
-        (other.parentContextPathOption == this.parentContextPathOption)
+        (other.parentContextPath == this.parentContextPath)
     case _ => false
   }
 
-  final override def hashCode: Int = (docUriOption, elem, parentContextPathOption).hashCode
+  final override def hashCode: Int = (docUriOption, elem, parentContextPath).hashCode
 
   final def baseUriOption: Option[URI] = {
     XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
@@ -162,44 +162,39 @@ object ContextAwareClarkElem {
       build(None, elem)
 
     def build(docUriOption: Option[URI], elem: U): ContextAwareClarkElem[U] = {
-      build(docUriOption, None, elem)
+      build(docUriOption, ClarkContextPath.Empty, elem)
     }
 
     /**
      * Expensive recursive factory method for "context-aware elements".
      */
-    def build(docUriOption: Option[URI], parentContextPathOption: Option[ContextPath], elem: U): ContextAwareClarkElem[U] = {
-      val parentBaseUriOption: Option[URI] = parentContextPathOption match {
-        case None =>
-          docUriOption
-        case Some(pcp) =>
-          XmlBaseSupport.findBaseUriByDocUriAndContextPath(docUriOption, pcp)(uriResolver).orElse(docUriOption)
-      }
+    def build(docUriOption: Option[URI], parentContextPath: ClarkContextPath, elem: U): ContextAwareClarkElem[U] = {
+      val parentBaseUriOption: Option[URI] =
+        XmlBaseSupport.findBaseUriByDocUriAndContextPath(docUriOption, parentContextPath)(uriResolver).orElse(docUriOption)
 
-      build(docUriOption, parentBaseUriOption, parentContextPathOption, elem)
+      build(docUriOption, parentBaseUriOption, parentContextPath, elem)
     }
 
     private def build(
       docUriOption: Option[URI],
       parentBaseUriOption: Option[URI],
-      parentContextPathOption: Option[ContextPath],
+      parentContextPath: ClarkContextPath,
       elem: U): ContextAwareClarkElem[U] = {
 
       val baseUriOption =
         XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
 
-      val contextPath: ContextPath = {
-        val entry = ContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
-        parentContextPathOption.map(pcp => pcp.append(entry)).getOrElse(ContextPath(entry))
+      val contextPath: ClarkContextPath = {
+        val entry = ClarkContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
+        parentContextPath.append(entry)
       }
-      val contextPathOption = Some(contextPath)
 
       // Recursive calls
       val childElems = elem.findAllChildElems map { e =>
-        build(docUriOption, baseUriOption, contextPathOption, e)
+        build(docUriOption, baseUriOption, contextPath, e)
       }
 
-      new ContextAwareClarkElem(docUriOption, parentBaseUriOption, parentContextPathOption, elem, childElems, uriResolver)
+      new ContextAwareClarkElem(docUriOption, parentBaseUriOption, parentContextPath, elem, childElems, uriResolver)
     }
   }
 
@@ -225,16 +220,16 @@ object ContextAwareClarkElem {
   }
 
   /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPathOption, elem)`
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPath, elem)`
    */
-  def apply[U <: ClarkElemApi[U]: ClassTag](docUriOption: Option[URI], parentContextPathOption: Option[ContextPath], elem: U): ContextAwareClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPathOption, elem)
+  def apply[U <: ClarkElemApi[U]: ClassTag](docUriOption: Option[URI], parentContextPath: ClarkContextPath, elem: U): ContextAwareClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPath, elem)
   }
 
   /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPathOption, elem)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPath, elem)`
    */
-  def apply[U <: ClarkElemApi[U]: ClassTag](docUri: URI, parentContextPathOption: Option[ContextPath], elem: U): ContextAwareClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPathOption, elem)
+  def apply[U <: ClarkElemApi[U]: ClassTag](docUri: URI, parentContextPath: ClarkContextPath, elem: U): ContextAwareClarkElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPath, elem)
   }
 }

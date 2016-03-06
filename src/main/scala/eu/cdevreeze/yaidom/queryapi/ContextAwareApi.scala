@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.queryapi
 
 import java.net.URI
 
-import eu.cdevreeze.yaidom.core.ContextPath
-
 /**
  * Abstract API for "context-aware elements".
  *

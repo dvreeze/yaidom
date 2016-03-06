@@ -22,12 +22,12 @@ import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
-import eu.cdevreeze.yaidom.core.ContextPath
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ContextAwareScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedContextPath
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
@@ -72,7 +72,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * {{{
  * // All child elements have the optional context path of the parent element as optional parent context path
  *
- * iElem.findAllChildElems.map(_.parentContextPathOption).distinct == List(Some(iElem.contextPath))
+ * iElem.findAllChildElems.map(_.parentContextPath).distinct == List(iElem.contextPath)
  * }}}
  *
  * The correspondence between queries on ContextAwareScopedElem and the same queries on the underlying elements is as follows:
@@ -92,7 +92,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 final class ContextAwareScopedElem[U <: ScopedElemApi[U]] private (
   val docUriOption: Option[URI],
   val parentBaseUriOption: Option[URI],
-  val parentContextPathOption: Option[ContextPath],
+  val parentContextPath: ScopedContextPath,
   val elem: U,
   childElems: immutable.IndexedSeq[ContextAwareScopedElem[U]],
   val uriResolver: XmlBaseSupport.UriResolver) extends Nodes.Elem with ScopedElemLike[ContextAwareScopedElem[U]] with ContextAwareScopedElemApi[ContextAwareScopedElem[U]] {
@@ -110,9 +110,9 @@ final class ContextAwareScopedElem[U <: ScopedElemApi[U]] private (
     assert(childElems.forall(_.docUriOption eq this.docUriOption), "Corrupt element!")
   }
 
-  final def contextPath: ContextPath = {
-    val entry = ContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
-    parentContextPathOption.map(pcp => pcp.append(entry)).getOrElse(ContextPath(entry))
+  final def contextPath: ScopedContextPath = {
+    val entry = ScopedContextPath.Entry(elem.qname, elem.attributes.toVector, elem.scope)
+    parentContextPath.append(entry)
   }
 
   final def findAllChildElems: immutable.IndexedSeq[ContextAwareScopedElem[U]] = childElems
@@ -134,11 +134,11 @@ final class ContextAwareScopedElem[U <: ScopedElemApi[U]] private (
     case other: ContextAwareScopedElem[U] =>
       (other.docUriOption == this.docUriOption) &&
         (other.elem == this.elem) &&
-        (other.parentContextPathOption == this.parentContextPathOption)
+        (other.parentContextPath == this.parentContextPath)
     case _ => false
   }
 
-  final override def hashCode: Int = (docUriOption, elem, parentContextPathOption).hashCode
+  final override def hashCode: Int = (docUriOption, elem, parentContextPath).hashCode
 
   final def baseUriOption: Option[URI] = {
     XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
@@ -170,44 +170,39 @@ object ContextAwareScopedElem {
       build(None, elem)
 
     def build(docUriOption: Option[URI], elem: U): ContextAwareScopedElem[U] = {
-      build(docUriOption, None, elem)
+      build(docUriOption, ScopedContextPath.Empty, elem)
     }
 
     /**
      * Expensive recursive factory method for "context-aware elements".
      */
-    def build(docUriOption: Option[URI], parentContextPathOption: Option[ContextPath], elem: U): ContextAwareScopedElem[U] = {
-      val parentBaseUriOption: Option[URI] = parentContextPathOption match {
-        case None =>
-          docUriOption
-        case Some(pcp) =>
-          XmlBaseSupport.findBaseUriByDocUriAndContextPath(docUriOption, pcp)(uriResolver).orElse(docUriOption)
-      }
+    def build(docUriOption: Option[URI], parentContextPath: ScopedContextPath, elem: U): ContextAwareScopedElem[U] = {
+      val parentBaseUriOption: Option[URI] =
+        XmlBaseSupport.findBaseUriByDocUriAndContextPath(docUriOption, parentContextPath)(uriResolver).orElse(docUriOption)
 
-      build(docUriOption, parentBaseUriOption, parentContextPathOption, elem)
+      build(docUriOption, parentBaseUriOption, parentContextPath, elem)
     }
 
     private def build(
       docUriOption: Option[URI],
       parentBaseUriOption: Option[URI],
-      parentContextPathOption: Option[ContextPath],
+      parentContextPath: ScopedContextPath,
       elem: U): ContextAwareScopedElem[U] = {
 
       val baseUriOption =
         XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
 
-      val contextPath: ContextPath = {
-        val entry = ContextPath.Entry(elem.resolvedName, elem.resolvedAttributes.toMap)
-        parentContextPathOption.map(pcp => pcp.append(entry)).getOrElse(ContextPath(entry))
+      val contextPath: ScopedContextPath = {
+        val entry = ScopedContextPath.Entry(elem.qname, elem.attributes.toVector, elem.scope)
+        parentContextPath.append(entry)
       }
-      val contextPathOption = Some(contextPath)
 
       // Recursive calls
       val childElems = elem.findAllChildElems map { e =>
-        build(docUriOption, baseUriOption, contextPathOption, e)
+        build(docUriOption, baseUriOption, contextPath, e)
       }
 
-      new ContextAwareScopedElem(docUriOption, parentBaseUriOption, parentContextPathOption, elem, childElems, uriResolver)
+      new ContextAwareScopedElem(docUriOption, parentBaseUriOption, parentContextPath, elem, childElems, uriResolver)
     }
   }
 
@@ -233,16 +228,16 @@ object ContextAwareScopedElem {
   }
 
   /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPathOption, elem)`
+   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPath, elem)`
    */
-  def apply[U <: ScopedElemApi[U]: ClassTag](docUriOption: Option[URI], parentContextPathOption: Option[ContextPath], elem: U): ContextAwareScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPathOption, elem)
+  def apply[U <: ScopedElemApi[U]: ClassTag](docUriOption: Option[URI], parentContextPath: ScopedContextPath, elem: U): ContextAwareScopedElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, parentContextPath, elem)
   }
 
   /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPathOption, elem)`
+   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPath, elem)`
    */
-  def apply[U <: ScopedElemApi[U]: ClassTag](docUri: URI, parentContextPathOption: Option[ContextPath], elem: U): ContextAwareScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPathOption, elem)
+  def apply[U <: ScopedElemApi[U]: ClassTag](docUri: URI, parentContextPath: ScopedContextPath, elem: U): ContextAwareScopedElem[U] = {
+    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), parentContextPath, elem)
   }
 }
