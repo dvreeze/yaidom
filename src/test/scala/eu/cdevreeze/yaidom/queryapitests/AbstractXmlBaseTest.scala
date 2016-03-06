@@ -25,6 +25,7 @@ import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
@@ -42,7 +43,7 @@ abstract class AbstractXmlBaseTest extends Suite {
 
   type E <: ScopedElemApi[E]
 
-  type E2 <: ScopedElemApi[E2]
+  type E2 <: HasENameApi
 
   protected def getDocument(path: String, docUri: URI): DocumentApi[E]
 

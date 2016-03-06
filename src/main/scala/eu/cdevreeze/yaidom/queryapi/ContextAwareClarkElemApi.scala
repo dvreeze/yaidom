@@ -29,4 +29,9 @@ trait ContextAwareClarkElemApi[E <: ContextAwareClarkElemApi[E]] extends ClarkEl
    * The Clark context path of this element. The last entry corresponds with this element.
    */
   def contextPath: ClarkContextPath
+
+  /**
+   * The parent Clark context path of this element, which always exists because this element always has a non-empty context path.
+   */
+  def parentContextPath: ClarkContextPath
 }

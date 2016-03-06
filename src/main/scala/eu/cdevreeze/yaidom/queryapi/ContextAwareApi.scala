@@ -31,9 +31,14 @@ trait ContextAwareApi {
   def docUriOption: Option[URI]
 
   /**
-   * The context path of this element. The last entry corresponds with this element.
+   * The non-empty context path of this element. The last entry corresponds with this element.
    */
   def contextPath: ContextPath
+
+  /**
+   * The parent context path of this element, which always exists because this element always has a non-empty context path.
+   */
+  def parentContextPath: ContextPath
 
   /**
    * Returns the optional base URI, computed from the document URI, if any, and the XML base attributes of the

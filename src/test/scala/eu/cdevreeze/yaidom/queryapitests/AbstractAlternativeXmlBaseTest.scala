@@ -29,7 +29,9 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom
 
 /**
@@ -54,7 +56,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
 
   type E <: ScopedElemApi[E]
 
-  type E2 <: ScopedElemApi[E2]
+  type E2 <: HasENameApi
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E]
 

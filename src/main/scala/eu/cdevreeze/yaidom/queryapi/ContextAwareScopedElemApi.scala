@@ -29,4 +29,9 @@ trait ContextAwareScopedElemApi[E <: ContextAwareScopedElemApi[E]] extends Scope
    * The Scoped context path of this element. The last entry corresponds with this element.
    */
   def contextPath: ScopedContextPath
+
+  /**
+   * The parent Scoped context path of this element, which always exists because this element always has a non-empty context path.
+   */
+  def parentContextPath: ScopedContextPath
 }

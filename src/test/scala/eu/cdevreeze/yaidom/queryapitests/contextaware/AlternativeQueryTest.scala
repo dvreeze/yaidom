@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.contextaware
 
 import java.net.URI
 
-import scala.reflect.classTag
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -42,8 +40,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem
 
-  private val contextawareElemBuilder =
-    ContextAwareScopedElem.Builder(classTag[simple.Elem], XmlBaseSupport.JdkUriResolver)
+  private val contextawareElemBuilder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
   protected val catalogElem: E = {
     val xml =
