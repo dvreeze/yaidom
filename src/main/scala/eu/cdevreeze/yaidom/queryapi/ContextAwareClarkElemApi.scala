@@ -24,14 +24,4 @@ package eu.cdevreeze.yaidom.queryapi
  * @author Chris de Vreeze
  */
 trait ContextAwareClarkElemApi[E <: ContextAwareClarkElemApi[E]] extends ClarkElemApi[E] with ContextAwareApi { self: E =>
-
-  /**
-   * The Clark context path of this element. The last entry corresponds with this element.
-   */
-  def contextPath: ClarkContextPath
-
-  /**
-   * The parent Clark context path of this element, which always exists because this element always has a non-empty context path.
-   */
-  def parentContextPath: ClarkContextPath
 }
