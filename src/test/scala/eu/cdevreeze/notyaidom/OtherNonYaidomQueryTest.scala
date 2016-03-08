@@ -997,20 +997,43 @@ object OtherNonYaidomQueryTest {
 
   trait ElemApi extends AnyElem {
 
-    def findAllChildElems: immutable.IndexedSeq[ThisElem]
+    type ThisElem <: ElemApi with this.type
 
     def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+    def findAllChildElems: immutable.IndexedSeq[ThisElem]
+
+    /**
+     * Filters descendant elements and self obeying the given element predicate.
+     * Note that the "self type" is used in a contravariant position as well as in a covariant position.
+     */
+    def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
 
     /**
      * Finds all descendant elements and self.
      */
     def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem]
+  }
 
-    /**
-     * Filters descendant elements and self obeying the given element predicate.
-     * Note that the "self type" is used in a contra-variant position as well as in a co-variant position.
-     */
-    def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+  trait ElemLike extends ElemApi {
+
+    type ThisElem <: ElemLike with this.type
+
+    def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+    final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
+      filterChildElems(_ => true)
+    }
+
+    final def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+      // Recursive, but not tail-recursive
+      val elms = findAllChildElems flatMap { _.filterElemsOrSelf(p) }
+      Vector(this).filter(p) ++ elms
+    }
+
+    final def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem] = {
+      filterElemsOrSelf(_ => true)
+    }
   }
 
   // Other element traits can be added, inheriting from AnyElem, so having access to member type ThisElem
@@ -1029,29 +1052,15 @@ object OtherNonYaidomQueryTest {
   final class Elem(
     val name: String,
     val attributes: Map[String, String],
-    val children: immutable.IndexedSeq[Node]) extends Node with ElemApi { self =>
+    val children: immutable.IndexedSeq[Node]) extends Node with ElemLike { self =>
 
     type ThisElem = Elem
 
     def this(name: String, children: immutable.IndexedSeq[Node]) =
       this(name, Map(), children)
 
-    def findAllChildElems: immutable.IndexedSeq[Elem] = {
-      filterChildElems(_ => true)
-    }
-
     def filterChildElems(p: Elem => Boolean): immutable.IndexedSeq[Elem] = {
       children collect { case e: Elem if p(e) => e }
-    }
-
-    def findAllElemsOrSelf: immutable.IndexedSeq[Elem] = {
-      filterElemsOrSelf(_ => true)
-    }
-
-    def filterElemsOrSelf(p: Elem => Boolean): immutable.IndexedSeq[Elem] = {
-      // Recursive, but not tail-recursive
-      val elms = findAllChildElems flatMap { _.filterElemsOrSelf(p) }
-      Vector(self).filter(p) ++ elms
     }
 
     def text: String = {
