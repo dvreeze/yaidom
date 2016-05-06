@@ -32,3 +32,15 @@ trait HasScopeApi {
    */
   def scope: Scope
 }
+
+object HasScopeApi {
+
+  /**
+   * The `HasScopeApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] {
+
+    def scope(thisElem: E): Scope
+  }
+}

@@ -29,6 +29,9 @@ import eu.cdevreeze.yaidom.core.QName
  */
 trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ClarkElemLike[E] { self: E =>
 
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Yet I did not want to depend on a val or def of the appropriate type class instance, so chose for code repetition.
+
   final def attributeAsQNameOption(expandedName: EName): Option[QName] =
     attributeOption(expandedName).map(v => QName(v.trim))
 
@@ -52,4 +55,38 @@ trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with Clark
   final def textAsResolvedQName: EName =
     scope.resolveQNameOption(textAsQName).getOrElse(
       sys.error(s"Could not resolve QName-valued element text $textAsQName, given scope [${scope}]"))
+}
+
+object ScopedElemLike {
+
+  /**
+   * The `ScopedElemLike` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] extends ScopedElemApi.FunctionApi[E] with ClarkElemLike.FunctionApi[E] {
+
+    final def attributeAsQNameOption(thisElem: E, expandedName: EName): Option[QName] =
+      attributeOption(thisElem, expandedName).map(v => QName(v.trim))
+
+    final def attributeAsQName(thisElem: E, expandedName: EName): QName =
+      attributeAsQNameOption(thisElem, expandedName).getOrElse(
+        sys.error(s"Missing QName-valued attribute $expandedName"))
+
+    final def attributeAsResolvedQNameOption(thisElem: E, expandedName: EName): Option[EName] = {
+      attributeAsQNameOption(thisElem, expandedName) map { qn =>
+        scope(thisElem).resolveQNameOption(qn).getOrElse(
+          sys.error(s"Could not resolve QName-valued attribute value $qn, given scope [${scope(thisElem)}]"))
+      }
+    }
+
+    final def attributeAsResolvedQName(thisElem: E, expandedName: EName): EName =
+      attributeAsResolvedQNameOption(thisElem, expandedName).getOrElse(
+        sys.error(s"Missing QName-valued attribute $expandedName"))
+
+    final def textAsQName(thisElem: E): QName = QName(text(thisElem).trim)
+
+    final def textAsResolvedQName(thisElem: E): EName =
+      scope(thisElem).resolveQNameOption(textAsQName(thisElem)).getOrElse(
+        sys.error(s"Could not resolve QName-valued element text ${textAsQName(thisElem)}, given scope [${scope(thisElem)}]"))
+  }
 }

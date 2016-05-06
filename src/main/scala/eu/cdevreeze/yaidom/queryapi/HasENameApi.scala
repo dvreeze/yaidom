@@ -88,6 +88,25 @@ trait HasENameApi {
 object HasENameApi {
 
   /**
+   * The `HasENameApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] {
+
+    def resolvedName(thisElem: E): EName
+
+    def resolvedAttributes(thisElem: E): immutable.Iterable[(EName, String)]
+
+    def localName(thisElem: E): String
+
+    def attributeOption(thisElem: E, expandedName: EName): Option[String]
+
+    def attribute(thisElem: E, expandedName: EName): String
+
+    def findAttributeByLocalName(thisElem: E, localName: String): Option[String]
+  }
+
+  /**
    * Making ElemApi filter/find methods accept ENames which are implicitly converted to element predicates.
    */
   implicit class ToHasElemApi(val ename: EName) extends (ElemApi[_] with HasENameApi => Boolean) {

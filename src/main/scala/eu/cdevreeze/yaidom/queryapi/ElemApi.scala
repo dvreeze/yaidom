@@ -253,6 +253,37 @@ trait ElemApi[E <: ElemApi[E]] { self: E =>
 object ElemApi {
 
   /**
+   * The `ElemApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] {
+
+    def findAllChildElems(thisElem: E): immutable.IndexedSeq[E]
+
+    def findAllElems(thisElem: E): immutable.IndexedSeq[E]
+
+    def findAllElemsOrSelf(thisElem: E): immutable.IndexedSeq[E]
+
+    def filterChildElems(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E]
+
+    def filterElems(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E]
+
+    def filterElemsOrSelf(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E]
+
+    def findChildElem(thisElem: E, p: E => Boolean): Option[E]
+
+    def findElem(thisElem: E, p: E => Boolean): Option[E]
+
+    def findElemOrSelf(thisElem: E, p: E => Boolean): Option[E]
+
+    def findTopmostElems(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E]
+
+    def findTopmostElemsOrSelf(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E]
+
+    def getChildElem(thisElem: E, p: E => Boolean): E
+  }
+
+  /**
    * Element predicate that filters away no elements, and that can be used in many methods of the ElemApi trait.
    * It is especially useful when using the SubtypeAwareElemApi trait.
    */

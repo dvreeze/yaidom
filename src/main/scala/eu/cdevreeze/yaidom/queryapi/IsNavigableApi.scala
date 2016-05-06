@@ -90,3 +90,27 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
   /** Returns (the equivalent of) `findReverseAncestryOrSelfByPath(path).get` */
   def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[E]
 }
+
+object IsNavigableApi {
+
+  /**
+   * The `IsNavigableApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] {
+
+    def findAllChildElemsWithPathEntries(thisElem: E): immutable.IndexedSeq[(E, Path.Entry)]
+
+    def findChildElemByPathEntry(thisElem: E, entry: Path.Entry): Option[E]
+
+    def getChildElemByPathEntry(thisElem: E, entry: Path.Entry): E
+
+    def findElemOrSelfByPath(thisElem: E, path: Path): Option[E]
+
+    def getElemOrSelfByPath(thisElem: E, path: Path): E
+
+    def findReverseAncestryOrSelfByPath(thisElem: E, path: Path): Option[immutable.IndexedSeq[E]]
+
+    def getReverseAncestryOrSelfByPath(thisElem: E, path: Path): immutable.IndexedSeq[E]
+  }
+}

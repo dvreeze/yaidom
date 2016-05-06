@@ -26,9 +26,28 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  */
 trait HasText extends HasTextApi {
 
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Yet I did not want to depend on a val or def of the appropriate type class instance, so chose for code repetition.
+
   /** Returns `text.trim`. */
   final def trimmedText: String = text.trim
 
   /** Returns `XmlStringUtils.normalizeString(text)`. */
   final def normalizedText: String = XmlStringUtils.normalizeString(text)
+}
+
+object HasText {
+
+  /**
+   * The `HasText` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] extends HasTextApi.FunctionApi[E] {
+
+    def text(thisElem: E): String
+
+    final def trimmedText(thisElem: E): String = text(thisElem).trim
+
+    final def normalizedText(thisElem: E): String = XmlStringUtils.normalizeString(text(thisElem))
+  }
 }
