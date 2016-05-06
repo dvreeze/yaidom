@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.core.EName
 trait HasEName extends HasENameApi {
 
   // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
-  // Yet I did not want to depend on a val or def of the appropriate type class instance, so chose for code repetition.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   /**
    * The local name, that is, the local part of the EName

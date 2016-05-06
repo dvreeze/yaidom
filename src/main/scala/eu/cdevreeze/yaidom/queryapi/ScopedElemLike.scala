@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.core.QName
 trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ClarkElemLike[E] { self: E =>
 
   // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
-  // Yet I did not want to depend on a val or def of the appropriate type class instance, so chose for code repetition.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   final def attributeAsQNameOption(expandedName: EName): Option[QName] =
     attributeOption(expandedName).map(v => QName(v.trim))

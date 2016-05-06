@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.core.Path
 trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike[E] with IsNavigable[E] with HasEName with HasText { self: E =>
 
   // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
-  // Yet I did not want to depend on a val or def of the appropriate type class instance, so chose for code repetition.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.

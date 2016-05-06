@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 trait HasText extends HasTextApi {
 
   // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
-  // Yet I did not want to depend on a val or def of the appropriate type class instance, so chose for code repetition.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   /** Returns `text.trim`. */
   final def trimmedText: String = text.trim
