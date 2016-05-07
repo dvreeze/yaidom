@@ -32,6 +32,9 @@ import scala.collection.immutable
  */
 trait HasParent[E <: HasParent[E]] extends HasParentApi[E] { self: E =>
 
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
+
   /**
    * Returns the equivalent `parentOption.get`, throwing an exception if this is the root element
    */
@@ -64,5 +67,35 @@ trait HasParent[E <: HasParent[E]] extends HasParentApi[E] { self: E =>
    */
   final def findAncestor(p: E => Boolean): Option[E] = {
     parentOption flatMap { e => e.findAncestorOrSelf(p) }
+  }
+}
+
+object HasParent {
+
+  /**
+   * The `HasParent` as type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] extends HasParentApi.FunctionApi[E] {
+
+    final def parent(thisElem: E): E = parentOption(thisElem: E).getOrElse(sys.error("There is no parent element"))
+
+    final def ancestorsOrSelf(thisElem: E): immutable.IndexedSeq[E] = {
+      thisElem +: (parentOption(thisElem: E).toIndexedSeq flatMap ((e: E) => ancestorsOrSelf(e)))
+    }
+
+    final def ancestors(thisElem: E): immutable.IndexedSeq[E] = ancestorsOrSelf(thisElem).drop(1)
+
+    @tailrec
+    final def findAncestorOrSelf(thisElem: E, p: E => Boolean): Option[E] = {
+      if (p(thisElem)) Some(thisElem) else {
+        val optParent = parentOption(thisElem)
+        if (optParent.isEmpty) None else findAncestorOrSelf(optParent.get, p)
+      }
+    }
+
+    final def findAncestor(thisElem: E, p: E => Boolean): Option[E] = {
+      parentOption(thisElem) flatMap { e => findAncestorOrSelf(e, p) }
+    }
   }
 }
