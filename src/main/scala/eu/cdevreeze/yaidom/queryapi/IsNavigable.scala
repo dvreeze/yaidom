@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
   // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
@@ -83,7 +83,7 @@ trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 object IsNavigable {
 
   /**
-   * The `IsNavigable` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `IsNavigable` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends IsNavigableApi.FunctionApi[E] {

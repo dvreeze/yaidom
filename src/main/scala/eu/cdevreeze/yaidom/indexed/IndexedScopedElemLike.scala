@@ -37,6 +37,9 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi[U]] extends IndexedScopedElemApi[E, U] with IndexedClarkElemLike[E, U] with ScopedElemLike[E] { self: E =>
 
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
+
   def docUriOption: Option[URI]
 
   def rootElem: U
@@ -58,5 +61,47 @@ trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi
   final def namespaces: Declarations = {
     val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
+  }
+}
+
+object IndexedScopedElemLike {
+
+  /**
+   * The `IndexedScopedElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E, U] extends IndexedScopedElemApi.FunctionApi[E, U] with IndexedClarkElemLike.FunctionApi[E, U] with ScopedElemLike.FunctionApi[E] {
+
+    def underlyingElementFunctionApi: ScopedElemApi.FunctionApi[U]
+
+    def docUriOption(thisElem: E): Option[URI]
+
+    def rootElem(thisElem: E): U
+
+    def path(thisElem: E): Path
+
+    def elem(thisElem: E): U
+
+    def baseUriOption(thisElem: E): Option[URI]
+
+    def findAllChildElems(thisElem: E): immutable.IndexedSeq[E]
+
+    final override def qname(thisElem: E): QName =
+      underlyingElementFunctionApi.qname(elem(thisElem))
+
+    final override def attributes(thisElem: E): immutable.Iterable[(QName, String)] =
+      underlyingElementFunctionApi.attributes(elem(thisElem))
+
+    final override def scope(thisElem: E): Scope =
+      underlyingElementFunctionApi.scope(this.elem(thisElem))
+
+    final def namespaces(thisElem: E): Declarations = {
+      val parentScope =
+        this.path(thisElem).parentPathOption map { path =>
+          underlyingElementFunctionApi.scope(
+            underlyingElementFunctionApi.getElemOrSelfByPath(rootElem(thisElem), path))
+        } getOrElse (Scope.Empty)
+      parentScope.relativize(underlyingElementFunctionApi.scope(this.elem(thisElem)))
+    }
   }
 }

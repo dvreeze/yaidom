@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.core.QName
  */
 trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ClarkElemLike[E] { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
   // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   final def attributeAsQNameOption(expandedName: EName): Option[QName] =
@@ -60,7 +60,7 @@ trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with Clark
 object ScopedElemLike {
 
   /**
-   * The `ScopedElemLike` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `ScopedElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends ScopedElemApi.FunctionApi[E] with ClarkElemLike.FunctionApi[E] {

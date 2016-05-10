@@ -88,7 +88,7 @@ trait HasENameApi {
 object HasENameApi {
 
   /**
-   * The `HasENameApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `HasENameApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] {

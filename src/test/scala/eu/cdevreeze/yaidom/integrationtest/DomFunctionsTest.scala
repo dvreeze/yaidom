@@ -58,8 +58,10 @@ import javax.xml.parsers.DocumentBuilderFactory
 class DomFunctionsTest extends Suite {
 
   import DomFunctionsTest.DomLikeElem
+  import DomFunctionsTest.DomLikeFunctionApi
 
-  implicit val ev = DomFunctionsTest.DomLikeFunctionApi.DomFunctions
+  // Why do we still need to explicitly create this "implicit"?
+  implicit val ev = DomLikeFunctionApi.DomFunctions
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

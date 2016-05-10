@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.core.EName
  */
 trait HasEName extends HasENameApi {
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
   // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   /**
@@ -67,7 +67,7 @@ trait HasEName extends HasENameApi {
 object HasEName {
 
   /**
-   * The `HasEName` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `HasEName` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends HasENameApi.FunctionApi[E] {

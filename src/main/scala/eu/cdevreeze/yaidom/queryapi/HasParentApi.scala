@@ -66,7 +66,7 @@ trait HasParentApi[E <: HasParentApi[E]] { self: E =>
 object HasParentApi {
 
   /**
-   * The `HasParentApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `HasParentApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] {

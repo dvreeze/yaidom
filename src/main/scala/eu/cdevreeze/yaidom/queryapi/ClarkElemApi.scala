@@ -44,7 +44,7 @@ trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with IsNavigableApi[
 object ClarkElemApi {
 
   /**
-   * The `ClarkElemApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `ClarkElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends ElemApi.FunctionApi[E] with IsNavigableApi.FunctionApi[E] with HasENameApi.FunctionApi[E] with HasTextApi.FunctionApi[E] {

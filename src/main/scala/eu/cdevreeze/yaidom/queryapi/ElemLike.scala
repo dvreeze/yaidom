@@ -220,7 +220,7 @@ import scala.collection.mutable
  */
 trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
   // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   def findAllChildElems: immutable.IndexedSeq[E]
@@ -321,7 +321,7 @@ trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
 object ElemLike {
 
   /**
-   * The `ElemLike` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `ElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends ElemApi.FunctionApi[E] {

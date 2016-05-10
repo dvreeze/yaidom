@@ -35,3 +35,19 @@ trait DocumentApi[E <: ElemApi[E]] {
   /** Returns the optional document URI, wrapped in an Option */
   def uriOption: Option[URI]
 }
+
+object DocumentApi {
+
+  /**
+   * The `DocumentApi` as potential type class trait. Each of the functions takes "this" document as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon documents can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[D, E] {
+
+    def underlyingElementFunctionApi: ElemApi.FunctionApi[E]
+
+    def documentElement(thisDoc: D): E
+
+    def uriOption(thisDoc: D): Option[URI]
+  }
+}

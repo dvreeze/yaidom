@@ -46,3 +46,21 @@ trait ContextAwareApi {
    */
   def baseUriOption: Option[URI]
 }
+
+object ContextAwareApi {
+
+  /**
+   * The `ContextAwareApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E] {
+
+    def docUriOption(thisElem: E): Option[URI]
+
+    def contextPath(thisElem: E): ContextPath
+
+    def parentContextPath(thisElem: E): ContextPath
+
+    def baseUriOption(thisElem: E): Option[URI]
+  }
+}

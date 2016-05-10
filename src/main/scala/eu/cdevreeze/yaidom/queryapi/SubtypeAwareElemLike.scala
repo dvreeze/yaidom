@@ -28,6 +28,9 @@ import ElemApi.anyElem
  */
 trait SubtypeAwareElemLike[A <: SubtypeAwareElemLike[A]] extends ElemLike[A] with SubtypeAwareElemApi[A] { self: A =>
 
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
+  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
+
   final def findAllChildElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterChildElemsOfType(subType)(anyElem)
   }
@@ -93,7 +96,7 @@ trait SubtypeAwareElemLike[A <: SubtypeAwareElemLike[A]] extends ElemLike[A] wit
 
     val p2: (A => Boolean) = {
       case elem: B if p(elem) => true
-      case _ => false
+      case _                  => false
     }
 
     f(p2) collect {
@@ -109,11 +112,103 @@ trait SubtypeAwareElemLike[A <: SubtypeAwareElemLike[A]] extends ElemLike[A] wit
 
     val p2: (A => Boolean) = {
       case elem: B if p(elem) => true
-      case _ => false
+      case _                  => false
     }
 
     f(p2) collect {
       case elem: B => elem
+    }
+  }
+}
+
+object SubtypeAwareElemLike {
+
+  /**
+   * The `SubtypeAwareElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[A] extends ElemLike.FunctionApi[A] with SubtypeAwareElemApi.FunctionApi[A] {
+
+    final def findAllChildElemsOfType[B <: A](thisElem: A, subType: ClassTag[B]): immutable.IndexedSeq[B] = {
+      filterChildElemsOfType(thisElem, subType)(_ => true)
+    }
+
+    final def filterChildElemsOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+      filter(thisElem, subType)(p) { (e, pred) => filterChildElems(e, pred) }
+    }
+
+    final def findAllElemsOfType[B <: A](thisElem: A, subType: ClassTag[B]): immutable.IndexedSeq[B] = {
+      filterElemsOfType(thisElem, subType)(_ => true)
+    }
+
+    final def filterElemsOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+      filter(thisElem, subType)(p) { (e, pred) => filterElems(e, pred) }
+    }
+
+    final def findAllElemsOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B]): immutable.IndexedSeq[B] = {
+      filterElemsOrSelfOfType(thisElem, subType)(_ => true)
+    }
+
+    final def filterElemsOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+      filter(thisElem, subType)(p) { (e, pred) => filterElemsOrSelf(e, pred) }
+    }
+
+    final def findChildElemOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): Option[B] = {
+      find(thisElem, subType)(p) { (e, pred) => findChildElem(e, pred) }
+    }
+
+    final def findElemOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): Option[B] = {
+      find(thisElem, subType)(p) { (e, pred) => findElem(e, pred) }
+    }
+
+    final def findElemOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): Option[B] = {
+      find(thisElem, subType)(p) { (e, pred) => findElemOrSelf(e, pred) }
+    }
+
+    final def findTopmostElemsOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+      filter(thisElem, subType)(p) { (e, pred) => findTopmostElems(e, pred) }
+    }
+
+    final def findTopmostElemsOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+      filter(thisElem, subType)(p) { (e, pred) => findTopmostElemsOrSelf(e, pred) }
+    }
+
+    final def getChildElemOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): B = {
+      val result = findChildElemOfType(thisElem, subType)(p)
+      require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
+      result.head
+    }
+
+    private final def filter[B <: A](
+      thisElem: A, subType: ClassTag[B])(p: B => Boolean)(f: ((A, A => Boolean) => immutable.IndexedSeq[A])): immutable.IndexedSeq[B] = {
+
+      // Implicit ClassTag[B] to make pattern matching below work (the implicit ClassTag "undoes" type erasure)
+      implicit val ct = subType
+
+      val p2: (A => Boolean) = {
+        case elem: B if p(elem) => true
+        case _                  => false
+      }
+
+      f(thisElem, p2) collect {
+        case elem: B => elem
+      }
+    }
+
+    private final def find[B <: A](
+      thisElem: A, subType: ClassTag[B])(p: B => Boolean)(f: ((A, A => Boolean) => Option[A])): Option[B] = {
+
+      // Implicit ClassTag[B] to make pattern matching below work (the implicit ClassTag "undoes" type erasure)
+      implicit val ct = subType
+
+      val p2: (A => Boolean) = {
+        case elem: B if p(elem) => true
+        case _                  => false
+      }
+
+      f(thisElem, p2) collect {
+        case elem: B => elem
+      }
     }
   }
 }

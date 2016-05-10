@@ -253,7 +253,7 @@ trait ElemApi[E <: ElemApi[E]] { self: E =>
 object ElemApi {
 
   /**
-   * The `ElemApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `ElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] {

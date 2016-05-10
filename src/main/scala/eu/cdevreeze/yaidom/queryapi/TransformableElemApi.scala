@@ -199,3 +199,25 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    */
   def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
 }
+
+object TransformableElemApi {
+
+  /**
+   * The `TransformableElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[N, E <: N] {
+
+    def transformChildElems(thisElem: E, f: E => E): E
+
+    def transformChildElemsToNodeSeq(thisElem: E, f: E => immutable.IndexedSeq[N]): E
+
+    def transformElemsOrSelf(thisElem: E, f: E => E): E
+
+    def transformElems(thisElem: E, f: E => E): E
+
+    def transformElemsOrSelfToNodeSeq(thisElem: E, f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+
+    def transformElemsToNodeSeq(thisElem: E, f: E => immutable.IndexedSeq[N]): E
+  }
+}

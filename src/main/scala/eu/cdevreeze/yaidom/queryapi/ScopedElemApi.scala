@@ -94,7 +94,7 @@ trait ScopedElemApi[E <: ScopedElemApi[E]] extends ClarkElemApi[E] with HasQName
 object ScopedElemApi {
 
   /**
-   * The `ScopedElemApi` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `ScopedElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends ClarkElemApi.FunctionApi[E] with HasQNameApi.FunctionApi[E] with HasScopeApi.FunctionApi[E] {

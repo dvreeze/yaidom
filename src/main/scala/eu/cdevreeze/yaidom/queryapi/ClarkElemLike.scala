@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike[E] with IsNavigable[E] with HasEName with HasText { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding type class.
+  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
   // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   /**
@@ -87,7 +87,7 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
 object ClarkElemLike {
 
   /**
-   * The `ClarkElemLike` as type class trait. Each of the functions takes "this" element as first parameter.
+   * The `ClarkElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
    * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
    */
   trait FunctionApi[E] extends ClarkElemApi.FunctionApi[E] with ElemLike.FunctionApi[E] with IsNavigable.FunctionApi[E] with HasEName.FunctionApi[E] with HasText.FunctionApi[E] {

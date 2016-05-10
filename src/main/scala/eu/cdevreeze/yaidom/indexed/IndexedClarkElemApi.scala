@@ -132,4 +132,27 @@ object IndexedClarkElemApi {
      */
     def build(docUriOption: Option[URI], rootElem: U, path: Path): E
   }
+
+  /**
+   * The `IndexedClarkElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
+   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
+   */
+  trait FunctionApi[E, U] extends ClarkElemApi.FunctionApi[E] {
+
+    def docUriOption(thisElem: E): Option[URI]
+
+    def rootElem(thisElem: E): U
+
+    def path(thisElem: E): Path
+
+    def elem(thisElem: E): U
+
+    def baseUriOption(thisElem: E): Option[URI]
+
+    def reverseAncestryOrSelfENames(thisElem: E): immutable.IndexedSeq[EName]
+
+    def reverseAncestryENames(thisElem: E): immutable.IndexedSeq[EName]
+
+    def reverseAncestryOrSelf(thisElem: E): immutable.IndexedSeq[U]
+  }
 }
