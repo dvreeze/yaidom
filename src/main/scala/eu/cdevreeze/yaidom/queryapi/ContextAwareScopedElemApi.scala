@@ -19,6 +19,8 @@ package eu.cdevreeze.yaidom.queryapi
 /**
  * Abstract API for "context-aware scoped elements".
  *
+ * WARNING: CONTEXT PATHS ARE CONSIDERED EXPERIMENTAL!
+ *
  * @tparam E The element type itself
  *
  * @author Chris de Vreeze

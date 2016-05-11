@@ -21,7 +21,9 @@ package eu.cdevreeze.yaidom
  * in this package mix in the `ContextAwareApi` trait. Unlike "indexed" elements, they do not wrap entire
  * element trees of an underlying element type, but contain a `ContextPath` as context only. That makes them
  * easier to construct in an ad-hoc manner, easier to use in streaming and update scenarios, and more light-weight than
- * "indexed" elements. Therefore "indexed" elements can be deprecated.
+ * "indexed" elements. Therefore "indexed" elements can possibly be deprecated.
+ *
+ * WARNING: THE CODE IN THIS PACKAGE IS CONSIDERED EXPERIMENTAL!
  *
  * An example of where such a representation can be useful is XML Schema. After all, to interpret an element definition
  * in an XML schema, we need context of the element definition to determine the target namespace, or to determine whether the

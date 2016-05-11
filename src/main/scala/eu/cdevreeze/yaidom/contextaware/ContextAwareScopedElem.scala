@@ -36,6 +36,8 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * An element within its context. In other words, an element as a pair containing the element itself (of an underlying element type)
  * and a parent context path as the ancestry of this element. It also contains an optional URI of the containing document, if any.
  *
+ * WARNING: THE CODE IN THIS PACKAGE IS CONSIDERED EXPERIMENTAL!
+ *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
  * A `ContextAwareScopedElem(rootElem)` can be seen as one '''immutable snapshot''' of an XML tree. All queries (using the `ElemApi` uniform

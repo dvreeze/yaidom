@@ -21,6 +21,8 @@ import java.net.URI
 /**
  * Abstract API for "context-aware elements".
  *
+ * WARNING: CONTEXT PATHS ARE CONSIDERED EXPERIMENTAL!
+ *
  * @author Chris de Vreeze
  */
 trait ContextAwareApi {

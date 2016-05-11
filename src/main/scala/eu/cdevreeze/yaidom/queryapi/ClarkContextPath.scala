@@ -25,7 +25,9 @@ import eu.cdevreeze.yaidom.core.EName
 /**
  * Context path, representing the ancestry(-or-self) path of an element. Although the context path of an element
  * contains the ancestry-or-self, it does not contain any siblings of the ancestry.
- * 
+ *
+ * WARNING: CONTEXT PATHS ARE CONSIDERED EXPERIMENTAL!
+ *
  * The entries know about ENames and ENames of attributes, and not about QNames.
  *
  * @author Chris de Vreeze

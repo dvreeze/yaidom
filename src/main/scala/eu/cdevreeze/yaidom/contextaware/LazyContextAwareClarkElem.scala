@@ -34,6 +34,8 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * Very lightweight lazy context-aware element implementation. It offers the `ContextAwareClarkElemApi` query API. It is optimized
  * for fast (just-in-time) element creation, not for fast querying. Other than that, it is much like `ContextAwareClarkElem`.
  *
+ * WARNING: THE CODE IN THIS PACKAGE IS CONSIDERED EXPERIMENTAL!
+ *
  * @tparam U The underlying element type
  *
  * @author Chris de Vreeze

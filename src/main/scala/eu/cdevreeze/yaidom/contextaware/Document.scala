@@ -32,6 +32,8 @@ import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 /**
  * `ContextAwareDocument`, containing an "context-aware" document element with simple elements as underlying elements.
  *
+ * WARNING: THE CODE IN THIS PACKAGE IS CONSIDERED EXPERIMENTAL!
+ *
  * @author Chris de Vreeze
  */
 final class Document(

@@ -28,6 +28,8 @@ import eu.cdevreeze.yaidom.simple
 /**
  * Factory object for `Elem` instances, where `Elem` is a type alias for `ContextAwareScopedElem[simple.Elem]`.
  *
+ * WARNING: THE CODE IN THIS PACKAGE IS CONSIDERED EXPERIMENTAL!
+ *
  * @author Chris de Vreeze
  */
 object Elem {

@@ -28,6 +28,8 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 /**
  * Document, containing a "context-aware" document element.
  *
+ * WARNING: THE CODE IN THIS PACKAGE IS CONSIDERED EXPERIMENTAL!
+ *
  * Note that class `ContextAwareDocument` does not have any query methods for `Elem` instances. In particular, the `ElemApi` does not
  * apply to documents. Therefore, given a document, querying for elements (other than the document element itself) always goes
  * via the document element.
