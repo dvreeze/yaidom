@@ -48,7 +48,7 @@ final class LazyDocument(
       })
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
-  def withDocumentElement(newRoot: Elem): LazyDocument = new LazyDocument(
+  def withDocumentElement(newRoot: LazyIndexedScopedElem[simple.Elem]): LazyDocument = new LazyDocument(
     xmlDeclarationOption = this.xmlDeclarationOption,
     children = this.children map {
       case elm: Nodes.Elem                => newRoot
