@@ -1023,7 +1023,7 @@ object OtherNonYaidomQueryTest {
       filterChildElems(_ => true)
     }
 
-    // Note that ThisElem is used both in covariant and contravariant positions
+    // Note that ThisElem is used both in the filter functions and in the return type
 
     final def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
       Vector(self).filter(p) ++ findAllChildElems.flatMap(e => e.filterElemsOrSelf(p))
