@@ -34,6 +34,7 @@ import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.HasParentApi
@@ -744,97 +745,38 @@ object DomFunctionsTest {
    */
   trait DomLikeFunctionApi[E] extends ScopedElemApi.FunctionApi[E] with HasParentApi.FunctionApi[E] {
 
-    def textChildren(thisElem: E): immutable.IndexedSeq[Nodes.Text]
+    type Node
+    type Text <: Node
+    type Comment <: Node
 
-    def commentChildren(thisElem: E): immutable.IndexedSeq[Nodes.Comment]
+    def textChildren(thisElem: E): immutable.IndexedSeq[Text]
+
+    def commentChildren(thisElem: E): immutable.IndexedSeq[Comment]
+
+    def textData(thisText: Text): String
+
+    def commentData(thisComment: Comment): String
   }
-
-  /**
-   * Partial implementation of DomLikeFunctionApi.
-   */
-  trait DomLikeFunctions[E] extends DomLikeFunctionApi[E] with ScopedElemLike.FunctionApi[E] with HasParent.FunctionApi[E]
 
   object DomLikeFunctionApi {
 
-    implicit object DomFunctions extends DomLikeFunctions[org.w3c.dom.Element] {
+    implicit object DomFunctions extends DomLikeFunctionApi[org.w3c.dom.Element] with DomElem.FunctionApi {
 
-      def findAllChildElems(thisElem: org.w3c.dom.Element): immutable.IndexedSeq[org.w3c.dom.Element] = {
-        children(thisElem) collect { case e: org.w3c.dom.Element => e }
+      type Node = org.w3c.dom.Node
+      type Text = org.w3c.dom.Text
+      type Comment = org.w3c.dom.Comment
+
+      def textChildren(thisElem: org.w3c.dom.Element): immutable.IndexedSeq[Text] = {
+        children(thisElem) collect { case t: org.w3c.dom.Text => t }
       }
 
-      def resolvedName(thisElem: org.w3c.dom.Element): EName = {
-        // Not efficient, because of expensive Scope computation
-
-        scope(thisElem).resolveQNameOption(qname(thisElem)).getOrElse(sys.error(s"Element name '${qname(thisElem)}' should resolve to an EName in scope [${scope(thisElem)}]"))
+      def commentChildren(thisElem: org.w3c.dom.Element): immutable.IndexedSeq[Comment] = {
+        children(thisElem) collect { case c: org.w3c.dom.Comment => c }
       }
 
-      def resolvedAttributes(thisElem: org.w3c.dom.Element): immutable.Iterable[(EName, String)] = {
-        val attrScope = scope(thisElem).withoutDefaultNamespace
+      def textData(thisText: Text): String = thisText.getData
 
-        attributes(thisElem) map { kv =>
-          val attName = kv._1
-          val attValue = kv._2
-          val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
-          (expandedName -> attValue)
-        }
-      }
-
-      def text(thisElem: org.w3c.dom.Element): String = {
-        val textChildren = children(thisElem) collect { case t: org.w3c.dom.Text => t }
-        val textStrings = textChildren map (_.getData)
-        textStrings.mkString
-      }
-
-      def qname(thisElem: org.w3c.dom.Element): QName = {
-        DomConversions.toQName(thisElem)
-      }
-
-      def attributes(thisElem: org.w3c.dom.Element): immutable.Iterable[(QName, String)] = {
-        DomConversions.extractAttributes(thisElem.getAttributes)
-      }
-
-      def scope(thisElem: org.w3c.dom.Element): Scope = {
-        val ancestryOrSelf = getAncestorsOrSelf(thisElem)
-
-        val resultScope =
-          ancestryOrSelf.foldRight(Scope.Empty) {
-            case (wrappedElem, accScope) =>
-              val decls = DomConversions.extractNamespaceDeclarations(wrappedElem.getAttributes)
-              accScope.resolve(decls)
-          }
-        resultScope
-      }
-
-      def parentOption(thisElem: org.w3c.dom.Element): Option[org.w3c.dom.Element] = {
-        val parentNodeOption = Option(thisElem.getParentNode)
-        val parentElemOption = parentNodeOption collect { case e: org.w3c.dom.Element => e }
-        parentElemOption
-      }
-
-      def textChildren(thisElem: org.w3c.dom.Element): immutable.IndexedSeq[Nodes.Text] = {
-        children(thisElem) collect { case t: org.w3c.dom.Text => t } map (t => eu.cdevreeze.yaidom.simple.Text(t.getData, false))
-      }
-
-      def commentChildren(thisElem: org.w3c.dom.Element): immutable.IndexedSeq[Nodes.Comment] = {
-        children(thisElem) collect { case c: org.w3c.dom.Comment => c } map (c => eu.cdevreeze.yaidom.simple.Comment(c.getData))
-      }
-
-      private def children(thisElem: org.w3c.dom.Element): immutable.IndexedSeq[org.w3c.dom.Node] = {
-        DomConversions.nodeListToIndexedSeq(thisElem.getChildNodes)
-      }
-
-      private def getAncestorsOrSelf(thisElem: org.w3c.dom.Element): List[org.w3c.dom.Element] = {
-        val parentElement: org.w3c.dom.Element = thisElem.getParentNode match {
-          case e: org.w3c.dom.Element => e
-          case _                      => null
-        }
-
-        if (parentElement eq null) List(thisElem)
-        else {
-          // Recursive call
-          thisElem :: getAncestorsOrSelf(parentElement)
-        }
-      }
+      def commentData(thisComment: Comment): String = thisComment.getData
     }
   }
 
@@ -876,11 +818,11 @@ object DomFunctionsTest {
     }
 
     def textChildren: immutable.IndexedSeq[Nodes.Text] = {
-      ev.textChildren(wrappedElem)
+      ev.textChildren(wrappedElem) map (t => eu.cdevreeze.yaidom.simple.Text(ev.textData(t), false))
     }
 
     def commentChildren: immutable.IndexedSeq[Nodes.Comment] = {
-      ev.commentChildren(wrappedElem)
+      ev.commentChildren(wrappedElem) map (c => eu.cdevreeze.yaidom.simple.Comment(ev.commentData(c)))
     }
   }
 }
