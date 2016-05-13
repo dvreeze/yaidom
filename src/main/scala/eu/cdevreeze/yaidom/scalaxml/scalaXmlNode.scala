@@ -87,7 +87,6 @@ final class ScalaXmlElem(
    * Returns the resolved name of the element. Note that there is no guarantee that the element name can be resolved!
    */
   override def resolvedName: EName = {
-    val qname = ScalaXmlConversions.toQName(wrappedNode)
     scope.resolveQNameOption(qname).getOrElse(
       sys.error(s"Could not resolve QName from prefix ${Option(wrappedNode.prefix).getOrElse("")} and label ${wrappedNode.label}"))
   }
@@ -224,6 +223,55 @@ object ScalaXmlNode {
 object ScalaXmlElem {
 
   def apply(wrappedNode: scala.xml.Elem): ScalaXmlElem = new ScalaXmlElem(wrappedNode)
+
+  /**
+   * Partial implementation of this element as functional API, where each method takes an (underlying) element as first parameter.
+   * This trait implements all remaining methods that are abstract in the promised public API.
+   */
+  trait FunctionApi extends ScopedElemLike.FunctionApi[scala.xml.Elem] with ResolvedNodes.Elem.FunctionApi[scala.xml.Node, scala.xml.Elem] {
+
+    final def findAllChildElems(thisElem: scala.xml.Elem): immutable.IndexedSeq[scala.xml.Elem] = {
+      children(thisElem) collect { case e: scala.xml.Elem => e }
+    }
+
+    final def resolvedName(thisElem: scala.xml.Elem): EName = {
+      val qn = qname(thisElem)
+      scope(thisElem).resolveQNameOption(qn).getOrElse(
+        sys.error(s"Could not resolve QName from prefix ${Option(thisElem.prefix).getOrElse("")} and label ${thisElem.label}"))
+    }
+
+    final def resolvedAttributes(thisElem: scala.xml.Elem): immutable.IndexedSeq[(EName, String)] = {
+      val attrScope = scope(thisElem).withoutDefaultNamespace
+      attributes(thisElem) map {
+        case (attrName, attrValue) =>
+          val ename = attrScope.resolveQNameOption(attrName).getOrElse(
+            sys.error(s"Could not resolve attribute name $attrName"))
+          (ename, attrValue)
+      }
+    }
+
+    final def text(thisElem: scala.xml.Elem): String = {
+      val textChildren = children(thisElem) collect { case t: scala.xml.Text => t }
+      val textStrings = textChildren map (_.text)
+      textStrings.mkString
+    }
+
+    final def qname(thisElem: scala.xml.Elem): QName = {
+      ScalaXmlConversions.toQName(thisElem)
+    }
+
+    final def attributes(thisElem: scala.xml.Elem): immutable.IndexedSeq[(QName, String)] = {
+      ScalaXmlConversions.extractAttributes(thisElem.attributes)
+    }
+
+    final def scope(thisElem: scala.xml.Elem): Scope = {
+      ScalaXmlConversions.extractScope(thisElem.scope)
+    }
+
+    final def children(thisElem: scala.xml.Elem): immutable.IndexedSeq[scala.xml.Node] = {
+      thisElem.child.toIndexedSeq
+    }
+  }
 }
 
 object ScalaXmlText {
