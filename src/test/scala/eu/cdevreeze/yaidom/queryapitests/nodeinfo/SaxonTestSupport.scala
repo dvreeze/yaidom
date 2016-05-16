@@ -34,10 +34,10 @@ import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
-import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.DocumentInfo
 import net.sf.saxon.om.NodeInfo
+import net.sf.saxon.`type`.Type
 import net.sf.saxon.s9api.Processor
 
 /**
@@ -47,7 +47,7 @@ import net.sf.saxon.s9api.Processor
  */
 trait SaxonTestSupport {
 
-  protected val processor = new Processor(false)
+  protected lazy val processor = new Processor(false)
 
   import ENameProvider.globalENameProvider._
   import QNameProvider.globalQNameProvider._
@@ -57,15 +57,11 @@ trait SaxonTestSupport {
     final override def toString: String = wrappedNode.toString
 
     protected def nodeInfo2EName(nodeInfo: NodeInfo): EName = {
-      val ns: String = nodeInfo.getURI
-      val nsOption: Option[String] = if (ns == "") None else Some(ns)
-      getEName(nsOption, nodeInfo.getLocalPart)
+      DomNode.nodeInfo2EName(nodeInfo)
     }
 
     protected def nodeInfo2QName(nodeInfo: NodeInfo): QName = {
-      val pref: String = nodeInfo.getPrefix
-      val prefOption: Option[String] = if (pref == "") None else Some(pref)
-      getQName(prefOption, nodeInfo.getLocalPart)
+      DomNode.nodeInfo2QName(nodeInfo)
     }
 
     final override def equals(obj: Any): Boolean = obj match {
@@ -90,7 +86,7 @@ trait SaxonTestSupport {
       else {
         val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
 
-        val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
 
         nodes.flatMap(nodeInfo => DomNode.wrapNodeOption(nodeInfo))
       }
@@ -110,7 +106,7 @@ trait SaxonTestSupport {
     override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
       val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
 
-      val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+      val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
 
       nodes map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
     }
@@ -120,7 +116,7 @@ trait SaxonTestSupport {
     override def attributes: immutable.IndexedSeq[(QName, String)] = {
       val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
 
-      val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+      val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
 
       nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
     }
@@ -130,7 +126,7 @@ trait SaxonTestSupport {
       else {
         val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
 
-        val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
 
         nodes.flatMap(nodeInfo => DomNode.wrapNodeOption(nodeInfo))
       }
@@ -160,7 +156,7 @@ trait SaxonTestSupport {
     override def scope: Scope = {
       val it = wrappedNode.iterateAxis(AxisInfo.NAMESPACE)
 
-      val nodes = Stream.continually(it.next).takeWhile(_ ne null).toVector
+      val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
 
       val resultMap = {
         val result =
@@ -220,5 +216,97 @@ trait SaxonTestSupport {
     def wrapDocument(doc: DocumentInfo): DomDocument = new DomDocument(doc)
 
     def wrapElement(elm: NodeInfo): DomElem = new DomElem(elm)
+
+    def nodeInfo2EName(nodeInfo: NodeInfo): EName = {
+      val ns: String = nodeInfo.getURI
+      val nsOption: Option[String] = if (ns == "") None else Some(ns)
+      getEName(nsOption, nodeInfo.getLocalPart)
+    }
+
+    def nodeInfo2QName(nodeInfo: NodeInfo): QName = {
+      val pref: String = nodeInfo.getPrefix
+      val prefOption: Option[String] = if (pref == "") None else Some(pref)
+      getQName(prefOption, nodeInfo.getLocalPart)
+    }
+  }
+
+  object DomElem {
+
+    /**
+     * Partial implementation of this element as functional API, where each method takes an (underlying) element as first parameter.
+     * This trait implements all remaining methods that are abstract in the promised public API.
+     */
+    trait FunctionApi extends ScopedElemLike.FunctionApi[NodeInfo] with HasParent.FunctionApi[NodeInfo] with ResolvedNodes.Elem.FunctionApi[NodeInfo, NodeInfo] {
+
+      final def findAllChildElems(thisElem: NodeInfo): immutable.IndexedSeq[NodeInfo] = {
+        children(thisElem) collect { case e: NodeInfo if e.getNodeKind == Type.ELEMENT => e }
+      }
+
+      final def resolvedName(thisElem: NodeInfo): EName = {
+        DomNode.nodeInfo2EName(thisElem)
+      }
+
+      final def resolvedAttributes(thisElem: NodeInfo): immutable.IndexedSeq[(EName, String)] = {
+        val it = thisElem.iterateAxis(AxisInfo.ATTRIBUTE)
+
+        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+
+        nodes map { nodeInfo => DomNode.nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
+      }
+
+      final def text(thisElem: NodeInfo): String = {
+        val textChildren =
+          children(thisElem) collect { case e: NodeInfo if e.getNodeKind == Type.TEXT || e.getNodeKind == Type.WHITESPACE_TEXT => e }
+        val textStrings = textChildren map { t => t.getStringValue }
+        textStrings.mkString
+      }
+
+      final def qname(thisElem: NodeInfo): QName = {
+        DomNode.nodeInfo2QName(thisElem)
+      }
+
+      final def attributes(thisElem: NodeInfo): immutable.IndexedSeq[(QName, String)] = {
+        val it = thisElem.iterateAxis(AxisInfo.ATTRIBUTE)
+
+        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+
+        nodes map { nodeInfo => DomNode.nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
+      }
+
+      final def scope(thisElem: NodeInfo): Scope = {
+        val it = thisElem.iterateAxis(AxisInfo.NAMESPACE)
+
+        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+
+        val resultMap = {
+          val result =
+            nodes map { nodeInfo =>
+              // Not very transparent: prefix is "display name" and namespace URI is "string value"
+              val prefix = nodeInfo.getDisplayName
+              val nsUri = nodeInfo.getStringValue
+              (prefix -> nsUri)
+            }
+          result.toMap
+        }
+
+        Scope.from(resultMap - "xml")
+      }
+
+      final def parentOption(thisElem: NodeInfo): Option[NodeInfo] = {
+        val parentNodeOption = Option(thisElem.getParent)
+        val parentElemOption = parentNodeOption collect { case e: NodeInfo if e.getNodeKind == Type.ELEMENT => e }
+        parentElemOption
+      }
+
+      final def children(thisElem: NodeInfo): immutable.IndexedSeq[NodeInfo] = {
+        if (!thisElem.hasChildNodes) Vector()
+        else {
+          val it = thisElem.iterateAxis(AxisInfo.CHILD)
+
+          val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+          nodes
+        }
+      }
+    }
   }
 }
