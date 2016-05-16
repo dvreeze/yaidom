@@ -149,8 +149,7 @@ abstract class AbstractXbrlInstanceTest extends Suite with AbstractXbrlInstanceT
     assertResult(true) {
       val rootScope = xbrlInstance.scope
 
-      // Converting to simple element first, because repeated scope computation can be expensive (e.g. DOM).
-      xbrlInstance.toSimpleElem.findAllElemsOrSelf.forall(e => e.scope == rootScope)
+      xbrlInstance.findAllElemsOrSelf.forall(e => e.scope == rootScope)
     }
 
     // Check standard namespace prefixes (rule 2.1.5)
