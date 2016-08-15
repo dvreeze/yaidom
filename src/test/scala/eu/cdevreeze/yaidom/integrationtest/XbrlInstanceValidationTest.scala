@@ -23,10 +23,10 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.contextaware
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
@@ -48,7 +48,7 @@ class XbrlInstanceValidationTest extends Suite {
     val doc: Document =
       parser.parse(classOf[XbrlInstanceValidationTest].getResourceAsStream("sample-xbrl-instance.xml"))
 
-    val caDoc = contextaware.Document(doc)
+    val caDoc = indexed.Document(doc)
 
     val xbrliElem = XbrliElem(caDoc.documentElement)
 
@@ -139,7 +139,7 @@ object XbrlInstanceValidationTest {
    *
    * Creating this class hierarchy is an effort, but it is a one-time effort potentially paying off very many times.
    */
-  sealed class XbrliElem(val underlyingElem: contextaware.Elem) extends ScopedElemLike[XbrliElem] with SubtypeAwareElemLike[XbrliElem] {
+  sealed class XbrliElem(val underlyingElem: indexed.Elem) extends ScopedElemLike[XbrliElem] with SubtypeAwareElemLike[XbrliElem] {
 
     def findAllChildElems: immutable.IndexedSeq[XbrliElem] = {
       underlyingElem.findAllChildElems.map(e => XbrliElem(e))
@@ -158,7 +158,7 @@ object XbrlInstanceValidationTest {
     def attributes: immutable.Iterable[(QName, String)] = underlyingElem.attributes
   }
 
-  final class XbrliXbrlElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliXbrlElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliXbrlEName)
 
     def findAllFacts: immutable.IndexedSeq[XbrliFactElem] = {
@@ -174,104 +174,104 @@ object XbrlInstanceValidationTest {
     }
   }
 
-  final class XbrliContextElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliContextElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliContextEName)
   }
 
-  final class XbrliUnitElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliUnitElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliUnitEName)
   }
 
   /**
    * An element which must be an item or a tuple, due to `mustBeFact` returning true.
    */
-  sealed abstract class XbrliFactElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  sealed abstract class XbrliFactElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(XbrliElem.mustBeFact(underlyingElem))
   }
 
   /**
    * An element which must be an item, due to `mustBeItem` returning true.
    */
-  final class XbrliItemElem(underlyingElem: contextaware.Elem) extends XbrliFactElem(underlyingElem) {
+  final class XbrliItemElem(underlyingElem: indexed.Elem) extends XbrliFactElem(underlyingElem) {
     require(XbrliElem.mustBeItem(underlyingElem))
   }
 
   /**
    * An element which must be a tuple, due to `mustBeTuple` returning true.
    */
-  final class XbrliTupleElem(underlyingElem: contextaware.Elem) extends XbrliFactElem(underlyingElem) {
+  final class XbrliTupleElem(underlyingElem: indexed.Elem) extends XbrliFactElem(underlyingElem) {
     require(XbrliElem.mustBeTuple(underlyingElem))
   }
 
-  final class XbrliEntityElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliEntityElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliEntityEName)
   }
 
-  final class XbrliPeriodElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliPeriodElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliPeriodEName)
   }
 
-  final class XbrliScenarioElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliScenarioElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliScenarioEName)
   }
 
-  final class XbrliInstantElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliInstantElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliInstantEName)
   }
 
-  final class XbrliStartDateElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliStartDateElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliStartDateEName)
   }
 
-  final class XbrliEndDateElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliEndDateElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliEndDateEName)
   }
 
-  final class XbrliForeverElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliForeverElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliForeverEName)
   }
 
-  final class XbrliIdentifierElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliIdentifierElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliIdentifierEName)
   }
 
-  final class XbrliSegmentElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliSegmentElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliSegmentEName)
   }
 
-  final class XbrliMeasureElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliMeasureElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliMeasureEName)
   }
 
-  final class XbrliDivideElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliDivideElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliDivideEName)
   }
 
-  final class XbrliUnitNumeratorElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliUnitNumeratorElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliUnitNumeratorEName)
   }
 
-  final class XbrliUnitDenominatorElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliUnitDenominatorElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliUnitDenominatorEName)
   }
 
-  final class LinkSchemaRefElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkSchemaRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkSchemaRefEName)
   }
 
-  final class LinkLinkbaseRefElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkLinkbaseRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkLinkbaseRefEName)
   }
 
-  final class LinkRoleRefElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkRoleRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkRoleRefEName)
   }
 
-  final class LinkArcroleRefElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkArcroleRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkArcroleRefEName)
   }
 
-  final class LinkFootnoteLinkElem(underlyingElem: contextaware.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkFootnoteLinkElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkFootnoteLinkEName)
   }
 
@@ -283,11 +283,11 @@ object XbrlInstanceValidationTest {
     /**
      * Returns true if the element is not xbrli:xbrl, and also not a descendant-or-self of an element with an EName in DisallowedFactAncestorOrSelfENames.
      */
-    def mustBeFact(e: contextaware.Elem): Boolean = {
+    def mustBeFact(e: indexed.Elem): Boolean = {
       if (e.resolvedName == XbrliXbrlEName) false
       else {
-        val notAllowed = e.contextPath.entries exists { entry =>
-          DisallowedFactAncestorOrSelfENames.contains(entry.resolvedName)
+        val notAllowed = e.path.entries exists { entry =>
+          DisallowedFactAncestorOrSelfENames.contains(entry.elementName)
         }
         !notAllowed
       }
@@ -296,18 +296,18 @@ object XbrlInstanceValidationTest {
     /**
      * Returns `mustBeFact(e) && e.attributeOption(ContextRefEName).isDefined`.
      */
-    def mustBeItem(e: contextaware.Elem): Boolean = {
+    def mustBeItem(e: indexed.Elem): Boolean = {
       mustBeFact(e) && e.attributeOption(ContextRefEName).isDefined
     }
 
     /**
      * Returns `mustBeFact(e) && e.attributeOption(ContextRefEName).isEmpty`.
      */
-    def mustBeTuple(e: contextaware.Elem): Boolean = {
+    def mustBeTuple(e: indexed.Elem): Boolean = {
       mustBeFact(e) && e.attributeOption(ContextRefEName).isEmpty
     }
 
-    def apply(e: contextaware.Elem): XbrliElem = {
+    def apply(e: indexed.Elem): XbrliElem = {
       if (mustBeFact(e)) {
         if (e.attributeOption(ContextRefEName).isDefined) new XbrliItemElem(e) else new XbrliTupleElem(e)
       } else {

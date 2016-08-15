@@ -6,7 +6,22 @@ ROAD MAP
 Towards version 1.6
 ===================
 
-Version 1.6.0 must offer a general element creation API.
+Version 1.6.0 must further simplify yaidom by removing "eager" indexed elements (replacing them by the "lazy" ones).
+The extra type parameter in the query API traits must also disappear, and querying for the ancestry of an element
+must retain the element type (for performance, this is not realistic with "eager" indexed elements, which are removed).
+
+Several experiments have been done for this version, but they have not made it into any release.
+
+For example, functional APIs (taking an element as first explicit parameter) have been tried for each corresponding
+query API trait. The OO query API traits are easier to use, so this experiment has been abandoned. So much for the
+use of type classes for yaidom query APIs.
+
+As another example, new element implementations have been tried, as an alternative to indexed elements. These elements
+would know the ancestry but not the siblings, for example. It was decided that this alternative element implementation
+offered too little bang for the buck, so this experiment has been abandoned too. Besides, yaidom should become leaner
+and meaner, not the other way around.
+
+A general element creation API is to be postponed to a later release.
 
 
 Towards version 1.5

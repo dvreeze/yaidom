@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 
 /**
- * Test case using yaidom in-context elements for XBRL schema processing.
+ * Test case using yaidom indexed elements for XBRL schema processing.
  *
  * @author Chris de Vreeze
  */

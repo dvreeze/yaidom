@@ -30,7 +30,6 @@ import org.scalatest.Ignore
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.contextaware
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
@@ -148,12 +147,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val indexedDoc = indexed.Document(doc)
 
     doQueryTest(indexedDoc.documentElement, "indexed.Elem")
-  }
-
-  @Test def testQueryContextAwareElem(): Unit = {
-    val contextawareDoc = contextaware.Document(doc)
-
-    doQueryTest(contextawareDoc.documentElement, "contextaware.Elem")
   }
 
   @Test def testQueryResolvedElem(): Unit = {
@@ -532,12 +525,6 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     val indexedDoc = indexed.Document(doc)
 
     doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
-  }
-
-  @Test def testNavigationForContextAwareElem(): Unit = {
-    val contextawareDoc = contextaware.Document(doc)
-
-    doNavigationTest(contextawareDoc.documentElement, "contextaware.Elem")
   }
 
   @Test def testNavigationForResolvedElem(): Unit = {
