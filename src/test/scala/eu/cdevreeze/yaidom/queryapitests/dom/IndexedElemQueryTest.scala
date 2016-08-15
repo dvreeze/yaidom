@@ -200,10 +200,9 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
     val db = dbf.newDocumentBuilder
     val domDoc = db.newDocument()
 
-    val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(classTag[DomElem], uriResolver)
+    val indexedElemBuilder = IndexedClarkElem
 
-    indexedElemBuilder.build(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
+    indexedElemBuilder(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

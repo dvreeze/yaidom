@@ -51,10 +51,6 @@ package eu.cdevreeze.yaidom
  * elements do not have this restriction, and can be updated in isolation. Hence the functional update support for
  * simple elements but not for the different indexed element implementations.
  *
- * If efficient functional updates on indexed elements are required, consider using the "lazy" indexed elements
- * such as `LazyIndexedClarkElem` and `LazyIndexedScopedElem` instead of the "eager" indexed elements `IndexedClarkElem`
- * and `IndexedScopedElem`. After all, creation of the lazy indexed elements is fast.
- *
  * @author Chris de Vreeze
  */
 package object indexed {

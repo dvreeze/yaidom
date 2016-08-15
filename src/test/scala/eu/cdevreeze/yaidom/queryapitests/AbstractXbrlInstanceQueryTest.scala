@@ -147,9 +147,9 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
     val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(ttag, uriResolver)
+    val indexedElemBuilder = IndexedClarkElem
 
-    val indexedInstance = indexedElemBuilder.build(xbrlInstance)
+    val indexedInstance = indexedElemBuilder(xbrlInstance)
 
     val elemsWithPaths =
       indexedInstance.findAllElemsOrSelf.map(p => (p.elem, p.path))

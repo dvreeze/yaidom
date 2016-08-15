@@ -41,12 +41,9 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  */
 final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
   val docUriOption: Option[URI],
-  val parentBaseUriOption: Option[URI],
   val rootElem: U,
-  childElems: immutable.IndexedSeq[IndexedScopedElem[U]],
   val path: Path,
-  val elem: U,
-  val uriResolver: XmlBaseSupport.UriResolver) extends Nodes.Elem with IndexedScopedElemLike[IndexedScopedElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedScopedElemLike[IndexedScopedElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
@@ -58,23 +55,35 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
    */
   private[yaidom] def assertConsistency(): Unit = {
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
-    assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
-    assert(childElems.forall(_.docUriOption eq this.docUriOption), "Corrupt element!")
   }
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = childElems
+  final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = {
+    elem.findAllChildElemsWithPathEntries map {
+      case (e, entry) =>
+        new IndexedScopedElem(docUriOption, rootElem, path.append(entry), e)
+    }
+  }
+
+  final def baseUriOption: Option[URI] = {
+    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
+  }
+
+  final def parentBaseUriOption: Option[URI] = {
+    if (path.isEmpty) {
+      docUriOption
+    } else {
+      XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path.parentPath)(XmlBaseSupport.JdkUriResolver)
+    }
+  }
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: IndexedScopedElem[U] =>
-      (other.docUriOption == docUriOption) && (other.rootElem == this.rootElem) && (other.path == this.path)
+      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
+        (other.path == this.path) && (other.elem == this.elem)
     case _ => false
   }
 
-  final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
-
-  final def baseUriOption: Option[URI] = {
-    XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
-  }
+  final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
 
   /**
    * Returns the document URI, falling back to the empty URI if absent.
@@ -89,98 +98,27 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
 
 object IndexedScopedElem {
 
-  /**
-   * Builder of `IndexedScopedElem` objects. The builder has a chosen URI resolver strategy. Typically these
-   * builders are long-lived global objects. Each element created with this builder will have the same URI resolver,
-   * viz. the one passed as constructor argument of the builder.
-   */
-  final case class Builder[U <: ScopedElemApi[U]](
-    val underlyingType: ClassTag[U],
-    override val uriResolver: XmlBaseSupport.UriResolver) extends IndexedScopedElemApi.Builder[IndexedScopedElem[U], U] {
-
-    override def build(rootElem: U): IndexedScopedElem[U] =
-      build(None, rootElem)
-
-    override def build(docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] =
-      build(docUriOption, rootElem, Path.Empty)
-
-    override def build(rootElem: U, path: Path): IndexedScopedElem[U] = {
-      build(None, rootElem, path)
-    }
-
-    /**
-     * Expensive recursive factory method for "indexed elements".
-     */
-    override def build(docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
-      // Expensive call, so invoked only once
-      val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
-        sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
-
-      val parentBaseUriOption: Option[URI] =
-        path.parentPathOption.flatMap(pp => XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, pp)(uriResolver)).orElse(docUriOption)
-
-      build(docUriOption, parentBaseUriOption, rootElem, path, elem)
-    }
-
-    private def build(
-      docUriOption: Option[URI],
-      parentBaseUriOption: Option[URI],
-      rootElem: U,
-      path: Path,
-      elem: U): IndexedScopedElem[U] = {
-
-      val baseUriOption =
-        XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
-
-      // Recursive calls
-      val childElems = elem.findAllChildElemsWithPathEntries map {
-        case (e, entry) =>
-          build(docUriOption, baseUriOption, rootElem, path.append(entry), e)
-      }
-
-      new IndexedScopedElem(docUriOption, parentBaseUriOption, rootElem, childElems, path, elem, uriResolver)
-    }
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
+    new IndexedScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem)`
-   */
-  def apply[U <: ScopedElemApi[U]: ClassTag](rootElem: U): IndexedScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem)
+  def apply[U <: ScopedElemApi[U]](docUri: URI, rootElem: U, path: Path): IndexedScopedElem[U] = {
+    apply(Some(docUri), rootElem, path)
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
-   */
-  def apply[U <: ScopedElemApi[U]: ClassTag](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)
+  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
+    new IndexedScopedElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
-   */
-  def apply[U <: ScopedElemApi[U]: ClassTag](docUri: URI, rootElem: U): IndexedScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)
+  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] = {
+    apply(docUriOption, rootElem, Path.Empty)
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
-   */
-  def apply[U <: ScopedElemApi[U]: ClassTag](rootElem: U, path: Path): IndexedScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem, path)
+  def apply[U <: ScopedElemApi[U]](docUri: URI, rootElem: U): IndexedScopedElem[U] = {
+    apply(Some(docUri), rootElem, Path.Empty)
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
-   */
-  def apply[U <: ScopedElemApi[U]: ClassTag](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)
-  }
-
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
-   */
-  def apply[U <: ScopedElemApi[U]: ClassTag](docUri: URI, rootElem: U, path: Path): IndexedScopedElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)
+  def apply[U <: ScopedElemApi[U]](rootElem: U): IndexedScopedElem[U] = {
+    apply(None, rootElem, Path.Empty)
   }
 }

@@ -85,8 +85,8 @@ object Document {
     new Document(None, Vector(documentElement))
   }
 
-  def from(d: simple.Document, uriResolver: XmlBaseSupport.UriResolver): Document = {
-    val elem = Elem.Builder(uriResolver).build(d.uriOption, d.documentElement)
+  def from(d: simple.Document): Document = {
+    val elem = IndexedScopedElem(d.uriOption, d.documentElement)
 
     val children = d.children map {
       case elm: Nodes.Elem                => elem
@@ -97,16 +97,16 @@ object Document {
   }
 
   /**
-   * Returns `from(d.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)`.
+   * Returns `from(d.withUriOption(Some(docUri)))`.
    */
   def apply(docUri: URI, d: simple.Document): Document = {
-    from(d.withUriOption(Some(docUri)), XmlBaseSupport.JdkUriResolver)
+    from(d.withUriOption(Some(docUri)))
   }
 
   /**
-   * Returns `from(d, XmlBaseSupport.JdkUriResolver)`.
+   * Returns `from(d)`.
    */
   def apply(d: simple.Document): Document = {
-    from(d, XmlBaseSupport.JdkUriResolver)
+    from(d)
   }
 }

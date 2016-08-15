@@ -38,8 +38,6 @@ import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
-import eu.cdevreeze.yaidom.indexed.LazyIndexedClarkElem
-import eu.cdevreeze.yaidom.indexed.LazyIndexedScopedElem
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
@@ -89,40 +87,12 @@ class IndexedElemTest extends Suite {
       IndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
   }
 
-  @Test def testLazyIndexedScopedElemIndexingForDomWrapperElem(): Unit = {
-    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, LazyIndexedScopedElem[DomElem]](
-      LazyIndexedScopedElem(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
-
-    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, LazyIndexedScopedElem[DomElem]](
-      LazyIndexedScopedElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
-  }
-
-  @Test def testLazyIndexedClarkElemIndexingForDomWrapperElem(): Unit = {
-    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, LazyIndexedClarkElem[DomElem]](
-      LazyIndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
-
-    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, LazyIndexedClarkElem[DomElem]](
-      LazyIndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
-  }
-
   @Test def testIndexingForScalaXmlWrapperElem(): Unit = {
     doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
       IndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement))))
 
     doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
       IndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement))))
-  }
-
-  @Test def testLazyIndexedScopedElemIndexingForScalaXmlWrapperElem(): Unit = {
-    doTestIndexing[ScalaXmlElem, LazyIndexedScopedElem[ScalaXmlElem]](
-      LazyIndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement))))
-
-    doTestIndexing[ScalaXmlElem, LazyIndexedScopedElem[ScalaXmlElem]](
-      LazyIndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement))))
   }
 
   @Test def testDoubleIndexing(): Unit = {

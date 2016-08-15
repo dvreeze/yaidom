@@ -49,7 +49,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
     val doc = docParser.parse(parsedDocUri)
 
-    indexed.Document.from(doc.withUriOption(Some(docUri)), resolveUri _)
+    indexed.Document.from(doc.withUriOption(Some(docUri)))
   }
 
   protected def getDocument(path: String): indexed.Document = {

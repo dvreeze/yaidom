@@ -111,10 +111,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
         </Magazine>
       </Bookstore>
 
-    val uriResolver = XmlBaseSupport.JdkUriResolver
-    val indexedElemBuilder = IndexedClarkElem.Builder(classTag[ScalaXmlElem], uriResolver)
-
-    indexedElemBuilder.build(ScalaXmlElem(scalaElem))
+    IndexedClarkElem(ScalaXmlElem(scalaElem))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =

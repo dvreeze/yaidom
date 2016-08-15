@@ -48,8 +48,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * memory leaks. See http://apmblog.compuware.com/2011/04/20/the-top-java-memory-problems-part-1/.)
  *
  * Having an IndexedClarkElem, it is always possible to re-create the root element as IndexedClarkElem, because
- * the underlying root element is always available. On the other hand, creating an IndexedClarkElem is expensive. Class
- * IndexedClarkElem is optimized for fast querying, at the expense of costly recursive creation.
+ * the underlying root element is always available.
  *
  * The optional parent base URI is stored for very fast (optional) base URI computation. This is helpful in
  * an XBRL context, where URI resolution against a base URI is typically a very frequent operation.
@@ -104,12 +103,9 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  */
 final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
   val docUriOption: Option[URI],
-  val parentBaseUriOption: Option[URI],
   val rootElem: U,
-  childElems: immutable.IndexedSeq[IndexedClarkElem[U]],
   val path: Path,
-  val elem: U,
-  val uriResolver: XmlBaseSupport.UriResolver) extends Nodes.Elem with IndexedClarkElemLike[IndexedClarkElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedClarkElemLike[IndexedClarkElem[U], U] {
 
   private implicit val uTag: ClassTag[U] = classTag[U]
 
@@ -121,28 +117,35 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
    */
   private[yaidom] def assertConsistency(): Unit = {
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
-    assert(childElems.map(_.elem) == elem.findAllChildElems, "Corrupt element!")
-    assert(childElems.forall(_.docUriOption eq this.docUriOption), "Corrupt element!")
   }
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = childElems
+  final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = {
+    elem.findAllChildElemsWithPathEntries map {
+      case (e, entry) =>
+        new IndexedClarkElem(docUriOption, rootElem, path.append(entry), e)
+    }
+  }
+
+  final def baseUriOption: Option[URI] = {
+    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
+  }
+
+  final def parentBaseUriOption: Option[URI] = {
+    if (path.isEmpty) {
+      docUriOption
+    } else {
+      XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path.parentPath)(XmlBaseSupport.JdkUriResolver)
+    }
+  }
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: IndexedClarkElem[U] =>
-      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) && (other.path == this.path)
+      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
+        (other.path == this.path) && (other.elem == this.elem)
     case _ => false
   }
 
-  final override def hashCode: Int = (docUriOption, rootElem, path).hashCode
-
-  final def baseUriOption: Option[URI] = {
-    XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
-  }
-
-  /**
-   * Returns the document URI, falling back to the empty URI if absent.
-   */
-  final def docUri: URI = docUriOption.getOrElse(new URI(""))
+  final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
 
   /**
    * Returns the base URI, falling back to the empty URI if absent.
@@ -152,98 +155,27 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
 
 object IndexedClarkElem {
 
-  /**
-   * Builder of `IndexedClarkElem` objects. The builder has a chosen URI resolver strategy. Typically these
-   * builders are long-lived global objects. Each element created with this builder will have the same URI resolver,
-   * viz. the one passed as constructor argument of the builder.
-   */
-  final case class Builder[U <: ClarkElemApi[U]](
-    val underlyingType: ClassTag[U],
-    override val uriResolver: XmlBaseSupport.UriResolver) extends IndexedClarkElemApi.Builder[IndexedClarkElem[U], U] {
-
-    override def build(rootElem: U): IndexedClarkElem[U] =
-      build(None, rootElem)
-
-    override def build(docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] =
-      build(docUriOption, rootElem, Path.Empty)
-
-    override def build(rootElem: U, path: Path): IndexedClarkElem[U] = {
-      build(None, rootElem, path)
-    }
-
-    /**
-     * Expensive recursive factory method for "indexed elements".
-     */
-    override def build(docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
-      // Expensive call, so invoked only once
-      val elem = rootElem.findElemOrSelfByPath(path).getOrElse(
-        sys.error(s"Could not find the element with path $path from root ${rootElem.resolvedName}"))
-
-      val parentBaseUriOption: Option[URI] =
-        path.parentPathOption.flatMap(pp => XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, pp)(uriResolver)).orElse(docUriOption)
-
-      build(docUriOption, parentBaseUriOption, rootElem, path, elem)
-    }
-
-    private def build(
-      docUriOption: Option[URI],
-      parentBaseUriOption: Option[URI],
-      rootElem: U,
-      path: Path,
-      elem: U): IndexedClarkElem[U] = {
-
-      val baseUriOption =
-        XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, elem)(uriResolver)
-
-      // Recursive calls
-      val childElems = elem.findAllChildElemsWithPathEntries map {
-        case (e, entry) =>
-          build(docUriOption, baseUriOption, rootElem, path.append(entry), e)
-      }
-
-      new IndexedClarkElem(docUriOption, parentBaseUriOption, rootElem, childElems, path, elem, uriResolver)
-    }
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
+    new IndexedClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem)`
-   */
-  def apply[U <: ClarkElemApi[U]: ClassTag](rootElem: U): IndexedClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem)
+  def apply[U <: ClarkElemApi[U]](docUri: URI, rootElem: U, path: Path): IndexedClarkElem[U] = {
+    apply(Some(docUri), rootElem, path)
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
-   */
-  def apply[U <: ClarkElemApi[U]: ClassTag](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)
+  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
+    new IndexedClarkElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
-   */
-  def apply[U <: ClarkElemApi[U]: ClassTag](docUri: URI, rootElem: U): IndexedClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)
+  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] = {
+    apply(docUriOption, rootElem, Path.Empty)
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
-   */
-  def apply[U <: ClarkElemApi[U]: ClassTag](rootElem: U, path: Path): IndexedClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(rootElem, path)
+  def apply[U <: ClarkElemApi[U]](docUri: URI, rootElem: U): IndexedClarkElem[U] = {
+    apply(Some(docUri), rootElem)
   }
 
-  /**
-   * Calls `Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
-   */
-  def apply[U <: ClarkElemApi[U]: ClassTag](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)
-  }
-
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
-   */
-  def apply[U <: ClarkElemApi[U]: ClassTag](docUri: URI, rootElem: U, path: Path): IndexedClarkElem[U] = {
-    Builder[U](classTag[U], XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)
+  def apply[U <: ClarkElemApi[U]](rootElem: U): IndexedClarkElem[U] = {
+    apply(None, rootElem, Path.Empty)
   }
 }

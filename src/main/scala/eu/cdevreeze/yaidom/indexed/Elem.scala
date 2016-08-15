@@ -31,67 +31,27 @@ import eu.cdevreeze.yaidom.simple
  */
 object Elem {
 
-  /**
-   * Builder of `Elem` objects. Somewhat more convenient than the corresponding `IndexedScopedElem` builder.
-   */
-  final case class Builder(override val uriResolver: XmlBaseSupport.UriResolver) extends IndexedScopedElemApi.Builder[Elem, simple.Elem] {
-
-    final val wrappedBuilder = IndexedScopedElem.Builder(classTag[simple.Elem], uriResolver)
-
-    override def build(rootElem: simple.Elem): Elem =
-      wrappedBuilder.build(rootElem)
-
-    override def build(docUriOption: Option[URI], rootElem: simple.Elem): Elem =
-      wrappedBuilder.build(docUriOption, rootElem)
-
-    override def build(rootElem: simple.Elem, path: Path): Elem = {
-      wrappedBuilder.build(rootElem, path)
-    }
-
-    override def build(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
-      wrappedBuilder.build(docUriOption, rootElem, path)
-    }
-  }
-
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)`
-   */
   def apply(rootElem: simple.Elem): Elem = {
-    Builder(XmlBaseSupport.JdkUriResolver).build(rootElem)
+    IndexedScopedElem(rootElem)
   }
 
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)`
-   */
   def apply(docUriOption: Option[URI], rootElem: simple.Elem): Elem = {
-    Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem)
+    IndexedScopedElem(docUriOption, rootElem)
   }
 
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)`
-   */
   def apply(docUri: URI, rootElem: simple.Elem): Elem = {
-    Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem)
+    IndexedScopedElem(docUri, rootElem)
   }
 
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)`
-   */
   def apply(rootElem: simple.Elem, path: Path): Elem = {
-    Builder(XmlBaseSupport.JdkUriResolver).build(rootElem, path)
+    IndexedScopedElem(rootElem, path)
   }
 
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)`
-   */
   def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
-    Builder(XmlBaseSupport.JdkUriResolver).build(docUriOption, rootElem, path)
+    IndexedScopedElem(docUriOption, rootElem, path)
   }
 
-  /**
-   * Calls `Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)`
-   */
   def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
-    Builder(XmlBaseSupport.JdkUriResolver).build(Some(docUri), rootElem, path)
+    IndexedScopedElem(docUri, rootElem, path)
   }
 }

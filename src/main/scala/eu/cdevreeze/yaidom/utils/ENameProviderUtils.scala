@@ -31,8 +31,6 @@ import eu.cdevreeze.yaidom.simple.Elem
  */
 object ENameProviderUtils {
 
-  private val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
-
   /**
    * Expensive method creating an ENameProvider.ENameProviderUsingImmutableCache from parsed schema roots. Each such schema root
    * is queried for element declarations, attribute declarations, etc. These declarations have "target ENames", which are
@@ -44,7 +42,7 @@ object ENameProviderUtils {
   def newENameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): ENameProvider.ENameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => SchemaRoot(indexedElemBuilder.build(e)))
+    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem(e)))
 
     val globalElemDeclENames = schemaRoots.flatMap(e => e.findAllGlobalElementDeclarations.map(_.targetEName)).toSet
 

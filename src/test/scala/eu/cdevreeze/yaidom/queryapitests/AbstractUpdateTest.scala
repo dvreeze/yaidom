@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.indexed.LazyIndexedClarkElem
+import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
@@ -96,7 +96,7 @@ abstract class AbstractUpdateTest extends Suite {
   }
 
   @Test def testUpdateElemsOrSelf(): Unit = {
-    val pathAwareClarkElem = LazyIndexedClarkElem(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
@@ -106,14 +106,14 @@ abstract class AbstractUpdateTest extends Suite {
     }
 
     assertResult(newRootElem) {
-      LazyIndexedClarkElem(newRootElem).elem
+      IndexedClarkElem(newRootElem).elem
     }
 
     checkElemAfterMeasureUpdate(newRootElem)
   }
 
   @Test def testUpdateElemsWithNodeSeqOnLazyIndexedElem(): Unit = {
-    val pathAwareClarkElem = LazyIndexedClarkElem(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
@@ -123,7 +123,7 @@ abstract class AbstractUpdateTest extends Suite {
     }
 
     assertResult(newRootElem) {
-      LazyIndexedClarkElem(newRootElem).elem
+      IndexedClarkElem(newRootElem).elem
     }
 
     checkElemAfterMeasureUpdate(newRootElem)

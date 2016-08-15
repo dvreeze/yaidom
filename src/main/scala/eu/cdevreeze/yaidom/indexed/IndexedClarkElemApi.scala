@@ -69,6 +69,12 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
   def baseUriOption: Option[URI]
 
   /**
+   * Returns the optional parent element base URI, computed from the document URI, if any, and the XML base attributes of the
+   * ancestors, if any.
+   */
+  def parentBaseUriOption: Option[URI]
+
+  /**
    * Returns the ENames of the ancestry-or-self reversed, starting with the root element and ending with this element.
    *
    * That is, returns:

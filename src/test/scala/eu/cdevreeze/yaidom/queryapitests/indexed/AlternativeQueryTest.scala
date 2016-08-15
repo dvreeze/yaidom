@@ -41,7 +41,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem
 
-  private val indexedElemBuilder = Elem.Builder(XmlBaseSupport.JdkUriResolver)
+  private val indexedElemBuilder = Elem
 
   protected val catalogElem: E = {
     val xml =
@@ -67,7 +67,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    val result = indexedElemBuilder.build(Some(new URI("http://catalog")), convertToElem(xml))
+    val result = indexedElemBuilder(Some(new URI("http://catalog")), convertToElem(xml))
 
     // Invoking some Document methods, but without altering the result
 
@@ -95,7 +95,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    indexedElemBuilder.build(Some(new URI("http://prices")), convertToElem(xml))
+    indexedElemBuilder(Some(new URI("http://prices")), convertToElem(xml))
   }
 
   protected val orderElem: E = {
@@ -109,12 +109,12 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    indexedElemBuilder.build(Some(new URI("http://order")), convertToElem(xml))
+    indexedElemBuilder(Some(new URI("http://order")), convertToElem(xml))
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    indexedElemBuilder.build(Some(new URI("http://bogus-uri")), convertToElem(elem))
+    indexedElemBuilder(Some(new URI("http://bogus-uri")), convertToElem(elem))
   }
 }
