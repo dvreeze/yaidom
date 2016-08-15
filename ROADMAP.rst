@@ -7,8 +7,10 @@ Towards version 1.6
 ===================
 
 Version 1.6.0 must further simplify yaidom by removing "eager" indexed elements (replacing them by the "lazy" ones).
-The extra type parameter in the query API traits must also disappear, and querying for the ancestry of an element
-must retain the element type (for performance, this is not realistic with "eager" indexed elements, which are removed).
+The API that had been used for "eager" indexed elements will then be used for the remaining ("lazy") indexed elements.
+
+Querying for the ancestry of an element (using the HasParentApi query API trait) must retain the element type
+(for performance, this is not realistic with "eager" indexed elements, so they must been removed).
 
 Several experiments have been done for this version, but they have not made it into any release.
 
