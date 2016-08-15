@@ -34,9 +34,6 @@ import scala.collection.immutable
  */
 trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends TransformableElemApi[N, E] { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
-  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
-
   def transformChildElems(f: E => E): E
 
   def transformChildElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
@@ -54,34 +51,5 @@ trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends 
 
   final def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E = {
     transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
-  }
-}
-
-object TransformableElemLike {
-
-  /**
-   * The `TransformableElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[N, E <: N] extends TransformableElemApi.FunctionApi[N, E] {
-
-    def transformChildElems(thisElem: E, f: E => E): E
-
-    def transformChildElemsToNodeSeq(thisElem: E, f: E => immutable.IndexedSeq[N]): E
-
-    final def transformElemsOrSelf(thisElem: E, f: E => E): E = {
-      f(transformChildElems(thisElem, e => transformElemsOrSelf(e, f)))
-    }
-
-    final def transformElems(thisElem: E, f: E => E): E =
-      transformChildElems(thisElem, e => transformElemsOrSelf(e, f))
-
-    final def transformElemsOrSelfToNodeSeq(thisElem: E, f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
-      f(transformChildElemsToNodeSeq(thisElem, e => transformElemsOrSelfToNodeSeq(e, f)))
-    }
-
-    final def transformElemsToNodeSeq(thisElem: E, f: E => immutable.IndexedSeq[N]): E = {
-      transformChildElemsToNodeSeq(thisElem, e => transformElemsOrSelfToNodeSeq(e, f))
-    }
   }
 }

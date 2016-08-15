@@ -220,9 +220,6 @@ import scala.collection.mutable
  */
 trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
-  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
-
   def findAllChildElems: immutable.IndexedSeq[E]
 
   final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems filter p
@@ -315,110 +312,5 @@ trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
   final def findElem(p: E => Boolean): Option[E] = {
     val elms = self.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
     elms.headOption
-  }
-}
-
-object ElemLike {
-
-  /**
-   * The `ElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends ElemApi.FunctionApi[E] {
-
-    def findAllChildElems(thisElem: E): immutable.IndexedSeq[E]
-
-    final def filterChildElems(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E] = {
-      findAllChildElems(thisElem) filter p
-    }
-
-    final def findChildElem(thisElem: E, p: E => Boolean): Option[E] = {
-      val result = filterChildElems(thisElem, p)
-      result.headOption
-    }
-
-    final def getChildElem(thisElem: E, p: E => Boolean): E = {
-      val result = filterChildElems(thisElem, p)
-      require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
-      result.head
-    }
-
-    final def findAllElemsOrSelf(thisElem: E): immutable.IndexedSeq[E] = {
-      val result = mutable.ArrayBuffer[E]()
-
-      // Not tail-recursive, but the depth should typically be limited
-      def accumulate(elm: E): Unit = {
-        result += elm
-        findAllChildElems(elm) foreach { e => accumulate(e) }
-      }
-
-      accumulate(thisElem)
-      result.toIndexedSeq
-    }
-
-    final def filterElemsOrSelf(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E] = {
-      val result = mutable.ArrayBuffer[E]()
-
-      // Not tail-recursive, but the depth should typically be limited
-      def accumulate(elm: E): Unit = {
-        if (p(elm)) result += elm
-        findAllChildElems(elm) foreach { e => accumulate(e) }
-      }
-
-      accumulate(thisElem)
-      result.toIndexedSeq
-    }
-
-    final def findAllElems(thisElem: E): immutable.IndexedSeq[E] = {
-      findAllChildElems(thisElem) flatMap { ch => findAllElemsOrSelf(ch) }
-    }
-
-    final def filterElems(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E] = {
-      findAllChildElems(thisElem) flatMap { ch => filterElemsOrSelf(ch, p) }
-    }
-
-    final def findTopmostElemsOrSelf(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E] = {
-      val result = mutable.ArrayBuffer[E]()
-
-      // Not tail-recursive, but the depth should typically be limited
-      def accumulate(elm: E): Unit = {
-        if (p(elm)) result += elm else {
-          findAllChildElems(elm) foreach { e => accumulate(e) }
-        }
-      }
-
-      accumulate(thisElem)
-      result.toIndexedSeq
-    }
-
-    final def findTopmostElems(thisElem: E, p: E => Boolean): immutable.IndexedSeq[E] = {
-      findAllChildElems(thisElem) flatMap { ch => findTopmostElemsOrSelf(ch, p) }
-    }
-
-    final def findElemOrSelf(thisElem: E, p: E => Boolean): Option[E] = {
-      // Not tail-recursive, but the depth should typically be limited
-      def findMatch(elm: E): Option[E] = {
-        if (p(elm)) Some(elm) else {
-          val childElms = findAllChildElems(elm)
-
-          var i = 0
-          var result: Option[E] = None
-
-          while ((result.isEmpty) && (i < childElms.size)) {
-            result = findMatch(childElms(i))
-            i += 1
-          }
-
-          result
-        }
-      }
-
-      findMatch(thisElem)
-    }
-
-    final def findElem(thisElem: E, p: E => Boolean): Option[E] = {
-      val elms = findAllChildElems(thisElem).view flatMap { ch => findElemOrSelf(ch, p) }
-      elms.headOption
-    }
   }
 }

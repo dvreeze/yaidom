@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.dom
 
-import java.net.URI
-
 import scala.collection.immutable
 
 import org.w3c
@@ -28,7 +26,6 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
@@ -265,72 +262,6 @@ object DomElem {
     else {
       // Recursive call
       elem :: getAncestorsOrSelf(parentElement)
-    }
-  }
-
-  /**
-   * Partial implementation of this element as functional API, where each method takes an (underlying) element as first parameter.
-   * This trait implements all remaining methods that are abstract in the promised public API.
-   */
-  trait FunctionApi extends ScopedElemLike.FunctionApi[w3c.dom.Element] with HasParent.FunctionApi[w3c.dom.Element] with ResolvedNodes.Elem.FunctionApi[w3c.dom.Node, w3c.dom.Element] {
-
-    final def findAllChildElems(thisElem: w3c.dom.Element): immutable.IndexedSeq[w3c.dom.Element] = {
-      children(thisElem) collect { case e: w3c.dom.Element => e }
-    }
-
-    final def resolvedName(thisElem: w3c.dom.Element): EName = {
-      // Not efficient, because of expensive Scope computation
-
-      val qn = qname(thisElem)
-      val sc = scope(thisElem)
-      sc.resolveQNameOption(qn).getOrElse(sys.error(s"Element name '${qn}' should resolve to an EName in scope [${sc}]"))
-    }
-
-    final def resolvedAttributes(thisElem: w3c.dom.Element): immutable.IndexedSeq[(EName, String)] = {
-      val attrScope = scope(thisElem).withoutDefaultNamespace
-
-      attributes(thisElem) map { kv =>
-        val attName = kv._1
-        val attValue = kv._2
-        val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
-        (expandedName -> attValue)
-      }
-    }
-
-    final def text(thisElem: w3c.dom.Element): String = {
-      val textChildren = children(thisElem) collect { case t: w3c.dom.Text => t }
-      val textStrings = textChildren map (_.getData)
-      textStrings.mkString
-    }
-
-    final def qname(thisElem: w3c.dom.Element): QName = {
-      DomConversions.toQName(thisElem)
-    }
-
-    final def attributes(thisElem: w3c.dom.Element): immutable.IndexedSeq[(QName, String)] = {
-      DomConversions.extractAttributes(thisElem.getAttributes)
-    }
-
-    final def scope(thisElem: w3c.dom.Element): Scope = {
-      val ancestryOrSelf = getAncestorsOrSelf(thisElem)
-
-      val resultScope =
-        ancestryOrSelf.foldRight(Scope.Empty) {
-          case (wrappedElem, accScope) =>
-            val decls = DomConversions.extractNamespaceDeclarations(wrappedElem.getAttributes)
-            accScope.resolve(decls)
-        }
-      resultScope
-    }
-
-    final def parentOption(thisElem: w3c.dom.Element): Option[w3c.dom.Element] = {
-      val parentNodeOption = Option(thisElem.getParentNode)
-      val parentElemOption = parentNodeOption collect { case e: w3c.dom.Element => e }
-      parentElemOption
-    }
-
-    final def children(thisElem: w3c.dom.Element): immutable.IndexedSeq[w3c.dom.Node] = {
-      DomConversions.nodeListToIndexedSeq(thisElem.getChildNodes)
     }
   }
 }

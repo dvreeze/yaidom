@@ -20,12 +20,10 @@ import java.net.URI
 
 import scala.Vector
 import scala.collection.immutable
-import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
@@ -34,10 +32,10 @@ import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
+import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.DocumentInfo
 import net.sf.saxon.om.NodeInfo
-import net.sf.saxon.`type`.Type
 import net.sf.saxon.s9api.Processor
 
 /**
@@ -227,86 +225,6 @@ trait SaxonTestSupport {
       val pref: String = nodeInfo.getPrefix
       val prefOption: Option[String] = if (pref == "") None else Some(pref)
       getQName(prefOption, nodeInfo.getLocalPart)
-    }
-  }
-
-  object DomElem {
-
-    /**
-     * Partial implementation of this element as functional API, where each method takes an (underlying) element as first parameter.
-     * This trait implements all remaining methods that are abstract in the promised public API.
-     */
-    trait FunctionApi extends ScopedElemLike.FunctionApi[NodeInfo] with HasParent.FunctionApi[NodeInfo] with ResolvedNodes.Elem.FunctionApi[NodeInfo, NodeInfo] {
-
-      final def findAllChildElems(thisElem: NodeInfo): immutable.IndexedSeq[NodeInfo] = {
-        children(thisElem) collect { case e: NodeInfo if e.getNodeKind == Type.ELEMENT => e }
-      }
-
-      final def resolvedName(thisElem: NodeInfo): EName = {
-        DomNode.nodeInfo2EName(thisElem)
-      }
-
-      final def resolvedAttributes(thisElem: NodeInfo): immutable.IndexedSeq[(EName, String)] = {
-        val it = thisElem.iterateAxis(AxisInfo.ATTRIBUTE)
-
-        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
-
-        nodes map { nodeInfo => DomNode.nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
-      }
-
-      final def text(thisElem: NodeInfo): String = {
-        val textChildren =
-          children(thisElem) collect { case e: NodeInfo if e.getNodeKind == Type.TEXT || e.getNodeKind == Type.WHITESPACE_TEXT => e }
-        val textStrings = textChildren map { t => t.getStringValue }
-        textStrings.mkString
-      }
-
-      final def qname(thisElem: NodeInfo): QName = {
-        DomNode.nodeInfo2QName(thisElem)
-      }
-
-      final def attributes(thisElem: NodeInfo): immutable.IndexedSeq[(QName, String)] = {
-        val it = thisElem.iterateAxis(AxisInfo.ATTRIBUTE)
-
-        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
-
-        nodes map { nodeInfo => DomNode.nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
-      }
-
-      final def scope(thisElem: NodeInfo): Scope = {
-        val it = thisElem.iterateAxis(AxisInfo.NAMESPACE)
-
-        val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
-
-        val resultMap = {
-          val result =
-            nodes map { nodeInfo =>
-              // Not very transparent: prefix is "display name" and namespace URI is "string value"
-              val prefix = nodeInfo.getDisplayName
-              val nsUri = nodeInfo.getStringValue
-              (prefix -> nsUri)
-            }
-          result.toMap
-        }
-
-        Scope.from(resultMap - "xml")
-      }
-
-      final def parentOption(thisElem: NodeInfo): Option[NodeInfo] = {
-        val parentNodeOption = Option(thisElem.getParent)
-        val parentElemOption = parentNodeOption collect { case e: NodeInfo if e.getNodeKind == Type.ELEMENT => e }
-        parentElemOption
-      }
-
-      final def children(thisElem: NodeInfo): immutable.IndexedSeq[NodeInfo] = {
-        if (!thisElem.hasChildNodes) Vector()
-        else {
-          val it = thisElem.iterateAxis(AxisInfo.CHILD)
-
-          val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
-          nodes
-        }
-      }
     }
   }
 }

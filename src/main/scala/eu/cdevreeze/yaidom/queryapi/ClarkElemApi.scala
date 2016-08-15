@@ -16,10 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.collection.immutable
-
-import eu.cdevreeze.yaidom.core.Path
-
 /**
  * Shorthand for `ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi`. In other words, the minimal element query API
  * corresponding to James Clark's "labelled element tree" abstraction, which is implemented as yaidom "resolved"
@@ -39,14 +35,4 @@ import eu.cdevreeze.yaidom.core.Path
  * @author Chris de Vreeze
  */
 trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi { self: E =>
-}
-
-object ClarkElemApi {
-
-  /**
-   * The `ClarkElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends ElemApi.FunctionApi[E] with IsNavigableApi.FunctionApi[E] with HasENameApi.FunctionApi[E] with HasTextApi.FunctionApi[E] {
-  }
 }

@@ -31,9 +31,6 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike[E] with IsNavigable[E] with HasEName with HasText { self: E =>
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
-  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
-
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
    *
@@ -80,47 +77,6 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
       val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
       nextEntries.put(ename, entry.index + 1)
       (e, entry)
-    }
-  }
-}
-
-object ClarkElemLike {
-
-  /**
-   * The `ClarkElemLike` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends ClarkElemApi.FunctionApi[E] with ElemLike.FunctionApi[E] with IsNavigable.FunctionApi[E] with HasEName.FunctionApi[E] with HasText.FunctionApi[E] {
-
-    final override def findChildElemByPathEntry(thisElem: E, entry: Path.Entry): Option[E] = {
-      // The previous implementation used immutable.IndexedSeq.toStream, which turned out to be surprisingly inefficient.
-      // This inefficiency was noticed when calling method IsNavigable.findReverseAncestryOrSelfByPath
-      // (and therefore this method) many times. Thanks to Johan Walters for pointing out this performance issue.
-
-      var sameENameIdx = 0
-      val childElemOption = findAllChildElems(thisElem) find { e =>
-        val ename = resolvedName(e)
-        if (ename == entry.elementName) {
-          if (entry.index == sameENameIdx) true
-          else {
-            sameENameIdx += 1
-            false
-          }
-        } else false
-      }
-      assert(childElemOption.forall(c => resolvedName(c) == entry.elementName))
-      childElemOption
-    }
-
-    final override def findAllChildElemsWithPathEntries(thisElem: E): immutable.IndexedSeq[(E, Path.Entry)] = {
-      val nextEntries = mutable.Map[EName, Int]()
-
-      findAllChildElems(thisElem) map { e =>
-        val ename = resolvedName(e)
-        val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
-        nextEntries.put(ename, entry.index + 1)
-        (e, entry)
-      }
     }
   }
 }

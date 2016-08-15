@@ -38,19 +38,3 @@ trait HasTextApi {
   /** Returns `XmlStringUtils.normalizeString(text)`. */
   def normalizedText: String
 }
-
-object HasTextApi {
-
-  /**
-   * The `HasTextApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] {
-
-    def text(thisElem: E): String
-
-    def trimmedText(thisElem: E): String
-
-    def normalizedText(thisElem: E): String
-  }
-}

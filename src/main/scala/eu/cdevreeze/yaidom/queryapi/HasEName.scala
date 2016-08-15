@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 
 /**
@@ -28,9 +26,6 @@ import eu.cdevreeze.yaidom.core.EName
  * @author Chris de Vreeze
  */
 trait HasEName extends HasENameApi {
-
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
-  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   /**
    * The local name, that is, the local part of the EName
@@ -62,31 +57,4 @@ trait HasEName extends HasENameApi {
    * Shorthand for `attributeOption(expandedName)`.
    */
   final def \@(expandedName: EName): Option[String] = attributeOption(expandedName)
-}
-
-object HasEName {
-
-  /**
-   * The `HasEName` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends HasENameApi.FunctionApi[E] {
-
-    def resolvedName(thisElem: E): EName
-
-    def resolvedAttributes(thisElem: E): immutable.Iterable[(EName, String)]
-
-    final def localName(thisElem: E): String = resolvedName(thisElem).localPart
-
-    final def attributeOption(thisElem: E, expandedName: EName): Option[String] = {
-      resolvedAttributes(thisElem) find { case (en, v) => (en == expandedName) } map (_._2)
-    }
-
-    final def attribute(thisElem: E, expandedName: EName): String =
-      attributeOption(thisElem, expandedName).getOrElse(sys.error(s"Missing attribute $expandedName"))
-
-    final def findAttributeByLocalName(thisElem: E, localName: String): Option[String] = {
-      resolvedAttributes(thisElem) find { case (en, v) => en.localPart == localName } map (_._2)
-    }
-  }
 }

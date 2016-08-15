@@ -34,9 +34,6 @@ import eu.cdevreeze.yaidom.core.Path
  */
 final class ElemWithPath[E <: IsNavigableApi[E]](val elem: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
 
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
-  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
-
   final override def findAllChildElems: immutable.IndexedSeq[ElemWithPath[E]] = {
     elem.findAllChildElemsWithPathEntries map {
       case (che, pathEntry) =>
@@ -50,20 +47,4 @@ object ElemWithPath {
   def apply[E <: IsNavigableApi[E]](elem: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elem, path)
 
   def apply[E <: IsNavigableApi[E]](elem: E): ElemWithPath[E] = new ElemWithPath[E](elem, Path.Empty)
-
-  /**
-   * The `ElemWithPath` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends ElemLike.FunctionApi[(E, Path)] {
-
-    def underlyingElementFunctionApi: IsNavigableApi.FunctionApi[E]
-
-    final override def findAllChildElems(thisElem: (E, Path)): immutable.IndexedSeq[(E, Path)] = {
-      underlyingElementFunctionApi.findAllChildElemsWithPathEntries(thisElem._1) map {
-        case (che, pathEntry) =>
-          (che, thisElem._2.append(pathEntry))
-      }
-    }
-  }
 }

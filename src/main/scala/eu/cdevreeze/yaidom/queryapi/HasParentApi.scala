@@ -62,25 +62,3 @@ trait HasParentApi[E <: HasParentApi[E]] { self: E =>
    */
   def findAncestor(p: E => Boolean): Option[E]
 }
-
-object HasParentApi {
-
-  /**
-   * The `HasParentApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] {
-
-    def parentOption(thisElem: E): Option[E]
-
-    def parent(thisElem: E): E
-
-    def ancestorsOrSelf(thisElem: E): immutable.IndexedSeq[E]
-
-    def ancestors(thisElem: E): immutable.IndexedSeq[E]
-
-    def findAncestorOrSelf(thisElem: E, p: E => Boolean): Option[E]
-
-    def findAncestor(thisElem: E, p: E => Boolean): Option[E]
-  }
-}

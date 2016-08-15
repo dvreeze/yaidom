@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import scala.Vector
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Path
@@ -33,9 +34,6 @@ import eu.cdevreeze.yaidom.core.Path
  * @author Chris de Vreeze
  */
 trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
-
-  // Implementation note: this is not DRY because it is pretty much the same code as in the corresponding potential type class.
-  // Yet I did not want to depend on a val or def returning the appropriate type class instance, so chose for code repetition.
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
 
@@ -77,57 +75,5 @@ trait IsNavigable[E <: IsNavigable[E]] extends IsNavigableApi[E] { self: E =>
 
   final def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[E] = {
     findReverseAncestryOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $self"))
-  }
-}
-
-object IsNavigable {
-
-  /**
-   * The `IsNavigable` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends IsNavigableApi.FunctionApi[E] {
-
-    def findAllChildElemsWithPathEntries(thisElem: E): immutable.IndexedSeq[(E, Path.Entry)]
-
-    def findChildElemByPathEntry(thisElem: E, entry: Path.Entry): Option[E]
-
-    final def getChildElemByPathEntry(thisElem: E, entry: Path.Entry): E =
-      findChildElemByPathEntry(thisElem, entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $thisElem"))
-
-    final def findElemOrSelfByPath(thisElem: E, path: Path): Option[E] = {
-      findReverseAncestryOrSelfByPath(thisElem, path).map(_.last)
-    }
-
-    final def getElemOrSelfByPath(thisElem: E, path: Path): E =
-      findElemOrSelfByPath(thisElem, path).getOrElse(sys.error(s"Expected existing path $path from root $thisElem"))
-
-    final def findReverseAncestryOrSelfByPath(thisElem: E, path: Path): Option[immutable.IndexedSeq[E]] = {
-      // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
-
-      val entryCount = path.entries.size
-
-      def findReverseAncestryOrSelfByPath(
-        currentRoot: E,
-        entryIndex: Int,
-        reverseAncestry: immutable.IndexedSeq[E]): Option[immutable.IndexedSeq[E]] = {
-
-        assert(entryIndex >= 0 && entryIndex <= entryCount)
-
-        if (entryIndex == entryCount) Some(reverseAncestry :+ currentRoot) else {
-          val newRootOption: Option[E] = findChildElemByPathEntry(currentRoot, path.entries(entryIndex))
-          // Recursive call. Not tail-recursive, but recursion depth should be limited.
-          newRootOption flatMap { newRoot =>
-            findReverseAncestryOrSelfByPath(newRoot, entryIndex + 1, reverseAncestry :+ currentRoot)
-          }
-        }
-      }
-
-      findReverseAncestryOrSelfByPath(thisElem, 0, Vector())
-    }
-
-    final def getReverseAncestryOrSelfByPath(thisElem: E, path: Path): immutable.IndexedSeq[E] = {
-      findReverseAncestryOrSelfByPath(thisElem, path).getOrElse(sys.error(s"Expected existing path $path from root $thisElem"))
-    }
   }
 }

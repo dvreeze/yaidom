@@ -105,37 +105,3 @@ trait SubtypeAwareElemApi[A <: SubtypeAwareElemApi[A]] extends ElemApi[A] { self
    */
   def getChildElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): B
 }
-
-object SubtypeAwareElemApi {
-
-  /**
-   * The `SubtypeAwareElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[A] extends ElemApi.FunctionApi[A] {
-
-    def findAllChildElemsOfType[B <: A](thisElem: A, subType: ClassTag[B]): immutable.IndexedSeq[B]
-
-    def filterChildElemsOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
-
-    def findAllElemsOfType[B <: A](thisElem: A, subType: ClassTag[B]): immutable.IndexedSeq[B]
-
-    def filterElemsOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
-
-    def findAllElemsOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B]): immutable.IndexedSeq[B]
-
-    def filterElemsOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
-
-    def findChildElemOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): Option[B]
-
-    def findElemOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): Option[B]
-
-    def findElemOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): Option[B]
-
-    def findTopmostElemsOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
-
-    def findTopmostElemsOrSelfOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
-
-    def getChildElemOfType[B <: A](thisElem: A, subType: ClassTag[B])(p: B => Boolean): B
-  }
-}

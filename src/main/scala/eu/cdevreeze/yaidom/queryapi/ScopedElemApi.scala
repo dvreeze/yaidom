@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 
@@ -89,14 +88,4 @@ trait ScopedElemApi[E <: ScopedElemApi[E]] extends ClarkElemApi[E] with HasQName
 
   /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
   def textAsResolvedQName: EName
-}
-
-object ScopedElemApi {
-
-  /**
-   * The `ScopedElemApi` as potential type class trait. Each of the functions takes "this" element as first parameter.
-   * Custom element implementations such as W3C DOM or Saxon NodeInfo can thus get this API without any wrapper object costs.
-   */
-  trait FunctionApi[E] extends ClarkElemApi.FunctionApi[E] with HasQNameApi.FunctionApi[E] with HasScopeApi.FunctionApi[E] {
-  }
 }
