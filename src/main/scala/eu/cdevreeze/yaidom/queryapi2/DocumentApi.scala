@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi
+package eu.cdevreeze.yaidom.queryapi2
 
-import eu.cdevreeze.yaidom.XmlStringUtils
+import java.net.URI
 
 /**
- * Trait partly implementing the contract for elements as text containers.
- * Typical element types are both an [[eu.cdevreeze.yaidom.queryapi.ElemLike]] as well as a [[eu.cdevreeze.yaidom.queryapi.HasText]].
+ * Minimal API for Documents, having a type parameter for the element type.
+ *
+ * This is a purely abstract API trait. It can be useful in generic code abstracting over multiple element implementations.
  *
  * @author Chris de Vreeze
  */
-trait HasText extends HasTextApi {
+trait DocumentApi extends AnyDocumentApi {
 
-  /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  type ThisDocApi <: DocumentApi
 
-  /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  /** Returns the document element */
+  def documentElement: DocElemType
+
+  /** Returns the optional document URI, wrapped in an Option */
+  def uriOption: Option[URI]
 }

@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi
+package eu.cdevreeze.yaidom.queryapi2
 
-import eu.cdevreeze.yaidom.XmlStringUtils
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.QName
 
 /**
- * Trait partly implementing the contract for elements as text containers.
- * Typical element types are both an [[eu.cdevreeze.yaidom.queryapi.ElemLike]] as well as a [[eu.cdevreeze.yaidom.queryapi.HasText]].
+ * Trait defining the contract for elements that have a QName, as well as attributes with QName keys.
+ *
+ * Using this trait (possibly in combination with other "element traits") we can abstract over several element implementations.
  *
  * @author Chris de Vreeze
  */
-trait HasText extends HasTextApi {
+trait HasQNameApi {
 
-  /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  /**
+   * The QName of the element
+   */
+  def qname: QName
 
-  /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  /**
+   * The attributes of the element as mapping from QNames to values
+   */
+  def attributes: immutable.Iterable[(QName, String)]
 }

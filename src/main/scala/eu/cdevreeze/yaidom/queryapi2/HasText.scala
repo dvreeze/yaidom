@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi
+package eu.cdevreeze.yaidom.queryapi2
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 

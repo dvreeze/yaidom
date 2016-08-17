@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi
-
-import eu.cdevreeze.yaidom.XmlStringUtils
+package eu.cdevreeze.yaidom.queryapi2
 
 /**
- * Trait partly implementing the contract for elements as text containers.
- * Typical element types are both an [[eu.cdevreeze.yaidom.queryapi.ElemLike]] as well as a [[eu.cdevreeze.yaidom.queryapi.HasText]].
+ * Super-trait for all element query API traits that know about the node super-type.
  *
  * @author Chris de Vreeze
  */
-trait HasText extends HasTextApi {
+trait AnyElemNodeApi extends AnyElemApi {
 
-  /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  type ThisNode
 
-  /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  type ThisElem <: ThisElemApi with ThisNode
 }

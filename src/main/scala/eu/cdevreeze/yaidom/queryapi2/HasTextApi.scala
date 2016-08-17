@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi
-
-import eu.cdevreeze.yaidom.XmlStringUtils
+package eu.cdevreeze.yaidom.queryapi2
 
 /**
- * Trait partly implementing the contract for elements as text containers.
+ * Trait defining the contract for elements as text containers.
  * Typical element types are both an [[eu.cdevreeze.yaidom.queryapi.ElemLike]] as well as a [[eu.cdevreeze.yaidom.queryapi.HasText]].
  *
  * @author Chris de Vreeze
  */
-trait HasText extends HasTextApi {
+trait HasTextApi {
+
+  /**
+   * Returns the concatenation of the text values of (the implicit) text children, including whitespace and CData.
+   * Non-text children are ignored. If there are no text children, the empty string is returned.
+   *
+   * Therefore, element children are ignored and do not contribute to the resulting text string.
+   */
+  def text: String
 
   /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  def trimmedText: String
 
   /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  def normalizedText: String
 }
