@@ -23,18 +23,5 @@ package eu.cdevreeze.yaidom.queryapi2
  */
 trait AnyDocumentApi {
 
-  // The 2 type members below are instrumental in implementing F-bounded polymorphism.
-  // Type ThisElemApi must always be a sub-type of the API trait or concrete element type in question.
-  // Type ThisElem (the "real self type") must be a sub-type of ThisElemApi everywhere.
-  // Note that we need no surrounding cake, and we need no types like ThisApi#ThisElem.
-
-  // For F-bounded polymorphism in DOT, see http://www.cs.uwm.edu/~boyland/fool2012/papers/fool2012_submission_3.pdf.
-
   type DocElemType <: AnyElemApi
-
-  type ThisDocApi <: AnyDocumentApi
-
-  type ThisDoc <: ThisDocApi
-
-  def self: ThisDoc
 }
