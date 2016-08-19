@@ -32,12 +32,11 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * of elements and paths. This could be seen as that API, re-using `ElemApi` instead of adding an extra API similar to it.
  * These `IndexedClarkElemApi` objects "are" the above-mentioned pairs of elements and paths.
  *
- * @tparam E The element type itself
- * @tparam U The underlying element type
- *
  * @author Chris de Vreeze
  */
-trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] extends ClarkElemApi[E] { self: E =>
+trait IndexedClarkElemApi extends AnyIndexedClarkElemApi with ClarkElemApi {
+
+  type ThisElemApi <: IndexedClarkElemApi
 
   /**
    * The optional document URI of the containing document, if any
@@ -47,7 +46,7 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
   /**
    * The root element of the underlying element type
    */
-  def rootElem: U
+  def rootElem: UnderlyingElem
 
   /**
    * The path of this element, relative to the root element
@@ -60,7 +59,7 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
    * rootElem.getElemOrSelfByPath(path)
    * }}}
    */
-  def elem: U
+  def elem: UnderlyingElem
 
   /**
    * Returns the optional base URI, computed from the document URI, if any, and the XML base attributes of the
@@ -105,16 +104,21 @@ trait IndexedClarkElemApi[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] 
    * rootElem.findReverseAncestryOrSelfByPath(path).get
    * }}}
    */
-  def reverseAncestryOrSelf: immutable.IndexedSeq[U]
+  def reverseAncestryOrSelf: immutable.IndexedSeq[UnderlyingElem]
 }
 
 object IndexedClarkElemApi {
+
+  type Aux[A, B] = IndexedClarkElemApi {
+    type ThisElem = A
+    type UnderlyingElem = B
+  }
 
   /**
    * API of builders of `IndexedClarkElemApi` objects. These builders keep a URI resolver for XML Base support.
    * Builder instances should be thread-safe global objects, encapsulating one chosen URI resolver.
    */
-  trait Builder[E <: IndexedClarkElemApi[E, U], U <: ClarkElemApi[U]] {
+  trait Builder[E <: IndexedClarkElemApi.Aux[E, U], U <: ClarkElemApi.Aux[U]] {
 
     def uriResolver: XmlBaseSupport.UriResolver
 

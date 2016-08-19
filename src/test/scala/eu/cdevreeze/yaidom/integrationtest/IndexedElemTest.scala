@@ -116,7 +116,7 @@ class IndexedElemTest extends Suite {
     }
   }
 
-  private def doTestIndexing[U <: ResolvedNodes.Elem with ClarkElemApi[U], E <: IndexedClarkElemApi[E, U]](rootElem: E): Unit = {
+  private def doTestIndexing[U <: ResolvedNodes.Elem with ClarkElemApi.Aux[U], E <: IndexedClarkElemApi.Aux[E, U]](rootElem: E): Unit = {
     assertResult(List("product", "number", "size")) {
       rootElem.findAllElemsOrSelf.map(_.localName)
     }

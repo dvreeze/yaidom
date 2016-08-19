@@ -541,7 +541,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doNavigationTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
-  private def doQueryTest[E <: ClarkElemLike[E]](elm: E, msg: String): Unit = {
+  private def doQueryTest[E <: ClarkElemLike.Aux[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -559,7 +559,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms ($msg)")
   }
 
-  private def doNavigationTest[E <: ClarkElemLike[E]](elm: E, msg: String): Unit = {
+  private def doNavigationTest[E <: ClarkElemLike.Aux[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)

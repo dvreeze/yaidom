@@ -37,26 +37,26 @@ import eu.cdevreeze.yaidom.core.Path
  * findElemOrSelfByPath(path1).flatMap(e => e.findElemOrSelfByPath(path2)) == findElemOrSelfByPath(path1.append(path2))
  * }}}
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
+trait IsNavigableApi extends AnyElemApi {
+
+  type ThisElemApi <: IsNavigableApi
 
   /**
    * Returns all child elements paired with their path entries.
    */
-  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)]
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)]
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
    *
    * Typically this method must be very efficient, in order for methods like findElemOrSelfByPath to be efficient.
    */
-  def findChildElemByPathEntry(entry: Path.Entry): Option[E]
+  def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem]
 
   /** Returns (the equivalent of) `findChildElemByPathEntry(entry).get` */
-  def getChildElemByPathEntry(entry: Path.Entry): E
+  def getChildElemByPathEntry(entry: Path.Entry): ThisElem
 
   /**
    * Finds the element with the given `Path` (where this element is the root), if any, wrapped in an `Option`.
@@ -71,10 +71,10 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
    * findElemOrSelfByPath(path) == findChildElemByPathEntry(path.firstEntry) flatMap (e => e.findElemOrSelfByPath(path.withoutFirstEntry))
    * }}}
    */
-  def findElemOrSelfByPath(path: Path): Option[E]
+  def findElemOrSelfByPath(path: Path): Option[ThisElem]
 
   /** Returns (the equivalent of) `findElemOrSelfByPath(path).get` */
-  def getElemOrSelfByPath(path: Path): E
+  def getElemOrSelfByPath(path: Path): ThisElem
 
   /**
    * Finds the reversed ancestry-or-self of the element with the given `Path` (where this element is the root),
@@ -85,8 +85,13 @@ trait IsNavigableApi[E <: IsNavigableApi[E]] { self: E =>
    *
    * This method comes in handy for (efficiently) computing base URIs, where the (reverse) ancestry-or-self is needed as input.
    */
-  def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[E]]
+  def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[ThisElem]]
 
   /** Returns (the equivalent of) `findReverseAncestryOrSelfByPath(path).get` */
-  def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[E]
+  def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[ThisElem]
+}
+
+object IsNavigableApi {
+
+  type Aux[A] = IsNavigableApi { type ThisElem = A }
 }

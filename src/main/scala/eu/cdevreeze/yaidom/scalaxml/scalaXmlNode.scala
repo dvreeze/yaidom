@@ -75,9 +75,17 @@ sealed trait CanBeScalaXmlDocumentChild extends ScalaXmlNode with Nodes.CanBeDoc
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemLike[ScalaXmlElem] { self =>
+  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemLike {
 
   require(wrappedNode ne null)
+
+  type ThisNode = ScalaXmlNode
+
+  type ThisElemApi = ScalaXmlElem
+
+  type ThisElem = ScalaXmlElem
+
+  def thisElem: ThisElem = this
 
   override type DomType = scala.xml.Elem
 

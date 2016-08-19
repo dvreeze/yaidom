@@ -44,7 +44,7 @@ import eu.cdevreeze.yaidom.simple.Text
 abstract class AbstractUpdateTest extends Suite {
 
   type N <: ResolvedNodes.Node
-  type E <: N with ResolvedNodes.Elem with ClarkElemApi[E] with UpdatableElemApi[N, E] with TransformableElemApi[N, E]
+  type E <: N with ResolvedNodes.Elem with ClarkElemApi.Aux[E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]
 
   implicit val clsTag: ClassTag[E]
 

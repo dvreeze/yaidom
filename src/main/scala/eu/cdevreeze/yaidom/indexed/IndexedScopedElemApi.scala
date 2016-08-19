@@ -22,12 +22,11 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 /**
  * Abstract API for "indexed Scoped elements".
  *
- * @tparam E The element type itself
- * @tparam U The underlying element type
- *
  * @author Chris de Vreeze
  */
-trait IndexedScopedElemApi[E <: IndexedScopedElemApi[E, U], U <: ScopedElemApi[U]] extends IndexedClarkElemApi[E, U] with ScopedElemApi[E] { self: E =>
+trait IndexedScopedElemApi extends IndexedClarkElemApi with ScopedElemApi {
+
+  type ThisElemApi <: IndexedScopedElemApi
 
   /**
    * Returns the namespaces declared in this element.
@@ -41,10 +40,15 @@ trait IndexedScopedElemApi[E <: IndexedScopedElemApi[E, U], U <: ScopedElemApi[U
 
 object IndexedScopedElemApi {
 
+  type Aux[A, B] = IndexedScopedElemApi {
+    type ThisElem = A
+    type UnderlyingElem = B
+  }
+
   /**
    * API of builders of `IndexedScopedElemApi` objects. These builders keep a URI resolver for XML Base support.
    * Builder instances should be thread-safe global objects, encapsulating one chosen URI resolver.
    */
-  trait Builder[E <: IndexedScopedElemApi[E, U], U <: ScopedElemApi[U]] extends IndexedClarkElemApi.Builder[E, U] {
+  trait Builder[E <: IndexedScopedElemApi.Aux[E, U], U <: ScopedElemApi.Aux[U]] extends IndexedClarkElemApi.Builder[E, U] {
   }
 }

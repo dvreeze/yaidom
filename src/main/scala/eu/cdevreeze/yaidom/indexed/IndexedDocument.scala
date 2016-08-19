@@ -35,9 +35,9 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  *
  * @author Chris de Vreeze
  */
-abstract class IndexedDocument[U <: ScopedElemApi[U]](
+abstract class IndexedDocument(
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends DocumentApi[IndexedScopedElem[U]] with Immutable {
+  val children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends DocumentApi with Immutable { self =>
 
   require(xmlDeclarationOption ne null)
   require(children ne null)
@@ -47,13 +47,19 @@ abstract class IndexedDocument[U <: ScopedElemApi[U]](
     s"A document must have exactly one child element")
 
   require(
-    children.collect({ case elm: IndexedScopedElem[U] => elm }).size == 1,
+    children.collect({ case elm: IndexedScopedElem[_] => elm }).size == 1,
     s"A document must have exactly one (IndexedScopedElem) child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
   require(documentElement.path == Path.Empty, "The document element must have the root Path")
 
-  final def documentElement: IndexedScopedElem[U] =
-    children.collect({ case elm: IndexedScopedElem[U] => elm }).head
+  type ThisDocApi <: IndexedDocument
+
+  type UnderlyingElem <: ScopedElemApi.Aux[UnderlyingElem]
+
+  type DocElemType = IndexedScopedElem[UnderlyingElem]
+
+  final def documentElement: DocElemType =
+    children.collect({ case elm: IndexedScopedElem[_] => elm }).head.asInstanceOf[DocElemType]
 
   final def processingInstructions: immutable.IndexedSeq[Nodes.ProcessingInstruction] =
     children.collect({ case pi: Nodes.ProcessingInstruction => pi })
@@ -68,13 +74,13 @@ abstract class IndexedDocument[U <: ScopedElemApi[U]](
    */
   final def uri: URI = uriOption.getOrElse(new URI(""))
 
-  def document: DocumentApi[U]
+  def document: DocumentApi.Aux[UnderlyingElem]
 
   final override def toString: String = document.toString
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
-  def withDocumentElement(newRoot: IndexedScopedElem[U]): IndexedDocument[U]
+  def withDocumentElement(newRoot: DocElemType): ThisDoc
 
   /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
-  def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): IndexedDocument[U]
+  def withXmlDeclarationOption(newXmlDeclarationOption: Option[XmlDeclaration]): ThisDoc
 }

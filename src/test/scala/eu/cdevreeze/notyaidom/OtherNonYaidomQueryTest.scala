@@ -999,7 +999,7 @@ object OtherNonYaidomQueryTest {
 
     type ThisElem <: ThisApi
 
-    def self: ThisElem
+    def thisElem: ThisElem
   }
 
   trait ElemApi extends AnyElemApi {
@@ -1026,7 +1026,7 @@ object OtherNonYaidomQueryTest {
     // Note that ThisElem is used both in the filter functions and in the return type
 
     final def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
-      Vector(self).filter(p) ++ findAllChildElems.flatMap(e => e.filterElemsOrSelf(p))
+      Vector(thisElem).filter(p) ++ findAllChildElems.flatMap(e => e.filterElemsOrSelf(p))
     }
 
     final def findAllElemsOrSelf(): immutable.IndexedSeq[ThisElem] = {
@@ -1057,7 +1057,7 @@ object OtherNonYaidomQueryTest {
     def this(name: String, children: immutable.IndexedSeq[Node]) =
       this(name, Map(), children)
 
-    def self: Elem = this
+    def thisElem: Elem = this
 
     def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[Elem] =
       children collect { case e: Elem if p(e) => e }

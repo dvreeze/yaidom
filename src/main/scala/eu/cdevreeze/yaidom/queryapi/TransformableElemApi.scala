@@ -103,12 +103,11 @@ import scala.collection.immutable
  * }
  * }}}
  *
- * @tparam N The node supertype of the element subtype
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E =>
+trait TransformableElemApi extends AnyElemNodeApi {
+
+  type ThisElemApi <: TransformableElemApi
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
@@ -124,7 +123,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * withChildren(newChildren)
    * }}}
    */
-  def transformChildElems(f: E => E): E
+  def transformChildElems(f: ThisElem => ThisElem): ThisElem
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
@@ -140,7 +139,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * withChildren(newChildren)
    * }}}
    */
-  def transformChildElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
+  def transformChildElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner.
@@ -155,7 +154,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * f(transformElems(f))
    * }}}
    */
-  def transformElemsOrSelf(f: E => E): E
+  def transformElemsOrSelf(f: ThisElem => ThisElem): ThisElem
 
   /**
    * Transforms the element by applying the given function to all its descendant elements, in a bottom-up manner.
@@ -165,7 +164,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * transformChildElems (e => e.transformElemsOrSelf(f))
    * }}}
    */
-  def transformElems(f: E => E): E
+  def transformElems(f: ThisElem => ThisElem): ThisElem
 
   /**
    * Transforms each descendant element to a node sequence by applying the given function to all its descendant-or-self elements,
@@ -181,7 +180,7 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * f(transformElemsToNodeSeq(f))
    * }}}
    */
-  def transformElemsOrSelfToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+  def transformElemsOrSelfToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): immutable.IndexedSeq[ThisNode]
 
   /**
    * Transforms each descendant element to a node sequence by applying the given function to all its descendant elements,
@@ -197,5 +196,13 @@ trait TransformableElemApi[N, E <: N with TransformableElemApi[N, E]] { self: E 
    * transformElemsOrSelf { e => e.transformChildElemsToNodeSeq(che => f(che)) }
    * }}}
    */
-  def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
+  def transformElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem
+}
+
+object TransformableElemApi {
+
+  type Aux[A, B] = TransformableElemApi {
+    type ThisNode = A
+    type ThisElem = B
+  }
 }

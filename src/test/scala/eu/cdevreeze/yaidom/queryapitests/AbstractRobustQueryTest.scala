@@ -39,7 +39,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  */
 abstract class AbstractRobustQueryTest extends Suite {
 
-  type E <: ClarkElemLike[E]
+  type E <: ClarkElemLike.Aux[E]
 
   private val expectedNames = Vector(
     "John Doe",

@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  */
 abstract class AbstractXbrlInstanceQueryTest extends Suite {
 
-  type E <: ClarkElemLike[E]
+  type E <: ClarkElemLike.Aux[E]
 
   implicit val ttag: ClassTag[E] = classTag[E]
 

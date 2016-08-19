@@ -30,24 +30,25 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 /**
  * Partial implementation of the abstract API for "indexed Scoped elements".
  *
- * @tparam E The element type itself
- * @tparam U The underlying element type
- *
  * @author Chris de Vreeze
  */
-trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi[U]] extends IndexedScopedElemApi[E, U] with IndexedClarkElemLike[E, U] with ScopedElemLike[E] { self: E =>
+trait IndexedScopedElemLike extends IndexedScopedElemApi with IndexedClarkElemLike with ScopedElemLike {
+
+  type ThisElemApi <: IndexedScopedElemLike
+
+  type UnderlyingElemApi <: ScopedElemApi.Aux[UnderlyingElem]
 
   def docUriOption: Option[URI]
 
-  def rootElem: U
+  def rootElem: UnderlyingElem
 
   def path: Path
 
-  def elem: U
+  def elem: UnderlyingElem
 
   def baseUriOption: Option[URI]
 
-  def findAllChildElems: immutable.IndexedSeq[E]
+  def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
   final override def qname: QName = elem.qname
 
@@ -58,5 +59,13 @@ trait IndexedScopedElemLike[E <: IndexedScopedElemLike[E, U], U <: ScopedElemApi
   final def namespaces: Declarations = {
     val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
     parentScope.relativize(this.elem.scope)
+  }
+}
+
+object IndexedScopedElemLike {
+
+  type Aux[A, B] = IndexedScopedElemLike {
+    type ThisElem = A
+    type UnderlyingElem = B
   }
 }

@@ -782,8 +782,10 @@ object JDomWrapperTest {
     final override def toString: String = wrappedNode.toString
   }
 
-  final class JDomDocument(val wrappedNode: org.jdom2.Document) extends DocumentApi[JDomElem] {
+  final class JDomDocument(val wrappedNode: org.jdom2.Document) extends DocumentApi {
     require(wrappedNode ne null)
+
+    type DocElemType = JDomElem
 
     def uriOption: Option[URI] = Option(wrappedNode.getBaseURI).map(s => URI.create(s))
 
@@ -796,11 +798,17 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with ScopedElemLike[JDomElem] with HasParent[JDomElem] { self =>
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
+    type ThisElemApi = JDomElem
+
+    type ThisElem = JDomElem
+
     override type DomType = org.jdom2.Element
+
+    def thisElem: ThisElem = this
 
     final def children: immutable.IndexedSeq[JDomNode] = {
       val childList = wrappedNode.getContent.asScala.toIndexedSeq

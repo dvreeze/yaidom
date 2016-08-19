@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi2
+package eu.cdevreeze.yaidom.queryapi
 
 /**
  * Super-trait for all element query API traits, promising a self type.
@@ -34,5 +34,5 @@ trait AnyElemApi {
 
   type ThisElem <: ThisElemApi
 
-  def self: ThisElem
+  def thisElem: ThisElem
 }

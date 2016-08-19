@@ -43,7 +43,7 @@ sealed trait EditableClarkElem extends Any {
 
   type N
 
-  type E <: N with ClarkElemApi[E]
+  type E <: N with ClarkElemApi.Aux[E]
 
   def toElem: E
 

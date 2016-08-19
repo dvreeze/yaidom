@@ -167,7 +167,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     /**
      * The unwrapped backing element type, for example `simple.Elem`
      */
-    type UnwrappedBackingElem <: ClarkElemApi[UnwrappedBackingElem]
+    type UnwrappedBackingElem <: ClarkElemApi.Aux[UnwrappedBackingElem]
 
     def rootElem: UnwrappedBackingElem
 
@@ -180,7 +180,13 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    * Super-class of elements in an ODS spreadsheet content.xml file. It offers the `SubtypeAwareElemApi` API, among
    * other query API traits.
    */
-  sealed class SpreadsheetElem(val bridgeElem: IndexedBridgeElem) extends ScopedElemLike[SpreadsheetElem] with SubtypeAwareElemLike[SpreadsheetElem] {
+  sealed class SpreadsheetElem(val bridgeElem: IndexedBridgeElem) extends ScopedElemLike with SubtypeAwareElemLike {
+
+    type ThisElemApi = SpreadsheetElem
+
+    type ThisElem = SpreadsheetElem
+
+    def thisElem: ThisElem = this
 
     final def findAllChildElems: immutable.IndexedSeq[SpreadsheetElem] =
       bridgeElem.findAllChildElems.map(e => SpreadsheetElem(e))

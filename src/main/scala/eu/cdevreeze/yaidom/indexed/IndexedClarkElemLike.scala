@@ -28,24 +28,25 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 /**
  * Partial implementation of the abstract API for "indexed elements".
  *
- * @tparam E The element type itself
- * @tparam U The underlying element type
- *
  * @author Chris de Vreeze
  */
-trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]] extends IndexedClarkElemApi[E, U] with ClarkElemLike[E] { self: E =>
+trait IndexedClarkElemLike extends IndexedClarkElemApi with ClarkElemLike {
+
+  type ThisElemApi <: IndexedClarkElemLike
+
+  type UnderlyingElemApi <: ClarkElemApi.Aux[UnderlyingElem]
 
   def docUriOption: Option[URI]
 
-  def rootElem: U
+  def rootElem: UnderlyingElem
 
   def path: Path
 
-  def elem: U
+  def elem: UnderlyingElem
 
   def baseUriOption: Option[URI]
 
-  def findAllChildElems: immutable.IndexedSeq[E]
+  def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
   final def resolvedName: EName = elem.resolvedName
 
@@ -62,13 +63,21 @@ trait IndexedClarkElemLike[E <: IndexedClarkElemLike[E, U], U <: ClarkElemApi[U]
     reverseAncestryOrSelfENames.dropRight(1)
   }
 
-  final def reverseAncestryOrSelf: immutable.IndexedSeq[U] = {
+  final def reverseAncestryOrSelf: immutable.IndexedSeq[UnderlyingElem] = {
     val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
 
     assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
     assert(!resultOption.get.isEmpty, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
-    assert(resultOption.get.last == self.elem)
+    assert(resultOption.get.last == thisElem.elem)
 
     resultOption.get
+  }
+}
+
+object IndexedClarkElemLike {
+
+  type Aux[A, B] = IndexedClarkElemLike {
+    type ThisElem = A
+    type UnderlyingElem = B
   }
 }

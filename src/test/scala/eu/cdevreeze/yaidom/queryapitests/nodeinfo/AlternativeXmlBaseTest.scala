@@ -45,7 +45,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTe
 
   type E2 = DomElem
 
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E] = {
+  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[E] = {
     val docPrinter = DocumentPrinterUsingDom.newInstance
     val xmlString = docPrinter.print(elem)
 

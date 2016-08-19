@@ -19,8 +19,6 @@ package eu.cdevreeze.yaidom.indexed
 import java.net.URI
 
 import scala.collection.immutable
-import scala.reflect.ClassTag
-import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
@@ -97,17 +95,23 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * Analogous properties hold for the other query methods.
  *
- * @tparam U The underlying element type
- *
  * @author Chris de Vreeze
  */
-final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
+final class IndexedClarkElem[U <: ClarkElemApi.Aux[U]] private (
   val docUriOption: Option[URI],
   val rootElem: U,
   val path: Path,
-  val elem: U) extends Nodes.Elem with IndexedClarkElemLike[IndexedClarkElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedClarkElemLike {
 
-  private implicit val uTag: ClassTag[U] = classTag[U]
+  type ThisElemApi = IndexedClarkElem[U]
+
+  type ThisElem = IndexedClarkElem[U]
+
+  def thisElem: ThisElem = this
+
+  type UnderlyingElemApi = U
+
+  type UnderlyingElem = U
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -119,7 +123,7 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
   }
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedClarkElem[U]] = {
+  final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
     elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
         new IndexedClarkElem(docUriOption, rootElem, path.append(entry), e)
@@ -155,27 +159,27 @@ final class IndexedClarkElem[U <: ClarkElemApi[U]] private (
 
 object IndexedClarkElem {
 
-  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
     new IndexedClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ClarkElemApi[U]](docUri: URI, rootElem: U, path: Path): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, rootElem: U, path: Path): IndexedClarkElem[U] = {
     apply(Some(docUri), rootElem, path)
   }
 
-  def apply[U <: ClarkElemApi[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi.Aux[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
     new IndexedClarkElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ClarkElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] = {
     apply(docUriOption, rootElem, Path.Empty)
   }
 
-  def apply[U <: ClarkElemApi[U]](docUri: URI, rootElem: U): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, rootElem: U): IndexedClarkElem[U] = {
     apply(Some(docUri), rootElem)
   }
 
-  def apply[U <: ClarkElemApi[U]](rootElem: U): IndexedClarkElem[U] = {
+  def apply[U <: ClarkElemApi.Aux[U]](rootElem: U): IndexedClarkElem[U] = {
     apply(None, rootElem, Path.Empty)
   }
 }

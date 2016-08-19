@@ -43,7 +43,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  */
 abstract class AbstractElemLikeQueryTest extends Suite {
 
-  type E <: ClarkElemLike[E]
+  type E <: ClarkElemLike.Aux[E]
 
   @Test def testQueryBookTitles(): Unit = {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title

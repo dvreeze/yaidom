@@ -139,7 +139,13 @@ object XbrlInstanceValidationTest {
    *
    * Creating this class hierarchy is an effort, but it is a one-time effort potentially paying off very many times.
    */
-  sealed class XbrliElem(val underlyingElem: indexed.Elem) extends ScopedElemLike[XbrliElem] with SubtypeAwareElemLike[XbrliElem] {
+  sealed class XbrliElem(val underlyingElem: indexed.Elem) extends ScopedElemLike with SubtypeAwareElemLike {
+
+    type ThisElemApi = XbrliElem
+
+    type ThisElem = XbrliElem
+
+    def thisElem: ThisElem = this
 
     def findAllChildElems: immutable.IndexedSeq[XbrliElem] = {
       underlyingElem.findAllChildElems.map(e => XbrliElem(e))

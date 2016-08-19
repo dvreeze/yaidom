@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractScopedElemLikeQueryTest extends Suite {
 
-  type E <: ScopedElemLike[E]
+  type E <: ScopedElemLike.Aux[E]
 
   val XsNamespace = "http://www.w3.org/2001/XMLSchema"
 

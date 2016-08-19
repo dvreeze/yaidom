@@ -115,7 +115,7 @@ final class ElemBuilder(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike[ElemBuilder] with TransformableElemLike[NodeBuilder, ElemBuilder] with HasQNameApi with HasText { self =>
+  val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi with HasText {
 
   require(qname ne null)
   require(attributes ne null)
@@ -123,6 +123,14 @@ final class ElemBuilder(
   require(children ne null)
 
   require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
+
+  type ThisNode = NodeBuilder
+
+  type ThisElemApi = ElemBuilder
+
+  type ThisElem = ElemBuilder
+
+  def thisElem: ThisElem = this
 
   type NodeType = Elem
 
@@ -193,8 +201,8 @@ final class ElemBuilder(
     copy(children = newChildren)
   }
 
-  /** Returns `withChildren(self.children :+ newChild)`. */
-  def plusChild(newChild: NodeBuilder): ElemBuilder = withChildren(self.children :+ newChild)
+  /** Returns `withChildren(thisElem.children :+ newChild)`. */
+  def plusChild(newChild: NodeBuilder): ElemBuilder = withChildren(thisElem.children :+ newChild)
 
   /**
    * Returns true if parentScope suffices to build an `Elem`, that is, if `build(parentScope)` returns an `Elem` instead of

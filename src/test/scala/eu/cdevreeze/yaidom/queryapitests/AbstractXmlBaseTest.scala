@@ -41,13 +41,13 @@ abstract class AbstractXmlBaseTest extends Suite {
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"
 
-  type E <: ScopedElemApi[E]
+  type E <: ScopedElemApi.Aux[E]
 
   type E2 <: HasENameApi
 
-  protected def getDocument(path: String, docUri: URI): DocumentApi[E]
+  protected def getDocument(path: String, docUri: URI): DocumentApi.Aux[E]
 
-  protected def getDocument(path: String): DocumentApi[E]
+  protected def getDocument(path: String): DocumentApi.Aux[E]
 
   protected def getBaseUri(elem: E): URI
 

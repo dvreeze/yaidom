@@ -90,23 +90,23 @@ object HasENameApi {
   /**
    * Making ElemApi filter/find methods accept ENames which are implicitly converted to element predicates.
    */
-  implicit class ToHasElemApi(val ename: EName) extends (ElemApi[_] with HasENameApi => Boolean) {
+  implicit class ToHasElemApi(val ename: EName) extends (ElemApi with HasENameApi => Boolean) {
 
-    def apply(elem: ElemApi[_] with HasENameApi): Boolean =
+    def apply(elem: ElemApi with HasENameApi): Boolean =
       (elem.resolvedName == this.ename)
   }
 
   /**
    * Returns the equivalent of `{ _.ename == ename }`
    */
-  def withEName(ename: EName): (ElemApi[_] with HasENameApi => Boolean) = { elem =>
+  def withEName(ename: EName): (ElemApi with HasENameApi => Boolean) = { elem =>
     elem.resolvedName == ename
   }
 
   /**
    * Returns the equivalent of `{ _.ename == EName(namespaceOption, localPart) }`, but without creating any EName instance.
    */
-  def withEName(namespaceOption: Option[String], localPart: String): (ElemApi[_] with HasENameApi => Boolean) = { elem =>
+  def withEName(namespaceOption: Option[String], localPart: String): (ElemApi with HasENameApi => Boolean) = { elem =>
     val resolvedName = elem.resolvedName
     (resolvedName.namespaceUriOption == namespaceOption) && (resolvedName.localPart == localPart)
   }
@@ -114,19 +114,19 @@ object HasENameApi {
   /**
    * Returns the equivalent of `withEName(Some(namespace), localPart)`
    */
-  def withEName(namespace: String, localPart: String): (ElemApi[_] with HasENameApi => Boolean) =
+  def withEName(namespace: String, localPart: String): (ElemApi with HasENameApi => Boolean) =
     withEName(Some(namespace), localPart)
 
   /**
    * Returns the equivalent of `withEName(None, localPart)`
    */
-  def withNoNsEName(localPart: String): (ElemApi[_] with HasENameApi => Boolean) =
+  def withNoNsEName(localPart: String): (ElemApi with HasENameApi => Boolean) =
     withEName(None, localPart)
 
   /**
    * Returns the equivalent of `{ _.localName == localName }`
    */
-  def withLocalName(localName: String): (ElemApi[_] with HasENameApi => Boolean) = { elem =>
+  def withLocalName(localName: String): (ElemApi with HasENameApi => Boolean) = { elem =>
     elem.localName == localName
   }
 }

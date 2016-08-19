@@ -38,7 +38,13 @@ private[utils] object XmlSchemas {
   /**
    * Any element in an xs:schema (including xs:schema itself).
    */
-  sealed class XsdElem private[utils] (val elem: indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with ClarkElemLike[XsdElem] {
+  sealed class XsdElem private[utils] (val elem: indexed.Elem) extends SubtypeAwareElemLike with ClarkElemLike {
+
+    type ThisElemApi = XsdElem
+
+    type ThisElem = XsdElem
+
+    def thisElem: ThisElem = this
 
     final override def findAllChildElems: immutable.IndexedSeq[XsdElem] = {
       elem.findAllChildElems.map(e => XsdElem(e))

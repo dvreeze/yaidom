@@ -56,11 +56,11 @@ import eu.cdevreeze.yaidom.core.QName
  * resolvedAttrs.toMap == this.resolvedAttributes.toMap
  * }}}
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait ScopedElemApi[E <: ScopedElemApi[E]] extends ClarkElemApi[E] with HasQNameApi with HasScopeApi { self: E =>
+trait ScopedElemApi extends ClarkElemApi with HasQNameApi with HasScopeApi {
+
+  type ThisElemApi <: ScopedElemApi
 
   /**
    * Returns the QName value of the attribute with the given expanded name, if any, wrapped in an `Option`.
@@ -88,4 +88,9 @@ trait ScopedElemApi[E <: ScopedElemApi[E]] extends ClarkElemApi[E] with HasQName
 
   /** Returns the equivalent of `scope.resolveQNameOption(textAsQName).get` */
   def textAsResolvedQName: EName
+}
+
+object ScopedElemApi {
+
+  type Aux[A] = ScopedElemApi { type ThisElem = A }
 }

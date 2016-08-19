@@ -54,8 +54,8 @@ object XmlBaseSupport {
    * Computes the optional base URI, given an optional document URI, the root element, and the Path from the root
    * element to "this" element. A URI resolution strategy must be provided as well.
    */
-  def findBaseUriByDocUriAndPath[E <: ClarkElemApi[E]](docUriOption: Option[URI], rootElem: E, path: Path)(resolveUri: UriResolver): Option[URI] = {
-    val reverseAncestryOrSelf: immutable.IndexedSeq[E] =
+  def findBaseUriByDocUriAndPath(docUriOption: Option[URI], rootElem: ClarkElemApi, path: Path)(resolveUri: UriResolver): Option[URI] = {
+    val reverseAncestryOrSelf: immutable.IndexedSeq[ClarkElemApi] =
       rootElem.findReverseAncestryOrSelfByPath(path).getOrElse(
         sys.error(s"Corrupt data. Could not get reverse ancestry-or-self of ${rootElem.getElemOrSelfByPath(path)}"))
 
@@ -70,7 +70,7 @@ object XmlBaseSupport {
   /**
    * Returns the optional base URI, given an optional parent base URI, and "this" element. A URI resolution strategy must be provided as well.
    */
-  def findBaseUriByParentBaseUri[E <: ClarkElemApi[E]](parentBaseUriOption: Option[URI], elem: E)(resolveUri: UriResolver): Option[URI] = {
+  def findBaseUriByParentBaseUri(parentBaseUriOption: Option[URI], elem: ClarkElemApi)(resolveUri: UriResolver): Option[URI] = {
     val baseUriAttributeOption = elem.attributeOption(XmlBaseEName).map(s => new URI(s))
     baseUriAttributeOption.map(bu => resolveUri(bu, parentBaseUriOption)).orElse(parentBaseUriOption)
   }

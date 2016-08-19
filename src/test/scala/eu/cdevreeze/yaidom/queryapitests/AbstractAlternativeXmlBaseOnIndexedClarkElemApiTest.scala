@@ -51,8 +51,8 @@ abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends Suite
   private val XLinkNs = "http://www.w3.org/1999/xlink"
   private val XLinkHrefEName = EName(XLinkNs, "href")
 
-  type U <: ClarkElemApi[U]
-  type E <: IndexedClarkElemApi[E, U]
+  type U <: ClarkElemApi.Aux[U]
+  type E <: IndexedClarkElemApi.Aux[E, U]
 
   // Naive resolveUri method
   protected def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {

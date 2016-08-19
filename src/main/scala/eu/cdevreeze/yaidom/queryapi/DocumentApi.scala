@@ -23,15 +23,22 @@ import java.net.URI
  *
  * This is a purely abstract API trait. It can be useful in generic code abstracting over multiple element implementations.
  *
- * @tparam E The element type
- *
  * @author Chris de Vreeze
  */
-trait DocumentApi[E <: ElemApi[E]] {
+trait DocumentApi extends AnyDocumentApi {
+
+  type ThisDocApi <: DocumentApi
 
   /** Returns the document element */
-  def documentElement: E
+  def documentElement: DocElemType
 
   /** Returns the optional document URI, wrapped in an Option */
   def uriOption: Option[URI]
+}
+
+object DocumentApi {
+
+  type Aux[A] = DocumentApi {
+    type DocElemType = A
+  }
 }

@@ -70,9 +70,11 @@ trait SaxonTestSupport {
     final override def hashCode: Int = this.wrappedNode.hashCode
   }
 
-  final class DomDocument(val wrappedNode: DocumentInfo) extends DocumentApi[DomElem] {
+  final class DomDocument(val wrappedNode: DocumentInfo) extends DocumentApi {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.DOCUMENT)
+
+    type DocElemType = DomElem
 
     def uriOption: Option[URI] = Option(wrappedNode.getSystemId).map(s => URI.create(s))
 
@@ -92,10 +94,16 @@ trait SaxonTestSupport {
   }
 
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
+
+    type ThisElemApi = DomElem
+
+    type ThisElem = DomElem
+
+    def thisElem: ThisElem = this
 
     override def findAllChildElems: immutable.IndexedSeq[DomElem] = children collect { case e: DomElem => e }
 

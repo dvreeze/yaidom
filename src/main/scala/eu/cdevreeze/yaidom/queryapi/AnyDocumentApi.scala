@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi2
+package eu.cdevreeze.yaidom.queryapi
 
 /**
- * Super-trait for all element query API traits that know about the node super-type.
+ * Super-trait for all document types, promising an element type for the document element.
  *
  * @author Chris de Vreeze
  */
-trait AnyElemNodeApi extends AnyElemApi {
+trait AnyDocumentApi {
 
-  type ThisNode
+  type ThisDocApi <: AnyDocumentApi
 
-  type ThisElem <: ThisElemApi with ThisNode
+  type ThisDoc <: ThisDocApi
+
+  type DocElemType <: AnyElemApi
 }

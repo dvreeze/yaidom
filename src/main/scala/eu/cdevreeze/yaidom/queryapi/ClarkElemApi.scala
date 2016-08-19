@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.queryapi
 
 /**
- * Shorthand for `ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi`. In other words, the minimal element query API
+ * Shorthand for `ElemApi with IsNavigableApi with HasENameApi with HasTextApi`. In other words, the minimal element query API
  * corresponding to James Clark's "labelled element tree" abstraction, which is implemented as yaidom "resolved"
  * elements.
  *
@@ -30,9 +30,14 @@ package eu.cdevreeze.yaidom.queryapi
  * '''Generic code abstracting over yaidom element implementations should either use
  * this trait, or sub-trait `ScopedElemApi`, depending on the abstraction level.'''
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait ClarkElemApi[E <: ClarkElemApi[E]] extends ElemApi[E] with IsNavigableApi[E] with HasENameApi with HasTextApi { self: E =>
+trait ClarkElemApi extends ElemApi with IsNavigableApi with HasENameApi with HasTextApi {
+
+  type ThisElemApi <: ClarkElemApi
+}
+
+object ClarkElemApi {
+
+  type Aux[A] = ClarkElemApi { type ThisElem = A }
 }

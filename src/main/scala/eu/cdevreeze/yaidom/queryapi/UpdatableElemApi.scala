@@ -177,18 +177,17 @@ import eu.cdevreeze.yaidom.core.Path
  * entire API, and practice with it. Always keep in mind that functional updates typically mess up formatting and/or namespace
  * (un)declarations, unless these aspects are taken into account.
  *
- * @tparam N The node supertype of the element subtype
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigableApi[E] { self: E =>
+trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
+
+  type ThisElemApi <: UpdatableElemApi
 
   /** Returns the child nodes of this element, in the correct order */
-  def children: immutable.IndexedSeq[N]
+  def children: immutable.IndexedSeq[ThisNode]
 
   /** Returns an element with the same name, attributes and scope as this element, but with the given child nodes */
-  def withChildren(newChildren: immutable.IndexedSeq[N]): E
+  def withChildren(newChildren: immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Filters the child elements with the given path entries, and returns a Map from the path entries of those filtered
@@ -206,13 +205,13 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
   def childNodeIndex(pathEntry: Path.Entry): Int
 
   /** Shorthand for `withChildren(newChildSeqs.flatten)` */
-  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[N]]): E
+  def withChildSeqs(newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[ThisNode]]): ThisElem
 
   /** Shorthand for `withChildren(children.updated(index, newChild))` */
-  def withUpdatedChildren(index: Int, newChild: N): E
+  def withUpdatedChildren(index: Int, newChild: ThisNode): ThisElem
 
   /** Shorthand for `withChildren(children.patch(from, newChildren, replace))` */
-  def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[N], replace: Int): E
+  def withPatchedChildren(from: Int, newChildren: immutable.IndexedSeq[ThisNode], replace: Int): ThisElem
 
   /**
    * Returns a copy in which the given child has been inserted at the given position (0-based).
@@ -220,31 +219,31 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * Afterwards, the resulting element indeed has the given child at position `index` (0-based).
    */
-  def plusChild(index: Int, child: N): E
+  def plusChild(index: Int, child: ThisNode): ThisElem
 
   /** Returns a copy in which the given child has been inserted at the end */
-  def plusChild(child: N): E
+  def plusChild(child: ThisNode): ThisElem
 
   /**
    * Returns a copy in which the given child, if any, has been inserted at the given position (0-based).
    * That is, returns `plusChild(index, childOption.get)` if the given optional child element is non-empty.
    */
-  def plusChildOption(index: Int, childOption: Option[N]): E
+  def plusChildOption(index: Int, childOption: Option[ThisNode]): ThisElem
 
   /**
    * Returns a copy in which the given child, if any, has been inserted at the end.
    * That is, returns `plusChild(childOption.get)` if the given optional child element is non-empty.
    */
-  def plusChildOption(childOption: Option[N]): E
+  def plusChildOption(childOption: Option[ThisNode]): ThisElem
 
   /** Returns a copy in which the given children have been inserted at the end */
-  def plusChildren(childSeq: immutable.IndexedSeq[N]): E
+  def plusChildren(childSeq: immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Returns a copy in which the child at the given position (0-based) has been removed.
    * Throws an exception if `index >= children.size`.
    */
-  def minusChild(index: Int): E
+  def minusChild(index: Int): ThisElem
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -255,10 +254,10 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * updateChildElems(Set(pathEntry)) { case (che, pe) => f(che) }
    * }}}
    */
-  def updateChildElem(pathEntry: Path.Entry)(f: E => E): E
+  def updateChildElem(pathEntry: Path.Entry)(f: ThisElem => ThisElem): ThisElem
 
   /** Returns `updateChildElem(pathEntry) { e => newElem }` */
-  def updateChildElem(pathEntry: Path.Entry, newElem: E): E
+  def updateChildElem(pathEntry: Path.Entry, newElem: ThisElem): ThisElem
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -269,10 +268,10 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * updateChildElemsWithNodeSeq(Set(pathEntry)) { case (che, pe) => f(che) }
    * }}}
    */
-  def updateChildElemWithNodeSeq(pathEntry: Path.Entry)(f: E => immutable.IndexedSeq[N]): E
+  def updateChildElemWithNodeSeq(pathEntry: Path.Entry)(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem
 
   /** Returns `updateChildElemWithNodeSeq(pathEntry) { e => newNodes }` */
-  def updateChildElemWithNodeSeq(pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[N]): E
+  def updateChildElemWithNodeSeq(pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -283,10 +282,10 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * updateElemsOrSelf(Set(path)) { case (e, path) => f(e) }
    * }}}
    */
-  def updateElemOrSelf(path: Path)(f: E => E): E
+  def updateElemOrSelf(path: Path)(f: ThisElem => ThisElem): ThisElem
 
   /** Returns `updateElemOrSelf(path) { e => newElem }` */
-  def updateElemOrSelf(path: Path, newElem: E): E
+  def updateElemOrSelf(path: Path, newElem: ThisElem): ThisElem
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function to the element
@@ -298,10 +297,10 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * updateElemsWithNodeSeq(Set(path)) { case (e, path) => f(e) }
    * }}}
    */
-  def updateElemWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
+  def updateElemWithNodeSeq(path: Path)(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem
 
   /** Returns `updateElemWithNodeSeq(path) { e => newNodes }` */
-  def updateElemWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
+  def updateElemWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Updates the child elements with the given path entries, applying the passed update function.
@@ -313,7 +312,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * If the set of path entries is small, this method is rather efficient.
    */
-  def updateChildElems(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
+  def updateChildElems(pathEntries: Set[Path.Entry])(f: (ThisElem, Path.Entry) => ThisElem): ThisElem
 
   /**
    * '''Updates the child elements with the given path entries''', applying the passed update function.
@@ -330,7 +329,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *   // Updating in reverse order of indexes, in order not to invalidate the path entries
    *   val newChildren = indexesByPathEntries.reverse.foldLeft(self.children) {
    *     case (accChildNodes, (pathEntry, idx)) =>
-   *       val che = accChildNodes(idx).asInstanceOf[E]
+   *       val che = accChildNodes(idx).asInstanceOf[ThisElem]
    *       accChildNodes.patch(idx, f(che, pathEntry), 1)
    *   }
    *   self.withChildren(newChildren)
@@ -339,7 +338,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * If the set of path entries is small, this method is rather efficient.
    */
-  def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
+  def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (ThisElem, Path.Entry) => immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Updates the descendant-or-self elements with the given paths, applying the passed update function.
@@ -369,7 +368,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElemsOrSelf(paths: Set[Path])(f: (E, Path) => E): E
+  def updateElemsOrSelf(paths: Set[Path])(f: (ThisElem, Path) => ThisElem): ThisElem
 
   /**
    * Updates the descendant elements with the given paths, applying the passed update function.
@@ -389,7 +388,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElems(paths: Set[Path])(f: (E, Path) => E): E
+  def updateElems(paths: Set[Path])(f: (ThisElem, Path) => ThisElem): ThisElem
 
   /**
    * Updates the descendant-or-self elements with the given paths, applying the passed update function.
@@ -419,7 +418,7 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): immutable.IndexedSeq[N]
+  def updateElemsOrSelfWithNodeSeq(paths: Set[Path])(f: (ThisElem, Path) => immutable.IndexedSeq[ThisNode]): immutable.IndexedSeq[ThisNode]
 
   /**
    * Updates the descendant elements with the given paths, applying the passed update function.
@@ -439,23 +438,23 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElemsWithNodeSeq(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
+  def updateElemsWithNodeSeq(paths: Set[Path])(f: (ThisElem, Path) => immutable.IndexedSeq[ThisNode]): ThisElem
 
   /**
    * Invokes `updateChildElems`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
-   * val editsByPathEntries: Map[Path.Entry, E] =
+   * val editsByPathEntries: Map[Path.Entry, ThisElem] =
    *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
    *
    * updateChildElems(editsByPathEntries.keySet) { case (che, pe) => editsByPathEntries.getOrElse(pe, che) }
    * }}}
    */
-  def updateChildElems(f: (E, Path.Entry) => Option[E]): E
+  def updateChildElems(f: (ThisElem, Path.Entry) => Option[ThisElem]): ThisElem
 
   /**
    * Invokes `updateChildElemsWithNodeSeq`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
-   * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[N]] =
+   * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[ThisNode]] =
    *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
    *
    * updateChildElemsWithNodeSeq(editsByPathEntries.keySet) { case (che, pe) =>
@@ -463,12 +462,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }
    * }}}
    */
-  def updateChildElemsWithNodeSeq(f: (E, Path.Entry) => Option[immutable.IndexedSeq[N]]): E
+  def updateChildElemsWithNodeSeq(f: (ThisElem, Path.Entry) => Option[immutable.IndexedSeq[ThisNode]]): ThisElem
 
   /**
    * Invokes `updateElemsOrSelf`, passing the topmost paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val mutableEditsByPaths = mutable.Map[Path, E]()
+   * val mutableEditsByPaths = mutable.Map[Path, ThisElem]()
    *
    * val foundElems =
    *   ElemWithPath(self) findTopmostElemsOrSelf { elm =>
@@ -486,12 +485,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }
    * }}}
    */
-  def updateTopmostElemsOrSelf(f: (E, Path) => Option[E]): E
+  def updateTopmostElemsOrSelf(f: (ThisElem, Path) => Option[ThisElem]): ThisElem
 
   /**
    * Invokes `updateElems`, passing the topmost non-empty paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val mutableEditsByPaths = mutable.Map[Path, E]()
+   * val mutableEditsByPaths = mutable.Map[Path, ThisElem]()
    *
    * val foundElems =
    *   ElemWithPath(self) findTopmostElems { elm =>
@@ -509,12 +508,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }
    * }}}
    */
-  def updateTopmostElems(f: (E, Path) => Option[E]): E
+  def updateTopmostElems(f: (ThisElem, Path) => Option[ThisElem]): ThisElem
 
   /**
    * Invokes `updateElemsOrSelfWithNodeSeq`, passing the topmost paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
+   * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[ThisNode]]()
    *
    * val foundElems =
    *   ElemWithPath(self) findTopmostElemsOrSelf { elm =>
@@ -532,12 +531,12 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }
    * }}}
    */
-  def updateTopmostElemsOrSelfWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): immutable.IndexedSeq[N]
+  def updateTopmostElemsOrSelfWithNodeSeq(f: (ThisElem, Path) => Option[immutable.IndexedSeq[ThisNode]]): immutable.IndexedSeq[ThisNode]
 
   /**
    * Invokes `updateElemsWithNodeSeq`, passing the topmost non-empty paths for which the passed function is defined. It is equivalent to:
    * {{{
-   * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[N]]()
+   * val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[ThisNode]]()
    *
    * val foundElems =
    *   ElemWithPath(self) findTopmostElems { elm =>
@@ -555,32 +554,13 @@ trait UpdatableElemApi[N, E <: N with UpdatableElemApi[N, E]] extends IsNavigabl
    * }
    * }}}
    */
-  def updateTopmostElemsWithNodeSeq(f: (E, Path) => Option[immutable.IndexedSeq[N]]): E
+  def updateTopmostElemsWithNodeSeq(f: (ThisElem, Path) => Option[immutable.IndexedSeq[ThisNode]]): ThisElem
+}
 
-  @deprecated(message = "Renamed to 'updateChildElem'", since = "1.5.0")
-  def updated(pathEntry: Path.Entry)(f: E => E): E
+object UpdatableElemApi {
 
-  @deprecated(message = "Renamed to 'updateChildElems'", since = "1.5.0")
-  def updatedAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => E): E
-
-  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
-  def updated(path: Path)(f: E => E): E
-
-  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
-  def updated(path: Path, newElem: E): E
-
-  @deprecated(message = "Renamed to 'updateElemsOrSelf'", since = "1.5.0")
-  def updatedAtPaths(paths: Set[Path])(f: (E, Path) => E): E
-
-  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path)(f: E => immutable.IndexedSeq[N]): E
-
-  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[N]): E
-
-  @deprecated(message = "Renamed to 'updateChildElemsWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeqAtPathEntries(pathEntries: Set[Path.Entry])(f: (E, Path.Entry) => immutable.IndexedSeq[N]): E
-
-  @deprecated(message = "Renamed to 'updateElemsWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeqAtPaths(paths: Set[Path])(f: (E, Path) => immutable.IndexedSeq[N]): E
+  type Aux[A, B] = UpdatableElemApi {
+    type ThisNode = A
+    type ThisElem = B
+  }
 }

@@ -29,8 +29,10 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  *
  * @author Chris de Vreeze
  */
-final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends DocumentApi[ScalaXmlElem] {
+final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends DocumentApi {
   require(wrappedDocument ne null)
+
+  type DocElemType = ScalaXmlElem
 
   final def children: immutable.IndexedSeq[CanBeScalaXmlDocumentChild] = {
     wrappedDocument.children.toIndexedSeq flatMap { node =>

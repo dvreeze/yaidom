@@ -19,8 +19,6 @@ package eu.cdevreeze.yaidom.indexed
 import java.net.URI
 
 import scala.collection.immutable
-import scala.reflect.ClassTag
-import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.Nodes
@@ -35,17 +33,23 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * The optional parent base URI is stored for very fast (optional) base URI computation. This is helpful in
  * an XBRL context, where URI resolution against a base URI is typically a very frequent operation.
  *
- * @tparam U The underlying element type
- *
  * @author Chris de Vreeze
  */
-final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
+final class IndexedScopedElem[U <: ScopedElemApi.Aux[U]] private (
   val docUriOption: Option[URI],
   val rootElem: U,
   val path: Path,
-  val elem: U) extends Nodes.Elem with IndexedScopedElemLike[IndexedScopedElem[U], U] {
+  val elem: U) extends Nodes.Elem with IndexedScopedElemLike {
 
-  private implicit val uTag: ClassTag[U] = classTag[U]
+  type ThisElemApi = IndexedScopedElem[U]
+
+  type ThisElem = IndexedScopedElem[U]
+
+  def thisElem: ThisElem = this
+
+  type UnderlyingElemApi = U
+
+  type UnderlyingElem = U
 
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
@@ -57,7 +61,7 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
     assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
   }
 
-  final def findAllChildElems: immutable.IndexedSeq[IndexedScopedElem[U]] = {
+  final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
     elem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
         new IndexedScopedElem(docUriOption, rootElem, path.append(entry), e)
@@ -98,27 +102,27 @@ final class IndexedScopedElem[U <: ScopedElemApi[U]] private (
 
 object IndexedScopedElem {
 
-  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
     new IndexedScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ScopedElemApi[U]](docUri: URI, rootElem: U, path: Path): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, rootElem: U, path: Path): IndexedScopedElem[U] = {
     apply(Some(docUri), rootElem, path)
   }
 
-  def apply[U <: ScopedElemApi[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi.Aux[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
     new IndexedScopedElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ScopedElemApi[U]](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] = {
     apply(docUriOption, rootElem, Path.Empty)
   }
 
-  def apply[U <: ScopedElemApi[U]](docUri: URI, rootElem: U): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, rootElem: U): IndexedScopedElem[U] = {
     apply(Some(docUri), rootElem, Path.Empty)
   }
 
-  def apply[U <: ScopedElemApi[U]](rootElem: U): IndexedScopedElem[U] = {
+  def apply[U <: ScopedElemApi.Aux[U]](rootElem: U): IndexedScopedElem[U] = {
     apply(None, rootElem, Path.Empty)
   }
 }

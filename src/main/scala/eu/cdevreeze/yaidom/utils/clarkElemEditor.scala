@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.simple
 sealed trait ClarkElemEditor {
 
   type N
-  type E <: N with ClarkElemApi[E]
+  type E <: N with ClarkElemApi.Aux[E]
 
   def wrap(elem: E): EditableClarkElem
 }

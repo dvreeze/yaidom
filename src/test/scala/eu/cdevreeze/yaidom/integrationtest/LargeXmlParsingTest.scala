@@ -145,7 +145,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement)
   }
 
-  private def doQueryTest[E <: ClarkElemLike[E]](elm: E): Unit = {
+  private def doQueryTest[E <: ClarkElemLike.Aux[E]](elm: E): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")

@@ -214,88 +214,88 @@ import scala.collection.mutable
  * implementations of the above-mentioned methods (in particular the first 3 ones), we either lose the ordering of result elements
  * in document order (depth-first), or we lose performance and/or clarity. That just is not worth it.
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
+trait ElemLike extends ElemApi {
 
-  def findAllChildElems: immutable.IndexedSeq[E]
+  type ThisElemApi <: ElemLike
 
-  final def filterChildElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems filter p
+  def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
-  final def \(p: E => Boolean): immutable.IndexedSeq[E] = filterChildElems(p)
+  final def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = findAllChildElems filter p
 
-  final def findChildElem(p: E => Boolean): Option[E] = {
+  final def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = filterChildElems(p)
+
+  final def findChildElem(p: ThisElem => Boolean): Option[ThisElem] = {
     val result = filterChildElems(p)
     result.headOption
   }
 
-  final def getChildElem(p: E => Boolean): E = {
+  final def getChildElem(p: ThisElem => Boolean): ThisElem = {
     val result = filterChildElems(p)
     require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
     result.head
   }
 
-  final def findAllElemsOrSelf: immutable.IndexedSeq[E] = {
-    val result = mutable.ArrayBuffer[E]()
+  final def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem] = {
+    val result = mutable.ArrayBuffer[ThisElem]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E): Unit = {
+    def accumulate(elm: ThisElem): Unit = {
       result += elm
       elm.findAllChildElems foreach { e => accumulate(e) }
     }
 
-    accumulate(self)
+    accumulate(thisElem)
     result.toIndexedSeq
   }
 
-  final def filterElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
-    val result = mutable.ArrayBuffer[E]()
+  final def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    val result = mutable.ArrayBuffer[ThisElem]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E): Unit = {
+    def accumulate(elm: ThisElem): Unit = {
       if (p(elm)) result += elm
       elm.findAllChildElems foreach { e => accumulate(e) }
     }
 
-    accumulate(self)
+    accumulate(thisElem)
     result.toIndexedSeq
   }
 
-  final def \\(p: E => Boolean): immutable.IndexedSeq[E] = filterElemsOrSelf(p)
+  final def \\(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = filterElemsOrSelf(p)
 
-  final def findAllElems: immutable.IndexedSeq[E] = findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
+  final def findAllElems: immutable.IndexedSeq[ThisElem] = findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
 
-  final def filterElems(p: E => Boolean): immutable.IndexedSeq[E] = findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
+  final def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
 
-  final def findTopmostElemsOrSelf(p: E => Boolean): immutable.IndexedSeq[E] = {
-    val result = mutable.ArrayBuffer[E]()
+  final def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    val result = mutable.ArrayBuffer[ThisElem]()
 
     // Not tail-recursive, but the depth should typically be limited
-    def accumulate(elm: E): Unit = {
+    def accumulate(elm: ThisElem): Unit = {
       if (p(elm)) result += elm else {
         elm.findAllChildElems foreach { e => accumulate(e) }
       }
     }
 
-    accumulate(self)
+    accumulate(thisElem)
     result.toIndexedSeq
   }
 
-  final def \\!(p: E => Boolean): immutable.IndexedSeq[E] = findTopmostElemsOrSelf(p)
+  final def \\!(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = findTopmostElemsOrSelf(p)
 
-  final def findTopmostElems(p: E => Boolean): immutable.IndexedSeq[E] =
+  final def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] =
     findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
 
-  final def findElemOrSelf(p: E => Boolean): Option[E] = {
+  final def findElemOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
     // Not tail-recursive, but the depth should typically be limited
-    def findMatch(elm: E): Option[E] = {
+    def findMatch(elm: ThisElem): Option[ThisElem] = {
       if (p(elm)) Some(elm) else {
         val childElms = elm.findAllChildElems
 
         var i = 0
-        var result: Option[E] = None
+        var result: Option[ThisElem] = None
 
         while ((result.isEmpty) && (i < childElms.size)) {
           result = findMatch(childElms(i))
@@ -306,11 +306,16 @@ trait ElemLike[E <: ElemLike[E]] extends ElemApi[E] { self: E =>
       }
     }
 
-    findMatch(self)
+    findMatch(thisElem)
   }
 
-  final def findElem(p: E => Boolean): Option[E] = {
-    val elms = self.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
+  final def findElem(p: ThisElem => Boolean): Option[ThisElem] = {
+    val elms = thisElem.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
     elms.headOption
   }
+}
+
+object ElemLike {
+
+  type Aux[A] = ElemLike { type ThisElem = A }
 }

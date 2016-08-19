@@ -27,29 +27,36 @@ import scala.collection.immutable
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]]. See the documentation of that trait
  * for examples of usage.
  *
- * @tparam N The node supertype of the element subtype
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait TransformableElemLike[N, E <: N with TransformableElemLike[N, E]] extends TransformableElemApi[N, E] { self: E =>
+trait TransformableElemLike extends TransformableElemApi {
 
-  def transformChildElems(f: E => E): E
+  type ThisElemApi <: TransformableElemLike
 
-  def transformChildElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E
+  def transformChildElems(f: ThisElem => ThisElem): ThisElem
 
-  final def transformElemsOrSelf(f: E => E): E = {
+  def transformChildElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem
+
+  final def transformElemsOrSelf(f: ThisElem => ThisElem): ThisElem = {
     f(transformChildElems(e => e.transformElemsOrSelf(f)))
   }
 
-  final def transformElems(f: E => E): E =
+  final def transformElems(f: ThisElem => ThisElem): ThisElem =
     transformChildElems(e => e.transformElemsOrSelf(f))
 
-  final def transformElemsOrSelfToNodeSeq(f: E => immutable.IndexedSeq[N]): immutable.IndexedSeq[N] = {
+  final def transformElemsOrSelfToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): immutable.IndexedSeq[ThisNode] = {
     f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
   }
 
-  final def transformElemsToNodeSeq(f: E => immutable.IndexedSeq[N]): E = {
+  final def transformElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem = {
     transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
+  }
+}
+
+object TransformableElemLike {
+
+  type Aux[A, B] = TransformableElemLike {
+    type ThisNode = A
+    type ThisElem = B
   }
 }

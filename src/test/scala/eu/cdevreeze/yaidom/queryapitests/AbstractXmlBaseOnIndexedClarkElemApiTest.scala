@@ -37,8 +37,8 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"
 
-  type U <: ClarkElemApi[U]
-  type E <: IndexedClarkElemApi[E, U]
+  type U <: ClarkElemApi.Aux[U]
+  type E <: IndexedClarkElemApi.Aux[E, U]
 
   protected def getDocElem(path: String, docUri: URI): E
 

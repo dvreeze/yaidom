@@ -35,8 +35,10 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  *
  * @author Chris de Vreeze
  */
-final class DomDocument(val wrappedDocument: w3c.dom.Document) extends DocumentApi[DomElem] {
+final class DomDocument(val wrappedDocument: w3c.dom.Document) extends DocumentApi {
   require(wrappedDocument ne null)
+
+  type DocElemType = DomElem
 
   final def children: immutable.IndexedSeq[CanBeDomDocumentChild] = {
     val childrenNodeList = wrappedDocument.getChildNodes

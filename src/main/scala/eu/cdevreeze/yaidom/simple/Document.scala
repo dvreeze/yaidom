@@ -55,7 +55,7 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 final class Document(
   val uriOption: Option[URI],
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi[Elem] with Immutable with Serializable {
+  val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi with Immutable with Serializable {
 
   require(uriOption ne null)
   require(xmlDeclarationOption ne null)
@@ -64,6 +64,8 @@ final class Document(
   require(
     children.collect({ case elm: Elem => elm }).size == 1,
     s"A document must have exactly one child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
+
+  type DocElemType = Elem
 
   val documentElement: Elem = children.collect({ case elm: Elem => elm }).head
 

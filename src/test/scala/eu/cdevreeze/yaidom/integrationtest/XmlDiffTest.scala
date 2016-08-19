@@ -148,7 +148,7 @@ object XmlDiffTest {
    * Both issues are resolvable. The matching function could be made pluggable. Using IndexedClarkElems is still
    * useful, for difference reporting purposes.
    */
-  def findDiffs[E <: resolved.ResolvedNodes.Elem with ClarkElemApi[E]](elem1: E, elem2: E): Diffs = {
+  def findDiffs[E <: resolved.ResolvedNodes.Elem with ClarkElemApi.Aux[E]](elem1: E, elem2: E): Diffs = {
     val indexedResolvedElem1 =
       indexed.IndexedClarkElem(resolved.Elem(elem1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
     val indexedResolvedElem2 =

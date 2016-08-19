@@ -25,11 +25,11 @@ import eu.cdevreeze.yaidom.core.Path
 /**
  * Partial implementation of `ClarkElemApi`.
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike[E] with IsNavigable[E] with HasEName with HasText { self: E =>
+trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable with HasEName with HasText {
+
+  type ThisElemApi <: ClarkElemLike
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
@@ -40,7 +40,7 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
    * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
    * production. Hence, this method should typically be fast enough.
    */
-  final override def findChildElemByPathEntry(entry: Path.Entry): Option[E] = {
+  final override def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem] = {
     // The previous implementation used immutable.IndexedSeq.toStream, which turned out to be surprisingly inefficient.
     // This inefficiency was noticed when calling method IsNavigable.findReverseAncestryOrSelfByPath
     // (and therefore this method) many times. Thanks to Johan Walters for pointing out this performance issue.
@@ -69,7 +69,7 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
    * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
    * production. Hence, this method should typically be fast enough.
    */
-  final override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(E, Path.Entry)] = {
+  final override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)] = {
     val nextEntries = mutable.Map[EName, Int]()
 
     findAllChildElems map { e =>
@@ -79,4 +79,9 @@ trait ClarkElemLike[E <: ClarkElemLike[E]] extends ClarkElemApi[E] with ElemLike
       (e, entry)
     }
   }
+}
+
+object ClarkElemLike {
+
+  type Aux[A] = ClarkElemLike { type ThisElem = A }
 }

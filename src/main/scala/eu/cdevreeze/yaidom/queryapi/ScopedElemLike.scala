@@ -22,11 +22,11 @@ import eu.cdevreeze.yaidom.core.QName
 /**
  * Partial implementation of `ScopedElemApi`.
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with ClarkElemLike[E] { self: E =>
+trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
+
+  type ThisElemApi <: ScopedElemLike
 
   final def attributeAsQNameOption(expandedName: EName): Option[QName] =
     attributeOption(expandedName).map(v => QName(v.trim))
@@ -51,4 +51,9 @@ trait ScopedElemLike[E <: ScopedElemLike[E]] extends ScopedElemApi[E] with Clark
   final def textAsResolvedQName: EName =
     scope.resolveQNameOption(textAsQName).getOrElse(
       sys.error(s"Could not resolve QName-valued element text $textAsQName, given scope [${scope}]"))
+}
+
+object ScopedElemLike {
+
+  type Aux[A] = ScopedElemLike { type ThisElem = A }
 }

@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.annotation.tailrec
 import scala.collection.immutable
 
 /**
@@ -26,34 +25,34 @@ import scala.collection.immutable
  *
  * Based on abstract method `parentOption` alone, this trait offers a rich API for querying the element ancestry of an element.
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait HasParent[E <: HasParent[E]] extends HasParentApi[E] { self: E =>
+trait HasParent extends HasParentApi {
+
+  type ThisElemApi <: HasParent
 
   /**
    * Returns the equivalent `parentOption.get`, throwing an exception if this is the root element
    */
-  final def parent: E = parentOption.getOrElse(sys.error("There is no parent element"))
+  final def parent: ThisElem = parentOption.getOrElse(sys.error("There is no parent element"))
 
   /**
    * Returns all ancestor elements or self
    */
-  final def ancestorsOrSelf: immutable.IndexedSeq[E] =
-    self +: (parentOption.toIndexedSeq flatMap ((e: E) => e.ancestorsOrSelf))
+  final def ancestorsOrSelf: immutable.IndexedSeq[ThisElem] =
+    thisElem +: (parentOption.toIndexedSeq flatMap ((e: ThisElem) => e.ancestorsOrSelf))
 
   /**
    * Returns `ancestorsOrSelf.drop(1)`
    */
-  final def ancestors: immutable.IndexedSeq[E] = ancestorsOrSelf.drop(1)
+  final def ancestors: immutable.IndexedSeq[ThisElem] = ancestorsOrSelf.drop(1)
 
   /**
    * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option
    */
-  @tailrec
-  final def findAncestorOrSelf(p: E => Boolean): Option[E] = {
-    if (p(self)) Some(self) else {
+  // @tailrec
+  final def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
+    if (p(thisElem)) Some(thisElem) else {
       val optParent = parentOption
       if (optParent.isEmpty) None else optParent.get.findAncestorOrSelf(p)
     }
@@ -62,7 +61,12 @@ trait HasParent[E <: HasParent[E]] extends HasParentApi[E] { self: E =>
   /**
    * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option
    */
-  final def findAncestor(p: E => Boolean): Option[E] = {
+  final def findAncestor(p: ThisElem => Boolean): Option[ThisElem] = {
     parentOption flatMap { e => e.findAncestorOrSelf(p) }
   }
+}
+
+object HasParent {
+
+  type Aux[A] = HasParent { type ThisElem = A }
 }

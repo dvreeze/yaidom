@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.simple.Node
  */
 abstract class AbstractXQuery3UseCasesTest extends Suite {
 
-  type E <: ScopedElemLike[E]
+  type E <: ScopedElemLike.Aux[E]
 
   protected val ns = "http://www.w3.org/TR/xquery-30-use-cases/"
 

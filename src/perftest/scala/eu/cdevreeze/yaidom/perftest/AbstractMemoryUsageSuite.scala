@@ -43,7 +43,7 @@ import eu.cdevreeze.yaidom.queryapi._
  */
 abstract class AbstractMemoryUsageSuite extends FunSuite {
 
-  type E <: ClarkElemLike[E]
+  type E <: ClarkElemLike.Aux[E]
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.perftest")
 
@@ -145,7 +145,7 @@ abstract class AbstractMemoryUsageSuite extends FunSuite {
 }
 
 object AbstractMemoryUsageSuite {
-  
+
   // To show that the global EName and QName providers have stable identifiers, so they can be imported
   import ENameProvider.globalENameProvider._
   import QNameProvider.globalQNameProvider._

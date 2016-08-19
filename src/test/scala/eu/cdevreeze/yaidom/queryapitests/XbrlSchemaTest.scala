@@ -184,7 +184,13 @@ object XbrlSchemaTest {
   val nsLink = "http://www.xbrl.org/2003/linkbase"
   val nsXLink = "http://www.w3.org/1999/xlink"
 
-  class XsdElem(val wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends SubtypeAwareElemLike[XsdElem] with ClarkElemLike[XsdElem] {
+  class XsdElem(val wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends SubtypeAwareElemLike with ClarkElemLike {
+
+    type ThisElemApi = XsdElem
+
+    type ThisElem = XsdElem
+
+    def thisElem: ThisElem = this
 
     override def findAllChildElems: immutable.IndexedSeq[XsdElem] =
       wrappedElem.findAllChildElems.map(e => XsdElem(e))

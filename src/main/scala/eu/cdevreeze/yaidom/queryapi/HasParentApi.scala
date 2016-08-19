@@ -23,42 +23,47 @@ import scala.collection.immutable
  *
  * This trait only knows about elements, not about documents as root element parents.
  *
- * @tparam E The captured element subtype
- *
  * @author Chris de Vreeze
  */
-trait HasParentApi[E <: HasParentApi[E]] { self: E =>
+trait HasParentApi extends AnyElemApi {
+
+  type ThisElemApi <: HasParentApi
 
   /**
    * Returns the parent element, if any, wrapped in an Option
    */
-  def parentOption: Option[E]
+  def parentOption: Option[ThisElem]
 
   /**
    * Returns the equivalent `parentOption.get`, throwing an exception if this is the root element
    */
-  def parent: E
+  def parent: ThisElem
 
   /**
    * Returns all ancestor elements or self, starting with this element, then the parent, if any, and ending with
    * the root element.
    */
-  def ancestorsOrSelf: immutable.IndexedSeq[E]
+  def ancestorsOrSelf: immutable.IndexedSeq[ThisElem]
 
   /**
    * Returns `ancestorsOrSelf.drop(1)`
    */
-  def ancestors: immutable.IndexedSeq[E]
+  def ancestors: immutable.IndexedSeq[ThisElem]
 
   /**
    * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option.
    * Searching starts with this element, then the parent, if applicable, and so on.
    */
-  def findAncestorOrSelf(p: E => Boolean): Option[E]
+  def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem]
 
   /**
    * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option.
    * Searching starts with the parent of this element, if applicable, then the grandparent, if applicable, and so on.
    */
-  def findAncestor(p: E => Boolean): Option[E]
+  def findAncestor(p: ThisElem => Boolean): Option[ThisElem]
+}
+
+object HasParentApi {
+
+  type Aux[A] = HasParentApi { type ThisElem = A }
 }

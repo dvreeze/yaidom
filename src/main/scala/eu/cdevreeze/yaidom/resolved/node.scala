@@ -126,11 +126,19 @@ sealed trait Node extends ResolvedNodes.Node with Immutable
 final case class Elem(
   override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike with UpdatableElemLike with TransformableElemLike {
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
   require(children ne null)
+
+  type ThisNode = Node
+
+  type ThisElemApi = Elem
+
+  type ThisElem = Elem
+
+  def thisElem: ThisElem = this
 
   @throws(classOf[java.io.ObjectStreamException])
   private[resolved] def writeReplace(): Any = new Elem.ElemSerializationProxy(resolvedName, resolvedAttributes, children)
@@ -202,7 +210,7 @@ final case class Elem(
       }
     }
 
-    self.withChildren(newChildren)
+    thisElem.withChildren(newChildren)
   }
 
   /** Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree */
@@ -233,7 +241,7 @@ final case class Elem(
       }
     }
 
-    accumulate(self.children)
+    accumulate(thisElem.children)
 
     val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
       n match {
@@ -242,7 +250,7 @@ final case class Elem(
       }
     }
 
-    self.withChildren(resultChildren)
+    thisElem.withChildren(resultChildren)
   }
 
   /**
@@ -253,7 +261,7 @@ final case class Elem(
     // Recursive, but not tail-recursive
 
     val newChildren: immutable.IndexedSeq[Node] = {
-      self.children map { (n: Node) =>
+      thisElem.children map { (n: Node) =>
         n match {
           case e: Elem => e.normalizeAllText
           case t: Text => Text(t.normalizedText)
@@ -262,7 +270,7 @@ final case class Elem(
       }
     }
 
-    self.withChildren(newChildren)
+    thisElem.withChildren(newChildren)
   }
 
   /**
@@ -297,7 +305,7 @@ final case class Elem(
       }
     }
 
-    accumulate(self.children)
+    accumulate(thisElem.children)
 
     val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
       n match {
@@ -306,7 +314,7 @@ final case class Elem(
       }
     }
 
-    self.withChildren(resultChildren)
+    thisElem.withChildren(resultChildren)
   }
 
   private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {

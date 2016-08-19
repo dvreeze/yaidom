@@ -33,7 +33,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  */
 abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTest {
 
-  type U <: ClarkElemApi[U]
+  type U <: ClarkElemApi.Aux[U]
 
   final override type E = IndexedClarkElem[U]
 
@@ -63,7 +63,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
     require(bookstore.localName == "Bookstore")
 
-    def getBookTitles[Elm <: ClarkElemApi[Elm]](store: Elm): immutable.IndexedSeq[Elm] =
+    def getBookTitles[Elm <: ClarkElemApi.Aux[Elm]](store: Elm): immutable.IndexedSeq[Elm] =
       for {
         book <- store \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
@@ -89,7 +89,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
     require(bookstore.localName == "Bookstore")
 
-    def getMagazines[Elm <: ClarkElemApi[Elm]](store: Elm): immutable.IndexedSeq[Elm] =
+    def getMagazines[Elm <: ClarkElemApi.Aux[Elm]](store: Elm): immutable.IndexedSeq[Elm] =
       for {
         magazine <- store \ (_.localName == "Magazine")
         magazineTitle = magazine.getChildElem(EName("Title")).trimmedText

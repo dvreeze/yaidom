@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractI18nQueryTest extends Suite {
 
-  type E <: ScopedElemLike[E]
+  type E <: ScopedElemLike.Aux[E]
 
   @Test def testI18n(): Unit = {
     val facts = rootElem.filterChildElems(e => e.qname.prefixOption == Some("tx"))

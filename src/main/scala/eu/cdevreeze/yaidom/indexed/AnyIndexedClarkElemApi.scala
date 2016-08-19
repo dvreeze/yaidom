@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi2
+package eu.cdevreeze.yaidom.indexed
 
-import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.queryapi.AnyElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
 /**
- * Trait partly implementing the contract for elements as text containers.
- * Typical element types are both an [[eu.cdevreeze.yaidom.queryapi.ElemLike]] as well as a [[eu.cdevreeze.yaidom.queryapi.HasText]].
+ * Super-trait for all "indexed Clark" element query API traits, promising an underlying element type.
  *
  * @author Chris de Vreeze
  */
-trait HasText extends HasTextApi {
+trait AnyIndexedClarkElemApi extends AnyElemApi {
 
-  /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  type UnderlyingElemApi <: ClarkElemApi
 
-  /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  type UnderlyingElem <: UnderlyingElemApi
 }

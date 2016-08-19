@@ -54,11 +54,11 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
   private val XLinkNs = "http://www.w3.org/1999/xlink"
   private val XLinkHrefEName = EName(XLinkNs, "href")
 
-  type E <: ScopedElemApi[E]
+  type E <: ScopedElemApi.Aux[E]
 
   type E2 <: HasENameApi
 
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi[E]
+  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[E]
 
   protected def getBaseUri(elem: E): URI
 

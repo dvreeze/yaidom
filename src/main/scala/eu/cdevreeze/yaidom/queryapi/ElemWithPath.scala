@@ -32,7 +32,13 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-final class ElemWithPath[E <: IsNavigableApi[E]](val elem: E, val path: Path) extends ElemLike[ElemWithPath[E]] {
+final class ElemWithPath[E <: IsNavigableApi.Aux[E]](val elem: E, val path: Path) extends ElemLike {
+
+  type ThisElemApi = ElemWithPath[E]
+
+  type ThisElem = ElemWithPath[E]
+
+  def thisElem: ThisElem = this
 
   final override def findAllChildElems: immutable.IndexedSeq[ElemWithPath[E]] = {
     elem.findAllChildElemsWithPathEntries map {
@@ -44,7 +50,7 @@ final class ElemWithPath[E <: IsNavigableApi[E]](val elem: E, val path: Path) ex
 
 object ElemWithPath {
 
-  def apply[E <: IsNavigableApi[E]](elem: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elem, path)
+  def apply[E <: IsNavigableApi.Aux[E]](elem: E, path: Path): ElemWithPath[E] = new ElemWithPath[E](elem, path)
 
-  def apply[E <: IsNavigableApi[E]](elem: E): ElemWithPath[E] = new ElemWithPath[E](elem, Path.Empty)
+  def apply[E <: IsNavigableApi.Aux[E]](elem: E): ElemWithPath[E] = new ElemWithPath[E](elem, Path.Empty)
 }

@@ -66,9 +66,15 @@ trait AbstractBlogXbrlTestSupport {
    */
   sealed class XbrliElem private[blogcode] (
     val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends ScopedElemLike[XbrliElem] with SubtypeAwareElemLike[XbrliElem] {
+    childElems: immutable.IndexedSeq[XbrliElem]) extends ScopedElemLike with SubtypeAwareElemLike {
 
     require(childElems.map(_.indexedElem) == indexedElem.findAllChildElems)
+
+    type ThisElemApi = XbrliElem
+
+    type ThisElem = XbrliElem
+
+    def thisElem: ThisElem = this
 
     /**
      * Very fast implementation of findAllChildElems, for fast querying

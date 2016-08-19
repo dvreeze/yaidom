@@ -35,17 +35,24 @@ import eu.cdevreeze.yaidom.simple.ProcessingInstruction
  */
 final class Document(
   xmlDeclarationOption: Option[XmlDeclaration],
-  children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends IndexedDocument[simple.Elem](xmlDeclarationOption, children) with Immutable {
+  children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends IndexedDocument(xmlDeclarationOption, children) with Immutable {
 
-  def document: simple.Document =
-    simple.Document(
-      uriOption,
-      xmlDeclarationOption,
+  type ThisDocApi = Document
+
+  type ThisDoc = Document
+
+  type UnderlyingElem = simple.Elem
+
+  def document: simple.Document = {
+    val childSeq: immutable.IndexedSeq[simple.CanBeDocumentChild] =
       children map {
-        case e: Nodes.Elem                   => documentElement.elem
+        case e: Nodes.Elem                   => documentElement.elem.asInstanceOf[simple.Elem]
         case pi: Nodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
         case c: Nodes.Comment                => Comment(c.text)
-      })
+      }
+
+    simple.Document(uriOption, xmlDeclarationOption, childSeq)
+  }
 
   /** Creates a copy, but with the new documentElement passed as parameter newRoot */
   def withDocumentElement(newRoot: Elem): Document = new Document(

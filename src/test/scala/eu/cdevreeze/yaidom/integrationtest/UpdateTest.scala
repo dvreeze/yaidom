@@ -298,12 +298,12 @@ class UpdateTest extends Suite {
     }
   }
 
-  private def attrNames[N, E <: N with ClarkElemLike[E] with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+  private def attrNames[N, E <: N with ClarkElemLike.Aux[E] with UpdatableElemLike.Aux[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf flatMap { e => e.resolvedAttributes.toMap.keySet }
     result.toSet
   }
 
-  private def elemNames[N, E <: N with ClarkElemLike[E] with UpdatableElemLike[N, E]](rootElm: E): Set[EName] = {
+  private def elemNames[N, E <: N with ClarkElemLike.Aux[E] with UpdatableElemLike.Aux[N, E]](rootElm: E): Set[EName] = {
     val result = rootElm.findAllElemsOrSelf map { e => e.resolvedName }
     result.toSet
   }

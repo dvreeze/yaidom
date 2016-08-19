@@ -41,7 +41,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  */
 abstract class AbstractAlternativeQueryTest extends Suite {
 
-  type E <: ClarkElemLike[E]
+  type E <: ClarkElemLike.Aux[E]
 
   @Test def testFindAllCatalogProducts(): Unit = {
     // See example 1-4.

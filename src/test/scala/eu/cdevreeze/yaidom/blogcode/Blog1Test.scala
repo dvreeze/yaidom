@@ -138,7 +138,7 @@ class Blog1Test extends Suite {
 
     // End of section that does not need to be copied again
 
-    def findAllBookAuthors[E <: ClarkElemApi[E]](docElem: E): immutable.IndexedSeq[String] = {
+    def findAllBookAuthors[E <: ClarkElemApi.Aux[E]](docElem: E): immutable.IndexedSeq[String] = {
       import HasENameApi._
       val result =
         for {

@@ -720,8 +720,10 @@ object XomWrapperTest {
     final override def toString: String = wrappedNode.toString
   }
 
-  final class XomDocument(val wrappedNode: nu.xom.Document) extends DocumentApi[XomElem] {
+  final class XomDocument(val wrappedNode: nu.xom.Document) extends DocumentApi {
     require(wrappedNode ne null)
+
+    type DocElemType = XomElem
 
     def uriOption: Option[URI] = Option(wrappedNode.getBaseURI).map(s => URI.create(s))
 
@@ -733,11 +735,17 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemLike[XomElem] with HasParent[XomElem] { self =>
+    override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
+    type ThisElemApi = XomElem
+
+    type ThisElem = XomElem
+
     override type DomType = nu.xom.Element
+
+    def thisElem: ThisElem = this
 
     override def findAllChildElems: immutable.IndexedSeq[XomElem] = children collect { case e: XomElem => e }
 

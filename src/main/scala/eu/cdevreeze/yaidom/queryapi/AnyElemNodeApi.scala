@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi2
-
-import scala.collection.immutable
-
-import eu.cdevreeze.yaidom.core.QName
+package eu.cdevreeze.yaidom.queryapi
 
 /**
- * Trait defining the contract for elements that have a QName, as well as attributes with QName keys.
- *
- * Using this trait (possibly in combination with other "element traits") we can abstract over several element implementations.
+ * Super-trait for all element query API traits that know about the node super-type.
  *
  * @author Chris de Vreeze
  */
-trait HasQNameApi {
+trait AnyElemNodeApi extends AnyElemApi {
 
-  /**
-   * The QName of the element
-   */
-  def qname: QName
+  type ThisNode
 
-  /**
-   * The attributes of the element as mapping from QNames to values
-   */
-  def attributes: immutable.Iterable[(QName, String)]
+  type ThisElem <: ThisElemApi with ThisNode
 }

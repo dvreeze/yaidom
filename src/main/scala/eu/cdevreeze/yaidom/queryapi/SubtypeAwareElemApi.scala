@@ -43,65 +43,72 @@ import scala.reflect.ClassTag
  *
  * @author Chris de Vreeze
  */
-trait SubtypeAwareElemApi[A <: SubtypeAwareElemApi[A]] extends ElemApi[A] { self: A =>
+trait SubtypeAwareElemApi extends ElemApi {
+
+  type ThisElemApi <: SubtypeAwareElemApi
 
   /**
    * Returns all child elements of the given sub-type, in the correct order.
    */
-  def findAllChildElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+  def findAllChildElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the child elements of the given sub-type obeying the given predicate.
    */
-  def filterChildElemsOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def filterChildElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns all descendant elements of the given sub-type (not including this element).
    */
-  def findAllElemsOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+  def findAllElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant elements of the given sub-type obeying the given predicate.
    */
-  def filterElemsOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def filterElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns all descendant-or-self elements of the given sub-type.
    */
-  def findAllElemsOrSelfOfType[B <: A](subType: ClassTag[B]): immutable.IndexedSeq[B]
+  def findAllElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant-or-self elements of the given sub-type obeying the given predicate.
    */
-  def filterElemsOrSelfOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def filterElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns the first found child element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
    */
-  def findChildElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+  def findChildElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B]
 
   /**
    * Returns the first found (topmost) descendant element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
    */
-  def findElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+  def findElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B]
 
   /**
    * Returns the first found (topmost) descendant-or-self element of the given sub-type obeying the given predicate, if any, wrapped in an `Option`.
    */
-  def findElemOrSelfOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): Option[B]
+  def findElemOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B]
 
   /**
    * Returns the descendant elements of the given sub-type obeying the given predicate that have no ancestor of the given sub-type obeying the predicate.
    */
-  def findTopmostElemsOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def findTopmostElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns the descendant-or-self elements of the given sub-type obeying the given predicate, such that no ancestor of the given sub-type obeys the predicate.
    */
-  def findTopmostElemsOrSelfOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
+  def findTopmostElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B]
 
   /**
    * Returns the single child element of the given sub-type obeying the given predicate, and throws an exception otherwise.
    */
-  def getChildElemOfType[B <: A](subType: ClassTag[B])(p: B => Boolean): B
+  def getChildElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): B
+}
+
+object SubtypeAwareElemApi {
+
+  type Aux[A] = SubtypeAwareElemApi { type ThisElem = A }
 }

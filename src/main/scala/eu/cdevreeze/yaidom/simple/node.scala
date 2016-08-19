@@ -175,7 +175,7 @@ final class Elem(
   val qname: QName,
   val attributes: immutable.IndexedSeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with ResolvedNodes.Elem with ScopedElemLike[Elem] with UpdatableElemLike[Node, Elem] with TransformableElemLike[Node, Elem] { self =>
+  override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with ResolvedNodes.Elem with ScopedElemLike with UpdatableElemLike with TransformableElemLike {
 
   require(qname ne null)
   require(attributes ne null)
@@ -183,6 +183,14 @@ final class Elem(
   require(children ne null)
 
   require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
+
+  type ThisNode = Node
+
+  type ThisElemApi = Elem
+
+  type ThisElem = Elem
+
+  def thisElem: ThisElem = this
 
   @throws(classOf[java.io.ObjectStreamException])
   private[yaidom] def writeReplace(): Any = new Elem.ElemSerializationProxy(qname, attributes, scope, children)
@@ -273,16 +281,16 @@ final class Elem(
    * That is, returns `if (attributeValueOption.isEmpty) self else plusAttribute(attributeName, attributeValueOption.get)`.
    */
   def plusAttributeOption(attributeName: QName, attributeValueOption: Option[String]): Elem = {
-    if (attributeValueOption.isEmpty) self else plusAttribute(attributeName, attributeValueOption.get)
+    if (attributeValueOption.isEmpty) thisElem else plusAttribute(attributeName, attributeValueOption.get)
   }
 
   /**
    * Functionally removes the given attribute, if present.
    *
-   * More precisely, returns `withAttributes(self.attributes filterNot (_._1 == attributeName))`.
+   * More precisely, returns `withAttributes(thisElem.attributes filterNot (_._1 == attributeName))`.
    */
   def minusAttribute(attributeName: QName): Elem = {
-    val newAttributes = self.attributes filterNot { case (attrName, attrValue) => attrName == attributeName }
+    val newAttributes = thisElem.attributes filterNot { case (attrName, attrValue) => attrName == attributeName }
     withAttributes(newAttributes)
   }
 
@@ -366,7 +374,7 @@ final class Elem(
       }
     }
 
-    self.withChildren(newChildren)
+    thisElem.withChildren(newChildren)
   }
 
   /**
@@ -446,7 +454,7 @@ final class Elem(
         Some(LineSeq(line))
       }
 
-    val declarations: Declarations = parentScope.relativize(self.scope)
+    val declarations: Declarations = parentScope.relativize(thisElem.scope)
 
     val namespacesLineSeqOption: Option[LineSeq] = {
       if (declarations.prefixNamespaceMap.isEmpty) None else {
@@ -469,8 +477,8 @@ final class Elem(
         val firstLine = LineSeq("children = Vector(")
         val contentLines = {
           val groups =
-            self.children map { child =>
-              child.toTreeReprAsLineSeq(self.scope, indentStep)(indentStep)
+            thisElem.children map { child =>
+              child.toTreeReprAsLineSeq(thisElem.scope, indentStep)(indentStep)
             }
           val result = LineSeqSeq(groups: _*).mkLineSeq(",")
           result

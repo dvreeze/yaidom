@@ -82,9 +82,15 @@ sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike[DomElem] with HasParent[DomElem] { self =>
+  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null)
+
+  type ThisElemApi = DomElem
+
+  type ThisElem = DomElem
+
+  def thisElem: ThisElem = this
 
   override type DomType = w3c.dom.Element
 
