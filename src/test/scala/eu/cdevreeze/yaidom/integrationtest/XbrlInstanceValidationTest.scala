@@ -27,6 +27,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.indexed.IndexedScopedElemApi
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
@@ -137,9 +138,15 @@ object XbrlInstanceValidationTest {
    *
    * Note that the underlying element must know its ancestry-or-self in order to recognize elements that must represent facts.
    *
+   * Also note that the underlying element is of ANY element type that is a sub-type of IndexedScopedElemApi.
+   * Hence, the XBRL instance data model does not depend on any particular backing element implementation, and
+   * indeed multiple backing element implementations can be plugged in. Also note that the underlying IndexedScopedElemApi
+   * backing element contract does not force the XBRL instance data model to use generics. That makes pattern matching
+   * on those XBRL data model classes easier.
+   *
    * Creating this class hierarchy is an effort, but it is a one-time effort potentially paying off very many times.
    */
-  sealed class XbrliElem(val underlyingElem: indexed.Elem) extends ScopedElemLike with SubtypeAwareElemLike {
+  sealed class XbrliElem(val underlyingElem: IndexedScopedElemApi) extends ScopedElemLike with SubtypeAwareElemLike {
 
     type ThisElemApi = XbrliElem
 
@@ -164,7 +171,7 @@ object XbrlInstanceValidationTest {
     def attributes: immutable.Iterable[(QName, String)] = underlyingElem.attributes
   }
 
-  final class XbrliXbrlElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliXbrlElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliXbrlEName)
 
     def findAllFacts: immutable.IndexedSeq[XbrliFactElem] = {
@@ -180,104 +187,104 @@ object XbrlInstanceValidationTest {
     }
   }
 
-  final class XbrliContextElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliContextElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliContextEName)
   }
 
-  final class XbrliUnitElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliUnitElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliUnitEName)
   }
 
   /**
    * An element which must be an item or a tuple, due to `mustBeFact` returning true.
    */
-  sealed abstract class XbrliFactElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  sealed abstract class XbrliFactElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(XbrliElem.mustBeFact(underlyingElem))
   }
 
   /**
    * An element which must be an item, due to `mustBeItem` returning true.
    */
-  final class XbrliItemElem(underlyingElem: indexed.Elem) extends XbrliFactElem(underlyingElem) {
+  final class XbrliItemElem(underlyingElem: IndexedScopedElemApi) extends XbrliFactElem(underlyingElem) {
     require(XbrliElem.mustBeItem(underlyingElem))
   }
 
   /**
    * An element which must be a tuple, due to `mustBeTuple` returning true.
    */
-  final class XbrliTupleElem(underlyingElem: indexed.Elem) extends XbrliFactElem(underlyingElem) {
+  final class XbrliTupleElem(underlyingElem: IndexedScopedElemApi) extends XbrliFactElem(underlyingElem) {
     require(XbrliElem.mustBeTuple(underlyingElem))
   }
 
-  final class XbrliEntityElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliEntityElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliEntityEName)
   }
 
-  final class XbrliPeriodElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliPeriodElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliPeriodEName)
   }
 
-  final class XbrliScenarioElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliScenarioElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliScenarioEName)
   }
 
-  final class XbrliInstantElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliInstantElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliInstantEName)
   }
 
-  final class XbrliStartDateElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliStartDateElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliStartDateEName)
   }
 
-  final class XbrliEndDateElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliEndDateElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliEndDateEName)
   }
 
-  final class XbrliForeverElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliForeverElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliForeverEName)
   }
 
-  final class XbrliIdentifierElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliIdentifierElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliIdentifierEName)
   }
 
-  final class XbrliSegmentElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliSegmentElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliSegmentEName)
   }
 
-  final class XbrliMeasureElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliMeasureElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliMeasureEName)
   }
 
-  final class XbrliDivideElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliDivideElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliDivideEName)
   }
 
-  final class XbrliUnitNumeratorElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliUnitNumeratorElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliUnitNumeratorEName)
   }
 
-  final class XbrliUnitDenominatorElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class XbrliUnitDenominatorElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == XbrliUnitDenominatorEName)
   }
 
-  final class LinkSchemaRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkSchemaRefElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkSchemaRefEName)
   }
 
-  final class LinkLinkbaseRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkLinkbaseRefElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkLinkbaseRefEName)
   }
 
-  final class LinkRoleRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkRoleRefElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkRoleRefEName)
   }
 
-  final class LinkArcroleRefElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkArcroleRefElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkArcroleRefEName)
   }
 
-  final class LinkFootnoteLinkElem(underlyingElem: indexed.Elem) extends XbrliElem(underlyingElem) {
+  final class LinkFootnoteLinkElem(underlyingElem: IndexedScopedElemApi) extends XbrliElem(underlyingElem) {
     require(resolvedName == LinkFootnoteLinkEName)
   }
 
@@ -289,7 +296,7 @@ object XbrlInstanceValidationTest {
     /**
      * Returns true if the element is not xbrli:xbrl, and also not a descendant-or-self of an element with an EName in DisallowedFactAncestorOrSelfENames.
      */
-    def mustBeFact(e: indexed.Elem): Boolean = {
+    def mustBeFact(e: IndexedScopedElemApi): Boolean = {
       if (e.resolvedName == XbrliXbrlEName) false
       else {
         val notAllowed = e.path.entries exists { entry =>
@@ -302,18 +309,18 @@ object XbrlInstanceValidationTest {
     /**
      * Returns `mustBeFact(e) && e.attributeOption(ContextRefEName).isDefined`.
      */
-    def mustBeItem(e: indexed.Elem): Boolean = {
+    def mustBeItem(e: IndexedScopedElemApi): Boolean = {
       mustBeFact(e) && e.attributeOption(ContextRefEName).isDefined
     }
 
     /**
      * Returns `mustBeFact(e) && e.attributeOption(ContextRefEName).isEmpty`.
      */
-    def mustBeTuple(e: indexed.Elem): Boolean = {
+    def mustBeTuple(e: IndexedScopedElemApi): Boolean = {
       mustBeFact(e) && e.attributeOption(ContextRefEName).isEmpty
     }
 
-    def apply(e: indexed.Elem): XbrliElem = {
+    def apply(e: IndexedScopedElemApi): XbrliElem = {
       if (mustBeFact(e)) {
         if (e.attributeOption(ContextRefEName).isDefined) new XbrliItemElem(e) else new XbrliTupleElem(e)
       } else {
