@@ -46,7 +46,7 @@ final class Document(
   def document: simple.Document = {
     val childSeq: immutable.IndexedSeq[simple.CanBeDocumentChild] =
       children map {
-        case e: Nodes.Elem                   => documentElement.elem.asInstanceOf[simple.Elem]
+        case e: Nodes.Elem                   => documentElement.elem
         case pi: Nodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
         case c: Nodes.Comment                => Comment(c.text)
       }
