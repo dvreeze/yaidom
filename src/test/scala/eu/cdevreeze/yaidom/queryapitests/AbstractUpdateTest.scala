@@ -106,7 +106,7 @@ abstract class AbstractUpdateTest extends Suite {
     }
 
     assertResult(newRootElem) {
-      IndexedClarkElem(newRootElem).elem
+      IndexedClarkElem(newRootElem).underlyingElem
     }
 
     checkElemAfterMeasureUpdate(newRootElem)
@@ -123,7 +123,7 @@ abstract class AbstractUpdateTest extends Suite {
     }
 
     assertResult(newRootElem) {
-      IndexedClarkElem(newRootElem).elem
+      IndexedClarkElem(newRootElem).underlyingElem
     }
 
     checkElemAfterMeasureUpdate(newRootElem)

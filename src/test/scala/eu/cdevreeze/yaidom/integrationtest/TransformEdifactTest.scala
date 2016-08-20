@@ -313,7 +313,7 @@ object TransformEdifactTest {
 
           partReverseAncestryOrSelf.zip(path.entries) forall {
             case (elem, entry) =>
-              elem.resolvedName == entry.ename && entry.p(elem)
+              elem.resolvedName == entry.ename && entry.p(elem.underlyingElem)
           }
         }
     }

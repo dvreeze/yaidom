@@ -112,7 +112,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
     indexedElemBuilder(Some(new URI("http://order")), convertToElem(xml))
   }
 
-  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.elem)
+  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.underlyingElem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
     indexedElemBuilder(Some(new URI("http://bogus-uri")), convertToElem(elem))

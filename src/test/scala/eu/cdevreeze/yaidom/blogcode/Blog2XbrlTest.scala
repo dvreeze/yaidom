@@ -368,7 +368,7 @@ class Blog2XbrlTest extends Suite {
 
     val periodOption =
       contextOption.flatMap(_.findElem(withEName(XbrliNs, "period")))
-    periodOption.map(_.elem)
+    periodOption.map(_.underlyingElem)
   }
 
   // Forgetting about complete segment, non-XDT segment, complete scenario and
@@ -396,7 +396,7 @@ class Blog2XbrlTest extends Suite {
   def unitAspectOption(fact: indexed.Elem): Option[simple.Elem] = {
     val unitOption =
       fact.attributeOption(EName("unitRef")).map(id => unitsById(id))
-    unitOption.map(_.elem)
+    unitOption.map(_.underlyingElem)
   }
 
   // Compare aspects, naively, and without knowledge about XML Schema types.
@@ -451,7 +451,7 @@ object Blog2XbrlTest {
   final case class EvaluationResult(val facts: Map[String, indexed.Elem], val result: Boolean) {
 
     override def toString: String = {
-      s"EvaluationResult(result: $result, facts: ${facts.mapValues(_.elem)})"
+      s"EvaluationResult(result: $result, facts: ${facts.mapValues(_.underlyingElem)})"
     }
   }
 }

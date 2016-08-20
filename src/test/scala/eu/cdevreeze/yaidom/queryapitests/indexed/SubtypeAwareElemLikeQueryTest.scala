@@ -85,12 +85,12 @@ object SubtypeAwareElemLikeQueryTest {
     final def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType] =
       backingElem.findChildElemByPathEntry(entry).map(e => new BridgeElemTakingIndexedElem(e))
 
-    final def toElem: eu.cdevreeze.yaidom.simple.Elem = backingElem.elem
+    final def toElem: eu.cdevreeze.yaidom.simple.Elem = backingElem.underlyingElem
 
-    final def rootElem: UnwrappedBackingElem = backingElem.rootElem
+    final def rootElem: UnwrappedBackingElem = backingElem.underlyingRootElem
 
     final def path: Path = backingElem.path
 
-    final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.elem
+    final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.underlyingElem
   }
 }

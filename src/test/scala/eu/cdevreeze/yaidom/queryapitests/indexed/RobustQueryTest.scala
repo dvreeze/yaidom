@@ -47,5 +47,5 @@ class RobustQueryTest extends AbstractRobustQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(elem.elem)
+    resolved.Elem(elem.underlyingElem)
 }

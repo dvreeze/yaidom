@@ -183,7 +183,7 @@ class NamespaceUtilsTest extends Suite {
 
     val editedLastTable = stripUnusedNamespaces(lastTable, DocumentENameExtractor.NoOp)
 
-    assertResult(resolved.Elem(lastTable.elem)) {
+    assertResult(resolved.Elem(lastTable.underlyingElem)) {
       resolved.Elem(editedLastTable)
     }
 

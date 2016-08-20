@@ -152,11 +152,11 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     val indexedInstance = indexedElemBuilder(xbrlInstance)
 
     val elemsWithPaths =
-      indexedInstance.findAllElemsOrSelf.map(p => (p.elem, p.path))
+      indexedInstance.findAllElemsOrSelf.map(p => (p.underlyingElem, p.path))
     val paths = elemsWithPaths.map(_._2)
 
     assertResult(xbrlInstance.findAllElemsOrSelf) {
-      indexedInstance.filterElemsOrSelf(e => paths.toSet.contains(e.path)).map(_.elem)
+      indexedInstance.filterElemsOrSelf(e => paths.toSet.contains(e.path)).map(_.underlyingElem)
     }
 
     def isIdentifierPath(p: Path): Boolean = {
@@ -164,7 +164,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     }
 
     assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier"))) {
-      indexedInstance.filterElemsOrSelf(e => paths.filter(isIdentifierPath).toSet.contains(e.path)).map(_.elem)
+      indexedInstance.filterElemsOrSelf(e => paths.filter(isIdentifierPath).toSet.contains(e.path)).map(_.underlyingElem)
     }
   }
 

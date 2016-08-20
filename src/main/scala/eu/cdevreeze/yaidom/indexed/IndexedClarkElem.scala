@@ -23,7 +23,6 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
@@ -33,10 +32,9 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
- * An `IndexedClarkElem(rootElem)` can be seen as one '''immutable snapshot''' of an XML tree. All queries (using the `ElemApi` uniform
+ * An `IndexedClarkElem(underlyingRootElem)` can be seen as one '''immutable snapshot''' of an XML tree. All queries (using the `ElemApi` uniform
  * query API) on that snapshot return results within the same snapshot. Take care not to mix up query results from different
- * snapshots. (This could have been modeled in an alternative design of the class, using a member type, but such a design has
- * not been chosen.)
+ * snapshots. (This could have been modeled in an alternative design of the class, but such a design has not been chosen.)
  *
  * Using IndexedClarkElem objects, it is easy to get the ancestry or siblings of an element, as elements of the underlying element type.
  *
@@ -44,9 +42,6 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * document element tree as state. Hence the underlying document element tree will always remain in memory if at least
  * one indexed element contains it in its state. (Yet with mutable org.w3c.dom element trees, it is also easy to cause
  * memory leaks. See http://apmblog.compuware.com/2011/04/20/the-top-java-memory-problems-part-1/.)
- *
- * Having an IndexedClarkElem, it is always possible to re-create the root element as IndexedClarkElem, because
- * the underlying root element is always available.
  *
  * The optional parent base URI is stored for very fast (optional) base URI computation. This is helpful in
  * an XBRL context, where URI resolution against a base URI is typically a very frequent operation.
@@ -80,17 +75,21 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * iElem.findAllElemsOrSelf.map(_.rootElem).distinct == List(iElem.rootElem)
  *
+ * iElem.findAllElemsOrSelf.map(_.underlyingRootElem).distinct == List(iElem.underlyingRootElem)
+ *
  * // The correspondence between rootElem, path and elem
  *
- * iElem.findAllElemsOrSelf.forall(e => e.rootElem.findElemOrSelfByPath(e.path).get == e.elem)
+ * iElem.findAllElemsOrSelf.forall(e => e.rootElem.findElemOrSelfByPath(e.path).get == e)
+ *
+ * iElem.findAllElemsOrSelf.forall(e => e.underlyingRootElem.findElemOrSelfByPath(e.path).get == e.underlyingElem)
  * }}}
  *
  * The correspondence between queries on IndexedClarkElems and the same queries on the underlying elements is as follows:
  * {{{
  * // Let p be a function from underlying element type E to Boolean
  *
- * IndexedClarkElem(rootElem).filterElemsOrSelf(e => p(e.elem)).map(_.elem) ==
- *   rootElem.filterElemsOrSelf(p)
+ * iElem.rootElem.filterElemsOrSelf(e => p(e.underlyingElem)).map(_.underlyingElem) ==
+ *   iElem.underlyingRootElem.filterElemsOrSelf(p)
  * }}}
  *
  * Analogous properties hold for the other query methods.
@@ -98,10 +97,10 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * @author Chris de Vreeze
  */
 final class IndexedClarkElem[U <: ClarkElemApi.Aux[U]] private (
-  val docUriOption: Option[URI],
-  val rootElem: U,
-  val path: Path,
-  val elem: U) extends Nodes.Elem with IndexedClarkElemLike {
+  docUriOption: Option[URI],
+  underlyingRootElem: U,
+  path: Path,
+  underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with Nodes.Elem {
 
   type ThisElemApi = IndexedClarkElem[U]
 
@@ -109,77 +108,60 @@ final class IndexedClarkElem[U <: ClarkElemApi.Aux[U]] private (
 
   def thisElem: ThisElem = this
 
-  type UnderlyingElemApi = U
-
-  type UnderlyingElem = U
-
-  /**
-   * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
-   * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this
-   * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
-   * class, it can be reasoned that these assertions must hold.)
-   */
-  private[yaidom] def assertConsistency(): Unit = {
-    assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
-  }
-
   final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
-    elem.findAllChildElemsWithPathEntries map {
+    underlyingElem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        new IndexedClarkElem(docUriOption, rootElem, path.append(entry), e)
-    }
-  }
-
-  final def baseUriOption: Option[URI] = {
-    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
-  }
-
-  final def parentBaseUriOption: Option[URI] = {
-    if (path.isEmpty) {
-      docUriOption
-    } else {
-      XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path.parentPath)(XmlBaseSupport.JdkUriResolver)
+        new IndexedClarkElem(docUriOption, underlyingRootElem, path.append(entry), e)
     }
   }
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: IndexedClarkElem[U] =>
-      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
-        (other.path == this.path) && (other.elem == this.elem)
+      (other.docUriOption == this.docUriOption) && (other.underlyingRootElem == this.underlyingRootElem) &&
+        (other.path == this.path) && (other.underlyingElem == this.underlyingElem)
     case _ => false
   }
 
-  final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
+  final override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
 
-  /**
-   * Returns the base URI, falling back to the empty URI if absent.
-   */
-  final def baseUri: URI = baseUriOption.getOrElse(new URI(""))
+  final def rootElem: ThisElem = {
+    new IndexedClarkElem[U](docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
+  }
+
+  final def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
+    val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
+
+    assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    assert(!resultOption.get.isEmpty, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    assert(resultOption.get.last == thisElem)
+
+    resultOption.get
+  }
 }
 
 object IndexedClarkElem {
 
-  def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedClarkElem[U] = {
-    new IndexedClarkElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): IndexedClarkElem[U] = {
+    new IndexedClarkElem[U](docUriOption, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, rootElem: U, path: Path): IndexedClarkElem[U] = {
-    apply(Some(docUri), rootElem, path)
+  def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, underlyingRootElem: U, path: Path): IndexedClarkElem[U] = {
+    apply(Some(docUri), underlyingRootElem, path)
   }
 
-  def apply[U <: ClarkElemApi.Aux[U]](rootElem: U, path: Path): IndexedClarkElem[U] = {
-    new IndexedClarkElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ClarkElemApi.Aux[U]](underlyingRootElem: U, path: Path): IndexedClarkElem[U] = {
+    new IndexedClarkElem[U](None, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U): IndexedClarkElem[U] = {
-    apply(docUriOption, rootElem, Path.Empty)
+  def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U): IndexedClarkElem[U] = {
+    apply(docUriOption, underlyingRootElem, Path.Empty)
   }
 
-  def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, rootElem: U): IndexedClarkElem[U] = {
-    apply(Some(docUri), rootElem)
+  def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, underlyingRootElem: U): IndexedClarkElem[U] = {
+    apply(Some(docUri), underlyingRootElem)
   }
 
-  def apply[U <: ClarkElemApi.Aux[U]](rootElem: U): IndexedClarkElem[U] = {
-    apply(None, rootElem, Path.Empty)
+  def apply[U <: ClarkElemApi.Aux[U]](underlyingRootElem: U): IndexedClarkElem[U] = {
+    apply(None, underlyingRootElem, Path.Empty)
   }
 }

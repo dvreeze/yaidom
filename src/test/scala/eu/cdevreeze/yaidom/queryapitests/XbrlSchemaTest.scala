@@ -115,7 +115,7 @@ class XbrlSchemaTest extends Suite {
     assertResult(true) {
       elemsContainingPlus forall { e =>
         val indexedElem = e.wrappedElem
-        indexedElem.rootElem.findElemOrSelfByPath(indexedElem.path) == Some(indexedElem.elem)
+        indexedElem.underlyingRootElem.findElemOrSelfByPath(indexedElem.path) == Some(indexedElem.underlyingElem)
       }
     }
   }
@@ -219,7 +219,7 @@ object XbrlSchemaTest {
     }
 
     def typeAttrOption: Option[EName] = {
-      wrappedElem.elem.attributeAsResolvedQNameOption(EName("type"))
+      wrappedElem.underlyingElem.attributeAsResolvedQNameOption(EName("type"))
     }
   }
 
@@ -227,7 +227,7 @@ object XbrlSchemaTest {
     require(resolvedName == EName(nsSchema, "element"))
     require(wrappedElem.path.entries.size >= 2)
 
-    def ref: EName = wrappedElem.elem.attributeAsResolvedQName(EName("ref"))
+    def ref: EName = wrappedElem.underlyingElem.attributeAsResolvedQName(EName("ref"))
   }
 
   object XsdElem {
@@ -236,7 +236,7 @@ object XbrlSchemaTest {
       case EName(nsSchema, "schema") => new XsdRootElem(elem)
       case EName(nsSchema, "element") if elem.path.entries.size == 1 =>
         new GlobalElementDeclaration(elem)
-      case EName(nsSchema, "element") if elem.elem.attributeAsResolvedQNameOption(EName("ref")).isDefined =>
+      case EName(nsSchema, "element") if elem.underlyingElem.attributeAsResolvedQNameOption(EName("ref")).isDefined =>
         new ElementReference(elem)
       case _ => new XsdElem(elem)
     }

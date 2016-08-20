@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.indexed
+package eu.cdevreeze.yaidom.queryapi
 
 import java.net.URI
 
@@ -22,19 +22,16 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * Abstract API for "indexed elements".
  *
  * Note how this API removes the need for an API which is like the `ElemApi` API, but taking and returning pairs
- * of elements and paths. This could be seen as that API, re-using `ElemApi` instead of adding an extra API similar to it.
- * These `IndexedClarkElemApi` objects "are" the above-mentioned pairs of elements and paths.
+ * of elements and paths.
  *
  * @author Chris de Vreeze
  */
-trait IndexedClarkElemApi extends AnyIndexedClarkElemApi with ClarkElemApi {
+trait IndexedClarkElemApi extends ClarkElemApi {
 
   type ThisElemApi <: IndexedClarkElemApi
 
@@ -44,22 +41,14 @@ trait IndexedClarkElemApi extends AnyIndexedClarkElemApi with ClarkElemApi {
   def docUriOption: Option[URI]
 
   /**
-   * The root element of the underlying element type
+   * The root element
    */
-  def rootElem: UnderlyingElem
+  def rootElem: ThisElem
 
   /**
    * The path of this element, relative to the root element
    */
   def path: Path
-
-  /**
-   * The underlying element, of the underlying element type. It must be equal to:
-   * {{{
-   * rootElem.getElemOrSelfByPath(path)
-   * }}}
-   */
-  def elem: UnderlyingElem
 
   /**
    * Returns the optional base URI, computed from the document URI, if any, and the XML base attributes of the
@@ -104,42 +93,12 @@ trait IndexedClarkElemApi extends AnyIndexedClarkElemApi with ClarkElemApi {
    * rootElem.findReverseAncestryOrSelfByPath(path).get
    * }}}
    */
-  def reverseAncestryOrSelf: immutable.IndexedSeq[UnderlyingElem]
+  def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem]
 }
 
 object IndexedClarkElemApi {
 
-  type Aux[A, B] = IndexedClarkElemApi {
+  type Aux[A] = IndexedClarkElemApi {
     type ThisElem = A
-    type UnderlyingElem = B
-  }
-
-  /**
-   * API of builders of `IndexedClarkElemApi` objects. These builders keep a URI resolver for XML Base support.
-   * Builder instances should be thread-safe global objects, encapsulating one chosen URI resolver.
-   */
-  trait Builder[E <: IndexedClarkElemApi.Aux[E, U], U <: ClarkElemApi.Aux[U]] {
-
-    def uriResolver: XmlBaseSupport.UriResolver
-
-    /**
-     * Returns the same as `build(None, rootElem)`.
-     */
-    def build(rootElem: U): E
-
-    /**
-     * Returns the same as `build(docUriOption, rootElem, Path.Empty)`.
-     */
-    def build(docUriOption: Option[URI], rootElem: U): E
-
-    /**
-     * Returns the same as `build(None, rootElem, path)`.
-     */
-    def build(rootElem: U, path: Path): E
-
-    /**
-     * Factory method for "indexed elements". Typical implementations are recursive and expensive.
-     */
-    def build(docUriOption: Option[URI], rootElem: U, path: Path): E
   }
 }

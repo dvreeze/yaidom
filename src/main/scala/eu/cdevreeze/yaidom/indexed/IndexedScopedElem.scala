@@ -20,10 +20,14 @@ import java.net.URI
 
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
  * Indexed Scoped element. Like `IndexedClarkElem` but instead of being and indexing
@@ -36,10 +40,10 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * @author Chris de Vreeze
  */
 final class IndexedScopedElem[U <: ScopedElemApi.Aux[U]] private (
-  val docUriOption: Option[URI],
-  val rootElem: U,
-  val path: Path,
-  val elem: U) extends Nodes.Elem with IndexedScopedElemLike {
+  docUriOption: Option[URI],
+  underlyingRootElem: U,
+  path: Path,
+  underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with Nodes.Elem with IndexedScopedElemApi with ScopedElemLike {
 
   type ThisElemApi = IndexedScopedElem[U]
 
@@ -47,82 +51,71 @@ final class IndexedScopedElem[U <: ScopedElemApi.Aux[U]] private (
 
   def thisElem: ThisElem = this
 
-  type UnderlyingElemApi = U
-
-  type UnderlyingElem = U
-
-  /**
-   * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
-   * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this
-   * method. Users of the API do not need to worry about this method. (In fact, looking at the implementation of this
-   * class, it can be reasoned that these assertions must hold.)
-   */
-  private[yaidom] def assertConsistency(): Unit = {
-    assert(elem == rootElem.getElemOrSelfByPath(path), "Corrupt element!")
-  }
-
   final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
-    elem.findAllChildElemsWithPathEntries map {
+    underlyingElem.findAllChildElemsWithPathEntries map {
       case (e, entry) =>
-        new IndexedScopedElem(docUriOption, rootElem, path.append(entry), e)
+        new IndexedScopedElem(docUriOption, underlyingRootElem, path.append(entry), e)
     }
   }
 
-  final def baseUriOption: Option[URI] = {
-    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
-  }
+  final def qname: QName = underlyingElem.qname
 
-  final def parentBaseUriOption: Option[URI] = {
-    if (path.isEmpty) {
-      docUriOption
-    } else {
-      XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path.parentPath)(XmlBaseSupport.JdkUriResolver)
-    }
-  }
+  final def attributes: immutable.IndexedSeq[(QName, String)] = underlyingElem.attributes.toIndexedSeq
+
+  final def scope: Scope = underlyingElem.scope
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: IndexedScopedElem[U] =>
-      (other.docUriOption == this.docUriOption) && (other.rootElem == this.rootElem) &&
-        (other.path == this.path) && (other.elem == this.elem)
+      (other.docUriOption == this.docUriOption) && (other.underlyingRootElem == this.underlyingRootElem) &&
+        (other.path == this.path) && (other.underlyingElem == this.underlyingElem)
     case _ => false
   }
 
-  final override def hashCode: Int = (docUriOption, rootElem, path, elem).hashCode
+  final override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
 
-  /**
-   * Returns the document URI, falling back to the empty URI if absent.
-   */
-  final def docUri: URI = docUriOption.getOrElse(new URI(""))
+  final def rootElem: ThisElem = {
+    new IndexedScopedElem[U](docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
+  }
 
-  /**
-   * Returns the base URI, falling back to the empty URI if absent.
-   */
-  final def baseUri: URI = baseUriOption.getOrElse(new URI(""))
+  final def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
+    val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
+
+    assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    assert(!resultOption.get.isEmpty, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+    assert(resultOption.get.last == thisElem)
+
+    resultOption.get
+  }
+
+  final def namespaces: Declarations = {
+    val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
+    parentScope.relativize(this.scope)
+  }
 }
 
 object IndexedScopedElem {
 
-  def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U, path: Path): IndexedScopedElem[U] = {
-    new IndexedScopedElem[U](docUriOption, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): IndexedScopedElem[U] = {
+    new IndexedScopedElem[U](docUriOption, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, rootElem: U, path: Path): IndexedScopedElem[U] = {
-    apply(Some(docUri), rootElem, path)
+  def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, underlyingRootElem: U, path: Path): IndexedScopedElem[U] = {
+    apply(Some(docUri), underlyingRootElem, path)
   }
 
-  def apply[U <: ScopedElemApi.Aux[U]](rootElem: U, path: Path): IndexedScopedElem[U] = {
-    new IndexedScopedElem[U](None, rootElem, path, rootElem.getElemOrSelfByPath(path))
+  def apply[U <: ScopedElemApi.Aux[U]](underlyingRootElem: U, path: Path): IndexedScopedElem[U] = {
+    new IndexedScopedElem[U](None, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
   }
 
-  def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], rootElem: U): IndexedScopedElem[U] = {
-    apply(docUriOption, rootElem, Path.Empty)
+  def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U): IndexedScopedElem[U] = {
+    apply(docUriOption, underlyingRootElem, Path.Empty)
   }
 
-  def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, rootElem: U): IndexedScopedElem[U] = {
-    apply(Some(docUri), rootElem, Path.Empty)
+  def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, underlyingRootElem: U): IndexedScopedElem[U] = {
+    apply(Some(docUri), underlyingRootElem, Path.Empty)
   }
 
-  def apply[U <: ScopedElemApi.Aux[U]](rootElem: U): IndexedScopedElem[U] = {
-    apply(None, rootElem, Path.Empty)
+  def apply[U <: ScopedElemApi.Aux[U]](underlyingRootElem: U): IndexedScopedElem[U] = {
+    apply(None, underlyingRootElem, Path.Empty)
   }
 }

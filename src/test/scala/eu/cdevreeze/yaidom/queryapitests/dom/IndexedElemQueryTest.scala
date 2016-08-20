@@ -206,5 +206,5 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.DomConversions.convertToElem(elem.elem.wrappedNode, Scope.Empty))
+    resolved.Elem(convert.DomConversions.convertToElem(elem.underlyingElem.wrappedNode, Scope.Empty))
 }

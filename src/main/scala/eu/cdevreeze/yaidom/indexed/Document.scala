@@ -23,7 +23,6 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
@@ -46,7 +45,7 @@ final class Document(
   def document: simple.Document = {
     val childSeq: immutable.IndexedSeq[simple.CanBeDocumentChild] =
       children map {
-        case e: Nodes.Elem                   => documentElement.elem
+        case e: Nodes.Elem                   => documentElement.underlyingElem
         case pi: Nodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
         case c: Nodes.Comment                => Comment(c.text)
       }

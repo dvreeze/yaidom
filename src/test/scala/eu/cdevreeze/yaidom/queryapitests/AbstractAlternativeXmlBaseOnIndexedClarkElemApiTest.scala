@@ -27,8 +27,8 @@ import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Node.emptyElem
 
@@ -52,7 +52,7 @@ abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends Suite
   private val XLinkHrefEName = EName(XLinkNs, "href")
 
   type U <: ClarkElemApi.Aux[U]
-  type E <: IndexedClarkElemApi.Aux[E, U]
+  type E <: IndexedClarkElemApi.Aux[E]
 
   // Naive resolveUri method
   protected def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {

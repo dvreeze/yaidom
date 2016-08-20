@@ -22,9 +22,9 @@ import org.junit.Test
 import org.scalatest.Suite
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
@@ -38,7 +38,7 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
   private val XLinkNs = "http://www.w3.org/1999/xlink"
 
   type U <: ClarkElemApi.Aux[U]
-  type E <: IndexedClarkElemApi.Aux[E, U]
+  type E <: IndexedClarkElemApi.Aux[E]
 
   protected def getDocElem(path: String, docUri: URI): E
 

@@ -172,7 +172,7 @@ object XmlDiffTest {
     val commonPaths = allElem1Paths.toSet.intersect(allElem2Paths.toSet)
 
     val inBothElemsButDiffering =
-      commonPaths.filter(p => allElems1ByPath(p).head.elem != allElems2ByPath(p).head.elem)
+      commonPaths.filter(p => allElems1ByPath(p).head.underlyingElem != allElems2ByPath(p).head.underlyingElem)
 
     Diffs(onlyInFirstElem, onlyInSecondElem, inBothElemsButDiffering)
   }

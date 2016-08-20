@@ -66,7 +66,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
 
   protected def getDocumentUri(elem: E): URI
 
-  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2]
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E]
 
   // Naive resolveUri method
   protected def resolveUri(uri: URI, baseUriOption: Option[URI]): URI = {

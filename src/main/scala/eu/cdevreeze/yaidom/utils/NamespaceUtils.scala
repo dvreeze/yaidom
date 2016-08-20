@@ -79,7 +79,7 @@ object NamespaceUtils {
   def stripUnusedNamespaces(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Elem = {
     val usedNamespaces = findAllNamespaces(elem, documentENameExtractor)
 
-    val resultElem = elem.elem transformElemsOrSelf { e =>
+    val resultElem = elem.underlyingElem transformElemsOrSelf { e =>
       e.copy(scope = e.scope filter { case (pref, ns) => usedNamespaces.contains(ns) })
     }
     resultElem

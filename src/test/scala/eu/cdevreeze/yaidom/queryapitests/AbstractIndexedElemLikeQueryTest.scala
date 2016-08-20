@@ -45,7 +45,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
         author <- bookstore.filterElems(withLocalName("Author"))
         bookPath <- author.path.findAncestorPath(_.elementNameOption.map(_.localPart) == Some("Book"))
         book <- bookstore.findElem(_.path == bookPath)
-        if book.getChildElem(withLocalName("Title")).elem.text.startsWith("A First Course in Database Systems")
+        if book.getChildElem(withLocalName("Title")).underlyingElem.text.startsWith("A First Course in Database Systems")
       } yield author
     val elems = bookstore.findAllElemsOrSelf
 
@@ -79,8 +79,8 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
       result.toSet
     }
 
-    assertResult(getBookTitles(bookstore.elem)) {
-      getBookTitles(bookstore).map(_.elem)
+    assertResult(getBookTitles(bookstore.underlyingElem)) {
+      getBookTitles(bookstore).map(_.underlyingElem)
     }
   }
 
@@ -106,8 +106,8 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
       result.toSet
     }
 
-    assertResult(getMagazines(bookstore.elem)) {
-      getMagazines(bookstore).map(_.elem)
+    assertResult(getMagazines(bookstore.underlyingElem)) {
+      getMagazines(bookstore).map(_.underlyingElem)
     }
   }
 }

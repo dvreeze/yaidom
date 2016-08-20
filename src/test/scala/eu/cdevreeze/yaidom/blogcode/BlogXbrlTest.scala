@@ -255,7 +255,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
     // Now using resolved elements, which offer much of the same query API, we can compare the instances for equality
 
     val resolvedOrgElem = resolved.Elem(doc.documentElement)
-    val resolvedEditedElem = resolved.Elem(editedIndexedRootElem.elem)
+    val resolvedEditedElem = resolved.Elem(editedIndexedRootElem.underlyingElem)
 
     // No need to manipulate whitespace before comparison in this case
     assertResult(resolvedOrgElem) {
@@ -356,7 +356,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
 
   private def transformContextForSEqualityComparison(context: XbrliContext): resolved.Elem = {
     // Ignoring "normalization" of dates and QNames, as well as order of dimensions etc.
-    val elem = context.indexedElem.elem.copy(attributes = Vector())
+    val elem = context.indexedElem.underlyingElem.copy(attributes = Vector())
     resolved.Elem(elem).coalesceAndNormalizeAllText.removeAllInterElementWhitespace
   }
 }

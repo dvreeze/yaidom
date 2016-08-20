@@ -62,7 +62,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
     elem.docUri
   }
 
-  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {
     elem.reverseAncestryOrSelf
   }
 

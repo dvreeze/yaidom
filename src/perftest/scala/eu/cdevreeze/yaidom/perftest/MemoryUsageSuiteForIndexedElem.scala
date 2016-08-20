@@ -47,7 +47,7 @@ class MemoryUsageSuiteForIndexedElem extends AbstractMemoryUsageSuite {
   }
 
   protected def createCommonRootParent(rootElems: Vector[indexed.Elem]): indexed.Elem = {
-    val result = Node.elem(qname = QName("root"), scope = Scope.Empty, children = rootElems.map(_.elem))
+    val result = Node.elem(qname = QName("root"), scope = Scope.Empty, children = rootElems.map(_.underlyingElem))
     indexed.Elem(result)
   }
 

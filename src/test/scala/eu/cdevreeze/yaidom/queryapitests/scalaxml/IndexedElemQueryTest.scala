@@ -115,5 +115,5 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.ScalaXmlConversions.convertToElem(elem.elem.wrappedNode))
+    resolved.Elem(convert.ScalaXmlConversions.convertToElem(elem.underlyingElem.wrappedNode))
 }

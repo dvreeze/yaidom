@@ -31,27 +31,27 @@ import eu.cdevreeze.yaidom.simple
  */
 object Elem {
 
-  def apply(rootElem: simple.Elem): Elem = {
-    IndexedScopedElem(rootElem)
+  def apply(underlyingRootElem: simple.Elem): Elem = {
+    IndexedScopedElem(underlyingRootElem)
   }
 
-  def apply(docUriOption: Option[URI], rootElem: simple.Elem): Elem = {
-    IndexedScopedElem(docUriOption, rootElem)
+  def apply(docUriOption: Option[URI], underlyingRootElem: simple.Elem): Elem = {
+    IndexedScopedElem(docUriOption, underlyingRootElem)
   }
 
-  def apply(docUri: URI, rootElem: simple.Elem): Elem = {
-    IndexedScopedElem(docUri, rootElem)
+  def apply(docUri: URI, underlyingRootElem: simple.Elem): Elem = {
+    IndexedScopedElem(docUri, underlyingRootElem)
   }
 
-  def apply(rootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem(rootElem, path)
+  def apply(underlyingRootElem: simple.Elem, path: Path): Elem = {
+    IndexedScopedElem(underlyingRootElem, path)
   }
 
-  def apply(docUriOption: Option[URI], rootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem(docUriOption, rootElem, path)
+  def apply(docUriOption: Option[URI], underlyingRootElem: simple.Elem, path: Path): Elem = {
+    IndexedScopedElem(docUriOption, underlyingRootElem, path)
   }
 
-  def apply(docUri: URI, rootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem(docUri, rootElem, path)
+  def apply(docUri: URI, underlyingRootElem: simple.Elem, path: Path): Elem = {
+    IndexedScopedElem(docUri, underlyingRootElem, path)
   }
 }

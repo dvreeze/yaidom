@@ -117,7 +117,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size == 1, s"Expected top-level element declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.elem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
 
     def targetEName: EName = {
       val tnsOption = (elem.rootElem \@ QName("targetNamespace").res)
@@ -125,11 +125,11 @@ private[utils] object XmlSchemas {
     }
 
     def typeAttributeOption: Option[EName] = {
-      elem.elem.attributeAsResolvedQNameOption(QName("type").res)
+      elem.attributeAsResolvedQNameOption(QName("type").res)
     }
 
     def substitutionGroupOption: Option[EName] = {
-      elem.elem.attributeAsResolvedQNameOption(QName("substitutionGroup").res)
+      elem.attributeAsResolvedQNameOption(QName("substitutionGroup").res)
     }
   }
 
@@ -144,7 +144,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size > 1, s"Expected local element declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.elem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
 
     def targetEName: EName = {
       val elementFormDefaultOption = (elem.rootElem \@ QName("elementFormDefault").res).map(s => s == "qualified")
@@ -156,7 +156,7 @@ private[utils] object XmlSchemas {
     }
 
     def typeAttributeOption: Option[EName] = {
-      elem.elem.attributeAsResolvedQNameOption(QName("type").res)
+      elem.attributeAsResolvedQNameOption(QName("type").res)
     }
   }
 
@@ -171,7 +171,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size > 1, s"Expected element reference, but found path ${elem.path}")
 
     def ref: EName = {
-      elem.elem.attributeAsResolvedQName(QName("ref").res)
+      elem.attributeAsResolvedQName(QName("ref").res)
     }
   }
 
@@ -186,7 +186,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size == 1, s"Expected top-level attribute declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.elem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
 
     def targetEName: EName = {
       val tnsOption = (elem.rootElem \@ QName("targetNamespace").res)
@@ -194,7 +194,7 @@ private[utils] object XmlSchemas {
     }
 
     def typeAttributeOption: Option[EName] = {
-      elem.elem.attributeAsResolvedQNameOption(QName("type").res)
+      elem.attributeAsResolvedQNameOption(QName("type").res)
     }
   }
 
@@ -209,7 +209,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size > 1, s"Expected local attribute declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.elem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
 
     def targetEName: EName = {
       val attributeFormDefaultOption = (elem.rootElem \@ QName("attributeFormDefault").res).map(s => s == "qualified")
@@ -221,7 +221,7 @@ private[utils] object XmlSchemas {
     }
 
     def typeAttributeOption: Option[EName] = {
-      elem.elem.attributeAsResolvedQNameOption(QName("type").res)
+      elem.attributeAsResolvedQNameOption(QName("type").res)
     }
   }
 
@@ -236,7 +236,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size > 1, s"Expected attribute reference, but found path ${elem.path}")
 
     def ref: EName = {
-      elem.elem.attributeAsResolvedQName(QName("ref").res)
+      elem.attributeAsResolvedQName(QName("ref").res)
     }
   }
 

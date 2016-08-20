@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.indexed
+package eu.cdevreeze.yaidom.queryapi
 
 import eu.cdevreeze.yaidom.core.Declarations
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
 /**
  * Abstract API for "indexed Scoped elements".
@@ -40,15 +39,7 @@ trait IndexedScopedElemApi extends IndexedClarkElemApi with ScopedElemApi {
 
 object IndexedScopedElemApi {
 
-  type Aux[A, B] = IndexedScopedElemApi {
+  type Aux[A] = IndexedScopedElemApi {
     type ThisElem = A
-    type UnderlyingElem = B
-  }
-
-  /**
-   * API of builders of `IndexedScopedElemApi` objects. These builders keep a URI resolver for XML Base support.
-   * Builder instances should be thread-safe global objects, encapsulating one chosen URI resolver.
-   */
-  trait Builder[E <: IndexedScopedElemApi.Aux[E, U], U <: ScopedElemApi.Aux[U]] extends IndexedClarkElemApi.Builder[E, U] {
   }
 }
