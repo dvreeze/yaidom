@@ -3,6 +3,27 @@ CHANGELOG
 =========
 
 
+1.6.0-M1
+========
+
+Version 1.6.1 contains several breaking changes, although the impact on client code is limited in that the compiler errors
+are easy to fix.
+
+The changes are as follows:
+
+* The query API traits now use type members instead of type parameters
+
+  * This removes some clutter
+  * This also postpones some type constraints, thus making these query API traits easier to use for generic "bridge elements"
+  * Indeed, this is a trade-off between ease of implementation of the XXXLike traits and ease of use as a generic "backing element" API, where the latter is considered more important
+  * Moreover, the Scala compiler itself moves to the encoding of type parameters (directly) as type members
+
+* The "indexed element" query API now retains the same element type when returning ancestor elements
+* Therefore the "eager indexed elements" have been removed, and the "normal" indexed elements and documents are now the "lazy" ones
+
+As a result, yaidom becomes leaner and meaner.
+
+
 1.5.1
 =====
 
