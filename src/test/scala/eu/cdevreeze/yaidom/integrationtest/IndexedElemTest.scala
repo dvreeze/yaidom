@@ -46,6 +46,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
@@ -114,6 +115,30 @@ class IndexedElemTest extends Suite {
 
     assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
       IndexedScopedElem(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem.underlyingElem.underlyingElem))
+    }
+  }
+
+  @Test def testGetChildren(): Unit = {
+    val docChildren = docWithCommentAtEnd.children
+
+    assertResult(2)(docChildren.size)
+
+    val rootElem = docWithCommentAtEnd.documentElement.prettify(2)
+    val indexedElem = IndexedScopedElem(rootElem)
+
+    val docElemChildren = IndexedScopedElem.getChildren(indexedElem)
+
+    assertResult(indexedElem.findAllChildElems) {
+      docElemChildren collect { case che: IndexedScopedElem[_] => che }
+    }
+
+    assertResult(rootElem.text) {
+      indexedElem.text
+    }
+
+    assertResult(indexedElem.text) {
+      val textChildren = docElemChildren collect { case ch: Nodes.Text => ch }
+      textChildren.map(_.text).mkString
     }
   }
 

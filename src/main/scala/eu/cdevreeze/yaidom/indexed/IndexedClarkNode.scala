@@ -24,6 +24,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 object IndexedClarkNode {
 
@@ -209,6 +210,35 @@ object IndexedClarkNode {
 
     def apply[U <: ClarkElemApi.Aux[U]](underlyingRootElem: U): Elem[U] = {
       apply(None, underlyingRootElem, Path.Empty)
+    }
+
+    /**
+     * Returns the child nodes of the given element, provided the underlying element knows its child nodes too
+     * (which is assured by the type restriction on the underlying element).
+     */
+    def getChildren[U <: ClarkElemApi.Aux[U] with ResolvedNodes.Elem](elem: Elem[U]): immutable.IndexedSeq[Node] = {
+      val childElems = elem.findAllChildElems
+      var childElemIdx = 0
+
+      val children =
+        elem.underlyingElem.children map {
+          case che: ResolvedNodes.Elem =>
+            val e = childElems(childElemIdx)
+            childElemIdx += 1
+            e
+          case ch: ResolvedNodes.Text =>
+            Text(ch.text, false)
+          case ch: Nodes.Comment =>
+            Comment(ch.text)
+          case ch: Nodes.ProcessingInstruction =>
+            ProcessingInstruction(ch.target, ch.data)
+          case ch: Nodes.EntityRef =>
+            EntityRef(ch.entity)
+        }
+
+      assert(childElemIdx == childElems.size)
+
+      children
     }
   }
 }
