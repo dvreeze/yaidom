@@ -32,26 +32,26 @@ import eu.cdevreeze.yaidom.simple
 object Elem {
 
   def apply(underlyingRootElem: simple.Elem): Elem = {
-    IndexedScopedElem(underlyingRootElem)
+    IndexedScopedNode.Elem(underlyingRootElem)
   }
 
   def apply(docUriOption: Option[URI], underlyingRootElem: simple.Elem): Elem = {
-    IndexedScopedElem(docUriOption, underlyingRootElem)
+    IndexedScopedNode.Elem(docUriOption, underlyingRootElem)
   }
 
   def apply(docUri: URI, underlyingRootElem: simple.Elem): Elem = {
-    IndexedScopedElem(docUri, underlyingRootElem)
+    IndexedScopedNode.Elem(docUri, underlyingRootElem)
   }
 
   def apply(underlyingRootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem(underlyingRootElem, path)
+    IndexedScopedNode.Elem(underlyingRootElem, path)
   }
 
   def apply(docUriOption: Option[URI], underlyingRootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem(docUriOption, underlyingRootElem, path)
+    IndexedScopedNode.Elem(docUriOption, underlyingRootElem, path)
   }
 
   def apply(docUri: URI, underlyingRootElem: simple.Elem, path: Path): Elem = {
-    IndexedScopedElem(docUri, underlyingRootElem, path)
+    IndexedScopedNode.Elem(docUri, underlyingRootElem, path)
   }
 }

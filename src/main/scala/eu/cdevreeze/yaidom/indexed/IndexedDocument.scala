@@ -23,7 +23,6 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
 /**
@@ -37,18 +36,14 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  */
 abstract class IndexedDocument(
   val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends DocumentApi with Immutable { self =>
+  val children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends DocumentApi with Immutable { self =>
 
   require(xmlDeclarationOption ne null)
   require(children ne null)
 
   require(
-    children.collect({ case elm: Nodes.Elem => elm }).size == 1,
-    s"A document must have exactly one child element")
-
-  require(
     children.collect({ case elm: IndexedScopedElem[_] => elm }).size == 1,
-    s"A document must have exactly one (IndexedScopedElem) child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
+    s"A document must have exactly one child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
   require(documentElement.path == Path.Empty, "The document element must have the root Path")
 
@@ -59,13 +54,13 @@ abstract class IndexedDocument(
   type DocElemType = IndexedScopedElem[UnderlyingElem]
 
   final def documentElement: DocElemType =
-    children.collect({ case elm: IndexedScopedElem[_] => elm }).head.asInstanceOf[DocElemType]
+    children.collect({ case elm: IndexedScopedNode.Elem[_] => elm }).head.asInstanceOf[DocElemType]
 
-  final def processingInstructions: immutable.IndexedSeq[Nodes.ProcessingInstruction] =
-    children.collect({ case pi: Nodes.ProcessingInstruction => pi })
+  final def processingInstructions: immutable.IndexedSeq[IndexedScopedNode.ProcessingInstruction] =
+    children.collect({ case pi: IndexedScopedNode.ProcessingInstruction => pi })
 
-  final def comments: immutable.IndexedSeq[Nodes.Comment] =
-    children.collect({ case c: Nodes.Comment => c })
+  final def comments: immutable.IndexedSeq[IndexedScopedNode.Comment] =
+    children.collect({ case c: IndexedScopedNode.Comment => c })
 
   final def uriOption: Option[URI] = documentElement.docUriOption
 

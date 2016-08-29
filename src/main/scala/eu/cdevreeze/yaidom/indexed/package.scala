@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom
 
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+
 /**
  * This package contains element representations that contain the "context" of the element. That is, the elements
  * in this package are pairs of a root element and a path (to the actual element itself). The "context" of an element
@@ -55,5 +58,13 @@ package eu.cdevreeze.yaidom
  */
 package object indexed {
 
-  type Elem = IndexedScopedElem[simple.Elem]
+  type Elem = IndexedScopedNode.Elem[simple.Elem]
+
+  type IndexedClarkElem[U <: ClarkElemApi.Aux[U]] = IndexedClarkNode.Elem[U]
+
+  type IndexedScopedElem[U <: ScopedElemApi.Aux[U]] = IndexedScopedNode.Elem[U]
+
+  val IndexedClarkElem = IndexedClarkNode.Elem
+
+  val IndexedScopedElem = IndexedScopedNode.Elem
 }

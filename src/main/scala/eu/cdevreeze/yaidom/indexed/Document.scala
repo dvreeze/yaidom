@@ -22,10 +22,7 @@ import scala.Vector
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.XmlDeclaration
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.simple
-import eu.cdevreeze.yaidom.simple.Comment
-import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 
 /**
  * `IndexedDocument`, containing an "indexed" document element with simple elements as underlying elements.
@@ -34,7 +31,7 @@ import eu.cdevreeze.yaidom.simple.ProcessingInstruction
  */
 final class Document(
   xmlDeclarationOption: Option[XmlDeclaration],
-  children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]) extends IndexedDocument(xmlDeclarationOption, children) with Immutable {
+  children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends IndexedDocument(xmlDeclarationOption, children) with Immutable {
 
   type ThisDocApi = Document
 
@@ -45,9 +42,9 @@ final class Document(
   def document: simple.Document = {
     val childSeq: immutable.IndexedSeq[simple.CanBeDocumentChild] =
       children map {
-        case e: Nodes.Elem                   => documentElement.underlyingElem
-        case pi: Nodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
-        case c: Nodes.Comment                => Comment(c.text)
+        case e: IndexedScopedNode.Elem[_]                => documentElement.underlyingElem
+        case pi: IndexedScopedNode.ProcessingInstruction => simple.ProcessingInstruction(pi.target, pi.data)
+        case c: IndexedScopedNode.Comment                => simple.Comment(c.text)
       }
 
     simple.Document(uriOption, xmlDeclarationOption, childSeq)
@@ -57,8 +54,8 @@ final class Document(
   def withDocumentElement(newRoot: Elem): Document = new Document(
     xmlDeclarationOption = this.xmlDeclarationOption,
     children = this.children map {
-      case elm: Nodes.Elem                => newRoot
-      case node: Nodes.CanBeDocumentChild => node
+      case elm: IndexedScopedNode.Elem[_]             => newRoot
+      case node: IndexedScopedNode.CanBeDocumentChild => node
     })
 
   /** Creates a copy, but with the new xmlDeclarationOption passed as parameter newXmlDeclarationOption */
@@ -71,7 +68,7 @@ object Document {
 
   def apply(
     xmlDeclarationOption: Option[XmlDeclaration],
-    children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]): Document = {
+    children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]): Document = {
 
     new Document(xmlDeclarationOption, children)
   }
@@ -79,8 +76,8 @@ object Document {
   def apply(
     xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
-    comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
+    processingInstructions: immutable.IndexedSeq[IndexedScopedNode.ProcessingInstruction] = immutable.IndexedSeq(),
+    comments: immutable.IndexedSeq[IndexedScopedNode.Comment] = immutable.IndexedSeq()): Document = {
 
     new Document(
       xmlDeclarationOption,
@@ -92,11 +89,12 @@ object Document {
   }
 
   def from(d: simple.Document): Document = {
-    val elem = IndexedScopedElem(d.uriOption, d.documentElement)
+    val elem = IndexedScopedNode.Elem(d.uriOption, d.documentElement)
 
     val children = d.children map {
-      case elm: Nodes.Elem                => elem
-      case node: Nodes.CanBeDocumentChild => node
+      case elm: simple.Elem                   => elem
+      case node: simple.Comment               => IndexedScopedNode.Comment(node.text)
+      case node: simple.ProcessingInstruction => IndexedScopedNode.ProcessingInstruction(node.target, node.data)
     }
 
     apply(d.xmlDeclarationOption, children)
