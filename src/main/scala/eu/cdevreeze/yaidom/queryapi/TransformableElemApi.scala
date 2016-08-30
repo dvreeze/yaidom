@@ -201,8 +201,11 @@ trait TransformableElemApi extends AnyElemNodeApi {
 
 object TransformableElemApi {
 
-  type Aux[A, B] = TransformableElemApi {
-    type ThisNode = A
-    type ThisElem = B
-  }
+  /**
+   * This query API type, fixing ThisNode, ThisElem and ThisElemApi to the passed type parameters.
+   *
+   * @tparam N The node self type
+   * @tparam E The element self type
+   */
+  type Aux[N, E] = TransformableElemApi { type ThisNode = N; type ThisElem = E; type ThisElemApi = E }
 }

@@ -42,11 +42,11 @@ import javax.xml.parsers.DocumentBuilderFactory
 @RunWith(classOf[JUnitRunner])
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
+  type D = DomDocument
+
   type E = DomElem
 
-  type E2 = DomElem
-
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[E] = {
+  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E] = {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val d = db.newDocument()
@@ -69,7 +69,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
     toUri(elem.wrappedNode.getOwnerDocument.getDocumentURI)
   }
 
-  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {
     elem.ancestorsOrSelf.reverse
   }
 

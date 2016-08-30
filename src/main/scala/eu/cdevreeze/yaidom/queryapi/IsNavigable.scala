@@ -80,5 +80,10 @@ trait IsNavigable extends IsNavigableApi {
 
 object IsNavigable {
 
-  type Aux[A] = IsNavigable { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = IsNavigable { type ThisElem = E; type ThisElemApi = E }
 }

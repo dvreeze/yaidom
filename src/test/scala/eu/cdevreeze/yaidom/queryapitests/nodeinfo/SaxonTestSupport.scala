@@ -64,7 +64,7 @@ trait SaxonTestSupport {
 
     final override def equals(obj: Any): Boolean = obj match {
       case other: DomNode => this.wrappedNode == other.wrappedNode
-      case _              => false
+      case _ => false
     }
 
     final override def hashCode: Int = this.wrappedNode.hashCode
@@ -73,6 +73,10 @@ trait SaxonTestSupport {
   final class DomDocument(val wrappedNode: DocumentInfo) extends DocumentApi {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.DOCUMENT)
+
+    type ThisDocApi = DomDocument
+
+    type ThisDoc = DomDocument
 
     type DocElemType = DomElem
 
@@ -210,12 +214,12 @@ trait SaxonTestSupport {
 
     def wrapNodeOption(node: NodeInfo): Option[DomNode] = {
       node.getNodeKind match {
-        case Type.ELEMENT                => Some(new DomElem(node))
-        case Type.TEXT                   => Some(new DomText(node))
-        case Type.WHITESPACE_TEXT        => Some(new DomText(node))
+        case Type.ELEMENT => Some(new DomElem(node))
+        case Type.TEXT => Some(new DomText(node))
+        case Type.WHITESPACE_TEXT => Some(new DomText(node))
         case Type.PROCESSING_INSTRUCTION => Some(new DomProcessingInstruction(node))
-        case Type.COMMENT                => Some(new DomComment(node))
-        case _                           => None
+        case Type.COMMENT => Some(new DomComment(node))
+        case _ => None
       }
     }
 

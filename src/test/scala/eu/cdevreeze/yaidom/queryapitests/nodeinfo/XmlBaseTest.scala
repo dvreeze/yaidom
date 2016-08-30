@@ -37,9 +37,9 @@ import net.sf.saxon.lib.ParseOptions
 @RunWith(classOf[JUnitRunner])
 class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
 
-  type E = DomElem
+  type D = DomDocument
 
-  type E2 = DomElem
+  type E = DomElem
 
   protected def getDocument(path: String, docUri: URI): DomDocument = {
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
@@ -68,7 +68,7 @@ class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
     toUri(elem.wrappedNode.getDocumentRoot.getSystemId)
   }
 
-  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {
     elem.ancestorsOrSelf.reverse
   }
 

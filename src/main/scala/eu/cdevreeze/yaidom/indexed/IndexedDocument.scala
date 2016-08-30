@@ -51,6 +51,8 @@ abstract class IndexedDocument(
 
   type UnderlyingElem <: ScopedElemApi.Aux[UnderlyingElem]
 
+  type UnderlyingDoc <: DocumentApi.Aux[UnderlyingDoc, UnderlyingElem]
+
   type DocElemType = IndexedScopedElem[UnderlyingElem]
 
   final def documentElement: DocElemType =
@@ -69,7 +71,7 @@ abstract class IndexedDocument(
    */
   final def uri: URI = uriOption.getOrElse(new URI(""))
 
-  def document: DocumentApi.Aux[UnderlyingElem]
+  def document: DocumentApi.Aux[UnderlyingDoc, UnderlyingElem]
 
   final override def toString: String = document.toString
 

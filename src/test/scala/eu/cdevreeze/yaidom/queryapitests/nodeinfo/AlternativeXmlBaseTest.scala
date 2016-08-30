@@ -41,11 +41,11 @@ import net.sf.saxon.lib.ParseOptions
 @RunWith(classOf[JUnitRunner])
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTestSupport {
 
+  type D = DomDocument
+
   type E = DomElem
 
-  type E2 = DomElem
-
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[E] = {
+  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E] = {
     val docPrinter = DocumentPrinterUsingDom.newInstance
     val xmlString = docPrinter.print(elem)
 
@@ -71,7 +71,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTe
     toUri(elem.wrappedNode.getDocumentRoot.getSystemId)
   }
 
-  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {
     elem.ancestorsOrSelf.reverse
   }
 

@@ -65,6 +65,10 @@ final class Document(
     children.collect({ case elm: Elem => elm }).size == 1,
     s"A document must have exactly one child element (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
+  type ThisDocApi = Document
+
+  type ThisDoc = Document
+
   type DocElemType = Elem
 
   val documentElement: Elem = children.collect({ case elm: Elem => elm }).head
@@ -94,7 +98,7 @@ final class Document(
     uriOption = this.uriOption,
     xmlDeclarationOption = this.xmlDeclarationOption,
     children = this.children map {
-      case elm: Elem                => newRoot
+      case elm: Elem => newRoot
       case node: CanBeDocumentChild => node
     })
 

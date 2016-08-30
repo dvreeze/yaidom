@@ -56,9 +56,9 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
 
   type E <: ScopedElemApi.Aux[E]
 
-  type E2 <: HasENameApi
+  type D <: DocumentApi.Aux[D, E]
 
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[E]
+  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E]
 
   protected def getBaseUri(elem: E): URI
 

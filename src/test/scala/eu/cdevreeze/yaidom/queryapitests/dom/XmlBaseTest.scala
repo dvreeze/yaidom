@@ -38,9 +38,9 @@ import javax.xml.parsers.DocumentBuilderFactory
 @RunWith(classOf[JUnitRunner])
 class XmlBaseTest extends AbstractXmlBaseTest {
 
-  type E = DomElem
+  type D = DomDocument
 
-  type E2 = DomElem
+  type E = DomElem
 
   protected def getDocument(path: String, docUri: URI): DomDocument = {
     val dbf = DocumentBuilderFactory.newInstance
@@ -70,7 +70,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
     toUri(elem.wrappedNode.getOwnerDocument.getDocumentURI)
   }
 
-  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E2] = {
+  protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {
     elem.ancestorsOrSelf.reverse
   }
 

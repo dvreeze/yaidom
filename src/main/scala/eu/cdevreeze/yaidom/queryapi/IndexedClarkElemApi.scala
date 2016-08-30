@@ -98,7 +98,10 @@ trait IndexedClarkElemApi extends ClarkElemApi {
 
 object IndexedClarkElemApi {
 
-  type Aux[A] = IndexedClarkElemApi {
-    type ThisElem = A
-  }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = IndexedClarkElemApi { type ThisElem = E; type ThisElemApi = E }
 }

@@ -30,6 +30,8 @@ import eu.cdevreeze.yaidom.core.Path
  * Note that this class renders a separate query API for element-path pairs obsolete. It takes a `IsNavigableApi`, using
  * its `findAllChildElemsWithPathEntries` method, and offers the equivalent of an `ElemApi` for element-path pairs.
  *
+ * @tparam E The underlying (root) element type
+ *
  * @author Chris de Vreeze
  */
 final class ElemWithPath[E <: IsNavigableApi.Aux[E]](val elem: E, val path: Path) extends ElemLike {

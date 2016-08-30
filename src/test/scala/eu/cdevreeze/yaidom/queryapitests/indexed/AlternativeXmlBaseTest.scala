@@ -41,11 +41,11 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
 
+  type D = yaidom.indexed.Document
+
   type E = yaidom.indexed.Elem
 
-  type E2 = yaidom.simple.Elem
-
-  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[E] = {
+  protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E] = {
     val doc = yaidom.indexed.Document.from(yaidom.simple.Document(Some(docUri), elem))
     doc
   }

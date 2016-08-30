@@ -55,5 +55,10 @@ trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
 
 object ScopedElemLike {
 
-  type Aux[A] = ScopedElemLike { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = ScopedElemLike { type ThisElem = E; type ThisElemApi = E }
 }

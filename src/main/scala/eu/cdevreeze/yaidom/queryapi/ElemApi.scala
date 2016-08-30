@@ -252,7 +252,12 @@ trait ElemApi extends AnyElemApi {
 
 object ElemApi {
 
-  type Aux[A] = ElemApi { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = ElemApi { type ThisElem = E; type ThisElemApi = E }
 
   /**
    * Element predicate that filters away no elements, and that can be used in many methods of the ElemApi trait.

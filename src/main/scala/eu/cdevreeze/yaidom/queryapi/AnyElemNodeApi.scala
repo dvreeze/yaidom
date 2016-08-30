@@ -23,7 +23,8 @@ package eu.cdevreeze.yaidom.queryapi
  */
 trait AnyElemNodeApi extends AnyElemApi {
 
-  type ThisNode
-
-  type ThisElem <: ThisElemApi with ThisNode
+  /**
+   * The node type, that is a super-type of the element type, but also of corresponding text node types etc.
+   */
+  type ThisNode >: ThisElem
 }

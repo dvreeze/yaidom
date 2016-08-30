@@ -39,5 +39,10 @@ trait ClarkElemApi extends ElemApi with IsNavigableApi with HasENameApi with Has
 
 object ClarkElemApi {
 
-  type Aux[A] = ClarkElemApi { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = ClarkElemApi { type ThisElem = E; type ThisElemApi = E }
 }

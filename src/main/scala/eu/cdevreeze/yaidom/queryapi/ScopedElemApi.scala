@@ -92,5 +92,10 @@ trait ScopedElemApi extends ClarkElemApi with HasQNameApi with HasScopeApi {
 
 object ScopedElemApi {
 
-  type Aux[A] = ScopedElemApi { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = ScopedElemApi { type ThisElem = E; type ThisElemApi = E }
 }

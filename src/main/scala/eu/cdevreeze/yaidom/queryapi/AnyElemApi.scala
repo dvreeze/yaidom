@@ -24,15 +24,33 @@ package eu.cdevreeze.yaidom.queryapi
 trait AnyElemApi {
 
   // The 2 type members below are instrumental in implementing F-bounded polymorphism.
-  // Type ThisElemApi must always be a sub-type of the API trait or concrete element type in question.
-  // Type ThisElem (the "real self type") must be a sub-type of ThisElemApi everywhere.
   // Note that we need no surrounding cake, and we need no types like ThisApi#ThisElem.
 
   // For F-bounded polymorphism in DOT, see http://www.cs.uwm.edu/~boyland/fool2012/papers/fool2012_submission_3.pdf.
 
+  /**
+   * Upperbound on type ThisElem, which must be restricted to a sub-type of the query API trait in question.
+   *
+   * Concrete element classes will restrict this type to that element class itself.
+   *
+   * The purely abstract query API traits (XXXApi) should only restrict this type to a sub-type of the query API trait,
+   * without putting any further restrictions on the type. This way these purely abstract traits are easy to use as "generic"
+   * element contracts abstracting over multiple backing element implementations (for example, Saxon tiny trees and native
+   * yaidom elements) without "infecting" the client code with generics.
+   *
+   * To a lesser extent, this should also be true for the partially implemented query API traits (XXXLike).
+   */
   type ThisElemApi <: AnyElemApi
 
+  /**
+   * The ("stable") element type itself. It is not restricted in the query API traits (only indirectly, through ThisElemApi).
+   *
+   * Concrete element classes will restrict this type to that element class itself.
+   */
   type ThisElem <: ThisElemApi
 
+  /**
+   * This element itself.
+   */
   def thisElem: ThisElem
 }

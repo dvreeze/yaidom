@@ -95,7 +95,7 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
     val p2: (ThisElem => Boolean) = {
       case elem: B if p(elem) => true
-      case _                  => false
+      case _ => false
     }
 
     f(p2) collect {
@@ -111,7 +111,7 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
     val p2: (ThisElem => Boolean) = {
       case elem: B if p(elem) => true
-      case _                  => false
+      case _ => false
     }
 
     f(p2) collect {
@@ -122,5 +122,10 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
 object SubtypeAwareElemLike {
 
-  type Aux[A] = SubtypeAwareElemLike { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = SubtypeAwareElemLike { type ThisElem = E; type ThisElemApi = E }
 }

@@ -40,9 +40,9 @@ class XmlBaseTest extends AbstractXmlBaseTest {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
 
-  type E = indexed.Elem
+  type D = indexed.Document
 
-  type E2 = simple.Elem
+  type E = indexed.Elem
 
   protected def getDocument(path: String, docUri: URI): indexed.Document = {
     val docParser = DocumentParserUsingSax.newInstance

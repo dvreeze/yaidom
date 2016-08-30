@@ -31,6 +31,8 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 /**
  * Common super-class for IndexedClarkElem and IndexedScopedElem.
  *
+ * @tparam U The underlying element type
+ *
  * @author Chris de Vreeze
  */
 abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](

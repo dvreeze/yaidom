@@ -317,5 +317,10 @@ trait ElemLike extends ElemApi {
 
 object ElemLike {
 
-  type Aux[A] = ElemLike { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = ElemLike { type ThisElem = E; type ThisElemApi = E }
 }

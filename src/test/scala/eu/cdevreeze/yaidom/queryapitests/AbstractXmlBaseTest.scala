@@ -43,11 +43,11 @@ abstract class AbstractXmlBaseTest extends Suite {
 
   type E <: ScopedElemApi.Aux[E]
 
-  type E2 <: HasENameApi
+  type D <: DocumentApi.Aux[D, E]
 
-  protected def getDocument(path: String, docUri: URI): DocumentApi.Aux[E]
+  protected def getDocument(path: String, docUri: URI): DocumentApi.Aux[D, E]
 
-  protected def getDocument(path: String): DocumentApi.Aux[E]
+  protected def getDocument(path: String): DocumentApi.Aux[D, E]
 
   protected def getBaseUri(elem: E): URI
 

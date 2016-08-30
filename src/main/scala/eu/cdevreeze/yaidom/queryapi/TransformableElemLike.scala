@@ -55,8 +55,11 @@ trait TransformableElemLike extends TransformableElemApi {
 
 object TransformableElemLike {
 
-  type Aux[A, B] = TransformableElemLike {
-    type ThisNode = A
-    type ThisElem = B
-  }
+  /**
+   * This query API type, fixing ThisNode, ThisElem and ThisElemApi to the passed type parameters.
+   *
+   * @tparam N The node self type
+   * @tparam E The element self type
+   */
+  type Aux[N, E] = TransformableElemLike { type ThisNode = N; type ThisElem = E; type ThisElemApi = E }
 }

@@ -110,5 +110,10 @@ trait SubtypeAwareElemApi extends ElemApi {
 
 object SubtypeAwareElemApi {
 
-  type Aux[A] = SubtypeAwareElemApi { type ThisElem = A }
+  /**
+   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   *
+   * @tparam E The element self type
+   */
+  type Aux[E] = SubtypeAwareElemApi { type ThisElem = E; type ThisElemApi = E }
 }

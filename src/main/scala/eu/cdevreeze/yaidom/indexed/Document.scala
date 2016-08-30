@@ -39,12 +39,14 @@ final class Document(
 
   type UnderlyingElem = simple.Elem
 
+  type UnderlyingDoc = simple.Document
+
   def document: simple.Document = {
     val childSeq: immutable.IndexedSeq[simple.CanBeDocumentChild] =
       children map {
-        case e: IndexedScopedNode.Elem[_]                => documentElement.underlyingElem
+        case e: IndexedScopedNode.Elem[_] => documentElement.underlyingElem
         case pi: IndexedScopedNode.ProcessingInstruction => simple.ProcessingInstruction(pi.target, pi.data)
-        case c: IndexedScopedNode.Comment                => simple.Comment(c.text)
+        case c: IndexedScopedNode.Comment => simple.Comment(c.text)
       }
 
     simple.Document(uriOption, xmlDeclarationOption, childSeq)
@@ -54,7 +56,7 @@ final class Document(
   def withDocumentElement(newRoot: Elem): Document = new Document(
     xmlDeclarationOption = this.xmlDeclarationOption,
     children = this.children map {
-      case elm: IndexedScopedNode.Elem[_]             => newRoot
+      case elm: IndexedScopedNode.Elem[_] => newRoot
       case node: IndexedScopedNode.CanBeDocumentChild => node
     })
 
@@ -92,8 +94,8 @@ object Document {
     val elem = IndexedScopedNode.Elem(d.uriOption, d.documentElement)
 
     val children = d.children map {
-      case elm: simple.Elem                   => elem
-      case node: simple.Comment               => IndexedScopedNode.Comment(node.text)
+      case elm: simple.Elem => elem
+      case node: simple.Comment => IndexedScopedNode.Comment(node.text)
       case node: simple.ProcessingInstruction => IndexedScopedNode.ProcessingInstruction(node.target, node.data)
     }
 

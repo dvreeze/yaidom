@@ -38,7 +38,11 @@ trait DocumentApi extends AnyDocumentApi {
 
 object DocumentApi {
 
-  type Aux[A] = DocumentApi {
-    type DocElemType = A
-  }
+  /**
+   * This document API type, fixing the type members to the passed type parameters.
+   *
+   * @tparam D The document type itself
+   * @tparam E The document element type
+   */
+  type Aux[D, E] = DocumentApi { type ThisDoc = D; type ThisDocApi = D; type DocElemType = E }
 }
