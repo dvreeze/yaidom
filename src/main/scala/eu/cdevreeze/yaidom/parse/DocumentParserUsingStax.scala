@@ -112,7 +112,7 @@ final class DocumentParserUsingStax(
 
 object DocumentParserUsingStax {
 
-  /** Returns a new instance, configured to coalesce whitespace */
+  /** Returns a new instance, configured to coalesce CDATA sections. */
   def newInstance(): DocumentParserUsingStax = {
     // Although the factory method newFactory should be used instead of newInstance,
     // to stay out of "XML JAR-hell", the newInstance method was used.
