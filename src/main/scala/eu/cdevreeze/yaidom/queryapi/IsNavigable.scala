@@ -81,7 +81,7 @@ trait IsNavigable extends IsNavigableApi {
 object IsNavigable {
 
   /**
-   * This query API type, fixing ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
    *
    * @tparam E The element self type
    */

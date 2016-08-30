@@ -560,7 +560,7 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
 object UpdatableElemApi {
 
   /**
-   * This query API type, fixing ThisNode, ThisElem and ThisElemApi to the passed type parameters.
+   * This query API type, restricting ThisNode, ThisElem and ThisElemApi to the passed type parameters.
    *
    * @tparam N The node self type
    * @tparam E The element self type

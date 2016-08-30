@@ -39,7 +39,7 @@ trait DocumentApi extends AnyDocumentApi {
 object DocumentApi {
 
   /**
-   * This document API type, fixing the type members to the passed type parameters.
+   * This document API type, restricting the type members to the passed type parameters.
    *
    * @tparam D The document type itself
    * @tparam E The document element type
