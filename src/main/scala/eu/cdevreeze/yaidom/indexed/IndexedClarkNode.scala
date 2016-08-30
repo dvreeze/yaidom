@@ -35,8 +35,6 @@ object IndexedClarkNode {
    */
   sealed trait Node extends Nodes.Node
 
-  sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
-
   /**
    * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
    * and a path (from that root element) to this element. More precisely, this element implementation contains an underlying root element,
@@ -113,7 +111,7 @@ object IndexedClarkNode {
     docUriOption: Option[URI],
     underlyingRootElem: U,
     path: Path,
-    underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with Nodes.Elem {
+    underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with Node with Nodes.Elem {
 
     type ThisElemApi = Elem[U]
 
@@ -163,29 +161,6 @@ object IndexedClarkNode {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
-    require(target ne null)
-    require(data ne null)
-  }
-
-  /**
-   * An entity reference. For example:
-   * {{{
-   * &hello;
-   * }}}
-   * We obtain this entity reference as follows:
-   * {{{
-   * EntityRef("hello")
-   * }}}
-   */
-  final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
-    require(entity ne null)
-  }
-
-  final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
-    require(text ne null)
-  }
-
   object Elem {
 
     def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
@@ -221,19 +196,15 @@ object IndexedClarkNode {
       var childElemIdx = 0
 
       val children =
-        elem.underlyingElem.children map {
-          case che: ResolvedNodes.Elem =>
+        elem.underlyingElem.children flatMap {
+          case che: Nodes.Elem =>
             val e = childElems(childElemIdx)
             childElemIdx += 1
-            e
-          case ch: ResolvedNodes.Text =>
-            Text(ch.text, false)
-          case ch: Nodes.Comment =>
-            Comment(ch.text)
-          case ch: Nodes.ProcessingInstruction =>
-            ProcessingInstruction(ch.target, ch.data)
-          case ch: Nodes.EntityRef =>
-            EntityRef(ch.entity)
+            Some(e)
+          case ch: Nodes.Text =>
+            Some(Text(ch.text, false))
+          case ch =>
+            None
         }
 
       assert(childElemIdx == childElems.size)

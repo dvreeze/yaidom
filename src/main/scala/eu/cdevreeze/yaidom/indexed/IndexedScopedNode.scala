@@ -175,19 +175,21 @@ object IndexedScopedNode {
       var childElemIdx = 0
 
       val children =
-        elem.underlyingElem.children map {
-          case che: ResolvedNodes.Elem =>
+        elem.underlyingElem.children flatMap {
+          case che: Nodes.Elem =>
             val e = childElems(childElemIdx)
             childElemIdx += 1
-            e
-          case ch: ResolvedNodes.Text =>
-            Text(ch.text, false)
+            Some(e)
+          case ch: Nodes.Text =>
+            Some(Text(ch.text, false))
           case ch: Nodes.Comment =>
-            Comment(ch.text)
+            Some(Comment(ch.text))
           case ch: Nodes.ProcessingInstruction =>
-            ProcessingInstruction(ch.target, ch.data)
+            Some(ProcessingInstruction(ch.target, ch.data))
           case ch: Nodes.EntityRef =>
-            EntityRef(ch.entity)
+            Some(EntityRef(ch.entity))
+          case ch =>
+            None
         }
 
       assert(childElemIdx == childElems.size)
