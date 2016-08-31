@@ -35,7 +35,10 @@ package eu.cdevreeze.yaidom.queryapi
  *
  * @author Chris de Vreeze
  */
-trait BackingElemApi extends IndexedScopedElemApi with HasParentApi
+trait BackingElemApi extends IndexedScopedElemApi with HasParentApi {
+
+  type ThisElemApi <: BackingElemApi
+}
 
 object BackingElemApi {
 
