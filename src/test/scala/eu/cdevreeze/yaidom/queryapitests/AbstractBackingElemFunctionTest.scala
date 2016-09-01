@@ -71,45 +71,48 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
 
   def docElem: E
 
-  def ops: BackingElemFunctionApi.Aux[E]
+  val ops: BackingElemFunctionApi.Aux[E]
+
+  // Stable identifier, so we can import all members of ops
+  import ops._
 
   @Test def testResolvedName(): Unit = {
-    assertResult(XsSchemaEName)(ops.resolvedName(docElem))
-    assertResult(Some(XsNamespace))(ops.resolvedName(docElem).namespaceUriOption)
-    assertResult("schema")(ops.resolvedName(docElem).localPart)
+    assertResult(XsSchemaEName)(resolvedName(docElem))
+    assertResult(Some(XsNamespace))(resolvedName(docElem).namespaceUriOption)
+    assertResult("schema")(resolvedName(docElem).localPart)
   }
 
   @Test def testQName(): Unit = {
-    assertResult(QName("xs:schema"))(ops.qname(docElem))
-    assertResult(Some("xs"))(ops.qname(docElem).prefixOption)
-    assertResult("schema")(ops.qname(docElem).localPart)
+    assertResult(QName("xs:schema"))(qname(docElem))
+    assertResult(Some("xs"))(qname(docElem).prefixOption)
+    assertResult("schema")(qname(docElem).localPart)
   }
 
   @Test def testDocUri(): Unit = {
-    assertResult("file")(ops.docUri(docElem).getScheme)
-    assertResult("some-data.xsd")((new File(ops.docUri(docElem))).getName)
-    assertResult(true)((new File(ops.docUri(docElem))).isFile)
-    assertResult(Some(ops.docUri(docElem)))(ops.docUriOption(docElem))
+    assertResult("file")(docUri(docElem).getScheme)
+    assertResult("some-data.xsd")((new File(docUri(docElem))).getName)
+    assertResult(true)((new File(docUri(docElem))).isFile)
+    assertResult(Some(docUri(docElem)))(docUriOption(docElem))
 
-    assertResult(Set(ops.docUri(docElem))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.docUri(e)).toSet
+    assertResult(Set(docUri(docElem))) {
+      findAllElemsOrSelf(docElem).map(e => docUri(e)).toSet
     }
-    assertResult(Set(Some(ops.docUri(docElem)))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.docUriOption(e)).toSet
+    assertResult(Set(Some(docUri(docElem)))) {
+      findAllElemsOrSelf(docElem).map(e => docUriOption(e)).toSet
     }
   }
 
   @Test def testDefaultBaseUri(): Unit = {
-    assertResult("file")(ops.baseUri(docElem).getScheme)
-    assertResult("some-data.xsd")((new File(ops.baseUri(docElem))).getName)
-    assertResult(true)((new File(ops.baseUri(docElem))).isFile)
-    assertResult(Some(ops.baseUri(docElem)))(ops.baseUriOption(docElem))
+    assertResult("file")(baseUri(docElem).getScheme)
+    assertResult("some-data.xsd")((new File(baseUri(docElem))).getName)
+    assertResult(true)((new File(baseUri(docElem))).isFile)
+    assertResult(Some(baseUri(docElem)))(baseUriOption(docElem))
 
-    assertResult(Set(ops.baseUri(docElem))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.baseUri(e)).toSet
+    assertResult(Set(baseUri(docElem))) {
+      findAllElemsOrSelf(docElem).map(e => baseUri(e)).toSet
     }
-    assertResult(Set(Some(ops.baseUri(docElem)))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.baseUriOption(e)).toSet
+    assertResult(Set(Some(baseUri(docElem)))) {
+      findAllElemsOrSelf(docElem).map(e => baseUriOption(e)).toSet
     }
   }
 
@@ -120,36 +123,36 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
         AttributeFormDefaultEName -> "unqualified",
         ElementFormDefaultEName -> "qualified")) {
 
-        ops.resolvedAttributes(docElem).toMap
+        resolvedAttributes(docElem).toMap
       }
 
-    val linkbaseRefElems = ops.filterElems(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterElems(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(Set(Some("simple"))) {
-      linkbaseRefElems.map(e => ops.attributeOption(e, EName(XLinkNamespace, "type"))).toSet
+      linkbaseRefElems.map(e => attributeOption(e, EName(XLinkNamespace, "type"))).toSet
     }
     assertResult(Set("simple")) {
-      linkbaseRefElems.map(e => ops.attribute(e, EName(XLinkNamespace, "type"))).toSet
+      linkbaseRefElems.map(e => attribute(e, EName(XLinkNamespace, "type"))).toSet
     }
   }
 
   @Test def testQNameAttributes(): Unit = {
-    val elementElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsElementEName)
+    val elementElems = filterElemsOrSelf(docElem, e => resolvedName(e) == XsElementEName)
 
     assertResult(true)(elementElems.size >= 100)
 
     assertResult(Set(QName("xbrli:item"))) {
-      elementElems.flatMap(e => ops.attributeAsQNameOption(e, SubstitutionGroupEName)).toSet
+      elementElems.flatMap(e => attributeAsQNameOption(e, SubstitutionGroupEName)).toSet
     }
     assertResult(Set(QName("xbrli:item"))) {
-      elementElems.map(e => ops.attributeAsQName(e, SubstitutionGroupEName)).toSet
+      elementElems.map(e => attributeAsQName(e, SubstitutionGroupEName)).toSet
     }
 
     assertResult(Set(XbrliItemEName)) {
-      elementElems.flatMap(e => ops.attributeAsResolvedQNameOption(e, SubstitutionGroupEName)).toSet
+      elementElems.flatMap(e => attributeAsResolvedQNameOption(e, SubstitutionGroupEName)).toSet
     }
     assertResult(Set(XbrliItemEName)) {
-      elementElems.map(e => ops.attributeAsResolvedQName(e, SubstitutionGroupEName)).toSet
+      elementElems.map(e => attributeAsResolvedQName(e, SubstitutionGroupEName)).toSet
     }
   }
 
@@ -160,13 +163,13 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
         QName("attributeFormDefault") -> "unqualified",
         QName("elementFormDefault") -> "qualified")) {
 
-        ops.attributes(docElem).toMap
+        attributes(docElem).toMap
       }
 
-    val linkbaseRefElems = ops.filterElems(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterElems(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(Set(Some("simple"))) {
-      linkbaseRefElems.map(e => ops.findAttributeByLocalName(e, "type")).toSet
+      linkbaseRefElems.map(e => findAttributeByLocalName(e, "type")).toSet
     }
   }
 
@@ -184,77 +187,77 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
         "nl-codes" -> "http://www.sometaxonomy/0.1/basis/sbr/types/nl-codes",
         "some-i" -> "http://www.sometaxonomy/0.1/basis/some2/items/some-data")) {
 
-        ops.scope(docElem)
+        scope(docElem)
       }
 
-    assertResult(Set(ops.scope(docElem))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.scope(e)).toSet
+    assertResult(Set(scope(docElem))) {
+      findAllElemsOrSelf(docElem).map(e => scope(e)).toSet
     }
 
-    assertResult(Declarations.from(ops.scope(docElem).prefixNamespaceMap.toIndexedSeq: _*)) {
-      ops.namespaces(docElem)
+    assertResult(Declarations.from(scope(docElem).prefixNamespaceMap.toIndexedSeq: _*)) {
+      namespaces(docElem)
     }
     assertResult(Set(Declarations.from())) {
-      ops.findAllElems(docElem).map(e => ops.namespaces(e)).toSet
+      findAllElems(docElem).map(e => namespaces(e)).toSet
     }
   }
 
   @Test def testText(): Unit = {
     assertResult(Set("")) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.text(e).trim).toSet
+      findAllElemsOrSelf(docElem).map(e => text(e).trim).toSet
     }
     assertResult(true) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.text(e)).filter(_.nonEmpty).nonEmpty
+      findAllElemsOrSelf(docElem).map(e => text(e)).filter(_.nonEmpty).nonEmpty
     }
-    assertResult(ops.findAllElemsOrSelf(docElem).map(e => ops.trimmedText(e))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.text(e).trim)
+    assertResult(findAllElemsOrSelf(docElem).map(e => trimmedText(e))) {
+      findAllElemsOrSelf(docElem).map(e => text(e).trim)
     }
-    assertResult(ops.findAllElemsOrSelf(docElem).map(e => ops.normalizedText(e))) {
-      ops.findAllElemsOrSelf(docElem).map(e => ops.text(e).trim)
+    assertResult(findAllElemsOrSelf(docElem).map(e => normalizedText(e))) {
+      findAllElemsOrSelf(docElem).map(e => text(e).trim)
     }
   }
 
   @Test def testFilterElemsOrSelf(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == EName("schema"))
+    val bogusElems = filterElemsOrSelf(docElem, e => resolvedName(e) == EName("schema"))
 
     assertResult(0)(bogusElems.size)
-    assertResult(ops.findAllElemsOrSelf(docElem).filter(e => ops.resolvedName(e) == EName("schema")))(bogusElems)
+    assertResult(findAllElemsOrSelf(docElem).filter(e => resolvedName(e) == EName("schema")))(bogusElems)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsSchemaEName)
+    val xsSchemaElems = filterElemsOrSelf(docElem, e => resolvedName(e) == XsSchemaEName)
 
     assertResult(1)(xsSchemaElems.size)
     assertResult(Set(XsSchemaEName)) {
-      xsSchemaElems.map(e => ops.resolvedName(e)).toSet
+      xsSchemaElems.map(e => resolvedName(e)).toSet
     }
-    assertResult(ops.findAllElemsOrSelf(docElem).filter(e => ops.resolvedName(e) == XsSchemaEName)) {
+    assertResult(findAllElemsOrSelf(docElem).filter(e => resolvedName(e) == XsSchemaEName)) {
       xsSchemaElems
     }
 
     // xs:import elements
 
-    val xsImportElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsImportEName)
+    val xsImportElems = filterElemsOrSelf(docElem, e => resolvedName(e) == XsImportEName)
 
     assertResult(7)(xsImportElems.size)
     assertResult(Set(XsImportEName)) {
-      xsImportElems.map(e => ops.resolvedName(e)).toSet
+      xsImportElems.map(e => resolvedName(e)).toSet
     }
-    assertResult(ops.findAllElemsOrSelf(docElem).filter(e => ops.resolvedName(e) == XsImportEName)) {
+    assertResult(findAllElemsOrSelf(docElem).filter(e => resolvedName(e) == XsImportEName)) {
       xsImportElems
     }
 
     // link:linkbaseRef elements
 
-    val linkbaseRefElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterElemsOrSelf(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(17)(linkbaseRefElems.size)
     assertResult(Set(LinkLinkbaseRefEName)) {
-      linkbaseRefElems.map(e => ops.resolvedName(e)).toSet
+      linkbaseRefElems.map(e => resolvedName(e)).toSet
     }
-    assertResult(ops.findAllElemsOrSelf(docElem).filter(e => ops.resolvedName(e) == LinkLinkbaseRefEName)) {
+    assertResult(findAllElemsOrSelf(docElem).filter(e => resolvedName(e) == LinkLinkbaseRefEName)) {
       linkbaseRefElems
     }
 
@@ -262,21 +265,21 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsAnnotationEName)
-        appinfoElem <- ops.filterElemsOrSelf(annotElem, e => ops.resolvedName(e) == XsAppinfoEName)
-        appinfoChildElem <- ops.filterElemsOrSelf(appinfoElem, e => ops.parent(e) == appinfoElem)
+        annotElem <- filterElemsOrSelf(docElem, e => resolvedName(e) == XsAnnotationEName)
+        appinfoElem <- filterElemsOrSelf(annotElem, e => resolvedName(e) == XsAppinfoEName)
+        appinfoChildElem <- filterElemsOrSelf(appinfoElem, e => parent(e) == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
     assertResult(Set(LinkLinkbaseRefEName)) {
-      appinfoChildElems.map(e => ops.resolvedName(e)).toSet
+      appinfoChildElems.map(e => resolvedName(e)).toSet
     }
 
     val appinfoChildElems2 =
       for {
-        annotElem <- ops.findAllElemsOrSelf(docElem).filter(e => ops.resolvedName(e) == XsAnnotationEName)
-        appinfoElem <- ops.findAllElemsOrSelf(annotElem).filter(e => ops.resolvedName(e) == XsAppinfoEName)
-        appinfoChildElem <- ops.findAllElemsOrSelf(appinfoElem).filter(e => ops.parent(e) == appinfoElem)
+        annotElem <- findAllElemsOrSelf(docElem).filter(e => resolvedName(e) == XsAnnotationEName)
+        appinfoElem <- findAllElemsOrSelf(annotElem).filter(e => resolvedName(e) == XsAppinfoEName)
+        appinfoChildElem <- findAllElemsOrSelf(appinfoElem).filter(e => parent(e) == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(appinfoChildElems2)(appinfoChildElems)
@@ -285,51 +288,51 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
   @Test def testFilterElems(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.filterElems(docElem, e => ops.resolvedName(e) == EName("schema"))
-    assertResult(ops.findAllElems(docElem).filter(e => ops.resolvedName(e) == EName("schema")))(bogusElems)
+    val bogusElems = filterElems(docElem, e => resolvedName(e) == EName("schema"))
+    assertResult(findAllElems(docElem).filter(e => resolvedName(e) == EName("schema")))(bogusElems)
 
     assertResult(0)(bogusElems.size)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.filterElems(docElem, e => ops.resolvedName(e) == XsSchemaEName)
-    assertResult(ops.findAllElems(docElem).filter(e => ops.resolvedName(e) == XsSchemaEName))(xsSchemaElems)
+    val xsSchemaElems = filterElems(docElem, e => resolvedName(e) == XsSchemaEName)
+    assertResult(findAllElems(docElem).filter(e => resolvedName(e) == XsSchemaEName))(xsSchemaElems)
 
     assertResult(0)(xsSchemaElems.size)
 
     // xs:import elements
 
-    val xsImportElems = ops.filterElems(docElem, e => ops.resolvedName(e) == XsImportEName)
+    val xsImportElems = filterElems(docElem, e => resolvedName(e) == XsImportEName)
 
     assertResult(7)(xsImportElems.size)
-    assertResult(Set(XsImportEName))(xsImportElems.map(e => ops.resolvedName(e)).toSet)
-    assertResult(ops.findAllElems(docElem).filter(e => ops.resolvedName(e) == XsImportEName))(xsImportElems)
+    assertResult(Set(XsImportEName))(xsImportElems.map(e => resolvedName(e)).toSet)
+    assertResult(findAllElems(docElem).filter(e => resolvedName(e) == XsImportEName))(xsImportElems)
 
     // link:linkbaseRef elements
 
-    val linkbaseRefElems = ops.filterElems(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterElems(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(17)(linkbaseRefElems.size)
-    assertResult(Set(LinkLinkbaseRefEName))(linkbaseRefElems.map(e => ops.resolvedName(e)).toSet)
-    assertResult(ops.findAllElems(docElem).filter(e => ops.resolvedName(e) == LinkLinkbaseRefEName))(linkbaseRefElems)
+    assertResult(Set(LinkLinkbaseRefEName))(linkbaseRefElems.map(e => resolvedName(e)).toSet)
+    assertResult(findAllElems(docElem).filter(e => resolvedName(e) == LinkLinkbaseRefEName))(linkbaseRefElems)
 
     // xs:appinfo child elements
 
     val appinfoChildElems =
       for {
-        annotElem <- ops.filterElems(docElem, e => ops.resolvedName(e) == XsAnnotationEName)
-        appinfoElem <- ops.filterElems(annotElem, e => ops.resolvedName(e) == XsAppinfoEName)
-        appinfoChildElem <- ops.filterElems(appinfoElem, e => ops.parent(e) == appinfoElem)
+        annotElem <- filterElems(docElem, e => resolvedName(e) == XsAnnotationEName)
+        appinfoElem <- filterElems(annotElem, e => resolvedName(e) == XsAppinfoEName)
+        appinfoChildElem <- filterElems(appinfoElem, e => parent(e) == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
-    assertResult(Set(LinkLinkbaseRefEName))(appinfoChildElems.map(e => ops.resolvedName(e)).toSet)
+    assertResult(Set(LinkLinkbaseRefEName))(appinfoChildElems.map(e => resolvedName(e)).toSet)
 
     val appinfoChildElems2 =
       for {
-        annotElem <- ops.findAllElems(docElem).filter(e => ops.resolvedName(e) == XsAnnotationEName)
-        appinfoElem <- ops.findAllElems(annotElem).filter(e => ops.resolvedName(e) == XsAppinfoEName)
-        appinfoChildElem <- ops.findAllElems(appinfoElem).filter(e => ops.parent(e) == appinfoElem)
+        annotElem <- findAllElems(docElem).filter(e => resolvedName(e) == XsAnnotationEName)
+        appinfoElem <- findAllElems(annotElem).filter(e => resolvedName(e) == XsAppinfoEName)
+        appinfoChildElem <- findAllElems(appinfoElem).filter(e => parent(e) == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(appinfoChildElems2)(appinfoChildElems)
@@ -338,29 +341,29 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
   @Test def testFilterChildElems(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.filterChildElems(docElem, (e => ops.resolvedName(e) == EName("schema")))
-    assertResult(ops.findAllChildElems(docElem).filter(e => ops.resolvedName(e) == EName("schema")))(bogusElems)
+    val bogusElems = filterChildElems(docElem, (e => resolvedName(e) == EName("schema")))
+    assertResult(findAllChildElems(docElem).filter(e => resolvedName(e) == EName("schema")))(bogusElems)
 
     assertResult(0)(bogusElems.size)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.filterChildElems(docElem, e => ops.resolvedName(e) == XsSchemaEName)
-    assertResult(ops.findAllChildElems(docElem).filter(e => ops.resolvedName(e) == XsSchemaEName))(xsSchemaElems)
+    val xsSchemaElems = filterChildElems(docElem, e => resolvedName(e) == XsSchemaEName)
+    assertResult(findAllChildElems(docElem).filter(e => resolvedName(e) == XsSchemaEName))(xsSchemaElems)
 
     assertResult(0)(xsSchemaElems.size)
 
     // xs:import elements
 
-    val xsImportElems = ops.filterChildElems(docElem, e => ops.resolvedName(e) == XsImportEName)
+    val xsImportElems = filterChildElems(docElem, e => resolvedName(e) == XsImportEName)
 
     assertResult(7)(xsImportElems.size)
-    assertResult(Set(XsImportEName))(xsImportElems.map(e => ops.resolvedName(e)).toSet)
-    assertResult(ops.findAllChildElems(docElem).filter(e => ops.resolvedName(e) == XsImportEName))(xsImportElems)
+    assertResult(Set(XsImportEName))(xsImportElems.map(e => resolvedName(e)).toSet)
+    assertResult(findAllChildElems(docElem).filter(e => resolvedName(e) == XsImportEName))(xsImportElems)
 
     // link:linkbaseRef elements
 
-    val linkbaseRefElems = ops.filterChildElems(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterChildElems(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(0)(linkbaseRefElems.size)
 
@@ -368,19 +371,19 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- ops.filterChildElems(docElem, e => ops.resolvedName(e) == XsAnnotationEName)
-        appinfoElem <- ops.filterChildElems(annotElem, e => ops.resolvedName(e) == XsAppinfoEName)
-        appinfoChildElem <- ops.filterChildElems(appinfoElem, e => ops.parent(e) == appinfoElem)
+        annotElem <- filterChildElems(docElem, e => resolvedName(e) == XsAnnotationEName)
+        appinfoElem <- filterChildElems(annotElem, e => resolvedName(e) == XsAppinfoEName)
+        appinfoChildElem <- filterChildElems(appinfoElem, e => parent(e) == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
-    assertResult(Set(LinkLinkbaseRefEName))(appinfoChildElems.map(e => ops.resolvedName(e)).toSet)
+    assertResult(Set(LinkLinkbaseRefEName))(appinfoChildElems.map(e => resolvedName(e)).toSet)
 
     val appinfoChildElems2 =
       for {
-        annotElem <- ops.findAllChildElems(docElem).filter(e => ops.resolvedName(e) == XsAnnotationEName)
-        appinfoElem <- ops.findAllChildElems(annotElem).filter(e => ops.resolvedName(e) == XsAppinfoEName)
-        appinfoChildElem <- ops.findAllChildElems(appinfoElem).filter(e => ops.parent(e) == appinfoElem)
+        annotElem <- findAllChildElems(docElem).filter(e => resolvedName(e) == XsAnnotationEName)
+        appinfoElem <- findAllChildElems(annotElem).filter(e => resolvedName(e) == XsAppinfoEName)
+        appinfoChildElem <- findAllChildElems(appinfoElem).filter(e => parent(e) == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(appinfoChildElems2)(appinfoChildElems)
@@ -389,126 +392,126 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
   @Test def testFindTopmostElemsOrSelf(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.findTopmostElemsOrSelf(docElem, e => ops.resolvedName(e) == EName("schema"))
+    val bogusElems = findTopmostElemsOrSelf(docElem, e => resolvedName(e) == EName("schema"))
 
     assertResult(0)(bogusElems.size)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.findTopmostElemsOrSelf(docElem, e => ops.resolvedName(e) == XsSchemaEName)
+    val xsSchemaElems = findTopmostElemsOrSelf(docElem, e => resolvedName(e) == XsSchemaEName)
 
     assertResult(1)(xsSchemaElems.size)
-    assertResult(Set(XsSchemaEName))(xsSchemaElems.map(e => ops.resolvedName(e)).toSet)
+    assertResult(Set(XsSchemaEName))(xsSchemaElems.map(e => resolvedName(e)).toSet)
 
     // xs:appinfo elements
 
     val appinfoElems =
-      ops.findTopmostElemsOrSelf(docElem, e => ops.resolvedName(e) == XsAppinfoEName || ops.parentOption(e).exists(e => ops.resolvedName(e) == XsAppinfoEName))
+      findTopmostElemsOrSelf(docElem, e => resolvedName(e) == XsAppinfoEName || parentOption(e).exists(e => resolvedName(e) == XsAppinfoEName))
 
     assertResult(1)(appinfoElems.size)
 
     val appinfoTreeElems =
-      ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsAppinfoEName || ops.parentOption(e).exists(e => ops.resolvedName(e) == XsAppinfoEName))
+      filterElemsOrSelf(docElem, e => resolvedName(e) == XsAppinfoEName || parentOption(e).exists(e => resolvedName(e) == XsAppinfoEName))
 
     assertResult(18)(appinfoTreeElems.size)
 
     assertResult(
-      appinfoTreeElems.filter(e => ops.parentOption(e).forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
+      appinfoTreeElems.filter(e => parentOption(e).forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
   }
 
   @Test def testFindTopmostElems(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.findTopmostElems(docElem, e => ops.resolvedName(e) == EName("schema"))
+    val bogusElems = findTopmostElems(docElem, e => resolvedName(e) == EName("schema"))
 
     assertResult(0)(bogusElems.size)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.findTopmostElems(docElem, e => ops.resolvedName(e) == XsSchemaEName)
+    val xsSchemaElems = findTopmostElems(docElem, e => resolvedName(e) == XsSchemaEName)
 
     assertResult(0)(xsSchemaElems.size)
 
     // xs:appinfo elements
 
     val appinfoElems =
-      ops.findTopmostElems(docElem, e => ops.resolvedName(e) == XsAppinfoEName || ops.parentOption(e).exists(e => ops.resolvedName(e) == XsAppinfoEName))
+      findTopmostElems(docElem, e => resolvedName(e) == XsAppinfoEName || parentOption(e).exists(e => resolvedName(e) == XsAppinfoEName))
 
     assertResult(1)(appinfoElems.size)
 
     val appinfoTreeElems =
-      ops.filterElems(docElem, e => ops.resolvedName(e) == XsAppinfoEName || ops.parentOption(e).exists(e => ops.resolvedName(e) == XsAppinfoEName))
+      filterElems(docElem, e => resolvedName(e) == XsAppinfoEName || parentOption(e).exists(e => resolvedName(e) == XsAppinfoEName))
 
     assertResult(18)(appinfoTreeElems.size)
 
     assertResult(
-      appinfoTreeElems.filter(e => ops.parentOption(e).forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
+      appinfoTreeElems.filter(e => parentOption(e).forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
   }
 
   @Test def testFindElemOrSelf(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.findElemOrSelf(docElem, e => ops.resolvedName(e) == EName("schema"))
+    val bogusElems = findElemOrSelf(docElem, e => resolvedName(e) == EName("schema"))
 
     assertResult(
-      ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == EName("schema")).headOption)(bogusElems)
+      filterElemsOrSelf(docElem, e => resolvedName(e) == EName("schema")).headOption)(bogusElems)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.findElemOrSelf(docElem, e => ops.resolvedName(e) == XsSchemaEName)
+    val xsSchemaElems = findElemOrSelf(docElem, e => resolvedName(e) == XsSchemaEName)
 
     assertResult(
-      ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsSchemaEName).headOption)(xsSchemaElems)
+      filterElemsOrSelf(docElem, e => resolvedName(e) == XsSchemaEName).headOption)(xsSchemaElems)
 
     // xs:import elements
 
-    val xsImportElems = ops.findElemOrSelf(docElem, e => ops.resolvedName(e) == XsImportEName)
+    val xsImportElems = findElemOrSelf(docElem, e => resolvedName(e) == XsImportEName)
 
     assertResult(
-      ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == XsImportEName).headOption)(xsImportElems)
+      filterElemsOrSelf(docElem, e => resolvedName(e) == XsImportEName).headOption)(xsImportElems)
 
     // link:linkbaseRef elements
 
-    val linkbaseRefElems = ops.findElemOrSelf(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = findElemOrSelf(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(
-      ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
+      filterElemsOrSelf(docElem, e => resolvedName(e) == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
   }
 
   @Test def testFindElem(): Unit = {
     // Non-existing elements
 
-    val bogusElems = ops.findElem(docElem, e => ops.resolvedName(e) == EName("schema"))
+    val bogusElems = findElem(docElem, e => resolvedName(e) == EName("schema"))
 
     assertResult(
-      ops.filterElems(docElem, e => ops.resolvedName(e) == EName("schema")).headOption)(bogusElems)
+      filterElems(docElem, e => resolvedName(e) == EName("schema")).headOption)(bogusElems)
 
     // xs:schema elements
 
-    val xsSchemaElems = ops.findElem(docElem, e => ops.resolvedName(e) == XsSchemaEName)
+    val xsSchemaElems = findElem(docElem, e => resolvedName(e) == XsSchemaEName)
 
     assertResult(
-      ops.filterElems(docElem, e => ops.resolvedName(e) == XsSchemaEName).headOption)(xsSchemaElems)
+      filterElems(docElem, e => resolvedName(e) == XsSchemaEName).headOption)(xsSchemaElems)
 
     // xs:import elements
 
-    val xsImportElems = ops.findElem(docElem, e => ops.resolvedName(e) == XsImportEName)
+    val xsImportElems = findElem(docElem, e => resolvedName(e) == XsImportEName)
 
     assertResult(
-      ops.filterElems(docElem, e => ops.resolvedName(e) == XsImportEName).headOption)(xsImportElems)
+      filterElems(docElem, e => resolvedName(e) == XsImportEName).headOption)(xsImportElems)
 
     // link:linkbaseRef elements
 
-    val linkbaseRefElems = ops.findElem(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = findElem(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(
-      ops.filterElems(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
+      filterElems(docElem, e => resolvedName(e) == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
   }
 
   @Test def testPathNavigation(): Unit = {
-    val linkbaseRefElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterElemsOrSelf(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
-    val linkbaseRefElemPaths = linkbaseRefElems.map(e => ops.path(e))
+    val linkbaseRefElemPaths = linkbaseRefElems.map(e => path(e))
 
     assertResult(17)(linkbaseRefElemPaths.size)
 
@@ -521,75 +524,75 @@ abstract class AbstractBackingElemFunctionTest extends Suite {
 
     assertResult(Set(expectedParentPath))(linkbaseRefElemPaths.flatMap(_.parentPathOption).toSet)
 
-    val linkbaseRefElems2 = linkbaseRefElems.flatMap(e => ops.findElemOrSelfByPath(ops.rootElem(e), ops.path(e)))
+    val linkbaseRefElems2 = linkbaseRefElems.flatMap(e => findElemOrSelfByPath(rootElem(e), path(e)))
 
     assertResult(linkbaseRefElems.size)(linkbaseRefElems2.size)
     assertResult(linkbaseRefElems)(linkbaseRefElems2)
   }
 
   @Test def testAncestry(): Unit = {
-    val linkbaseRefElems = ops.filterElemsOrSelf(docElem, e => ops.resolvedName(e) == LinkLinkbaseRefEName)
+    val linkbaseRefElems = filterElemsOrSelf(docElem, e => resolvedName(e) == LinkLinkbaseRefEName)
 
     assertResult(17)(linkbaseRefElems.size)
 
     assertResult(Set(List(XsSchemaEName, XsAnnotationEName, XsAppinfoEName))) {
-      linkbaseRefElems.map(e => ops.reverseAncestryENames(e)).toSet
+      linkbaseRefElems.map(e => reverseAncestryENames(e)).toSet
     }
 
     assertResult(Set(List(XsSchemaEName, XsAnnotationEName, XsAppinfoEName, LinkLinkbaseRefEName))) {
-      linkbaseRefElems.map(e => ops.reverseAncestryOrSelfENames(e)).toSet
+      linkbaseRefElems.map(e => reverseAncestryOrSelfENames(e)).toSet
     }
 
-    assertResult(linkbaseRefElems.map(e => ops.ancestors(e).map(e => ops.resolvedName(e)).reverse).toSet) {
-      linkbaseRefElems.map(e => ops.reverseAncestryENames(e)).toSet
+    assertResult(linkbaseRefElems.map(e => ancestors(e).map(e => resolvedName(e)).reverse).toSet) {
+      linkbaseRefElems.map(e => reverseAncestryENames(e)).toSet
     }
 
-    assertResult(linkbaseRefElems.map(e => ops.ancestorsOrSelf(e).map(e => ops.resolvedName(e)).reverse).toSet) {
-      linkbaseRefElems.map(e => ops.reverseAncestryOrSelfENames(e)).toSet
+    assertResult(linkbaseRefElems.map(e => ancestorsOrSelf(e).map(e => resolvedName(e)).reverse).toSet) {
+      linkbaseRefElems.map(e => reverseAncestryOrSelfENames(e)).toSet
     }
 
     assertResult(linkbaseRefElems) {
-      linkbaseRefElems.map(e => ops.getChildElemByPathEntry(ops.parent(e), ops.path(e).lastEntry))
+      linkbaseRefElems.map(e => getChildElemByPathEntry(parent(e), path(e).lastEntry))
     }
 
-    assertResult(linkbaseRefElems.map(e => ops.reverseAncestryOrSelfENames(e)).toSet) {
-      linkbaseRefElems.map(e => ops.reverseAncestryOrSelf(e).map(e => ops.resolvedName(e))).toSet
+    assertResult(linkbaseRefElems.map(e => reverseAncestryOrSelfENames(e)).toSet) {
+      linkbaseRefElems.map(e => reverseAncestryOrSelf(e).map(e => resolvedName(e))).toSet
     }
 
-    assertResult(ops.filterElems(docElem, e => ops.resolvedName(e) == XsAppinfoEName).toSet) {
-      linkbaseRefElems.map(e => ops.parent(e)).toSet
+    assertResult(filterElems(docElem, e => resolvedName(e) == XsAppinfoEName).toSet) {
+      linkbaseRefElems.map(e => parent(e)).toSet
     }
-    assertResult(ops.filterElems(docElem, e => ops.resolvedName(e) == XsAppinfoEName).toSet) {
-      linkbaseRefElems.flatMap(e => ops.parentOption(e)).toSet
+    assertResult(filterElems(docElem, e => resolvedName(e) == XsAppinfoEName).toSet) {
+      linkbaseRefElems.flatMap(e => parentOption(e)).toSet
     }
 
     assertResult(Set(docElem)) {
-      linkbaseRefElems.flatMap(e => ops.findAncestor(e, e2 => ops.resolvedName(e2) == XsSchemaEName)).toSet
+      linkbaseRefElems.flatMap(e => findAncestor(e, e2 => resolvedName(e2) == XsSchemaEName)).toSet
     }
     assertResult(Set(docElem)) {
-      linkbaseRefElems.flatMap(e => ops.findAncestorOrSelf(e, e2 => ops.resolvedName(e2) == XsSchemaEName)).toSet
+      linkbaseRefElems.flatMap(e => findAncestorOrSelf(e, e2 => resolvedName(e2) == XsSchemaEName)).toSet
     }
 
     assertResult(0) {
-      linkbaseRefElems.flatMap(e => ops.findAncestor(e, e2 => ops.resolvedName(e2) == LinkLinkbaseRefEName)).size
+      linkbaseRefElems.flatMap(e => findAncestor(e, e2 => resolvedName(e2) == LinkLinkbaseRefEName)).size
     }
     assertResult(linkbaseRefElems) {
-      linkbaseRefElems.flatMap(e => ops.findAncestorOrSelf(e, e2 => ops.resolvedName(e2) == LinkLinkbaseRefEName))
+      linkbaseRefElems.flatMap(e => findAncestorOrSelf(e, e2 => resolvedName(e2) == LinkLinkbaseRefEName))
     }
   }
 
   @Test def testPathConsistency(): Unit = {
-    val allElemsOrSelf = ops.findAllElemsOrSelf(docElem)
+    val allElemsOrSelf = findAllElemsOrSelf(docElem)
 
     assertResult(Set(docElem)) {
-      allElemsOrSelf.map(e => ops.rootElem(e)).toSet
+      allElemsOrSelf.map(e => rootElem(e)).toSet
     }
     assertResult(allElemsOrSelf) {
-      allElemsOrSelf.map(e => ops.getElemOrSelfByPath(ops.rootElem(e), ops.path(e)))
+      allElemsOrSelf.map(e => getElemOrSelfByPath(rootElem(e), path(e)))
     }
 
     assertResult(allElemsOrSelf) {
-      allElemsOrSelf.map(e => ops.parentOption(e).flatMap(e2 => ops.findChildElemByPathEntry(e2, ops.path(e).lastEntry)).getOrElse(docElem))
+      allElemsOrSelf.map(e => parentOption(e).flatMap(e2 => findChildElemByPathEntry(e2, path(e).lastEntry)).getOrElse(docElem))
     }
   }
 }
