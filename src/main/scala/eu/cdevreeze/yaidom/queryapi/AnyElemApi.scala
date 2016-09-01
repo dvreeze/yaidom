@@ -16,8 +16,13 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import scala.reflect.ClassTag
+
 /**
  * Super-trait for all element query API traits, promising a self type.
+ *
+ * Simplicity and consistency of the entire query API are 2 important design considerations. For example, the query
+ * API methods themselves use no generics.
  *
  * @author Chris de Vreeze
  */
@@ -53,4 +58,19 @@ trait AnyElemApi {
    * This element itself.
    */
   def thisElem: ThisElem
+
+  /**
+   * Downcasts this element to a sub-type of AnyElemApi. It is needed in generic code written against "raw" query API traits.
+   *
+   * A safe usage pattern is as follows: choose a query API trait to start with, such as BackingElemApi. Whenever needed
+   * while querying, downcast the result(s) to that same type. This should be safe while using query methods of that
+   * query API trait or one of the super-type traits.
+   *
+   * Hence, the convenience of programming against "raw" query API traits is traded for some (relatively safe)
+   * casting inconvenience.
+   */
+  final def downcast[A <: AnyElemApi](implicit clsTag: ClassTag[A]): A = this match {
+    case self: A => this.asInstanceOf[A]
+    case self    => sys.error(s"Cannot downcast this element to type ${clsTag}")
+  }
 }
