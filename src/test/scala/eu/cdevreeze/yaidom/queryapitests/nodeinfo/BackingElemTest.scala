@@ -35,8 +35,6 @@ class BackingElemTest extends AbstractBackingElemTest with SaxonTestSupport {
 
   private val docBuilder = processor.newDocumentBuilder()
 
-  type E = DomElem
-
   val docElem: E = {
     val docUri = classOf[AbstractBackingElemTest].getResource("some-data.xsd").toURI
     val doc = docBuilder.build(new File(docUri)).getUnderlyingNode().asInstanceOf[DocumentInfo]

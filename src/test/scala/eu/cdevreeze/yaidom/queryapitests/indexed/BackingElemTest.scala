@@ -36,8 +36,6 @@ class BackingElemTest extends AbstractBackingElemTest {
 
   private val docParser = DocumentParserUsingStax.newInstance()
 
-  type E = Elem
-
   val docElem: E = {
     val docUri = classOf[AbstractBackingElemTest].getResource("some-data.xsd").toURI
     val doc = docParser.parse(docUri).withUriOption(Some(docUri))
