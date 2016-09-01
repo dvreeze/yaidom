@@ -3,10 +3,25 @@ CHANGELOG
 =========
 
 
+1.6.0-M2
+========
+
+Milestone 2 of 1.6.0 contains relatively small changes, some of them (somewhat) breaking. For example:
+
+* Indexed elements now have a node super-type too
+
+  * Hence, all yaidom element implementations have a corresponding node super-type, with at least element and text sub-types
+  * Now "indexed documents" no longer (need to) hold simple comment and processing instruction nodes
+
+* Added ``BackingElemApi``, as abstraction for "generic backing elements" in XML dialect support
+* Documentation of type members and type parameters in query API
+* Bug fix in comment (thanks, Matthias Hogerheijde)
+
+
 1.6.0-M1
 ========
 
-Version 1.6.1 contains several breaking changes, although the impact on client code is limited in that the compiler errors
+Version 1.6.0 contains several breaking changes, although the impact on client code is limited in that the compiler errors
 are easy to fix.
 
 The changes are as follows:
