@@ -25,7 +25,8 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
@@ -44,7 +45,7 @@ object IndexedScopedNode {
 
   /**
    * Indexed Scoped element. Like `IndexedClarkElem` but instead of being and indexing
-   * a `ClarkElemApi`, it is and indexes a `ScopedElemApi`. Other than that, see the
+   * a `ClarkElemApi`, it is and indexes a `ScopedElemApi`, and is even a `BackingElemApi`. Other than that, see the
    * documentation for `IndexedClarkElem`.
    *
    * The optional parent base URI is stored for very fast (optional) base URI computation. This is helpful in
@@ -56,7 +57,7 @@ object IndexedScopedNode {
     docUriOption: Option[URI],
     underlyingRootElem: U,
     path: Path,
-    underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with IndexedScopedElemApi with ScopedElemLike with Nodes.Elem {
+    underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with BackingElemApi with ScopedElemLike with HasParent with Nodes.Elem {
 
     type ThisElemApi = Elem[U]
 
@@ -98,6 +99,10 @@ object IndexedScopedNode {
       assert(resultOption.get.last == thisElem)
 
       resultOption.get
+    }
+
+    final def parentOption: Option[ThisElem] = {
+      path.parentPathOption.map(pp => Elem(this.docUriOption, this.underlyingRootElem, pp))
     }
 
     final def namespaces: Declarations = {

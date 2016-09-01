@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
+import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
 

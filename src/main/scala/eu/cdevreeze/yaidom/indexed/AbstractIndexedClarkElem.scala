@@ -98,4 +98,8 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
   final def reverseAncestryENames: immutable.IndexedSeq[EName] = {
     reverseAncestryOrSelfENames.dropRight(1)
   }
+
+  final def reverseAncestry: immutable.IndexedSeq[ThisElem] = {
+    reverseAncestryOrSelf.init
+  }
 }

@@ -25,6 +25,7 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.XdmNode
@@ -55,7 +56,7 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest with SaxonTest
 
     val bos = new ByteArrayOutputStream
     val serializer = processor.newSerializer(bos)
-    serializer.serializeNode(new XdmNode(elem.wrappedNode))
+    serializer.serializeNode(new XdmNode(elem.asInstanceOf[DomElem].wrappedNode))
     val xmlBytes = bos.toByteArray
 
     val docParser = DocumentParserUsingStax.newInstance

@@ -25,7 +25,7 @@ import org.scalatest.Suite
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  */
 abstract class AbstractXbrlInstanceQueryTest extends Suite {
 
-  type E <: ClarkElemLike.Aux[E]
+  type E <: ClarkElemApi.Aux[E]
 
   implicit val ttag: ClassTag[E] = classTag[E]
 

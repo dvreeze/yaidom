@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.XdmNode
@@ -160,7 +161,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupp
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
     val bos = new ByteArrayOutputStream
     val serializer = processor.newSerializer(bos)
-    serializer.serializeNode(new XdmNode(elem.wrappedNode))
+    serializer.serializeNode(new XdmNode(elem.asInstanceOf[DomElem].wrappedNode))
     val xmlBytes = bos.toByteArray
 
     val docParser = DocumentParserUsingStax.newInstance

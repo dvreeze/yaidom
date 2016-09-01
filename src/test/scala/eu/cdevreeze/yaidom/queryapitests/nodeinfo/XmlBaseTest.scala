@@ -26,6 +26,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
+import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
 

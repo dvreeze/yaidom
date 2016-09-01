@@ -41,6 +41,11 @@ trait IndexedClarkElemApi extends ClarkElemApi {
   def docUriOption: Option[URI]
 
   /**
+   * The document URI, defaulting to the empty URI if absent
+   */
+  def docUri: URI
+
+  /**
    * The root element
    */
   def rootElem: ThisElem
@@ -55,6 +60,11 @@ trait IndexedClarkElemApi extends ClarkElemApi {
    * ancestors, if any.
    */
   def baseUriOption: Option[URI]
+
+  /**
+   * The base URI, defaulting to the empty URI if absent
+   */
+  def baseUri: URI
 
   /**
    * Returns the optional parent element base URI, computed from the document URI, if any, and the XML base attributes of the
@@ -94,6 +104,14 @@ trait IndexedClarkElemApi extends ClarkElemApi {
    * }}}
    */
   def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem]
+
+  /**
+   * Returns the reversed ancestor elements. That is, returns:
+   * {{{
+   * reverseAncestryOrSelf.init
+   * }}}
+   */
+  def reverseAncestry: immutable.IndexedSeq[ThisElem]
 }
 
 object IndexedClarkElemApi {
