@@ -3,6 +3,15 @@ CHANGELOG
 =========
 
 
+1.6.0-M3
+========
+
+Milestone 3 of 1.6.0 got rid of the element down-casts in code against "raw" BackingElemApi traits, by "overriding"
+query API methods of super-types in BackingElemApi, thus restricting the return types to the ThisElem type member
+in BackingElemApi. This is good news, because it means that XML dialect support against generic backends (implementing
+BackingElemApi) is easy and safe to implement.
+
+
 1.6.0-M2
 ========
 
@@ -21,7 +30,7 @@ Milestone 2 of 1.6.0 contains relatively small changes, some of them (somewhat) 
 1.6.0-M1
 ========
 
-Version 1.6.0 contains several breaking changes, although the impact on client code is limited in that the compiler errors
+Version 1.6.0 (M1) contains several breaking changes, although the impact on client code is limited in that the compiler errors
 are easy to fix.
 
 The changes are as follows:
