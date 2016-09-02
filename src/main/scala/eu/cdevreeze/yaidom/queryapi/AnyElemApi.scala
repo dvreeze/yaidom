@@ -60,7 +60,7 @@ trait AnyElemApi {
   def thisElem: ThisElem
 
   /**
-   * Downcasts this element to a sub-type of AnyElemApi. It is needed in generic code written against "raw" query API traits.
+   * Casts this element to a given sub-type of AnyElemApi. It is needed in generic code written against "raw" query API traits.
    *
    * A safe usage pattern is as follows: choose a query API trait to start with, such as BackingElemApi. Whenever needed
    * while querying, downcast the result(s) to that same type. This should be safe while using query methods of that
@@ -69,8 +69,8 @@ trait AnyElemApi {
    * Hence, the convenience of programming against "raw" query API traits is traded for some (relatively safe)
    * casting inconvenience.
    */
-  final def downcast[A <: AnyElemApi](implicit clsTag: ClassTag[A]): A = this match {
+  final def castElem[A <: AnyElemApi](implicit clsTag: ClassTag[A]): A = this match {
     case self: A => this.asInstanceOf[A]
-    case self    => sys.error(s"Cannot downcast this element to type ${clsTag}")
+    case self => sys.error(s"Cannot cast this element to type ${clsTag}")
   }
 }
