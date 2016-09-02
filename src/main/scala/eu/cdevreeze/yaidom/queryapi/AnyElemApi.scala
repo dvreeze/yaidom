@@ -49,6 +49,11 @@ trait AnyElemApi {
    * The ("stable") element type itself. It is not restricted in the query API traits (only indirectly, through ThisElemApi).
    *
    * Concrete element classes will restrict this type to that element class itself.
+   *
+   * Why do we need 2 type members ThisElem and ThisElemApi and not just ThisElem? Consider for example query method implementations
+   * in trait ElemLike. Had we used just one type member ThisElem (restricting it to be a sub-type of ElemLike), then a call
+   * of a function like findAllChildElems on another element would not return a value of the same type (ElemLike.this.ThisElem)
+   * according to the Scala compiler. To prevent the use of casts, we used 2 type members ThisElem and ThisElemApi instead.
    */
   type ThisElem <: ThisElemApi
 
