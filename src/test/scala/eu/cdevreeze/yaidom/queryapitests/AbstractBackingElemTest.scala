@@ -66,7 +66,8 @@ abstract class AbstractBackingElemTest extends Suite {
   private val ElementFormDefaultEName = EName("elementFormDefault")
   private val AttributeFormDefaultEName = EName("attributeFormDefault")
 
-  // Nice, just the "raw" type without generics. There is a price, though, and that is the down-casts in the query code below.
+  // Nice, just the "raw" type without generics. There is a small price, though, and that is that some lambdas need explicit parameter types.
+  // That is the case because BackingElemApi "overrides" some super-trait methods, restricting the ThisElem type member to the one of BackingElemApi.
   type E = BackingElemApi
 
   def docElem: E
@@ -263,9 +264,9 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- docElem.filterElemsOrSelf(_.resolvedName == XsAnnotationEName).map(_.castElem[E])
-        appinfoElem <- annotElem.filterElemsOrSelf(_.resolvedName == XsAppinfoEName).map(_.castElem[E])
-        appinfoChildElem <- appinfoElem.filterElemsOrSelf(_.parent == appinfoElem)
+        annotElem <- docElem.filterElemsOrSelf(_.resolvedName == XsAnnotationEName)
+        appinfoElem <- annotElem.filterElemsOrSelf(_.resolvedName == XsAppinfoEName)
+        appinfoChildElem <- appinfoElem.filterElemsOrSelf((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
@@ -275,8 +276,8 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems2 =
       for {
-        annotElem <- docElem.findAllElemsOrSelf.filter(_.resolvedName == XsAnnotationEName).map(_.castElem[E])
-        appinfoElem <- annotElem.findAllElemsOrSelf.filter(_.resolvedName == XsAppinfoEName).map(_.castElem[E])
+        annotElem <- docElem.findAllElemsOrSelf.filter(_.resolvedName == XsAnnotationEName)
+        appinfoElem <- annotElem.findAllElemsOrSelf.filter(_.resolvedName == XsAppinfoEName)
         appinfoChildElem <- appinfoElem.findAllElemsOrSelf.filter(_.parent == appinfoElem)
       } yield appinfoChildElem
 
@@ -318,9 +319,9 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- docElem.filterElems(_.resolvedName == XsAnnotationEName).map(_.castElem[E])
-        appinfoElem <- annotElem.filterElems(_.resolvedName == XsAppinfoEName).map(_.castElem[E])
-        appinfoChildElem <- appinfoElem.filterElems(_.parent == appinfoElem)
+        annotElem <- docElem.filterElems(_.resolvedName == XsAnnotationEName)
+        appinfoElem <- annotElem.filterElems(_.resolvedName == XsAppinfoEName)
+        appinfoChildElem <- appinfoElem.filterElems((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
@@ -328,8 +329,8 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems2 =
       for {
-        annotElem <- docElem.findAllElems.filter(_.resolvedName == XsAnnotationEName).map(_.castElem[E])
-        appinfoElem <- annotElem.findAllElems.filter(_.resolvedName == XsAppinfoEName).map(_.castElem[E])
+        annotElem <- docElem.findAllElems.filter(_.resolvedName == XsAnnotationEName)
+        appinfoElem <- annotElem.findAllElems.filter(_.resolvedName == XsAppinfoEName)
         appinfoChildElem <- appinfoElem.findAllElems.filter(_.parent == appinfoElem)
       } yield appinfoChildElem
 
@@ -369,9 +370,9 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- docElem.filterChildElems(_.resolvedName == XsAnnotationEName).map(_.castElem[E])
-        appinfoElem <- annotElem.filterChildElems(_.resolvedName == XsAppinfoEName).map(_.castElem[E])
-        appinfoChildElem <- appinfoElem.filterChildElems(_.parent == appinfoElem)
+        annotElem <- docElem.filterChildElems(_.resolvedName == XsAnnotationEName)
+        appinfoElem <- annotElem.filterChildElems(_.resolvedName == XsAppinfoEName)
+        appinfoChildElem <- appinfoElem.filterChildElems((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
@@ -379,8 +380,8 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems2 =
       for {
-        annotElem <- docElem.findAllChildElems.filter(_.resolvedName == XsAnnotationEName).map(_.castElem[E])
-        appinfoElem <- annotElem.findAllChildElems.filter(_.resolvedName == XsAppinfoEName).map(_.castElem[E])
+        annotElem <- docElem.findAllChildElems.filter(_.resolvedName == XsAnnotationEName)
+        appinfoElem <- annotElem.findAllChildElems.filter(_.resolvedName == XsAppinfoEName)
         appinfoChildElem <- appinfoElem.findAllChildElems.filter(_.parent == appinfoElem)
       } yield appinfoChildElem
 
@@ -419,9 +420,9 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- (docElem \\ (_.resolvedName == XsAnnotationEName)).map(_.castElem[E])
-        appinfoElem <- (annotElem \\ (_.resolvedName == XsAppinfoEName)).map(_.castElem[E])
-        appinfoChildElem <- appinfoElem \\ (_.parent == appinfoElem)
+        annotElem <- (docElem \\ (_.resolvedName == XsAnnotationEName))
+        appinfoElem <- (annotElem \\ (_.resolvedName == XsAppinfoEName))
+        appinfoChildElem <- appinfoElem \\ ((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
@@ -458,9 +459,9 @@ abstract class AbstractBackingElemTest extends Suite {
 
     val appinfoChildElems =
       for {
-        annotElem <- (docElem \ (_.resolvedName == XsAnnotationEName)).map(_.castElem[E])
-        appinfoElem <- (annotElem \ (_.resolvedName == XsAppinfoEName)).map(_.castElem[E])
-        appinfoChildElem <- appinfoElem \ (_.parent == appinfoElem)
+        annotElem <- (docElem \ (_.resolvedName == XsAnnotationEName))
+        appinfoElem <- (annotElem \ (_.resolvedName == XsAppinfoEName))
+        appinfoChildElem <- appinfoElem \ ((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
 
     assertResult(17)(appinfoChildElems.size)
@@ -484,12 +485,12 @@ abstract class AbstractBackingElemTest extends Suite {
     // xs:appinfo elements
 
     val appinfoElems =
-      docElem.findTopmostElemsOrSelf(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.castElem[E].resolvedName == XsAppinfoEName))
+      docElem.findTopmostElemsOrSelf(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.resolvedName == XsAppinfoEName))
 
     assertResult(1)(appinfoElems.size)
 
     val appinfoTreeElems =
-      docElem.filterElemsOrSelf(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.castElem[E].resolvedName == XsAppinfoEName))
+      docElem.filterElemsOrSelf(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.resolvedName == XsAppinfoEName))
 
     assertResult(18)(appinfoTreeElems.size)
 
@@ -513,12 +514,12 @@ abstract class AbstractBackingElemTest extends Suite {
     // xs:appinfo elements
 
     val appinfoElems =
-      docElem.findTopmostElems(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.castElem[E].resolvedName == XsAppinfoEName))
+      docElem.findTopmostElems(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.resolvedName == XsAppinfoEName))
 
     assertResult(1)(appinfoElems.size)
 
     val appinfoTreeElems =
-      docElem.filterElems(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.castElem[E].resolvedName == XsAppinfoEName))
+      docElem.filterElems(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.resolvedName == XsAppinfoEName))
 
     assertResult(18)(appinfoTreeElems.size)
 
@@ -543,12 +544,12 @@ abstract class AbstractBackingElemTest extends Suite {
     // xs:appinfo elements
 
     val appinfoElems =
-      docElem \\! (e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.castElem[E].resolvedName == XsAppinfoEName))
+      docElem \\! (e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.resolvedName == XsAppinfoEName))
 
     assertResult(1)(appinfoElems.size)
 
     val appinfoTreeElems =
-      docElem.filterElemsOrSelf(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.castElem[E].resolvedName == XsAppinfoEName))
+      docElem.filterElemsOrSelf(e => e.resolvedName == XsAppinfoEName || e.parentOption.exists(_.resolvedName == XsAppinfoEName))
 
     assertResult(18)(appinfoTreeElems.size)
 
@@ -651,16 +652,16 @@ abstract class AbstractBackingElemTest extends Suite {
       linkbaseRefElems.map(_.reverseAncestryOrSelfENames).toSet
     }
 
-    assertResult(linkbaseRefElems.map(_.ancestors.map(_.castElem[E].resolvedName).reverse).toSet) {
+    assertResult(linkbaseRefElems.map(_.ancestors.map(_.resolvedName).reverse).toSet) {
       linkbaseRefElems.map(_.reverseAncestryENames).toSet
     }
 
-    assertResult(linkbaseRefElems.map(_.ancestorsOrSelf.map(_.castElem[E].resolvedName).reverse).toSet) {
+    assertResult(linkbaseRefElems.map(_.ancestorsOrSelf.map(_.resolvedName).reverse).toSet) {
       linkbaseRefElems.map(_.reverseAncestryOrSelfENames).toSet
     }
 
     assertResult(linkbaseRefElems) {
-      linkbaseRefElems.map(e => e.parent.castElem[E].getChildElemByPathEntry(e.path.lastEntry))
+      linkbaseRefElems.map(e => e.parent.getChildElemByPathEntry(e.path.lastEntry))
     }
 
     assertResult(linkbaseRefElems.map(_.reverseAncestryOrSelfENames).toSet) {
@@ -675,17 +676,17 @@ abstract class AbstractBackingElemTest extends Suite {
     }
 
     assertResult(Set(docElem)) {
-      linkbaseRefElems.flatMap(_.findAncestor(_.castElem[E].resolvedName == XsSchemaEName)).toSet
+      linkbaseRefElems.flatMap(_.findAncestor((e: E) => e.resolvedName == XsSchemaEName)).toSet
     }
     assertResult(Set(docElem)) {
-      linkbaseRefElems.flatMap(_.findAncestorOrSelf(_.castElem[E].resolvedName == XsSchemaEName)).toSet
+      linkbaseRefElems.flatMap(_.findAncestorOrSelf((e: E) => e.resolvedName == XsSchemaEName)).toSet
     }
 
     assertResult(0) {
-      linkbaseRefElems.flatMap(_.findAncestor(_.castElem[E].resolvedName == LinkLinkbaseRefEName)).size
+      linkbaseRefElems.flatMap(_.findAncestor((e: E) => e.resolvedName == LinkLinkbaseRefEName)).size
     }
     assertResult(linkbaseRefElems) {
-      linkbaseRefElems.flatMap(_.findAncestorOrSelf(_.castElem[E].resolvedName == LinkLinkbaseRefEName))
+      linkbaseRefElems.flatMap(_.findAncestorOrSelf((e: E) => e.resolvedName == LinkLinkbaseRefEName))
     }
   }
 
@@ -700,7 +701,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
 
     assertResult(allElemsOrSelf) {
-      allElemsOrSelf.map(e => e.parentOption.flatMap(_.castElem[E].findChildElemByPathEntry(e.path.lastEntry)).getOrElse(docElem))
+      allElemsOrSelf.map(e => e.parentOption.flatMap(_.findChildElemByPathEntry(e.path.lastEntry)).getOrElse(docElem))
     }
   }
 }

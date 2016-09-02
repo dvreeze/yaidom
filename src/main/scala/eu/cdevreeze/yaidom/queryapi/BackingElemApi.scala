@@ -16,6 +16,13 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
+import java.net.URI
+
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
+
 /**
  * Shorthand for `IndexedScopedElemApi with HasParentApi`. In other words, this is an ancestry-aware "scoped element"
  * query API.
@@ -32,6 +39,78 @@ package eu.cdevreeze.yaidom.queryapi
 trait BackingElemApi extends IndexedScopedElemApi with HasParentApi {
 
   type ThisElemApi <: BackingElemApi
+
+  // Restricting AnyElemApi methods to use "this ThisElem", to prevent down-casts in code using this "raw" query API trait
+
+  def thisElem: ThisElem
+
+  // Restricting ElemApi methods to use "this ThisElem", to prevent down-casts in code using this "raw" query API trait
+
+  def findAllChildElems: immutable.IndexedSeq[ThisElem]
+
+  def findAllElems: immutable.IndexedSeq[ThisElem]
+
+  def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem]
+
+  def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def findChildElem(p: ThisElem => Boolean): Option[ThisElem]
+
+  def findElem(p: ThisElem => Boolean): Option[ThisElem]
+
+  def findElemOrSelf(p: ThisElem => Boolean): Option[ThisElem]
+
+  def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def getChildElem(p: ThisElem => Boolean): ThisElem
+
+  def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def \\(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  def \\!(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
+
+  // Restricting IsNavigableApi methods to use "this ThisElem", to prevent down-casts in code using this "raw" query API trait
+
+  def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)]
+
+  def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem]
+
+  def getChildElemByPathEntry(entry: Path.Entry): ThisElem
+
+  def findElemOrSelfByPath(path: Path): Option[ThisElem]
+
+  def getElemOrSelfByPath(path: Path): ThisElem
+
+  def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[ThisElem]]
+
+  def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[ThisElem]
+
+  // Restricting IndexedClarkElemApi methods to use "this ThisElem", to prevent down-casts in code using this "raw" query API trait
+
+  def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem]
+
+  def reverseAncestry: immutable.IndexedSeq[ThisElem]
+
+  // Restricting HasParentApi methods to use "this ThisElem", to prevent down-casts in code using this "raw" query API trait
+
+  def parentOption: Option[ThisElem]
+
+  def parent: ThisElem
+
+  def ancestorsOrSelf: immutable.IndexedSeq[ThisElem]
+
+  def ancestors: immutable.IndexedSeq[ThisElem]
+
+  def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem]
+
+  def findAncestor(p: ThisElem => Boolean): Option[ThisElem]
 }
 
 object BackingElemApi {
