@@ -22,7 +22,7 @@ import scala.collection.immutable
 import org.joda.time.LocalDate
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import AbstractBlogXbrlTestSupport.XbrliNs
@@ -57,7 +57,7 @@ import eu.cdevreeze.yaidom.utils.TextENameExtractor
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class Blog2XbrlTest extends Suite {
+class Blog2XbrlTest extends FunSuite {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[Blog2XbrlTest].getResource("company-instance.xml").toURI))
@@ -75,7 +75,7 @@ class Blog2XbrlTest extends Suite {
    * Simple XBRL instance queries. Shows XBRL instances, and introduces yaidom ScopedElemApi query API, as well as
    * Scala Collections. If you know ElemApi method `filterElemsOrSelf`, you basically know all of its methods.
    */
-  @Test def testSimpleInstanceQueries(): Unit = {
+  test("testSimpleInstanceQueries") {
     // Let variable "doc" in principle be a document of any yaidom document type (here it is "simple")
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
@@ -146,7 +146,7 @@ class Blog2XbrlTest extends Suite {
    * See http://xbrlreview.blogspot.nl/p/json-financialreport-network-httpwww.html for a similar representation,
    * but in JSON.
    */
-  @Test def testFactAspectQueries(): Unit = {
+  test("testFactAspectQueries") {
     val fact =
       (idoc.documentElement findChildElem { e =>
         e.resolvedName == EName(GaapNs, "AverageNumberEmployees") &&
@@ -219,7 +219,7 @@ class Blog2XbrlTest extends Suite {
    *
    * See http://www.xbrlsite.com/DigitalFinancialReporting/ComprehensiveExample/2011-07-15/gaap-formula.xml.
    */
-  @Test def testSimulatedAssertion1(): Unit = {
+  test("testSimulatedAssertion1") {
     val topLevelFacts =
       idocElem.filterChildElems(e =>
         !Set(XbrliNs, LinkNs).contains(e.resolvedName.namespaceUriOption.getOrElse("")))

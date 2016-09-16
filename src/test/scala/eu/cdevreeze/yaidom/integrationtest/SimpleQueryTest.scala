@@ -20,7 +20,7 @@ import scala.Vector
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
@@ -47,9 +47,9 @@ import eu.cdevreeze.yaidom.scalaxml
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class SimpleQueryTest extends Suite {
+class SimpleQueryTest extends FunSuite {
 
-  @Test def testVerySimpleProductQuery(): Unit = {
+  test("testVerySimpleProductQuery") {
     val productElems =
       for {
         productElem <- catalogDoc.documentElement \ EName("product")
@@ -64,7 +64,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testVerySimpleDeptQuery(): Unit = {
+  test("testVerySimpleDeptQuery") {
     val depts =
       for {
         productElem <- catalogDoc.documentElement \\ EName("product")
@@ -76,7 +76,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testVerySimpleAccProductQuery(): Unit = {
+  test("testVerySimpleAccProductQuery") {
     val accProductElems =
       for {
         productElem <- catalogDoc.documentElement \ EName("product")
@@ -93,7 +93,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testSimpleAccProductNameQuery(): Unit = {
+  test("testSimpleAccProductNameQuery") {
     // Simulating the ordering allowed by XQuery FLWOR expressions.
 
     val accProductNameElems =
@@ -112,7 +112,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testSimpleHtmlAccProductNameQuery(): Unit = {
+  test("testSimpleHtmlAccProductNameQuery") {
     // Simulating the ordering and element constructors allowed by XQuery FLWOR expressions.
 
     import Node._
@@ -144,7 +144,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testReasonablySimpleHtmlAccProductNameQuery(): Unit = {
+  test("testReasonablySimpleHtmlAccProductNameQuery") {
     // Simulating the ordering and direct constructors allowed by XQuery FLWOR expressions.
 
     import Node._
@@ -186,7 +186,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testRewrittenHtmlAccProductNameQuery(): Unit = {
+  test("testRewrittenHtmlAccProductNameQuery") {
     // Same as above, but rewritten using Scala XML literals.
 
     val catalogScalaXmlElem = new scalaxml.ScalaXmlElem(convertElem(catalogDoc.documentElement))
@@ -226,7 +226,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testSimpleItemQuery(): Unit = {
+  test("testSimpleItemQuery") {
     // Simple "join"
 
     val itemElems =
@@ -258,7 +258,7 @@ class SimpleQueryTest extends Suite {
     }
   }
 
-  @Test def testSimpleAggregationQuery(): Unit = {
+  test("testSimpleAggregationQuery") {
     // Simple "aggregation"
 
     val departmentElems =

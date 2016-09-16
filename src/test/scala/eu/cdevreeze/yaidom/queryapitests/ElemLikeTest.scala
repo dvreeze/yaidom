@@ -21,7 +21,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -47,11 +47,11 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ElemLikeTest extends Suite {
+class ElemLikeTest extends FunSuite {
 
   private val ns = "http://bookstore"
 
-  @Test def testChildElems(): Unit = {
+  test("testChildElems") {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms = bookstore.findAllChildElems
@@ -112,7 +112,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testCollectFromChildElems(): Unit = {
+  test("testCollectFromChildElems") {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms = bookstore.findAllChildElems
@@ -156,7 +156,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
-  @Test def testElems(): Unit = {
+  test("testElems") {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
@@ -217,7 +217,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testCollectFromElems(): Unit = {
+  test("testCollectFromElems") {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
@@ -255,7 +255,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
-  @Test def testElemsOrSelf(): Unit = {
+  test("testElemsOrSelf") {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElemsOrSelf
@@ -320,7 +320,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testCollectFromElemsOrSelf(): Unit = {
+  test("testCollectFromElemsOrSelf") {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElemsOrSelf
@@ -362,7 +362,7 @@ class ElemLikeTest extends Suite {
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
   }
 
-  @Test def testTopmostElems(): Unit = {
+  test("testTopmostElems") {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
@@ -439,7 +439,7 @@ class ElemLikeTest extends Suite {
     assert(firstUllmanAncestors.toSet.subsetOf(ullmanAncestors.toSet))
   }
 
-  @Test def testFindParentInTree(): Unit = {
+  test("testFindParentInTree") {
     require(bookstore.localName == "Bookstore")
 
     val bookElms = bookstore filterElems { _.localName == "Book" }
@@ -477,7 +477,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testGetIndex(): Unit = {
+  test("testGetIndex") {
     require(bookstore.localName == "Bookstore")
 
     val index: Map[EName, immutable.IndexedSeq[Elem]] = bookstore.findAllElemsOrSelf groupBy { _.resolvedName }
@@ -498,7 +498,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testFindByPath(): Unit = {
+  test("testFindByPath") {
     require(bookstore.localName == "Bookstore")
 
     assertResult(Some(bookstore)) {
@@ -542,7 +542,7 @@ class ElemLikeTest extends Suite {
     }
   }
 
-  @Test def testEqualities(): Unit = {
+  test("testEqualities") {
     require(bookstore.localName == "Bookstore")
 
     val allElms = bookstore.findAllElemsOrSelf

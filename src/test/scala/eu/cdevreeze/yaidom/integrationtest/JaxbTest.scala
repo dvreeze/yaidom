@@ -20,7 +20,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.core.Scope
@@ -43,9 +43,9 @@ import javax.xml.bind.annotation.XmlElement
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class JaxbTest extends Suite {
+class JaxbTest extends FunSuite {
 
-  @Test def testRoundtripXbrl(): Unit = {
+  test("testRoundtripXbrl") {
     val jaxbContext = JAXBContext.newInstance(classOf[JaxbTest.Wrapper])
     val marshaller = jaxbContext.createMarshaller()
     val unmarshaller = jaxbContext.createUnmarshaller()

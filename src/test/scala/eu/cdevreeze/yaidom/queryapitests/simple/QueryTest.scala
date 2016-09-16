@@ -47,7 +47,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
-  @Test def testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths(): Unit = {
+  test("testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths") {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     require(bookstore.localName == "Bookstore")
@@ -114,7 +114,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitlesUsingPaths(): Unit = {
+  test("testQueryBooksOrMagazinesWithNonUniqueTitlesUsingPaths") {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
     require(bookstore.localName == "Bookstore")
@@ -144,7 +144,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBookUsingPaths(): Unit = {
+  test("testQueryBooksOrMagazinesWithTitleAsOtherBookUsingPaths") {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
     require(bookstore.localName == "Bookstore")
@@ -185,7 +185,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksWithAuthorInTitle(): Unit = {
+  test("testQueryBooksWithAuthorInTitle") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -228,7 +228,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksPricedBelowAverage(): Unit = {
+  test("testQueryBooksPricedBelowAverage") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -276,7 +276,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksOrderedByPrice(): Unit = {
+  test("testQueryBooksOrderedByPrice") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -330,7 +330,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    * &lt;/InvertedBookstore&gt;
    * }}}
    */
-  @Test def testQueryInvertedBookstore(): Unit = {
+  test("testQueryInvertedBookstore") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -384,7 +384,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformLeavingOutPrices(): Unit = {
+  test("testTransformLeavingOutPrices") {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -424,7 +424,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformCombiningFirstAndLastName(): Unit = {
+  test("testTransformCombiningFirstAndLastName") {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -462,7 +462,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformAuthors(): Unit = {
+  test("testTransformAuthors") {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.

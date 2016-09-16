@@ -25,7 +25,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
 
@@ -42,19 +42,19 @@ import eu.cdevreeze.yaidom.parse
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ElemLikePropTest extends Suite with Checkers {
+class ElemLikePropTest extends FunSuite with Checkers {
 
   import Arbitrary.arbitrary
 
   // Simple "definitions"
 
-  @Test def testFilterChildElemsDefinition(): Unit = {
+  test("testFilterChildElemsDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterChildElems(p) == elem.findAllChildElems.filter(p)
     }, minSuccessful(100))
   }
 
-  @Test def testFilterElemsOrSelfDefinition(): Unit = {
+  test("testFilterElemsOrSelfDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterElemsOrSelf(p) == {
         Vector(elem).filter(p) ++ (elem.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
@@ -62,7 +62,7 @@ class ElemLikePropTest extends Suite with Checkers {
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsOrSelfDefinition(): Unit = {
+  test("testFindTopmostElemsOrSelfDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElemsOrSelf(p) == {
         if (p(elem)) Vector(elem)
@@ -71,7 +71,7 @@ class ElemLikePropTest extends Suite with Checkers {
     }, minSuccessful(100))
   }
 
-  @Test def testFilterElemsDefinition(): Unit = {
+  test("testFilterElemsDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterElems(p) == {
         (elem.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
@@ -79,7 +79,7 @@ class ElemLikePropTest extends Suite with Checkers {
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsDefinition(): Unit = {
+  test("testFindTopmostElemsDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElems(p) == {
         (elem.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p)))
@@ -87,13 +87,13 @@ class ElemLikePropTest extends Suite with Checkers {
     }, minSuccessful(100))
   }
 
-  @Test def testFindAllElemsOrSelfDefinition(): Unit = {
+  test("testFindAllElemsOrSelfDefinition") {
     check({ (elem: Elem) =>
       elem.findAllElemsOrSelf == elem.filterElemsOrSelf(_ => true)
     }, minSuccessful(100))
   }
 
-  @Test def testFindAllElemsDefinition(): Unit = {
+  test("testFindAllElemsDefinition") {
     check({ (elem: Elem) =>
       elem.findAllElems == elem.filterElems(_ => true)
     }, minSuccessful(100))
@@ -101,31 +101,31 @@ class ElemLikePropTest extends Suite with Checkers {
 
   // Simple theorems
 
-  @Test def testFilterElemsOrSelfProperty(): Unit = {
+  test("testFilterElemsOrSelfProperty") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterElemsOrSelf(p) == elem.findAllElemsOrSelf.filter(p)
     }, minSuccessful(100))
   }
 
-  @Test def testFilterElemsProperty(): Unit = {
+  test("testFilterElemsProperty") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.filterElems(p) == elem.findAllElems.filter(p)
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsOrSelfProperty(): Unit = {
+  test("testFindTopmostElemsOrSelfProperty") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       (elem.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) == elem.filterElemsOrSelf(p)
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsProperty(): Unit = {
+  test("testFindTopmostElemsProperty") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       (elem.findTopmostElems(p) flatMap (_.filterElemsOrSelf(p))) == elem.filterElems(p)
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsOrSelfAlternativeDefinition(): Unit = {
+  test("testFindTopmostElemsOrSelfAlternativeDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElemsOrSelf(p) == {
         elem.filterElemsOrSelf(p) filter { e =>
@@ -136,7 +136,7 @@ class ElemLikePropTest extends Suite with Checkers {
     }, minSuccessful(100))
   }
 
-  @Test def testFindTopmostElemsAlternativeDefinition(): Unit = {
+  test("testFindTopmostElemsAlternativeDefinition") {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElems(p) == {
         elem.filterElems(p) filter { e =>

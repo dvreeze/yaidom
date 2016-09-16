@@ -21,7 +21,7 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Ignore
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
@@ -50,7 +50,7 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ScalaXmlInteropTest extends Suite {
+class ScalaXmlInteropTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -59,7 +59,7 @@ class ScalaXmlInteropTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testConvert(): Unit = {
+  test("testConvert") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(bookstore)
@@ -129,7 +129,7 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  @Test def testConvertStrangeXml(): Unit = {
+  test("testConvertStrangeXml") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(strangeXml)
@@ -162,7 +162,7 @@ class ScalaXmlInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testConvertDefaultNamespaceXml(): Unit = {
+  test("testConvertDefaultNamespaceXml") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXml)
@@ -207,7 +207,7 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  @Test def testConvertXmlWithNonExpandedEntityRef(): Unit = {
+  test("testConvertXmlWithNonExpandedEntityRef") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithEntityRef)
@@ -264,7 +264,7 @@ class ScalaXmlInteropTest extends Suite {
     }
   }
 
-  @Test def testConvertXmlWithNamespaceUndeclarations(): Unit = {
+  test("testConvertXmlWithNamespaceUndeclarations") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithNSUndeclarations)
@@ -298,7 +298,7 @@ class ScalaXmlInteropTest extends Suite {
    * Currently this test is ignored because of bug: SI 3368: Preserve CDATA sections, don't convert them to generic Text nodes.
    * (see https://issues.scala-lang.org/browse/SI-3368).
    */
-  @Ignore @Test def testConvertXmlWithEscapedChars(): Unit = {
+  ignore("testConvertXmlWithEscapedChars") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithEscapedChars)
@@ -349,7 +349,7 @@ class ScalaXmlInteropTest extends Suite {
     doChecks(root3)
   }
 
-  @Test def testConvertXmlWithSpecialChars(): Unit = {
+  test("testConvertXmlWithSpecialChars") {
     // 1. Convert XML to Elem
 
     val root: Elem = convertToElem(trivialXmlWithEuro)
@@ -401,7 +401,7 @@ class ScalaXmlInteropTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testConvertGroovyXmlExample(): Unit = {
+  test("testConvertGroovyXmlExample") {
     val doc = Document(convertToElem(cars))
 
     assertResult("records") {

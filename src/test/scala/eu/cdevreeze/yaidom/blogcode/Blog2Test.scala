@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.blogcode
 
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
@@ -37,7 +37,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class Blog2Test extends Suite {
+class Blog2Test extends FunSuite {
 
   private val pathToParentDir: java.io.File =
     (new java.io.File(classOf[Blog2Test].getResource("feed1.txt").toURI)).getParentFile
@@ -45,7 +45,7 @@ class Blog2Test extends Suite {
   /**
    * The code of the entire article.
    */
-  @Test def testFindNamesInFeed1(): Unit = {
+  test("testFindNamesInFeed1") {
     import java.net.URI
     import javax.xml.parsers._
     import scala.collection.immutable

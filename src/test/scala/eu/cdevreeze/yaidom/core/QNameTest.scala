@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.core
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 /**
@@ -27,9 +27,9 @@ import org.scalatest.junit.JUnitRunner
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class QNameTest extends Suite {
+class QNameTest extends FunSuite {
 
-  @Test def testUnprefixedName(): Unit = {
+  test("testUnprefixedName") {
     val qname = UnprefixedName("Bookstore")
 
     assertResult("Bookstore") {
@@ -131,7 +131,7 @@ class QNameTest extends Suite {
     }
   }
 
-  @Test def testPrefixedName(): Unit = {
+  test("testPrefixedName") {
     val qname = PrefixedName("books", "Bookstore")
 
     assertResult("Bookstore") {

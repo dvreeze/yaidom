@@ -22,7 +22,7 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -44,7 +44,7 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
+class LargeXmlParsingTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -78,7 +78,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     this.xmlBytes = bos.toByteArray
   }
 
-  @Test def testParseLargeXmlUsingSax(): Unit = {
+  test("testParseLargeXmlUsingSax") {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -89,7 +89,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement)
   }
 
-  @Test def testParseLargeXmlIntoResolvedElemUsingSax(): Unit = {
+  test("testParseLargeXmlIntoResolvedElemUsingSax") {
     val parser = DocumentParserUsingSax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -111,7 +111,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testParseLargeXmlUsingStax(): Unit = {
+  test("testParseLargeXmlUsingStax") {
     val parser = DocumentParserUsingStax.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -122,7 +122,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement)
   }
 
-  @Test def testParseLargeXmlUsingDom(): Unit = {
+  test("testParseLargeXmlUsingDom") {
     val parser = DocumentParserUsingDom.newInstance
 
     val startMs = System.currentTimeMillis()
@@ -133,7 +133,7 @@ class LargeXmlParsingTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement)
   }
 
-  @Test def testParseLargeXmlUsingDomLS(): Unit = {
+  test("testParseLargeXmlUsingDomLS") {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val startMs = System.currentTimeMillis()

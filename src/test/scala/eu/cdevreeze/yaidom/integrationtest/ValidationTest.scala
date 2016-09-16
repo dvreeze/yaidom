@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ValidationTest extends Suite {
+class ValidationTest extends FunSuite {
 
   import ValidationTest._
 
@@ -102,7 +102,7 @@ class ValidationTest extends Suite {
 
   // The tests themselves
 
-  @Test def testValidateAddress(): Unit = {
+  test("testValidateAddress") {
     val elmBuilder =
       elem(
         qname = QName("Address"),
@@ -138,7 +138,7 @@ class ValidationTest extends Suite {
     }
   }
 
-  @Test def testValidatePurchaseOrder(): Unit = {
+  test("testValidatePurchaseOrder") {
     val docParser = DocumentParserUsingSax.newInstance
     val is = classOf[ValidationTest].getResourceAsStream("po.xml")
     val doc = docParser.parse(is)

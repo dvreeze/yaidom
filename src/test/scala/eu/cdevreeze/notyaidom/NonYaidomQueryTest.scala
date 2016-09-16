@@ -20,7 +20,7 @@ import java.{ util => jutil, io => jio }
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 
 /**
@@ -40,11 +40,11 @@ import org.scalatest.junit.JUnitRunner
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class NonYaidomQueryTest extends Suite {
+class NonYaidomQueryTest extends FunSuite {
 
   import NonYaidomQueryTest._
 
-  @Test def testQueryBookTitles(): Unit = {
+  test("testQueryBookTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
     require(bookstore.name == "Bookstore")
@@ -65,7 +65,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookOrMagazineTitles(): Unit = {
+  test("testQueryBookOrMagazineTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
     require(bookstore.name == "Bookstore")
@@ -89,7 +89,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitles(): Unit = {
+  test("testQueryTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.name == "Bookstore")
@@ -112,7 +112,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryAllTitles(): Unit = {
+  test("testQueryAllTitles") {
     // XPath: doc("bookstore.xml")//Title
 
     require(bookstore.name == "Bookstore")
@@ -132,7 +132,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryAllElements(): Unit = {
+  test("testQueryAllElements") {
     // XPath: doc("bookstore.xml")//*
 
     require(bookstore.name == "Bookstore")
@@ -149,7 +149,7 @@ class NonYaidomQueryTest extends Suite {
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
   }
 
-  @Test def testQueryBookIsbns(): Unit = {
+  test("testQueryBookIsbns") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
     require(bookstore.name == "Bookstore")
@@ -166,7 +166,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBooks(): Unit = {
+  test("testQueryCheapBooks") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
     require(bookstore.name == "Bookstore")
@@ -187,7 +187,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBookTitles(): Unit = {
+  test("testQueryCheapBookTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
     require(bookstore.name == "Bookstore")
@@ -208,7 +208,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBookAuthors(): Unit = {
+  test("testQueryCheapBookAuthors") {
     // Own example..
 
     require(bookstore.name == "Bookstore")
@@ -245,7 +245,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfBooksWithRemarks(): Unit = {
+  test("testQueryTitlesOfBooksWithRemarks") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
 
     require(bookstore.name == "Bookstore")
@@ -264,7 +264,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByUllman(): Unit = {
+  test("testQueryTitlesOfCheapBooksByUllman") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.name == "Bookstore")
@@ -287,7 +287,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByJeffreyUllman(): Unit = {
+  test("testQueryTitlesOfCheapBooksByJeffreyUllman") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
     require(bookstore.name == "Bookstore")
@@ -318,7 +318,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfBooksByJeffreyUllmanButNotWidom(): Unit = {
+  test("testQueryTitlesOfBooksByJeffreyUllmanButNotWidom") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]/Title
 
     require(bookstore.name == "Bookstore")
@@ -341,7 +341,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQuerySecondAuthors(): Unit = {
+  test("testQuerySecondAuthors") {
     // XPath: doc("bookstore.xml")//Authors/Author[2]
 
     require(bookstore.name == "Bookstore")
@@ -365,7 +365,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryGreatBooks(): Unit = {
+  test("testQueryGreatBooks") {
     // XPath: doc("bookstore.xml")//Book[contains(Remark, "great")]/Title
 
     require(bookstore.name == "Bookstore")
@@ -383,7 +383,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryMagazinesWithSameNameAsBook(): Unit = {
+  test("testQueryMagazinesWithSameNameAsBook") {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
     require(bookstore.name == "Bookstore")
@@ -406,7 +406,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitles(): Unit = {
+  test("testQueryBooksOrMagazinesWithNonUniqueTitles") {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
     require(bookstore.name == "Bookstore")
@@ -433,7 +433,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBook(): Unit = {
+  test("testQueryBooksOrMagazinesWithTitleAsOtherBook") {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
     require(bookstore.name == "Bookstore")
@@ -469,7 +469,7 @@ class NonYaidomQueryTest extends Suite {
    * doc("bookstore.xml")//Book[count(Authors/Author[contains(First_Name, "J"]) = count(Authors/Author/First_Name)]
    * </pre>
    */
-  @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ(): Unit = {
+  test("testQueryBooksWithAllAuthorFirstNamesWithLetterJ") {
     require(bookstore.name == "Bookstore")
 
     val books =
@@ -491,7 +491,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksFromUllmanButNotWidom(): Unit = {
+  test("testQueryBooksFromUllmanButNotWidom") {
     // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
 
     require(bookstore.name == "Bookstore")
@@ -531,7 +531,7 @@ class NonYaidomQueryTest extends Suite {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksWithAuthorInTitle(): Unit = {
+  test("testQueryBooksWithAuthorInTitle") {
     require(bookstore.name == "Bookstore")
 
     val titleAndFirstNames =
@@ -569,7 +569,7 @@ class NonYaidomQueryTest extends Suite {
    * &lt;/Average&gt;
    * }}}
    */
-  @Test def testQueryAverageBookPrice(): Unit = {
+  test("testQueryAverageBookPrice") {
     require(bookstore.name == "Bookstore")
 
     val prices: immutable.IndexedSeq[Double] =
@@ -597,7 +597,7 @@ class NonYaidomQueryTest extends Suite {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksPricedBelowAverage(): Unit = {
+  test("testQueryBooksPricedBelowAverage") {
     require(bookstore.name == "Bookstore")
 
     val prices: immutable.IndexedSeq[Double] =
@@ -643,7 +643,7 @@ class NonYaidomQueryTest extends Suite {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksOrderedByPrice(): Unit = {
+  test("testQueryBooksOrderedByPrice") {
     require(bookstore.name == "Bookstore")
 
     def cheaper(book1: Elem, book2: Elem): Boolean = {
@@ -687,7 +687,7 @@ class NonYaidomQueryTest extends Suite {
    *        &lt;/Last_Name&gt;
    * }}}
    */
-  @Test def testQueryLastNames(): Unit = {
+  test("testQueryLastNames") {
     require(bookstore.name == "Bookstore")
 
     val lastNameValues: immutable.IndexedSeq[String] =
@@ -716,7 +716,7 @@ class NonYaidomQueryTest extends Suite {
    *        &lt;/BookPair&gt;
    * }}}
    */
-  @Test def testQueryBookPairsFromSameAuthor(): Unit = {
+  test("testQueryBookPairsFromSameAuthor") {
     require(bookstore.name == "Bookstore")
 
     def bookAuthorLastNames(book: Elem): Set[String] = {
@@ -785,7 +785,7 @@ class NonYaidomQueryTest extends Suite {
    * &lt;/InvertedBookstore&gt;
    * }}}
    */
-  @Test def testQueryInvertedBookstore(): Unit = {
+  test("testQueryInvertedBookstore") {
     require(bookstore.name == "Bookstore")
 
     def books(authorLastName: String) =
@@ -833,7 +833,7 @@ class NonYaidomQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookAndMagazineTitlesRelabeled(): Unit = {
+  test("testQueryBookAndMagazineTitlesRelabeled") {
     // Taken from the XSLT demo
     require(bookstore.name == "Bookstore")
 

@@ -20,7 +20,7 @@ import scala.Vector
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -39,13 +39,13 @@ import eu.cdevreeze.yaidom.simple.Node
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class SimulateXsltTest extends Suite {
+class SimulateXsltTest extends FunSuite {
 
   import Node._
 
   private val docParser = DocumentParserUsingDom.newInstance()
 
-  @Test def testTransformHelloElem(): Unit = {
+  test("testTransformHelloElem") {
     // Here we use updateTopmostXXX twice, once for the child elements and once for the root element
     // We can recognize the "pattern matches" (although order of updating topmost elements matters)
 
@@ -93,7 +93,7 @@ class SimulateXsltTest extends Suite {
     }
   }
 
-  @Test def testTransformHelloElemUsingPaths(): Unit = {
+  test("testTransformHelloElemUsingPaths") {
     // Here we use updateElemsOrSelfWithNodeSeq once, after collecting the paths of the elements to update
     // (of the child elements and the root element)
     // Again, we can recognize the "pattern matches" (and order of updating is handled by the update method)
@@ -140,7 +140,7 @@ class SimulateXsltTest extends Suite {
     }
   }
 
-  @Test def testTransformHelloElemUsingQuery(): Unit = {
+  test("testTransformHelloElemUsingQuery") {
     // Here we use a "pull"/query approach rather than a "push"/update approach
     // We can recognize the "HTML template"
     // This may be the easiest and best approach (cf. XQuery versus XSLT)

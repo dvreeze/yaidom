@@ -20,7 +20,7 @@ import scala.Vector
 import scala.collection.immutable
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -40,13 +40,13 @@ import eu.cdevreeze.yaidom.simple.Node
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXQuery3UseCasesTest extends Suite {
+abstract class AbstractXQuery3UseCasesTest extends FunSuite {
 
   type E <: ScopedElemApi.Aux[E]
 
   protected val ns = "http://www.w3.org/TR/xquery-30-use-cases/"
 
-  @Test def testQ1(): Unit = {
+  test("testQ1") {
     import Node._
 
     require(salesElem.localName == "sales")
@@ -89,7 +89,7 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     }
   }
 
-  @Test def testQ2(): Unit = {
+  test("testQ2") {
     import Node._
 
     require(productsElem.localName == "products")
@@ -170,7 +170,7 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     }
   }
 
-  @Test def testQ3(): Unit = {
+  test("testQ3") {
     import Node._
 
     require(productsElem.localName == "products")
@@ -268,7 +268,7 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
    * So, when querying documents with namespaces in a namespace-aware manner, yaidom's precision and namespace support
    * really start to shine.
    */
-  @Test def testQ4(): Unit = {
+  test("testQ4") {
     import Node._
 
     require(productsElem.localName == "products")
@@ -347,7 +347,7 @@ abstract class AbstractXQuery3UseCasesTest extends Suite {
     }
   }
 
-  @Test def testQ5(): Unit = {
+  test("testQ5") {
     import Node._
 
     require(productsElem.localName == "products")

@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -51,7 +51,7 @@ import javax.xml.transform.TransformerFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class FriendFeedTest extends Suite {
+class FriendFeedTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -60,7 +60,7 @@ class FriendFeedTest extends Suite {
 
   private val StatsScope = Scope.from("" -> NsFriendFeedStats)
 
-  @Test def testFilterFeedProcessing(): Unit = {
+  test("testFilterFeedProcessing") {
     // Note the functional expression-oriented programming style, with many small expressions assigned to val variables.
     // Also note the abundant use of suffix "Elm" in variable names for Elems and ElemBuilders.
 

@@ -22,7 +22,7 @@ import scala.reflect.classTag
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
@@ -45,11 +45,11 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XmlSchemasTest extends Suite {
+class XmlSchemasTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.utils")
 
-  @Test def testQueryXsd(): Unit = {
+  test("testQueryXsd") {
     val scope = Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")
     import scope._
 

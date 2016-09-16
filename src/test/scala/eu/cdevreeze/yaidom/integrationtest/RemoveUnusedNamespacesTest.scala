@@ -20,7 +20,7 @@ import scala.Vector
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
@@ -48,12 +48,12 @@ import eu.cdevreeze.yaidom.utils.TextENameExtractor
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class RemoveUnusedNamespacesTest extends Suite {
+class RemoveUnusedNamespacesTest extends FunSuite {
 
   /**
    * See http://stackoverflow.com/questions/23002655/xquery-how-to-remove-unused-namespace-in-xml-node.
    */
-  @Test def testRemoveUnusedNamespaces(): Unit = {
+  test("testRemoveUnusedNamespaces") {
     val xml =
       <otx xmlns="http://iso.org/OTX/1.0.0" xmlns:i18n="http://iso.org/OTX/1.0.0/i18n" xmlns:diag="http://iso.org/OTX/1.0.0/DiagCom" xmlns:measure="http://iso.org/OTX/1.0.0/Measure" xmlns:string="http://iso.org/OTX/1.0.0/StringUtil" xmlns:dmd="http://iso.org/OTX/1.0.0/Auxiliaries/DiagMetaData" xmlns:fileXml="http://vwag.de/OTX/1.0.0/XmlFile" xmlns:log="http://iso.org/OTX/1.0.0/Logging" xmlns:file="http://vwag.de/OTX/1.0.0/File" xmlns:dataPlus="http://iso.org/OTX/1.0.0/DiagDataBrowsingPlus" xmlns:event="http://iso.org/OTX/1.0.0/Event" xmlns:quant="http://iso.org/OTX/1.0.0/Quantities" xmlns:hmi="http://iso.org/OTX/1.0.0/HMI" xmlns:math="http://iso.org/OTX/1.0.0/Math" xmlns:flash="http://iso.org/OTX/1.0.0/Flash" xmlns:data="http://iso.org/OTX/1.0.0/DiagDataBrowsing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dt="http://iso.org/OTX/1.0.0/DateTime" xmlns:eventPlus="http://iso.org/OTX/1.0.0/EventPlus" xmlns:corePlus="http://iso.org/OTX/1.0.0/CorePlus" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:job="http://iso.org/OTX/1.0.0/Job" id="id_4e5722f2f81a4309860c146fd3c743e5" name="NewDocument1" package="NewOtxProject1Package1" version="1.0.0.0" timestamp="2014-04-11T09:42:50.2091628+07:00">
         <declarations>
@@ -116,7 +116,7 @@ class RemoveUnusedNamespacesTest extends Suite {
   /**
    * See http://stackoverflow.com/questions/9007894/strip-all-foreign-namespace-nodes-with-xquery.
    */
-  @Test def testRemoveChildElementsInOtherNamespaces(): Unit = {
+  test("testRemoveChildElementsInOtherNamespaces") {
     val xml =
       <entry xmlns="http://www.w3.org/2005/Atom">
         <id>urn:uuid:1234</id>
@@ -158,7 +158,7 @@ class RemoveUnusedNamespacesTest extends Suite {
   /**
    * See https://www.oxygenxml.com/archives/xsl-list/201103/msg00174.html.
    */
-  @Test def testCleanupNamespaces(): Unit = {
+  test("testCleanupNamespaces") {
     val xml =
       <t:Test xmlns:t="http://www.test.org" xmlns:unused="http://www.unused.org" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <t:faultcode>soap:client</t:faultcode>
@@ -206,7 +206,7 @@ class RemoveUnusedNamespacesTest extends Suite {
   /**
    * See http://sourceforge.net/p/saxon/mailman/message/11206899/.
    */
-  @Test def testPushUpNamespaceDeclarations(): Unit = {
+  test("testPushUpNamespaceDeclarations") {
     val xml =
       <mydummyframe>
         <myspecialnode xmlns:aaa="blah" xmlns:bbb="foo" xmlns:ccc="bar" myattr="ccc:karl"/>
@@ -239,7 +239,7 @@ class RemoveUnusedNamespacesTest extends Suite {
   /**
    * See http://www.lenzconsulting.com/namespaces-in-xslt/, on "copy-namespaces".
    */
-  @Test def testExcludeNamespaces(): Unit = {
+  test("testExcludeNamespaces") {
     val xml =
       <doc xmlns:my="http://example.com" my:id="AAA">
         <p>This is the first paragraph.</p>

@@ -20,7 +20,7 @@ import scala.Vector
 import scala.collection.immutable
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -39,11 +39,11 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeQueryTest extends Suite {
+abstract class AbstractAlternativeQueryTest extends FunSuite {
 
   type E <: ClarkElemLike.Aux[E]
 
-  @Test def testFindAllCatalogProducts(): Unit = {
+  test("testFindAllCatalogProducts") {
     // See example 1-4.
 
     require(catalogElem.localName == "catalog")
@@ -83,7 +83,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     }
   }
 
-  @Test def testFindAllDepartments(): Unit = {
+  test("testFindAllDepartments") {
     // XPath: doc("catalog.xml")/*/product/@dept
     // Or: doc("catalog.xml")//product/@dept
 
@@ -100,7 +100,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     }
   }
 
-  @Test def testFindAllAccProducts(): Unit = {
+  test("testFindAllAccProducts") {
     // XPath: doc("catalog.xml")/catalog/product[@dept = "ACC"]
 
     require(catalogElem.localName == "catalog")
@@ -137,7 +137,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     }
   }
 
-  @Test def testFindSecondProduct(): Unit = {
+  test("testFindSecondProduct") {
     // XPath: doc("catalog.xml")/catalog/product[2]
 
     require(catalogElem.localName == "catalog")
@@ -156,7 +156,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     }
   }
 
-  @Test def testFindAllAccProductNames(): Unit = {
+  test("testFindAllAccProductNames") {
     // See example 1-5.
 
     require(catalogElem.localName == "catalog")
@@ -179,7 +179,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     }
   }
 
-  @Test def testListAllAccProducts(): Unit = {
+  test("testListAllAccProducts") {
     // See example 1-10.
 
     require(catalogElem.localName == "catalog")
@@ -210,7 +210,7 @@ abstract class AbstractAlternativeQueryTest extends Suite {
     }
   }
 
-  @Test def testJoin(): Unit = {
+  test("testJoin") {
     // See example 1-11.
 
     require(catalogElem.localName == "catalog")

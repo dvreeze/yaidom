@@ -22,7 +22,7 @@ import scala.Vector
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -48,7 +48,7 @@ import javax.xml.transform.TransformerFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class UpdateTest extends Suite {
+class UpdateTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -70,7 +70,7 @@ class UpdateTest extends Suite {
     DocumentPrinterUsingDom.newInstance(dbf, tf)
   }
 
-  @Test def testUpdateUsingPaths(): Unit = {
+  test("testUpdateUsingPaths") {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -95,7 +95,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  @Test def testUpdateUsingPathSet(): Unit = {
+  test("testUpdateUsingPathSet") {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -120,7 +120,7 @@ class UpdateTest extends Suite {
     }
   }
 
-  @Test def testUpdateUsingTransform(): Unit = {
+  test("testUpdateUsingTransform") {
     val is = classOf[UpdateTest].getResourceAsStream("books.xml")
 
     val doc1: Document = docParser.parse(is)
@@ -162,7 +162,7 @@ class UpdateTest extends Suite {
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom functional updates */
-  @Test def testAnotherUpdate(): Unit = {
+  test("testAnotherUpdate") {
     val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
 
     val doc: Document = docParser.parse(is)
@@ -229,7 +229,7 @@ class UpdateTest extends Suite {
   }
 
   /** Same example as http://www.journaldev.com/901/how-to-edit-xml-file-in-java-dom-parser, but now using yaidom function topmostUpdated */
-  @Test def testAnotherUpdateUsingTransformTopmost(): Unit = {
+  test("testAnotherUpdateUsingTransformTopmost") {
     val is = classOf[UpdateTest].getResourceAsStream("employee.xml")
 
     val doc: Document = docParser.parse(is)

@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.integrationtest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.w3c.dom.NodeList
 
@@ -52,7 +52,7 @@ import javax.xml.xpath.XPathFunctionResolver
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XbrlInstanceXPathTest extends Suite with BeforeAndAfterAll {
+class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
 
   import XbrlInstanceXPathTest.XbrliNs
   import XbrlInstanceXPathTest.LinkNs
@@ -64,7 +64,7 @@ class XbrlInstanceXPathTest extends Suite with BeforeAndAfterAll {
   private val doc =
     docParser.parse(classOf[XbrlInstanceXPathTest].getResourceAsStream("sample-xbrl-instance.xml"))
 
-  @Test def testQueryForUnits(): Unit = {
+  test("testQueryForUnits") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs)
     val namespaceContext = scope.toNamespaceContext
@@ -94,7 +94,7 @@ class XbrlInstanceXPathTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryForTopLevelFacts(): Unit = {
+  test("testQueryForTopLevelFacts") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
     val namespaceContext = scope.toNamespaceContext
@@ -145,7 +145,7 @@ class XbrlInstanceXPathTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryForTopLevelItems(): Unit = {
+  test("testQueryForTopLevelItems") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
     val namespaceContext = scope.toNamespaceContext
@@ -199,7 +199,7 @@ class XbrlInstanceXPathTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryForTopLevelTuples(): Unit = {
+  test("testQueryForTopLevelTuples") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
     val namespaceContext = scope.toNamespaceContext
@@ -243,7 +243,7 @@ class XbrlInstanceXPathTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryForSomeTopLevelItems(): Unit = {
+  test("testQueryForSomeTopLevelItems") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
     val namespaceContext = scope.toNamespaceContext

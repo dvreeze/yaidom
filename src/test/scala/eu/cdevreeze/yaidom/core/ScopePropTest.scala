@@ -25,7 +25,7 @@ import org.scalacheck.Gen.listOfN
 import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
 
@@ -35,23 +35,23 @@ import org.scalatest.prop.Checkers
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ScopePropTest extends Suite with Checkers {
+class ScopePropTest extends FunSuite with Checkers {
 
   import Arbitrary.arbitrary
 
-  @Test def testResolveProperty(): Unit = {
+  test("testResolveProperty") {
     check({ (scope1: Scope, scope2: Scope) =>
       scope1.resolve(scope1.relativize(scope2)) == scope2
     }, minSuccessful(500))
   }
 
-  @Test def testRelativizeProperty(): Unit = {
+  test("testRelativizeProperty") {
     check({ (scope: Scope, decls: Declarations) =>
       scope.relativize(scope.resolve(decls)) == scope.minimize(decls)
     }, minSuccessful(500))
   }
 
-  @Test def testMinimizeProperty(): Unit = {
+  test("testMinimizeProperty") {
     check({ (scope: Scope, decls: Declarations) =>
       scope.resolve(scope.minimize(decls)) == scope.resolve(decls)
     }, minSuccessful(500))

@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -43,13 +43,13 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class AnotherUpdateTest extends Suite {
+class AnotherUpdateTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val docParser = DocumentParserUsingDom.newInstance()
 
-  @Test def testDeleteMagazines(): Unit = {
+  test("testDeleteMagazines") {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -87,7 +87,7 @@ class AnotherUpdateTest extends Suite {
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags, deleteMagsResolved)
   }
 
-  @Test def testInsertAfter(): Unit = {
+  test("testInsertAfter") {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -161,7 +161,7 @@ class AnotherUpdateTest extends Suite {
     })
   }
 
-  @Test def testInsertBefore(): Unit = {
+  test("testInsertBefore") {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -235,7 +235,7 @@ class AnotherUpdateTest extends Suite {
     })
   }
 
-  @Test def testInsertAsFirstInto(): Unit = {
+  test("testInsertAsFirstInto") {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)
@@ -297,7 +297,7 @@ class AnotherUpdateTest extends Suite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, { e => Vector(insertBook(e)) })
   }
 
-  @Test def testUpdate(): Unit = {
+  test("testUpdate") {
     val is = classOf[AnotherUpdateTest].getResourceAsStream("books.xml")
 
     val doc: Document = docParser.parse(is)

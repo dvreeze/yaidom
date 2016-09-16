@@ -29,7 +29,7 @@ import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -47,12 +47,12 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class MileageRecordsTest extends Suite {
+class MileageRecordsTest extends FunSuite {
   import MileageRecordsTest.MileageRecords
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testReferentialIntegrity(): Unit = {
+  test("testReferentialIntegrity") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -93,7 +93,7 @@ class MileageRecordsTest extends Suite {
     }
   }
 
-  @Test def testSucceedingTrips(): Unit = {
+  test("testSucceedingTrips") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -127,7 +127,7 @@ class MileageRecordsTest extends Suite {
     }
   }
 
-  @Test def testTripLengths(): Unit = {
+  test("testTripLengths") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -158,7 +158,7 @@ class MileageRecordsTest extends Suite {
     }
   }
 
-  @Test def testTotalPrivateKms(): Unit = {
+  test("testTotalPrivateKms") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -180,7 +180,7 @@ class MileageRecordsTest extends Suite {
     }
   }
 
-  @Test def testConvertToCsv(): Unit = {
+  test("testConvertToCsv") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -224,7 +224,7 @@ class MileageRecordsTest extends Suite {
     }
   }
 
-  @Test def testUpdateKms(): Unit = {
+  test("testUpdateKms") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -266,7 +266,7 @@ class MileageRecordsTest extends Suite {
     // docPrinter.print(newMileageRecords.toElem, "UTF-8", System.out)
   }
 
-  @Test def testNoWorkTripsInWeekends(): Unit = {
+  test("testNoWorkTripsInWeekends") {
     import HasENameApi._
 
     val docParser = DocumentParserUsingSax.newInstance

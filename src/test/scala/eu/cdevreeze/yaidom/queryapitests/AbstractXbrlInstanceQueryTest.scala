@@ -20,7 +20,7 @@ import scala.reflect.ClassTag
 import scala.reflect.classTag
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXbrlInstanceQueryTest extends Suite {
+abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
 
   type E <: ClarkElemApi.Aux[E]
 
@@ -44,7 +44,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
   private val LinkNs = "http://www.xbrl.org/2003/linkbase"
   private val XLinkNs = "http://www.w3.org/1999/xlink"
 
-  @Test def testSimpleQueries(): Unit = {
+  test("testSimpleQueries") {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
     // Finding child elements (more verbose than XPath, but very precise)
@@ -143,7 +143,7 @@ abstract class AbstractXbrlInstanceQueryTest extends Suite {
     }
   }
 
-  @Test def testBulkNavigation(): Unit = {
+  test("testBulkNavigation") {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
     val uriResolver = XmlBaseSupport.JdkUriResolver

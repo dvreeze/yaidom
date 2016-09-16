@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -44,7 +44,7 @@ import eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeXmlBaseTest extends Suite {
+abstract class AbstractAlternativeXmlBaseTest extends FunSuite {
 
   import yaidom.simple.Node._
 
@@ -77,7 +77,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
 
   protected def nullUri: URI
 
-  @Test def testXmlBaseAttributeOnElement(): Unit = {
+  test("testXmlBaseAttributeOnElement") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val docElem =
@@ -100,7 +100,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testTwoEquivalentHrefs(): Unit = {
+  test("testTwoEquivalentHrefs") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val docElem1 =
@@ -142,7 +142,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc2.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testMissingXmlBaseAttribute(): Unit = {
+  test("testMissingXmlBaseAttribute") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val docElem =
@@ -165,7 +165,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testXmlBaseAttributeOnParent(): Unit = {
+  test("testXmlBaseAttributeOnParent") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val referenceElem =
@@ -194,7 +194,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testNestedXmlBaseAttributes(): Unit = {
+  test("testNestedXmlBaseAttributes") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val referenceElem =
@@ -233,7 +233,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testOtherNestedXmlBaseAttributes(): Unit = {
+  test("testOtherNestedXmlBaseAttributes") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val referenceElem =
@@ -266,7 +266,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testNestedAbsoluteXmlBaseAttributes(): Unit = {
+  test("testNestedAbsoluteXmlBaseAttributes") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val referenceElem =
@@ -305,7 +305,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testEmptyDocUriAndXmlBaseAttribute(): Unit = {
+  test("testEmptyDocUriAndXmlBaseAttribute") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val docElem =
@@ -328,7 +328,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testEmptyXmlBaseAttribute(): Unit = {
+  test("testEmptyXmlBaseAttribute") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val docElem =
@@ -353,7 +353,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testNestedSometimesEmptyXmlBaseAttributes(): Unit = {
+  test("testNestedSometimesEmptyXmlBaseAttributes") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val referenceElem =
@@ -397,7 +397,7 @@ abstract class AbstractAlternativeXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testNestedSometimesEmptyXmlBaseAttributesAgain(): Unit = {
+  test("testNestedSometimesEmptyXmlBaseAttributesAgain") {
     val scope = Scope.from("xlink" -> XLinkNs)
 
     val referenceElem =

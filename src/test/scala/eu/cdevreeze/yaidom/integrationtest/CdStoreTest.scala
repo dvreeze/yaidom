@@ -21,7 +21,7 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -41,11 +41,11 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class CdStoreTest extends Suite with BeforeAndAfterAll {
+class CdStoreTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testQueryArtistElems(): Unit = {
+  test("testQueryArtistElems") {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
@@ -79,7 +79,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryArtistAsText(): Unit = {
+  test("testQueryArtistAsText") {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
@@ -127,7 +127,7 @@ class CdStoreTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryPrice(): Unit = {
+  test("testQueryPrice") {
     val parser = DocumentParserUsingSax.newInstance
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))

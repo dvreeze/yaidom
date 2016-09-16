@@ -21,7 +21,7 @@ import scala.annotation.elidable.ASSERTION
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -40,9 +40,9 @@ import eu.cdevreeze.yaidom.simple
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XmlDiffTest extends Suite {
+class XmlDiffTest extends FunSuite {
 
-  @Test def testNamespaceAwareness(): Unit = {
+  test("testNamespaceAwareness") {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is1 = classOf[XmlDiffTest].getResourceAsStream("feed1.xml")
@@ -58,7 +58,7 @@ class XmlDiffTest extends Suite {
     }
   }
 
-  @Test def testNamespaceAwarenessAgain(): Unit = {
+  test("testNamespaceAwarenessAgain") {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is1 = classOf[XmlDiffTest].getResourceAsStream("feed1.xml")
@@ -75,7 +75,7 @@ class XmlDiffTest extends Suite {
     }
   }
 
-  @Test def testDiffInOneSharedElem(): Unit = {
+  test("testDiffInOneSharedElem") {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is1 = classOf[XmlDiffTest].getResourceAsStream("feed1.xml")
@@ -100,7 +100,7 @@ class XmlDiffTest extends Suite {
     }
   }
 
-  @Test def testDiffInOneNonSharedElem(): Unit = {
+  test("testDiffInOneNonSharedElem") {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is1 = classOf[XmlDiffTest].getResourceAsStream("feed1.xml")

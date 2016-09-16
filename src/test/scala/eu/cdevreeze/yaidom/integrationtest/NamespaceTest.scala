@@ -21,7 +21,7 @@ import java.{ util => jutil }
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class NamespaceTest extends Suite {
+class NamespaceTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -50,7 +50,7 @@ class NamespaceTest extends Suite {
   val nsXhtml = "http://www.w3.org/1999/xhtml"
   val nsExamples = "http://xmlportfolio.com/xmlguild-examples"
 
-  @Test def testFeed1(): Unit = {
+  test("testFeed1") {
     testFeed("feed1.xml")
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -69,7 +69,7 @@ class NamespaceTest extends Suite {
     assert(rootElmBuilder.findAllElems forall (eb => eb.namespaces.isEmpty))
   }
 
-  @Test def testFeed2(): Unit = {
+  test("testFeed2") {
     testFeed("feed2.xml")
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -93,7 +93,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testFeed3(): Unit = {
+  test("testFeed3") {
     testFeed("feed3.xml")
 
     val docParser = DocumentParserUsingSax.newInstance
@@ -119,7 +119,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testFeedEquality(): Unit = {
+  test("testFeedEquality") {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc1 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed1.xml"))
@@ -133,7 +133,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testUndeclareDefaultNamespace(): Unit = {
+  test("testUndeclareDefaultNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc1 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("simpleStylesheet1.xsl"))
@@ -171,7 +171,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testOverrideNamespace(): Unit = {
+  test("testOverrideNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
     val s = """|<my:foo xmlns:my="http://example.com/uri1">
@@ -186,7 +186,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testNamespaceIsNotUri(): Unit = {
+  test("testNamespaceIsNotUri") {
     val docParser = DocumentParserUsingSax.newInstance
 
     // Relative URIs should not be used! In any case, namespace URI comparison is string comparison.
@@ -212,7 +212,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testUndeclareNonDefaultNamespace(): Unit = {
+  test("testUndeclareNonDefaultNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
     // Only XML version 1.1 allows the use of prefixed namespace undeclarations
@@ -230,7 +230,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testXmlNamespace(): Unit = {
+  test("testXmlNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
     val s = """|<my:foo xmlns:my="http://example.com/uri">
@@ -250,7 +250,7 @@ class NamespaceTest extends Suite {
     }
   }
 
-  @Test def testUndeclareAnotherNonDefaultNamespace(): Unit = {
+  test("testUndeclareAnotherNonDefaultNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
     // Only XML version 1.1 allows the use of prefixed namespace undeclarations

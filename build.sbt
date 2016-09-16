@@ -39,7 +39,7 @@ libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
   if (version.contains("2.12.0-RC1")) "org.scalatest" % "scalatest_2.12.0-RC1" % "3.0.0" % "test"
-  else "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+  else "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 }
 
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.6" % "test"

@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.blogcode
 
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
@@ -46,7 +46,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class Blog1Test extends Suite {
+class Blog1Test extends FunSuite {
 
   private val pathToParentDir: java.io.File =
     (new java.io.File(classOf[Blog1Test].getResource("books.xml").toURI)).getParentFile
@@ -54,7 +54,7 @@ class Blog1Test extends Suite {
   /**
    * The code in this test can be copied to the "introduction to yaidom querying" section in the first article on yaidom.
    */
-  @Test def testIntroductionToYaidomQuerying(): Unit = {
+  test("testIntroductionToYaidomQuerying") {
     import java.io.File
     import javax.xml.parsers._
     import scala.collection.immutable
@@ -110,7 +110,7 @@ class Blog1Test extends Suite {
   /**
    * The code in this test can be copied to the "uniform element querying API" section in the first article on yaidom.
    */
-  @Test def testUniformElementQueryingApi(): Unit = {
+  test("testUniformElementQueryingApi") {
     // Start of section that does not need to be copied again
 
     import java.io.File
@@ -210,7 +210,7 @@ class Blog1Test extends Suite {
   /**
    * The code in this test can be copied to the "introductory example" section in the first article on yaidom.
    */
-  @Test def testIntroductoryExample(): Unit = {
+  test("testIntroductoryExample") {
     // Start of section that does not need to be copied again
 
     import java.io.File

@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.queryapitests
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
@@ -32,13 +32,13 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractScopedElemLikeQueryTest extends Suite {
+abstract class AbstractScopedElemLikeQueryTest extends FunSuite {
 
   type E <: ScopedElemLike.Aux[E]
 
   val XsNamespace = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testResolveQNamesInContent(): Unit = {
+  test("testResolveQNamesInContent") {
     val elemElemDeclOption =
       xsdSchemaElem.findChildElem(e => e.localName == "element" && e.attributeOption(EName("name")) == Some("schema"))
 
@@ -88,7 +88,7 @@ abstract class AbstractScopedElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testNavigation(): Unit = {
+  test("testNavigation") {
     val scope = Scope.from("xs" -> XsNamespace)
     val path1 = PathBuilder.from(QName("xs:element") -> 0, QName("xs:complexType") -> 0, QName("xs:complexContent") -> 0).build(scope)
     val path2 = PathBuilder.from(QName("xs:extension") -> 0, QName("xs:sequence") -> 0, QName("xs:choice") -> 0, QName("xs:element") -> 3).build(scope)

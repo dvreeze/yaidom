@@ -21,7 +21,7 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Ignore
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import com.google.common.cache.CacheBuilder
@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class NamePoolingTest extends Suite {
+class NamePoolingTest extends FunSuite {
 
   import NamePoolingTest._
   import HasENameApi._
@@ -50,7 +50,7 @@ class NamePoolingTest extends Suite {
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   // TODO Fix!
-  @Ignore @Test def testNamePooling(): Unit = {
+  ignore("testNamePooling") {
     ENameProvider.globalENameProvider.become(new GuavaENameProvider(1000))
     QNameProvider.globalQNameProvider.become(new GuavaQNameProvider(1000))
 

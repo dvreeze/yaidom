@@ -23,7 +23,7 @@ import scala.io.Codec
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.QName
@@ -44,57 +44,57 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class DocumentParserTest extends Suite {
+class DocumentParserTest extends FunSuite {
 
-  @Test def testParseWithEndingCommentsUsingSax(): Unit = {
+  test("testParseWithEndingCommentsUsingSax") {
     val parser = DocumentParserUsingSax.newInstance
 
     doTestParseWithEndingComments(parser)
   }
 
-  @Test def testParseWithEndingCommentsUsingStax(): Unit = {
+  test("testParseWithEndingCommentsUsingStax") {
     val parser = DocumentParserUsingStax.newInstance
 
     doTestParseWithEndingComments(parser)
   }
 
-  @Test def testParseWithEndingCommentsUsingDom(): Unit = {
+  test("testParseWithEndingCommentsUsingDom") {
     val parser = DocumentParserUsingDom.newInstance
 
     doTestParseWithEndingComments(parser)
   }
 
-  @Test def testParseWithEndingCommentsUsingDomLS(): Unit = {
+  test("testParseWithEndingCommentsUsingDomLS") {
     val parser = DocumentParserUsingDomLS.newInstance
 
     doTestParseWithEndingComments(parser)
   }
 
-  @Test def testParseXml11UsingSax(): Unit = {
+  test("testParseXml11UsingSax") {
     val parser = DocumentParserUsingSax.newInstance
 
     doTestParseXml11(parser)
   }
 
-  @Test def testParseXml11UsingStax(): Unit = {
+  test("testParseXml11UsingStax") {
     val parser = DocumentParserUsingStax.newInstance
 
     doTestParseXml11(parser)
   }
 
-  @Test def testParseXml11UsingDom(): Unit = {
+  test("testParseXml11UsingDom") {
     val parser = DocumentParserUsingDom.newInstance
 
     doTestParseXml11(parser)
   }
 
-  @Test def testParseXml11UsingDomLS(): Unit = {
+  test("testParseXml11UsingDomLS") {
     val parser = DocumentParserUsingDomLS.newInstance
 
     doTestParseXml11(parser)
   }
 
-  @Test def testParseScalaXmlWithEndingComments(): Unit = {
+  test("testParseScalaXmlWithEndingComments") {
     val xml =
       """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
          |<prod:product xmlns:prod="http://datypic.com/prod">
@@ -131,7 +131,7 @@ class DocumentParserTest extends Suite {
     }
   }
 
-  @Test def testParseScalaXmlWithStartingComments(): Unit = {
+  test("testParseScalaXmlWithStartingComments") {
     val xml =
       """|<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
          |<!-- Bogus comment at the beginning -->
@@ -168,7 +168,7 @@ class DocumentParserTest extends Suite {
     }
   }
 
-  @Test def testParseDomWithEndingComments(): Unit = {
+  test("testParseDomWithEndingComments") {
     val xml =
       """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
          |<prod:product xmlns:prod="http://datypic.com/prod">
@@ -206,7 +206,7 @@ class DocumentParserTest extends Suite {
     }
   }
 
-  @Test def testParseDomWithStartingComments(): Unit = {
+  test("testParseDomWithStartingComments") {
     val xml =
       """|<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
          |<!-- Bogus comment at the beginning -->

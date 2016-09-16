@@ -20,7 +20,7 @@ import java.{ io => jio }
 import java.{ util => jutil }
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.resolved
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractOtherNamespaceTest extends Suite {
+abstract class AbstractOtherNamespaceTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -48,7 +48,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
 
   def documentParserForXml11: DocumentParser
 
-  @Test def testNamespaceDeclaration(): Unit = {
+  test("testNamespaceDeclaration") {
     val xml =
       """|<prod:product xmlns:prod="http://datypic.com/prod">
          |  <prod:number>557</prod:number>
@@ -92,7 +92,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testMultipleNamespaceDeclarations(): Unit = {
+  test("testMultipleNamespaceDeclarations") {
     val xml =
       """|<ord:order xmlns:ord="http://datypic.com/ord"
          |           xmlns:prod="http://datypic.com/prod">
@@ -162,7 +162,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testDefaultNamespaceDeclaration(): Unit = {
+  test("testDefaultNamespaceDeclaration") {
     val xml =
       """|<order xmlns="http://datypic.com/ord"
          |       xmlns:prod="http://datypic.com/prod">
@@ -272,7 +272,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testNamespaceDeclarationsInMultipleTags(): Unit = {
+  test("testNamespaceDeclarationsInMultipleTags") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>
@@ -381,7 +381,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testInvalidPrefixOutsideOfScope(): Unit = {
+  test("testInvalidPrefixOutsideOfScope") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>
@@ -403,7 +403,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testOverridingNamespaceDeclaration(): Unit = {
+  test("testOverridingNamespaceDeclaration") {
     val xml =
       """|<order xmlns="http://datypic.com/ord"
          |       xmlns:prod="http://datypic.com/prod">
@@ -525,7 +525,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testOverridingDefaultNamespaceDeclaration(): Unit = {
+  test("testOverridingDefaultNamespaceDeclaration") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>
@@ -634,7 +634,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testUndeclaringDefaultNamespace(): Unit = {
+  test("testUndeclaringDefaultNamespace") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>
@@ -702,7 +702,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testUndeclaringPrefixedNamespace(): Unit = {
+  test("testUndeclaringPrefixedNamespace") {
     val xml =
       """|<?xml version="1.1" encoding="utf-8"?>
          |<ord:order xmlns:ord="http://datypic.com/ord">
@@ -812,7 +812,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testTwoAttributesWithSameLocalName(): Unit = {
+  test("testTwoAttributesWithSameLocalName") {
     val xml =
       """|<product xmlns="http://datypic.com/prod"
          |         xmlns:app="http://datypic.com/app">
@@ -858,7 +858,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testTwoMoreAttributesWithSameLocalName(): Unit = {
+  test("testTwoMoreAttributesWithSameLocalName") {
     val xml =
       """|<product xmlns="http://datypic.com/prod"
          |         xmlns:prod="http://datypic.com/prod">
@@ -903,7 +903,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testInvalidDuplicateAttributes(): Unit = {
+  test("testInvalidDuplicateAttributes") {
     val xml =
       """|<product xmlns:prod="http://datypic.com/prod"
          |         xmlns:prod2="http://datypic.com/prod">
@@ -917,7 +917,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testSummaryExample(): Unit = {
+  test("testSummaryExample") {
     val xml =
       """|<envelope>
          |  <order xmlns="http://datypic.com/ord"
@@ -1062,7 +1062,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixNamespaceDeclaration(): Unit = {
+  test("testFixNamespaceDeclaration") {
     val xml =
       """|<prod:product xmlns:prod="http://datypic.com/prod">
          |  <prod:number>557</prod:number>
@@ -1093,7 +1093,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixMultipleNamespaceDeclarations(): Unit = {
+  test("testFixMultipleNamespaceDeclarations") {
     val xml =
       """|<ord:order xmlns:ord="http://datypic.com/ord"
          |           xmlns:prod="http://datypic.com/prod">
@@ -1145,7 +1145,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixNamespacesHavingDefaultNamespaceDeclaration(): Unit = {
+  test("testFixNamespacesHavingDefaultNamespaceDeclaration") {
     val xml =
       """|<order xmlns="http://datypic.com/ord"
          |       xmlns:prod="http://datypic.com/prod">
@@ -1197,7 +1197,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixNamespaceDeclarationsInMultipleTags(): Unit = {
+  test("testFixNamespaceDeclarationsInMultipleTags") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>
@@ -1252,7 +1252,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixNamespacesHavingOverriddenNamespaceDeclaration(): Unit = {
+  test("testFixNamespacesHavingOverriddenNamespaceDeclaration") {
     val xml =
       """|<order xmlns="http://datypic.com/ord"
          |       xmlns:prod="http://datypic.com/prod">
@@ -1310,7 +1310,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixNamespacesHavingOverriddenDefaultNamespaceDeclaration(): Unit = {
+  test("testFixNamespacesHavingOverriddenDefaultNamespaceDeclaration") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>
@@ -1365,7 +1365,7 @@ abstract class AbstractOtherNamespaceTest extends Suite {
     }
   }
 
-  @Test def testFixNamespacesHavingUndeclaredDefaultNamespace(): Unit = {
+  test("testFixNamespacesHavingUndeclaredDefaultNamespace") {
     val xml =
       """|<order xmlns="http://datypic.com/ord">
          |  <number>123ABBCC123</number>

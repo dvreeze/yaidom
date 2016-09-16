@@ -26,7 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Ignore
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert
@@ -58,7 +58,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class LargeXmlTest extends Suite with BeforeAndAfterAll {
+class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -104,7 +104,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testQueryLargeXmlRepeatedly(): Unit = {
+  ignore("testQueryLargeXmlRepeatedly") {
     val FirstNameEName = EName("firstName")
     val LastNameEName = EName("lastName")
     val ContactEName = EName("contact")
@@ -138,32 +138,32 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQuerySimpleElem(): Unit = {
+  test("testQuerySimpleElem") {
     doQueryTest(doc.documentElement, "simple.Elem")
   }
 
-  @Test def testQueryIndexedElem(): Unit = {
+  test("testQueryIndexedElem") {
     val indexedDoc = indexed.Document(doc)
 
     doQueryTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
-  @Test def testQueryResolvedElem(): Unit = {
+  test("testQueryResolvedElem") {
     val resolvedElem = resolved.Elem(doc.documentElement)
 
     doQueryTest(resolvedElem, "resolved.Elem")
   }
 
-  @Test def testQueryDomElem(): Unit = {
+  test("testQueryDomElem") {
     doQueryTest(DomDocument(domDoc).documentElement, "dom.DomElem")
   }
 
-  @Test def testQueryScalaXmlElem(): Unit = {
+  test("testQueryScalaXmlElem") {
     doQueryTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testProcessLargeTreeRepr(): Unit = {
+  ignore("testProcessLargeTreeRepr") {
     val startMs2 = System.currentTimeMillis()
     val treeRepr: String = doc.toString
     val endMs2 = System.currentTimeMillis()
@@ -176,7 +176,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement, "testProcessLargeTreeRepr: simple.Elem")
   }
 
-  @Ignore @Test def testSerializeLargeNodeBuilder(): Unit = {
+  ignore("testSerializeLargeNodeBuilder") {
     val startMs2 = System.currentTimeMillis()
 
     val docBuilder = DocBuilder.fromDocument(doc)
@@ -204,7 +204,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc2.documentElement, "testSerializeLargeNodeBuilder: simple.Elem")
   }
 
-  @Ignore @Test def testSerializeLargeNode(): Unit = {
+  ignore("testSerializeLargeNode") {
     val startMs2 = System.currentTimeMillis()
 
     val bos = new jio.ByteArrayOutputStream
@@ -230,7 +230,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     doQueryTest(doc2.documentElement, "testSerializeLargeNode: simple.Elem")
   }
 
-  @Test def testFind(): Unit = {
+  test("testFind") {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -300,7 +300,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info(s"Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took ${end6Ms - start6Ms} ms")
   }
 
-  @Test def testUpdate(): Unit = {
+  test("testUpdate") {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -353,7 +353,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testUpdateUsingPaths(): Unit = {
+  test("testUpdateUsingPaths") {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -410,7 +410,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testUpdateUsingBulkUpdate(): Unit = {
+  test("testUpdateUsingBulkUpdate") {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -466,7 +466,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testTransform(): Unit = {
+  test("testTransform") {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -516,27 +516,27 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testNavigation(): Unit = {
+  test("testNavigation") {
     doNavigationTest(doc.documentElement, "simple.Elem")
   }
 
-  @Test def testNavigationForIndexedElem(): Unit = {
+  test("testNavigationForIndexedElem") {
     val indexedDoc = indexed.Document(doc)
 
     doNavigationTest(indexedDoc.documentElement, "indexed.Elem")
   }
 
-  @Test def testNavigationForResolvedElem(): Unit = {
+  test("testNavigationForResolvedElem") {
     val resolvedElem = resolved.Elem(doc.documentElement)
 
     doNavigationTest(resolvedElem, "resolved.Elem")
   }
 
-  @Test def testNavigationForDomElem(): Unit = {
+  test("testNavigationForDomElem") {
     doNavigationTest(DomDocument(domDoc).documentElement, "dom.DomElem")
   }
 
-  @Test def testNavigationForScalaXmlElem(): Unit = {
+  test("testNavigationForScalaXmlElem") {
     doNavigationTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 

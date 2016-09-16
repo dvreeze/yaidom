@@ -20,7 +20,7 @@ import scala.Vector
 import scala.collection.immutable
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -41,11 +41,11 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractElemLikeQueryTest extends Suite {
+abstract class AbstractElemLikeQueryTest extends FunSuite {
 
   type E <: ClarkElemLike.Aux[E]
 
-  @Test def testQueryBookTitles(): Unit = {
+  test("testQueryBookTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
     require(bookstore.localName == "Bookstore")
@@ -63,7 +63,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookTitlesUsingQNames(): Unit = {
+  test("testQueryBookTitlesUsingQNames") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
     require(bookstore.localName == "Bookstore")
@@ -86,7 +86,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookTitlesAgain(): Unit = {
+  test("testQueryBookTitlesAgain") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
     // This time using the HasENameApi companion object
 
@@ -105,7 +105,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookOrMagazineTitles(): Unit = {
+  test("testQueryBookOrMagazineTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
     require(bookstore.localName == "Bookstore")
@@ -130,7 +130,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitles(): Unit = {
+  test("testQueryTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.localName == "Bookstore")
@@ -150,7 +150,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryAllTitles(): Unit = {
+  test("testQueryAllTitles") {
     // XPath: doc("bookstore.xml")//Title
 
     require(bookstore.localName == "Bookstore")
@@ -170,7 +170,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryAllElements(): Unit = {
+  test("testQueryAllElements") {
     // XPath: doc("bookstore.xml")//*
 
     require(bookstore.localName == "Bookstore")
@@ -187,7 +187,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     assert(childrenAlsoIncluded, "Expected child elements of each element also in the result")
   }
 
-  @Test def testQueryBookIsbns(): Unit = {
+  test("testQueryBookIsbns") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/data(@ISBN)
 
     require(bookstore.localName == "Bookstore")
@@ -206,7 +206,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBooks(): Unit = {
+  test("testQueryCheapBooks") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
     require(bookstore.localName == "Bookstore")
@@ -227,7 +227,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBooksUsingQNames(): Unit = {
+  test("testQueryCheapBooksUsingQNames") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
 
     require(bookstore.localName == "Bookstore")
@@ -253,7 +253,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBookTitles(): Unit = {
+  test("testQueryCheapBookTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -291,7 +291,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBookAuthors(): Unit = {
+  test("testQueryCheapBookAuthors") {
     // Own example..
 
     require(bookstore.localName == "Bookstore")
@@ -328,7 +328,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryCheapBookAuthorsAgain(): Unit = {
+  test("testQueryCheapBookAuthorsAgain") {
     // Own example..
     // This time using the HasENameApi companion object
 
@@ -366,7 +366,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfBooksWithRemarks(): Unit = {
+  test("testQueryTitlesOfBooksWithRemarks") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Remark]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -385,7 +385,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByUllman(): Unit = {
+  test("testQueryTitlesOfCheapBooksByUllman") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -407,7 +407,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByJeffreyUllman(): Unit = {
+  test("testQueryTitlesOfCheapBooksByJeffreyUllman") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -431,7 +431,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryTitlesOfBooksByJeffreyUllmanButNotWidom(): Unit = {
+  test("testQueryTitlesOfBooksByJeffreyUllmanButNotWidom") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -454,7 +454,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksByJeffreyUllman(): Unit = {
+  test("testQueryBooksByJeffreyUllman") {
     // Own example
 
     require(bookstore.localName == "Bookstore")
@@ -477,7 +477,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQuerySecondAuthors(): Unit = {
+  test("testQuerySecondAuthors") {
     // XPath: doc("bookstore.xml")//Authors/Author[2]
 
     require(bookstore.localName == "Bookstore")
@@ -501,7 +501,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryGreatBooks(): Unit = {
+  test("testQueryGreatBooks") {
     // XPath: doc("bookstore.xml")//Book[contains(Remark, "great")]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -519,7 +519,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryMagazinesWithSameNameAsBook(): Unit = {
+  test("testQueryMagazinesWithSameNameAsBook") {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
     require(bookstore.localName == "Bookstore")
@@ -542,7 +542,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryMagazinesWithSameNameAsBookUsingQNames(): Unit = {
+  test("testQueryMagazinesWithSameNameAsBookUsingQNames") {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
     require(bookstore.localName == "Bookstore")
@@ -568,7 +568,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithNonUniqueTitles(): Unit = {
+  test("testQueryBooksOrMagazinesWithNonUniqueTitles") {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::*/Title or Title = preceding-sibling::*/Title]
 
     require(bookstore.localName == "Bookstore")
@@ -595,7 +595,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksOrMagazinesWithTitleAsOtherBook(): Unit = {
+  test("testQueryBooksOrMagazinesWithTitleAsOtherBook") {
     // XPath: doc("bookstore.xml")//(Book|Magazine)[Title = following-sibling::Book/Title or Title = preceding-sibling::Book/Title]
 
     require(bookstore.localName == "Bookstore")
@@ -627,7 +627,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
    * doc("bookstore.xml")//Book[count(Authors/Author[contains(First_Name, "J"]) = count(Authors/Author/First_Name)]
    * </pre>
    */
-  @Test def testQueryBooksWithAllAuthorFirstNamesWithLetterJ(): Unit = {
+  test("testQueryBooksWithAllAuthorFirstNamesWithLetterJ") {
     require(bookstore.localName == "Bookstore")
 
     val books =
@@ -649,7 +649,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBooksFromUllmanButNotWidom(): Unit = {
+  test("testQueryBooksFromUllmanButNotWidom") {
     // XPath: doc("bookstore.xml")//Book[Authors/Author/Last_Name = "Ullman" and count(Authors/Author[Last_Name = "Widom"]) = 0]
 
     require(bookstore.localName == "Bookstore")
@@ -680,7 +680,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
    * &lt;/Average&gt;
    * }}}
    */
-  @Test def testQueryAverageBookPrice(): Unit = {
+  test("testQueryAverageBookPrice") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -707,7 +707,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
    *        &lt;/Last_Name&gt;
    * }}}
    */
-  @Test def testQueryLastNames(): Unit = {
+  test("testQueryLastNames") {
     require(bookstore.localName == "Bookstore")
 
     val lastNameValues: immutable.IndexedSeq[String] =
@@ -736,7 +736,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
    *        &lt;/BookPair&gt;
    * }}}
    */
-  @Test def testQueryBookPairsFromSameAuthor(): Unit = {
+  test("testQueryBookPairsFromSameAuthor") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -790,7 +790,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookAndMagazineTitlesRelabeled(): Unit = {
+  test("testQueryBookAndMagazineTitlesRelabeled") {
     // Taken from the XSLT demo
     require(bookstore.localName == "Bookstore")
 
@@ -816,7 +816,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     assert(ngCount == 2, "Expected 'National Geographic' twice")
   }
 
-  @Test def testDepthFirst(): Unit = {
+  test("testDepthFirst") {
     require(bookstore.localName == "Bookstore")
 
     // Returns descendant-or-self elements in depth-first order, that is, in document order
@@ -876,7 +876,7 @@ abstract class AbstractElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testQueryBookWithGivenIsbn(): Unit = {
+  test("testQueryBookWithGivenIsbn") {
     // See http://kousenit.wordpress.com/2008/03/12/nothing-makes-you-want-groovy-more-than-xml/,
     // but taking "our" bookstore as input XML. Somewhat more verbose than the Groovy example, but also more
     // explicit (about elements, expanded names, etc.).

@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
@@ -57,7 +57,7 @@ import javax.xml.stream.XMLResolver
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class StaxInteropTest extends Suite {
+class StaxInteropTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -66,7 +66,7 @@ class StaxInteropTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse(): Unit = {
+  test("testParse") {
     // 1. Parse XML file into Elem
 
     val staxParser = DocumentParserUsingStax.newInstance().withConverterToDocument(StaxConversions)
@@ -195,7 +195,7 @@ class StaxInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
-  @Test def testParseStrangeXml(): Unit = {
+  test("testParseStrangeXml") {
     // 1. Parse XML file into Elem
 
     val staxParser = DocumentParserUsingStax.newInstance().withConverterToDocument(StaxConversions)
@@ -238,7 +238,7 @@ class StaxInteropTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testParseDefaultNamespaceXml(): Unit = {
+  test("testParseDefaultNamespaceXml") {
     // 1. Parse XML file into Elem
 
     val staxParser = DocumentParserUsingStax.newInstance().withConverterToDocument(StaxConversions)
@@ -319,7 +319,7 @@ class StaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd(): Unit = {
+  test("testParseSchemaXsd") {
     // 1. Parse XML file into Elem
 
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
@@ -559,7 +559,7 @@ class StaxInteropTest extends Suite {
     checkFieldPattern(root3)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
+  test("testParseXmlWithExpandedEntityRef") {
     // 1. Parse XML file into Elem
 
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
@@ -627,7 +627,7 @@ class StaxInteropTest extends Suite {
     checkChildText(root3)
   }
 
-  @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
+  test("testParseXmlWithNonExpandedEntityRef") {
     // 1. Parse XML file into Elem
 
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
@@ -703,7 +703,7 @@ class StaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
+  test("testParseXmlWithNamespaceUndeclarations") {
     // 1. Parse XML file into Elem
 
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
@@ -750,7 +750,7 @@ class StaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars(): Unit = {
+  test("testParseXmlWithEscapedChars") {
     // 1. Parse XML file into Elem
 
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
@@ -828,7 +828,7 @@ class StaxInteropTest extends Suite {
     doChecks(root3)
   }
 
-  @Test def testParseXmlWithSpecialChars(): Unit = {
+  test("testParseXmlWithSpecialChars") {
     // 1. Parse XML file into Elem
 
     val staxParser = DocumentParserUsingStax.newInstance
@@ -896,7 +896,7 @@ class StaxInteropTest extends Suite {
     //   "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
   }
 
-  @Test def testParseGeneratedHtml(): Unit = {
+  test("testParseGeneratedHtml") {
     // 1. Parse XML file into Elem
 
     val staxParser = DocumentParserUsingStax.newInstance
@@ -987,7 +987,7 @@ class StaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseBrokenXml(): Unit = {
+  test("testParseBrokenXml") {
     // Using method newInstance instead of newFactory to stay out of "XML JAR-hell".
     val xmlInputFactory = XMLInputFactory.newInstance
     xmlInputFactory.setXMLResolver(new LoggingResolver)
@@ -1007,7 +1007,7 @@ class StaxInteropTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample(): Unit = {
+  test("testParseGroovyXmlExample") {
     val parser = DocumentParserUsingStax.newInstance
 
     val doc = parser.parse(classOf[StaxInteropTest].getResourceAsStream("cars.xml"))
@@ -1080,7 +1080,7 @@ class StaxInteropTest extends Suite {
     }
   }
 
-  @Test def testParseFileWithUtf8Bom(): Unit = {
+  test("testParseFileWithUtf8Bom") {
     // 1. Parse XML file into Elem
 
     val staxParser = DocumentParserUsingStax.newInstance

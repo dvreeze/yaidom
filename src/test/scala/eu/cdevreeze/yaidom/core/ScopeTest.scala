@@ -20,7 +20,7 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 /**
@@ -29,9 +29,9 @@ import org.scalatest.junit.JUnitRunner
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ScopeTest extends Suite {
+class ScopeTest extends FunSuite {
 
-  @Test def testCreateScope(): Unit = {
+  test("testCreateScope") {
     intercept[Exception] {
       Scope.from("" -> null)
     }
@@ -59,7 +59,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testCreateDeclarations(): Unit = {
+  test("testCreateDeclarations") {
     intercept[Exception] {
       Declarations.from("" -> null)
     }
@@ -102,7 +102,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveDeclarations(): Unit = {
+  test("testResolveDeclarations") {
     val scope1 = Scope.Empty
 
     assertResult(0) {
@@ -221,7 +221,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQName(): Unit = {
+  test("testResolveQName") {
     val scope1 = Scope.from()
 
     assertResult(Some(EName("book"))) {
@@ -255,7 +255,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQNameNotUndeclaringPrefixes(): Unit = {
+  test("testResolveQNameNotUndeclaringPrefixes") {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
     val scope2 = Scope.from("" -> "http://e", "b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
@@ -283,7 +283,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testResolveQNameNotUndeclaringNamespaces(): Unit = {
+  test("testResolveQNameNotUndeclaringNamespaces") {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d")
     val scope2 = Scope.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d")
 
@@ -318,7 +318,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testInverse(): Unit = {
+  test("testInverse") {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
 
@@ -335,7 +335,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPrefixesForNamespace(): Unit = {
+  test("testPrefixesForNamespace") {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
 
@@ -353,7 +353,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPropertyAboutMultipleScopes(): Unit = {
+  test("testPropertyAboutMultipleScopes") {
     val scope1 = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "h" -> "http://h")
     val scope2 = Scope.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d", "e" -> "http://e")
 
@@ -404,7 +404,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testPropertyAboutScopeAndDeclaration(): Unit = {
+  test("testPropertyAboutScopeAndDeclaration") {
     val scope = Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "g" -> "http://g", "h" -> "http://h")
     val decls = Declarations.from("b" -> "http://b", "c" -> "http://ccc", "d" -> "http://d", "g" -> "", "e" -> "http://e", "m" -> "")
 
@@ -481,7 +481,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testIncludeNamespace(): Unit = {
+  test("testIncludeNamespace") {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
 
@@ -572,7 +572,7 @@ class ScopeTest extends Suite {
     }
   }
 
-  @Test def testConvertToNamespaceContext(): Unit = {
+  test("testConvertToNamespaceContext") {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
     val namespaceContext = scope.toNamespaceContext

@@ -22,7 +22,7 @@ import javax.xml.transform.TransformerFactory
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -46,7 +46,7 @@ import eu.cdevreeze.yaidom.core.QName
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class AirportExampleTest extends Suite {
+class AirportExampleTest extends FunSuite {
 
   import AirportExampleTest._
 
@@ -54,7 +54,7 @@ class AirportExampleTest extends Suite {
 
   private val nsWebServiceX = "http://www.webserviceX.NET"
 
-  @Test def testDocumentStructure(): Unit = {
+  test("testDocumentStructure") {
     // 1. Parse XML files into Documents
 
     val saxParser = DocumentParserUsingSax.newInstance
@@ -81,7 +81,7 @@ class AirportExampleTest extends Suite {
     rootElms foreach { root => validateDocumentStructure(root) }
   }
 
-  @Test def testShortDocumentQueries(): Unit = {
+  test("testShortDocumentQueries") {
     // 1. Parse XML files into Documents
 
     val domParser = DocumentParserUsingDom.newInstance
@@ -217,7 +217,7 @@ class AirportExampleTest extends Suite {
     assert(!deAirportCodesCloseToArnhem.contains("FRA"))
   }
 
-  @Test def testDocumentTransformations(): Unit = {
+  test("testDocumentTransformations") {
     // 1. Parse XML files into Documents
 
     val staxParser = DocumentParserUsingStax.newInstance

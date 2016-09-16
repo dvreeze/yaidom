@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.queryapitests
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
@@ -32,11 +32,11 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractI18nQueryTest extends Suite {
+abstract class AbstractI18nQueryTest extends FunSuite {
 
   type E <: ScopedElemLike.Aux[E]
 
-  @Test def testI18n(): Unit = {
+  test("testI18n") {
     val facts = rootElem.filterChildElems(e => e.qname.prefixOption == Some("tx"))
 
     assertResult(List("la_á", "la_é", "la_í", "ó", "la_ú", "España1").map(s => QName("tx", s))) {

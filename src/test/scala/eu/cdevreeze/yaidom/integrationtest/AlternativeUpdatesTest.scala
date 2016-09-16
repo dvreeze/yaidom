@@ -21,7 +21,7 @@ import scala.collection.immutable
 import scala.reflect.classTag
 import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 import eu.cdevreeze.yaidom.convert
@@ -42,11 +42,11 @@ import eu.cdevreeze.yaidom.simple.Elem
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class AlternativeUpdatesTest extends Suite {
+class AlternativeUpdatesTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testRetainFirstAuthorsUsingTransformElemsOrSelf(): Unit = {
+  test("testRetainFirstAuthorsUsingTransformElemsOrSelf") {
     val updatedElem = bookstore transformElemsOrSelf {
       case e: Elem if e.localName == "Authors" =>
         val authors = e.filterChildElems(che => che.localName == "Author")
@@ -59,7 +59,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingTransformElems(): Unit = {
+  test("testRetainFirstAuthorsUsingTransformElems") {
     val updatedElem = bookstore transformElems {
       case e: Elem if e.localName == "Authors" =>
         val authors = e.filterChildElems(che => che.localName == "Author")
@@ -72,7 +72,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths(): Unit = {
+  test("testRetainFirstAuthorsUsingUpdatedAtPathsPassingAllPaths") {
     val paths = indexed.Elem(bookstore).findAllElemsOrSelf.map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
@@ -89,7 +89,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths(): Unit = {
+  test("testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths") {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
@@ -106,7 +106,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedAtPaths(): Unit = {
+  test("testRetainFirstAuthorsUsingUpdatedAtPaths") {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
@@ -120,7 +120,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths(): Unit = {
+  test("testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths") {
     val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Author").map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsWithNodeSeq(paths) { (elem, path) =>
@@ -133,7 +133,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testRetainFirstAuthorsUsingDom(): Unit = {
+  test("testRetainFirstAuthorsUsingDom") {
     val domDoc = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
     val domBookstore = convert.DomConversions.convertElem(bookstore, domDoc, Scope.Empty)
     require(domBookstore.getOwnerDocument == domDoc, "Expected the owner document to be the created DOM Document")
@@ -159,7 +159,7 @@ class AlternativeUpdatesTest extends Suite {
     }
   }
 
-  @Test def testUpdatedAtPathsInternally(): Unit = {
+  test("testUpdatedAtPathsInternally") {
     val paths = indexed.Elem(bookstore).findAllElemsOrSelf.map(_.path).toSet
 
     var foundPaths = Vector[Path]()

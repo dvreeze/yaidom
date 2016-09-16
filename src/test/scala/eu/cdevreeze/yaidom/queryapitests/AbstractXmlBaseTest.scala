@@ -21,7 +21,7 @@ import java.net.URI
 import scala.collection.immutable
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXmlBaseTest extends Suite {
+abstract class AbstractXmlBaseTest extends FunSuite {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"
@@ -64,7 +64,7 @@ abstract class AbstractXmlBaseTest extends Suite {
     if (uri.toString.isEmpty) baseUri else baseUri.resolve(uri)
   }
 
-  @Test def testXmlBase(): Unit = {
+  test("testXmlBase") {
     val doc = getDocument("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
 
     testXmlBase(doc.documentElement)
@@ -73,7 +73,7 @@ abstract class AbstractXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testXmlBase2(): Unit = {
+  test("testXmlBase2") {
     val doc = getDocument("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
 
     val elem = doc.documentElement
@@ -84,7 +84,7 @@ abstract class AbstractXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testXmlBase3(): Unit = {
+  test("testXmlBase3") {
     val doc = getDocument("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml", new URI("http://bogusBaseUri"))
 
     val elem = doc.documentElement
@@ -95,7 +95,7 @@ abstract class AbstractXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testXmlBase4(): Unit = {
+  test("testXmlBase4") {
     val doc = getDocument("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
 
     val elem = doc.documentElement.findElem(_.resolvedName == EName("olist")).get
@@ -106,7 +106,7 @@ abstract class AbstractXmlBaseTest extends Suite {
     doc.documentElement.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e))
   }
 
-  @Test def testOtherXmlBase(): Unit = {
+  test("testOtherXmlBase") {
     val elem = getTestElem
 
     assertResult(new URI("http://example.org/wine/")) {

@@ -20,7 +20,7 @@ import java.{ util => jutil }
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
@@ -48,7 +48,7 @@ import net.sf.saxon.s9api.Processor
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
+class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -57,7 +57,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse(): Unit = {
+  test("testParse") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("books.xml")
 
     val parseOptions = new ParseOptions
@@ -87,7 +87,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseStrangeXml(): Unit = {
+  test("testParseStrangeXml") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("strangeXml.xml")
 
     val parseOptions = new ParseOptions
@@ -110,7 +110,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseDefaultNamespaceXml(): Unit = {
+  test("testParseDefaultNamespaceXml") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("trivialXml.xml")
 
     val parseOptions = new ParseOptions
@@ -135,7 +135,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseSchemaXsd(): Unit = {
+  test("testParseSchemaXsd") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("XMLSchema.xsd")
 
     val parseOptions = new ParseOptions
@@ -338,7 +338,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
+  test("testParseXmlWithExpandedEntityRef") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val parseOptions = new ParseOptions
@@ -374,7 +374,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
+  test("testParseXmlWithNamespaceUndeclarations") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val parseOptions = new ParseOptions
@@ -393,7 +393,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseXmlWithEscapedChars(): Unit = {
+  test("testParseXmlWithEscapedChars") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
 
     val parseOptions = new ParseOptions
@@ -440,7 +440,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
     checkEqualityOfDomAndSaxonElems(domDoc)
   }
 
-  @Test def testParseXmlWithSpecialChars(): Unit = {
+  test("testParseXmlWithSpecialChars") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
     val parseOptions = new ParseOptions
@@ -479,7 +479,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample(): Unit = {
+  test("testParseGroovyXmlExample") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("cars.xml")
 
     val parseOptions = new ParseOptions
@@ -545,7 +545,7 @@ class SaxonDomWrapperTest extends Suite with SaxonTestSupport {
   /**
    * Example of finding elements and their ancestors.
    */
-  @Test def testParseSchemaExample(): Unit = {
+  test("testParseSchemaExample") {
     val is = classOf[SaxonDomWrapperTest].getResourceAsStream("gaap.xsd")
 
     val parseOptions = new ParseOptions

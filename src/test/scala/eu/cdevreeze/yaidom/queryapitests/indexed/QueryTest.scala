@@ -46,7 +46,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
-  @Test def testInternalConsistency(): Unit = {
+  test("testInternalConsistency") {
     require(bookstore.localName == "Bookstore")
 
     val elems = bookstore.findAllElemsOrSelf
@@ -54,7 +54,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     elems.foreach(e => e.assertConsistency())
   }
 
-  @Test def testQueryAll(): Unit = {
+  test("testQueryAll") {
     require(bookstore.localName == "Bookstore")
 
     val elems = bookstore.findAllElemsOrSelf
@@ -75,7 +75,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBookOrMagazineTitlesUsingParent(): Unit = {
+  test("testQueryBookOrMagazineTitlesUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
     require(bookstore.localName == "Bookstore")
@@ -101,7 +101,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesUsingPaths(): Unit = {
+  test("testQueryTitlesUsingPaths") {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.localName == "Bookstore")
@@ -124,7 +124,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByUllmanUsingParent(): Unit = {
+  test("testQueryTitlesOfCheapBooksByUllmanUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -148,7 +148,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByJeffreyUllmanUsingParent(): Unit = {
+  test("testQueryTitlesOfCheapBooksByJeffreyUllmanUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -196,7 +196,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBooksByJeffreyUllmanUsingParent(): Unit = {
+  test("testQueryBooksByJeffreyUllmanUsingParent") {
     // Own example
 
     require(bookstore.localName == "Bookstore")
@@ -224,7 +224,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryElementsWithParentNotBookOrBookstore(): Unit = {
+  test("testQueryElementsWithParentNotBookOrBookstore") {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     require(bookstore.localName == "Bookstore")
@@ -255,7 +255,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksWithAuthorInTitle(): Unit = {
+  test("testQueryBooksWithAuthorInTitle") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -298,7 +298,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksPricedBelowAverage(): Unit = {
+  test("testQueryBooksPricedBelowAverage") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -346,7 +346,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksOrderedByPrice(): Unit = {
+  test("testQueryBooksOrderedByPrice") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -400,7 +400,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    * &lt;/InvertedBookstore&gt;
    * }}}
    */
-  @Test def testQueryInvertedBookstore(): Unit = {
+  test("testQueryInvertedBookstore") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -457,7 +457,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testTransformLeavingOutPrices(): Unit = {
+  test("testTransformLeavingOutPrices") {
     // Made up example. Here the focus is different: not querying and explicitly mentioning the structure
     // of the query result, but just transforming parts of the XML tree, leaving the remainder of the tree like it is,
     // without having to know about what the rest of the tree exactly looks like. Think XSLT, rather than XQuery.
@@ -500,7 +500,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testAncestryQueryingConsistency(): Unit = {
+  test("testAncestryQueryingConsistency") {
     val reverseAncestryOrSelfENames = bookstore.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
 
     assertResult(bookstore.findAllElemsOrSelf.map(_.resolvedName)) {

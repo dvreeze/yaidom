@@ -24,7 +24,7 @@ import scala.xml.NodeSeq.seqToNodeSeq
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.w3c.dom.DOMException
 import org.xml.sax.SAXParseException
 
@@ -66,7 +66,7 @@ import javax.xml.parsers.SAXParserFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class TheCaseForYaidomTest extends Suite {
+class TheCaseForYaidomTest extends FunSuite {
 
   /**
    * Our XML, which is not namespace-well-formed.
@@ -84,7 +84,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to create a DOM tree for the (wrong) XML. It fails, as expected.
    */
-  @Test def testTryCreatingDomForWrongXml(): Unit = {
+  test("testTryCreatingDomForWrongXml") {
     val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder()
     val d = db.newDocument()
@@ -101,7 +101,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the XML into a yaidom Elem (via SAX), but fails, as expected.
    */
-  @Test def testTryParsingWrongXmlViaSax(): Unit = {
+  test("testTryParsingWrongXmlViaSax") {
     val parser = DocumentParserUsingSax.newInstance
 
     intercept[SAXParseException] {
@@ -112,7 +112,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the XML into a yaidom Elem (via StAX), but fails, as expected.
    */
-  @Test def testTryParsingWrongXmlViaStax(): Unit = {
+  test("testTryParsingWrongXmlViaStax") {
     val parser = DocumentParserUsingStax.newInstance
 
     intercept[Exception] {
@@ -123,7 +123,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the XML into a yaidom Elem (via DOM), but fails, as expected.
    */
-  @Test def testTryParsingWrongXmlViaDom(): Unit = {
+  test("testTryParsingWrongXmlViaDom") {
     val parser = DocumentParserUsingDom.newInstance
 
     intercept[SAXParseException] {
@@ -134,7 +134,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the XML into a yaidom Elem (via DOM LS), but fails, as expected.
    */
-  @Test def testTryParsingWrongXmlViaDomLS(): Unit = {
+  test("testTryParsingWrongXmlViaDomLS") {
     val parser = DocumentParserUsingDomLS.newInstance
 
     intercept[RuntimeException] {
@@ -147,7 +147,7 @@ class TheCaseForYaidomTest extends Suite {
    * This time the underlying parser is not namespace-aware, but still yaidom Elem
    * creation fails.
    */
-  @Test def testTryParsingWrongXmlAgain(): Unit = {
+  test("testTryParsingWrongXmlAgain") {
     val spf = SAXParserFactory.newInstance
     spf.setNamespaceAware(false)
     val parser = DocumentParserUsingSax.newInstance(spf)
@@ -164,7 +164,7 @@ class TheCaseForYaidomTest extends Suite {
    * A fatal error is reported, but the exception is "eaten", returning a scala.xml.Elem, which is
    * not namespace-well-formed.
    */
-  @Test def testTryParsingWrongXmlUsingScalaXml(): Unit = {
+  test("testTryParsingWrongXmlUsingScalaXml") {
     val scalaElem = scala.xml.XML.load(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
 
     // Why null? Why not an Option?
@@ -189,7 +189,7 @@ class TheCaseForYaidomTest extends Suite {
    * themselves. Indeed, ElemBuilders can only be queried for qualified names, but not
    * for expanded names.
    */
-  @Test def testCreateElemBuilderForWrongXml(): Unit = {
+  test("testCreateElemBuilderForWrongXml") {
     import NodeBuilder._
 
     val elemBuilder =
@@ -210,7 +210,7 @@ class TheCaseForYaidomTest extends Suite {
    * Tries to create an Elem for the XML, without passing the
    * correct parent scope. This fails, as expected.
    */
-  @Test def testTryCreatingElemForWrongXml(): Unit = {
+  test("testTryCreatingElemForWrongXml") {
     import Node._
 
     intercept[RuntimeException] {
@@ -225,7 +225,7 @@ class TheCaseForYaidomTest extends Suite {
    * Tries to convert an ElemBuilder for the XML into an Elem, this time passing the
    * correct parent scope. This succeeds, as expected, and so do the subsequent queries.
    */
-  @Test def testQueryElemForFixedWrongXml(): Unit = {
+  test("testQueryElemForFixedWrongXml") {
     import NodeBuilder._
 
     val elemBuilder =
@@ -267,7 +267,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to create a Scala XML Elem for the XML, which succeeds (although it should not succeed).
    */
-  @Test def testCreateScalaXmlElemForWrongXml(): Unit = {
+  test("testCreateScalaXmlElemForWrongXml") {
     val scalaElem =
       <root><prefix:element></prefix:element></root>
 
@@ -283,7 +283,7 @@ class TheCaseForYaidomTest extends Suite {
    * namespace is absent, due to the non-namespace-well-formedness, but this is not
    * "XML querying", if we consider namespace-well-formedness essential for XML.
    */
-  @Test def testQueryScalaXmlElemForWrongXml(): Unit = {
+  test("testQueryScalaXmlElemForWrongXml") {
     val scalaElem =
       <root><prefix:element></prefix:element></root>
 
@@ -314,7 +314,7 @@ class TheCaseForYaidomTest extends Suite {
    * Tries to query a wrapper around the Scala XML Elem, which only fails once an incorrect
    * Scope is used under the hood.
    */
-  @Test def testQueryWrappedScalaXmlElemForWrongXml(): Unit = {
+  test("testQueryWrappedScalaXmlElemForWrongXml") {
     val scalaElem =
       <root><prefix:element></prefix:element></root>
     val elm = ScalaXmlElem(scalaElem)
@@ -339,7 +339,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to convert the Scala XML Elem to a yaidom Elem, which fails, as expected.
    */
-  @Test def testTryToConvertScalaXmlElemForWrongXml(): Unit = {
+  test("testTryToConvertScalaXmlElemForWrongXml") {
     val scalaElem =
       <root><prefix:element></prefix:element></root>
 
@@ -353,7 +353,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to create a DOM tree for the (wrong) 2nd XML. It fails, as expected.
    */
-  @Test def testTryCreatingDomForWrongXml2(): Unit = {
+  test("testTryCreatingDomForWrongXml2") {
     val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder()
     val d = db.newDocument()
@@ -367,7 +367,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the 2nd XML into a yaidom Elem (via SAX), but fails, as expected.
    */
-  @Test def testTryParsingWrongXml2ViaSax(): Unit = {
+  test("testTryParsingWrongXml2ViaSax") {
     val parser = DocumentParserUsingSax.newInstance
 
     intercept[SAXParseException] {
@@ -378,7 +378,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the 2nd XML into a yaidom Elem (via StAX), but fails, as expected.
    */
-  @Test def testTryParsingWrongXml2ViaStax(): Unit = {
+  test("testTryParsingWrongXml2ViaStax") {
     val parser = DocumentParserUsingStax.newInstance
 
     intercept[Exception] {
@@ -389,7 +389,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the 2nd XML into a yaidom Elem (via DOM), but fails, as expected.
    */
-  @Test def testTryParsingWrongXml2ViaDom(): Unit = {
+  test("testTryParsingWrongXml2ViaDom") {
     val parser = DocumentParserUsingDom.newInstance
 
     intercept[SAXParseException] {
@@ -400,7 +400,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to parse the 2nd XML into a yaidom Elem (via DOM LS), but fails, as expected.
    */
-  @Test def testTryParsingWrongXml2ViaDomLS(): Unit = {
+  test("testTryParsingWrongXml2ViaDomLS") {
     val parser = DocumentParserUsingDomLS.newInstance
 
     intercept[RuntimeException] {
@@ -413,7 +413,7 @@ class TheCaseForYaidomTest extends Suite {
    * This time the underlying parser is not namespace-aware, but still yaidom Elem
    * creation fails.
    */
-  @Test def testTryParsingWrongXml2Again(): Unit = {
+  test("testTryParsingWrongXml2Again") {
     val spf = SAXParserFactory.newInstance
     spf.setNamespaceAware(false)
     val parser = DocumentParserUsingSax.newInstance(spf)
@@ -430,7 +430,7 @@ class TheCaseForYaidomTest extends Suite {
    * A fatal error is reported, but the exception is "eaten", returning a scala.xml.Elem, which is
    * not namespace-well-formed.
    */
-  @Test def testTryParsingWrongXml2UsingScalaXml(): Unit = {
+  test("testTryParsingWrongXml2UsingScalaXml") {
     val scalaElem = scala.xml.XML.load(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
 
     assertResult("link") {
@@ -453,7 +453,7 @@ class TheCaseForYaidomTest extends Suite {
    * themselves. Indeed, ElemBuilders can only be queried for qualified names, but not
    * for expanded names.
    */
-  @Test def testCreateElemBuilderForWrongXml2(): Unit = {
+  test("testCreateElemBuilderForWrongXml2") {
     import NodeBuilder._
 
     val elemBuilder =
@@ -484,7 +484,7 @@ class TheCaseForYaidomTest extends Suite {
    * Tries to create an Elem for the 2nd XML, without passing the
    * correct parent scope. This fails, as expected.
    */
-  @Test def testTryCreatingElemForWrongXml2(): Unit = {
+  test("testTryCreatingElemForWrongXml2") {
     import Node._
 
     intercept[RuntimeException] {
@@ -503,7 +503,7 @@ class TheCaseForYaidomTest extends Suite {
    * Tries to convert an ElemBuilder for the 2nd XML into an Elem, this time passing the
    * correct parent scope. This succeeds, as expected, and so do the subsequent queries.
    */
-  @Test def testQueryElemForFixedWrongXml2(): Unit = {
+  test("testQueryElemForFixedWrongXml2") {
     import NodeBuilder._
 
     val elemBuilder =
@@ -541,7 +541,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to create a Scala XML Elem for the 2nd XML, which succeeds (although it should not succeed).
    */
-  @Test def testCreateScalaXmlElemForWrongXml2(): Unit = {
+  test("testCreateScalaXmlElemForWrongXml2") {
     val scalaElem =
       <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="my-lab-en.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
 
@@ -557,7 +557,7 @@ class TheCaseForYaidomTest extends Suite {
    * namespace is absent, due to the non-namespace-well-formedness, but this is not
    * "XML querying", if we consider namespace-well-formedness essential for XML.
    */
-  @Test def testQueryScalaXmlElemForWrongXml2(): Unit = {
+  test("testQueryScalaXmlElemForWrongXml2") {
     val scalaElem =
       <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="my-lab-en.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
 
@@ -586,7 +586,7 @@ class TheCaseForYaidomTest extends Suite {
    * Tries to query a wrapper around the 2nd Scala XML Elem, which only fails once an incorrect
    * Scope is used under the hood.
    */
-  @Test def testQueryWrappedScalaXmlElemForWrongXml2(): Unit = {
+  test("testQueryWrappedScalaXmlElemForWrongXml2") {
     val scalaElem =
       <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="my-lab-en.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
     val elm = ScalaXmlElem(scalaElem)
@@ -609,7 +609,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * Tries to convert the 2nd Scala XML Elem to a yaidom Elem, which fails, as expected.
    */
-  @Test def testTryToConvertScalaXmlElemForWrongXml2(): Unit = {
+  test("testTryToConvertScalaXmlElemForWrongXml2") {
     val scalaElem =
       <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="my-lab-en.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
 
@@ -627,7 +627,7 @@ class TheCaseForYaidomTest extends Suite {
    * For comparing XML, yaidom offers resolved elements as a basis. In resolved elements,
    * attribute order does not play any role.
    */
-  @Test def testEqualityIfAttributeOrderDiffers(): Unit = {
+  test("testEqualityIfAttributeOrderDiffers") {
     import Node._
 
     val ns = "http://www.w3.org/1999/xhtml"
@@ -655,7 +655,7 @@ class TheCaseForYaidomTest extends Suite {
   /**
    * In Scala XML, prefixes are relevant for XML equality comparisons.
    */
-  @Test def testScalaXmlEqualityIfPrefixDiffers(): Unit = {
+  test("testScalaXmlEqualityIfPrefixDiffers") {
     val ns = "http://www.w3.org/1999/xhtml"
 
     val xml1 =
@@ -677,7 +677,7 @@ class TheCaseForYaidomTest extends Suite {
    * For comparing XML, yaidom offers resolved elements as a basis. In resolved elements,
    * prefixes are irrelevant, in contrast to namespace URIs.
    */
-  @Test def testEqualityIfPrefixDiffers(): Unit = {
+  test("testEqualityIfPrefixDiffers") {
     import Node._
 
     val nsXLink = "http://www.w3.org/1999/xlink"

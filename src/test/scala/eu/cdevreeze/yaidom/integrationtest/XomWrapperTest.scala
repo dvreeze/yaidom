@@ -24,7 +24,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
@@ -55,7 +55,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XomWrapperTest extends Suite {
+class XomWrapperTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -66,7 +66,7 @@ class XomWrapperTest extends Suite {
 
   import XomWrapperTest._
 
-  @Test def testParse(): Unit = {
+  test("testParse") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -95,7 +95,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseStrangeXml(): Unit = {
+  test("testParseStrangeXml") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -114,7 +114,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseDefaultNamespaceXml(): Unit = {
+  test("testParseDefaultNamespaceXml") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -141,7 +141,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseSchemaXsd(): Unit = {
+  test("testParseSchemaXsd") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
 
@@ -350,7 +350,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
+  test("testParseXmlWithExpandedEntityRef") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -388,7 +388,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
+  test("testParseXmlWithNamespaceUndeclarations") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -409,7 +409,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseXmlWithEscapedChars(): Unit = {
+  test("testParseXmlWithEscapedChars") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     dbf.setCoalescing(true)
@@ -458,7 +458,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseXmlWithSpecialChars(): Unit = {
+  test("testParseXmlWithSpecialChars") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -495,7 +495,7 @@ class XomWrapperTest extends Suite {
     checkEqualityOfDomAndXomElems(d)
   }
 
-  @Test def testParseGeneratedHtml(): Unit = {
+  test("testParseGeneratedHtml") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -592,7 +592,7 @@ class XomWrapperTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample(): Unit = {
+  test("testParseGroovyXmlExample") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder
@@ -660,7 +660,7 @@ class XomWrapperTest extends Suite {
   /**
    * Example of finding elements and their ancestors.
    */
-  @Test def testParseSchemaExample(): Unit = {
+  test("testParseSchemaExample") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setNamespaceAware(true)
     val db = dbf.newDocumentBuilder

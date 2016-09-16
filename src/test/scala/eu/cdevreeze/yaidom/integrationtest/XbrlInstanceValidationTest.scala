@@ -20,7 +20,7 @@ import scala.collection.immutable
 import scala.reflect.classTag
 
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XbrlInstanceValidationTest extends Suite {
+class XbrlInstanceValidationTest extends FunSuite {
   import XbrlInstanceValidationTest._
 
   def testValidateInstance(): Unit = {

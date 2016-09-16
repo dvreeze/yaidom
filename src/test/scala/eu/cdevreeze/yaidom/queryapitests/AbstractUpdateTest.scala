@@ -20,7 +20,7 @@ import scala.Vector
 import scala.reflect.ClassTag
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
@@ -41,7 +41,7 @@ import eu.cdevreeze.yaidom.simple.Text
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractUpdateTest extends Suite {
+abstract class AbstractUpdateTest extends FunSuite {
 
   type N <: ResolvedNodes.Node
   type E <: N with ResolvedNodes.Elem with ClarkElemApi.Aux[E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]
@@ -50,7 +50,7 @@ abstract class AbstractUpdateTest extends Suite {
 
   // Below, we update the measure elements, replacing the unprefixed measures with prefixed ones (using prefix xbrli)
 
-  @Test def testTransformElems(): Unit = {
+  test("testTransformElems") {
     val newRootElem = rootElem transformElems {
       case e if e.resolvedName == EName(XbrliNs, "measure") =>
         updateMeasure(e)
@@ -60,7 +60,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterMeasureUpdate(newRootElem)
   }
 
-  @Test def testTransformElemsToNodeSeq(): Unit = {
+  test("testTransformElemsToNodeSeq") {
     val newRootElem = rootElem transformElemsToNodeSeq {
       case e if e.resolvedName == EName(XbrliNs, "measure") =>
         Vector(updateMeasure(e))
@@ -70,7 +70,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterMeasureUpdate(newRootElem)
   }
 
-  @Test def testTransformElemsOrSelfToNodeSeq(): Unit = {
+  test("testTransformElemsOrSelfToNodeSeq") {
     val newRootElems = rootElem transformElemsOrSelfToNodeSeq {
       case e if e.resolvedName == EName(XbrliNs, "measure") =>
         Vector(updateMeasure(e))
@@ -83,7 +83,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterMeasureUpdate(newRootElems.head.asInstanceOf[E])
   }
 
-  @Test def testUpdateTopmostElemsWithNodeSeq(): Unit = {
+  test("testUpdateTopmostElemsWithNodeSeq") {
     val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "measure") =>
@@ -95,7 +95,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterMeasureUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsOrSelf(): Unit = {
+  test("testUpdateElemsOrSelf") {
     val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
@@ -112,7 +112,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterMeasureUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsWithNodeSeqOnLazyIndexedElem(): Unit = {
+  test("testUpdateElemsWithNodeSeqOnLazyIndexedElem") {
     val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem(rootElem))
 
     val paths: Set[Path] =
@@ -132,7 +132,7 @@ abstract class AbstractUpdateTest extends Suite {
   // Below, we update the unit IDs and references for unit U-Monetary.
   // There are many of those, so updates take time.
 
-  @Test def testTransformElemsForUnitUpdate(): Unit = {
+  test("testTransformElemsForUnitUpdate") {
     val newRootElem = rootElem transformElems {
       case e if e.resolvedName == EName(XbrliNs, "unit") =>
         updateUnitId(e)
@@ -144,7 +144,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  @Test def testTransformElemsOrSelfForUnitUpdate(): Unit = {
+  test("testTransformElemsOrSelfForUnitUpdate") {
     val newRootElem = rootElem transformElemsOrSelf {
       case e => updateUnitRef(updateUnitId(e))
     }
@@ -152,7 +152,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  @Test def testUpdateTopmostElemsWithNodeSeqForUnitUpdate(): Unit = {
+  test("testUpdateTopmostElemsWithNodeSeqForUnitUpdate") {
     val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
@@ -166,7 +166,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsWithNodeSeqAgainForUnitUpdate(): Unit = {
+  test("testUpdateElemsWithNodeSeqAgainForUnitUpdate") {
     val pathAwareClarkElem = ElemWithPath(rootElem)
 
     val elems =
@@ -186,7 +186,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  @Test def testUpdateTopmostElemsOrSelfForUnitUpdate(): Unit = {
+  test("testUpdateTopmostElemsOrSelfForUnitUpdate") {
     val newRootElem = rootElem updateTopmostElemsOrSelf { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
@@ -203,7 +203,7 @@ abstract class AbstractUpdateTest extends Suite {
   // Below, we update the context IDs and references for context D-2007-PPE-Other.
   // There are only a few of those, so updates are fast.
 
-  @Test def testTransformElemsForContextUpdate(): Unit = {
+  test("testTransformElemsForContextUpdate") {
     val newRootElem = rootElem transformElems {
       case e if e.resolvedName == EName(XbrliNs, "context") =>
         updateContextId(e)
@@ -215,7 +215,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  @Test def testTransformElemsOrSelfForContextUpdate(): Unit = {
+  test("testTransformElemsOrSelfForContextUpdate") {
     val newRootElem = rootElem transformElemsOrSelf {
       case e => updateContextRef(updateContextId(e))
     }
@@ -223,7 +223,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  @Test def testUpdateTopmostElemsWithNodeSeqForContextUpdate(): Unit = {
+  test("testUpdateTopmostElemsWithNodeSeqForContextUpdate") {
     val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "context") =>
@@ -237,7 +237,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  @Test def testUpdateElemsWithNodeSeqAgainForContextUpdate(): Unit = {
+  test("testUpdateElemsWithNodeSeqAgainForContextUpdate") {
     val pathAwareClarkElem = ElemWithPath(rootElem)
 
     val elems =
@@ -257,7 +257,7 @@ abstract class AbstractUpdateTest extends Suite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  @Test def testUpdateTopmostElemsOrSelfForContextUpdate(): Unit = {
+  test("testUpdateTopmostElemsOrSelfForContextUpdate") {
     val newRootElem = rootElem updateTopmostElemsOrSelf { (e: E, p: Path) =>
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "context") =>
@@ -275,7 +275,7 @@ abstract class AbstractUpdateTest extends Suite {
   // This example shows how method updateTopmostElems helps in updating elements with specific ancestries.
   // It appears that the updateTopmostXXX methods can do a lot that otherwise could be done using XSLT.
 
-  @Test def testReorderExplicitMembers(): Unit = {
+  test("testReorderExplicitMembers") {
     // Easy to express using updateTopmostElems method
 
     val newRootElem = rootElem updateTopmostElems { (e, path) =>
@@ -308,7 +308,7 @@ abstract class AbstractUpdateTest extends Suite {
 
   // Update the value of a specific fact
 
-  @Test def testUpdateFact(): Unit = {
+  test("testUpdateFact") {
     val gaapNs = "http://xasb.org/gaap"
 
     val elems =

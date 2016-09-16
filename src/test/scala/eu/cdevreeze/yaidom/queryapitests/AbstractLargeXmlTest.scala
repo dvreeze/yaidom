@@ -23,7 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Ignore
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
+abstract class AbstractLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests")
 
@@ -76,7 +76,7 @@ abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
   }
 
   /** A real stress test (disabled by default). When running it, use jvisualvm to check on the JVM behavior */
-  @Ignore @Test def testQueryLargeXmlRepeatedly(): Unit = {
+  ignore("testQueryLargeXmlRepeatedly") {
     val FirstNameEName = EName("firstName")
     val LastNameEName = EName("lastName")
     val ContactEName = EName("contact")
@@ -110,7 +110,7 @@ abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryElem(): Unit = {
+  test("testQueryElem") {
     val startMs = System.currentTimeMillis()
 
     assert(doc.documentElement.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -128,7 +128,7 @@ abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms")
   }
 
-  @Test def testFind(): Unit = {
+  test("testFind") {
     val rootElm = doc.documentElement
     val allElms = rootElm.findAllElemsOrSelf
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -198,7 +198,7 @@ abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
     logger.info(s"Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took ${end6Ms - start6Ms} ms")
   }
 
-  @Test def testNavigation(): Unit = {
+  test("testNavigation") {
     val startMs = System.currentTimeMillis()
     val rootElm = doc.documentElement
 

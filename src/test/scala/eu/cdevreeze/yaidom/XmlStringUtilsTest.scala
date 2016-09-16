@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import XmlStringUtils.isAllowedElementLocalName
@@ -32,9 +32,9 @@ import XmlStringUtils.isProbablyValidXmlName
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XmlStringUtilsTest extends Suite {
+class XmlStringUtilsTest extends FunSuite {
 
-  @Test def testNameValidity(): Unit = {
+  test("testNameValidity") {
     import XmlStringUtils._
 
     assertResult(true) {
@@ -90,7 +90,7 @@ class XmlStringUtilsTest extends Suite {
     }
   }
 
-  @Test def testXPathNotValidName(): Unit = {
+  test("testXPathNotValidName") {
     import XmlStringUtils._
 
     // To parse simple XPath expressions, we want to establish that "/", "*", "[" and "]" are never themselves

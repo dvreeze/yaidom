@@ -47,7 +47,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = DomElem
 
-  @Test def testQueryAll(): Unit = {
+  test("testQueryAll") {
     require(bookstore.localName == "Bookstore")
 
     val elems = bookstore.findAllElemsOrSelf
@@ -57,7 +57,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBookOrMagazineTitlesUsingParent(): Unit = {
+  test("testQueryBookOrMagazineTitlesUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/(Book | Magazine)/Title
 
     require(bookstore.localName == "Bookstore")
@@ -80,7 +80,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesUsingPaths(): Unit = {
+  test("testQueryTitlesUsingPaths") {
     // XPath: doc("bookstore.xml")/Bookstore/*/Title
 
     require(bookstore.localName == "Bookstore")
@@ -103,7 +103,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryCheapBookTitlesUsingParent(): Unit = {
+  test("testQueryCheapBookTitlesUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -124,7 +124,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByUllmanUsingParent(): Unit = {
+  test("testQueryTitlesOfCheapBooksByUllmanUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -145,7 +145,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByJeffreyUllmanUsingParent(): Unit = {
+  test("testQueryTitlesOfCheapBooksByJeffreyUllmanUsingParent") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author[Last_Name = "Ullman" and First_Name = "Jeffrey"]]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -189,7 +189,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryBooksByJeffreyUllmanUsingParent(): Unit = {
+  test("testQueryBooksByJeffreyUllmanUsingParent") {
     // Own example
 
     require(bookstore.localName == "Bookstore")
@@ -216,7 +216,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     }
   }
 
-  @Test def testQueryElementsWithParentNotBookOrBookstore(): Unit = {
+  test("testQueryElementsWithParentNotBookOrBookstore") {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
     require(bookstore.localName == "Bookstore")
@@ -247,7 +247,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksWithAuthorInTitle(): Unit = {
+  test("testQueryBooksWithAuthorInTitle") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -294,7 +294,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksPricedBelowAverage(): Unit = {
+  test("testQueryBooksPricedBelowAverage") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._
@@ -347,7 +347,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
    *        &lt;/Book&gt;
    * }}}
    */
-  @Test def testQueryBooksOrderedByPrice(): Unit = {
+  test("testQueryBooksOrderedByPrice") {
     require(bookstore.localName == "Bookstore")
 
     import NodeBuilder._

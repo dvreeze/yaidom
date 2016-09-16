@@ -24,7 +24,7 @@ import scala.reflect.classTag
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.DomConversions
@@ -61,15 +61,15 @@ import eu.cdevreeze.yaidom.simple.Elem
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class IndexedElemTest extends Suite {
+class IndexedElemTest extends FunSuite {
 
-  @Test def testIndexingForSimpleElem(): Unit = {
+  test("testIndexingForSimpleElem") {
     doTestIndexing[Elem, indexed.Elem](IndexedScopedElem(docWithCommentAtEnd.documentElement))
 
     doTestIndexing[Elem, indexed.Elem](IndexedScopedElem(docUsingXml11.documentElement))
   }
 
-  @Test def testIndexingForDomWrapperElem(): Unit = {
+  test("testIndexingForDomWrapperElem") {
     val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
     doTestIndexing[DomElem, IndexedScopedElem[DomElem]](
       IndexedScopedElem(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
@@ -79,7 +79,7 @@ class IndexedElemTest extends Suite {
       IndexedScopedElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
   }
 
-  @Test def testClarkElemIndexingForDomWrapperElem(): Unit = {
+  test("testClarkElemIndexingForDomWrapperElem") {
     val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
     doTestIndexing[DomElem, IndexedClarkElem[DomElem]](
       IndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
@@ -89,7 +89,7 @@ class IndexedElemTest extends Suite {
       IndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
   }
 
-  @Test def testIndexingForScalaXmlWrapperElem(): Unit = {
+  test("testIndexingForScalaXmlWrapperElem") {
     doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
       IndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement))))
 
@@ -97,7 +97,7 @@ class IndexedElemTest extends Suite {
       IndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement))))
   }
 
-  @Test def testDoubleIndexing(): Unit = {
+  test("testDoubleIndexing") {
     val rootElem = docWithCommentAtEnd.documentElement
     val strangeElem = IndexedScopedElem(IndexedScopedElem(rootElem))
 
@@ -118,7 +118,7 @@ class IndexedElemTest extends Suite {
     }
   }
 
-  @Test def testGetChildren(): Unit = {
+  test("testGetChildren") {
     val docChildren = docWithCommentAtEnd.children
 
     assertResult(2)(docChildren.size)

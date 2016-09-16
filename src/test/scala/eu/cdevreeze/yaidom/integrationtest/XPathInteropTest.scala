@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.integrationtest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.w3c.dom.NodeList
 
@@ -41,9 +41,9 @@ import javax.xml.xpath.XPathFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XPathInteropTest extends Suite with BeforeAndAfterAll {
+class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
 
-  @Test def testProcessXPathResults(): Unit = {
+  test("testProcessXPathResults") {
     val ns = "http://bookstore"
 
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.

@@ -20,7 +20,7 @@ import java.{ util => jutil }
 
 import org.junit.Test
 import org.scalatest.Ignore
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -40,11 +40,11 @@ import eu.cdevreeze.yaidom.resolved
  *
  * @author Chris de Vreeze
  */
-class OtherNamespaceTestUsingXmlLiterals extends Suite {
+class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testNamespaceDeclaration(): Unit = {
+  test("testNamespaceDeclaration") {
     val xml =
       <prod:product xmlns:prod="http://datypic.com/prod">
         <prod:number>557</prod:number>
@@ -87,7 +87,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testMultipleNamespaceDeclarations(): Unit = {
+  test("testMultipleNamespaceDeclarations") {
     val xml =
       <ord:order xmlns:ord="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod">
         <ord:number>123ABBCC123</ord:number>
@@ -155,7 +155,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testDefaultNamespaceDeclaration(): Unit = {
+  test("testDefaultNamespaceDeclaration") {
     val xml =
       <order xmlns="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod">
         <number>123ABBCC123</number>
@@ -261,7 +261,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testNamespaceDeclarationsInMultipleTags(): Unit = {
+  test("testNamespaceDeclarationsInMultipleTags") {
     val xml =
       <order xmlns="http://datypic.com/ord">
         <number>123ABBCC123</number>
@@ -367,7 +367,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testInvalidPrefixOutsideOfScope(): Unit = {
+  test("testInvalidPrefixOutsideOfScope") {
     // Scala XML does not mind about the unbound prefix
 
     val xml =
@@ -392,7 +392,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testOverridingNamespaceDeclaration(): Unit = {
+  test("testOverridingNamespaceDeclaration") {
     val xml =
       <order xmlns="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod">
         <number>123ABBCC123</number>
@@ -511,7 +511,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testOverridingDefaultNamespaceDeclaration(): Unit = {
+  test("testOverridingDefaultNamespaceDeclaration") {
     val xml =
       <order xmlns="http://datypic.com/ord">
         <number>123ABBCC123</number>
@@ -617,7 +617,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testUndeclaringDefaultNamespace(): Unit = {
+  test("testUndeclaringDefaultNamespace") {
     val xml =
       <order xmlns="http://datypic.com/ord">
         <number>123ABBCC123</number>
@@ -685,7 +685,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
   }
 
   /** Disabled test, because it is unclear what behavior to expect w.r.t. Scala XML literals and XML 1.1. */
-  @Ignore @Test def testUndeclaringPrefixedNamespace(): Unit = {
+  ignore("testUndeclaringPrefixedNamespace") {
     // Note: undeclaring prefixes is only allowed for XML version 1.1
 
     val xml =
@@ -793,7 +793,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testTwoAttributesWithSameLocalName(): Unit = {
+  test("testTwoAttributesWithSameLocalName") {
     val xml =
       <product xmlns="http://datypic.com/prod" xmlns:app="http://datypic.com/app">
         <number>557</number>
@@ -837,7 +837,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testTwoMoreAttributesWithSameLocalName(): Unit = {
+  test("testTwoMoreAttributesWithSameLocalName") {
     val xml =
       <product xmlns="http://datypic.com/prod" xmlns:prod="http://datypic.com/prod">
         <number>557</number>
@@ -881,7 +881,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
   }
 
   /** Disabled test, because an exception was expected but did not occur (which is explainable). */
-  @Ignore @Test def testInvalidDuplicateAttributes(): Unit = {
+  ignore("testInvalidDuplicateAttributes") {
     intercept[java.lang.Exception] {
       val xml =
         <product xmlns:prod="http://datypic.com/prod" xmlns:prod2="http://datypic.com/prod">
@@ -893,7 +893,7 @@ class OtherNamespaceTestUsingXmlLiterals extends Suite {
     }
   }
 
-  @Test def testSummaryExample(): Unit = {
+  test("testSummaryExample") {
     val xml =
       <envelope>
         <order xmlns="http://datypic.com/ord" xmlns:prod="http://datypic.com/prod">

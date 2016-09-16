@@ -3,7 +3,7 @@ package eu.cdevreeze.yaidom.queryapitests
 import java.io.File
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
@@ -13,7 +13,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 
-abstract class AbstractBackingElemTest extends Suite {
+abstract class AbstractBackingElemTest extends FunSuite {
 
   private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
   private val XLinkNamespace = "http://www.w3.org/1999/xlink"
@@ -72,19 +72,19 @@ abstract class AbstractBackingElemTest extends Suite {
 
   def docElem: E
 
-  @Test def testResolvedName(): Unit = {
+  test("testResolvedName") {
     assertResult(XsSchemaEName)(docElem.resolvedName)
     assertResult(Some(XsNamespace))(docElem.resolvedName.namespaceUriOption)
     assertResult("schema")(docElem.resolvedName.localPart)
   }
 
-  @Test def testQName(): Unit = {
+  test("testQName") {
     assertResult(QName("xs:schema"))(docElem.qname)
     assertResult(Some("xs"))(docElem.qname.prefixOption)
     assertResult("schema")(docElem.qname.localPart)
   }
 
-  @Test def testDocUri(): Unit = {
+  test("testDocUri") {
     assertResult("file")(docElem.docUri.getScheme)
     assertResult("some-data.xsd")((new File(docElem.docUri)).getName)
     assertResult(true)((new File(docElem.docUri)).isFile)
@@ -98,7 +98,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testDefaultBaseUri(): Unit = {
+  test("testDefaultBaseUri") {
     assertResult("file")(docElem.baseUri.getScheme)
     assertResult("some-data.xsd")((new File(docElem.baseUri)).getName)
     assertResult(true)((new File(docElem.baseUri)).isFile)
@@ -112,7 +112,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testResolvedAttributes(): Unit = {
+  test("testResolvedAttributes") {
     assertResult(
       Map(
         TargetNamespaceEName -> "http://www.sometaxonomy/0.1/basis/some2/items/some-data",
@@ -135,7 +135,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testQNameAttributes(): Unit = {
+  test("testQNameAttributes") {
     val elementElems = docElem.filterElemsOrSelf(_.resolvedName == XsElementEName)
 
     assertResult(true)(elementElems.size >= 100)
@@ -155,7 +155,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testAttributes(): Unit = {
+  test("testAttributes") {
     assertResult(
       Map(
         QName("targetNamespace") -> "http://www.sometaxonomy/0.1/basis/some2/items/some-data",
@@ -172,7 +172,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testScope(): Unit = {
+  test("testScope") {
     assertResult(
       Scope.from(
         "xs" -> XsNamespace,
@@ -201,7 +201,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testText(): Unit = {
+  test("testText") {
     assertResult(Set("")) {
       docElem.findAllElemsOrSelf.map(_.text.trim).toSet
     }
@@ -216,7 +216,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testFilterElemsOrSelf(): Unit = {
+  test("testFilterElemsOrSelf") {
     // Non-existing elements
 
     val bogusElems = docElem.filterElemsOrSelf(_.resolvedName == EName("schema"))
@@ -284,7 +284,7 @@ abstract class AbstractBackingElemTest extends Suite {
     assertResult(appinfoChildElems2)(appinfoChildElems)
   }
 
-  @Test def testFilterElems(): Unit = {
+  test("testFilterElems") {
     // Non-existing elements
 
     val bogusElems = docElem.filterElems(_.resolvedName == EName("schema"))
@@ -337,7 +337,7 @@ abstract class AbstractBackingElemTest extends Suite {
     assertResult(appinfoChildElems2)(appinfoChildElems)
   }
 
-  @Test def testFilterChildElems(): Unit = {
+  test("testFilterChildElems") {
     // Non-existing elements
 
     val bogusElems = docElem.filterChildElems(_.resolvedName == EName("schema"))
@@ -388,7 +388,7 @@ abstract class AbstractBackingElemTest extends Suite {
     assertResult(appinfoChildElems2)(appinfoChildElems)
   }
 
-  @Test def testFilterElemsOrSelfUsingAlias(): Unit = {
+  test("testFilterElemsOrSelfUsingAlias") {
     // Non-existing elements
 
     val bogusElems = docElem \\ (_.resolvedName == EName("schema"))
@@ -429,7 +429,7 @@ abstract class AbstractBackingElemTest extends Suite {
     assertResult(Set(LinkLinkbaseRefEName))(appinfoChildElems.map(_.resolvedName).toSet)
   }
 
-  @Test def testFilterChildElemsUsingAlias(): Unit = {
+  test("testFilterChildElemsUsingAlias") {
     // Non-existing elements
 
     val bogusElems = docElem \ (_.resolvedName == EName("schema"))
@@ -468,7 +468,7 @@ abstract class AbstractBackingElemTest extends Suite {
     assertResult(Set(LinkLinkbaseRefEName))(appinfoChildElems.map(_.resolvedName).toSet)
   }
 
-  @Test def testFindTopmostElemsOrSelf(): Unit = {
+  test("testFindTopmostElemsOrSelf") {
     // Non-existing elements
 
     val bogusElems = docElem.findTopmostElemsOrSelf(_.resolvedName == EName("schema"))
@@ -498,7 +498,7 @@ abstract class AbstractBackingElemTest extends Suite {
       appinfoTreeElems.filter(e => e.parentOption.forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
   }
 
-  @Test def testFindTopmostElems(): Unit = {
+  test("testFindTopmostElems") {
     // Non-existing elements
 
     val bogusElems = docElem.findTopmostElems(_.resolvedName == EName("schema"))
@@ -527,7 +527,7 @@ abstract class AbstractBackingElemTest extends Suite {
       appinfoTreeElems.filter(e => e.parentOption.forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
   }
 
-  @Test def testFindTopmostElemsOrSelfUsingAlias(): Unit = {
+  test("testFindTopmostElemsOrSelfUsingAlias") {
     // Non-existing elements
 
     val bogusElems = docElem \\! (_.resolvedName == EName("schema"))
@@ -557,7 +557,7 @@ abstract class AbstractBackingElemTest extends Suite {
       appinfoTreeElems.filter(e => e.parentOption.forall(e2 => !appinfoTreeElems.contains(e2))))(appinfoElems)
   }
 
-  @Test def testFindElemOrSelf(): Unit = {
+  test("testFindElemOrSelf") {
     // Non-existing elements
 
     val bogusElems = docElem.findElemOrSelf(_.resolvedName == EName("schema"))
@@ -587,7 +587,7 @@ abstract class AbstractBackingElemTest extends Suite {
       docElem.filterElemsOrSelf(_.resolvedName == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
   }
 
-  @Test def testFindElem(): Unit = {
+  test("testFindElem") {
     // Non-existing elements
 
     val bogusElems = docElem.findElem(_.resolvedName == EName("schema"))
@@ -617,7 +617,7 @@ abstract class AbstractBackingElemTest extends Suite {
       docElem.filterElems(_.resolvedName == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
   }
 
-  @Test def testPathNavigation(): Unit = {
+  test("testPathNavigation") {
     val linkbaseRefElems = docElem.filterElemsOrSelf(_.resolvedName == LinkLinkbaseRefEName)
 
     val linkbaseRefElemPaths = linkbaseRefElems.map(_.path)
@@ -639,7 +639,7 @@ abstract class AbstractBackingElemTest extends Suite {
     assertResult(linkbaseRefElems)(linkbaseRefElems2)
   }
 
-  @Test def testAncestry(): Unit = {
+  test("testAncestry") {
     val linkbaseRefElems = docElem.filterElemsOrSelf(_.resolvedName == LinkLinkbaseRefEName)
 
     assertResult(17)(linkbaseRefElems.size)
@@ -690,7 +690,7 @@ abstract class AbstractBackingElemTest extends Suite {
     }
   }
 
-  @Test def testPathConsistency(): Unit = {
+  test("testPathConsistency") {
     val allElemsOrSelf = docElem.findAllElemsOrSelf
 
     assertResult(Set(docElem)) {

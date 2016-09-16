@@ -20,7 +20,7 @@ import java.{ util => jutil }
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import NamespaceUtils.pushUpPrefixedNamespaces
@@ -43,13 +43,13 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class NamespaceUtilsTest extends Suite {
+class NamespaceUtilsTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.utils")
 
   private val docParser = DocumentParserUsingSax.newInstance
 
-  @Test def testPushUpNamespacesInFeed1(): Unit = {
+  test("testPushUpNamespacesInFeed1") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("feed1.txt"))
     val rootElem = doc.documentElement
 
@@ -66,7 +66,7 @@ class NamespaceUtilsTest extends Suite {
     }
   }
 
-  @Test def testPushUpNamespacesInFeed2(): Unit = {
+  test("testPushUpNamespacesInFeed2") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("feed2.txt"))
     val rootElem = doc.documentElement
 
@@ -89,7 +89,7 @@ class NamespaceUtilsTest extends Suite {
     }
   }
 
-  @Test def testPushUpNamespacesInFeed3(): Unit = {
+  test("testPushUpNamespacesInFeed3") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("feed3.txt"))
     val rootElem = doc.documentElement
 
@@ -109,7 +109,7 @@ class NamespaceUtilsTest extends Suite {
     }
   }
 
-  @Test def testPushUpNamespacesInObfuscatedXml(): Unit = {
+  test("testPushUpNamespacesInObfuscatedXml") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("obfuscated.xml"))
     val rootElem = doc.documentElement
 
@@ -138,7 +138,7 @@ class NamespaceUtilsTest extends Suite {
     }
   }
 
-  @Test def testPushUpNamespacesInStrangeNsXml(): Unit = {
+  test("testPushUpNamespacesInStrangeNsXml") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("strange-ns.xml"))
     val rootElem = doc.documentElement
 
@@ -158,7 +158,7 @@ class NamespaceUtilsTest extends Suite {
     }
   }
 
-  @Test def testStripNamespaces(): Unit = {
+  test("testStripNamespaces") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("content.xml"))
     val rootElem = indexed.Elem(doc.documentElement)
 
@@ -192,7 +192,7 @@ class NamespaceUtilsTest extends Suite {
     }
   }
 
-  @Test def testFindUsedNamespaces(): Unit = {
+  test("testFindUsedNamespaces") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("HelloWorld.xml"))
     val rootElem = indexed.Elem(doc.documentElement)
 

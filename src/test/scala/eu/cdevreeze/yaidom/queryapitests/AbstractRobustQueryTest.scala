@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.Vector
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
@@ -37,7 +37,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractRobustQueryTest extends Suite {
+abstract class AbstractRobustQueryTest extends FunSuite {
 
   type E <: ClarkElemLike.Aux[E]
 
@@ -51,7 +51,7 @@ abstract class AbstractRobustQueryTest extends Suite {
     "Xao Li",
     "Jonathan Li")
 
-  @Test def testRobustQuerying(): Unit = {
+  test("testRobustQuerying") {
     val contactNames =
       for {
         rootElem <- Option(contactsElem).toVector
@@ -64,7 +64,7 @@ abstract class AbstractRobustQueryTest extends Suite {
     }
   }
 
-  @Test def testEvenMoreRobustQuerying(): Unit = {
+  test("testEvenMoreRobustQuerying") {
     val contactNames =
       for {
         name <- contactsElem.filterElems(withLocalName("Name"))

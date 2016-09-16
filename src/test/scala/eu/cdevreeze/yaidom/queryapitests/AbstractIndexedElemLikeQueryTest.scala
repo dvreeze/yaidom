@@ -37,7 +37,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
   final override type E = IndexedClarkElem[U]
 
-  @Test def testQueryTheBookAuthors(): Unit = {
+  test("testQueryTheBookAuthors") {
     require(bookstore.localName == "Bookstore")
 
     val theBookAuthors =
@@ -58,7 +58,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
     }
   }
 
-  @Test def testQueryTitlesOfCheapBooksByUllmanAgain(): Unit = {
+  test("testQueryTitlesOfCheapBooksByUllmanAgain") {
     // XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90 and Authors/Author/Last_Name = "Ullman"]/Title
 
     require(bookstore.localName == "Bookstore")
@@ -84,7 +84,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
     }
   }
 
-  @Test def testQueryMagazinesWithSameNameAsBookAgain(): Unit = {
+  test("testQueryMagazinesWithSameNameAsBookAgain") {
     // XPath: doc("bookstore.xml")//Magazine[Title = doc("bookstore.xml")//Book[Title]]
 
     require(bookstore.localName == "Bookstore")

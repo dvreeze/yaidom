@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.integrationtest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.QName
@@ -35,9 +35,9 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ScopedQueryTest extends Suite with BeforeAndAfterAll {
+class ScopedQueryTest extends FunSuite with BeforeAndAfterAll {
 
-  @Test def testQueryBooks(): Unit = {
+  test("testQueryBooks") {
     val docParser = DocumentParserUsingSax.newInstance()
 
     val doc = docParser.parse(classOf[ScopedQueryTest].getResourceAsStream("books-with-strange-namespaces.xml"))
@@ -76,7 +76,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryBookAuthors(): Unit = {
+  test("testQueryBookAuthors") {
     val docParser = DocumentParserUsingSax.newInstance()
 
     val doc = docParser.parse(classOf[ScopedQueryTest].getResourceAsStream("books-with-strange-namespaces.xml"))
@@ -100,7 +100,7 @@ class ScopedQueryTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testQueryBookAuthorsAgain(): Unit = {
+  test("testQueryBookAuthorsAgain") {
     val docParser = DocumentParserUsingSax.newInstance()
 
     val doc = docParser.parse(classOf[ScopedQueryTest].getResourceAsStream("books-with-strange-namespaces.xml"))

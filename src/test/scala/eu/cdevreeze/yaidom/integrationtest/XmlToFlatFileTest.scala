@@ -22,7 +22,7 @@ import scala.Vector
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -36,9 +36,9 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XmlToFlatFileTest extends Suite {
+class XmlToFlatFileTest extends FunSuite {
 
-  @Test def testConvertXmlToFlatFile(): Unit = {
+  test("testConvertXmlToFlatFile") {
     val docParser = DocumentParserUsingStax.newInstance
 
     val xmlData = """<?xml version="1.0"?>

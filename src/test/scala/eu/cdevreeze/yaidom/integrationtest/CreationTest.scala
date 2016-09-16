@@ -21,7 +21,7 @@ import javax.xml.transform.stream.StreamSource
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.simple.NodeBuilder._
@@ -42,13 +42,13 @@ import eu.cdevreeze.yaidom.simple
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class CreationTest extends Suite {
+class CreationTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsBookstore = "http://bookstore"
 
-  @Test def testCreation(): Unit = {
+  test("testCreation") {
     // 1. Parse XML file into Elem
 
     val docParser = DocumentParserUsingDom.newInstance()
@@ -213,7 +213,7 @@ class CreationTest extends Suite {
     }
   }
 
-  @Test def testNotUndeclaringPrefixes(): Unit = {
+  test("testNotUndeclaringPrefixes") {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
@@ -272,7 +272,7 @@ class CreationTest extends Suite {
     }
   }
 
-  @Test def testNotUndeclaringPrefixesAgain(): Unit = {
+  test("testNotUndeclaringPrefixesAgain") {
     val docParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
@@ -337,7 +337,7 @@ class CreationTest extends Suite {
     }
   }
 
-  @Test def testInsertionWhileReusingPrefixes(): Unit = {
+  test("testInsertionWhileReusingPrefixes") {
     val booksElmBuilder: ElemBuilder =
       elem(
         qname = QName("books:Book"),

@@ -24,7 +24,7 @@ import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
 import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.parse
@@ -46,7 +46,7 @@ import eu.cdevreeze.yaidom.simple.Text
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class EqualityTest extends Suite {
+class EqualityTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -55,7 +55,7 @@ class EqualityTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testBookstoreEquality(): Unit = {
+  test("testBookstoreEquality") {
     // 1. Parse XML file into Document
 
     val parser = parse.DocumentParserUsingDom.newInstance
@@ -107,7 +107,7 @@ class EqualityTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
-  @Test def testStrangeXmlDescendantsOrSelf(): Unit = {
+  test("testStrangeXmlDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
     val parser = parse.DocumentParserUsingDom.newInstance
@@ -132,7 +132,7 @@ class EqualityTest extends Suite {
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/79 */
-  @Test def testDefaultNamespaceXmlDescendantsOrSelf(): Unit = {
+  test("testDefaultNamespaceXmlDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
     val parser = parse.DocumentParserUsingDom.newInstance
@@ -156,7 +156,7 @@ class EqualityTest extends Suite {
     }
   }
 
-  @Test def testSchemaXsdDescendantsOrSelf(): Unit = {
+  test("testSchemaXsdDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -217,7 +217,7 @@ class EqualityTest extends Suite {
     }
   }
 
-  @Test def testEqualityForXmlWithEntityRefs(): Unit = {
+  test("testEqualityForXmlWithEntityRefs") {
     // 1. Parse XML file into Document, twice
 
     val parser1 = parse.DocumentParserUsingDom.newInstance
@@ -293,7 +293,7 @@ class EqualityTest extends Suite {
     }
   }
 
-  @Test def testXmlWithNSUndeclarationsDescendantsOrSelf(): Unit = {
+  test("testXmlWithNSUndeclarationsDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
     val parser = parse.DocumentParserUsingDom.newInstance
@@ -319,7 +319,7 @@ class EqualityTest extends Suite {
     }
   }
 
-  @Test def testEqualityForXmlWithEscapedCharacters(): Unit = {
+  test("testEqualityForXmlWithEscapedCharacters") {
     // 1. Parse XML file into Document, and create an equivalent document
 
     val parser1 = parse.DocumentParserUsingDom.newInstance
@@ -362,7 +362,7 @@ class EqualityTest extends Suite {
     }
   }
 
-  @Test def testEqualityForXmlWithEuro(): Unit = {
+  test("testEqualityForXmlWithEuro") {
     // 1. Parse XML file into Document, and create an equivalent document
 
     val parser1 = parse.DocumentParserUsingDom.newInstance

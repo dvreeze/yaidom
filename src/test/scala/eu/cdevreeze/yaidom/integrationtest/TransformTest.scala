@@ -21,7 +21,7 @@ import scala.collection.immutable.Stream.consWrapper
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -38,9 +38,9 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class TransformTest extends Suite {
+class TransformTest extends FunSuite {
 
-  @Test def testNestedTransformation(): Unit = {
+  test("testNestedTransformation") {
     // See http://stackoverflow.com/questions/4313032/scala-xml-transform-throws-away-transformed-elements-with-multiple-attributes.
     // Also see http://scala-scales.googlecode.com/svn/sites/scales/scales-xml_2.9.1/0.2/ScalesXmlIntro.html,
     // on nested transformations.
@@ -90,7 +90,7 @@ class TransformTest extends Suite {
     }
   }
 
-  @Test def testTransformAttributeValues(): Unit = {
+  test("testTransformAttributeValues") {
     // See http://stackoverflow.com/questions/2569580/how-to-change-attribute-on-scala-xml-element/2581712#2581712.
 
     val scope = Scope.Empty

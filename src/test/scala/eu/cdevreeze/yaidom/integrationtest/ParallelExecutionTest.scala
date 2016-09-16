@@ -32,7 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Ignore
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -62,7 +62,7 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
+class ParallelExecutionTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -70,32 +70,32 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
 
   private val i = new juc.atomic.AtomicInteger(0)
 
-  @Test def testParallelExecutionUsingDom(): Unit = {
+  test("testParallelExecutionUsingDom") {
     doTestParallelExecution(
       { () => DocumentParserUsingDom.newInstance },
       { () => DocumentPrinterUsingDom.newInstance })
   }
 
-  @Test def testParallelExecutionUsingDomLS(): Unit = {
+  test("testParallelExecutionUsingDomLS") {
     doTestParallelExecution(
       { () => DocumentParserUsingDomLS.newInstance },
       { () => DocumentPrinterUsingDomLS.newInstance })
   }
 
-  @Test def testParallelExecutionUsingSax(): Unit = {
+  test("testParallelExecutionUsingSax") {
     doTestParallelExecution(
       { () => DocumentParserUsingSax.newInstance },
       { () => DocumentPrinterUsingSax.newInstance })
   }
 
-  @Test def testParallelExecutionUsingStax(): Unit = {
+  test("testParallelExecutionUsingStax") {
     doTestParallelExecution(
       { () => DocumentParserUsingStax.newInstance },
       { () => DocumentPrinterUsingStax.newInstance })
   }
 
   // TODO Fix!
-  @Ignore @Test def testNumberOfRefEqualENamesUsingDefaultENameProvider(): Unit = {
+  ignore("testNumberOfRefEqualENamesUsingDefaultENameProvider") {
     val enameProvider = new ENameProvider.TrivialENameProvider
     val refEqualGrandChildENameCount = 1
 
@@ -104,7 +104,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   // TODO Fix!
-  @Ignore @Test def testNumberOfRefEqualENamesUsingCachingENameProvider(): Unit = {
+  ignore("testNumberOfRefEqualENamesUsingCachingENameProvider") {
     val enameProvider = new ENameProvider.SimpleCachingENameProvider
     val refEqualGrandChildENameCount = 250
 
@@ -113,7 +113,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   // TODO Fix!
-  @Ignore @Test def testNumberOfRefEqualENamesUsingThreadLocalENameProvider(): Unit = {
+  ignore("testNumberOfRefEqualENamesUsingThreadLocalENameProvider") {
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => new ENameProvider.SimpleCachingENameProvider })
     val refEqualGrandChildENameCount = 25
 
@@ -122,7 +122,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   // TODO Fix!
-  @Ignore @Test def testNumberOfRefEqualENamesUsingSharedCachingENameProvider(): Unit = {
+  ignore("testNumberOfRefEqualENamesUsingSharedCachingENameProvider") {
     val sharedENameProvider = new ENameProvider.SimpleCachingENameProvider
     val enameProvider = new ENameProvider.ThreadLocalENameProvider({ () => sharedENameProvider })
     val refEqualGrandChildENameCount = 250
@@ -132,7 +132,7 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   }
 
   // TODO Fix!
-  @Ignore @Test def testNumberOfRefEqualENamesUsingDifferentThreadBoundENameProviders(): Unit = {
+  ignore("testNumberOfRefEqualENamesUsingDifferentThreadBoundENameProviders") {
     val sharedENameProvider1 = new ENameProvider.SimpleCachingENameProvider
     val sharedENameProvider2 = new ENameProvider.SimpleCachingENameProvider
 

@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.EntityResolver
 import org.xml.sax.ErrorHandler
@@ -55,7 +55,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class DomWrapperTest extends Suite {
+class DomWrapperTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -64,7 +64,7 @@ class DomWrapperTest extends Suite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
-  @Test def testParse(): Unit = {
+  test("testParse") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
@@ -87,7 +87,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseStrangeXml(): Unit = {
+  test("testParseStrangeXml") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("strangeXml.xml")
@@ -101,7 +101,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseDefaultNamespaceXml(): Unit = {
+  test("testParseDefaultNamespaceXml") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXml.xml")
@@ -123,7 +123,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseSchemaXsd(): Unit = {
+  test("testParseSchemaXsd") {
     val dbf = DocumentBuilderFactory.newInstance
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
@@ -327,7 +327,7 @@ class DomWrapperTest extends Suite {
     checkFieldPattern(root)
   }
 
-  @Test def testParseXmlWithExpandedEntityRef(): Unit = {
+  test("testParseXmlWithExpandedEntityRef") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
@@ -360,7 +360,7 @@ class DomWrapperTest extends Suite {
     checkChildText(root)
   }
 
-  @Test def testParseXmlWithNonExpandedEntityRef(): Unit = {
+  test("testParseXmlWithNonExpandedEntityRef") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setExpandEntityReferences(false)
     val db = dbf.newDocumentBuilder
@@ -402,7 +402,7 @@ class DomWrapperTest extends Suite {
     checkChildTextAndEntityRef(root)
   }
 
-  @Test def testParseXmlWithNamespaceUndeclarations(): Unit = {
+  test("testParseXmlWithNamespaceUndeclarations") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
@@ -418,7 +418,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseXmlWithEscapedChars(): Unit = {
+  test("testParseXmlWithEscapedChars") {
     val dbf = DocumentBuilderFactory.newInstance
     dbf.setCoalescing(true)
     val db = dbf.newDocumentBuilder
@@ -462,7 +462,7 @@ class DomWrapperTest extends Suite {
     doChecks(root)
   }
 
-  @Test def testParseXmlWithSpecialChars(): Unit = {
+  test("testParseXmlWithSpecialChars") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
@@ -494,7 +494,7 @@ class DomWrapperTest extends Suite {
     doChecks(root)
   }
 
-  @Test def testParseGeneratedHtml(): Unit = {
+  test("testParseGeneratedHtml") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
@@ -580,7 +580,7 @@ class DomWrapperTest extends Suite {
     }
   }
 
-  @Test def testParseBrokenXml(): Unit = {
+  test("testParseBrokenXml") {
     var errorCount = 0
     var fatalErrorCount = 0
     var warningCount = 0
@@ -626,7 +626,7 @@ class DomWrapperTest extends Suite {
    * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
    * The Scala counterpart is more type-safe.
    */
-  @Test def testParseGroovyXmlExample(): Unit = {
+  test("testParseGroovyXmlExample") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("cars.xml")
@@ -687,7 +687,7 @@ class DomWrapperTest extends Suite {
   /**
    * Example of finding elements and their ancestors.
    */
-  @Test def testParseSchemaExample(): Unit = {
+  test("testParseSchemaExample") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("gaap.xsd")
@@ -716,7 +716,7 @@ class DomWrapperTest extends Suite {
   /**
    * Example of parsing a document with multiple kinds of nodes.
    */
-  @Test def testParseMultipleNodeKinds(): Unit = {
+  test("testParseMultipleNodeKinds") {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithDifferentKindsOfNodes.xml")

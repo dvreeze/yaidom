@@ -20,7 +20,7 @@ import java.{ util => jutil }
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import NamespaceUtils.pushUpPrefixedNamespaces
@@ -43,11 +43,11 @@ import eu.cdevreeze.yaidom.simple
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class ClarkElemEditorTest extends Suite {
+class ClarkElemEditorTest extends FunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
 
-  @Test def testCreateXbrlInstance(): Unit = {
+  test("testCreateXbrlInstance") {
     val instance = NamespaceUtils.pushUpPrefixedNamespaces(createInstance())
 
     val unusedScope = Scope.from("company" -> "http://www.example.com/company")

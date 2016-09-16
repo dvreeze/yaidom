@@ -20,7 +20,7 @@ import scala.Vector
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import AbstractBlogXbrlTestSupport.XbrliNs
@@ -51,7 +51,7 @@ import eu.cdevreeze.yaidom.utils.TextENameExtractor
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
+class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[BlogXbrlTest].getResource("sample-Instance-Proof.xml").toURI))
@@ -90,7 +90,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
    * Simple XBRL instance queries. Shows XBRL instances, and introduces yaidom ScopedElemApi query API, as well as
    * Scala Collections. If you know ElemApi method `filterElemsOrSelf`, you basically know all of its methods.
    */
-  @Test def testSimpleQueries(): Unit = {
+  test("testSimpleQueries") {
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
@@ -139,7 +139,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
    * such as simple elements not only offer uniform yaidom query APIs, but also offer methods to query for specific
    * nodes such as comments and CDATA text.
    */
-  @Test def testSpecificNodeQueries(): Unit = {
+  test("testSpecificNodeQueries") {
     // Now use DOM-based DocumentParser
     val docParser = DocumentParserUsingDom.newInstance
 
@@ -172,7 +172,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
    * Checks use of recommended namespace prefixes (rule 2.1.5). Shows simple FRIS rules, and shows yaidom Scopes
    * and namespace support.
    */
-  @Test def testUsedNamespacePrefixes(): Unit = {
+  test("testUsedNamespacePrefixes") {
     // Now use StAX-based DocumentParser
     val docParser = DocumentParserUsingStax.newInstance
 
@@ -215,7 +215,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
    * Also shows how yaidom is useful despite its lack of schema type knowledge (although a yaidom facade wrapping
    * type-aware Saxon-EE trees is quite feasible).
    */
-  @Test def testNoUnusedNamespaces(): Unit = {
+  test("testNoUnusedNamespaces") {
     // Now use DOM-LS-based DocumentParser
     val docParser = DocumentParserUsingDomLS.newInstance
 
@@ -268,7 +268,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
    * can easily be added. Also shows the SubtypeAwareElemApi query API trait, for more type-safe querying in custom
    * XML dialects (such as the XBRL instances dialect used here).
    */
-  @Test def testOrderInXbrlInstance(): Unit = {
+  test("testOrderInXbrlInstance") {
     // Rule 2.1.10: the order of child elements must be as specified in this rule
 
     val remainingChildElems =
@@ -307,7 +307,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
    * Checks some context-related requirements (rule 2.4.2, for example). Shows how yaidom's extensibility helps in
    * supporting different XML dialects such as XBRL instances, which is to be preferred to raw XML element support.
    */
-  @Test def testContextProperties(): Unit = {
+  test("testContextProperties") {
     // Rule 2.4.2: all contexts must be used. It is also checked that all context references are indeed correct.
     // Note how friendly the XBRL instance model is as compared to raw XML elements.
 
@@ -338,7 +338,7 @@ class BlogXbrlTest extends Suite with AbstractBlogXbrlTestSupport {
   /**
    * Checks some fact-related requirements (rule 2.8.3, for example). Again shows yaidom's support for XML dialects.
    */
-  @Test def testFactProperties(): Unit = {
+  test("testFactProperties") {
     // Rule 2.8.3: concepts are either top-level or nested in tuples, both not both
 
     val topLevelConceptNames = xbrlInstance.allTopLevelFactsByEName.keySet

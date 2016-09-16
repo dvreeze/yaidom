@@ -24,7 +24,7 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
@@ -42,7 +42,7 @@ import javax.xml.transform.stream.StreamSource
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
+class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   @volatile private var xmlBytes: Array[Byte] = _
 
@@ -73,7 +73,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
    *
    * This test example is simple, and does not use any namespaces.
    */
-  @Test def testProcessLargeXmlUsingStreaming(): Unit = {
+  test("testProcessLargeXmlUsingStreaming") {
     val inputFactory = XMLInputFactory.newInstance
 
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
@@ -114,7 +114,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testProcessAnotherXmlUsingStreaming(): Unit = {
+  test("testProcessAnotherXmlUsingStreaming") {
     val fileUri = classOf[StreamingLargeXmlTest].getResource("enterprise-info.xml").toURI
 
     val inputFactory = XMLInputFactory.newInstance

@@ -20,7 +20,7 @@ import java.{ util => jutil, io => jio }
 import scala.collection.immutable
 import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll, Ignore }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll, Ignore }
 import org.scalatest.junit.JUnitRunner
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
 import eu.cdevreeze.yaidom.queryapi.HasENameApi._
@@ -37,11 +37,11 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class HtmlTest extends Suite with BeforeAndAfterAll {
+class HtmlTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  @Test def testParseHtml(): Unit = {
+  test("testParseHtml") {
     val docParser = DocumentParserUsingSax.newInstance(new SAXFactoryImpl)
 
     val doc = docParser.parse(classOf[HtmlTest].getResourceAsStream("badHtmlExample.html"))
@@ -70,7 +70,7 @@ class HtmlTest extends Suite with BeforeAndAfterAll {
     }
   }
 
-  @Test def testRoundtripHtml(): Unit = {
+  test("testRoundtripHtml") {
     val docParser = DocumentParserUsingSax.newInstance(new SAXFactoryImpl)
 
     val doc = docParser.parse(classOf[HtmlTest].getResourceAsStream("badHtmlExample.html"))

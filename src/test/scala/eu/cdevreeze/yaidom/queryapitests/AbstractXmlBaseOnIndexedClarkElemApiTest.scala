@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.queryapitests
 import java.net.URI
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
+abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends FunSuite {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"
@@ -49,7 +49,7 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
     XmlBaseSupport.JdkUriResolver(uri, baseUriOption)
   }
 
-  @Test def testXmlBase(): Unit = {
+  test("testXmlBase") {
     val docElem = getDocElem("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
 
     testXmlBase(docElem)
@@ -58,7 +58,7 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
     docElem.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e, docElem))
   }
 
-  @Test def testXmlBase2(): Unit = {
+  test("testXmlBase2") {
     val docElem = getDocElem("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
 
     val elem = docElem
@@ -69,7 +69,7 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
     docElem.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e, docElem))
   }
 
-  @Test def testXmlBase3(): Unit = {
+  test("testXmlBase3") {
     val docElem = getDocElem("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml", new URI("http://bogusBaseUri"))
 
     val elem = docElem
@@ -80,7 +80,7 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
     docElem.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e, docElem))
   }
 
-  @Test def testXmlBase4(): Unit = {
+  test("testXmlBase4") {
     val docElem = getDocElem("/eu/cdevreeze/yaidom/queryapitests/xmlBaseTestFile.xml")
 
     val elem = docElem.findElem(_.resolvedName == EName("olist")).get
@@ -91,7 +91,7 @@ abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends Suite {
     docElem.findAllElemsOrSelf.foreach(e => testXmlBaseProperty2(e, docElem))
   }
 
-  @Test def testOtherXmlBase(): Unit = {
+  test("testOtherXmlBase") {
     val elem = getTestElem
 
     assertResult(new URI("http://example.org/wine/")) {

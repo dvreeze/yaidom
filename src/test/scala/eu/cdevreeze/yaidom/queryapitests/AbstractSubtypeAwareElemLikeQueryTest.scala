@@ -20,7 +20,7 @@ import scala.collection.immutable
 import scala.reflect.classTag
 
 import org.junit.Test
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
@@ -40,11 +40,11 @@ import AbstractSubtypeAwareElemLikeQueryTest._
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
+abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
 
   type E <: IndexedBridgeElem
 
-  @Test def testQueryTable(): Unit = {
+  test("testQueryTable") {
     val documentContent = new DocumentContent(wrappedDocumentContent)
 
     val tables = documentContent.findAllElemsOfType(classTag[Table])
@@ -78,7 +78,7 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends Suite {
     }
   }
 
-  @Test def testEqualities(): Unit = {
+  test("testEqualities") {
     val documentContent = new DocumentContent(wrappedDocumentContent)
 
     assertResult(documentContent.findAllElemsOfType(classTag[TableCell])) {

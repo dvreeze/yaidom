@@ -21,7 +21,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -55,12 +55,12 @@ import TransformEdifactTest.ElemSeqTransformers._
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class TransformEdifactTest extends Suite {
+class TransformEdifactTest extends FunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
   private val docPrinter = DocumentPrinterUsingSax.newInstance
 
-  @Test def testTransform(): Unit = {
+  test("testTransform") {
     val edifactDoc =
       indexed.Document(
         docParser.parse(classOf[TransformEdifactTest].getResource("edifact/sample-edifact.xml").toURI))
