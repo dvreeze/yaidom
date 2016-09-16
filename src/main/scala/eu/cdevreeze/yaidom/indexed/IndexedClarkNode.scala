@@ -113,8 +113,6 @@ object IndexedClarkNode {
     path: Path,
     underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with Node with Nodes.Elem {
 
-    type ThisElemApi = Elem[U]
-
     type ThisElem = Elem[U]
 
     def thisElem: ThisElem = this

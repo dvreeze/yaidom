@@ -81,8 +81,6 @@ final class ScalaXmlElem(
 
   type ThisNode = ScalaXmlNode
 
-  type ThisElemApi = ScalaXmlElem
-
   type ThisElem = ScalaXmlElem
 
   def thisElem: ThisElem = this

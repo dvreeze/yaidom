@@ -181,7 +181,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
 
-  type ThisElemApi <: UpdatableElemApi
+  type ThisElem <: UpdatableElemApi
 
   /** Returns the child nodes of this element, in the correct order */
   def children: immutable.IndexedSeq[ThisNode]
@@ -560,10 +560,10 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
 object UpdatableElemApi {
 
   /**
-   * This query API type, restricting ThisNode, ThisElem and ThisElemApi to the passed type parameters.
+   * This query API type, restricting ThisNode and ThisElem to the passed type parameters.
    *
    * @tparam N The node self type
    * @tparam E The element self type
    */
-  type Aux[N, E] = UpdatableElemApi { type ThisNode = N; type ThisElem = E; type ThisElemApi = E }
+  type Aux[N, E] = UpdatableElemApi { type ThisNode = N; type ThisElem = E }
 }

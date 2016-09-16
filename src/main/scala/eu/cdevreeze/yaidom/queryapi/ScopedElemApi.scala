@@ -60,7 +60,7 @@ import eu.cdevreeze.yaidom.core.QName
  */
 trait ScopedElemApi extends ClarkElemApi with HasQNameApi with HasScopeApi {
 
-  type ThisElemApi <: ScopedElemApi
+  type ThisElem <: ScopedElemApi
 
   /**
    * Returns the QName value of the attribute with the given expanded name, if any, wrapped in an `Option`.
@@ -93,9 +93,9 @@ trait ScopedElemApi extends ClarkElemApi with HasQNameApi with HasScopeApi {
 object ScopedElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = ScopedElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = ScopedElemApi { type ThisElem = E }
 }

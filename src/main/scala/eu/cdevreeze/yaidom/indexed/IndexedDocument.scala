@@ -47,7 +47,7 @@ abstract class IndexedDocument(
 
   require(documentElement.path == Path.Empty, "The document element must have the root Path")
 
-  type ThisDocApi <: IndexedDocument
+  type ThisDoc <: IndexedDocument
 
   type UnderlyingElem <: ScopedElemApi.Aux[UnderlyingElem]
 

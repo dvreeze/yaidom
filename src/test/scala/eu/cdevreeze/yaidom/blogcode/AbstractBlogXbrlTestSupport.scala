@@ -70,8 +70,6 @@ trait AbstractBlogXbrlTestSupport {
 
     require(childElems.map(_.indexedElem) == indexedElem.findAllChildElems)
 
-    type ThisElemApi = XbrliElem
-
     type ThisElem = XbrliElem
 
     def thisElem: ThisElem = this

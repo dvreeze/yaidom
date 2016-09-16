@@ -11,7 +11,7 @@ version := "1.6.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.11.7", "2.10.6") // ++ Seq("2.12.0-M3")
+crossScalaVersions := Seq("2.11.7", "2.10.6", "2.12.0-RC1")
 
 // See: Toward a safer Scala
 // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
@@ -38,7 +38,7 @@ libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12.0-M3")) "org.scalatest" % "scalatest_2.12.0-M3" % "2.2.5-M3" % "test"
+  if (version.contains("2.12.0-RC1")) "org.scalatest" % "scalatest_2.12.0-RC1" % "3.0.0" % "test"
   else "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 }
 

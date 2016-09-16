@@ -25,7 +25,6 @@ import scala.Vector
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.ConfigMap
 import org.scalatest.Ignore
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
@@ -74,7 +73,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(enames))
   QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(qnames))
 
-  override def beforeAll(configMap: ConfigMap): Unit = {
+  override def beforeAll(): Unit = {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 

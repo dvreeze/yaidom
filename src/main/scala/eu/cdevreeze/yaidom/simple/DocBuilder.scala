@@ -49,8 +49,6 @@ final class DocBuilder(
     children.collect({ case elm: ElemBuilder => elm }).size == 1,
     s"A document (builder) must have exactly one child element (builder) (${uriOption.map(_.toString).getOrElse("No URI found")})")
 
-  type ThisDocApi = DocBuilder
-
   type ThisDoc = DocBuilder
 
   type DocElemType = ElemBuilder

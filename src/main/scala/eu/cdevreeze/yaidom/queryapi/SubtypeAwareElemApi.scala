@@ -45,7 +45,7 @@ import scala.reflect.ClassTag
  */
 trait SubtypeAwareElemApi extends ElemApi {
 
-  type ThisElemApi <: SubtypeAwareElemApi
+  type ThisElem <: SubtypeAwareElemApi
 
   /**
    * Returns all child elements of the given sub-type, in the correct order.
@@ -111,9 +111,9 @@ trait SubtypeAwareElemApi extends ElemApi {
 object SubtypeAwareElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = SubtypeAwareElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = SubtypeAwareElemApi { type ThisElem = E }
 }

@@ -207,8 +207,8 @@ class ParallelExecutionTest extends Suite with BeforeAndAfterAll {
   private def doTestNumberOfRefEqualENames(enameProvider: ENameProvider, numberOfRefEqualGrandChildENames: Int): Unit = {
     ENameProvider.globalENameProvider.become(enameProvider)
 
-    val docParser = new ThreadLocalDocumentParser(DocumentParserUsingSax.newInstance)
-    val docPrinter = new ThreadLocalDocumentPrinter(DocumentPrinterUsingSax.newInstance)
+    val docParser = new ThreadLocalDocumentParser(() => DocumentParserUsingSax.newInstance())
+    val docPrinter = new ThreadLocalDocumentPrinter(() => DocumentPrinterUsingSax.newInstance())
 
     // No re-use (or pooling) of threads!
     implicit val execContext: ExecutionContext = ExecutionContext.fromExecutor(new juc.Executor {

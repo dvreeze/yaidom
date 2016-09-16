@@ -107,7 +107,7 @@ import scala.collection.immutable
  */
 trait TransformableElemApi extends AnyElemNodeApi {
 
-  type ThisElemApi <: TransformableElemApi
+  type ThisElem <: TransformableElemApi
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
@@ -202,10 +202,10 @@ trait TransformableElemApi extends AnyElemNodeApi {
 object TransformableElemApi {
 
   /**
-   * This query API type, restricting ThisNode, ThisElem and ThisElemApi to the passed type parameters.
+   * This query API type, restricting ThisNode and ThisElem to the passed type parameters.
    *
    * @tparam N The node self type
    * @tparam E The element self type
    */
-  type Aux[N, E] = TransformableElemApi { type ThisNode = N; type ThisElem = E; type ThisElemApi = E }
+  type Aux[N, E] = TransformableElemApi { type ThisNode = N; type ThisElem = E }
 }

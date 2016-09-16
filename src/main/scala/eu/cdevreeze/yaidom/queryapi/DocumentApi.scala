@@ -27,7 +27,7 @@ import java.net.URI
  */
 trait DocumentApi extends AnyDocumentApi {
 
-  type ThisDocApi <: DocumentApi
+  type ThisDoc <: DocumentApi
 
   /** Returns the document element */
   def documentElement: DocElemType
@@ -44,5 +44,5 @@ object DocumentApi {
    * @tparam D The document type itself
    * @tparam E The document element type
    */
-  type Aux[D, E] = DocumentApi { type ThisDoc = D; type ThisDocApi = D; type DocElemType = E }
+  type Aux[D, E] = DocumentApi { type ThisDoc = D; type DocElemType = E }
 }

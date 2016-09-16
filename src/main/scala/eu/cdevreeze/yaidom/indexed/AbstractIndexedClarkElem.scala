@@ -41,7 +41,7 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
   val path: Path,
   val underlyingElem: U) extends Nodes.Elem with IndexedClarkElemApi with ClarkElemLike {
 
-  type ThisElemApi <: AbstractIndexedClarkElem[U]
+  type ThisElem <: AbstractIndexedClarkElem.Aux[ThisElem, U]
 
   @deprecated(message = "Use 'underlyingElem' instead", since = "1.6.0")
   final def elem: U = underlyingElem
@@ -102,4 +102,15 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
   final def reverseAncestry: immutable.IndexedSeq[ThisElem] = {
     reverseAncestryOrSelf.init
   }
+}
+
+object AbstractIndexedClarkElem {
+
+  /**
+   * This query API type, restricting ThisElem to the first type parameter.
+   *
+   * @tparam E The element self type
+   * @tparam U The underlying element type
+   */
+  type Aux[E, U <: ClarkElemApi.Aux[U]] = AbstractIndexedClarkElem[U] { type ThisElem = E }
 }

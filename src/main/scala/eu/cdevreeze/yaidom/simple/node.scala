@@ -186,8 +186,6 @@ final class Elem(
 
   type ThisNode = Node
 
-  type ThisElemApi = Elem
-
   type ThisElem = Elem
 
   def thisElem: ThisElem = this

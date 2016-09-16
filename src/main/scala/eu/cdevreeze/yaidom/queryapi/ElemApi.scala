@@ -147,7 +147,7 @@ import scala.collection.immutable
  */
 trait ElemApi extends AnyElemApi {
 
-  type ThisElemApi <: ElemApi
+  type ThisElem <: ElemApi
 
   /**
    * '''Core method''' that returns '''all child elements''', in the correct order.
@@ -253,11 +253,11 @@ trait ElemApi extends AnyElemApi {
 object ElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = ElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = ElemApi { type ThisElem = E }
 
   /**
    * Element predicate that filters away no elements, and that can be used in many methods of the ElemApi trait.

@@ -36,8 +36,6 @@ import eu.cdevreeze.yaidom.core.Path
  */
 final class ElemWithPath[E <: IsNavigableApi.Aux[E]](val elem: E, val path: Path) extends ElemLike {
 
-  type ThisElemApi = ElemWithPath[E]
-
   type ThisElem = ElemWithPath[E]
 
   def thisElem: ThisElem = this

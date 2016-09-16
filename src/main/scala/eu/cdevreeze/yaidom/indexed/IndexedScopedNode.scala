@@ -59,8 +59,6 @@ object IndexedScopedNode {
     path: Path,
     underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with BackingElemApi with ScopedElemLike with HasParent with Nodes.Elem {
 
-    type ThisElemApi = Elem[U]
-
     type ThisElem = Elem[U]
 
     def thisElem: ThisElem = this

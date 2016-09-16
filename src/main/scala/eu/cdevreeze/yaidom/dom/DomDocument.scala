@@ -38,8 +38,6 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 final class DomDocument(val wrappedDocument: w3c.dom.Document) extends DocumentApi {
   require(wrappedDocument ne null)
 
-  type ThisDocApi = DomDocument
-
   type ThisDoc = DomDocument
 
   type DocElemType = DomElem

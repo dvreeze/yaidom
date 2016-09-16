@@ -126,8 +126,6 @@ final class ElemBuilder(
 
   type ThisNode = NodeBuilder
 
-  type ThisElemApi = ElemBuilder
-
   type ThisElem = ElemBuilder
 
   def thisElem: ThisElem = this

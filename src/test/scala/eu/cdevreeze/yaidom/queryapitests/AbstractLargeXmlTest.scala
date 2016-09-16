@@ -22,7 +22,6 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.ConfigMap
 import org.scalatest.Ignore
 import org.scalatest.Suite
 
@@ -62,7 +61,7 @@ abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
 
   protected def parseDocument(is: jio.InputStream): D
 
-  override def beforeAll(configMap: ConfigMap): Unit = {
+  override def beforeAll(): Unit = {
     val zipFileUrl = classOf[AbstractLargeXmlTest].getResource("/eu/cdevreeze/yaidom/integrationtest/veryBigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 

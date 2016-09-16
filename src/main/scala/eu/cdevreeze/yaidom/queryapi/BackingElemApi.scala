@@ -16,11 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import java.net.URI
-
 import scala.collection.immutable
 
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 
 /**
@@ -38,7 +35,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait BackingElemApi extends IndexedScopedElemApi with HasParentApi {
 
-  type ThisElemApi <: BackingElemApi
+  type ThisElem <: BackingElemApi
 
   // Restricting AnyElemApi methods to use "this ThisElem", to prevent down-casts in code using this "raw" query API trait
 
@@ -118,9 +115,9 @@ trait BackingElemApi extends IndexedScopedElemApi with HasParentApi {
 object BackingElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = BackingElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = BackingElemApi { type ThisElem = E }
 }

@@ -41,7 +41,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait IsNavigableApi extends AnyElemApi {
 
-  type ThisElemApi <: IsNavigableApi
+  type ThisElem <: IsNavigableApi
 
   /**
    * Returns all child elements paired with their path entries.
@@ -94,9 +94,9 @@ trait IsNavigableApi extends AnyElemApi {
 object IsNavigableApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = IsNavigableApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = IsNavigableApi { type ThisElem = E }
 }

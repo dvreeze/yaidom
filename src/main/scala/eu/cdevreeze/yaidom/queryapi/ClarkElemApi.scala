@@ -34,15 +34,15 @@ package eu.cdevreeze.yaidom.queryapi
  */
 trait ClarkElemApi extends ElemApi with IsNavigableApi with HasENameApi with HasTextApi {
 
-  type ThisElemApi <: ClarkElemApi
+  type ThisElem <: ClarkElemApi
 }
 
 object ClarkElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = ClarkElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = ClarkElemApi { type ThisElem = E }
 }

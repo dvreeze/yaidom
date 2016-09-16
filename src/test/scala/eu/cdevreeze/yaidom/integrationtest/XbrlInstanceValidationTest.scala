@@ -148,8 +148,6 @@ object XbrlInstanceValidationTest {
    */
   sealed class XbrliElem(val underlyingElem: IndexedScopedElemApi) extends ScopedElemLike with SubtypeAwareElemLike {
 
-    type ThisElemApi = XbrliElem
-
     type ThisElem = XbrliElem
 
     def thisElem: ThisElem = this

@@ -113,8 +113,6 @@ trait SaxonTestSupport {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.DOCUMENT)
 
-    type ThisDocApi = DomDocument
-
     type ThisDoc = DomDocument
 
     type DocElemType = DomElem
@@ -143,8 +141,6 @@ trait SaxonTestSupport {
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
-
-    type ThisElemApi = DomElem
 
     type ThisElem = DomElem
 

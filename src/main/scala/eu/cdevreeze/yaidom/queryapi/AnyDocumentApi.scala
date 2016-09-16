@@ -24,18 +24,11 @@ package eu.cdevreeze.yaidom.queryapi
 trait AnyDocumentApi {
 
   /**
-   * Upperbound on type ThisDoc, which must be restricted to a sub-type of the "document API" trait or class in question.
+   * The document type itself. It must be restricted to a sub-type of the document API trait in question.
    *
    * Concrete document classes will restrict this type to that document class itself.
    */
-  type ThisDocApi <: AnyDocumentApi
-
-  /**
-   * The ("stable") document type itself. It is not restricted in the "document API" traits and classes (only indirectly, through ThisDocApi).
-   *
-   * Concrete document classes will restrict this type to that document class itself.
-   */
-  type ThisDoc <: ThisDocApi
+  type ThisDoc <: AnyDocumentApi
 
   /**
    * The type of the document element.

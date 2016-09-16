@@ -26,8 +26,9 @@ package eu.cdevreeze.yaidom
  * Most API traits are orthogonal, but some API traits are useful combinations of other ones. Examples include
  * the above-mentioned `ClarkElemApi` and `ScopedElemApi` traits.
  *
- * Simplicity and consistency of the entire query API are 2 important design considerations. For example, the query
- * API methods themselves use no generics.
+ * <em>Simplicity</em> and <em>consistency</em> of the entire query API are 2 important design considerations. For example, the query
+ * API methods themselves use no generics. Note how the resulting API with type members is essentially the same as the
+ * "old" yaidom query API using type parameters, except that the purely abstract traits are less constrained in the type members.
  *
  * This package depends only on the core package in yaidom, but many other packages do depend on this one.
  *
@@ -35,7 +36,7 @@ package eu.cdevreeze.yaidom
  * essentially just uses type member ThisElem, defined in a common super-trait. The old query API may be somewhat easier to develop
  * (that is, convincing the compiler), but the new query API is easier to use as generic "backend" element query API. As an example,
  * common "bridge" element query APIs come to mind, used within type-safe XML dialect DOM tree implementations. The reason
- * this is easier with the new API is intuitively that far fewer type constraints leak to the query API client code.
+ * this is easier with the new API is intuitively that fewer type constraints leak to the query API client code.
  *
  * @author Chris de Vreeze
  */

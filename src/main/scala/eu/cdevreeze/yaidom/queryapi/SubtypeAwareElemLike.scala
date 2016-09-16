@@ -28,7 +28,7 @@ import ElemApi.anyElem
  */
 trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
-  type ThisElemApi <: SubtypeAwareElemLike
+  type ThisElem <: SubtypeAwareElemLike.Aux[ThisElem]
 
   final def findAllChildElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterChildElemsOfType(subType)(anyElem)
@@ -95,7 +95,7 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
     val p2: (ThisElem => Boolean) = {
       case elem: B if p(elem) => true
-      case _ => false
+      case _                  => false
     }
 
     f(p2) collect {
@@ -111,7 +111,7 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
     val p2: (ThisElem => Boolean) = {
       case elem: B if p(elem) => true
-      case _ => false
+      case _                  => false
     }
 
     f(p2) collect {
@@ -123,9 +123,9 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 object SubtypeAwareElemLike {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = SubtypeAwareElemLike { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = SubtypeAwareElemLike { type ThisElem = E }
 }

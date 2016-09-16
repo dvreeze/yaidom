@@ -186,8 +186,6 @@ object XbrlSchemaTest {
 
   class XsdElem(val wrappedElem: eu.cdevreeze.yaidom.indexed.Elem) extends SubtypeAwareElemLike with ClarkElemLike {
 
-    type ThisElemApi = XsdElem
-
     type ThisElem = XsdElem
 
     def thisElem: ThisElem = this

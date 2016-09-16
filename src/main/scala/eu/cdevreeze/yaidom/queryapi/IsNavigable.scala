@@ -33,7 +33,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait IsNavigable extends IsNavigableApi {
 
-  type ThisElemApi <: IsNavigable
+  type ThisElem <: IsNavigable.Aux[ThisElem]
 
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)]
 
@@ -81,9 +81,9 @@ trait IsNavigable extends IsNavigableApi {
 object IsNavigable {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = IsNavigable { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = IsNavigable { type ThisElem = E }
 }

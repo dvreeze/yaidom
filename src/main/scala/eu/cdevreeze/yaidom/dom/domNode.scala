@@ -86,8 +86,6 @@ final class DomElem(
 
   require(wrappedNode ne null)
 
-  type ThisElemApi = DomElem
-
   type ThisElem = DomElem
 
   def thisElem: ThisElem = this

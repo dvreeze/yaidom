@@ -802,8 +802,6 @@ object JDomWrapperTest {
 
     require(wrappedNode ne null)
 
-    type ThisElemApi = JDomElem
-
     type ThisElem = JDomElem
 
     override type DomType = org.jdom2.Element

@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.core.Declarations
  */
 trait IndexedScopedElemApi extends IndexedClarkElemApi with ScopedElemApi {
 
-  type ThisElemApi <: IndexedScopedElemApi
+  type ThisElem <: IndexedScopedElemApi
 
   /**
    * Returns the namespaces declared in this element.
@@ -40,9 +40,9 @@ trait IndexedScopedElemApi extends IndexedClarkElemApi with ScopedElemApi {
 object IndexedScopedElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = IndexedScopedElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = IndexedScopedElemApi { type ThisElem = E }
 }

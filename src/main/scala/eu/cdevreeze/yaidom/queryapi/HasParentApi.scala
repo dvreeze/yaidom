@@ -27,7 +27,7 @@ import scala.collection.immutable
  */
 trait HasParentApi extends AnyElemApi {
 
-  type ThisElemApi <: HasParentApi
+  type ThisElem <: HasParentApi
 
   /**
    * Returns the parent element, if any, wrapped in an Option
@@ -66,9 +66,9 @@ trait HasParentApi extends AnyElemApi {
 object HasParentApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = HasParentApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = HasParentApi { type ThisElem = E }
 }

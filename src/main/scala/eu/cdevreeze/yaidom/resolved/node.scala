@@ -26,7 +26,6 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -133,8 +132,6 @@ final case class Elem(
   require(children ne null)
 
   type ThisNode = Node
-
-  type ThisElemApi = Elem
 
   type ThisElem = Elem
 

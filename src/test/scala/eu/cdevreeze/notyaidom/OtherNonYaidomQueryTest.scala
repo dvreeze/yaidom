@@ -988,23 +988,19 @@ object OtherNonYaidomQueryTest {
 
   trait AnyElemApi {
 
-    // The 2 type members below are instrumental in implementing F-bounded polymorphism.
-    // Type ThisApi must always be a sub-type of the API trait or concrete element type in question.
-    // Type ThisElem (the "real self type") must be a sub-type of ThisApi everywhere.
+    // The type member below is used for implementing F-bounded polymorphism.
     // Note that we need no surrounding cake, and we need no types like ThisApi#ThisElem.
 
     // For F-bounded polymorphism in DOT, see http://www.cs.uwm.edu/~boyland/fool2012/papers/fool2012_submission_3.pdf.
 
-    type ThisApi <: AnyElemApi
-
-    type ThisElem <: ThisApi
+    type ThisElem <: AnyElemApi
 
     def thisElem: ThisElem
   }
 
   trait ElemApi extends AnyElemApi {
 
-    type ThisApi <: ElemApi
+    type ThisElem <: ElemApi
 
     def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
 
@@ -1015,9 +1011,9 @@ object OtherNonYaidomQueryTest {
     def findAllElemsOrSelf(): immutable.IndexedSeq[ThisElem]
   }
 
-  trait ElemLike extends ElemApi {
+  trait ElemLike extends ElemApi { self =>
 
-    type ThisApi <: ElemLike
+    type ThisElem <: ElemLike { type ThisElem = self.ThisElem }
 
     final def findAllChildElems(): immutable.IndexedSeq[ThisElem] = {
       filterChildElems(_ => true)
@@ -1049,8 +1045,6 @@ object OtherNonYaidomQueryTest {
     val name: String,
     val attributes: Map[String, String],
     val children: immutable.IndexedSeq[Node]) extends Node with ElemLike {
-
-    type ThisApi = Elem
 
     type ThisElem = Elem
 

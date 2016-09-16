@@ -182,8 +182,6 @@ object AbstractSubtypeAwareElemLikeQueryTest {
    */
   sealed class SpreadsheetElem(val bridgeElem: IndexedBridgeElem) extends ScopedElemLike with SubtypeAwareElemLike {
 
-    type ThisElemApi = SpreadsheetElem
-
     type ThisElem = SpreadsheetElem
 
     def thisElem: ThisElem = this

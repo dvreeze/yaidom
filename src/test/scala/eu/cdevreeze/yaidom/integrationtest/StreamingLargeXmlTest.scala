@@ -24,7 +24,6 @@ import java.{ util => jutil }
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.ConfigMap
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
@@ -47,7 +46,7 @@ class StreamingLargeXmlTest extends Suite with BeforeAndAfterAll {
 
   @volatile private var xmlBytes: Array[Byte] = _
 
-  override def beforeAll(configMap: ConfigMap): Unit = {
+  override def beforeAll(): Unit = {
     val zipFileUrl = classOf[StreamingLargeXmlTest].getResource("bigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 

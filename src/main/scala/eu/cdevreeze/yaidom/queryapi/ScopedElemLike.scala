@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.core.QName
  */
 trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
 
-  type ThisElemApi <: ScopedElemLike
+  type ThisElem <: ScopedElemLike.Aux[ThisElem]
 
   final def attributeAsQNameOption(expandedName: EName): Option[QName] =
     attributeOption(expandedName).map(v => QName(v.trim))
@@ -56,9 +56,9 @@ trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
 object ScopedElemLike {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = ScopedElemLike { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = ScopedElemLike { type ThisElem = E }
 }

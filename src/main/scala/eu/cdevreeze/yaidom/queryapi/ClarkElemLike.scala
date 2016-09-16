@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable with HasEName with HasText {
 
-  type ThisElemApi <: ClarkElemLike
+  type ThisElem <: ClarkElemLike.Aux[ThisElem]
 
   /**
    * Finds the child element with the given `Path.Entry` (where this element is the root), if any, wrapped in an `Option`.
@@ -84,9 +84,9 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable with Has
 object ClarkElemLike {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = ClarkElemLike { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = ClarkElemLike { type ThisElem = E }
 }

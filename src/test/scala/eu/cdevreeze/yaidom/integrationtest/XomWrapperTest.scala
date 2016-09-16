@@ -739,8 +739,6 @@ object XomWrapperTest {
 
     require(wrappedNode ne null)
 
-    type ThisElemApi = XomElem
-
     type ThisElem = XomElem
 
     override type DomType = nu.xom.Element

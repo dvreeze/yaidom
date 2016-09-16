@@ -40,8 +40,6 @@ private[utils] object XmlSchemas {
    */
   sealed class XsdElem private[utils] (val elem: indexed.Elem) extends SubtypeAwareElemLike with ClarkElemLike {
 
-    type ThisElemApi = XsdElem
-
     type ThisElem = XsdElem
 
     def thisElem: ThisElem = this

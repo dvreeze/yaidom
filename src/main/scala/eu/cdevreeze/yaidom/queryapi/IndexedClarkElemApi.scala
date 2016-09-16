@@ -33,7 +33,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait IndexedClarkElemApi extends ClarkElemApi {
 
-  type ThisElemApi <: IndexedClarkElemApi
+  type ThisElem <: IndexedClarkElemApi
 
   /**
    * The optional document URI of the containing document, if any
@@ -117,9 +117,9 @@ trait IndexedClarkElemApi extends ClarkElemApi {
 object IndexedClarkElemApi {
 
   /**
-   * This query API type, restricting ThisElem and ThisElemApi to the type parameter.
+   * This query API type, restricting ThisElem to the type parameter.
    *
    * @tparam E The element self type
    */
-  type Aux[E] = IndexedClarkElemApi { type ThisElem = E; type ThisElemApi = E }
+  type Aux[E] = IndexedClarkElemApi { type ThisElem = E }
 }

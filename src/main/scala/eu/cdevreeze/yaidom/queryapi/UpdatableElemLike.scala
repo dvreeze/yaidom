@@ -38,7 +38,7 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
 
-  type ThisElemApi <: UpdatableElemLike with IsNavigableApi.Aux[ThisElem]
+  type ThisElem <: UpdatableElemLike.Aux[ThisNode, ThisElem]
 
   def children: immutable.IndexedSeq[ThisNode]
 
@@ -316,10 +316,10 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
 object UpdatableElemLike {
 
   /**
-   * This query API type, restricting ThisNode, ThisElem and ThisElemApi to the passed type parameters.
+   * This query API type, restricting ThisNode and ThisElem to the passed type parameters.
    *
    * @tparam N The node self type
    * @tparam E The element self type
    */
-  type Aux[N, E] = UpdatableElemLike { type ThisNode = N; type ThisElem = E; type ThisElemApi = E }
+  type Aux[N, E] = UpdatableElemLike { type ThisNode = N; type ThisElem = E }
 }
