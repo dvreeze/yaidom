@@ -73,7 +73,7 @@ class LargeXmlTest extends Suite with BeforeAndAfterAll {
   ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(enames))
   QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(qnames))
 
-  override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit = {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 

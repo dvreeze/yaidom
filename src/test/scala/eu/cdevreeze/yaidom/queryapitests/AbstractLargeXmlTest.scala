@@ -61,7 +61,7 @@ abstract class AbstractLargeXmlTest extends Suite with BeforeAndAfterAll {
 
   protected def parseDocument(is: jio.InputStream): D
 
-  override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit = {
     val zipFileUrl = classOf[AbstractLargeXmlTest].getResource("/eu/cdevreeze/yaidom/integrationtest/veryBigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 
