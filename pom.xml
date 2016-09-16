@@ -182,7 +182,7 @@
 		<dependency>
 			<groupId>org.scalacheck</groupId>
 			<artifactId>scalacheck_${scala.binary.version}</artifactId>
-			<version>1.11.6</version>
+			<version>1.13.2</version>
 			<scope>test</scope>
 		</dependency>
 

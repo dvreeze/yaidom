@@ -42,7 +42,7 @@ libraryDependencies <+= scalaBinaryVersion apply { version =>
   else "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 }
 
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.6" % "test"
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
