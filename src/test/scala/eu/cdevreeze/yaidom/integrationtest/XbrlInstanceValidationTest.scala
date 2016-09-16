@@ -43,7 +43,7 @@ import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 class XbrlInstanceValidationTest extends FunSuite {
   import XbrlInstanceValidationTest._
 
-  def testValidateInstance(): Unit = {
+  test("testValidateInstance") {
     val parser = DocumentParserUsingSax.newInstance()
 
     val doc: Document =

@@ -43,7 +43,7 @@ class XbrlSchemaTest extends FunSuite {
 
   val xsNs = "http://www.w3.org/2001/XMLSchema"
 
-  def testQueryXbrlSchema(): Unit = {
+  test("testQueryXbrlSchema") {
     val parser = DocumentParserUsingSax.newInstance()
     val doc: eu.cdevreeze.yaidom.simple.Document =
       parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("gaap.xsd"))
@@ -120,7 +120,7 @@ class XbrlSchemaTest extends FunSuite {
     }
   }
 
-  def testQueryMultipleXsds(): Unit = {
+  test("testQueryMultipleXsds") {
     val parser = DocumentParserUsingSax.newInstance()
     val ipoDoc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("ipo.xsd"))
     val addressDoc: Document =
