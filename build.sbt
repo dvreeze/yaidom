@@ -11,7 +11,7 @@ version := "1.6.0-M4"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.11.7", "2.12.0-RC1") // "2.10.6"
+crossScalaVersions := Seq("2.11.7", "2.12.0-RC1")
 
 // See: Toward a safer Scala
 // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
@@ -28,9 +28,9 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warning
   if (version.contains("2.11")) newSourceDirs else Seq()
 }
 
-libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (!version.contains("2.10")) Seq("org.scala-lang.modules" %% "scala-xml" % "1.0.5")
-  else Seq()
+libraryDependencies <+= scalaBinaryVersion apply { version =>
+  if (version.contains("2.12.0-RC1")) "org.scala-lang.modules" % "scala-xml_2.12.0-RC1" % "1.0.5"
+  else "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
@@ -42,7 +42,10 @@ libraryDependencies <+= scalaBinaryVersion apply { version =>
   else "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 }
 
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
+libraryDependencies <+= scalaBinaryVersion apply { version =>
+  if (version.contains("2.12.0-RC1")) "org.scalacheck" % "scalacheck_2.12.0-RC1" % "1.13.2" % "test"
+  else "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
+}
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
