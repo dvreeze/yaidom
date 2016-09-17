@@ -8,8 +8,8 @@ CHANGELOG
 
 Milestone 4 of 1.6.0 fixes compilation errors against Scala 2.12.0-RC1. The query API traits with partial implementations
 had to be more strict in the constraints on type member ThisElem, analogous to the constraints on the corresponding
-type parameters in yaidom before version 1.6.X. The gain is in the fact that type members ThisElemApi (and ThisDocApi)
-are no longer needed; type member ThisElem (and ThisDoc) suffices.
+type parameters in yaidom before version 1.6.X. The gain is in the fact that type member ThisElemApi (or ThisDocApi)
+is no longer needed; type member ThisElem (or ThisDoc) suffices.
 
 So the net result is that the query API traits differ from the ones in yaidom before version 1.6.X in the following way:
 * Type members are used instead of type parameters, thus improving readability and reducing clutter
