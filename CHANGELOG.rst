@@ -3,6 +3,27 @@ CHANGELOG
 =========
 
 
+1.6.0-M4
+========
+
+Milestone 4 of 1.6.0 fixes compilation errors against Scala 2.12.0-RC1. The query API traits with partial implementations
+had to be more strict in the constraints on type member ThisElem, analogous to the constraints on the corresponding
+type parameters in yaidom before version 1.6.X. The gain is in the fact that type members ThisElemApi (and ThisDocApi)
+are no longer needed; type member ThisElem (and ThisDoc) suffices.
+
+So the net result is that the query API traits differ from the ones in yaidom before version 1.6.X in the following way:
+* Type members are used instead of type parameters, thus improving readability and reducing clutter
+* The purely abstract query API traits have simple non-restrictive type constraints on the type members (not involving the "self" type)
+* This makes query API (combination) trait BackingElemApi an easy to use abstraction over multiple element implementations
+* The partial implementation query API traits have type constraints analogous to the ones in yaidom before version 1.6.X
+* The resulting query API is consistent and simple, like before, but better supporting abstractions over element implementations
+
+Other changes are:
+* Scala 2.10 is no longer supported. Instead, cross-compilation against Scala 2.12.0-RC1 is done.
+* Scalatest has been upgraded to version 3.0.0
+* One streaming test case is ignored, because of infinite loops (whatever the cause) in Scala 2.12.0-RC1. This must be analyzed.
+
+
 1.6.0-M3
 ========
 
