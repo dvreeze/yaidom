@@ -18,19 +18,22 @@ crossScalaVersions := Seq("2.11.7", "2.12.0-RC1")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
-(unmanagedSourceDirectories in Compile) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq() // Not yet used
-  if (version.contains("2.11")) newSourceDirs else Seq()
+(unmanagedSourceDirectories in Compile) <++= (scalaBinaryVersion, baseDirectory) apply { case (version, base) =>
+  if (version.contains("2.12")) Seq(base / "src" / "main" / "scala-2.12") else Seq()
 }
 
-(unmanagedSourceDirectories in Test) <++= scalaBinaryVersion apply { version =>
-  val newSourceDirs = Seq() // Not yet used
-  if (version.contains("2.11")) newSourceDirs else Seq()
+(unmanagedSourceDirectories in Test) <++= (scalaBinaryVersion, baseDirectory) apply { case (version, base) =>
+  if (version.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12") else Seq()
 }
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
   if (version.contains("2.12.0-RC1")) "org.scala-lang.modules" % "scala-xml_2.12.0-RC1" % "1.0.5"
   else "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
+}
+
+libraryDependencies <++= scalaBinaryVersion apply { version =>
+  if (version.contains("2.12.0-RC1")) Seq("org.scala-lang.modules" % "scala-java8-compat_2.12.0-RC1" % "0.8.0-RC7")
+  else Seq()
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
