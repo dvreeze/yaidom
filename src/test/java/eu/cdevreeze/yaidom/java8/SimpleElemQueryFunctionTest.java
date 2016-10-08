@@ -12,8 +12,8 @@ import org.junit.Test;
 
 import eu.cdevreeze.yaidom.core.EName;
 import eu.cdevreeze.yaidom.java8.elems.SimpleElems;
-import eu.cdevreeze.yaidom.java8.functionapi.ScopedElemFunctionApi;
 import eu.cdevreeze.yaidom.java8.functionapi.JavaStreamUtil;
+import eu.cdevreeze.yaidom.java8.functionapi.ScopedElemFunctionApi;
 import eu.cdevreeze.yaidom.parse.DocumentParser;
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax;
 import eu.cdevreeze.yaidom.simple.Document;
@@ -25,10 +25,11 @@ public class SimpleElemQueryFunctionTest {
 	public void testQueryBookTitles() {
 		// XPath: doc("bookstore.xml")/Bookstore/Book/Title
 
-		Stream<Elem> bookTitles = ops.filterChildElems(bookstore,
-				book -> "Book".equals(ops.localName(book))).map(
-				e -> ops.getChildElem(e,
-						e2 -> "Title".equals(ops.localName(e2))));
+		Stream<Elem> books = ops.filterChildElems(bookstore,
+				book -> "Book".equals(ops.localName(book)));
+
+		Stream<Elem> bookTitles = books.map(e -> ops.getChildElem(e,
+				e2 -> "Title".equals(ops.localName(e2))));
 
 		assertEquals(
 				bookTitles.map(e -> ops.trimmedText(e)).collect(
@@ -48,10 +49,11 @@ public class SimpleElemQueryFunctionTest {
 		EName bookEName = EName.apply(ns, "Book");
 		EName titleEName = EName.apply(ns, "Title");
 
-		Stream<Elem> bookTitles = ops.filterChildElems(bookstore,
-				book -> bookEName.equals(ops.resolvedName(book))).map(
-				e -> ops.getChildElem(e,
-						e2 -> titleEName.equals(ops.resolvedName(e2))));
+		Stream<Elem> books = ops.filterChildElems(bookstore,
+				book -> bookEName.equals(ops.resolvedName(book)));
+
+		Stream<Elem> bookTitles = books.map(e -> ops.getChildElem(e,
+				e2 -> titleEName.equals(ops.resolvedName(e2))));
 
 		assertEquals(
 				bookTitles.map(e -> ops.trimmedText(e)).collect(
