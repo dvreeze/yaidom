@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8.queryapi
+package eu.cdevreeze.yaidom.java8.functionapi
 
 import java.net.URI
 import java.util.Optional
@@ -26,53 +26,52 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 
 /**
- * Equivalent of `BackingElemApi`, but returning Java 8 Streams, to be used in Java code.
+ * Equivalent of `BackingElemApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
+ * in Java code.
  *
  * @author Chris de Vreeze
  */
-trait BackingElemStreamApi extends ScopedElemStreamApi {
-
-  type ThisElem <: BackingElemStreamApi
+trait BackingElemFunctionApi[E] extends ScopedElemFunctionApi[E] {
 
   // IndexedScopedElemApi own methods
 
-  def namespaces: Declarations
+  def namespaces(elem: E): Declarations
 
   // IndexedClarkElemApi own methods
 
-  def docUriOption: Optional[URI]
+  def docUriOption(elem: E): Optional[URI]
 
-  def docUri: URI
+  def docUri(elem: E): URI
 
-  def rootElem: ThisElem
+  def rootElem(elem: E): E
 
-  def path: Path
+  def path(elem: E): Path
 
-  def baseUriOption: Optional[URI]
+  def baseUriOption(elem: E): Optional[URI]
 
-  def baseUri: URI
+  def baseUri(elem: E): URI
 
-  def parentBaseUriOption: Optional[URI]
+  def parentBaseUriOption(elem: E): Optional[URI]
 
-  def reverseAncestryOrSelfENames: Stream[EName]
+  def reverseAncestryOrSelfENames(elem: E): Stream[EName]
 
-  def reverseAncestryENames: Stream[EName]
+  def reverseAncestryENames(elem: E): Stream[EName]
 
-  def reverseAncestryOrSelf: Stream[ThisElem]
+  def reverseAncestryOrSelf(elem: E): Stream[E]
 
-  def reverseAncestry: Stream[ThisElem]
+  def reverseAncestry(elem: E): Stream[E]
 
   // HasParentApi methods
 
-  def parentOption: Optional[ThisElem]
+  def parentOption(elem: E): Optional[E]
 
-  def parent: ThisElem
+  def parent(elem: E): E
 
-  def ancestorsOrSelf: Stream[ThisElem]
+  def ancestorsOrSelf(elem: E): Stream[E]
 
-  def ancestors: Stream[ThisElem]
+  def ancestors(elem: E): Stream[E]
 
-  def findAncestorOrSelf(p: Predicate[ThisElem]): Optional[ThisElem]
+  def findAncestorOrSelf(elem: E, p: Predicate[E]): Optional[E]
 
-  def findAncestor(p: Predicate[ThisElem]): Optional[ThisElem]
+  def findAncestor(elem: E, p: Predicate[E]): Optional[E]
 }

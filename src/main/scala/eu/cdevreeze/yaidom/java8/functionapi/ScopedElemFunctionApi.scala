@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8.queryapi
+package eu.cdevreeze.yaidom.java8.functionapi
 
 import java.util.Optional
 import java.util.stream.Stream
@@ -24,40 +24,34 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 
 /**
- * Equivalent of `ScopedElemApi`, but returning Java 8 Streams, to be used in Java code.
+ * Equivalent of `ScopedElemApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
+ * in Java code.
  *
  * @author Chris de Vreeze
  */
-trait ScopedElemStreamApi extends ClarkElemStreamApi {
-
-  type ThisElem <: ScopedElemStreamApi
+trait ScopedElemFunctionApi[E] extends ClarkElemFunctionApi[E] {
 
   // HasQNameApi methods
 
-  def qname: QName
+  def qname(elem: E): QName
 
-  def attributes: Stream[ScopedElemStreamApi.Attr]
+  def attributes(elem: E): Stream[Attr]
 
   // HasScopeApi
 
-  def scope: Scope
+  def scope(elem: E): Scope
 
   // ScopedElemApi own methods
 
-  def attributeAsQNameOption(expandedName: EName): Optional[QName]
+  def attributeAsQNameOption(elem: E, expandedName: EName): Optional[QName]
 
-  def attributeAsQName(expandedName: EName): QName
+  def attributeAsQName(elem: E, expandedName: EName): QName
 
-  def attributeAsResolvedQNameOption(expandedName: EName): Optional[EName]
+  def attributeAsResolvedQNameOption(elem: E, expandedName: EName): Optional[EName]
 
-  def attributeAsResolvedQName(expandedName: EName): EName
+  def attributeAsResolvedQName(elem: E, expandedName: EName): EName
 
-  def textAsQName: QName
+  def textAsQName(elem: E): QName
 
-  def textAsResolvedQName: EName
-}
-
-object ScopedElemStreamApi {
-
-  final case class Attr(val qname: QName, val value: String)
+  def textAsResolvedQName(elem: E): EName
 }
