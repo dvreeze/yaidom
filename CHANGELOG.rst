@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+1.6.0-M5
+========
+
+Milestone 5 of version 1.6.0 offers some experimental support for Java 8, making yaidom easy to use in Java 8. To that end,
+yaidom offers a Java 8 facade to its query API, using the Java 8 Stream and Optional APIs.
+
+
 1.6.0-M4
 ========
 
