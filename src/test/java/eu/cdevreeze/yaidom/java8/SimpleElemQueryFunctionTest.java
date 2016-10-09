@@ -90,6 +90,32 @@ public class SimpleElemQueryFunctionTest {
 						Collectors.toSet()));
 	}
 
+	@Test
+	public void testQueryCheapBooks() {
+		// XPath: doc("bookstore.xml")/Bookstore/Book[@Price < 90]
+
+		Stream<Elem> books = ops.filterChildElems(bookstore,
+				book -> "Book".equals(ops.localName(book)));
+
+		EName priceEName = EName.apply("Price");
+
+		Stream<Elem> cheapBooks = books.filter(e -> JavaStreamUtil.toStream(
+				ops.attributeOption(e, priceEName)).anyMatch(
+				a -> java.lang.Integer.parseInt(a) < 90));
+
+		Stream<Elem> cheapBookTitles = cheapBooks.flatMap(e -> JavaStreamUtil
+				.toStream(ops.findChildElem(e,
+						e2 -> "Title".equals(ops.localName(e2)))));
+
+		assertEquals(
+				cheapBookTitles.map(e -> ops.trimmedText(e)).collect(
+						Collectors.toSet()),
+				Stream.of("A First Course in Database Systems",
+						"Hector and Jeff's Database Hints",
+						"Jennifer's Economical Database Hints").collect(
+						Collectors.toSet()));
+	}
+
 	private Elem getBookstore() {
 		DocumentParser docParser = DocumentParserUsingSax.newInstance();
 		URI docUri;
