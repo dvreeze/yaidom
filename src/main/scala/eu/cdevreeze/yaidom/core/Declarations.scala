@@ -96,6 +96,9 @@ final case class Declarations(prefixNamespaceMap: Map[String, String]) extends I
   /** Alias for `minus` */
   def --(prefixes: Set[String]): Declarations = minus(prefixes)
 
+  /** Alias for `append(Declarations.from((prefix, namespace)))` */
+  def append(prefix: String, namespace: String): Declarations = append(Declarations.from((prefix, namespace)))
+
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml

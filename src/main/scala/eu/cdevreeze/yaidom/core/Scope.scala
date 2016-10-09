@@ -370,6 +370,9 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   /** Alias for `minus` */
   def --(prefixes: Set[String]): Scope = minus(prefixes)
 
+  /** Alias for `append(Scope.from((prefix, namespace)))` */
+  def append(prefix: String, namespace: String): Scope = append(Scope.from((prefix, namespace)))
+
   /** Creates a `String` representation of this `Scope`, as it is shown in XML */
   def toStringInXml: String = {
     val defaultNsString = if (defaultNamespaceOption.isEmpty) "" else """xmlns="%s"""".format(defaultNamespaceOption.get)
