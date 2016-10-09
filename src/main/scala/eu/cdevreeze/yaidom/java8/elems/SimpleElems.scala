@@ -20,7 +20,7 @@ import eu.cdevreeze.yaidom.java8.functions.ScopedElemFunctions
 import eu.cdevreeze.yaidom.simple.Elem
 
 /**
- * ScopedElemFunctionApi applied to native yaidom simple elements.Easy to use in Java 8 code.
+ * ScopedElemFunctionApi applied to native yaidom simple elements. Easy to use in Java 8 code.
  *
  * @author Chris de Vreeze
  */

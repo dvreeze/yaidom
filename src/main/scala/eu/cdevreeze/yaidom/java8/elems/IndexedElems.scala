@@ -20,7 +20,7 @@ import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.java8.functions.BackingElemFunctions
 
 /**
- * BackingElemFunctionApi applied to native yaidom indexed elements.Easy to use in Java 8 code.
+ * BackingElemFunctionApi applied to native yaidom indexed elements. Easy to use in Java 8 code.
  *
  * @author Chris de Vreeze
  */

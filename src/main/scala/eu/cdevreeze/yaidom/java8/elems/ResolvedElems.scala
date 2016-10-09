@@ -20,7 +20,7 @@ import eu.cdevreeze.yaidom.java8.functions.ClarkElemFunctions
 import eu.cdevreeze.yaidom.resolved.Elem
 
 /**
- * ClarkElemFunctionApi applied to native yaidom resolved elements.Easy to use in Java 8 code.
+ * ClarkElemFunctionApi applied to native yaidom resolved elements. Easy to use in Java 8 code.
  *
  * @author Chris de Vreeze
  */

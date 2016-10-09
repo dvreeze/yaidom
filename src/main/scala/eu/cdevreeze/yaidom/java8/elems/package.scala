@@ -22,6 +22,8 @@ package eu.cdevreeze.yaidom.java8
  *
  * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
  *
+ * This API is experimental!
+ *
  * @author Chris de Vreeze
  */
 package object elems
