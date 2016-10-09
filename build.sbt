@@ -33,7 +33,7 @@ libraryDependencies <+= scalaBinaryVersion apply { version =>
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
   if (version.contains("2.12.0-RC1")) Seq("org.scala-lang.modules" % "scala-java8-compat_2.12.0-RC1" % "0.8.0-RC7")
-  else Seq("org.scala-lang.modules" % "scala-java8-compat_2.11" % "0.8.0-RC7")
+  else Seq("org.scala-lang.modules" % "scala-java8-compat_2.11" % "0.8.0-RC7" % "optional")
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
