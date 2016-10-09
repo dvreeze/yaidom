@@ -198,26 +198,6 @@ final class Document(
       content,
       LineSeq(")")).mkLineSeq.shift(indent)
   }
-
-  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
-  def updated(path: Path)(f: Elem => Elem): Document =
-    updateElemOrSelf(path)(f)
-
-  @deprecated(message = "Renamed to 'updateElemOrSelf'", since = "1.5.0")
-  def updated(path: Path, newElem: Elem): Document =
-    updateElemOrSelf(path, newElem)
-
-  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
-    updateElemWithNodeSeq(path)(f)
-
-  @deprecated(message = "Renamed to 'updateElemWithNodeSeq'", since = "1.5.0")
-  def updatedWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
-    updateElemWithNodeSeq(path, newNodes)
-
-  @deprecated(message = "Renamed to 'updateElemsOrSelf'", since = "1.5.0")
-  def updatedAtPaths(paths: Set[Path])(f: (Elem, Path) => Elem): Document =
-    updateElemsOrSelf(paths)(f)
 }
 
 object Document {

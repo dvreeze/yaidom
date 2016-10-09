@@ -37,9 +37,6 @@ final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) ex
   /** Returns true if this is the empty `PathBuilder`, so if it has no entries */
   def isEmpty: Boolean = entries.isEmpty
 
-  @deprecated(message = "Use 'isEmpty' instead", since = "1.5.0")
-  def isRoot: Boolean = isEmpty
-
   /** Prepends a given `Entry` to this `PathBuilder` */
   def prepend(entry: PathBuilder.Entry): PathBuilder = PathBuilder(entry +: self.entries)
 
@@ -68,9 +65,6 @@ final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) ex
 object PathBuilder {
 
   val Empty: PathBuilder = PathBuilder(immutable.IndexedSeq())
-
-  @deprecated(message = "Use 'Empty' instead", since = "1.5.0")
-  val Root: PathBuilder = Empty
 
   def apply(entries: immutable.IndexedSeq[PathBuilder.Entry]): PathBuilder = new PathBuilder(entries)
 

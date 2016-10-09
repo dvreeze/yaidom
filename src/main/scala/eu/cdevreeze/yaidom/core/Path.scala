@@ -101,9 +101,6 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   /** Returns true if this is the empty `Path`, so if it has no entries */
   def isEmpty: Boolean = entries.isEmpty
 
-  @deprecated(message = "Use 'isEmpty' instead", since = "1.5.0")
-  def isRoot: Boolean = isEmpty
-
   /** Returns the element name (as EName) of the last path entry, if any, wrapped in an Option */
   def elementNameOption: Option[EName] = lastEntryOption.map(_.elementName)
 
@@ -218,9 +215,6 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
 object Path {
 
   val Empty: Path = Path(immutable.IndexedSeq())
-
-  @deprecated(message = "Use 'Empty' instead", since = "1.5.0")
-  val Root: Path = Empty
 
   def apply(entries: immutable.IndexedSeq[Path.Entry]): Path = new Path(entries)
 
