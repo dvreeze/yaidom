@@ -22,9 +22,9 @@ import java.util.stream.Stream
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.java8.functionapi.ClarkElemFunctionApi
 import eu.cdevreeze.yaidom.java8.functionapi.JavaStreamUtil.makeStream
-import eu.cdevreeze.yaidom.java8.functionapi.ResolvedAttr
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
 /**

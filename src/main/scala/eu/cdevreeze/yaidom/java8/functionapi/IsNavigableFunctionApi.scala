@@ -20,6 +20,7 @@ import java.util.Optional
 import java.util.stream.Stream
 
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.java8.ElemPathEntryPair
 
 /**
  * Equivalent of `IsNavigableApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used

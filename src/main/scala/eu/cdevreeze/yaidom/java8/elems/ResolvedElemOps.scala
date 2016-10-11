@@ -22,8 +22,8 @@ import java.util.stream.Stream
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.java8.functionapi.ElemPathEntryPair
-import eu.cdevreeze.yaidom.java8.functionapi.ResolvedAttr
+import eu.cdevreeze.yaidom.java8.ElemPathEntryPair
+import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.resolved.Elem
 
 /**

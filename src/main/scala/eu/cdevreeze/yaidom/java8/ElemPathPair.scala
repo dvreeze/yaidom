@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8.functionapi
+package eu.cdevreeze.yaidom.java8
 
 import eu.cdevreeze.yaidom.core.Path
 

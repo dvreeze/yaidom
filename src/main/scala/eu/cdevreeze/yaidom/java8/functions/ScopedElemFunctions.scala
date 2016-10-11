@@ -24,7 +24,7 @@ import scala.compat.java8.OptionConverters.RichOptionForJava8
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.java8.functionapi.Attr
+import eu.cdevreeze.yaidom.java8.Attr
 import eu.cdevreeze.yaidom.java8.functionapi.JavaStreamUtil.makeStream
 import eu.cdevreeze.yaidom.java8.functionapi.ScopedElemFunctionApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi

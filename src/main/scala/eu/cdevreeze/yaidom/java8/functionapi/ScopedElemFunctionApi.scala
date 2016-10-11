@@ -22,6 +22,7 @@ import java.util.stream.Stream
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.java8.Attr
 
 /**
  * Equivalent of `ScopedElemApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used

@@ -22,7 +22,7 @@ import java.util.stream.Stream
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.java8.functionapi.ElemPathEntryPair
+import eu.cdevreeze.yaidom.java8.ElemPathEntryPair
 import eu.cdevreeze.yaidom.java8.functionapi.IsNavigableFunctionApi
 import eu.cdevreeze.yaidom.java8.functionapi.JavaStreamUtil.makeJavaStreamFunction
 import eu.cdevreeze.yaidom.java8.functionapi.JavaStreamUtil.makeSingletonStream

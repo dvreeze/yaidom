@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8.functionapi
+package eu.cdevreeze.yaidom.java8
 
-import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.EName
 
 /**
- * Pair containing an element and a Path entry.
+ * Resolved attribute, containing the name as EName and a String value.
  *
  * @author Chris de Vreeze
  */
-final case class ElemPathEntryPair[E](val elem: E, val pathEntry: Path.Entry)
+final case class ResolvedAttr(val ename: EName, val value: String)

@@ -24,9 +24,9 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.java8.functionapi.Attr
-import eu.cdevreeze.yaidom.java8.functionapi.ElemPathEntryPair
-import eu.cdevreeze.yaidom.java8.functionapi.ResolvedAttr
+import eu.cdevreeze.yaidom.java8.Attr
+import eu.cdevreeze.yaidom.java8.ElemPathEntryPair
+import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.simple.Elem
 
 /**

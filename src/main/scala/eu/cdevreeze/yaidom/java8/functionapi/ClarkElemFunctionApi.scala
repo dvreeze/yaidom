@@ -20,6 +20,7 @@ import java.util.Optional
 import java.util.stream.Stream
 
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.java8.ResolvedAttr
 
 /**
  * Equivalent of `ClarkElemApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
