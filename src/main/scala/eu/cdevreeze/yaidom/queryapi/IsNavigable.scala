@@ -39,15 +39,17 @@ trait IsNavigable extends IsNavigableApi {
 
   def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem]
 
-  final def getChildElemByPathEntry(entry: Path.Entry): ThisElem =
+  final def getChildElemByPathEntry(entry: Path.Entry): ThisElem = {
     findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $thisElem"))
+  }
 
   final def findElemOrSelfByPath(path: Path): Option[ThisElem] = {
     findReverseAncestryOrSelfByPath(path).map(_.last)
   }
 
-  final def getElemOrSelfByPath(path: Path): ThisElem =
+  final def getElemOrSelfByPath(path: Path): ThisElem = {
     findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $thisElem"))
+  }
 
   final def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[ThisElem]] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation

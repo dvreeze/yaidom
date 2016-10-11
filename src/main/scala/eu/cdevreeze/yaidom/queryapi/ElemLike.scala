@@ -222,9 +222,13 @@ trait ElemLike extends ElemApi {
 
   def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
-  final def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = findAllChildElems filter p
+  final def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    findAllChildElems filter p
+  }
 
-  final def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = filterChildElems(p)
+  final def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    filterChildElems(p)
+  }
 
   final def findChildElem(p: ThisElem => Boolean): Option[ThisElem] = {
     val result = filterChildElems(p)
@@ -263,11 +267,17 @@ trait ElemLike extends ElemApi {
     result.toIndexedSeq
   }
 
-  final def \\(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = filterElemsOrSelf(p)
+  final def \\(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    filterElemsOrSelf(p)
+  }
 
-  final def findAllElems: immutable.IndexedSeq[ThisElem] = findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
+  final def findAllElems: immutable.IndexedSeq[ThisElem] = {
+    findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
+  }
 
-  final def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
+  final def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
+  }
 
   final def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     val result = mutable.ArrayBuffer[ThisElem]()
@@ -283,10 +293,13 @@ trait ElemLike extends ElemApi {
     result.toIndexedSeq
   }
 
-  final def \\!(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = findTopmostElemsOrSelf(p)
+  final def \\!(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+    findTopmostElemsOrSelf(p)
+  }
 
-  final def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] =
+  final def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
+  }
 
   final def findElemOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
     // Not tail-recursive, but the depth should typically be limited
