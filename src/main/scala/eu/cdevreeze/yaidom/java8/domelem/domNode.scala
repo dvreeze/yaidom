@@ -47,19 +47,9 @@ sealed abstract class DomNode(val underlyingNode: Node)
 sealed abstract class CanBeDomDocumentChild(override val underlyingNode: Node) extends DomNode(underlyingNode)
 
 /**
- * Workaround for Scala issue SI-8905.
- */
-sealed abstract class AbstractDomElem(override val underlyingNode: Element) extends CanBeDomDocumentChild(underlyingNode) with StreamingScopedElemLike[DomElem] { self: DomElem =>
-
-  final override def getChildElem(p: Predicate[DomElem]): DomElem = {
-    super.getChildElem(p)
-  }
-}
-
-/**
  * Wrapper around DOM element, offering the streaming element query API.
  */
-final class DomElem(override val underlyingNode: Element) extends AbstractDomElem(underlyingNode) {
+final class DomElem(override val underlyingNode: Element) extends CanBeDomDocumentChild(underlyingNode) with StreamingScopedElemLike[DomElem] {
 
   def findAllChildElems: Stream[DomElem] = {
     ScalaStreamSupport.stream(dom.DomElem(underlyingNode).findAllChildElems).map[DomElem](asJavaFunction(e => new DomElem(e.wrappedNode)))
@@ -87,6 +77,13 @@ final class DomElem(override val underlyingNode: Element) extends AbstractDomEle
 
   def scope: Scope = {
     dom.DomElem(underlyingNode).scope
+  }
+
+  /**
+   * Workaround for Scala issue SI-8905.
+   */
+  final override def getChildElem(p: Predicate[DomElem]): DomElem = {
+    super.getChildElem(p)
   }
 }
 

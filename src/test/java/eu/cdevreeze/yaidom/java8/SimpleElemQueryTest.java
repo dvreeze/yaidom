@@ -30,7 +30,6 @@ public class SimpleElemQueryTest {
 
 		Stream<SimpleElem> books = bookstore.filterChildElems(withLocalName("Book"));
 
-		// Why cast needed?
 		Stream<SimpleElem> bookTitles = books.map(e -> e.getChildElem(withLocalName("Title")));
 
 		assertEquals(
@@ -50,7 +49,6 @@ public class SimpleElemQueryTest {
 
 		Stream<SimpleElem> books = bookstore.filterChildElems(withEName(bookEName));
 
-		// Why cast needed?
 		Stream<SimpleElem> bookTitles = books.map(e -> e.getChildElem(withEName(titleEName)));
 
 		assertEquals(

@@ -35,19 +35,9 @@ import eu.cdevreeze.yaidom.resolved
 sealed abstract class ResolvedNode(val underlyingNode: resolved.Node)
 
 /**
- * Workaround for Scala issue SI-8905.
- */
-sealed abstract class AbstractResolvedElem(override val underlyingNode: resolved.Elem) extends ResolvedNode(underlyingNode) with StreamingClarkElemLike[ResolvedElem] { self: ResolvedElem =>
-
-  final override def getChildElem(p: Predicate[ResolvedElem]): ResolvedElem = {
-    super.getChildElem(p)
-  }
-}
-
-/**
  * Wrapper around native yaidom resolved element, offering the streaming element query API.
  */
-final class ResolvedElem(override val underlyingNode: resolved.Elem) extends AbstractResolvedElem(underlyingNode) {
+final class ResolvedElem(override val underlyingNode: resolved.Elem) extends ResolvedNode(underlyingNode) with StreamingClarkElemLike[ResolvedElem] {
 
   def findAllChildElems: Stream[ResolvedElem] = {
     ScalaStreamSupport.stream(underlyingNode.findAllChildElems).map[ResolvedElem](asJavaFunction(e => new ResolvedElem(e)))
@@ -63,6 +53,13 @@ final class ResolvedElem(override val underlyingNode: resolved.Elem) extends Abs
 
   def text: String = {
     underlyingNode.text
+  }
+
+  /**
+   * Workaround for Scala issue SI-8905.
+   */
+  final override def getChildElem(p: Predicate[ResolvedElem]): ResolvedElem = {
+    super.getChildElem(p)
   }
 }
 

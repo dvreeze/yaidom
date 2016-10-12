@@ -16,9 +16,12 @@
 
 package eu.cdevreeze.yaidom.java8.simpleelem
 
+import java.util.function.Predicate
 import java.util.stream.Stream
+
 import scala.compat.java8.FunctionConverters.asJavaFunction
 import scala.compat.java8.ScalaStreamSupport
+
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -26,7 +29,6 @@ import eu.cdevreeze.yaidom.java8.Attr
 import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
 import eu.cdevreeze.yaidom.simple
-import java.util.function.Predicate
 
 /**
  * Wrapper around native yaidom simple node.
@@ -38,19 +40,9 @@ sealed abstract class SimpleNode(val underlyingNode: simple.Node)
 sealed abstract class CanBeDocumentChild(override val underlyingNode: simple.CanBeDocumentChild) extends SimpleNode(underlyingNode)
 
 /**
- * Workaround for Scala issue SI-8905.
- */
-sealed abstract class AbstractSimpleElem(override val underlyingNode: simple.Elem) extends CanBeDocumentChild(underlyingNode) with StreamingScopedElemLike[SimpleElem] { self: SimpleElem =>
-
-  final override def getChildElem(p: Predicate[SimpleElem]): SimpleElem = {
-    super.getChildElem(p)
-  }
-}
-
-/**
  * Wrapper around native yaidom simple element, offering the streaming element query API.
  */
-final class SimpleElem(override val underlyingNode: simple.Elem) extends AbstractSimpleElem(underlyingNode) {
+final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDocumentChild(underlyingNode) with StreamingScopedElemLike[SimpleElem] {
 
   def findAllChildElems: Stream[SimpleElem] = {
     ScalaStreamSupport.stream(underlyingNode.findAllChildElems).map[SimpleElem](asJavaFunction(e => new SimpleElem(e)))
@@ -78,6 +70,13 @@ final class SimpleElem(override val underlyingNode: simple.Elem) extends Abstrac
 
   def scope: Scope = {
     underlyingNode.scope
+  }
+
+  /**
+   * Workaround for Scala issue SI-8905.
+   */
+  final override def getChildElem(p: Predicate[SimpleElem]): SimpleElem = {
+    super.getChildElem(p)
   }
 }
 
