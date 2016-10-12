@@ -14,15 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8
+package eu.cdevreeze.yaidom.java8.simpleelem
+
+import java.net.URI
+import java.util.Optional
+
+import scala.compat.java8.OptionConverters.RichOptionForJava8
+
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingDocumentApi
+import eu.cdevreeze.yaidom.simple
 
 /**
- * The functional streaming API implementation that can be used in Java 8, implemented for some (abstract) yaidom elements as query API traits.
- *
- * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
- *
- * This API is experimental!
+ * Wrapper around native yaidom simple document.
  *
  * @author Chris de Vreeze
  */
-package object functions
+final class SimpleDocument(val underlyingDocument: simple.Document) extends StreamingDocumentApi[SimpleElem] {
+
+  def documentElement: SimpleElem = {
+    new SimpleElem(underlyingDocument.documentElement)
+  }
+
+  def uriOption: Optional[URI] = {
+    underlyingDocument.uriOption.asJava
+  }
+}

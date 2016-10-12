@@ -27,8 +27,12 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 trait HasText extends HasTextApi {
 
   /** Returns `text.trim`. */
-  final def trimmedText: String = text.trim
+  final def trimmedText: String = {
+    text.trim
+  }
 
   /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = XmlStringUtils.normalizeString(text)
+  final def normalizedText: String = {
+    XmlStringUtils.normalizeString(text)
+  }
 }

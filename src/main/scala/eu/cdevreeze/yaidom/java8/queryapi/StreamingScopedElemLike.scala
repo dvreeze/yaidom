@@ -14,38 +14,57 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapi
+package eu.cdevreeze.yaidom.java8.queryapi
+
+import java.util.Optional
+import java.util.stream.Stream
+
+import scala.compat.java8.OptionConverters.RichOptionForJava8
+import scala.compat.java8.OptionConverters.RichOptionalGeneric
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.java8.Attr
 
 /**
- * Partial implementation of `ScopedElemApi`.
+ * Equivalent of `ScopedElemLike`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
+ * in Java code.
  *
  * @author Chris de Vreeze
  */
-trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
+trait StreamingScopedElemLike[E <: StreamingScopedElemLike[E]] extends StreamingScopedElemApi[E] with StreamingClarkElemLike[E] { self: E =>
 
-  type ThisElem <: ScopedElemLike.Aux[ThisElem]
+  // HasQNameApi methods
 
-  final def attributeAsQNameOption(expandedName: EName): Option[QName] = {
-    attributeOption(expandedName).map(v => QName(v.trim))
+  def qname: QName
+
+  def attributes: Stream[Attr]
+
+  // HasScopeApi
+
+  def scope: Scope
+
+  // ScopedElemApi own methods
+
+  final def attributeAsQNameOption(expandedName: EName): Optional[QName] = {
+    attributeOption(expandedName).asScala.map(v => QName(v.trim)).asJava
   }
 
   final def attributeAsQName(expandedName: EName): QName = {
-    attributeAsQNameOption(expandedName).getOrElse(
+    attributeAsQNameOption(expandedName).orElseGet(
       sys.error(s"Missing QName-valued attribute $expandedName"))
   }
 
-  final def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
-    attributeAsQNameOption(expandedName) map { qn =>
+  final def attributeAsResolvedQNameOption(expandedName: EName): Optional[EName] = {
+    (attributeAsQNameOption(expandedName).asScala map { qn =>
       scope.resolveQNameOption(qn).getOrElse(
         sys.error(s"Could not resolve QName-valued attribute value $qn, given scope [${scope}]"))
-    }
+    }).asJava
   }
 
   final def attributeAsResolvedQName(expandedName: EName): EName = {
-    attributeAsResolvedQNameOption(expandedName).getOrElse(
+    attributeAsResolvedQNameOption(expandedName).orElseGet(
       sys.error(s"Missing QName-valued attribute $expandedName"))
   }
 
@@ -57,14 +76,4 @@ trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
     scope.resolveQNameOption(textAsQName).getOrElse(
       sys.error(s"Could not resolve QName-valued element text $textAsQName, given scope [${scope}]"))
   }
-}
-
-object ScopedElemLike {
-
-  /**
-   * This query API type, restricting ThisElem to the type parameter.
-   *
-   * @tparam E The element self type
-   */
-  type Aux[E] = ScopedElemLike { type ThisElem = E }
 }

@@ -80,7 +80,8 @@ trait StreamingElemLike[E <: StreamingElemLike[E]] extends StreamingElemApi[E] {
     }
   }
 
-  final def getChildElem(p: Predicate[E]): E = {
+  // Not final. Also see issue SI-8905.
+  def getChildElem(p: Predicate[E]): E = {
     val filteredChildElems = filterChildElems(p).collect(Collectors.toList[E])
 
     require(

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8.elems
+package eu.cdevreeze.yaidom.java8.queryapi
 
-import eu.cdevreeze.yaidom.java8.functions.ScopedElemFunctions
-import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
+import java.net.URI
+import java.util.Optional
 
 /**
- * ScopedElemFunctionApi applied to native yaidom simple elements. Easy to use in Java 8 code.
+ * Equivalent of `DocumentApi`.
  *
  * @author Chris de Vreeze
  */
-final class ScalaElems extends ScopedElemFunctions[ScalaXmlElem]
+trait StreamingDocumentApi[E] {
 
-object ScalaElems {
+  def documentElement: E
 
-  def getInstance: ScalaElems = new ScalaElems
+  def uriOption: Optional[URI]
 }

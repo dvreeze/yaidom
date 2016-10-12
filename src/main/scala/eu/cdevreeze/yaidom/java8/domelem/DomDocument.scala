@@ -14,19 +14,30 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8.elems
+package eu.cdevreeze.yaidom.java8.domelem
 
-import eu.cdevreeze.yaidom.java8.functions.ClarkElemFunctions
-import eu.cdevreeze.yaidom.resolved.Elem
+import java.net.URI
+import java.util.Optional
+
+import scala.compat.java8.OptionConverters.RichOptionForJava8
+
+import org.w3c.dom.Document
+
+import eu.cdevreeze.yaidom.dom
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingDocumentApi
 
 /**
- * ClarkElemFunctionApi applied to native yaidom resolved elements. Easy to use in Java 8 code.
+ * Wrapper around DOM document.
  *
  * @author Chris de Vreeze
  */
-final class ResolvedElems extends ClarkElemFunctions[Elem]
+final class DomDocument(val underlyingDocument: Document) extends StreamingDocumentApi[DomElem] {
 
-object ResolvedElems {
+  def documentElement: DomElem = {
+    new DomElem(dom.DomDocument(underlyingDocument).documentElement.wrappedNode)
+  }
 
-  def getInstance: ResolvedElems = new ResolvedElems
+  def uriOption: Optional[URI] = {
+    dom.DomDocument(underlyingDocument).uriOption.asJava
+  }
 }

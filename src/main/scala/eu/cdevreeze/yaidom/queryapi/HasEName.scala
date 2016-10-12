@@ -30,7 +30,9 @@ trait HasEName extends HasENameApi {
   /**
    * The local name, that is, the local part of the EName
    */
-  final def localName: String = resolvedName.localPart
+  final def localName: String = {
+    resolvedName.localPart
+  }
 
   /**
    * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
@@ -42,8 +44,9 @@ trait HasEName extends HasENameApi {
   /**
    * Returns the value of the attribute with the given expanded name, and throws an exception otherwise.
    */
-  final def attribute(expandedName: EName): String =
+  final def attribute(expandedName: EName): String = {
     attributeOption(expandedName).getOrElse(sys.error(s"Missing attribute $expandedName"))
+  }
 
   /**
    * Returns the first found attribute value of an attribute with the given local name, if any, wrapped in an `Option`.
@@ -56,5 +59,7 @@ trait HasEName extends HasENameApi {
   /**
    * Shorthand for `attributeOption(expandedName)`.
    */
-  final def \@(expandedName: EName): Option[String] = attributeOption(expandedName)
+  final def \@(expandedName: EName): Option[String] = {
+    attributeOption(expandedName)
+  }
 }
