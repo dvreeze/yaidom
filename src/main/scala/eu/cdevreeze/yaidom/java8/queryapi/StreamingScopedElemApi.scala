@@ -20,35 +20,39 @@ import java.util.Optional
 import java.util.stream.Stream
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.java8.ResolvedAttr
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.java8.Attr
 
 /**
- * Equivalent of `ClarkElemApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
+ * Equivalent of `ScopedElemApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
  * in Java code.
  *
  * @author Chris de Vreeze
  */
-trait ClarkElemStreamApi[E <: ClarkElemStreamApi[E]] extends ElemStreamApi[E] with IsNavigableStreamApi[E] {
+trait StreamingScopedElemApi[E <: StreamingScopedElemApi[E]] extends StreamingClarkElemApi[E] {
 
-  // HasENameApi methods
+  // HasQNameApi methods
 
-  def resolvedName: EName
+  def qname: QName
 
-  def resolvedAttributes: Stream[ResolvedAttr]
+  def attributes: Stream[Attr]
 
-  def localName: String
+  // HasScopeApi
 
-  def attributeOption(expandedName: EName): Optional[String]
+  def scope: Scope
 
-  def attribute(expandedName: EName): String
+  // ScopedElemApi own methods
 
-  def findAttributeByLocalName(localName: String): Optional[String]
+  def attributeAsQNameOption(expandedName: EName): Optional[QName]
 
-  // HasTextApi
+  def attributeAsQName(expandedName: EName): QName
 
-  def text: String
+  def attributeAsResolvedQNameOption(expandedName: EName): Optional[EName]
 
-  def trimmedText: String
+  def attributeAsResolvedQName(expandedName: EName): EName
 
-  def normalizedText: String
+  def textAsQName: QName
+
+  def textAsResolvedQName: EName
 }

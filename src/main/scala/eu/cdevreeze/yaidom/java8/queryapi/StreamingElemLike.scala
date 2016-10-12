@@ -30,7 +30,7 @@ import scala.compat.java8.FunctionConverters.enrichAsJavaPredicate
  *
  * @author Chris de Vreeze
  */
-trait ElemStreamLike[E <: ElemStreamLike[E]] extends ElemStreamApi[E] { self: E =>
+trait StreamingElemLike[E <: StreamingElemLike[E]] extends StreamingElemApi[E] { self: E =>
 
   def findAllChildElems: Stream[E]
 

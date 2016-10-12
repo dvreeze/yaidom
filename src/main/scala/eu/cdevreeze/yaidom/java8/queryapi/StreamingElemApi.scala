@@ -26,7 +26,7 @@ import java.util.stream.Stream
  *
  * @author Chris de Vreeze
  */
-trait ElemStreamApi[E <: ElemStreamApi[E]] {
+trait StreamingElemApi[E <: StreamingElemApi[E]] {
 
   // ElemApi methods
 

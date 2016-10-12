@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait BackingElemStreamApi[E <: BackingElemStreamApi[E]] extends ScopedElemStreamApi[E] {
+trait StreamingBackingElemApi[E <: StreamingBackingElemApi[E]] extends StreamingScopedElemApi[E] {
 
   // IndexedScopedElemApi own methods
 

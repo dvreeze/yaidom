@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.java8.ElemPathEntryPair
  *
  * @author Chris de Vreeze
  */
-trait IsNavigableStreamApi[E <: IsNavigableStreamApi[E]] {
+trait StreamingIsNavigableApi[E <: StreamingIsNavigableApi[E]] {
 
   // IsNavigableApi methods
 

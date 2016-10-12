@@ -30,12 +30,12 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.java8.ElemPathEntryPair
 
 /**
- * Equivalent of `IsNavigableApi`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
+ * Equivalent of `IsNavigable`, but returning Java 8 Streams and taking Java 8 Predicates, to be used
  * in Java code.
  *
  * @author Chris de Vreeze
  */
-trait IsNavigableStreamLike[E <: IsNavigableStreamLike[E]] extends IsNavigableStreamApi[E] { self: E =>
+trait StreamingIsNavigable[E <: StreamingIsNavigable[E]] extends StreamingIsNavigableApi[E] { self: E =>
 
   // IsNavigableApi methods
 
