@@ -86,11 +86,4 @@ trait StreamingIsNavigable[E <: StreamingIsNavigable[E]] extends StreamingIsNavi
   final def getReverseAncestryOrSelfByPath(path: Path): Stream[E] = {
     findReverseAncestryOrSelfByPath(path).asScala.getOrElse(sys.error(s"Expected existing path $path from root $self"))
   }
-
-  /**
-   * Turns a Java Optional into a Java Stream, for lack of such a conversion in Java 8.
-   */
-  private def toStream[A](x: Optional[A]): Stream[A] = {
-    ScalaStreamSupport.stream(x.asScala.toSeq)
-  }
 }

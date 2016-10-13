@@ -89,6 +89,15 @@ final class ScalaXmlElem(override val underlyingNode: Elem) extends CanBeScalaXm
   final override def getChildElem(p: Predicate[ScalaXmlElem]): ScalaXmlElem = {
     super.getChildElem(p)
   }
+
+  override def equals(other: Any): Boolean = other match {
+    case other: ScalaXmlElem => this.underlyingNode == other.underlyingNode
+    case _                   => false
+  }
+
+  override def hashCode: Int = {
+    underlyingNode.hashCode
+  }
 }
 
 final class ScalaXmlText(override val underlyingNode: Text) extends ScalaXmlNode(underlyingNode) {

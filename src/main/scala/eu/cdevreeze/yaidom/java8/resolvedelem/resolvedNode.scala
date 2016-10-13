@@ -39,7 +39,7 @@ sealed abstract class ResolvedNode(val underlyingNode: resolved.Node)
 /**
  * Wrapper around native yaidom resolved element, offering the streaming element query API.
  */
-final class ResolvedElem(override val underlyingNode: resolved.Elem) extends ResolvedNode(underlyingNode) with StreamingClarkElemLike[ResolvedElem] {
+final case class ResolvedElem(override val underlyingNode: resolved.Elem) extends ResolvedNode(underlyingNode) with StreamingClarkElemLike[ResolvedElem] {
 
   def findAllChildElems: Stream[ResolvedElem] = {
     val underlyingResult: Stream[resolved.Elem] =
@@ -75,4 +75,11 @@ final class ResolvedText(override val underlyingNode: resolved.Text) extends Res
   def trimmedText: String = underlyingNode.trimmedText
 
   def normalizedText: String = underlyingNode.normalizedText
+}
+
+object ResolvedElem {
+
+  def apply(elem: resolved.ResolvedNodes.Elem): ResolvedElem = {
+    new ResolvedElem(resolved.Elem(elem))
+  }
 }

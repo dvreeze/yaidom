@@ -90,6 +90,15 @@ final class DomElem(override val underlyingNode: Element) extends CanBeDomDocume
   final override def getChildElem(p: Predicate[DomElem]): DomElem = {
     super.getChildElem(p)
   }
+
+  override def equals(other: Any): Boolean = other match {
+    case other: DomElem => this.underlyingNode == other.underlyingNode
+    case _              => false
+  }
+
+  override def hashCode: Int = {
+    underlyingNode.hashCode
+  }
 }
 
 final class DomText(override val underlyingNode: Text) extends DomNode(underlyingNode) {

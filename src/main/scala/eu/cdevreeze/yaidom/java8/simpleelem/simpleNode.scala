@@ -83,6 +83,15 @@ final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDo
   final override def getChildElem(p: Predicate[SimpleElem]): SimpleElem = {
     super.getChildElem(p)
   }
+
+  override def equals(other: Any): Boolean = other match {
+    case other: SimpleElem => this.underlyingNode == other.underlyingNode
+    case _                 => false
+  }
+
+  override def hashCode: Int = {
+    underlyingNode.hashCode
+  }
 }
 
 final class SimpleText(override val underlyingNode: simple.Text) extends SimpleNode(underlyingNode) {

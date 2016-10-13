@@ -162,6 +162,15 @@ final class IndexedElem(override val underlyingNode: indexed.Elem) extends CanBe
   final override def getChildElem(p: Predicate[IndexedElem]): IndexedElem = {
     super.getChildElem(p)
   }
+
+  override def equals(other: Any): Boolean = other match {
+    case other: IndexedElem => this.underlyingNode == other.underlyingNode
+    case _                  => false
+  }
+
+  override def hashCode: Int = {
+    underlyingNode.hashCode
+  }
 }
 
 final class IndexedText(override val underlyingNode: IndexedScopedNode.Text) extends IndexedNode(underlyingNode) {
@@ -190,4 +199,11 @@ final class IndexedProcessingInstruction(override val underlyingNode: IndexedSco
 final class IndexedEntityRef(override val underlyingNode: IndexedScopedNode.EntityRef) extends IndexedNode(underlyingNode) {
 
   def entity: String = underlyingNode.entity
+}
+
+object IndexedElem {
+
+  def apply(elem: eu.cdevreeze.yaidom.simple.Elem, path: Path): IndexedElem = {
+    new IndexedElem(IndexedScopedNode.Elem(elem, path))
+  }
 }
