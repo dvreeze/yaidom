@@ -20,13 +20,15 @@ import java.util.function.Predicate
 import java.util.stream.Stream
 
 import scala.compat.java8.FunctionConverters.asJavaFunction
-import scala.compat.java8.ScalaStreamSupport
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.java8.Attr
 import eu.cdevreeze.yaidom.java8.ResolvedAttr
+import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
+import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
+import eu.cdevreeze.yaidom.java8.StreamUtil.toStream
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
 import eu.cdevreeze.yaidom.simple
 
@@ -45,7 +47,10 @@ sealed abstract class CanBeDocumentChild(override val underlyingNode: simple.Can
 final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDocumentChild(underlyingNode) with StreamingScopedElemLike[SimpleElem] {
 
   def findAllChildElems: Stream[SimpleElem] = {
-    ScalaStreamSupport.stream(underlyingNode.findAllChildElems).map[SimpleElem](asJavaFunction(e => new SimpleElem(e)))
+    val underlyingResult: Stream[simple.Elem] =
+      toSingletonStream(underlyingNode).flatMap(toJavaStreamFunction(e => e.findAllChildElems))
+
+    underlyingResult.map[SimpleElem](asJavaFunction(e => new SimpleElem(e)))
   }
 
   def resolvedName: EName = {
@@ -53,7 +58,7 @@ final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDo
   }
 
   def resolvedAttributes: Stream[ResolvedAttr] = {
-    ScalaStreamSupport.stream(underlyingNode.resolvedAttributes).map[ResolvedAttr](asJavaFunction(attr => ResolvedAttr(attr._1, attr._2)))
+    toStream(underlyingNode.resolvedAttributes).map[ResolvedAttr](asJavaFunction(attr => ResolvedAttr(attr._1, attr._2)))
   }
 
   def text: String = {
@@ -65,7 +70,7 @@ final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDo
   }
 
   def attributes: Stream[Attr] = {
-    ScalaStreamSupport.stream(underlyingNode.attributes).map[Attr](asJavaFunction(attr => Attr(attr._1, attr._2)))
+    toStream(underlyingNode.attributes).map[Attr](asJavaFunction(attr => Attr(attr._1, attr._2)))
   }
 
   def scope: Scope = {

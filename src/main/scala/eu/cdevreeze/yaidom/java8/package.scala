@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8
+package eu.cdevreeze.yaidom
 
 /**
- * The streaming element query API that can be used in Java 8. This package contains the purely abstract API.
- * It can be implemented for yaidom element implementations, but also for other ones, including element implementations
- * that do not offer a yaidom query API, like Saxon NodeInfo, XOM, or JDOM.
+ * The streaming element query API that can be used in Java 8, in this package and its sub-packages. This package
+ * itself contains some common data structures shared by the API.
  *
  * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
  *
@@ -27,4 +26,4 @@ package eu.cdevreeze.yaidom.java8
  *
  * @author Chris de Vreeze
  */
-package object queryapi
+package object java8

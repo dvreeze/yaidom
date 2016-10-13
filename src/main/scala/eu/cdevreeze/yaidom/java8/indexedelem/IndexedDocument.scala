@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8
+package eu.cdevreeze.yaidom.java8.indexedelem
+
+import java.net.URI
+import java.util.Optional
+
+import scala.compat.java8.OptionConverters.RichOptionForJava8
+
+import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingDocumentApi
 
 /**
- * The streaming element query API that can be used in Java 8. This package contains the purely abstract API.
- * It can be implemented for yaidom element implementations, but also for other ones, including element implementations
- * that do not offer a yaidom query API, like Saxon NodeInfo, XOM, or JDOM.
- *
- * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
- *
- * This API is experimental!
+ * Wrapper around native yaidom indexed document.
  *
  * @author Chris de Vreeze
  */
-package object queryapi
+final class IndexedDocument(val underlyingDocument: indexed.Document) extends StreamingDocumentApi[IndexedElem] {
+
+  def documentElement: IndexedElem = {
+    new IndexedElem(underlyingDocument.documentElement)
+  }
+
+  def uriOption: Optional[URI] = {
+    underlyingDocument.uriOption.asJava
+  }
+}

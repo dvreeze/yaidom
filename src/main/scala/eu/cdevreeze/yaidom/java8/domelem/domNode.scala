@@ -20,7 +20,6 @@ import java.util.function.Predicate
 import java.util.stream.Stream
 
 import scala.compat.java8.FunctionConverters.asJavaFunction
-import scala.compat.java8.ScalaStreamSupport
 
 import org.w3c.dom.Comment
 import org.w3c.dom.Element
@@ -35,6 +34,9 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.java8.Attr
 import eu.cdevreeze.yaidom.java8.ResolvedAttr
+import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
+import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
+import eu.cdevreeze.yaidom.java8.StreamUtil.toStream
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
 
 /**
@@ -52,7 +54,10 @@ sealed abstract class CanBeDomDocumentChild(override val underlyingNode: Node) e
 final class DomElem(override val underlyingNode: Element) extends CanBeDomDocumentChild(underlyingNode) with StreamingScopedElemLike[DomElem] {
 
   def findAllChildElems: Stream[DomElem] = {
-    ScalaStreamSupport.stream(dom.DomElem(underlyingNode).findAllChildElems).map[DomElem](asJavaFunction(e => new DomElem(e.wrappedNode)))
+    val underlyingResult: Stream[dom.DomElem] =
+      toSingletonStream(dom.DomElem(underlyingNode)).flatMap(toJavaStreamFunction(e => e.findAllChildElems))
+
+    underlyingResult.map[DomElem](asJavaFunction(e => new DomElem(e.wrappedNode)))
   }
 
   def resolvedName: EName = {
@@ -60,7 +65,7 @@ final class DomElem(override val underlyingNode: Element) extends CanBeDomDocume
   }
 
   def resolvedAttributes: Stream[ResolvedAttr] = {
-    ScalaStreamSupport.stream(dom.DomElem(underlyingNode).resolvedAttributes).map[ResolvedAttr](asJavaFunction(attr => ResolvedAttr(attr._1, attr._2)))
+    toStream(dom.DomElem(underlyingNode).resolvedAttributes).map[ResolvedAttr](asJavaFunction(attr => ResolvedAttr(attr._1, attr._2)))
   }
 
   def text: String = {
@@ -72,7 +77,7 @@ final class DomElem(override val underlyingNode: Element) extends CanBeDomDocume
   }
 
   def attributes: Stream[Attr] = {
-    ScalaStreamSupport.stream(dom.DomElem(underlyingNode).attributes).map[Attr](asJavaFunction(attr => Attr(attr._1, attr._2)))
+    toStream(dom.DomElem(underlyingNode).attributes).map[Attr](asJavaFunction(attr => Attr(attr._1, attr._2)))
   }
 
   def scope: Scope = {

@@ -24,6 +24,8 @@ import scala.compat.java8.ScalaStreamSupport
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.java8.ResolvedAttr
+import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
+import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingClarkElemLike
 import eu.cdevreeze.yaidom.resolved
 
@@ -40,7 +42,10 @@ sealed abstract class ResolvedNode(val underlyingNode: resolved.Node)
 final class ResolvedElem(override val underlyingNode: resolved.Elem) extends ResolvedNode(underlyingNode) with StreamingClarkElemLike[ResolvedElem] {
 
   def findAllChildElems: Stream[ResolvedElem] = {
-    ScalaStreamSupport.stream(underlyingNode.findAllChildElems).map[ResolvedElem](asJavaFunction(e => new ResolvedElem(e)))
+    val underlyingResult: Stream[resolved.Elem] =
+      toSingletonStream(underlyingNode).flatMap(toJavaStreamFunction(e => e.findAllChildElems))
+
+    underlyingResult.map[ResolvedElem](asJavaFunction(e => new ResolvedElem(e)))
   }
 
   def resolvedName: EName = {
