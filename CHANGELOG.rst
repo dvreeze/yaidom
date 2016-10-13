@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+1.6.0-M6
+========
+
+Milestone 6 of version 1.6.0 offers improved experimental support for Java 8, compared to the previous milestone.
+The streaming query API is now an OO API instead of a functional API.
+
+
 1.6.0-M5
 ========
 
