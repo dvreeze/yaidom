@@ -392,25 +392,35 @@ final class Elem(
 
     val tabOrSpace = if (useTab) "\t" else " "
 
-    // Not an efficient implementation. It is recursive, but not tail-recursive.
+    def indentToIndentString(totalIndent: Int): String = {
+      // String concatenation. If this function is called as little as possible, performance will not suffer too much.
+      newLine + (tabOrSpace * totalIndent)
+    }
+
+    // Not a very efficient implementation, but string concatenation is kept to a minimum.
+    // The nested prettify function is recursive, but not tail-recursive.
+
+    val indentStringsByIndent = mutable.Map[Int, String]()
 
     def prettify(elm: Elem, currentIndent: Int): Elem = {
       val childNodes = elm.children
-      val hasElemChild = findChildElem(e => true).isDefined
+      val hasElemChild = elm.findChildElem(e => true).isDefined
       val doPrettify = (childNodes forall (n => !isText(n))) && (hasElemChild)
 
       if (doPrettify) {
         val newIndent = currentIndent + indent
-        val indentText = Text(newLine + (tabOrSpace * newIndent), false)
-        val endIndentText = Text(newLine + (tabOrSpace * currentIndent), false)
 
+        val indentTextString = indentStringsByIndent.getOrElseUpdate(newIndent, indentToIndentString(newIndent))
+        val endIndentTextString = indentStringsByIndent.getOrElseUpdate(currentIndent, indentToIndentString(currentIndent))
+
+        // Recursive calls
         val prettifiedChildNodes = childNodes map {
           case e: Elem => prettify(e, newIndent)
           case n       => n
         }
 
-        val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(indentText, n) }
-        val newChildNodes = prefixedPrettifiedChildNodes :+ endIndentText
+        val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(Text(indentTextString, false), n) }
+        val newChildNodes = prefixedPrettifiedChildNodes :+ Text(endIndentTextString, false)
 
         elm.withChildren(newChildNodes)
       } else {
