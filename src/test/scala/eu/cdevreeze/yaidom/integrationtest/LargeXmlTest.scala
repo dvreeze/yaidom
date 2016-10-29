@@ -162,12 +162,26 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     doQueryTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
+  /** A heavy test prettifying the document. When running it, consider using jvisualvm to check on the JVM behavior */
+  test("testPrettify") {
+    val startMs = System.currentTimeMillis()
+    val prettifiedElem = doc.documentElement.prettify(3)
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testPrettify] Calling prettify took ${endMs - startMs} ms")
+
+    assertResult(List(1, 4, 7)) {
+      prettifiedElem.findAllElemsOrSelf.flatMap(_.textChildren.filter(_.text.trim.isEmpty)).distinct.map(_.text.size).sorted
+    }
+
+    doQueryTest(doc.documentElement, "testPrettify: simple.Elem")
+  }
+
   /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
   ignore("testProcessLargeTreeRepr") {
-    val startMs2 = System.currentTimeMillis()
+    val startMs = System.currentTimeMillis()
     val treeRepr: String = doc.toString
-    val endMs2 = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeTreeRepr] Calling toString took ${endMs2 - startMs2} ms")
+    val endMs = System.currentTimeMillis()
+    logger.info(s"[testProcessLargeTreeRepr] Calling toString took ${endMs - startMs} ms")
 
     assertResult("document(") {
       treeRepr.take("document(".length)

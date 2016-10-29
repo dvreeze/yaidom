@@ -33,37 +33,44 @@ private[yaidom] object PrettyPrinting {
   private val NewLine = "%n".format()
 
   /**
-   * Line, consisting of an indent, followed by 0 or more prefixes, followed by the initial content of the line, followed
+   * Line, consisting of an indent, followed by 0 or more prefixes, followed by the "real" (non-empty) content of the line, followed
    * by 0 or more suffixes (which are stored in reverse order).
    *
    * This class is designed to make `LineSeq` operations such as `append` and `prepend` efficient, without creating any
-   * unnecessary string literals.
+   * unnecessary string literals. It is also designed to possibly contain multiple successive line parts, in order to prevent unnecessary
+   * string concatenation.
    *
-   * The line may have newlines, but not in prefixes and suffixes. If the line contains any newlines, there will be no
-   * indentation at these line breaks.
+   * The line may have newlines, but not in prefixes and suffixes. If the line contains any newlines, there will be no indentation
+   * at these line breaks. Thus XML attributes and their values can be modeled as part of one Line object, even if they contain line breaks.
    */
-  final class Line(val indent: Int, val initialLine: String, val prefixes: List[String], val suffixesReversed: List[String]) {
-    require(initialLine ne null)
+  final class Line(val indent: Int, val lineParts: immutable.IndexedSeq[String], val prefixes: List[String], val suffixesReversed: List[String]) {
+    require(lineParts ne null)
+    require(lineParts.nonEmpty, s"Empty line content (ignoring prefixes and suffixes) not allowed")
+    require(lineParts.head.nonEmpty, s"Empty line content (ignoring prefixes and suffixes) not allowed")
     require(prefixes forall (s => s.indexOf('\n') < 0))
     require(suffixesReversed forall (s => s.indexOf('\n') < 0))
 
-    def this(indent: Int, line: String) = this(indent, line, Nil, Nil)
+    def this(indent: Int, lineParts: immutable.IndexedSeq[String]) = this(indent, lineParts, Nil, Nil)
+
+    def this(indent: Int, line: String) = this(indent, immutable.IndexedSeq(line))
+
+    def this(lineParts: immutable.IndexedSeq[String]) = this(0, lineParts)
 
     def this(line: String) = this(0, line)
 
     /** Functionally adds an indent */
     def plusIndent(addedIndent: Int): Line = {
-      if (addedIndent == 0) this else new Line(addedIndent + indent, initialLine, prefixes, suffixesReversed)
+      if (addedIndent == 0) this else new Line(addedIndent + indent, lineParts, prefixes, suffixesReversed)
     }
 
     /** Functionally appends a trailing string (which must contain no newline) to this line */
     def append(s: String): Line = {
-      if (s.isEmpty) this else new Line(indent, initialLine, prefixes, (s :: suffixesReversed))
+      if (s.isEmpty) this else new Line(indent, lineParts, prefixes, (s :: suffixesReversed))
     }
 
-    /** Functionally prepends a string (which must contain no newline) to this line */
+    /** Functionally prepends a string (which must contain no newline) to this line as prefix */
     def prepend(s: String): Line = {
-      if (s.isEmpty) this else new Line(indent, initialLine, s :: prefixes, suffixesReversed)
+      if (s.isEmpty) this else new Line(indent, lineParts, s :: prefixes, suffixesReversed)
     }
 
     /**
@@ -74,50 +81,17 @@ private[yaidom] object PrettyPrinting {
 
       prefixes foreach { s => sb.append(s) }
 
-      sb.append(initialLine)
+      lineParts foreach { s => sb.append(s) }
 
       suffixesReversed.reverse foreach { s => sb.append(s) }
     }
   }
 
-  /**
-   * Utility method wrapping a string in a Java or multiline string literal.
-   *
-   * This implementation does no "Java escaping". It uses multiline string literals, assuming that no
-   * three subsequent double quotes occur, but uses Java string literals instead, if all characters are
-   * letters, digits or some common punctuation characters.
-   *
-   * If three subsequent double quotes occur, then the resulting multiline string will be broken.
-   * Within the context of pretty printing, where the printed output will not be parsed, this is less of a problem.
-   *
-   * An earlier implementation used the Apache Commons Lang method StringEscapeUtils.escapeJava.
-   * That method in turn uses the java.util.regex.Pattern class. Alas, for large strings this could result in
-   * a stack overflow error. See the bug report at http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993.
-   *
-   * Currently, however, Apache Commons Lang is not used in yaidom. Hence, this problem does not occur. Moreover,
-   * it reduces the dependencies of yaidom on other libraries.
-   */
-  final def toStringLiteral(s: String): String = {
-    if (useJavaStringLiteral(s)) toJavaStringLiteral(s)
-    else toMultilineStringLiteral(s)
-  }
+  object Line {
 
-  final def toMultilineStringLiteral(s: String): String = {
-    "\"\"\"" + s + "\"\"\""
-  }
-
-  private def useJavaStringLiteral(s: String): Boolean = {
-    // Quite defensive, more so than needed
-    // Typically fast enough, because immediately returns false on encountering whitespace (or newline)
-    s forall { c =>
-      java.lang.Character.isLetterOrDigit(c) ||
-        (c == ':') || (c == ';') || (c == '.') || (c == ',') ||
-        (c == '-') || (c == '_') || (c == '/') || (c == '\\')
+    def from(firstPart: String, centralParts: immutable.IndexedSeq[String], lastPart: String): Line = {
+      new Line(firstPart +: (centralParts :+ lastPart))
     }
-  }
-
-  private def toJavaStringLiteral(s: String): String = {
-    "\"" + s + "\""
   }
 
   /** Collection of lines, on which operations such as `shift` can be performed */
@@ -184,13 +158,8 @@ private[yaidom] object PrettyPrinting {
 
     def apply(lines: Line*): LineSeq = new LineSeq(Vector(lines: _*))
 
-    def apply(s: String): LineSeq = {
-      val lines = s.lines.toIndexedSeq map { (ln: String) => new Line(ln) }
-      new LineSeq(lines)
-    }
-
-    def singletonOrEmptyLineSeq(s: String): LineSeq = {
-      if (s.isEmpty) LineSeq() else LineSeq(new Line(s))
+    def singletonOrEmptyLineSeq(parts: immutable.IndexedSeq[String]): LineSeq = {
+      if (parts.forall(_.isEmpty)) LineSeq() else LineSeq(new Line(parts))
     }
   }
 
@@ -214,7 +183,7 @@ private[yaidom] object PrettyPrinting {
         for (grp <- nonLastGroups) {
           // Same as: lines ++= (grp.append(separator).lines)
 
-          if (!grp.lines.isEmpty) {
+          if (grp.lines.nonEmpty) {
             lines ++= grp.lines.dropRight(1)
             lines += (grp.lines.last.append(separator))
           }
@@ -229,5 +198,46 @@ private[yaidom] object PrettyPrinting {
   object LineSeqSeq {
 
     def apply(groups: LineSeq*): LineSeqSeq = new LineSeqSeq(Vector(groups: _*))
+  }
+
+  /**
+   * Utility method wrapping a string in a Java or multiline string literal, as a sequence of Strings.
+   * The result as String can be obtained by calling the no-argument `mkString` method on the result.
+   *
+   * This implementation does no "Java escaping". It uses multiline string literals, assuming that no
+   * three subsequent double quotes occur, but uses Java string literals instead, if all characters are
+   * letters, digits or some common punctuation characters.
+   *
+   * If three subsequent double quotes occur, then the resulting multiline string will be broken.
+   * Within the context of pretty printing, where the printed output will not be parsed, this is less of a problem.
+   *
+   * An earlier implementation used the Apache Commons Lang method StringEscapeUtils.escapeJava.
+   * That method in turn uses the java.util.regex.Pattern class. Alas, for large strings this could result in
+   * a stack overflow error. See the bug report at http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993.
+   *
+   * Currently, however, Apache Commons Lang is not used in yaidom. Hence, this problem does not occur. Moreover,
+   * it reduces the dependencies of yaidom on other libraries.
+   */
+  final def toStringLiteralAsSeq(s: String): immutable.IndexedSeq[String] = {
+    if (useJavaStringLiteral(s)) toJavaStringLiteralAsSeq(s)
+    else toMultilineStringLiteralAsSeq(s)
+  }
+
+  final def toMultilineStringLiteralAsSeq(s: String): immutable.IndexedSeq[String] = {
+    immutable.IndexedSeq("\"\"\"", s, "\"\"\"")
+  }
+
+  private def useJavaStringLiteral(s: String): Boolean = {
+    // Quite defensive, more so than needed
+    // Typically fast enough, because immediately returns false on encountering whitespace (or newline)
+    s forall { c =>
+      java.lang.Character.isLetterOrDigit(c) ||
+        (c == ':') || (c == ';') || (c == '.') || (c == ',') ||
+        (c == '-') || (c == '_') || (c == '/') || (c == '\\')
+    }
+  }
+
+  private def toJavaStringLiteralAsSeq(s: String): immutable.IndexedSeq[String] = {
+    immutable.IndexedSeq("\"", s, "\"")
   }
 }

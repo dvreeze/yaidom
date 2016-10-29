@@ -21,9 +21,10 @@ import java.net.URI
 import scala.Vector
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.PrettyPrinting.Line
 import eu.cdevreeze.yaidom.PrettyPrinting.LineSeq
 import eu.cdevreeze.yaidom.PrettyPrinting.LineSeqSeq
-import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteral
+import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteralAsSeq
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.XmlDeclaration
@@ -166,15 +167,15 @@ final class Document(
 
     val uriOptionLineSeq: LineSeq =
       if (this.uriOption.isEmpty) {
-        val line = "uriOption = None"
+        val line = new Line("uriOption = None")
         LineSeq(line)
       } else {
-        val line = s"uriOption = Some(${toStringLiteral(this.uriOption.get.toString)})"
+        val line = Line.from("uriOption = Some(", toStringLiteralAsSeq(this.uriOption.get.toString), ")")
         LineSeq(line)
       }
 
     val childrenLineSeq: LineSeq = {
-      val firstLine = LineSeq("children = Vector(")
+      val firstLine = LineSeq(new Line("children = Vector("))
 
       val contentLines = {
         val groups =
@@ -185,7 +186,7 @@ final class Document(
         result
       }
 
-      val lastLine = LineSeq(")")
+      val lastLine = LineSeq(new Line(")"))
 
       LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq
     }
@@ -194,9 +195,9 @@ final class Document(
     val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
 
     LineSeqSeq(
-      LineSeq("document("),
+      LineSeq(new Line("document(")),
       content,
-      LineSeq(")")).mkLineSeq.shift(indent)
+      LineSeq(new Line(")"))).mkLineSeq.shift(indent)
   }
 }
 
@@ -249,6 +250,13 @@ object Document {
    * comments and processing instructions.
    */
   def apply(documentElement: Elem): Document = apply(None, None, documentElement)
+
+  def document(
+    uriOption: Option[String],
+    children: immutable.IndexedSeq[CanBeDocumentChild]): Document = {
+
+    apply(uriOption map { uriString => new URI(uriString) }, None, children)
+  }
 
   def document(
     uriOption: Option[String],

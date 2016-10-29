@@ -98,6 +98,13 @@ object DocBuilder {
 
   def document(
     uriOption: Option[String],
+    children: immutable.IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
+
+    new DocBuilder(uriOption map { uriString => new URI(uriString) }, None, children)
+  }
+
+  def document(
+    uriOption: Option[String],
     xmlDeclarationOption: Option[XmlDeclaration],
     children: immutable.IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
 
