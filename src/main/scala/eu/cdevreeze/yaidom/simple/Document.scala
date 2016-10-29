@@ -170,7 +170,7 @@ final class Document(
         val line = Line("uriOption = None")
         LineSeq(line)
       } else {
-        val line = Line(toStringLiteralAsSeq(this.uriOption.get.toString): _*).prepend("uriOption = Some(").append(")")
+        val line = Line.from(toStringLiteralAsSeq(this.uriOption.get.toString)).prepend("uriOption = Some(").append(")")
         LineSeq(line)
       }
 

@@ -87,6 +87,8 @@ private[yaidom] object PrettyPrinting {
   object Line {
 
     def apply(lineParts: String*): Line = new Line(Vector(lineParts: _*))
+
+    def from(lineParts: immutable.IndexedSeq[String]): Line = new Line(lineParts)
   }
 
   /** Collection of lines, on which operations such as `shift` can be performed */

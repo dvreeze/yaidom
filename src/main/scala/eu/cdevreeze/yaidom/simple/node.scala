@@ -444,7 +444,7 @@ final class Elem(
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val qnameLineSeq: LineSeq = {
-      val line = Line(toStringLiteralAsSeq(this.qname.toString): _*).prepend("qname = QName(").append(")")
+      val line = Line.from(toStringLiteralAsSeq(this.qname.toString)).prepend("qname = QName(").append(")")
       LineSeq(line)
     }
 
@@ -462,7 +462,7 @@ final class Elem(
           rawResult.dropRight(1)
         }
 
-        val line = Line(attributeEntryStrings: _*).prepend("attributes = Vector(").append(")")
+        val line = Line.from(attributeEntryStrings).prepend("attributes = Vector(").append(")")
         Some(LineSeq(line))
       }
 
@@ -482,7 +482,7 @@ final class Elem(
           rawResult.dropRight(1)
         }
 
-        val line = Line(namespaceEntryStrings: _*).prepend("namespaces = Declarations.from(").append(")")
+        val line = Line.from(namespaceEntryStrings).prepend("namespaces = Declarations.from(").append(")")
         Some(LineSeq(line))
       }
     }
@@ -580,7 +580,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val targetStringLiteral = toStringLiteralAsSeq(target)
     val dataStringLiteral = toStringLiteralAsSeq(data)
-    val partOfLine = new Line((targetStringLiteral :+ ", ") ++ dataStringLiteral)
+    val partOfLine = Line.from((targetStringLiteral :+ ", ") ++ dataStringLiteral)
     val line = partOfLine.prepend("processingInstruction(").append(")")
     LineSeq(line).shift(indent)
   }
@@ -602,7 +602,7 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val entityStringLiteral = toStringLiteralAsSeq(entity)
-    val line = Line(entityStringLiteral: _*).prepend("entityRef(").append(")")
+    val line = Line.from(entityStringLiteral).prepend("entityRef(").append(")")
     LineSeq(line).shift(indent)
   }
 }
