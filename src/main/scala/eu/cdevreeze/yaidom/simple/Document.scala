@@ -167,15 +167,15 @@ final class Document(
 
     val uriOptionLineSeq: LineSeq =
       if (this.uriOption.isEmpty) {
-        val line = new Line("uriOption = None")
+        val line = Line("uriOption = None")
         LineSeq(line)
       } else {
-        val line = Line.from("uriOption = Some(", toStringLiteralAsSeq(this.uriOption.get.toString), ")")
+        val line = Line(toStringLiteralAsSeq(this.uriOption.get.toString): _*).prepend("uriOption = Some(").append(")")
         LineSeq(line)
       }
 
     val childrenLineSeq: LineSeq = {
-      val firstLine = LineSeq(new Line("children = Vector("))
+      val firstLine = LineSeq(Line("children = Vector("))
 
       val contentLines = {
         val groups =
@@ -186,7 +186,7 @@ final class Document(
         result
       }
 
-      val lastLine = LineSeq(new Line(")"))
+      val lastLine = LineSeq(Line(")"))
 
       LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq
     }
@@ -195,9 +195,9 @@ final class Document(
     val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
 
     LineSeqSeq(
-      LineSeq(new Line("document(")),
+      LineSeq(Line("document(")),
       content,
-      LineSeq(new Line(")"))).mkLineSeq.shift(indent)
+      LineSeq(Line(")"))).mkLineSeq.shift(indent)
   }
 }
 

@@ -444,7 +444,7 @@ final class Elem(
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val qnameLineSeq: LineSeq = {
-      val line = Line.from("qname = QName(", toStringLiteralAsSeq(this.qname.toString), ")")
+      val line = Line(toStringLiteralAsSeq(this.qname.toString): _*).prepend("qname = QName(").append(")")
       LineSeq(line)
     }
 
@@ -462,7 +462,7 @@ final class Elem(
           rawResult.dropRight(1)
         }
 
-        val line = Line.from("attributes = Vector(", attributeEntryStrings, ")")
+        val line = Line(attributeEntryStrings: _*).prepend("attributes = Vector(").append(")")
         Some(LineSeq(line))
       }
 
@@ -482,14 +482,14 @@ final class Elem(
           rawResult.dropRight(1)
         }
 
-        val line = Line.from("namespaces = Declarations.from(", namespaceEntryStrings, ")")
+        val line = Line(namespaceEntryStrings: _*).prepend("namespaces = Declarations.from(").append(")")
         Some(LineSeq(line))
       }
     }
 
     val childrenLineSeqOption: Option[LineSeq] =
       if (this.children.isEmpty) None else {
-        val firstLine = LineSeq(new Line("children = Vector("))
+        val firstLine = LineSeq(Line("children = Vector("))
 
         val contentLines: LineSeq = {
           // Recursive calls
@@ -502,7 +502,7 @@ final class Elem(
           val result = LineSeqSeq(groups: _*).mkLineSeq(",")
           result
         }
-        val lastLine = LineSeq(new Line(")"))
+        val lastLine = LineSeq(Line(")"))
 
         Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
       }
@@ -515,9 +515,9 @@ final class Elem(
     val elemFunctionNameWithOpeningBracket: String = if (childrenLineSeqOption.isEmpty) "emptyElem(" else "elem("
 
     LineSeqSeq(
-      LineSeq(new Line(elemFunctionNameWithOpeningBracket)),
+      LineSeq(Line(elemFunctionNameWithOpeningBracket)),
       content,
-      LineSeq(new Line(")"))).mkLineSeq.shift(indent)
+      LineSeq(Line(")"))).mkLineSeq.shift(indent)
   }
 
   private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {
@@ -580,7 +580,9 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val targetStringLiteral = toStringLiteralAsSeq(target)
     val dataStringLiteral = toStringLiteralAsSeq(data)
-    LineSeq(Line.from("processingInstruction(", targetStringLiteral ++ Vector(", ") ++ dataStringLiteral, ")")).shift(indent)
+    val partOfLine = new Line((targetStringLiteral :+ ", ") ++ dataStringLiteral)
+    val line = partOfLine.prepend("processingInstruction(").append(")")
+    LineSeq(line).shift(indent)
   }
 }
 
@@ -600,7 +602,8 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
     val entityStringLiteral = toStringLiteralAsSeq(entity)
-    LineSeq(Line.from("entityRef(", entityStringLiteral, ")")).shift(indent)
+    val line = Line(entityStringLiteral: _*).prepend("entityRef(").append(")")
+    LineSeq(line).shift(indent)
   }
 }
 

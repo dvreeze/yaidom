@@ -33,44 +33,45 @@ private[yaidom] object PrettyPrinting {
   private val NewLine = "%n".format()
 
   /**
-   * Line, consisting of an indent, followed by 0 or more prefixes, followed by the "real" (non-empty) content of the line, followed
-   * by 0 or more suffixes (which are stored in reverse order).
+   * Line, consisting of an indent, followed by the "real" (non-empty) content of the line as a sequence of strings.
    *
    * This class is designed to make `LineSeq` operations such as `append` and `prepend` efficient, without creating any
-   * unnecessary string literals. It is also designed to possibly contain multiple successive line parts, in order to prevent unnecessary
-   * string concatenation.
+   * unnecessary string literals. It is also designed to possibly contain multiple successive non-concatenated line parts,
+   * in order to prevent unnecessary string concatenation.
    *
-   * The line may have newlines, but not in prefixes and suffixes. If the line contains any newlines, there will be no indentation
-   * at these line breaks. Thus XML attributes and their values can be modeled as part of one Line object, even if they contain line breaks.
+   * The line may have newlines, but if the line contains any newlines, there will be no indentation at these line breaks.
+   * Thus XML attributes and their values can be modeled as part of one Line object, even if they contain line breaks.
+   *
+   * Appending and prepending, on the other hand, may not introduce any line breaks!
    */
-  final class Line(val indent: Int, val lineParts: immutable.IndexedSeq[String], val prefixes: List[String], val suffixesReversed: List[String]) {
+  final class Line(val indent: Int, val lineParts: immutable.IndexedSeq[String]) {
     require(lineParts ne null)
     require(lineParts.nonEmpty, s"Empty line content (ignoring prefixes and suffixes) not allowed")
     require(lineParts.head.nonEmpty, s"Empty line content (ignoring prefixes and suffixes) not allowed")
-    require(prefixes forall (s => s.indexOf('\n') < 0))
-    require(suffixesReversed forall (s => s.indexOf('\n') < 0))
-
-    def this(indent: Int, lineParts: immutable.IndexedSeq[String]) = this(indent, lineParts, Nil, Nil)
-
-    def this(indent: Int, line: String) = this(indent, immutable.IndexedSeq(line))
 
     def this(lineParts: immutable.IndexedSeq[String]) = this(0, lineParts)
+
+    def this(indent: Int, line: String) = this(indent, immutable.IndexedSeq(line))
 
     def this(line: String) = this(0, line)
 
     /** Functionally adds an indent */
     def plusIndent(addedIndent: Int): Line = {
-      if (addedIndent == 0) this else new Line(addedIndent + indent, lineParts, prefixes, suffixesReversed)
+      if (addedIndent == 0) this else new Line(addedIndent + indent, lineParts)
     }
 
     /** Functionally appends a trailing string (which must contain no newline) to this line */
     def append(s: String): Line = {
-      if (s.isEmpty) this else new Line(indent, lineParts, prefixes, (s :: suffixesReversed))
+      require(s.indexOf('\n') < 0, "The string to append must not have any newlines")
+
+      if (s.isEmpty) this else new Line(indent, lineParts :+ s)
     }
 
-    /** Functionally prepends a string (which must contain no newline) to this line as prefix */
+    /** Functionally prepends a string (which must contain no newline) to this line */
     def prepend(s: String): Line = {
-      if (s.isEmpty) this else new Line(indent, lineParts, s :: prefixes, suffixesReversed)
+      require(s.indexOf('\n') < 0, "The string to prepend must not have any newlines")
+
+      if (s.isEmpty) this else new Line(indent, s +: lineParts)
     }
 
     /**
@@ -79,19 +80,13 @@ private[yaidom] object PrettyPrinting {
     def addToStringBuilder(sb: StringBuilder): Unit = {
       for (i <- 0 until indent) sb.append(' ')
 
-      prefixes foreach { s => sb.append(s) }
-
       lineParts foreach { s => sb.append(s) }
-
-      suffixesReversed.reverse foreach { s => sb.append(s) }
     }
   }
 
   object Line {
 
-    def from(firstPart: String, centralParts: immutable.IndexedSeq[String], lastPart: String): Line = {
-      new Line(firstPart +: (centralParts :+ lastPart))
-    }
+    def apply(lineParts: String*): Line = new Line(Vector(lineParts: _*))
   }
 
   /** Collection of lines, on which operations such as `shift` can be performed */
