@@ -26,6 +26,7 @@ import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDomLS
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
@@ -209,6 +210,47 @@ class PrettifyTest extends FunSuite {
     val doc = parser.parse(new java.io.ByteArrayInputStream(xmlString.getBytes("UTF-8")))
 
     doTest(doc)
+  }
+
+  /**
+   * See http://stackoverflow.com/questions/11703635/strip-whitespace-and-newlines-from-xml-in-java.
+   */
+  test("testRemoveIgnorableWhitespace") {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setCoalescing(false)
+    val parser = DocumentParserUsingDom.newInstance(dbf)
+
+    val xmlString = """<?xml version="1.0" encoding="UTF-8"?>
+<tag1>
+ <tag2>
+    <![CDATA[  Some data ]]>
+ </tag2>
+</tag1>
+"""
+
+    val doc = parser.parse(new java.io.ByteArrayInputStream(xmlString.getBytes("UTF-8")))
+
+    assertResult(true) {
+      doc.documentElement.filterElems(_.localName == "tag2").flatMap(_.textChildren).size >= 3
+    }
+
+    val editedDoc =
+      doc.transformingDocumentElement(_.removeAllInterElementWhitespace) transformElemsOrSelf { elm =>
+        if (elm.localName == "tag2") elm.withChildren(elm.textChildren.filter(_.text.trim.nonEmpty)) else elm
+      }
+
+    assertResult(1) {
+      editedDoc.documentElement.findAllChildElems.flatMap(_.textChildren).filter(_.isCData).size
+    }
+
+    // Very sensitive. Only a (default) DocumentPrinterUsingDomLS seems to return the expected XML output.
+    val docPrinter = DocumentPrinterUsingDomLS.newInstance()
+
+    val editedXmlString = docPrinter.print(editedDoc.documentElement)
+
+    assertResult("""<tag1><tag2><![CDATA[  Some data ]]></tag2></tag1>""") {
+      editedXmlString
+    }
   }
 
   private def doTest(doc: Document): Unit = {
