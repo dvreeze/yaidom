@@ -182,28 +182,43 @@ final case class Elem(
     textStrings.mkString
   }
 
-  /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
+  /**
+   *  Returns a copy where inter-element whitespace has been removed, throughout the node tree.
+   *
+   *  That is, for each descendant-or-self element determines if it has at least one child element and no non-whitespace
+   *  text child nodes, and if so, removes all (whitespace) text children.
+   *
+   *  This method is useful if it is known that whitespace around element nodes is used for formatting purposes, and (in
+   *  the absence of an XML Schema or DTD) can therefore be treated as "ignorable whitespace". In the case of "mixed content"
+   *  (if text around element nodes is not all whitespace), this method will not remove any text children of the parent element.
+   *
+   *  XML space attributes (xml:space) are not respected by this method. If such whitespace preservation functionality is needed,
+   *  it can be written as a transformation where for specific elements this method is not called.
+   */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
       case _                                => false
     }
 
-    def isElem(n: Node): Boolean = n match {
-      case e: Elem => true
-      case _       => false
+    def isNonTextNode(n: Node): Boolean = n match {
+      case t: Text => false
+      case n       => true
     }
 
-    val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!findAllChildElems.isEmpty)
+    val doStripWhitespace = (findChildElem(_ => true).nonEmpty) && (children forall (n => isWhitespaceText(n) || isNonTextNode(n)))
 
     // Recursive, but not tail-recursive
 
     val newChildren = {
-      val remainder = if (doStripWhitespace) findAllChildElems else children
+      val remainder = if (doStripWhitespace) children.filter(n => isNonTextNode(n)) else children
 
       remainder map {
-        case e: Elem => e.removeAllInterElementWhitespace
-        case n       => n
+        case e: Elem =>
+          // Recursive call
+          e.removeAllInterElementWhitespace
+        case n =>
+          n
       }
     }
 
@@ -212,12 +227,10 @@ final case class Elem(
 
   /** Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree */
   def coalesceAllAdjacentText: Elem = {
-    val newChildren = mutable.ArrayBuffer[Node]()
-
     // Recursive, but not tail-recursive
 
-    def accumulate(childNodes: Seq[Node]): Unit = {
-      if (!childNodes.isEmpty) {
+    def accumulate(childNodes: Seq[Node], newChildrenBuffer: mutable.ArrayBuffer[Node]): Unit = {
+      if (childNodes.nonEmpty) {
         val head = childNodes.head
 
         head match {
@@ -229,25 +242,26 @@ final case class Elem(
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
 
-            newChildren += Text(combinedText)
-            accumulate(remainder)
-          case e: Elem =>
-            newChildren += e
-            accumulate(childNodes.tail)
+            newChildrenBuffer += Text(combinedText)
+
+            // Recursive call
+            accumulate(remainder, newChildrenBuffer)
+          case n: Node =>
+            newChildrenBuffer += n
+
+            // Recursive call
+            accumulate(childNodes.tail, newChildrenBuffer)
         }
       }
     }
 
-    accumulate(thisElem.children)
+    thisElem transformElemsOrSelf { elm =>
+      val newChildrenBuffer = mutable.ArrayBuffer[Node]()
 
-    val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
-      n match {
-        case e: Elem => e.coalesceAllAdjacentText
-        case n       => n
-      }
+      accumulate(elm.children, newChildrenBuffer)
+
+      elm.withChildren(newChildrenBuffer.toIndexedSeq)
     }
-
-    thisElem.withChildren(resultChildren)
   }
 
   /**
@@ -255,19 +269,20 @@ final case class Elem(
    * Note that it makes little sense to call this method before `coalesceAllAdjacentText`.
    */
   def normalizeAllText: Elem = {
-    // Recursive, but not tail-recursive
-
-    val newChildren: immutable.IndexedSeq[Node] = {
-      thisElem.children map { (n: Node) =>
-        n match {
-          case e: Elem => e.normalizeAllText
-          case t: Text => Text(t.normalizedText)
-          case n       => n
+    thisElem transformElemsOrSelf { elm =>
+      val newChildren: immutable.IndexedSeq[Node] = {
+        elm.children map { (n: Node) =>
+          n match {
+            case t: Text =>
+              Text(t.normalizedText)
+            case n =>
+              n
+          }
         }
       }
-    }
 
-    thisElem.withChildren(newChildren)
+      elm.withChildren(newChildren)
+    }
   }
 
   /**
@@ -276,12 +291,10 @@ final case class Elem(
    * but more efficient.
    */
   def coalesceAndNormalizeAllText: Elem = {
-    val newChildren = mutable.ArrayBuffer[Node]()
-
     // Recursive, but not tail-recursive
 
-    def accumulate(childNodes: Seq[Node]): Unit = {
-      if (!childNodes.isEmpty) {
+    def accumulate(childNodes: Seq[Node], newChildrenBuffer: mutable.ArrayBuffer[Node]): Unit = {
+      if (childNodes.nonEmpty) {
         val head = childNodes.head
 
         head match {
@@ -293,25 +306,26 @@ final case class Elem(
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
 
-            newChildren += Text(XmlStringUtils.normalizeString(combinedText))
-            accumulate(remainder)
-          case e: Elem =>
-            newChildren += e
-            accumulate(childNodes.tail)
+            newChildrenBuffer += Text(XmlStringUtils.normalizeString(combinedText))
+
+            // Recursive call
+            accumulate(remainder, newChildrenBuffer)
+          case n: Node =>
+            newChildrenBuffer += n
+
+            // Recursive call
+            accumulate(childNodes.tail, newChildrenBuffer)
         }
       }
     }
 
-    accumulate(thisElem.children)
+    thisElem transformElemsOrSelf { elm =>
+      val newChildrenBuffer = mutable.ArrayBuffer[Node]()
 
-    val resultChildren = newChildren.toIndexedSeq map { (n: Node) =>
-      n match {
-        case e: Elem => e.coalesceAndNormalizeAllText
-        case n       => n
-      }
+      accumulate(elm.children, newChildrenBuffer)
+
+      elm.withChildren(newChildrenBuffer.toIndexedSeq)
     }
-
-    thisElem.withChildren(resultChildren)
   }
 
   private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {

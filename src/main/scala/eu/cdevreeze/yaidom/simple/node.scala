@@ -348,32 +348,150 @@ final class Elem(
     this.copy(scope = newScope) transformChildElems { e => e.notUndeclaringPrefixes(newScope) }
   }
 
-  /** Returns a copy where inter-element whitespace has been removed, throughout the node tree */
+  /**
+   *  Returns a copy where inter-element whitespace has been removed, throughout the node tree.
+   *
+   *  That is, for each descendant-or-self element determines if it has at least one child element and no non-whitespace
+   *  text child nodes, and if so, removes all (whitespace) text children.
+   *
+   *  This method is useful if it is known that whitespace around element nodes is used for formatting purposes, and (in
+   *  the absence of an XML Schema or DTD) can therefore be treated as "ignorable whitespace". In the case of "mixed content"
+   *  (if text around element nodes is not all whitespace), this method will not remove any text children of the parent element.
+   *
+   *  XML space attributes (xml:space) are not respected by this method. If such whitespace preservation functionality is needed,
+   *  it can be written as a transformation where for specific elements this method is not called.
+   */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
       case _                                => false
     }
 
-    def isElem(n: Node): Boolean = n match {
-      case e: Elem => true
-      case _       => false
+    def isNonTextNode(n: Node): Boolean = n match {
+      case t: Text => false
+      case n       => true
     }
 
-    val doStripWhitespace = (children forall (n => isWhitespaceText(n) || isElem(n))) && (!findAllChildElems.isEmpty)
+    val doStripWhitespace = (findChildElem(_ => true).nonEmpty) && (children forall (n => isWhitespaceText(n) || isNonTextNode(n)))
 
     // Recursive, but not tail-recursive
 
     val newChildren = {
-      val remainder = if (doStripWhitespace) findAllChildElems else children
+      val remainder = if (doStripWhitespace) children.filter(n => isNonTextNode(n)) else children
 
       remainder map {
-        case e: Elem => e.removeAllInterElementWhitespace
-        case n       => n
+        case e: Elem =>
+          // Recursive call
+          e.removeAllInterElementWhitespace
+        case n =>
+          n
       }
     }
 
     thisElem.withChildren(newChildren)
+  }
+
+  /** Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree */
+  def coalesceAllAdjacentText: Elem = {
+    // Recursive, but not tail-recursive
+
+    def accumulate(childNodes: Seq[Node], newChildrenBuffer: mutable.ArrayBuffer[Node]): Unit = {
+      if (childNodes.nonEmpty) {
+        val head = childNodes.head
+
+        head match {
+          case t: Text =>
+            val (textNodes, remainder) = childNodes span {
+              case t: Text => true
+              case _       => false
+            }
+
+            val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
+
+            newChildrenBuffer += Text(combinedText, false) // No CDATA?
+
+            // Recursive call
+            accumulate(remainder, newChildrenBuffer)
+          case n: Node =>
+            newChildrenBuffer += n
+
+            // Recursive call
+            accumulate(childNodes.tail, newChildrenBuffer)
+        }
+      }
+    }
+
+    thisElem transformElemsOrSelf { elm =>
+      val newChildrenBuffer = mutable.ArrayBuffer[Node]()
+
+      accumulate(elm.children, newChildrenBuffer)
+
+      elm.withChildren(newChildrenBuffer.toIndexedSeq)
+    }
+  }
+
+  /**
+   * Returns a copy where text nodes have been normalized, throughout the node tree.
+   * Note that it makes little sense to call this method before `coalesceAllAdjacentText`.
+   */
+  def normalizeAllText: Elem = {
+    thisElem transformElemsOrSelf { elm =>
+      val newChildren: immutable.IndexedSeq[Node] = {
+        elm.children map { (n: Node) =>
+          n match {
+            case t: Text =>
+              Text(t.normalizedText, false) // No CDATA?
+            case n =>
+              n
+          }
+        }
+      }
+
+      elm.withChildren(newChildren)
+    }
+  }
+
+  /**
+   * Returns a copy where adjacent text nodes have been combined into one text node, and where all
+   * text is normalized, throughout the node tree. Same as calling `coalesceAllAdjacentText` followed by `normalizeAllText`,
+   * but more efficient.
+   */
+  def coalesceAndNormalizeAllText: Elem = {
+    // Recursive, but not tail-recursive
+
+    def accumulate(childNodes: Seq[Node], newChildrenBuffer: mutable.ArrayBuffer[Node]): Unit = {
+      if (childNodes.nonEmpty) {
+        val head = childNodes.head
+
+        head match {
+          case t: Text =>
+            val (textNodes, remainder) = childNodes span {
+              case t: Text => true
+              case _       => false
+            }
+
+            val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
+
+            newChildrenBuffer += Text(XmlStringUtils.normalizeString(combinedText), false) // No CDATA?
+
+            // Recursive call
+            accumulate(remainder, newChildrenBuffer)
+          case n: Node =>
+            newChildrenBuffer += n
+
+            // Recursive call
+            accumulate(childNodes.tail, newChildrenBuffer)
+        }
+      }
+    }
+
+    thisElem transformElemsOrSelf { elm =>
+      val newChildrenBuffer = mutable.ArrayBuffer[Node]()
+
+      accumulate(elm.children, newChildrenBuffer)
+
+      elm.withChildren(newChildrenBuffer.toIndexedSeq)
+    }
   }
 
   /**
@@ -406,7 +524,7 @@ final class Elem(
     def prettify(elm: Elem, currentIndent: Int): Elem = {
       val childNodes = elm.children
       val hasElemChild = elm.findChildElem(e => true).isDefined
-      val doPrettify = (childNodes forall (n => !isText(n))) && (hasElemChild)
+      val doPrettify = hasElemChild && (childNodes forall (n => !isText(n)))
 
       if (doPrettify) {
         val newIndent = currentIndent + indent
@@ -425,6 +543,7 @@ final class Elem(
 
         elm.withChildren(newChildNodes)
       } else {
+        // Once we have encountered text-only content or mixed content, the formatting stops right there for that part of the DOM tree.
         elm
       }
     }

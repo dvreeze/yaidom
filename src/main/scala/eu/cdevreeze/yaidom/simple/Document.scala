@@ -101,6 +101,13 @@ final class Document(
       case node: CanBeDocumentChild => node
     })
 
+  /**
+   * Returns `withDocumentElement(f(documentElement))`.
+   */
+  def transformingDocumentElement(f: Elem => Elem): Document = {
+    withDocumentElement(f(documentElement))
+  }
+
   /** Creates a copy, but with the new uriOption passed as parameter newUriOption */
   def withUriOption(newUriOption: Option[URI]): Document = new Document(
     uriOption = newUriOption,
