@@ -349,17 +349,17 @@ final class Elem(
   }
 
   /**
-   *  Returns a copy where inter-element whitespace has been removed, throughout the node tree.
+   * Returns a copy where inter-element whitespace has been removed, throughout the node tree.
    *
-   *  That is, for each descendant-or-self element determines if it has at least one child element and no non-whitespace
-   *  text child nodes, and if so, removes all (whitespace) text children.
+   * That is, for each descendant-or-self element determines if it has at least one child element and no non-whitespace
+   * text child nodes, and if so, removes all (whitespace) text children.
    *
-   *  This method is useful if it is known that whitespace around element nodes is used for formatting purposes, and (in
-   *  the absence of an XML Schema or DTD) can therefore be treated as "ignorable whitespace". In the case of "mixed content"
-   *  (if text around element nodes is not all whitespace), this method will not remove any text children of the parent element.
+   * This method is useful if it is known that whitespace around element nodes is used for formatting purposes, and (in
+   * the absence of an XML Schema or DTD) can therefore be treated as "ignorable whitespace". In the case of "mixed content"
+   * (if text around element nodes is not all whitespace), this method will not remove any text children of the parent element.
    *
-   *  XML space attributes (xml:space) are not respected by this method. If such whitespace preservation functionality is needed,
-   *  it can be written as a transformation where for specific elements this method is not called.
+   * XML space attributes (xml:space) are not respected by this method. If such whitespace preservation functionality is needed,
+   * it can be written as a transformation where for specific elements this method is not called.
    */
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
@@ -391,8 +391,11 @@ final class Elem(
     thisElem.withChildren(newChildren)
   }
 
-  /** Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree */
-  def coalesceAllAdjacentText: Elem = {
+  /**
+   * Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree.
+   * After combining the adjacent text nodes, all text nodes are transformed by calling the passed function.
+   */
+  def coalesceAllAdjacentTextAndPostprocess(f: Text => Text): Elem = {
     // Recursive, but not tail-recursive
 
     def accumulate(childNodes: Seq[Node], newChildrenBuffer: mutable.ArrayBuffer[Node]): Unit = {
@@ -408,7 +411,7 @@ final class Elem(
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
 
-            newChildrenBuffer += Text(combinedText, false) // No CDATA?
+            newChildrenBuffer += f(Text(combinedText, false)) // No CDATA?
 
             // Recursive call
             accumulate(remainder, newChildrenBuffer)
@@ -430,19 +433,30 @@ final class Elem(
     }
   }
 
+  /** Returns a copy where adjacent text nodes have been combined into one text node, throughout the node tree */
+  def coalesceAllAdjacentText: Elem = {
+    coalesceAllAdjacentTextAndPostprocess(t => t)
+  }
+
   /**
-   * Returns a copy where text nodes have been normalized, throughout the node tree.
-   * Note that it makes little sense to call this method before `coalesceAllAdjacentText`.
+   * Returns a copy where adjacent text nodes have been combined into one text node, and where all
+   * text is normalized, throughout the node tree. Same as calling `coalesceAllAdjacentText` followed by `normalizeAllText`,
+   * but more efficient.
    */
-  def normalizeAllText: Elem = {
+  def coalesceAndNormalizeAllText: Elem = {
+    coalesceAllAdjacentTextAndPostprocess(t => Text(XmlStringUtils.normalizeString(t.text), t.isCData))
+  }
+
+  /**
+   * Returns a copy where text nodes have been transformed, throughout the node tree.
+   */
+  def transformAllText(f: Text => Text): Elem = {
     thisElem transformElemsOrSelf { elm =>
       val newChildren: immutable.IndexedSeq[Node] = {
         elm.children map { (n: Node) =>
           n match {
-            case t: Text =>
-              Text(t.normalizedText, false) // No CDATA?
-            case n =>
-              n
+            case t: Text => f(t)
+            case n       => n
           }
         }
       }
@@ -452,46 +466,11 @@ final class Elem(
   }
 
   /**
-   * Returns a copy where adjacent text nodes have been combined into one text node, and where all
-   * text is normalized, throughout the node tree. Same as calling `coalesceAllAdjacentText` followed by `normalizeAllText`,
-   * but more efficient.
+   * Returns a copy where text nodes have been normalized, throughout the node tree.
+   * Note that it makes little sense to call this method before `coalesceAllAdjacentText`.
    */
-  def coalesceAndNormalizeAllText: Elem = {
-    // Recursive, but not tail-recursive
-
-    def accumulate(childNodes: Seq[Node], newChildrenBuffer: mutable.ArrayBuffer[Node]): Unit = {
-      if (childNodes.nonEmpty) {
-        val head = childNodes.head
-
-        head match {
-          case t: Text =>
-            val (textNodes, remainder) = childNodes span {
-              case t: Text => true
-              case _       => false
-            }
-
-            val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
-
-            newChildrenBuffer += Text(XmlStringUtils.normalizeString(combinedText), false) // No CDATA?
-
-            // Recursive call
-            accumulate(remainder, newChildrenBuffer)
-          case n: Node =>
-            newChildrenBuffer += n
-
-            // Recursive call
-            accumulate(childNodes.tail, newChildrenBuffer)
-        }
-      }
-    }
-
-    thisElem transformElemsOrSelf { elm =>
-      val newChildrenBuffer = mutable.ArrayBuffer[Node]()
-
-      accumulate(elm.children, newChildrenBuffer)
-
-      elm.withChildren(newChildrenBuffer.toIndexedSeq)
-    }
+  def normalizeAllText: Elem = {
+    transformAllText(t => Text(t.normalizedText, false)) // No CDATA?
   }
 
   /**
