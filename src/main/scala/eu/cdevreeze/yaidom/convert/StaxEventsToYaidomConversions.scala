@@ -67,9 +67,6 @@ import javax.xml.stream.events.XMLEvent
 trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEvent]] {
   import StaxEventsToYaidomConversions.EventEndState
   import StaxEventsToYaidomConversions.EventWithEndState
-  import StaxEventsToYaidomConversions.DocumentWithRemainingEventStates
-  import StaxEventsToYaidomConversions.ElemSeqWithRemainingEventStates
-  import StaxEventsToYaidomConversions.ElemWithRemainingEventStates
 
   /**
    * Converts the given sequence of `XMLEvent` instances to a yaidom `Document`. Invokes `convertToDocument(v.iterator)`.
@@ -91,14 +88,14 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
       result.buffered
     }
 
-    val result = takeDocument(eventStateIterator)
+    val doc = takeDocument(eventStateIterator)
 
     require {
-      result.remainder forall { ev =>
+      eventStateIterator forall { ev =>
         !ev.event.isStartElement && !ev.event.isEndElement && !ev.event.isStartDocument && !ev.event.isEndDocument
       }
     }
-    result.doc
+    doc
   }
 
   /**
@@ -130,12 +127,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
       result.buffered
     }
 
-    val result = takeElem(eventStateIterator)
+    val elem = takeElem(eventStateIterator)
 
     require {
-      result.remainder forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
+      eventStateIterator forall { ev => !ev.event.isStartElement && !ev.event.isEndElement }
     }
-    result.elem
+    elem
   }
 
   /** Converts a StAX `Characters` event to a yaidom `Text` */
@@ -170,13 +167,12 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   }
 
   /**
-   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to a Document. The remaining
-   * event end states are also returned in the result. The first event must be a StartDocument event, or else an
-   * exception is thrown.
+   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to a Document. The first event must
+   * be a StartDocument event, or else an exception is thrown.
    *
    * The input iterator should come from a call to method `convertToEventWithEndStateIterator`.
    */
-  final def takeDocument(eventStateIterator: BufferedIterator[EventWithEndState]): DocumentWithRemainingEventStates = {
+  final def takeDocument(eventStateIterator: BufferedIterator[EventWithEndState]): Document = {
     require(eventStateIterator.hasNext)
 
     var it = eventStateIterator
@@ -209,10 +205,8 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
       nextHead.event match {
         case ev if ev.isStartElement => {
           require(docChildren.collect({ case e: Elem => e }).isEmpty, "Only 1 document element allowed and required")
-          val result = takeElem(it)
-          val docElement = result.elem
-          docChildren += docElement
-          it = result.remainder
+          val docElem = takeElem(it)
+          docChildren += docElem
         }
         case ev: javax.xml.stream.events.ProcessingInstruction => {
           val pi = convertToProcessingInstruction(ev)
@@ -242,17 +236,17 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
       uriOption = uriOption,
       xmlDeclarationOption = xmlDeclOption,
       children = docChildren.toVector)
-    new DocumentWithRemainingEventStates(doc, it)
+    doc
   }
 
   /**
-   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to a Elem. The remaining
-   * event end states are also returned in the result. The first event must be a StartElement event, or else an
-   * exception is thrown.
+   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to a Elem. The first event
+   * must be a StartElement event, or else an exception is thrown. The iterator can still be used afterwards for the
+   * remaining events.
    *
    * The input iterator should come from a call to method `convertToEventWithEndStateIterator`.
    */
-  final def takeElem(eventStateIterator: BufferedIterator[EventWithEndState]): ElemWithRemainingEventStates = {
+  final def takeElem(eventStateIterator: BufferedIterator[EventWithEndState]): Elem = {
     require(eventStateIterator.hasNext)
 
     var it = eventStateIterator
@@ -281,10 +275,8 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
       nextHead.event match {
         case ev: StartElement => {
           // Recursive call (not tail-recursive, but recursion depth is rather limited)
-          val result = takeElem(it)
-          val ch = result.elem
+          val ch = takeElem(it)
           children += ch
-          it = result.remainder
         }
         case ev: Characters => {
           val ch = convertToText(ev)
@@ -316,13 +308,13 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
       s"Expected end-element name ${head.event.asStartElement.getName} but encountered ${endElementEv.getName}")
 
     val elemWithChildren: Elem = elem.withChildren(children.toIndexedSeq)
-    new ElemWithRemainingEventStates(elemWithChildren, it)
+    elemWithChildren
   }
 
   /**
    * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to an Elem sequence until
-   * the predicate holds. The remaining event end states are also returned in the result. The first event, if any, must be a
-   * StartElement event, or else an exception is thrown.
+   * the predicate holds. The first event, if any, must be a StartElement event, or else an exception is thrown. The iterator
+   * can still be used afterwards for the remaining events.
    *
    * The input iterator should come from a call to method `convertToEventWithEndStateIterator`.
    *
@@ -330,11 +322,14 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
    * not hold for the last elements, they are returned anyway. Moreover, if the predicate does not stop in time, too many elements may be
    * kept in memory.
    *
-   * TODO Return NodeSeqWithRemainingEventStates instead.
+   * TODO Return a Node collection instead, or create a similar method that returns a Node collection.
    */
-  final def takeElemSeqUntil(eventStateIterator: BufferedIterator[EventWithEndState], p: ElemSeqWithRemainingEventStates => Boolean): ElemSeqWithRemainingEventStates = {
+  final def takeElemsUntil(
+    eventStateIterator: BufferedIterator[EventWithEndState],
+    p: (immutable.IndexedSeq[Elem], Option[EventWithEndState]) => Boolean): immutable.IndexedSeq[Elem] = {
+
     if (!eventStateIterator.hasNext) {
-      new ElemSeqWithRemainingEventStates(Vector(), eventStateIterator)
+      Vector()
     } else {
       var it = eventStateIterator
 
@@ -342,19 +337,18 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
 
       var elems = Vector[Elem]()
 
-      while (it.hasNext && !p(new ElemSeqWithRemainingEventStates(elems, it))) {
+      while (it.hasNext && !p(elems, Some(it.head))) {
         assert(it.head.event.isStartElement, s"Not a StartElement event: ${it.head.event}")
 
-        elems = elems :+ takeElem(it).elem
+        elems = elems :+ takeElem(it)
 
         while (it.hasNext && !it.head.event.isStartElement) {
           it.next // May lose comments etc.
         }
       }
 
-      val result = new ElemSeqWithRemainingEventStates(elems, it)
-      assert(!it.hasNext || p(result))
-      result
+      assert(!it.hasNext || p(elems, Some(it.head)))
+      elems
     }
   }
 
@@ -413,12 +407,6 @@ object StaxEventsToYaidomConversions {
         (state.currentElemOption.map(_.qname.localPart) == Some(event.asStartElement.getName.getLocalPart)),
       s"Corrupt EventWithEndState. Mismatch between StartElement and EventEndState.")
   }
-
-  final class DocumentWithRemainingEventStates(val doc: Document, val remainder: BufferedIterator[EventWithEndState])
-
-  final class ElemWithRemainingEventStates(val elem: Elem, val remainder: BufferedIterator[EventWithEndState])
-
-  final class ElemSeqWithRemainingEventStates(val elems: immutable.IndexedSeq[Elem], val remainder: BufferedIterator[EventWithEndState])
 
   private def eventToElemWithoutChildren(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): ElemWithoutChildren = {
     val declarations: Declarations = {

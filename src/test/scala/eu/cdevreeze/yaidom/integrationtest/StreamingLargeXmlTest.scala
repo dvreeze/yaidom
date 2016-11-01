@@ -32,7 +32,7 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithEndStateIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
-import eu.cdevreeze.yaidom.convert.StaxConversions.takeElemSeqUntil
+import eu.cdevreeze.yaidom.convert.StaxConversions.takeElemsUntil
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
@@ -110,9 +110,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     dropWhileNotContact()
 
     while (it.hasNext) {
-      val contactResult = takeElem(it)
-
-      val contactElem = contactResult.elem
+      val contactElem = takeElem(it)
 
       assert(contactElem.localName == "contact")
       contactCount += 1
@@ -169,7 +167,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     }
 
     def take10Contacts(): immutable.IndexedSeq[Elem] = {
-      takeElemSeqUntil(it, result => result.elems.size == 10).elems
+      takeElemsUntil(it, (elms, nextEvOption) => elms.size == 10)
     }
 
     dropWhileNotContact()
@@ -229,9 +227,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     dropWhileNotEnterprise()
 
     while (it.hasNext) {
-      val enterpriseResult = takeElem(it)
-
-      val enterpriseElem = enterpriseResult.elem
+      val enterpriseElem = takeElem(it)
 
       assert(enterpriseElem.localName == "Enterprise")
       enterpriseCount += 1
