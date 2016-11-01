@@ -21,6 +21,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.{ util => jutil }
 
+import scala.collection.immutable
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
@@ -30,12 +32,15 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithEndStateIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
+import eu.cdevreeze.yaidom.convert.StaxConversions.takeElemSeqUntil
+import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
 
 /**
- * Large XML test case, using streaming, thus keeping the memory footprint low.
+ * Large XML test case, using streaming, thus keeping the memory footprint low. This test case shows how to code StAX-based streaming for yaidom, keeping the
+ * memory footprint low. This approach must therefore work for XML files of multiple GiB.
  *
  * Acknowledgments: The large XML files come from http://javakata6425.appspot.com/#!goToPageIIIarticleIIIOptimally%20parse%20humongous%20XML%20files%20with%20vanilla%20Java.
  *
@@ -67,20 +72,26 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     this.xmlBytes = bos.toByteArray
   }
 
-  // TODO Restore this test method. It did not work on Scala 2.12.0-RC1. Where is the bug?
-  // There appears to be an infinite loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078.
-
   /**
    * Test showing how StAX can help process very large XML inputs in many situations.
    * It is neither elegant nor fast code, but chunks of the input XML are processed by yaidom.
    *
    * This test example is simple, and does not use any namespaces.
    */
-  ignore("testProcessLargeXmlUsingStreaming") {
+  test("testProcessLargeXmlUsingStreaming") {
     val inputFactory = XMLInputFactory.newInstance
 
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    // In an earlier version of this test file buffered iterators were created while traversing the
+    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
+    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
+    // no longer create a buffered iterator more than once.
 
     var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
 
@@ -90,13 +101,18 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     def isStartContact(xmlEvent: XMLEvent): Boolean =
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
-    it = it.dropWhile(es => !isStartContact(es.event)).buffered
+    def dropWhileNotContact(): Unit = {
+      while (it.hasNext && !isStartContact(it.head.event)) {
+        it.next()
+      }
+    }
+
+    dropWhileNotContact()
 
     while (it.hasNext) {
       val contactResult = takeElem(it)
 
       val contactElem = contactResult.elem
-      it = contactResult.remainder
 
       assert(contactElem.localName == "contact")
       contactCount += 1
@@ -106,7 +122,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
         Set("firstName", "lastName").subsetOf(contactElem.findAllElems.map(_.localName).toSet)
       }
 
-      it = it.dropWhile(es => !isStartContact(es.event)).buffered
+      dropWhileNotContact()
     }
 
     assertResult(true) {
@@ -117,16 +133,85 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  // TODO Restore this test method. It did not work on Scala 2.12.0-RC1. Where is the bug?
-  // There appears to be an infinite loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078.
+  /**
+   * Test showing how StAX can help process very large XML inputs in many situations.
+   * It is neither elegant nor fast code, but chunks of the input XML are processed by yaidom.
+   *
+   * This test example is simple, and does not use any namespaces.
+   */
+  test("testProcessLargeXmlUsingStreamingStoringMultipleElements") {
+    val inputFactory = XMLInputFactory.newInstance
 
-  ignore("testProcessAnotherXmlUsingStreaming") {
+    val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
+    val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    // In an earlier version of this test file buffered iterators were created while traversing the
+    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
+    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
+    // no longer create a buffered iterator more than once.
+
+    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+
+    var contactCount = 0
+    var elemCount = 0
+
+    def isStartContact(xmlEvent: XMLEvent): Boolean =
+      xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
+
+    def dropWhileNotContact(): Unit = {
+      while (it.hasNext && !isStartContact(it.head.event)) {
+        it.next()
+      }
+    }
+
+    def take10Contacts(): immutable.IndexedSeq[Elem] = {
+      takeElemSeqUntil(it, result => result.elems.size == 10).elems
+    }
+
+    dropWhileNotContact()
+
+    while (it.hasNext) {
+      val contactElems = take10Contacts()
+
+      assert(contactElems.forall(_.localName == "contact"))
+      contactCount += contactElems.size
+      elemCount += contactElems.flatMap(_.findAllElemsOrSelf).size
+
+      assertResult(true) {
+        Set("firstName", "lastName").subsetOf(contactElems.flatMap(_.findAllElems).map(_.localName).toSet)
+      }
+
+      dropWhileNotContact()
+    }
+
+    assertResult(true) {
+      contactCount >= 1000
+    }
+    assertResult(true) {
+      elemCount >= 10000
+    }
+  }
+
+  test("testProcessAnotherXmlUsingStreaming") {
     val fileUri = classOf[StreamingLargeXmlTest].getResource("enterprise-info.xml").toURI
 
     val inputFactory = XMLInputFactory.newInstance
 
     val streamSource = new StreamSource(new FileInputStream(new File(fileUri)))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    // In an earlier version of this test file buffered iterators were created while traversing the
+    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
+    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
+    // no longer create a buffered iterator more than once.
 
     var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
 
@@ -135,13 +220,18 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     def isEnterprise(xmlEvent: XMLEvent): Boolean =
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "Enterprise"
 
-    it = it.dropWhile(es => !isEnterprise(es.event)).buffered
+    def dropWhileNotEnterprise(): Unit = {
+      while (it.hasNext && !isEnterprise(it.head.event)) {
+        it.next()
+      }
+    }
+
+    dropWhileNotEnterprise()
 
     while (it.hasNext) {
       val enterpriseResult = takeElem(it)
 
       val enterpriseElem = enterpriseResult.elem
-      it = enterpriseResult.remainder
 
       assert(enterpriseElem.localName == "Enterprise")
       enterpriseCount += 1
@@ -152,7 +242,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
         }
       }
 
-      it = it.dropWhile(es => !isEnterprise(es.event)).buffered
+      dropWhileNotEnterprise()
     }
 
     assertResult(2000) {

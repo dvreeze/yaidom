@@ -68,6 +68,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   import StaxEventsToYaidomConversions.EventEndState
   import StaxEventsToYaidomConversions.EventWithEndState
   import StaxEventsToYaidomConversions.DocumentWithRemainingEventStates
+  import StaxEventsToYaidomConversions.ElemSeqWithRemainingEventStates
   import StaxEventsToYaidomConversions.ElemWithRemainingEventStates
 
   /**
@@ -319,6 +320,45 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   }
 
   /**
+   * Given a buffered iterator of EventWithEndState objects, converts the (initial) events to an Elem sequence until
+   * the predicate holds. The remaining event end states are also returned in the result. The first event, if any, must be a
+   * StartElement event, or else an exception is thrown.
+   *
+   * The input iterator should come from a call to method `convertToEventWithEndStateIterator`.
+   *
+   * Note that comments, processing instructions etc. may get lost in this operation. Be careful with the predicate: if it does
+   * not hold for the last elements, they are returned anyway. Moreover, if the predicate does not stop in time, too many elements may be
+   * kept in memory.
+   *
+   * TODO Return NodeSeqWithRemainingEventStates instead.
+   */
+  final def takeElemSeqUntil(eventStateIterator: BufferedIterator[EventWithEndState], p: ElemSeqWithRemainingEventStates => Boolean): ElemSeqWithRemainingEventStates = {
+    if (!eventStateIterator.hasNext) {
+      new ElemSeqWithRemainingEventStates(Vector(), eventStateIterator)
+    } else {
+      var it = eventStateIterator
+
+      require(it.head.event.isStartElement, s"Not a StartElement event: ${it.head.event}")
+
+      var elems = Vector[Elem]()
+
+      while (it.hasNext && !p(new ElemSeqWithRemainingEventStates(elems, it))) {
+        assert(it.head.event.isStartElement, s"Not a StartElement event: ${it.head.event}")
+
+        elems = elems :+ takeElem(it).elem
+
+        while (it.hasNext && !it.head.event.isStartElement) {
+          it.next // May lose comments etc.
+        }
+      }
+
+      val result = new ElemSeqWithRemainingEventStates(elems, it)
+      assert(!it.hasNext || p(result))
+      result
+    }
+  }
+
+  /**
    * Convenience method to turn an XMLEventReader into a Scala Iterator of XMLEvent objects.
    */
   final def asIterator(xmlEventReader: XMLEventReader): Iterator[XMLEvent] = {
@@ -377,6 +417,8 @@ object StaxEventsToYaidomConversions {
   final class DocumentWithRemainingEventStates(val doc: Document, val remainder: BufferedIterator[EventWithEndState])
 
   final class ElemWithRemainingEventStates(val elem: Elem, val remainder: BufferedIterator[EventWithEndState])
+
+  final class ElemSeqWithRemainingEventStates(val elems: immutable.IndexedSeq[Elem], val remainder: BufferedIterator[EventWithEndState])
 
   private def eventToElemWithoutChildren(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): ElemWithoutChildren = {
     val declarations: Declarations = {
