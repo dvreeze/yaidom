@@ -52,7 +52,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
   @volatile private var xmlBytes: Array[Byte] = _
 
   protected override def beforeAll(): Unit = {
-    val zipFileUrl = classOf[StreamingLargeXmlTest].getResource("bigFile.zip")
+    val zipFileUrl = classOf[StreamingLargeXmlTest].getResource("veryBigFile.zip")
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 
     val zipEntries = zipFile.entries()
@@ -124,10 +124,10 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     }
 
     assertResult(true) {
-      contactCount >= 1000
+      contactCount >= 10000
     }
     assertResult(true) {
-      elemCount >= 10000
+      elemCount >= 100000
     }
   }
 
@@ -187,10 +187,10 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     }
 
     assertResult(true) {
-      contactCount >= 1000
+      contactCount >= 10000
     }
     assertResult(true) {
-      elemCount >= 10000
+      elemCount >= 100000
     }
   }
 
