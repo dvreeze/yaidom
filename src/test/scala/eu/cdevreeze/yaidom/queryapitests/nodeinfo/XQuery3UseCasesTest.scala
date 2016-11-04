@@ -179,7 +179,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupp
     val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
     val doc: DomDocument =
       DomNode.wrapDocument(
-        processor.getUnderlyingConfiguration.buildDocument(
+        processor.getUnderlyingConfiguration.buildDocumentTree(
           new StreamSource(is, d.uriOption.map(_.toString).getOrElse("")), parseOptions))
     doc
   }

@@ -56,8 +56,7 @@ libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
 
 libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
 
-// Consider upgrading to version 9.7.X.
-libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.6.0-7" % "test"
+libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.7.0-10" % "test"
 
 libraryDependencies += ("joda-time" % "joda-time" % "2.9.5" % "test").intransitive()
 

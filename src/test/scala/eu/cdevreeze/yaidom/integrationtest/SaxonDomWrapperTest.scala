@@ -62,7 +62,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -92,7 +92,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -115,7 +115,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -157,7 +157,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
     parseOptions.setEntityResolver(resolver)
 
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -343,7 +343,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -379,7 +379,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -399,7 +399,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
     val parseOptions = new ParseOptions
     // No need to try to influence "coalescing" behavior?
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -445,7 +445,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -484,7 +484,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val root: DomElem = domDoc.documentElement
 
@@ -550,7 +550,7 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
 
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
-      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+      DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
 
     val elementDecls = domDoc.documentElement filterElems { e =>
       e.resolvedName == EName(nsXmlSchema, "element")

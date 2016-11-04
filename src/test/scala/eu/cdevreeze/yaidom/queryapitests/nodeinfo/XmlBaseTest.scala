@@ -48,7 +48,7 @@ class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
     val is = new FileInputStream(new File(parsedDocUri))
     val doc: DomDocument =
       DomNode.wrapDocument(
-        processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is, docUri.toString), parseOptions))
+        processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is, docUri.toString), parseOptions))
     doc
   }
 
@@ -62,11 +62,11 @@ class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
 
   protected def getParentBaseUri(elem: E): URI = {
     elem.parentOption.map(e => toUri(e.wrappedNode.getBaseURI)).getOrElse(
-      toUri(elem.wrappedNode.getDocumentRoot.getSystemId))
+      toUri(elem.wrappedNode.getTreeInfo.getRootNode.getSystemId))
   }
 
   protected def getDocumentUri(elem: E): URI = {
-    toUri(elem.wrappedNode.getDocumentRoot.getSystemId)
+    toUri(elem.wrappedNode.getTreeInfo.getRootNode.getSystemId)
   }
 
   protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {

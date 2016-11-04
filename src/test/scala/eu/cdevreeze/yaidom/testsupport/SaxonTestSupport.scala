@@ -34,8 +34,8 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AxisInfo
-import net.sf.saxon.om.DocumentInfo
 import net.sf.saxon.om.NodeInfo
+import net.sf.saxon.om.TreeInfo
 import net.sf.saxon.pattern.NodeKindTest
 import net.sf.saxon.s9api.Processor
 
@@ -109,13 +109,15 @@ trait SaxonTestSupport {
     }
   }
 
-  final class DomDocument(val wrappedNode: DocumentInfo) extends DocumentApi {
+  final class DomDocument(val wrappedTreeInfo: TreeInfo) extends DocumentApi {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.DOCUMENT)
 
     type ThisDoc = DomDocument
 
     type DocElemType = DomElem
+
+    def wrappedNode: NodeInfo = wrappedTreeInfo.getRootNode
 
     def uriOption: Option[URI] = Option(wrappedNode.getSystemId).map(s => URI.create(s))
 
@@ -543,7 +545,7 @@ trait SaxonTestSupport {
       }
     }
 
-    def wrapDocument(doc: DocumentInfo): DomDocument = new DomDocument(doc)
+    def wrapDocument(doc: TreeInfo): DomDocument = new DomDocument(doc)
 
     def wrapElement(elm: NodeInfo): DomElem = new DomElem(elm)
 

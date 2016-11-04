@@ -24,7 +24,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapitests.AbstractLargeXmlTest
 import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.stream.StreamSource
-import net.sf.saxon.om.DocumentInfo
 
 /**
  * Large XML test for Saxon-backed Elems.
@@ -36,10 +35,8 @@ class LargeXmlTest extends AbstractLargeXmlTest with SaxonTestSupport {
 
   type D = DomDocument
 
-  private val docBuilder = processor.newDocumentBuilder()
-
   protected def parseDocument(is: InputStream): D = {
-    val doc = docBuilder.build(new StreamSource(is)).getUnderlyingNode().asInstanceOf[DocumentInfo]
+    val doc = processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is))
     DomNode.wrapDocument(doc)
   }
 }

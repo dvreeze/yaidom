@@ -23,7 +23,7 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractBackingElemTest
 import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
-import net.sf.saxon.om.DocumentInfo
+import javax.xml.transform.stream.StreamSource
 
 /**
  * Backing element test for Saxon Elems.
@@ -33,11 +33,10 @@ import net.sf.saxon.om.DocumentInfo
 @RunWith(classOf[JUnitRunner])
 class BackingElemTest extends AbstractBackingElemTest with SaxonTestSupport {
 
-  private val docBuilder = processor.newDocumentBuilder()
-
   val docElem: E = {
     val docUri = classOf[AbstractBackingElemTest].getResource("some-data.xsd").toURI
-    val doc = docBuilder.build(new File(docUri)).getUnderlyingNode().asInstanceOf[DocumentInfo]
+    val inputSource = new StreamSource(new File(docUri))
+    val doc = processor.getUnderlyingConfiguration.buildDocumentTree(inputSource)
     DomNode.wrapDocument(doc).documentElement
   }
 }

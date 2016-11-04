@@ -54,7 +54,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTe
     val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
     val doc: DomDocument =
       DomNode.wrapDocument(
-        processor.getUnderlyingConfiguration.buildDocument(
+        processor.getUnderlyingConfiguration.buildDocumentTree(
           new StreamSource(is, Option(docUri).map(_.toString).getOrElse(null)), parseOptions))
     doc
   }
@@ -65,11 +65,11 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTe
 
   protected def getParentBaseUri(elem: E): URI = {
     elem.parentOption.map(e => toUri(e.wrappedNode.getBaseURI)).getOrElse(
-      toUri(elem.wrappedNode.getDocumentRoot.getSystemId))
+      toUri(elem.wrappedNode.getTreeInfo.getRootNode.getSystemId))
   }
 
   protected def getDocumentUri(elem: E): URI = {
-    toUri(elem.wrappedNode.getDocumentRoot.getSystemId)
+    toUri(elem.wrappedNode.getTreeInfo.getRootNode.getSystemId)
   }
 
   protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {

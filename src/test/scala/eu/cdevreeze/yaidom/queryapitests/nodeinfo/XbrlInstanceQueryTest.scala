@@ -47,7 +47,7 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest with SaxonTest
 
     val doc: DomDocument =
       DomNode.wrapDocument(
-        processor.getUnderlyingConfiguration.buildDocument(new StreamSource(is), parseOptions))
+        processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
     doc.documentElement
   }
 
