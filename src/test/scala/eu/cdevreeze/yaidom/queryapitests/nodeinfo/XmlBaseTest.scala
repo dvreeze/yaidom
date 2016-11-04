@@ -62,11 +62,11 @@ class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
 
   protected def getParentBaseUri(elem: E): URI = {
     elem.parentOption.map(e => toUri(e.wrappedNode.getBaseURI)).getOrElse(
-      toUri(elem.wrappedNode.getTreeInfo.getRootNode.getSystemId))
+      toUri(elem.wrappedNode.getSystemId))
   }
 
   protected def getDocumentUri(elem: E): URI = {
-    toUri(elem.wrappedNode.getTreeInfo.getRootNode.getSystemId)
+    toUri(elem.wrappedNode.getSystemId)
   }
 
   protected def getReverseAncestryOrSelf(elem: E): immutable.IndexedSeq[E] = {
