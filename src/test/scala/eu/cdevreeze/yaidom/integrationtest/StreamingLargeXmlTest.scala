@@ -245,4 +245,67 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       enterpriseCount
     }
   }
+
+  /**
+   * Streaming test reading Wikipedia. See http://blog.korny.info/2014/03/08/xml-for-fun-and-profit.html.
+   * Just run this test once, to show that StAX-based usage of yaidom for very large XML documents works in practice.
+   *
+   * The last run processed more than 5000000 document abstracts (doc elements), with a speed of around 1000 documents
+   * per second, taking merely about 1.5 GiB in memory!
+   */
+  ignore("testProcessWikipediaUsingStreaming") {
+    // External file, and a very large one as well. This really proves that StAX-based streaming in yaidom works, where
+    // descendant elements with a given name are loaded entirely in memory as yaidom Elem, one Elem at the time.
+
+    val uri = java.net.URI.create("https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-abstract.xml")
+
+    val inputFactory = XMLInputFactory.newInstance
+
+    val streamSource = new StreamSource(uri.toURL.openStream())
+    val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    // In an earlier version of this test file buffered iterators were created while traversing the
+    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
+    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
+    // no longer create a buffered iterator more than once.
+
+    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+
+    var docCount = 0
+
+    def isDoc(xmlEvent: XMLEvent): Boolean =
+      xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "doc"
+
+    def dropWhileNotDoc(): Unit = {
+      while (it.hasNext && !isDoc(it.head.event)) {
+        it.next()
+      }
+    }
+
+    dropWhileNotDoc()
+
+    while (it.hasNext) {
+      val docElem = takeElem(it)
+
+      assert(docElem.localName == "doc")
+      docCount += 1
+
+      if (docCount % 1000 == 0) {
+        println(s"Found $docCount docs")
+        assertResult(true) {
+          Set("doc", "title", "abstract", "url").subsetOf(docElem.findAllElemsOrSelf.map(_.localName).toSet)
+        }
+      }
+
+      dropWhileNotDoc()
+    }
+
+    assertResult(true) {
+      docCount >= 1000000
+    }
+  }
 }
