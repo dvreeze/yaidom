@@ -459,7 +459,8 @@ class AirportExampleTest extends FunSuite {
   }
 
   private def airportCode(e: Elem): String = {
-    require(e.resolvedName == EName(nsWebServiceX, "Table"))
+    val expectedEName = EName(nsWebServiceX, "Table")
+    require(e.resolvedName == expectedEName, s"Expected $expectedEName but got ${e.resolvedName}")
 
     e.getChildElem(EName(nsWebServiceX, "AirportCode")).trimmedText
   }

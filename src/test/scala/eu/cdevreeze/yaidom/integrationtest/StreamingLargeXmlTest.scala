@@ -30,7 +30,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
-import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithEndStateIterator
+import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithAncestryIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElemsUntil
 import eu.cdevreeze.yaidom.simple.Elem
@@ -93,7 +93,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
     // no longer create a buffered iterator more than once.
 
-    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
     var elemCount = 0
@@ -152,7 +152,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
     // no longer create a buffered iterator more than once.
 
-    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
     var elemCount = 0
@@ -211,7 +211,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
     // no longer create a buffered iterator more than once.
 
-    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var enterpriseCount = 0
 
@@ -273,7 +273,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
     // no longer create a buffered iterator more than once.
 
-    var it = convertToEventWithEndStateIterator(asIterator(xmlEventReader)).buffered
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var docCount = 0
 
