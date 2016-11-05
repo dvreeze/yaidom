@@ -21,7 +21,7 @@ import scala.collection.immutable
 import scala.collection.mutable
 
 /**
- * The ancestry path of an element in an element tree. The first entry represents the root element, and the last one the "current" element.
+ * The ancestry path of an element in an element tree. The first entry represents the "current" element, and the last one the "root" element.
  * Each entry is like an element without its children, but with the element QName, Scope and attributes (mapping QNames to attribute values).
  *
  * An `AncestryPath` is quite different from a `Path`. The former represents the ancestry-or-self of an element in an element tree, while
@@ -30,26 +30,28 @@ import scala.collection.mutable
  * Hence an ancestry path is a property of an element in a tree, whereas a (navigation) path is a navigation notion (through an element tree).
  * The latter should really be called NavigationPath. Both concepts have in common that they only know about element nodes.
  *
+ * An AncestryPath can be thought of as a stack where the head is the "current" element and the tail is the ancestor elements.
+ *
  * @author Chris de Vreeze
  */
-final case class AncestryPath(val entries: immutable.IndexedSeq[AncestryPath.Entry]) extends Immutable { self =>
-  require(entries ne null)
-  require(entries.size >= 1, s"Ancestry paths must have at least one entry")
+final case class AncestryPath(val ancestorOrSelfEntries: List[AncestryPath.Entry]) extends Immutable { self =>
+  require(ancestorOrSelfEntries ne null)
+  require(ancestorOrSelfEntries.size >= 1, s"Ancestry paths must have at least one entry")
 
   /**
    * Returns true if this ancestry path has only one entry.
    */
-  def isRoot: Boolean = (entries.size == 1)
+  def isRoot: Boolean = (ancestorOrSelfEntries.size == 1)
 
   /**
-   * The ancestry path entry pointing to the "root element", which is the first entry.
+   * The ancestry path entry pointing to the "root element", which is the last entry.
    */
-  def rootEntry: AncestryPath.Entry = entries.head
+  def rootEntry: AncestryPath.Entry = ancestorOrSelfEntries.last
 
   /**
-   * The ancestry path entry pointing to "this element", which is the last entry.
+   * The ancestry path entry pointing to "this element", which is the first entry.
    */
-  def lastEntry: AncestryPath.Entry = entries.last
+  def firstEntry: AncestryPath.Entry = ancestorOrSelfEntries.head
 
   /**
    * Returns `AncestryPath(rootEntry)`.
@@ -57,17 +59,18 @@ final case class AncestryPath(val entries: immutable.IndexedSeq[AncestryPath.Ent
   def root: AncestryPath = AncestryPath.fromEntry(rootEntry)
 
   /**
-   * Returns `AncestryPath(lastEntry)`.
+   * Returns `AncestryPath(firstEntry)`.
    */
-  def asRoot: AncestryPath = AncestryPath.fromEntry(lastEntry)
+  def asRoot: AncestryPath = AncestryPath.fromEntry(firstEntry)
 
   /**
    * Gets the parent ancestry path (if any, because a root ancestry path has no parent) wrapped in an `Option`.
    */
   def parentOption: Option[AncestryPath] = {
-    entries match {
-      case xs if xs.size == 1 => None
-      case _                  => Some(AncestryPath(entries.dropRight(1)))
+    ancestorOrSelfEntries match {
+      case Nil       => sys.error(s"Corrupt data. An AncestryPath can not be empty.")
+      case hd :: Nil => None
+      case hd :: tl  => Some(AncestryPath(tl))
     }
   }
 
@@ -99,31 +102,31 @@ final case class AncestryPath(val entries: immutable.IndexedSeq[AncestryPath.Ent
   }
 
   /**
-   * Appends a new last entry to this ancestry path.
+   * Prepends a new first entry to this ancestry path.
    */
-  def append(entry: AncestryPath.Entry): AncestryPath = {
-    AncestryPath(self.entries :+ entry)
+  def prepend(entry: AncestryPath.Entry): AncestryPath = {
+    AncestryPath(entry :: self.ancestorOrSelfEntries)
   }
 
   /**
-   * Returns the QNames, from root entry to last entry.
+   * Returns the QNames, from the last entry to the root entry.
    */
-  def qnames: immutable.IndexedSeq[QName] = {
-    entries.map(_.qname)
+  def qnames: List[QName] = {
+    ancestorOrSelfEntries.map(_.qname)
   }
 
   /**
-   * Returns the ENames, from root entry to last entry.
+   * Returns the ENames, from the last entry to the root entry.
    */
-  def enames: immutable.IndexedSeq[EName] = {
-    entries.map(_.ename)
+  def enames: List[EName] = {
+    ancestorOrSelfEntries.map(_.ename)
   }
 }
 
 object AncestryPath {
 
   def fromEntry(entry: AncestryPath.Entry): AncestryPath = {
-    AncestryPath(immutable.IndexedSeq(entry))
+    AncestryPath(List(entry))
   }
 
   /** An entry in an `AncestryPath`, as an element without children. */

@@ -256,13 +256,13 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
     val startElement: StartElement = head.event.asStartElement
     require(head.ancestryPathAfterEventOption.nonEmpty)
 
-    val entry: AncestryPath.Entry = head.ancestryPathAfterEventOption.get.lastEntry
+    val entry: AncestryPath.Entry = head.ancestryPathAfterEventOption.get.firstEntry
     val elem: Elem = Elem(entry.qname, entry.attributes, entry.scope, immutable.IndexedSeq())
 
     def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithAncestry]): Boolean = {
       if (!eventIterator.hasNext) false else {
         val hd: EventWithAncestry = eventIterator.head
-        (hd.event.isEndElement) && (hd.qnames == head.qnames.init)
+        (hd.event.isEndElement) && (hd.qnames == head.qnames.tail)
       }
     }
 

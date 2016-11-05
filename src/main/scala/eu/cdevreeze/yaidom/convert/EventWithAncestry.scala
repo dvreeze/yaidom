@@ -47,7 +47,7 @@ final case class EventWithAncestry(val event: XMLEvent, val ancestryPathAfterEve
    * Returns the current Scope after the event.
    */
   def currentScope: Scope = {
-    ancestryPathAfterEventOption.map(_.lastEntry.scope).getOrElse(Scope.Empty)
+    ancestryPathAfterEventOption.map(_.firstEntry.scope).getOrElse(Scope.Empty)
   }
 
   /**
@@ -58,17 +58,17 @@ final case class EventWithAncestry(val event: XMLEvent, val ancestryPathAfterEve
   }
 
   /**
-   * Returns the QNames from top to bottom.
+   * Returns the QNames from bottom to top.
    */
-  def qnames: immutable.IndexedSeq[QName] = {
-    ancestryPathAfterEventOption.map(_.qnames).getOrElse(immutable.IndexedSeq())
+  def qnames: List[QName] = {
+    ancestryPathAfterEventOption.map(_.qnames).getOrElse(Nil)
   }
 
   /**
-   * Returns the ENames from top to bottom.
+   * Returns the ENames from bottom to top.
    */
-  def enames: immutable.IndexedSeq[EName] = {
-    ancestryPathAfterEventOption.map(_.enames).getOrElse(immutable.IndexedSeq())
+  def enames: List[EName] = {
+    ancestryPathAfterEventOption.map(_.enames).getOrElse(Nil)
   }
 }
 
@@ -80,19 +80,19 @@ object EventWithAncestry {
   def nextAncestryPathOption(ancestryPathAfterPreviousEventOption: Option[AncestryPath], event: XMLEvent): Option[AncestryPath] = {
     if (event.isStartElement) {
       val startElemEvent = event.asStartElement
-      val currentScope = ancestryPathAfterPreviousEventOption.map(_.lastEntry.scope).getOrElse(Scope.Empty)
+      val currentScope = ancestryPathAfterPreviousEventOption.map(_.firstEntry.scope).getOrElse(Scope.Empty)
       val entry =
         EventWithAncestry.convertStartElemEventToAncestryPathEntry(startElemEvent, currentScope)
 
       val nextAncestryPathOption =
-        if (ancestryPathAfterPreviousEventOption.isEmpty) Some(AncestryPath.fromEntry(entry)) else ancestryPathAfterPreviousEventOption.map(_.append(entry))
+        if (ancestryPathAfterPreviousEventOption.isEmpty) Some(AncestryPath.fromEntry(entry)) else ancestryPathAfterPreviousEventOption.map(_.prepend(entry))
       nextAncestryPathOption
     } else if (event.isEndElement) {
       val endElemEvent = event.asEndElement
 
       require(ancestryPathAfterPreviousEventOption.isDefined, s"Corrupt StAX stream. Cannot process EndElement event if there is no ancestry-or-self")
       require(
-        ancestryPathAfterPreviousEventOption.get.lastEntry.qname.localPart == endElemEvent.getName.getLocalPart,
+        ancestryPathAfterPreviousEventOption.get.firstEntry.qname.localPart == endElemEvent.getName.getLocalPart,
         s"Corrupt StAX stream. The local name ${endElemEvent.getName.getLocalPart} does not match that of the corresponding StartElement event")
 
       val nextAncestryPathOption =
