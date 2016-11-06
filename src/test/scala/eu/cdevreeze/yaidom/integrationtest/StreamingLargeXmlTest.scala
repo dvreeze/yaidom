@@ -19,9 +19,11 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.{ io => jio }
 import java.io.File
 import java.io.FileInputStream
+import java.net.URI
 import java.{ util => jutil }
 
 import scala.collection.immutable
+import scala.collection.mutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,13 +31,16 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.convert.EventWithAncestry
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithAncestryIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElemsUntil
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.stream.XMLInputFactory
+import javax.xml.stream.events.{ ProcessingInstruction => StaxProcessingInstruction }
 import javax.xml.stream.events.XMLEvent
 import javax.xml.transform.stream.StreamSource
 
@@ -50,7 +55,7 @@ import javax.xml.transform.stream.StreamSource
 @RunWith(classOf[JUnitRunner])
 class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
-  import EventWithAncestry.dropWhileNot
+  import EventWithAncestry.dropUntil
 
   @volatile private var xmlBytes: Array[Byte] = _
 
@@ -100,7 +105,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
     def dropWhileNotContact(): Unit = {
-      dropWhileNot(it, e => isStartContact(e.event))
+      dropUntil(it, e => isStartContact(e.event))
     }
 
     dropWhileNotContact()
@@ -152,7 +157,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
     def dropWhileNotContact(): Unit = {
-      dropWhileNot(it, e => isStartContact(e.event))
+      dropUntil(it, e => isStartContact(e.event))
     }
 
     def take10Contacts(): immutable.IndexedSeq[Elem] = {
@@ -203,7 +208,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "Enterprise"
 
     def dropWhileNotEnterprise(): Unit = {
-      dropWhileNot(it, e => isEnterprise(e.event))
+      dropUntil(it, e => isEnterprise(e.event))
     }
 
     dropWhileNotEnterprise()
@@ -225,6 +230,272 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     assertResult(2000) {
       enterpriseCount
+    }
+  }
+
+  /**
+   * Test method finding a schemaRef element in an XBRL instance. StAX streaming is used here to keep memory usage (and CPU cycles)
+   * to a minimum when finding a schemaRef element high in the document. This is another use case of StAX streaming: the XBRL instance
+   * may or may not be large, but we can get the required result (a schemaRef element) with very little processing (as compared to building
+   * parsing an entire DOM tree). This shows that the combination of StAX and yaidom can be used for many scenarios, and that there
+   * can be much freedom in how much of the StAX stream is processed, and how many yaidom elements are created.
+   */
+  test("testFindEntrypoint") {
+    val fileUri = classOf[StreamingLargeXmlTest].getResource("sample-xbrl-instance.xml").toURI
+
+    val inputFactory = XMLInputFactory.newInstance
+
+    val streamSource = new StreamSource(new FileInputStream(new File(fileUri)))
+    val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+
+    def isSchemaRef(ev: EventWithAncestry): Boolean =
+      ev.event.isStartElement() && ev.enames.headOption == Some(EName(LinkNamespace, "schemaRef"))
+
+    def dropWhileNotSchemaRef(): Unit = {
+      dropUntil(it, e => isSchemaRef(e))
+    }
+
+    dropWhileNotSchemaRef()
+
+    require(it.hasNext, s"Expected a link:schemaRef element but there are no more elements in the StAX stream")
+
+    // Before materializing the next (schemaRef) element, we peek into the next event and have a look at the ancestry path.
+    val event = it.head
+
+    assertResult(Some(EName(LinkNamespace, "schemaRef"))) {
+      event.enames.headOption
+    }
+    assertResult(List(EName(LinkNamespace, "schemaRef"), EName(XbrliNamespace, "xbrl"))) {
+      event.enames
+    }
+
+    val baseUri = event.ancestryPathAfterEventOption.map(_.ancestorOrSelfEntries.reverse).getOrElse(Nil).foldLeft(fileUri) {
+      case (accUri, elemEntry) =>
+        val elem = Elem(elemEntry.qname, elemEntry.attributes, elemEntry.scope, Vector())
+        XmlBaseSupport.findBaseUriByParentBaseUri(Some(accUri), elem)(XmlBaseSupport.JdkUriResolver).getOrElse(accUri)
+    }
+
+    assertResult(fileUri) {
+      baseUri
+    }
+
+    // Now materialize the next (schemaRef) element.
+    val schemaRef = takeElem(it)
+
+    assertResult(EName(LinkNamespace, "schemaRef")) {
+      schemaRef.resolvedName
+    }
+
+    assertResult(Some(URI.create("gaap.xsd"))) {
+      schemaRef.attributeOption(EName(XLinkNamespace, "href")).map(s => URI.create(s))
+    }
+    assertResult(Some(URI.create("gaap.xsd")).map(u => fileUri.resolve(u))) {
+      val schemaRefUriOption = schemaRef.attributeOption(EName(XLinkNamespace, "href")).map(s => URI.create(s))
+      schemaRefUriOption.map(u => baseUri.resolve(u))
+    }
+
+    dropUntil(it, ev => ev.event.isStartElement)
+
+    assertResult(true) {
+      it.hasNext
+    }
+    assertResult(Some(EName(LinkNamespace, "linkbaseRef"))) {
+      val nextEv = it.next
+      nextEv.enames.headOption
+    }
+  }
+
+  /**
+   * Test method performing non-standard two-pass XBRL streaming, where the first pass accumulates all contexts and
+   * units, and where the second pass materializes and processes one fact at a time. The idea is here that the
+   * XBRL instance may be too large to keep entirely in memory, but that this is not the case for the contexts and
+   * units.
+   */
+  test("testNonStandardTwoPassXbrlStreaming") {
+    val fileUri = classOf[StreamingLargeXmlTest].getResource("sample-xbrl-instance.xml").toURI
+
+    val inputFactory = XMLInputFactory.newInstance
+
+    val streamSource = new StreamSource(new FileInputStream(new File(fileUri)))
+    val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+
+    val contextBuffer = mutable.ArrayBuffer[Elem]()
+    val unitBuffer = mutable.ArrayBuffer[Elem]()
+
+    def isContextOrUnit(ev: EventWithAncestry): Boolean = {
+      ev.event.isStartElement && Set(Option(XbrliContextEName), Option(XbrliUnitEName)).contains(ev.enames.headOption)
+    }
+
+    while (it.hasNext) {
+      dropUntil(it, isContextOrUnit _)
+
+      if (it.hasNext) {
+        val elem = takeElem(it)
+
+        if (elem.resolvedName == XbrliContextEName) {
+          contextBuffer += elem
+        } else {
+          assert(elem.resolvedName == XbrliUnitEName)
+          unitBuffer += elem
+        }
+      }
+    }
+
+    // We keep all contexts and units in memory
+
+    val contexts = contextBuffer.toIndexedSeq
+    val units = unitBuffer.toIndexedSeq
+
+    val contextsById = contexts.groupBy(_.attribute(EName("id"))).mapValues(_.head)
+    val unitsById = units.groupBy(_.attribute(EName("id"))).mapValues(_.head)
+
+    // Let's do the second pass, taking one fact element at a time
+
+    val streamSource2 = new StreamSource(new FileInputStream(new File(fileUri)))
+    val xmlEventReader2 = inputFactory.createXMLEventReader(streamSource2)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    var it2 = convertToEventWithAncestryIterator(asIterator(xmlEventReader2)).buffered
+
+    def isTopLevelFact(ev: EventWithAncestry): Boolean = {
+      ev.event.isStartElement &&
+        ev.enames.headOption.exists(en => !Set(Option(XbrliNamespace), Option(LinkNamespace)).contains(en.namespaceUriOption)) &&
+        ev.enames.size == 2
+    }
+
+    var allContextsFound = true
+    var allUnitsFound = true
+
+    dropUntil(it2, isTopLevelFact _)
+
+    while (it2.hasNext) {
+      val fact = takeElem(it2)
+      require(fact.attributeOption(ContextRefEName).isDefined, s"Missing @contextRef in ${fact.resolvedName}")
+
+      allContextsFound = allContextsFound && contextsById.contains(fact.attribute(ContextRefEName))
+
+      if (fact.attributeOption(UnitRefEName).isDefined) {
+        allUnitsFound = allUnitsFound && unitsById.contains(fact.attribute(UnitRefEName))
+      }
+
+      assert(fact.resolvedName.namespaceUriOption != Some(XbrliNamespace))
+      assert(fact.resolvedName.namespaceUriOption != Some(LinkNamespace))
+
+      dropUntil(it2, isTopLevelFact _)
+    }
+
+    assertResult(true) {
+      allContextsFound
+    }
+    assertResult(true) {
+      allUnitsFound
+    }
+  }
+
+  /**
+   * Test method performing one-pass XBRL streaming, where contexts and units are accumulated and kept in memory,
+   * and where each encountered fact must reference a context and if numeric a unit that have already been read.
+   * The idea is that the XBRL instance may be too large to keep entirely in memory, but that this is not the case
+   * for the contexts and units, which must precede that facts using them.
+   *
+   * See http://www.xbrl.org/Specification/streaming-extensions-module/CR-2015-12-09/streaming-extensions-module-CR-2015-12-09.html.
+   *
+   * The processing in this test conforms to the XBRL Stream Extensions Module.
+   *
+   * It is easy to turn this into a full XBRL streaming implementation, by first supporting parsing of the streaming
+   * processing instruction, then respect the context and unit buffer sizes, then turn each fact with its context
+   * (and unit, if numeric) into a small XBRL instance. From there is it normal XBRL instance validation (or other
+   * XBRL instance processing) per such instance, and then somehow accumulating or aggregating the results.
+   */
+  test("testOnePassXbrlStreaming") {
+    val fileUri = classOf[StreamingLargeXmlTest].getResource("sample-xbrl-instance-for-streaming.xml").toURI
+
+    val inputFactory = XMLInputFactory.newInstance
+
+    val streamSource = new StreamSource(new FileInputStream(new File(fileUri)))
+    val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+
+    // Turn the Java iterator of StAX events into a Scala buffered iterator of enriched StAX events.
+    // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
+    // called to advance the iterator.
+
+    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+
+    var contextMap = Map[String, Elem]()
+    var unitMap = Map[String, Elem]()
+
+    var allContextsFound = true
+    var allUnitsFound = true
+
+    def isStreamingPI(ev: EventWithAncestry): Boolean = {
+      ev.event.isProcessingInstruction && ev.event.asInstanceOf[StaxProcessingInstruction].getTarget == "xbrl-streamable-instance"
+    }
+
+    def isContextOrUnit(ev: EventWithAncestry): Boolean = {
+      ev.event.isStartElement && Set(Option(XbrliContextEName), Option(XbrliUnitEName)).contains(ev.enames.headOption)
+    }
+
+    def isTopLevelFact(ev: EventWithAncestry): Boolean = {
+      ev.event.isStartElement &&
+        ev.enames.headOption.exists(en => !Set(Option(XbrliNamespace), Option(LinkNamespace)).contains(en.namespaceUriOption)) &&
+        ev.enames.size == 2
+    }
+
+    dropUntil(it, isStreamingPI _)
+
+    require(it.hasNext)
+    val piEvent = it.next
+
+    // The following check is a bit sensitive, but good enough for this test (because we know the input file)
+
+    assertResult("""version="1.0" contextBuffer="INF" unitBuffer="INF"""") {
+      piEvent.event.asInstanceOf[StaxProcessingInstruction].getData.trim
+    }
+
+    while (it.hasNext) {
+      dropUntil(it, ev => isContextOrUnit(ev) || isTopLevelFact(ev))
+
+      if (it.hasNext) {
+        val elem = takeElem(it)
+
+        if (elem.resolvedName == XbrliContextEName) {
+          contextMap += (elem.attribute(EName("id")) -> elem)
+        } else if (elem.resolvedName == XbrliUnitEName) {
+          unitMap += (elem.attribute(EName("id")) -> elem)
+        } else {
+          val factElem = elem
+
+          allContextsFound = allContextsFound && contextMap.contains(factElem.attribute(ContextRefEName))
+
+          if (factElem.attributeOption(UnitRefEName).isDefined) {
+            allUnitsFound = allUnitsFound && unitMap.contains(factElem.attribute(UnitRefEName))
+          }
+        }
+      }
+    }
+
+    // The following assertions must be true if the XBRL instance is to be valid w.r.t. the XBRL streaming specification.
+
+    assertResult(true) {
+      allContextsFound
+    }
+    assertResult(true) {
+      allUnitsFound
     }
   }
 
@@ -259,7 +530,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "doc"
 
     def dropWhileNotDoc(): Unit = {
-      dropWhileNot(it, e => isDoc(e.event))
+      dropUntil(it, e => isDoc(e.event))
     }
 
     dropWhileNotDoc()
@@ -290,4 +561,14 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       docCount >= 1000000
     }
   }
+
+  private val XbrliNamespace = "http://www.xbrl.org/2003/instance"
+  private val LinkNamespace = "http://www.xbrl.org/2003/linkbase"
+  private val XLinkNamespace = "http://www.w3.org/1999/xlink"
+
+  private val XbrliContextEName = EName(XbrliNamespace, "context")
+  private val XbrliUnitEName = EName(XbrliNamespace, "unit")
+
+  private val ContextRefEName = EName("contextRef")
+  private val UnitRefEName = EName("unitRef")
 }

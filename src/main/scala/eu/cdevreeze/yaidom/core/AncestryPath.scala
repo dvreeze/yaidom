@@ -25,8 +25,8 @@ import scala.collection.mutable
  * Each entry is like an element without its children, but with the element QName, Scope and attributes (mapping QNames to attribute values).
  *
  * An `AncestryPath` is quite different from a `Path`. The former represents the ancestry-or-self of an element in an element tree, while
- * the latter represents a series of steps to navigate through an element tree (to descendants-or-self). Ancestry paths have no knowledge of the
- * siblings of "this" element or of its ancestors, while (navigation) paths can be used to navigate to any descendant-or-self element.
+ * the latter represents a series of steps to navigate through an element tree, to descendant-or-self elements. Ancestry paths have no knowledge
+ * of the siblings of "this" element or of its ancestors, while (navigation) paths can be used to navigate to any descendant-or-self element.
  * Hence an ancestry path is a property of an element in a tree, whereas a (navigation) path is a navigation notion (through an element tree).
  * The latter should really be called NavigationPath. Both concepts have in common that they only know about element nodes.
  *

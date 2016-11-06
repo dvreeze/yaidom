@@ -175,7 +175,7 @@ object EventWithAncestry {
    * Helper method dropping events from the buffered iterator while the given predicate does not hold.
    * The same buffered iterator can still be used after calling this function.
    */
-  def dropWhileNot(it: BufferedIterator[EventWithAncestry], p: EventWithAncestry => Boolean): Unit = {
+  def dropUntil(it: BufferedIterator[EventWithAncestry], p: EventWithAncestry => Boolean): Unit = {
     dropWhile(it, (e => !p(e)))
   }
 
