@@ -55,7 +55,7 @@ import javax.xml.transform.stream.StreamSource
 @RunWith(classOf[JUnitRunner])
 class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
-  import EventWithAncestry.dropUntil
+  import EventWithAncestry.dropWhileNot
 
   @volatile private var xmlBytes: Array[Byte] = _
 
@@ -105,7 +105,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
     def dropWhileNotContact(): Unit = {
-      dropUntil(it, e => isStartContact(e.event))
+      dropWhileNot(it, e => isStartContact(e.event))
     }
 
     dropWhileNotContact()
@@ -157,7 +157,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
     def dropWhileNotContact(): Unit = {
-      dropUntil(it, e => isStartContact(e.event))
+      dropWhileNot(it, e => isStartContact(e.event))
     }
 
     def take10Contacts(): immutable.IndexedSeq[Elem] = {
@@ -208,7 +208,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "Enterprise"
 
     def dropWhileNotEnterprise(): Unit = {
-      dropUntil(it, e => isEnterprise(e.event))
+      dropWhileNot(it, e => isEnterprise(e.event))
     }
 
     dropWhileNotEnterprise()
@@ -258,7 +258,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       ev.event.isStartElement() && ev.enames.headOption == Some(EName(LinkNamespace, "schemaRef"))
 
     def dropWhileNotSchemaRef(): Unit = {
-      dropUntil(it, e => isSchemaRef(e))
+      dropWhileNot(it, e => isSchemaRef(e))
     }
 
     dropWhileNotSchemaRef()
@@ -300,7 +300,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       schemaRefUriOption.map(u => baseUri.resolve(u))
     }
 
-    dropUntil(it, ev => ev.event.isStartElement)
+    dropWhileNot(it, ev => ev.event.isStartElement)
 
     assertResult(true) {
       it.hasNext
@@ -339,7 +339,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     }
 
     while (it.hasNext) {
-      dropUntil(it, isContextOrUnit _)
+      dropWhileNot(it, isContextOrUnit _)
 
       if (it.hasNext) {
         val elem = takeElem(it)
@@ -381,7 +381,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     var allContextsFound = true
     var allUnitsFound = true
 
-    dropUntil(it2, isTopLevelFact _)
+    dropWhileNot(it2, isTopLevelFact _)
 
     while (it2.hasNext) {
       val fact = takeElem(it2)
@@ -396,7 +396,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       assert(fact.resolvedName.namespaceUriOption != Some(XbrliNamespace))
       assert(fact.resolvedName.namespaceUriOption != Some(LinkNamespace))
 
-      dropUntil(it2, isTopLevelFact _)
+      dropWhileNot(it2, isTopLevelFact _)
     }
 
     assertResult(true) {
@@ -456,7 +456,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
         ev.enames.size == 2
     }
 
-    dropUntil(it, isStreamingPI _)
+    dropWhileNot(it, isStreamingPI _)
 
     require(it.hasNext)
     val piEvent = it.next
@@ -468,7 +468,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     }
 
     while (it.hasNext) {
-      dropUntil(it, ev => isContextOrUnit(ev) || isTopLevelFact(ev))
+      dropWhileNot(it, ev => isContextOrUnit(ev) || isTopLevelFact(ev))
 
       if (it.hasNext) {
         val elem = takeElem(it)
@@ -530,7 +530,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "doc"
 
     def dropWhileNotDoc(): Unit = {
-      dropUntil(it, e => isDoc(e.event))
+      dropWhileNot(it, e => isDoc(e.event))
     }
 
     dropWhileNotDoc()
