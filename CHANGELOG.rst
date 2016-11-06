@@ -3,6 +3,28 @@ CHANGELOG
 =========
 
 
+1.6.0-M7
+=======
+
+Milestone 7 contains the following improvements over the previous milestone:
+
+* Improved whitespace handling and DOM tree printing
+
+  * Refactored and simplified the prettifying implementation (in ``PrettyPrinting``)
+  * As a result, improved performance of ``simple.Elem.prettify`` (and applied a small bug fix, of a bug that hardly manifests itself)
+  * Improved performance of ``simple.Elem.toString`` (which prints the DOM tree), thus hopefully fixing issue yaidom-0001
+  * Refactored methods like ``removeAllInterElementWhitespace``, ``coalesceAllAdjacentText`` etc., and made the API slightly more general
+  * As a result, fixed issue yaidom-0004
+  * Added tests for whitespace handling and DOM tree printing
+  
+* Cross-compilation for Scala 2.12.0, and upgraded some dependencies (including the Saxon-HE test dependency)
+* Improved support for StAX-based streaming, while allowing for some breaking changes
+
+  * Fixed the test case that no longer worked for Scala 2.12, and should not work in the first place, because of repeated ``buffered`` calls on the same ``Iterator``
+  * Refactored ``StaxEventsToYaidomConversions``, using new classes ``AncestryPath`` and ``EventWithAncestry``
+  * Added some interesting tests to ``StreamingLargeXmlTest``, showing XBRL streaming, cheap XBRL entrypoint detection, and even traversal of entire wikipedia abstracts file (the latter test is ignored)
+
+
 1.6.0-M6
 ========
 
