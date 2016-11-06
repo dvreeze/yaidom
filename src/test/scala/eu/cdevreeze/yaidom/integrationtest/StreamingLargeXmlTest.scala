@@ -29,6 +29,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.convert.EventWithAncestry
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithAncestryIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
@@ -48,6 +49,8 @@ import javax.xml.transform.stream.StreamSource
  */
 @RunWith(classOf[JUnitRunner])
 class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
+
+  import EventWithAncestry.dropWhileNot
 
   @volatile private var xmlBytes: Array[Byte] = _
 
@@ -88,11 +91,6 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    // In an earlier version of this test file buffered iterators were created while traversing the
-    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
-    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
-    // no longer create a buffered iterator more than once.
-
     var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
@@ -102,9 +100,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
     def dropWhileNotContact(): Unit = {
-      while (it.hasNext && !isStartContact(it.head.event)) {
-        it.next()
-      }
+      dropWhileNot(it, e => isStartContact(e.event))
     }
 
     dropWhileNotContact()
@@ -147,11 +143,6 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    // In an earlier version of this test file buffered iterators were created while traversing the
-    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
-    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
-    // no longer create a buffered iterator more than once.
-
     var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
@@ -161,9 +152,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "contact"
 
     def dropWhileNotContact(): Unit = {
-      while (it.hasNext && !isStartContact(it.head.event)) {
-        it.next()
-      }
+      dropWhileNot(it, e => isStartContact(e.event))
     }
 
     def take10Contacts(): immutable.IndexedSeq[Elem] = {
@@ -206,11 +195,6 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    // In an earlier version of this test file buffered iterators were created while traversing the
-    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
-    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
-    // no longer create a buffered iterator more than once.
-
     var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var enterpriseCount = 0
@@ -219,9 +203,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "Enterprise"
 
     def dropWhileNotEnterprise(): Unit = {
-      while (it.hasNext && !isEnterprise(it.head.event)) {
-        it.next()
-      }
+      dropWhileNot(it, e => isEnterprise(e.event))
     }
 
     dropWhileNotEnterprise()
@@ -250,8 +232,8 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
    * Streaming test reading Wikipedia. See http://blog.korny.info/2014/03/08/xml-for-fun-and-profit.html.
    * Just run this test once, to show that StAX-based usage of yaidom for very large XML documents works in practice.
    *
-   * The last run processed more than 5000000 document abstracts (doc elements), with a speed of around 1000 documents
-   * per second, taking merely about 1.5 GiB in memory!
+   * The last run processed 5277000 document abstracts (doc elements) in 2703 seconds, so with a speed of 1952
+   * doc elements per second, taking merely about 1.5 GiB in memory! No fewer than 101570334 elements were found.
    */
   ignore("testProcessWikipediaUsingStreaming") {
     // External file, and a very large one as well. This really proves that StAX-based streaming in yaidom works, where
@@ -268,22 +250,16 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    // In an earlier version of this test file buffered iterators were created while traversing the
-    // originally created buffered iterator. This did not work on Scala 2.12.0-RC1, resulting in an infinite
-    // loop in scala.collection.Iterator.hasNext, hopping between lines 800 and 1078. So we take care to
-    // no longer create a buffered iterator more than once.
-
     var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var docCount = 0
+    var elemCount = 0
 
     def isDoc(xmlEvent: XMLEvent): Boolean =
       xmlEvent.isStartElement() && xmlEvent.asStartElement().getName.getLocalPart == "doc"
 
     def dropWhileNotDoc(): Unit = {
-      while (it.hasNext && !isDoc(it.head.event)) {
-        it.next()
-      }
+      dropWhileNot(it, e => isDoc(e.event))
     }
 
     dropWhileNotDoc()
@@ -294,11 +270,17 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
       assert(docElem.localName == "doc")
       docCount += 1
 
+      val allElems = docElem.findAllElemsOrSelf
+
+      assertResult(true) {
+        Set("doc", "title", "abstract", "url").subsetOf(allElems.map(_.localName).toSet)
+      }
+
+      elemCount += allElems.size
+
       if (docCount % 1000 == 0) {
-        println(s"Found $docCount docs")
-        assertResult(true) {
-          Set("doc", "title", "abstract", "url").subsetOf(docElem.findAllElemsOrSelf.map(_.localName).toSet)
-        }
+        println(s"Found $docCount docs so far")
+        println(s"\tFound $elemCount elements so far")
       }
 
       dropWhileNotDoc()

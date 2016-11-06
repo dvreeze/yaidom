@@ -161,6 +161,24 @@ object EventWithAncestry {
     AncestryPath.Entry(elemQName, currAttrs, currScope)
   }
 
+  /**
+   * Helper method dropping events from the buffered iterator while the given predicate holds.
+   * The same buffered iterator can still be used after calling this function.
+   */
+  def dropWhile(it: BufferedIterator[EventWithAncestry], p: EventWithAncestry => Boolean): Unit = {
+    while (it.hasNext && p(it.head)) {
+      it.next()
+    }
+  }
+
+  /**
+   * Helper method dropping events from the buffered iterator while the given predicate does not hold.
+   * The same buffered iterator can still be used after calling this function.
+   */
+  def dropWhileNot(it: BufferedIterator[EventWithAncestry], p: EventWithAncestry => Boolean): Unit = {
+    dropWhile(it, (e => !p(e)))
+  }
+
   /** Gets an optional prefix from a `javax.xml.namespace.QName` */
   private def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
     val prefix: String = jqname.getPrefix
