@@ -54,12 +54,12 @@ final case class AncestryPath(val ancestorOrSelfEntries: List[AncestryPath.Entry
   def firstEntry: AncestryPath.Entry = ancestorOrSelfEntries.head
 
   /**
-   * Returns `AncestryPath(rootEntry)`.
+   * Returns `AncestryPath.fromEntry(rootEntry)`.
    */
   def root: AncestryPath = AncestryPath.fromEntry(rootEntry)
 
   /**
-   * Returns `AncestryPath(firstEntry)`.
+   * Returns `AncestryPath.fromEntry(firstEntry)`.
    */
   def asRoot: AncestryPath = AncestryPath.fromEntry(firstEntry)
 

@@ -112,7 +112,7 @@ or removal of deprecations:
 * Version 1.3 removes these deprecations
 * Version 1.4 makes yaidom still meaner and cleaner w.r.t. indexed elements and 2 main query APIs: "clark" and "scoped"
 * Version 1.5 improves functional updates (and makes them more consistent with the rest of the API)
-* Version 1.6 improves element creation APIs
+* Version 1.6 improves the quality of APIs and implementations
 
 During this evolution it is tried to make yaidom meaner and cleaner. Much of it is discovered, rather than designed up-front.
 Discovering the "core of yaidom" requires experimentation, lots of it. For example, the functional update support of
