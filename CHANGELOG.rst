@@ -28,7 +28,7 @@ The main changes compared to versions 1.5.X are as follows:
   
 * The "eager" indexed elements have been removed
 
-  * They were expensive to (recursively) create, but very fast to query, because the child elements were stored as field
+  * They were expensive to (recursively) create, but very fast to query, because the child elements were stored as fields
   * Yet for performance reasons they required to hop to the underlying element type when querying for the ancestry, which is not nice from an API point of view
   * Now the "lazy" indexed elements are the only ones remaining (a 'Clark' and a 'Scoped' variant)
   * They are slightly slower in querying, but fast to create, fast in querying the ancestry, fast to (functionally) update, and more friendly from an API point of view
@@ -38,7 +38,7 @@ The main changes compared to versions 1.5.X are as follows:
 * All element implementations, including the indexed ones, now have a Node super-type
 
   * All element implementations reside in a Node hierarchy with specific sub-types for the abstract ``Nodes.Node`` type and its "own" type hierarchy
-  * Hence an indexed Document now longer needs to hold comments and processing instructions from another Node hierarchy (such as simple nodes)
+  * Hence an indexed Document no longer needs to hold comments and processing instructions from another Node hierarchy (such as simple nodes)
   
 * Improved whitespace handling and DOM tree printing; see the release notes of version 1.6.0-M7
 * Improved support for StAX-based streaming; now many streaming scenarios are possible where only parts of the XML are turned into trees in memory; see the release notes of version 1.6.0-M7
