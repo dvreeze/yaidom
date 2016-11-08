@@ -26,29 +26,20 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warning
   if (version.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12") else Seq()
 }
 
-libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12.0")) "org.scala-lang.modules" % "scala-xml_2.12.0" % "1.0.6"
-  else "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
-}
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
 libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12.0")) Seq("org.scala-lang.modules" % "scala-java8-compat_2.12.0" % "0.8.0")
-  else Seq("org.scala-lang.modules" % "scala-java8-compat_2.11" % "0.8.0" % "optional")
+  if (version.contains("2.12")) Seq("org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.8.0")
+  else Seq("org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0" % "optional")
 }
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
-libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12.0")) "org.scalatest" % "scalatest_2.12.0" % "3.0.0" % "test"
-  else "org.scalatest" %% "scalatest" % "3.0.0" % "test"
-}
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
-libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12.0")) "org.scalacheck" % "scalacheck_2.12.0" % "1.13.4" % "test"
-  else "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
-}
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
