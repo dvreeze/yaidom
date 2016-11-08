@@ -9,6 +9,8 @@ CHANGELOG
 Version 1.6.0 is the same as version 1.6.0-M7. Version 1.6.0 is a release that aims at improving the quality of the
 library, compared to versions 1.5.X, while trying to make yaidom still leaner and meaner.
 
+IMPORTANT NOTE: Yaidom 1.6.0 for Scala 2.12 has an erroneous optional dependency on scala-java8-compat_2.11!
+
 Version 1.6.0 has many breaking changes compared to 1.5.1, but code using yaidom is relatively easy to adapt in order
 to make it compile and work with yaidom 1.6.0. 
 
