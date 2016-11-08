@@ -3,6 +3,50 @@ CHANGELOG
 =========
 
 
+1.6.0
+=====
+
+Version 1.6.0 is the same as version 1.6.0-M7. Version 1.6.0 is a release that aims at improving the quality of the
+library, compared to versions 1.5.X, while trying to make yaidom still leaner and meaner.
+
+Version 1.6.0 has many breaking changes compared to 1.5.1, but code using yaidom is relatively easy to adapt in order
+to make it compile and work with yaidom 1.6.0. 
+
+The main changes compared to versions 1.5.X are as follows:
+
+* The query API traits now use type members instead of type parameters
+
+  * This removes some clutter in the query API traits, because unlike type parameters, type members do not have to be repeated everywhere
+  * This is also logical in that type parameters are just alternative syntax for type members (in the new Scala compiler dotty)
+  * The partial implementation traits in the query API (XXXLike) use F-bounded polymorphism with self types in the same way as before, but now encoded with type members
+  * The purely abstract traits in the query API (XXXApi) are now less restrictive, however, in that the type member (for "this" element) is only restricted to a sub-type of the "raw" query API trait
+  * This makes it easy to use purely abstract query API traits as "interfaces" abstracting over concrete element implementations
+  * A new purely abstract trait ``BackingElemApi`` (combining several purely abstract query API traits) does just that, and may be used to abstract over concrete backing elements of XML dialects that themselves offer the yaidom query API, but more type-safe
+  * Like before, the solution easily scales to more query API traits, but now encoded with type members (so the solution is still simple enough)
+  * Moving a code base from yaidom 1.5.X to 1.6.0 is easy w.r.t. mixing in the query API traits in element implementations (see the yaidom ones)
+  * Code that only uses the query API (as opposed to creating new element implementations) is hardly affected by the move to yaidom 1.6.0
+  
+* The "eager" indexed elements have been removed
+
+  * They were expensive to (recursively) create, but very fast to query, because the child elements were stored as field
+  * Yet for performance reasons they required to hop to the underlying element type when querying for the ancestry, which is not nice from an API point of view
+  * Now the "lazy" indexed elements are the only ones remaining (a 'Clark' and a 'Scoped' variant)
+  * They are slightly slower in querying, but fast to create, fast in querying the ancestry, fast to (functionally) update, and more friendly from an API point of view
+  * For a user migrating to yaidom 1.6.0, re-compilation is almost enough when using the "new" indexed elements
+  * Yet keep in mind that XML Base computation is surely less efficient than it was for the "old" indexed elements (it used to be stored in the element)
+  
+* All element implementations, including the indexed ones, now have a Node super-type
+
+  * All element implementations reside in a Node hierarchy with specific sub-types for the abstract ``Nodes.Node`` type and its "own" type hierarchy
+  * Hence an indexed Document now longer needs to hold comments and processing instructions from another Node hierarchy (such as simple nodes)
+  
+* Improved whitespace handling and DOM tree printing; see the release notes of version 1.6.0-M7
+* Improved support for StAX-based streaming; now many streaming scenarios are possible where only parts of the XML are turned into trees in memory; see the release notes of version 1.6.0-M7
+* Many bug fixes, including the ones documented as yaidom issues (also see above)
+* Cross-compiling for Scala 2.12 as well (and dropping support for Scala 2.10)
+* Experimental support for Java 8 interop, including a mirrored query API using Java 8 Streams (this part of yaidom requires Java 8)
+
+
 1.6.0-M7
 =======
 
