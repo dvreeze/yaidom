@@ -45,113 +45,100 @@ class PackageDependencyTest extends FunSuite {
   }
 
   test("testParentPackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom").ensuring(_.isDirectory)
-
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    assertResult(Nil) {
-      importers.filter(i => isYaidomImporter(i))
-    }
+    testPackageDependencies(None, Set(), Set())
   }
 
   test("testCorePackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/core").ensuring(_.isDirectory)
-
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
-
-    assertResult(Set()) {
-      usedYaidomSubpackages
-    }
+    testPackageDependencies(Some("core"), Set(), Set())
   }
 
   test("testQueryApiPackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/queryapi").ensuring(_.isDirectory)
-
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
-
-    assertResult(Set("core")) {
-      usedYaidomSubpackages
-    }
+    testPackageDependencies(
+      Some("queryapi"),
+      Set("core"),
+      Set("core"))
   }
 
   test("testResolvedPackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/resolved").ensuring(_.isDirectory)
-
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
-
-    assertResult(Set("core", "queryapi")) {
-      usedYaidomSubpackages
-    }
+    testPackageDependencies(
+      Some("resolved"),
+      Set("core", "queryapi"),
+      Set("core", "queryapi"))
   }
 
   test("testSimplePackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/simple").ensuring(_.isDirectory)
+    testPackageDependencies(
+      Some("simple"),
+      Set("core", "queryapi", "resolved"),
+      Set("core", "queryapi", "resolved"))
+  }
 
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
-
-    assertResult(Set("core", "queryapi", "resolved")) {
-      usedYaidomSubpackages
-    }
+  test("testIndexedPackage") {
+    testPackageDependencies(
+      Some("indexed"),
+      Set("core", "queryapi", "resolved", "simple"),
+      Set("core", "queryapi", "resolved", "simple"))
   }
 
   test("testConvertPackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/convert").ensuring(_.isDirectory)
-
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
-
-    assertResult(true) {
-      usedYaidomSubpackages.subsetOf(Set("core", "queryapi", "resolved", "simple"))
-    }
-    assertResult(true) {
-      Set("core", "simple").subsetOf(usedYaidomSubpackages)
-    }
+    testPackageDependencies(
+      Some("convert"),
+      Set("core", "simple"),
+      Set("core", "queryapi", "resolved", "simple"))
   }
 
   test("testParsePackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/parse").ensuring(_.isDirectory)
-
-    val sources = findSourcesInDir(dir)
-    val importers = sources.flatMap(source => findImporters(source))
-
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
-
-    assertResult(true) {
-      usedYaidomSubpackages.subsetOf(Set("core", "queryapi", "resolved", "simple", "convert"))
-    }
-    assertResult(true) {
-      Set("simple", "convert").subsetOf(usedYaidomSubpackages)
-    }
+    testPackageDependencies(
+      Some("parse"),
+      Set("convert", "simple"),
+      Set("core", "queryapi", "resolved", "simple", "convert"))
   }
 
   test("testPrintPackage") {
-    val dir = new File(mainScalaDir, "eu/cdevreeze/yaidom/print").ensuring(_.isDirectory)
+    testPackageDependencies(
+      Some("print"),
+      Set("convert", "simple"),
+      Set("core", "queryapi", "resolved", "simple", "convert"))
+  }
+
+  test("testDomPackage") {
+    testPackageDependencies(
+      Some("dom"),
+      Set("core", "queryapi", "resolved", "convert"),
+      Set("core", "queryapi", "resolved", "convert"))
+  }
+
+  test("testScalaXmlPackage") {
+    testPackageDependencies(
+      Some("scalaxml"),
+      Set("core", "queryapi", "resolved", "convert"),
+      Set("core", "queryapi", "resolved", "convert"))
+  }
+
+  private def testPackageDependencies(
+    yaidomSubPackageOption: Option[String],
+    minimalSubPackages: Set[String],
+    allowedSubPackages: Set[String]): Unit = {
+
+    require(minimalSubPackages.subsetOf(allowedSubPackages))
+
+    val dir =
+      if (yaidomSubPackageOption.isEmpty) {
+        new File(mainScalaDir, "eu/cdevreeze/yaidom")
+      } else {
+        new File(new File(mainScalaDir, "eu/cdevreeze/yaidom"), yaidomSubPackageOption.get)
+      }
 
     val sources = findSourcesInDir(dir)
     val importers = sources.flatMap(source => findImporters(source))
 
     val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
 
-    assertResult(true) {
-      usedYaidomSubpackages.subsetOf(Set("core", "queryapi", "resolved", "simple", "convert"))
+    assertResult(Set.empty) {
+      usedYaidomSubpackages.diff(allowedSubPackages)
     }
-    assertResult(true) {
-      Set("simple", "convert").subsetOf(usedYaidomSubpackages)
+    assertResult(Set.empty) {
+      minimalSubPackages.diff(usedYaidomSubpackages)
     }
   }
 
