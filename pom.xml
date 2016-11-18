@@ -275,6 +275,12 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>org.scalameta</groupId>
+			<artifactId>scalameta_${scala.binary.version}</artifactId>
+			<version>1.3.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>

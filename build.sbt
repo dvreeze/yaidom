@@ -19,19 +19,18 @@ crossScalaVersions := Seq("2.11.8", "2.12.0")
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
 (unmanagedSourceDirectories in Compile) <++= (scalaBinaryVersion, baseDirectory) apply { case (version, base) =>
-  if (version.contains("2.12")) Seq(base / "src" / "main" / "scala-2.12") else Seq()
+  if (version.contains("2.12")) Seq(base / "src" / "main" / "scala-2.12")
+  else if (version.contains("2.11")) Seq(base / "src" / "main" / "scala-2.11") else Seq()
 }
 
 (unmanagedSourceDirectories in Test) <++= (scalaBinaryVersion, baseDirectory) apply { case (version, base) =>
-  if (version.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12") else Seq()
+  if (version.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12")
+  else if (version.contains("2.11")) Seq(base / "src" / "test" / "scala-2.11") else Seq()
 }
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
-libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12")) Seq("org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.8.0")
-  else Seq("org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0" % "optional")
-}
+libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0" % "optional"
 
 libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
 
@@ -40,6 +39,11 @@ libraryDependencies += "junit" % "junit" % "4.12" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
+
+libraryDependencies <++= scalaBinaryVersion apply { version =>
+  if (version.contains("2.11")) Seq("org.scalameta" % "scalameta_2.11" % "1.3.0" % "test")
+  else Seq()
+}
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
@@ -60,6 +64,7 @@ libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1" % "test"
 libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "test").intransitive()
 
 libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.0.0" % "test"
+
 
 // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
