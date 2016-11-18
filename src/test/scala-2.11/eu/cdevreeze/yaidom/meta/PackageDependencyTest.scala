@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package eu.cdevreeze.yaidom.meta
 
 import java.io.File
@@ -34,6 +33,11 @@ import scala.meta._
 @RunWith(classOf[JUnitRunner])
 class PackageDependencyTest extends FunSuite {
 
+  /**
+   * Sub-package of yaidom, for example List("core") or List("java8", "indexed").
+   */
+  type SubPackage = List[String]
+
   private val mainScalaDir: File = {
     val euDir = new File(classOf[PackageDependencyTest].getResource("/eu").toURI)
     assert(euDir.isDirectory)
@@ -49,76 +53,125 @@ class PackageDependencyTest extends FunSuite {
   }
 
   test("testCorePackage") {
-    testPackageDependencies(Some("core"), Set(), Set())
+    testPackageDependencies(Some(List("core")), Set(), Set())
   }
 
   test("testQueryApiPackage") {
     testPackageDependencies(
-      Some("queryapi"),
-      Set("core"),
-      Set("core"))
+      Some(List("queryapi")),
+      Set(List("core")),
+      Set(List("core")))
   }
 
   test("testResolvedPackage") {
     testPackageDependencies(
-      Some("resolved"),
-      Set("core", "queryapi"),
-      Set("core", "queryapi"))
+      Some(List("resolved")),
+      Set(List("core"), List("queryapi")),
+      Set(List("core"), List("queryapi")))
   }
 
   test("testSimplePackage") {
     testPackageDependencies(
-      Some("simple"),
-      Set("core", "queryapi", "resolved"),
-      Set("core", "queryapi", "resolved"))
+      Some(List("simple")),
+      Set(List("core"), List("queryapi"), List("resolved")),
+      Set(List("core"), List("queryapi"), List("resolved")))
   }
 
   test("testIndexedPackage") {
     testPackageDependencies(
-      Some("indexed"),
-      Set("core", "queryapi", "resolved", "simple"),
-      Set("core", "queryapi", "resolved", "simple"))
+      Some(List("indexed")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("simple")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("simple")))
   }
 
   test("testConvertPackage") {
     testPackageDependencies(
-      Some("convert"),
-      Set("core", "simple"),
-      Set("core", "queryapi", "resolved", "simple"))
+      Some(List("convert")),
+      Set(List("core"), List("simple")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("simple")))
   }
 
   test("testParsePackage") {
     testPackageDependencies(
-      Some("parse"),
-      Set("convert", "simple"),
-      Set("core", "queryapi", "resolved", "simple", "convert"))
+      Some(List("parse")),
+      Set(List("convert"), List("simple")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("simple"), List("convert")))
   }
 
   test("testPrintPackage") {
     testPackageDependencies(
-      Some("print"),
-      Set("convert", "simple"),
-      Set("core", "queryapi", "resolved", "simple", "convert"))
+      Some(List("print")),
+      Set(List("convert"), List("simple")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("simple"), List("convert")))
   }
 
   test("testDomPackage") {
     testPackageDependencies(
-      Some("dom"),
-      Set("core", "queryapi", "resolved", "convert"),
-      Set("core", "queryapi", "resolved", "convert"))
+      Some(List("dom")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("convert")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("convert")))
   }
 
   test("testScalaXmlPackage") {
     testPackageDependencies(
-      Some("scalaxml"),
-      Set("core", "queryapi", "resolved", "convert"),
-      Set("core", "queryapi", "resolved", "convert"))
+      Some(List("scalaxml")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("convert")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8Package") {
+    testPackageDependencies(
+      Some(List("java8")),
+      Set(List("core")),
+      Set(List("core"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8QueryApiPackage") {
+    testPackageDependencies(
+      Some(List("java8", "queryapi")),
+      Set(List("core"), List("java8")),
+      Set(List("core"), List("java8"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8SimpleElemPackage") {
+    testPackageDependencies(
+      Some(List("java8", "simpleelem")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("simple")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("simple"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8IndexedElemPackage") {
+    testPackageDependencies(
+      Some(List("java8", "indexedelem")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("indexed")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("indexed"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8ScalaXmlElemPackage") {
+    testPackageDependencies(
+      Some(List("java8", "scalaxmlelem")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("scalaxml")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("scalaxml"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8DomElemPackage") {
+    testPackageDependencies(
+      Some(List("java8", "domelem")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("dom")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("dom"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8ResolvedElemPackage") {
+    testPackageDependencies(
+      Some(List("java8", "resolvedelem")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("resolved")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("resolved"), List("queryapi"), List("convert")))
   }
 
   private def testPackageDependencies(
-    yaidomSubPackageOption: Option[String],
-    minimalSubPackages: Set[String],
-    allowedSubPackages: Set[String]): Unit = {
+    yaidomSubPackageOption: Option[SubPackage],
+    minimalSubPackages: Set[SubPackage],
+    allowedSubPackages: Set[SubPackage]): Unit = {
 
     require(minimalSubPackages.subsetOf(allowedSubPackages))
 
@@ -126,13 +179,13 @@ class PackageDependencyTest extends FunSuite {
       if (yaidomSubPackageOption.isEmpty) {
         new File(mainScalaDir, "eu/cdevreeze/yaidom")
       } else {
-        new File(new File(mainScalaDir, "eu/cdevreeze/yaidom"), yaidomSubPackageOption.get)
+        new File(new File(mainScalaDir, "eu/cdevreeze/yaidom"), yaidomSubPackageOption.get.mkString("/"))
       }
 
     val sources = findSourcesInDir(dir)
     val importers = sources.flatMap(source => findImporters(source))
 
-    val usedYaidomSubpackages: Set[String] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
+    val usedYaidomSubpackages: Set[SubPackage] = importers.flatMap(i => usedYaidomSubPackages(i)).toSet
 
     assertResult(Set.empty) {
       usedYaidomSubpackages.diff(allowedSubPackages)
@@ -153,31 +206,53 @@ class PackageDependencyTest extends FunSuite {
   }
 
   private def isYaidomImporter(importer: Importer): Boolean = {
-    val termNames = importer collect { case tn: Term.Name => tn }
+    val termNames = importer.ref collect { case tn: Term.Name => tn }
 
     termNames.take(3).map(_.structure) ==
       List(Term.Name("eu"), Term.Name("cdevreeze"), Term.Name("yaidom")).map(_.structure)
   }
 
-  private def usedYaidomSubPackages(importer: Importer): Set[String] = {
+  private def usedYaidomSubPackages(importer: Importer): Set[SubPackage] = {
     if (isYaidomImporter(importer)) {
-      val termNames = importer collect { case tn: Term.Name => tn }
+      val termNames = importer.ref collect { case tn: Term.Name => tn }
 
-      val termNameOption = termNames.drop(3).headOption
+      val termNamesAfterYaidom: List[Name] = termNames.drop(3)
 
-      termNameOption match {
-        case Some(name) if yaidomSubPackages.contains(name.value.trim) => Set(name.value.trim)
-        case Some(name) => Set()
-        case None =>
-          importer.importees.flatMap(_.collect({ case n: Name if yaidomSubPackages.contains(n.value) => n.value })).toSet
-      }
+      val importeeNames: Seq[Name] =
+        importer.importees.flatMap(_.collect({ case n: Name => n }))
+
+      val nameListsAfterYaidom: Seq[List[Name]] =
+        importeeNames.map(name => termNamesAfterYaidom ::: List(name))
+
+      val nameValueListsAfterYaidom: Seq[List[String]] =
+        nameListsAfterYaidom.map(names => names.map(_.value))
+
+      yaidomSubPackages.filter(subPkg => nameValueListsAfterYaidom.exists(names => names.startsWith(subPkg)))
     } else {
       Set()
     }
   }
 
-  private val yaidomSubPackages: Set[String] = {
-    Set("convert", "core", "dom", "indexed", "java8", "parse", "print", "queryapi", "resolved", "scalaxml", "simple", "utils")
+  private val yaidomSubPackages: Set[SubPackage] = {
+    Set(
+      List("convert"),
+      List("core"),
+      List("dom"),
+      List("indexed"),
+      List("java8"),
+      List("java8", "domelem"),
+      List("java8", "indexedelem"),
+      List("java8", "queryapi"),
+      List("java8", "resolvedelem"),
+      List("java8", "scalaxmlelem"),
+      List("java8", "simpleelem"),
+      List("parse"),
+      List("print"),
+      List("queryapi"),
+      List("resolved"),
+      List("scalaxml"),
+      List("simple"),
+      List("utils"))
   }
 
   private def getProjectDir(dir: File): File = {
