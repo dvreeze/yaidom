@@ -39,8 +39,7 @@ class PackageDependencyTest extends FunSuite {
     assert(euDir.isDirectory)
     val testClassDir = euDir.getParentFile
     assert(testClassDir.isDirectory)
-    assert(testClassDir.getName == "test-classes")
-    val projDir = testClassDir.getParentFile.getParentFile
+    val projDir = getProjectDir(testClassDir)
     val resultDir = new File(projDir, "src/main/scala")
     resultDir.ensuring(_.isDirectory)
   }
@@ -192,5 +191,19 @@ class PackageDependencyTest extends FunSuite {
 
   private val yaidomSubPackages: Set[String] = {
     Set("convert", "core", "dom", "indexed", "java8", "parse", "print", "queryapi", "resolved", "scalaxml", "simple", "utils")
+  }
+
+  private def getProjectDir(dir: File): File = {
+    require((dir ne null) && dir.isDirectory, s"Expected directory '${dir}' but this is not a directory")
+
+    if (dir.getName == "yaidom") {
+      dir
+    } else {
+      val parentDir = dir.getParentFile
+      require(parentDir ne null, s"Unexpected directory '${dir}' without parent directory")
+
+      // Recursive call
+      getProjectDir(parentDir)
+    }
   }
 }
