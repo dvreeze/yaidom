@@ -34,10 +34,13 @@ import org.xml.sax.InputSource
 import JDomWrapperTest._
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
@@ -752,6 +755,31 @@ class JDomWrapperTest extends FunSuite {
     checkEqualityOfDomAndJDomElems(d)
   }
 
+  test("testPathsAndAncestries") {
+    val dbf = DocumentBuilderFactory.newInstance
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder
+    val is = classOf[JDomWrapperTest].getResourceAsStream("books.xml")
+    val domBuilder = new org.jdom2.input.DOMBuilder
+    val d = db.parse(is)
+    val doc = domBuilder.build(d)
+    val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
+
+    val root: JDomElem = domDoc.documentElement
+
+    assertResult(ElemWithPath(root).findAllElemsOrSelf.map(_.path)) {
+      root.findAllElemsOrSelf.map(_.path)
+    }
+
+    assertResult(root.findAllElemsOrSelf.map(_.path.entries.map(_.elementName)).map(names => root.resolvedName +: names)) {
+      root.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
+    }
+
+    assertResult(root.findAllElemsOrSelf.map(e => e.path.entries.scanLeft(root)({ case (accElem, entry) => accElem.getChildElemByPathEntry(entry) }))) {
+      root.findAllElemsOrSelf.map(_.reverseAncestryOrSelf)
+    }
+  }
+
   private def checkEqualityOfDomAndJDomElems(d: org.w3c.dom.Document): Unit = {
     val rootElem1 = resolved.Elem(DomDocument(d).documentElement)
     val domBuilder = new org.jdom2.input.DOMBuilder
@@ -798,7 +826,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with ScopedElemLike with HasParent {
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with BackingElemApi with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
@@ -881,6 +909,87 @@ object JDomWrapperTest {
 
     override def parentOption: Option[JDomElem] =
       Option(wrappedNode.getParentElement) map { e => JDomNode.wrapElement(e) }
+
+    override def namespaces: Declarations = {
+      declarations
+    }
+
+    def baseUriOption: Option[URI] = {
+      Option(wrappedNode.getXMLBaseURI)
+    }
+
+    def baseUri: URI = {
+      baseUriOption.getOrElse(JDomNode.EmptyUri)
+    }
+
+    def docUriOption: Option[URI] = {
+      Option(wrappedNode.getDocument).flatMap(d => Option(d.getBaseURI)).map(u => URI.create(u))
+    }
+
+    def docUri: URI = {
+      docUriOption.getOrElse(JDomNode.EmptyUri)
+    }
+
+    def parentBaseUriOption: Option[URI] = {
+      parentOption.flatMap(_.baseUriOption)
+    }
+
+    def path: Path = {
+      // Expensive!
+
+      val reverseAncestorOrSelfPairs = reverseAncestryOrSelf.sliding(2).toIndexedSeq.filter(_.size == 2)
+
+      val pathEntries: immutable.IndexedSeq[Path.Entry] = reverseAncestorOrSelfPairs map { pair =>
+        val fromElem = pair(0)
+        val toElem = pair(1)
+
+        val expandedName = toElem.resolvedName
+        val sameNameChildElems = fromElem.filterChildElems(_.resolvedName == expandedName)
+        val idxOption = sameNameChildElems.zipWithIndex.find(pair => pair._1 == toElem).map(_._2)
+        require(idxOption.isDefined, s"Corrupt data. No Path found for element $wrappedNode")
+
+        Path.Entry(expandedName, idxOption.get)
+      }
+      Path(pathEntries)
+    }
+
+    def reverseAncestry: immutable.IndexedSeq[JDomElem] = {
+      reverseAncestryOrSelf.init
+    }
+
+    def reverseAncestryENames: immutable.IndexedSeq[EName] = {
+      reverseAncestry.map(_.resolvedName)
+    }
+
+    def reverseAncestryOrSelf: immutable.IndexedSeq[JDomElem] = {
+      underlyingAncestryOrSelf.reverse.map(n => JDomNode.wrapElement(n))
+    }
+
+    def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
+      reverseAncestryOrSelf.map(_.resolvedName)
+    }
+
+    def rootElem: JDomElem = {
+      JDomNode.wrapElement(underlyingAncestryOrSelf.last)
+    }
+
+    override def equals(other: Any): Boolean = other match {
+      case other: JDomElem => this.wrappedNode == other.wrappedNode
+      case _               => false
+    }
+
+    override def hashCode: Int = {
+      wrappedNode.hashCode
+    }
+
+    private def underlyingAncestryOrSelf: immutable.IndexedSeq[org.jdom2.Element] = {
+      var currNodes = Vector(wrappedNode)
+      while (currNodes.last.getParentElement ne null) {
+        val last = currNodes.last
+        currNodes = currNodes :+ last.getParentElement
+      }
+      currNodes
+    }
   }
 
   final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode with ResolvedNodes.Text {
@@ -922,6 +1031,8 @@ object JDomWrapperTest {
   }
 
   object JDomNode {
+
+    val EmptyUri = URI.create("")
 
     def wrapNodeOption(node: org.jdom2.Content): Option[JDomNode] = {
       node match {
