@@ -36,10 +36,11 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  * @author Chris de Vreeze
  */
 abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
-  val docUriOption: Option[URI],
-  val underlyingRootElem: U,
-  val path: Path,
-  val underlyingElem: U) extends Nodes.Elem with IndexedClarkElemApi with ClarkElemLike {
+    val docUriOption: Option[URI],
+    val parentBaseUriOption: Option[URI],
+    val underlyingRootElem: U,
+    val path: Path,
+    val underlyingElem: U) extends Nodes.Elem with IndexedClarkElemApi with ClarkElemLike {
 
   type ThisElem <: AbstractIndexedClarkElem.Aux[ThisElem, U]
 
@@ -54,6 +55,7 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
    */
   private[yaidom] def assertConsistency(): Unit = {
     assert(underlyingElem == underlyingRootElem.getElemOrSelfByPath(path), "Corrupt element!")
+    assert(parentBaseUriOption == AbstractIndexedClarkElem.computeParentBaseUriOption(this), "Corrupt element!")
   }
 
   def findAllChildElems: immutable.IndexedSeq[ThisElem]
@@ -62,22 +64,18 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
 
   def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem]
 
+  /**
+   * Returns the optional base URI. This method is fast, due to the use of the optional base URI of
+   * the parent element, if any.
+   */
   final def baseUriOption: Option[URI] = {
-    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, underlyingRootElem, path)(XmlBaseSupport.JdkUriResolver)
+    XmlBaseSupport.findBaseUriByParentBaseUri(parentBaseUriOption, underlyingElem)(XmlBaseSupport.JdkUriResolver)
   }
 
   /**
    * Returns the base URI, falling back to the empty URI if absent.
    */
   final def baseUri: URI = baseUriOption.getOrElse(new URI(""))
-
-  final def parentBaseUriOption: Option[URI] = {
-    if (path.isEmpty) {
-      docUriOption
-    } else {
-      XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, underlyingRootElem, path.parentPath)(XmlBaseSupport.JdkUriResolver)
-    }
-  }
 
   /**
    * Returns the document URI, falling back to the empty URI if absent.
@@ -113,4 +111,12 @@ object AbstractIndexedClarkElem {
    * @tparam U The underlying element type
    */
   type Aux[E, U <: ClarkElemApi.Aux[U]] = AbstractIndexedClarkElem[U] { type ThisElem = E }
+
+  private[yaidom] def computeParentBaseUriOption(elm: AbstractIndexedClarkElem[_ <: ClarkElemApi]): Option[URI] = {
+    if (elm.path.isEmpty) {
+      elm.docUriOption
+    } else {
+      XmlBaseSupport.findBaseUriByDocUriAndPath(elm.docUriOption, elm.underlyingRootElem, elm.path.parentPath)(XmlBaseSupport.JdkUriResolver)
+    }
+  }
 }

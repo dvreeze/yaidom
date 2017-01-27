@@ -30,6 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 object IndexedScopedNode {
@@ -54,10 +55,11 @@ object IndexedScopedNode {
    * @author Chris de Vreeze
    */
   final class Elem[U <: ScopedElemApi.Aux[U]] private[IndexedScopedNode] (
-    docUriOption: Option[URI],
-    underlyingRootElem: U,
-    path: Path,
-    underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with BackingElemApi with ScopedElemLike with HasParent with Nodes.Elem {
+      docUriOption: Option[URI],
+      parentBaseUriOption: Option[URI],
+      underlyingRootElem: U,
+      path: Path,
+      underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with BackingElemApi with ScopedElemLike with HasParent with Nodes.Elem {
 
     type ThisElem = Elem[U]
 
@@ -66,7 +68,7 @@ object IndexedScopedNode {
     final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
       underlyingElem.findAllChildElemsWithPathEntries map {
         case (e, entry) =>
-          new Elem(docUriOption, underlyingRootElem, path.append(entry), e)
+          new Elem(docUriOption, baseUriOption, underlyingRootElem, path.append(entry), e)
       }
     }
 
@@ -86,7 +88,7 @@ object IndexedScopedNode {
     final override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
 
     final def rootElem: ThisElem = {
-      new Elem[U](docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
+      new Elem[U](docUriOption, docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
     }
 
     final def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
@@ -146,7 +148,13 @@ object IndexedScopedNode {
   object Elem {
 
     def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
-      new Elem[U](docUriOption, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
+      val underlyingElem = underlyingRootElem.getElemOrSelfByPath(path)
+
+      val parentBaseUriOption = path.parentPathOption map { pp =>
+        XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, underlyingRootElem, pp)(XmlBaseSupport.JdkUriResolver)
+      } getOrElse (docUriOption)
+
+      new Elem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     }
 
     def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
@@ -154,7 +162,7 @@ object IndexedScopedNode {
     }
 
     def apply[U <: ScopedElemApi.Aux[U]](underlyingRootElem: U, path: Path): Elem[U] = {
-      new Elem[U](None, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
+      apply(None, underlyingRootElem, path)
     }
 
     def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {

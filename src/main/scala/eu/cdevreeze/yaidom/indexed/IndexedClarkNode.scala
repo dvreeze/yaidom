@@ -24,6 +24,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 object IndexedClarkNode {
@@ -108,10 +109,11 @@ object IndexedClarkNode {
    * @author Chris de Vreeze
    */
   final class Elem[U <: ClarkElemApi.Aux[U]] private[IndexedClarkNode] (
-    docUriOption: Option[URI],
-    underlyingRootElem: U,
-    path: Path,
-    underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, underlyingRootElem, path, underlyingElem) with Node with Nodes.Elem {
+      docUriOption: Option[URI],
+      parentBaseUriOption: Option[URI],
+      underlyingRootElem: U,
+      path: Path,
+      underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem) with Node with Nodes.Elem {
 
     type ThisElem = Elem[U]
 
@@ -120,7 +122,7 @@ object IndexedClarkNode {
     final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
       underlyingElem.findAllChildElemsWithPathEntries map {
         case (e, entry) =>
-          new Elem(docUriOption, underlyingRootElem, path.append(entry), e)
+          new Elem(docUriOption, baseUriOption, underlyingRootElem, path.append(entry), e)
       }
     }
 
@@ -134,7 +136,7 @@ object IndexedClarkNode {
     final override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
 
     final def rootElem: ThisElem = {
-      new Elem[U](docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
+      new Elem[U](docUriOption, docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
     }
 
     final def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
@@ -162,7 +164,13 @@ object IndexedClarkNode {
   object Elem {
 
     def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
-      new Elem[U](docUriOption, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
+      val underlyingElem = underlyingRootElem.getElemOrSelfByPath(path)
+
+      val parentBaseUriOption = path.parentPathOption map { pp =>
+        XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, underlyingRootElem, pp)(XmlBaseSupport.JdkUriResolver)
+      } getOrElse (docUriOption)
+
+      new Elem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     }
 
     def apply[U <: ClarkElemApi.Aux[U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
@@ -170,7 +178,7 @@ object IndexedClarkNode {
     }
 
     def apply[U <: ClarkElemApi.Aux[U]](underlyingRootElem: U, path: Path): Elem[U] = {
-      new Elem[U](None, underlyingRootElem, path, underlyingRootElem.getElemOrSelfByPath(path))
+      apply(None, underlyingRootElem, path)
     }
 
     def apply[U <: ClarkElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
