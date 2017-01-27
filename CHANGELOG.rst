@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+1.6.1
+=====
+
+Version 1.6.1 speeds up base URI computation for indexed elements, by storing the optional parent base URI.
+This is important in an XBRL context, where the base URI is used extensively, for example when resolving XLink arcs.
+This change is a non-breaking change.
+
+
 1.6.0
 =====
 
