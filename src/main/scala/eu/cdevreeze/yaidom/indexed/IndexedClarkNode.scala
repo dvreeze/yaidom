@@ -120,9 +120,11 @@ object IndexedClarkNode {
     def thisElem: ThisElem = this
 
     final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
+      val baseUriOpt = baseUriOption
+
       underlyingElem.findAllChildElemsWithPathEntries map {
         case (e, entry) =>
-          new Elem(docUriOption, baseUriOption, underlyingRootElem, path.append(entry), e)
+          new Elem(docUriOption, baseUriOpt, underlyingRootElem, path.append(entry), e)
       }
     }
 
