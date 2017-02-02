@@ -88,8 +88,12 @@ class NewlineTest extends FunSuite {
       whitespaceTextNodes2.filter(_.text.contains('\r')).isEmpty
     }
 
-    assertResult(whitespaceTextNodes1.mkString) {
-      whitespaceTextNodes2.mkString
+    // Checking that the whitespace text content is exactly the same in both cases, proving
+    // (at least on the platform where this test runs) that the CR and only the CR characters have been
+    // removed by the DOM parser.
+
+    assertResult(whitespaceTextNodes1.map(_.text).mkString) {
+      whitespaceTextNodes2.map(_.text).mkString
     }
   }
 
