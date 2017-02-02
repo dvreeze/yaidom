@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- From: http://www.java-only.com/LoadTutorial.javaonly?id=60 -->
+<cdstore>
+	<cd genre="rock">
+		<artist>An Artist</artist>
+		<title>The title</title>
+		<price>15.00</price>
+	</cd>
+	<cd genre="metal">
+		<artist>An other artist</artist>
+		<title>The other title</title>
+		<price>10.00</price>
+	</cd>
+</cdstore>
