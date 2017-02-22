@@ -433,9 +433,10 @@ trait SaxonTestSupport {
 
         val lastSquareStartBracketIdx = saxonAbsolutePathString.lastIndexOf('[')
         require(lastSquareStartBracketIdx > 0, s"Found no '[' in '${saxonAbsolutePathString}'")
-        require(saxonAbsolutePathString.endsWith("]"), s"Found no '[' in '${saxonAbsolutePathString}'")
+        require(saxonAbsolutePathString.endsWith("]"), s"Found no ']' at the end of '${saxonAbsolutePathString}'")
 
-        val elementIndex = saxonAbsolutePathString.substring(lastSquareStartBracketIdx + 1).init.toInt - 1
+        val elementIndex =
+          saxonAbsolutePathString.substring(lastSquareStartBracketIdx + 1, saxonAbsolutePathString.length - 1).toInt - 1
 
         Path.Entry(elm.resolvedName, elementIndex)
       }
