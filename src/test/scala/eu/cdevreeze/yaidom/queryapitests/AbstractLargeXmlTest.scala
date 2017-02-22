@@ -217,4 +217,21 @@ abstract class AbstractLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info(s"The navigation test (invoking findElemOrSelfByPath twice) took ${endMs - startMs} ms")
   }
+
+  test("testPaths") {
+    val startMs = System.currentTimeMillis()
+    val rootElm = doc.documentElement
+
+    val allElemsOrSelf = rootElm.findAllElemsOrSelf
+    val someElms =
+      (Vector(0, 1000, 2000, 3000, 8000, 12000, 18000, 19000) ++ (19300 to 19350).toVector).map(i => allElemsOrSelf(i))
+    val someElmPaths = someElms.map(_.path)
+
+    assertResult(someElms) {
+      someElmPaths.map(path => rootElm.getElemOrSelfByPath(path))
+    }
+
+    val endMs = System.currentTimeMillis()
+    logger.info(s"The path retrieval and navigation test took ${endMs - startMs} ms")
+  }
 }

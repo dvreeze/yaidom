@@ -33,6 +33,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import net.sf.saxon.`type`.Type
+import net.sf.saxon.om.AbsolutePath
 import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.om.TreeInfo
@@ -139,7 +140,7 @@ trait SaxonTestSupport {
    * Saxon NodeInfo element wrapper. It is efficient, because of an entirely custom query API implementation tailored to Saxon.
    */
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with BackingElemApi {
+      override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with BackingElemApi {
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
@@ -425,21 +426,20 @@ trait SaxonTestSupport {
     }
 
     def path: Path = {
-      // Expensive!
+      // Not too slow, but not very fast either
 
-      val reverseAncestorOrSelfPairs = reverseAncestryOrSelf.sliding(2).toIndexedSeq.filter(_.size == 2)
+      val pathEntries: immutable.IndexedSeq[Path.Entry] = reverseAncestryOrSelf.tail map { elm =>
+        val saxonAbsolutePathString = AbsolutePath.pathToNode(elm.wrappedNode).getPathUsingUris
 
-      val pathEntries: immutable.IndexedSeq[Path.Entry] = reverseAncestorOrSelfPairs map { pair =>
-        val fromElem = pair(0)
-        val toElem = pair(1)
+        val lastSquareStartBracketIdx = saxonAbsolutePathString.lastIndexOf('[')
+        require(lastSquareStartBracketIdx > 0, s"Found no '[' in '${saxonAbsolutePathString}'")
+        require(saxonAbsolutePathString.endsWith("]"), s"Found no '[' in '${saxonAbsolutePathString}'")
 
-        val expandedName = toElem.resolvedName
-        val sameNameChildElems = fromElem.filterChildElems(_.resolvedName == expandedName)
-        val idxOption = sameNameChildElems.zipWithIndex.find(pair => pair._1 == toElem).map(_._2)
-        require(idxOption.isDefined, s"Corrupt data. No Path found for element $wrappedNode")
+        val elementIndex = saxonAbsolutePathString.substring(lastSquareStartBracketIdx + 1).init.toInt - 1
 
-        Path.Entry(expandedName, idxOption.get)
+        Path.Entry(elm.resolvedName, elementIndex)
       }
+
       Path(pathEntries)
     }
 
