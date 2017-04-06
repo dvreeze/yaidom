@@ -16,11 +16,14 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
+import scala.collection.immutable
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 
 import eu.cdevreeze.yaidom.convert
@@ -45,30 +48,7 @@ class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
 
   test("testProcessXPathResults") {
     val ns = "http://bookstore"
-
-    // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
-    val scope = Scope.from("bk" -> ns)
-    val namespaceContext = scope.toNamespaceContext
-
-    val xpathFactory =
-      XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
-    val xpath = xpathFactory.newXPath()
-    xpath.setNamespaceContext(namespaceContext)
-
-    val expr = xpath.compile("//bk:Book")
-
-    val is = classOf[XPathInteropTest].getResourceAsStream("books.xml")
-    val docParser = parse.DocumentParserUsingSax.newInstance
-    val doc = docParser.parse(is)
-    val dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance()
-    dbf.setNamespaceAware(true)
-    val db = dbf.newDocumentBuilder()
-    val domDoc = convert.DomConversions.convertDocument(doc)(db.newDocument())
-
-    val nodeList = expr.evaluate(domDoc, XPathConstants.NODESET).asInstanceOf[NodeList]
-
-    // Converting NodeList to a Scala IndexedSeq of (DOM) Node instances.
-    val domNodes = nodeListToIndexedSeq(nodeList)
+    val domNodes = runXPath("//bk:Book", Scope.from("bk" -> ns))
 
     require(domNodes.forall(_.isInstanceOf[org.w3c.dom.Element]))
 
@@ -109,5 +89,59 @@ class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
     assertResult(Set("Hector Garcia-Molina", "Jeffrey Ullman", "Jennifer Widom")) {
       authors
     }
+  }
+
+  test("testXPathWithMissingNamespaceBinding") {
+    val domNodes = runXPath("//Book", Scope.Empty)
+
+    require(domNodes.forall(_.isInstanceOf[org.w3c.dom.Element]))
+
+    val domElems = domNodes map (n => n.asInstanceOf[org.w3c.dom.Element])
+
+    assertResult(0) {
+      domElems.size
+    }
+  }
+
+  test("testXPathWithDuplicateNamespaceBindings") {
+    // Note that there is no real reason that a Scope passed as namespace context must be invertible!
+    val ns = "http://bookstore"
+    val domNodes = runXPath("//bk:Bookstore/book:Book", Scope.from("" -> ns, "bk" -> ns, "book" -> ns))
+
+    require(domNodes.forall(_.isInstanceOf[org.w3c.dom.Element]))
+
+    val domElems = domNodes map (n => n.asInstanceOf[org.w3c.dom.Element])
+
+    assertResult(4) {
+      domElems.size
+    }
+  }
+
+  private def runXPath(xpathExpr: String, scope: Scope): immutable.IndexedSeq[Node] = {
+    val ns = "http://bookstore"
+
+    // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
+    val namespaceContext = scope.toNamespaceContext
+
+    val xpathFactory =
+      XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
+    val xpath = xpathFactory.newXPath()
+    xpath.setNamespaceContext(namespaceContext)
+
+    val expr = xpath.compile(xpathExpr)
+
+    val is = classOf[XPathInteropTest].getResourceAsStream("books.xml")
+    val docParser = parse.DocumentParserUsingSax.newInstance
+    val doc = docParser.parse(is)
+    val dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+    dbf.setNamespaceAware(true)
+    val db = dbf.newDocumentBuilder()
+    val domDoc = convert.DomConversions.convertDocument(doc)(db.newDocument())
+
+    val nodeList = expr.evaluate(domDoc, XPathConstants.NODESET).asInstanceOf[NodeList]
+
+    // Converting NodeList to a Scala IndexedSeq of (DOM) Node instances.
+    val domNodes = nodeListToIndexedSeq(nodeList)
+    domNodes
   }
 }

@@ -84,7 +84,7 @@ import scala.collection.mutable
  * An [[eu.cdevreeze.yaidom.core.Path]] corresponds to one and only one canonical path of the element (modulo prefix names),
  * which is the corresponding (canonical) XPath expression. See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
  * There is one catch, though. The `Path` does not know the root element name, so that is not a part of the corresponding
- * canonical XPath expression. See the documentation of method `toCanonicalXPath`.
+ * canonical XPath expression. See the documentation of method `toResolvedCanonicalXPath`.
  *
  * The `Path` contains an `IndexedSeq` of path entries for a specific child element, grandchild element etc.,
  * but the (root) element itself is referred to by an empty list of path entries.
@@ -202,6 +202,23 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   override def toString: String = s"Path(${entries.toString})"
 
   /**
+   * Returns the corresponding "resolved" canonical XPath, but modified for the root element (which is unknown in the `Path`).
+   * The modification is that the root element is written as a slash followed by an asterisk. Unlike real
+   * XPath, QNames are resolved as ENames, and shown in James Clark notation for ENames.
+   *
+   * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path for (real) canonical XPath.
+   *
+   * The "resolved" XPath-like expressions returned by this method need no context to convey their semantics,
+   * unlike real XPath expressions (canonical or otherwise). This is an important advantage of these expressions, in spite
+   * of their relative verbosity. A good use case is error reporting about parts of XML documents.
+   * For example, Saxon-EE uses a similar notation for error reporting (in XML format) in its schema validator.
+   */
+  def toResolvedCanonicalXPath: String = {
+    val entryXPaths = entries map { entry => entry.toResolvedCanonicalXPath }
+    "/" + "*" + entryXPaths.mkString
+  }
+
+  /**
    * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `Path`).
    * The modification is that the root element is written as a slash followed by an asterisk.
    *
@@ -232,6 +249,37 @@ object Path {
   def from(entries: (EName, Int)*): Path = {
     val entrySeq: Seq[Path.Entry] = entries map { p => Entry(p._1, p._2) }
     new Path(entrySeq.toIndexedSeq)
+  }
+
+  /** Parses a String, which must be in the `toResolvedCanonicalXPath` format, into an `Path`. */
+  def fromResolvedCanonicalXPath(s: String): Path = {
+    require(s.startsWith("/*"), "The 'resolved' canonical XPath must start with '/*'")
+    val remainder = s.drop(2)
+    require(remainder.headOption.forall(_ == '/'), "The 'resolved' canonical XPath's third character, if any, must be a slash")
+    require(remainder.endsWith("]"), "The 'resolved' canonical XPath must have a (last entry) position ending with ']', such as [1]")
+
+    def getEntryStringsReversed(str: String): List[String] = str match {
+      case "" => Nil
+      case _ =>
+        assert(str.startsWith("/"))
+        assert(str.endsWith("]"))
+
+        val previousEntryEndIndex = str.lastIndexOf("]/")
+
+        val (entryString, previousEntriesString) =
+          if (previousEntryEndIndex < 0) {
+            (str, "")
+          } else {
+            (str.substring(previousEntryEndIndex + 1), str.substring(0, previousEntryEndIndex + 1))
+          }
+
+        // Recursive call
+        entryString :: getEntryStringsReversed(previousEntriesString)
+    }
+
+    val entryStrings = getEntryStringsReversed(remainder).toIndexedSeq.reverse
+    val entries = entryStrings map { entryString => Path.Entry.fromResolvedCanonicalXPath(entryString) }
+    Path(entries)
   }
 
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `Path`. The passed scope must be invertible. */
@@ -276,6 +324,11 @@ object Path {
     /** Position (1-based) of the element as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
+    /** Returns the corresponding "resolved" canonical XPath, replacing QNames by ENames */
+    def toResolvedCanonicalXPath: String = {
+      s"/${elementName.toString}[${position}]"
+    }
+
     /** Given an invertible `Scope`, returns the corresponding canonical XPath */
     def toCanonicalXPath(scope: Scope): String = {
       require(scope.isInvertible, s"Scope '${scope}' is not invertible")
@@ -283,9 +336,9 @@ object Path {
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
           val nsUri: String = elementName.namespaceUriOption.get
-          require((scope.prefixNamespaceMap - "").values.toSet.contains(nsUri), s"Expected at least one prefix for namespace URI '${nsUri}'")
+          require(scope.prefixNamespaceMap.values.toSet.contains(nsUri), s"Expected at least one (possibly empty) prefix for namespace URI '${nsUri}'")
 
-          val result = (scope.prefixNamespaceMap - "").toList collectFirst {
+          val result = scope.prefixNamespaceMap.toList collectFirst {
             case pair if pair._2 == nsUri =>
               val prefix: String = pair._1
               val ns: String = pair._2
@@ -309,6 +362,24 @@ object Path {
       require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
       fromCanonicalXPath(s)(scope)
+    }
+
+    /** Parses a `String`, which must be in the `toResolvedCanonicalXPath` format, into an `Path.Entry` */
+    def fromResolvedCanonicalXPath(s: String): Entry = {
+      require(s.startsWith("/"), "The 'resolved' canonical XPath for the 'entry' must start with a slash")
+      require(s.endsWith("]"), "The 'resolved' canonical XPath for the 'entry' must have a position ending with ']', such as [1]")
+      require(s.size >= 5, "The 'resolved' canonical XPath for the 'entry' must contain at least 5 characters")
+
+      val positionIndex = s.lastIndexOf("[")
+      require(positionIndex >= 2, s"The 'resolved' canonical XPath for the 'entry' must have a position starting with '['")
+      require(positionIndex <= s.size - 3, "The 'resolved' canonical XPath for the 'entry' must have a position of at least 3 characters, such as [1]")
+
+      val enameString = s.substring(1, positionIndex)
+      val elementName = EName.parse(enameString)
+
+      val position = s.substring(positionIndex + 1, s.size - 1).toInt
+
+      Entry(elementName, position - 1)
     }
 
     /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `Path.Entry`, given an invertible `Scope` */

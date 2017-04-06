@@ -62,7 +62,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
       Elem(
         qname = e.qname,
-        attributes = e.attributes :+ (QName("path") -> path.toCanonicalXPath(scope)),
+        attributes = e.attributes :+ (QName("path") -> path.toResolvedCanonicalXPath),
         scope = e.scope,
         children = e.children.zipWithIndex map {
           case (ch, idx) =>
@@ -82,7 +82,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val elms =
       for {
         desc <- bookStoreWithPaths.findAllElems
-        path = Path.fromCanonicalXPath(desc.attribute(EName("path")))(Scope.Empty)
+        path = Path.fromResolvedCanonicalXPath(desc.attribute(EName("path")))
         parent <- bookstore.findElemOrSelfByPath(path.parentPath)
         if parent.qname != QName("Bookstore") && parent.qname != QName("Book")
       } yield desc
