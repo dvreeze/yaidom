@@ -256,7 +256,9 @@ object Path {
     require(s.startsWith("/*"), "The 'resolved' canonical XPath must start with '/*'")
     val remainder = s.drop(2)
     require(remainder.headOption.forall(_ == '/'), "The 'resolved' canonical XPath's third character, if any, must be a slash")
-    require(remainder.endsWith("]"), "The 'resolved' canonical XPath must have a (last entry) position ending with ']', such as [1]")
+    require(
+      remainder.isEmpty || remainder.endsWith("]"),
+      "The 'resolved' canonical XPath, if non-empty, must have a (last entry) position ending with ']', such as [1]")
 
     def getEntryStringsReversed(str: String): List[String] = str match {
       case "" => Nil
