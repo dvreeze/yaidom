@@ -140,7 +140,7 @@ private[yaidom] object PrettyPrinting {
      * That is, equivalent to appending `lines.map(_.toString).mkString(NewLine)`
      */
     def addToStringBuilder(sb: StringBuilder): Unit = {
-      if (!lines.isEmpty) {
+      if (lines.nonEmpty) {
         lines.head.addToStringBuilder(sb)
 
         for (line <- lines.drop(1)) {

@@ -230,7 +230,7 @@ object ValidationTest {
       }
     }
 
-    if (lastValidationResult.success && !remainingChildElms.isEmpty) {
+    if (lastValidationResult.success && remainingChildElms.nonEmpty) {
       lastValidationResult = ValidationResult.notOk("There were remaining (non-matched) elements")
     }
 

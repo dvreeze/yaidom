@@ -253,7 +253,7 @@ class NonYaidomQueryTest extends FunSuite {
     val bookTitles =
       for {
         book <- bookstore.findAllChildElems filter { _.name == "Book" }
-        if !book.findAllChildElems.filter(_.name == "Remark").isEmpty
+        if book.findAllChildElems.filter(_.name == "Remark").nonEmpty
       } yield book.findAllChildElems.filter(_.name == "Title").head
 
     assertResult(Set(
@@ -397,7 +397,7 @@ class NonYaidomQueryTest extends FunSuite {
           bookTitle = book.findAllChildElems.find(_.name == "Title").get.text.trim
           if magazineTitle == bookTitle
         } yield book
-        if !booksWithSameName.isEmpty
+        if booksWithSameName.nonEmpty
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
@@ -543,7 +543,7 @@ class NonYaidomQueryTest extends FunSuite {
           result.toSet
         }
         searchedForFirstNames = authorFirstNames filter { firstName => title.text.trim.indexOf(firstName) >= 0 }
-        if !searchedForFirstNames.isEmpty
+        if searchedForFirstNames.nonEmpty
       } yield new Elem(
         name = "Book",
         children = Vector(
@@ -1003,9 +1003,9 @@ object NonYaidomQueryTest {
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final class Elem(
-    val name: String,
-    val attributes: Map[String, String],
-    val children: immutable.IndexedSeq[Node]) extends Node { self =>
+      val name: String,
+      val attributes: Map[String, String],
+      val children: immutable.IndexedSeq[Node]) extends Node { self =>
 
     def this(name: String, children: immutable.IndexedSeq[Node]) =
       this(name, Map(), children)

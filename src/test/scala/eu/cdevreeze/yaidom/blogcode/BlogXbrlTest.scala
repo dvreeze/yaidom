@@ -155,7 +155,7 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
 
     assertResult(true) {
       val contexts = doc.documentElement.filterChildElems(withEName(XbrliNs, "context"))
-      contexts forall (e => !e.commentChildren.isEmpty)
+      contexts forall (e => e.commentChildren.nonEmpty)
     }
 
     // The gaap:ManagementDiscussionAndAnalysisTextBlock fact (occurring once) has 4 CDATA text children
@@ -274,28 +274,28 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
     val remainingChildElems =
       xbrlInstance.findAllChildElems dropWhile {
         case e: SchemaRef => true
-        case e => false
+        case e            => false
       } dropWhile {
         case e: LinkbaseRef => true
-        case e => false
+        case e              => false
       } dropWhile {
         case e: RoleRef => true
-        case e => false
+        case e          => false
       } dropWhile {
         case e: ArcroleRef => true
-        case e => false
+        case e             => false
       } dropWhile {
         case e: XbrliContext => true
-        case e => false
+        case e               => false
       } dropWhile {
         case e: XbrliUnit => true
-        case e => false
+        case e            => false
       } dropWhile {
         case e: Fact => true
-        case e => false
+        case e       => false
       } dropWhile {
         case e: FootnoteLink => true
-        case e => false
+        case e               => false
       }
 
     assertResult(true) {

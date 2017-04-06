@@ -101,6 +101,9 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   /** Returns true if this is the empty `Path`, so if it has no entries */
   def isEmpty: Boolean = entries.isEmpty
 
+  /** Returns true if this is not the empty `Path`, so if it has at least one entry */
+  def nonEmpty: Boolean = !isEmpty
+
   /** Returns the element name (as EName) of the last path entry, if any, wrapped in an Option */
   def elementNameOption: Option[EName] = lastEntryOption.map(_.elementName)
 

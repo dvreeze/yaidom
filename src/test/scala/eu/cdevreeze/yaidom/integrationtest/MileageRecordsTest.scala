@@ -327,12 +327,12 @@ object MileageRecordsTest {
   }
 
   final class Address(
-    val name: String,
-    val street: String,
-    val houseNumber: String,
-    val city: String,
-    val zipCode: String,
-    val country: String) {
+      val name: String,
+      val street: String,
+      val houseNumber: String,
+      val city: String,
+      val zipCode: String,
+      val country: String) {
 
     def toElem(qname: QName): Elem = {
       val xml =
@@ -362,11 +362,11 @@ object MileageRecordsTest {
   }
 
   final class KnownTrip(
-    val name: String,
-    val categoryName: String,
-    val fromAddressName: String,
-    val toAddressName: String,
-    val km: BigDecimal) {
+      val name: String,
+      val categoryName: String,
+      val fromAddressName: String,
+      val toAddressName: String,
+      val km: BigDecimal) {
 
     require(km >= 0, s"${km} must be >= 0")
 
@@ -402,10 +402,10 @@ object MileageRecordsTest {
   }
 
   final class Trip(
-    val date: LocalDate,
-    val tripName: String,
-    val startKm: Int,
-    val endKm: Int) {
+      val date: LocalDate,
+      val tripName: String,
+      val startKm: Int,
+      val endKm: Int) {
 
     require(startKm <= endKm, s"${startKm} must be <= ${endKm} on date ${date}")
 
@@ -449,10 +449,10 @@ object MileageRecordsTest {
   }
 
   final class MileageRecords(
-    val tripCategories: immutable.IndexedSeq[TripCategory],
-    val knownAddresses: immutable.IndexedSeq[Address],
-    val knownTrips: immutable.IndexedSeq[KnownTrip],
-    val trips: immutable.IndexedSeq[Trip]) {
+      val tripCategories: immutable.IndexedSeq[TripCategory],
+      val knownAddresses: immutable.IndexedSeq[Address],
+      val knownTrips: immutable.IndexedSeq[KnownTrip],
+      val trips: immutable.IndexedSeq[Trip]) {
 
     val tripCategoriesByName: Map[String, TripCategory] =
       tripCategories.map(tripCat => (tripCat.name -> tripCat)).toMap
@@ -465,7 +465,7 @@ object MileageRecordsTest {
 
     def getTripAt(date: LocalDate, relativeIdx: Int): Trip = {
       val tripsAtDate = trips.filter(tr => tr.date == date)
-      require(!tripsAtDate.isEmpty)
+      require(tripsAtDate.nonEmpty)
       require(relativeIdx >= 0 && relativeIdx < tripsAtDate.size)
 
       tripsAtDate(relativeIdx)

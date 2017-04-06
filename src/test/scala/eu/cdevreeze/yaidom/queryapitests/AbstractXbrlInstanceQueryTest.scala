@@ -160,7 +160,7 @@ abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
     }
 
     def isIdentifierPath(p: Path): Boolean = {
-      !p.isEmpty && (p.elementNameOption.get == EName(XbrliNs, "identifier"))
+      p.nonEmpty && (p.elementNameOption.get == EName(XbrliNs, "identifier"))
     }
 
     assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier"))) {

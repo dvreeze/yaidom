@@ -117,7 +117,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
           result.toSet
         }
         searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
-        if !searchedForFirstNames.isEmpty
+        if searchedForFirstNames.nonEmpty
       } yield Elem(
         resolvedName = EName("Book"),
         resolvedAttributes = Map(),

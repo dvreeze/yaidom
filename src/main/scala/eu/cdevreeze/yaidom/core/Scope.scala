@@ -236,6 +236,9 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   /** Returns true if this Scope is empty. Faster than comparing this Scope against the empty Scope. */
   def isEmpty: Boolean = prefixNamespaceMap.isEmpty
 
+  /** Returns true if this Scope is not empty. */
+  def nonEmpty: Boolean = !isEmpty
+
   /** Returns the default namespace, if any, wrapped in an Option */
   def defaultNamespaceOption: Option[String] = prefixNamespaceMap.get(DefaultNsPrefix)
 
@@ -411,7 +414,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * parent tree.
    */
   def prefixesForNamespace(namespaceUri: String): Set[String] = {
-    require(!namespaceUri.isEmpty, s"Empty namespace URI not allowed")
+    require(namespaceUri.nonEmpty, s"Empty namespace URI not allowed")
 
     val prefixes = this.prefixNamespaceMap.toSeq collect { case (prefix, ns) if ns == namespaceUri => prefix }
     prefixes.toSet
@@ -433,7 +436,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * parent tree.
    */
   def prefixForNamespace(namespaceUri: String, getFallbackPrefix: () => String): String = {
-    require(!namespaceUri.isEmpty, s"Empty namespace URI not allowed")
+    require(namespaceUri.nonEmpty, s"Empty namespace URI not allowed")
 
     if (namespaceUri == XmlNamespace) {
       "xml"
@@ -473,7 +476,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * }}}
    */
   def includingNamespace(namespaceUri: String, getFallbackPrefix: () => String): Scope = {
-    require(!namespaceUri.isEmpty, s"Empty namespace URI not allowed")
+    require(namespaceUri.nonEmpty, s"Empty namespace URI not allowed")
 
     if (namespaceUri == XmlNamespace || !prefixesForNamespace(namespaceUri).isEmpty) {
       this

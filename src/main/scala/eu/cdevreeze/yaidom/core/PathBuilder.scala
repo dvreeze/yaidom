@@ -37,6 +37,9 @@ final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) ex
   /** Returns true if this is the empty `PathBuilder`, so if it has no entries */
   def isEmpty: Boolean = entries.isEmpty
 
+  /** Returns true if this is not the empty `PathBuilder`, so if it has at least one entry */
+  def nonEmpty: Boolean = !isEmpty
+
   /** Prepends a given `Entry` to this `PathBuilder` */
   def prepend(entry: PathBuilder.Entry): PathBuilder = PathBuilder(entry +: self.entries)
 

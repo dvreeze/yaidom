@@ -61,6 +61,9 @@ final case class Declarations(prefixNamespaceMap: Map[String, String]) extends I
   /** Returns true if this Declarations is empty. Faster than comparing this Declarations against the empty Declarations. */
   def isEmpty: Boolean = prefixNamespaceMap.isEmpty
 
+  /** Returns true if this Declarations is not empty. */
+  def nonEmpty: Boolean = !isEmpty
+
   /** Returns an adapted copy of this Declarations, but retaining only the undeclarations, if any */
   def retainingUndeclarations: Declarations = {
     val m = prefixNamespaceMap filter { case (pref, ns) => ns == "" }

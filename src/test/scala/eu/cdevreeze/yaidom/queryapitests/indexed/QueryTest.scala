@@ -60,7 +60,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val elems = bookstore.findAllElemsOrSelf
 
     assertResult(true) {
-      !elems.isEmpty
+      elems.nonEmpty
     }
 
     assertResult(true) {
@@ -269,7 +269,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
           result.toSet
         }
         searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
-        if !searchedForFirstNames.isEmpty
+        if searchedForFirstNames.nonEmpty
       } yield elem(
         qname = QName("Book"),
         children = Vector(

@@ -97,7 +97,7 @@ object IndexedScopedNode {
       val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
 
       assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
-      assert(!resultOption.get.isEmpty, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
+      assert(resultOption.get.nonEmpty, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
       assert(resultOption.get.last == thisElem)
 
       resultOption.get

@@ -374,7 +374,7 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
     val bookTitles =
       for {
         book <- bookstore \ (_.localName == "Book")
-        if !book.filterChildElems(EName("Remark")).isEmpty
+        if book.filterChildElems(EName("Remark")).nonEmpty
       } yield book.getChildElem(EName("Title"))
 
     assertResult(Set(
@@ -533,7 +533,7 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
           bookTitle = book.getChildElem(EName("Title")).trimmedText
           if magazineTitle == bookTitle
         } yield book
-        if !booksWithSameName.isEmpty
+        if booksWithSameName.nonEmpty
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
@@ -559,7 +559,7 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
           bookTitle = book.getChildElem(QName("Title").res).trimmedText
           if magazineTitle == bookTitle
         } yield book
-        if !booksWithSameName.isEmpty
+        if booksWithSameName.nonEmpty
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {

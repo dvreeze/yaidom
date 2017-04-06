@@ -98,7 +98,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
           bookTitle = book.getChildElem(EName("Title")).trimmedText
           if magazineTitle == bookTitle
         } yield book
-        if !booksWithSameName.isEmpty
+        if booksWithSameName.nonEmpty
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {

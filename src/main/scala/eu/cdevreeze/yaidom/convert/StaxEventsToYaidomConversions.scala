@@ -172,7 +172,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
    * The input iterator should come from a call to method `convertToEventWithAncestryIterator`.
    */
   final def takeDocument(eventStateIterator: BufferedIterator[EventWithAncestry]): Document = {
-    require(eventStateIterator.hasNext)
+    require(eventStateIterator.hasNext, s"Empty event iterator")
 
     var it = eventStateIterator
 
@@ -246,7 +246,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
    * The input iterator should come from a call to method `convertToEventWithAncestryIterator`.
    */
   final def takeElem(eventStateIterator: BufferedIterator[EventWithAncestry]): Elem = {
-    require(eventStateIterator.hasNext)
+    require(eventStateIterator.hasNext, s"Empty event iterator")
 
     var it = eventStateIterator
 

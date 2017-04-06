@@ -65,8 +65,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   sealed class XbrliElem private[blogcode] (
-    val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends ScopedElemLike with SubtypeAwareElemLike {
+      val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends ScopedElemLike with SubtypeAwareElemLike {
 
     require(childElems.map(_.indexedElem) == indexedElem.findAllChildElems)
 
@@ -112,8 +112,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class XbrlInstance private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliXbrlEName, s"Expected EName $XbrliXbrlEName but found $resolvedName")
 
@@ -210,8 +210,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class SchemaRef private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == LinkSchemaRefEName, s"Expected EName $LinkSchemaRefEName but found $resolvedName")
   }
@@ -222,8 +222,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class LinkbaseRef private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == LinkLinkbaseRefEName, s"Expected EName $LinkLinkbaseRefEName but found $resolvedName")
   }
@@ -234,8 +234,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class RoleRef private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == LinkRoleRefEName, s"Expected EName $LinkRoleRefEName but found $resolvedName")
   }
@@ -246,8 +246,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class ArcroleRef private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == LinkArcroleRefEName, s"Expected EName $LinkArcroleRefEName but found $resolvedName")
   }
@@ -258,8 +258,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class XbrliContext private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliContextEName, s"Expected EName $XbrliContextEName but found $resolvedName")
 
@@ -284,8 +284,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class XbrliUnit private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliUnitEName, s"Expected EName $XbrliUnitEName but found $resolvedName")
 
@@ -306,8 +306,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   abstract class Fact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     def isTopLevel: Boolean = indexedElem.path.entries.size == 1
 
@@ -320,8 +320,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   abstract class ItemFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends Fact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends Fact(indexedElem, childElems) {
 
     require(attributeOption(ContextRefEName).isDefined, s"Expected attribute $ContextRefEName")
 
@@ -334,8 +334,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class NonNumericItemFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends ItemFact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends ItemFact(indexedElem, childElems) {
 
     require(attributeOption(UnitRefEName).isEmpty, s"Expected no attribute $UnitRefEName")
   }
@@ -346,8 +346,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   abstract class NumericItemFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends ItemFact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends ItemFact(indexedElem, childElems) {
 
     require(attributeOption(UnitRefEName).isDefined, s"Expected attribute $UnitRefEName")
 
@@ -360,8 +360,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class NilNumericItemFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends NumericItemFact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends NumericItemFact(indexedElem, childElems) {
 
     require(isNil, s"Expected nil numeric item fact")
   }
@@ -372,8 +372,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class NonNilNonFractionNumericItemFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends NumericItemFact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends NumericItemFact(indexedElem, childElems) {
 
     require(!isNil, s"Expected non-nil numeric item fact")
 
@@ -388,8 +388,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class NonNilFractionItemFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends NumericItemFact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends NumericItemFact(indexedElem, childElems) {
 
     require(!isNil, s"Expected non-nil numeric item fact")
 
@@ -412,8 +412,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class TupleFact private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends Fact(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends Fact(indexedElem, childElems) {
 
     def findAllChildFacts: immutable.IndexedSeq[Fact] = {
       findAllChildElemsOfType(classTag[Fact])
@@ -438,8 +438,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class FootnoteLink private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == LinkFootnoteLinkEName, s"Expected EName $LinkFootnoteLinkEName but found $resolvedName")
   }
@@ -450,8 +450,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class Entity private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliEntityEName, s"Expected EName $XbrliEntityEName but found $resolvedName")
 
@@ -472,8 +472,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class Period private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliPeriodEName, s"Expected EName $XbrliPeriodEName but found $resolvedName")
 
@@ -496,8 +496,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class Scenario private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliScenarioEName, s"Expected EName $XbrliScenarioEName but found $resolvedName")
   }
@@ -508,8 +508,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class Segment private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliSegmentEName, s"Expected EName $XbrliSegmentEName but found $resolvedName")
   }
@@ -520,8 +520,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class Identifier private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliIdentifierEName, s"Expected EName $XbrliIdentifierEName but found $resolvedName")
   }
@@ -532,8 +532,8 @@ trait AbstractBlogXbrlTestSupport {
    * @author Chris de Vreeze
    */
   final class Divide private[blogcode] (
-    override val indexedElem: indexed.Elem,
-    childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
+      override val indexedElem: indexed.Elem,
+      childElems: immutable.IndexedSeq[XbrliElem]) extends XbrliElem(indexedElem, childElems) {
 
     require(resolvedName == XbrliDivideEName, s"Expected EName $XbrliDivideEName but found $resolvedName")
 
@@ -597,7 +597,7 @@ trait AbstractBlogXbrlTestSupport {
       if (ItemFact.accepts(elem)) ItemFact(elem, childElems) else TupleFact(elem, childElems)
 
     def isFactPath(path: Path): Boolean = {
-      !path.isEmpty &&
+      path.nonEmpty &&
         !Set(Option(LinkNs), Option(XbrliNs)).contains(path.firstEntry.elementName.namespaceUriOption)
     }
   }

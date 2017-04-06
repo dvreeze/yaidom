@@ -46,11 +46,11 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
    */
   final def convertNode(node: Node, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.Node = {
     node match {
-      case e: Elem => convertElem(e, parentNamespaceBinding)
-      case t: Text => convertText(t)
+      case e: Elem                   => convertElem(e, parentNamespaceBinding)
+      case t: Text                   => convertText(t)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi)
-      case er: EntityRef => convertEntityRef(er)
-      case c: Comment => convertComment(c)
+      case er: EntityRef             => convertEntityRef(er)
+      case c: Comment                => convertComment(c)
     }
   }
 
@@ -141,7 +141,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
       val scopeAsSeq = scope.prefixNamespaceMap.toSeq map {
         case (pref, uri) => (editedPrefix(pref) -> uri)
       }
-      assert(!scopeAsSeq.isEmpty)
+      assert(scopeAsSeq.nonEmpty)
 
       val topScope: scala.xml.NamespaceBinding = scala.xml.TopScope
       val nsBinding: scala.xml.NamespaceBinding = scopeAsSeq.foldLeft(topScope) {
@@ -163,7 +163,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
   private def convertScope(scope: Scope, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.NamespaceBinding = {
     val decls = toScope(parentNamespaceBinding).relativize(scope)
 
-    if (!decls.retainingUndeclarations.isEmpty) {
+    if (decls.retainingUndeclarations.nonEmpty) {
       // No way to re-use the immutable parent NamespaceBinding, so converting the scope without using the parent NamespaceBinding
       convertScope(scope)
     } else {
