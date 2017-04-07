@@ -251,7 +251,13 @@ object Path {
     new Path(entrySeq.toIndexedSeq)
   }
 
-  /** Parses a String, which must be in the `toResolvedCanonicalXPath` format, into an `Path`. */
+  /**
+   * Parses a String, which must be in the `toResolvedCanonicalXPath` format, into a `Path`.
+   *
+   * Entry boundaries are recognized by finding ']' characters (followed by the slash starting the
+   * next entry). In theory this is not robust, but in practice it is. See discussions on valid
+   * characters in IRIs and URIs.
+   */
   def fromResolvedCanonicalXPath(s: String): Path = {
     require(s.startsWith("/*"), "The 'resolved' canonical XPath must start with '/*'")
     val remainder = s.drop(2)
@@ -347,7 +353,7 @@ object Path {
               prefix
           }
           require(result.isDefined)
-          result
+          if (result.get.isEmpty) None else result
         }
       }
 
