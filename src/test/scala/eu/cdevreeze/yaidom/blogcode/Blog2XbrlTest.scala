@@ -192,7 +192,7 @@ class Blog2XbrlTest extends FunSuite {
       altInstanceElem.filterElems(withEName(None, "conceptAspect")).map(e => EName.parse(e.text)).toSet
     }
     assertResult(Set(Path.Empty)) {
-      altInstanceElem.filterElems(withEName(None, "locationAspect")).map(e => Path.fromCanonicalXPath(e.text)(Scope.Empty)).toSet
+      altInstanceElem.filterElems(withEName(None, "locationAspect")).map(e => Path.fromResolvedCanonicalXPath(e.text)).toSet
     }
     assertResult(Set("http://regulator.gov/id")) {
       altInstanceElem.filterElems(withEName(None, "entityIdentifierAspect")).flatMap(e => e.attributeOption(EName("scheme"))).toSet
@@ -430,7 +430,7 @@ class Blog2XbrlTest extends FunSuite {
         val aspectsElem =
           emptyElem(QName("aspects"), sc).
             plusChild(textElem(QName("conceptAspect"), sc, conceptAspect(fact).toString)).
-            plusChild(textElem(QName("locationAspect"), sc, locationAspect(fact).toCanonicalXPath(sc))).
+            plusChild(textElem(QName("locationAspect"), sc, locationAspect(fact).toResolvedCanonicalXPath)).
             plusChildOption(entityIdentifierAspectOption(fact).map(kv => textElem(QName("entityIdentifierAspect"), Vector(QName("scheme") -> kv._1), sc, kv._2.toString))).
             plusChildOption(periodAspectOption(fact).map(p => elem(QName("periodAspect"), sc, p.findAllChildElems))).
             plusChildren(explicitDimensionAspects(fact).toVector.map(kv => textElem(QName("dimensionAspect"), Vector(QName("dimension") -> kv._1.toString), sc, kv._2.toString))).
