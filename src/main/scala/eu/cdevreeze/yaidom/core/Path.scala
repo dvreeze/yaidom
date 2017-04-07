@@ -224,7 +224,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
    *
    * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
    */
-  @deprecated(message = "Use 'toResolvedCanonicalXPath' instead", since = "0.6.2")
+  @deprecated(message = "Use 'toResolvedCanonicalXPath' instead", since = "1.6.2")
   def toCanonicalXPath(scope: Scope): String = {
     require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
@@ -240,7 +240,7 @@ object Path {
   def apply(entries: immutable.IndexedSeq[Path.Entry]): Path = new Path(entries)
 
   /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
-  @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "0.6.2")
+  @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
   def apply(s: String)(scope: Scope): Path = {
     require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
@@ -293,7 +293,7 @@ object Path {
   }
 
   /** Parses a String, which must be in the `toCanonicalXPath` format, into an `Path`. The passed scope must be invertible. */
-  @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "0.6.2")
+  @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
   def fromCanonicalXPath(s: String)(scope: Scope): Path = {
     require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
@@ -341,7 +341,7 @@ object Path {
     }
 
     /** Given an invertible `Scope`, returns the corresponding canonical XPath */
-    @deprecated(message = "Use 'toResolvedCanonicalXPath' instead", since = "0.6.2")
+    @deprecated(message = "Use 'toResolvedCanonicalXPath' instead", since = "1.6.2")
     def toCanonicalXPath(scope: Scope): String = {
       require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
@@ -370,7 +370,7 @@ object Path {
   object Entry {
 
     /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
-    @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "0.6.2")
+    @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
     def apply(s: String)(scope: Scope): Entry = {
       require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 
@@ -396,7 +396,7 @@ object Path {
     }
 
     /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `Path.Entry`, given an invertible `Scope` */
-    @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "0.6.2")
+    @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
     def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
       require(scope.isInvertible, s"Scope '${scope}' is not invertible")
 

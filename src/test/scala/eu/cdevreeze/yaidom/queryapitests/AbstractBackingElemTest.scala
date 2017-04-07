@@ -704,4 +704,16 @@ abstract class AbstractBackingElemTest extends FunSuite {
       allElemsOrSelf.map(e => e.parentOption.flatMap(_.findChildElemByPathEntry(e.path.lastEntry)).getOrElse(docElem))
     }
   }
+
+  test("testPathConversions") {
+    val allElemsOrSelf = docElem.findAllElemsOrSelf
+
+    val paths1 = allElemsOrSelf.map(_.path)
+
+    val paths2 = paths1.map(_.toResolvedCanonicalXPath).map(s => Path.fromResolvedCanonicalXPath(s))
+
+    assertResult(paths1) {
+      paths2
+    }
+  }
 }
