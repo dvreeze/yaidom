@@ -348,7 +348,7 @@ object Path {
       val prefixOption: Option[String] = {
         if (elementName.namespaceUriOption.isEmpty) None else {
           val nsUri: String = elementName.namespaceUriOption.get
-          require(scope.prefixNamespaceMap.values.toSet.contains(nsUri), s"Expected at least one (possibly empty) prefix for namespace URI '${nsUri}'")
+          require(scope.namespaces.contains(nsUri), s"Expected at least one (possibly empty) prefix for namespace URI '${nsUri}'")
 
           val result = scope.prefixNamespaceMap.toList collectFirst {
             case pair if pair._2 == nsUri =>

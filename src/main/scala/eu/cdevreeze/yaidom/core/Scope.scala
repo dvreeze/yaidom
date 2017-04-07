@@ -261,7 +261,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
    * Only if there is such a one-to-one correspondence, the indexes in `Path`s and `PathBuilder`s are stable, when converting
    * between the two.
    */
-  def isInvertible: Boolean = prefixNamespaceMap.keySet.size == prefixNamespaceMap.values.toSet.size
+  def isInvertible: Boolean = prefixNamespaceMap.keySet.size == namespaces.size
 
   /** Returns true if this is a subscope of the given parameter `Scope`. A `Scope` is considered subscope of itself. */
   def subScopeOf(scope: Scope): Boolean = {
@@ -284,6 +284,14 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
   /** Returns `this.prefixNamespaceMap.keySet`. */
   def keySet: Set[String] = this.prefixNamespaceMap.keySet
+
+  /** Returns `this.prefixNamespaceMap.values.toSet`. Hence, the "XML namespace" is not returned. */
+  def namespaces: Set[String] = this.prefixNamespaceMap.values.toSet
+
+  /** Returns `filter(kv => p(kv._2))`. */
+  def filterNamespaces(p: String => Boolean): Scope = {
+    filter(kv => p(kv._2))
+  }
 
   /**
    * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
