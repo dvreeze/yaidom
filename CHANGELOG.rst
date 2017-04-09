@@ -3,6 +3,25 @@ CHANGELOG
 =========
 
 
+1.6.2
+=====
+
+Version 1.6.2 replaced the methods for canonical XPath expressions by ``Path`` methods that replace QNames by
+ENames (in James Clark notation) in those "canonical XPaths". The old methods are still available, but have been deprecated.
+
+The main changes are:
+
+* Introduced ``Path`` methods ``toResolvedCanonicalXPath`` and ``fromResolvedCanonicalXPath``, deprecating the old ones
+* Added method ``nonEmpty`` to ``Path``, ``PathBuilder``, ``Scope`` and ``Declarations``
+* Added methods ``namespaces`` and ``filterNamespaces`` to ``Scope``
+
+Version 1.6.2 has no breaking changes compared to version 1.6.1 and 1.6.0, except that the "canonical
+XPath" methods have been deprecated. If calls to those methods are replaced, version 1.6.2 can otherwise be used
+as if it were version 1.6.0.
+
+Note that version 1.6.2 is even more true to its vision of preferring ENames to QNames than previous versions.
+
+
 1.6.1
 =====
 
