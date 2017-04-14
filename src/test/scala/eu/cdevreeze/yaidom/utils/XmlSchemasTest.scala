@@ -146,12 +146,12 @@ class XmlSchemasTest extends FunSuite {
 
     assertResult(true) {
       localElemDecls exists { e =>
-        e.targetEName == QName("xs:group").res && e.typeAttributeOption == Some(QName("xs:groupRef").res)
+        e.targetEName == QName("xs:group").res && e.typeAttributeOption.contains(QName("xs:groupRef").res)
       }
     }
     assertResult(true) {
       localElemDecls exists { e =>
-        e.targetEName == QName("xs:element").res && e.typeAttributeOption == Some(QName("xs:localElement").res)
+        e.targetEName == QName("xs:element").res && e.typeAttributeOption.contains(QName("xs:localElement").res)
       }
     }
 
@@ -162,7 +162,7 @@ class XmlSchemasTest extends FunSuite {
 
     assertResult(true) {
       localAttrDecls exists { e =>
-        e.targetEName == QName("minOccurs").res && e.typeAttributeOption == Some(QName("xs:nonNegativeInteger").res)
+        e.targetEName == QName("minOccurs").res && e.typeAttributeOption.contains(QName("xs:nonNegativeInteger").res)
       }
     }
 

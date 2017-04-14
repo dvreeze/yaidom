@@ -137,7 +137,7 @@ class RemoveUnusedNamespacesTest extends FunSuite {
 
     val editedRootElem =
       rootElem transformChildElemsToNodeSeq {
-        case e: Elem if e.resolvedName.namespaceUriOption == Some("http://www.w3.org/2005/Atom") => Vector(e)
+        case e: Elem if e.resolvedName.namespaceUriOption.contains("http://www.w3.org/2005/Atom") => Vector(e)
         case e: Elem => Vector()
       }
 
@@ -147,7 +147,7 @@ class RemoveUnusedNamespacesTest extends FunSuite {
 
     assertResult {
       resolved.Elem(rootElem) transformChildElemsToNodeSeq {
-        case e: resolved.Elem if e.resolvedName.namespaceUriOption == Some("http://www.w3.org/2005/Atom") => Vector(e)
+        case e: resolved.Elem if e.resolvedName.namespaceUriOption.contains("http://www.w3.org/2005/Atom") => Vector(e)
         case e: resolved.Elem => Vector()
       }
     } {

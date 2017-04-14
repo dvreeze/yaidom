@@ -268,7 +268,7 @@ class ElemLikeTest extends FunSuite {
       elms.size
     }
     assertResult(47) {
-      val elms = bookstore \\ { e => e.resolvedName.namespaceUriOption == Some(ns.toString) }
+      val elms = bookstore \\ { e => e.resolvedName.namespaceUriOption.contains(ns.toString) }
       elms.size
     }
     assertResult(4) {
@@ -339,7 +339,7 @@ class ElemLikeTest extends FunSuite {
       elms.size
     }
     assertResult(47) {
-      val elms = bookstore \\ { e => e.resolvedName.namespaceUriOption == Some(ns.toString) }
+      val elms = bookstore \\ { e => e.resolvedName.namespaceUriOption.contains(ns.toString) }
       elms.size
     }
     assertResult(4) {
@@ -805,7 +805,7 @@ class ElemLikeTest extends FunSuite {
     require {
       result.findAllElemsOrSelf forall { e => e.resolvedName.namespaceUriOption == Option(ns.toString) }
     }
-    require(result.qname.prefixOption == Some("books"))
+    require(result.qname.prefixOption.contains("books"))
     require {
       result.findAllElems forall { e => e.qname.prefixOption.isEmpty }
     }

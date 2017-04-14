@@ -166,7 +166,7 @@ import eu.cdevreeze.yaidom.core.Path
  * val bookPaths = indexed.Elem(bookstoreElem) filterElems (_.resolvedName == EName(bookstoreNamespace, "Book")) map (_.path)
  *
  * bookstoreElem = bookstoreElem.updateElemsWithNodeSeq(bookPaths.toSet) { (elem, path) =>
- *   if ((elem \@ EName("ISBN")) == Some("978-1617290657")) Vector() else Vector(elem)
+ *   if ((elem \@ EName("ISBN")).contains("978-1617290657")) Vector() else Vector(elem)
  * }
  * bookstoreElem = bookstoreElem.prettify(2)
  * }}}

@@ -885,7 +885,7 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
 
     val isbn = "ISBN-0-11-222222-3"
 
-    val bookElmOption = bookstore findElem { e => e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn) }
+    val bookElmOption = bookstore findElem { e => e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn) }
     val bookElm = bookElmOption.getOrElse(sys.error(s"Expected Book with ISBN $isbn"))
 
     val title = bookElm.getChildElem(_.localName == "Title").text
@@ -908,16 +908,16 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
   protected val bookstore: E
 
   protected def book1: E =
-    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN") == Some("ISBN-0-13-713526-2")).get
+    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN").contains("ISBN-0-13-713526-2")).get
 
   protected def book2: E =
-    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN") == Some("ISBN-0-13-815504-6")).get
+    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN").contains("ISBN-0-13-815504-6")).get
 
   protected def book3: E =
-    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN") == Some("ISBN-0-11-222222-3")).get
+    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN").contains("ISBN-0-11-222222-3")).get
 
   protected def book4: E =
-    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN") == Some("ISBN-9-88-777777-6")).get
+    bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN").contains("ISBN-9-88-777777-6")).get
 
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
 }

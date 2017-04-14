@@ -40,7 +40,7 @@ abstract class AbstractScopedElemLikeQueryTest extends FunSuite {
 
   test("testResolveQNamesInContent") {
     val elemElemDeclOption =
-      xsdSchemaElem.findChildElem(e => e.localName == "element" && e.attributeOption(EName("name")) == Some("schema"))
+      xsdSchemaElem.findChildElem(e => e.localName == "element" && e.attributeOption(EName("name")).contains("schema"))
 
     assertResult(true) {
       elemElemDeclOption.isDefined
@@ -69,7 +69,7 @@ abstract class AbstractScopedElemLikeQueryTest extends FunSuite {
     }
 
     val elemKeyDefOption =
-      elemElemDecl.findChildElem(e => e.qname == QName("xs:key") && (e \@ EName("name")) == Some("element"))
+      elemElemDecl.findChildElem(e => e.qname == QName("xs:key") && (e \@ EName("name")).contains("element"))
 
     assertResult(true) {
       elemKeyDefOption.isDefined

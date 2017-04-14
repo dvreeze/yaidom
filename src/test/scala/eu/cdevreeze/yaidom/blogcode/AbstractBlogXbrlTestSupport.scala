@@ -311,7 +311,7 @@ trait AbstractBlogXbrlTestSupport {
 
     def isTopLevel: Boolean = indexedElem.path.entries.size == 1
 
-    def isNil: Boolean = attributeOption(XsiNilEName) == Some("true")
+    def isNil: Boolean = attributeOption(XsiNilEName).contains("true")
   }
 
   /**
@@ -617,7 +617,7 @@ trait AbstractBlogXbrlTestSupport {
 
       if (unitRefOption.isEmpty) new NonNumericItemFact(elem, childElems)
       else {
-        if (elem.attributeOption(XsiNilEName) == Some("true"))
+        if (elem.attributeOption(XsiNilEName).contains("true"))
           new NilNumericItemFact(elem, childElems)
         else if (elem.findChildElem(withEName(XbrliNumeratorEName)).isDefined)
           new NonNilFractionItemFact(elem, childElems)

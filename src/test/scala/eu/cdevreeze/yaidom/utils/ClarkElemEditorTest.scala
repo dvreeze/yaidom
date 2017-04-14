@@ -67,13 +67,13 @@ class ClarkElemEditorTest extends FunSuite {
     val filteredInstance = parsedInstance.minusAttribute(QName("xsi:schemaLocation")) transformChildElemsToNodeSeq {
       case e if e.localName == "schemaRef" =>
         Vector(e)
-      case e if e.localName == "context" && e.attributeOption(EName("id")) == Some("I-2007") =>
+      case e if e.localName == "context" && e.attributeOption(EName("id")).contains("I-2007") =>
         Vector(e)
-      case e if e.localName == "unit" && e.attributeOption(EName("id")) == Some("U-Monetary") =>
+      case e if e.localName == "unit" && e.attributeOption(EName("id")).contains("U-Monetary") =>
         Vector(e)
       case e if e.localName == "CashAndCashEquivalents" &&
-        e.attributeOption(EName("contextRef")) == Some("I-2007") &&
-        e.attributeOption(EName("unitRef")) == Some("U-Monetary") =>
+        e.attributeOption(EName("contextRef")).contains("I-2007") &&
+        e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
         Vector(e)
       case e =>
         Vector()

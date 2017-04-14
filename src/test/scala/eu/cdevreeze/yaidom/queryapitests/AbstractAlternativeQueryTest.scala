@@ -107,7 +107,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
 
     val productElems =
       catalogElem filterChildElems { elem =>
-        elem.localName == "product" && elem.attributeOption(EName("dept")) == Some("ACC")
+        elem.localName == "product" && elem.attributeOption(EName("dept")).contains("ACC")
       }
 
     assertResult(List(
@@ -164,7 +164,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
     val productNameElems =
       for {
         productElem <- catalogElem \ withLocalName("product")
-        if (productElem \@ EName("dept")) == Some("ACC")
+        if (productElem \@ EName("dept")).contains("ACC")
         nameElem <- productElem \ withLocalName("name")
       } yield nameElem
 
@@ -187,7 +187,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
     val productNameElems: immutable.IndexedSeq[scala.xml.Elem] =
       for {
         productElem <- catalogElem \ withLocalName("product") sortBy (e => e.getChildElem(withLocalName("name")).text)
-        if (productElem \@ EName("dept")) == Some("ACC")
+        if (productElem \@ EName("dept")).contains("ACC")
         dept <- productElem \@ EName("dept")
         productName = productElem.getChildElem(withLocalName("name")).text
       } yield <li class={ dept }>{ productName }</li>

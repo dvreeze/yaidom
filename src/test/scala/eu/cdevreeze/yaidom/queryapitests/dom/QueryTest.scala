@@ -88,7 +88,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val titles =
       for {
         title <- bookstore findTopmostElems { _.resolvedName == EName("Title") }
-        if title.parentOption.isDefined && title.parent.parentOption.map(_.localName) == Some("Bookstore")
+        if title.parentOption.isDefined && title.parent.parentOption.map(_.localName).contains("Bookstore")
       } yield title
 
     assertResult(Set(

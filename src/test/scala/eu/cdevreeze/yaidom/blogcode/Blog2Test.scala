@@ -135,23 +135,23 @@ class Blog2Test extends FunSuite {
     val allAtomElems = allElems.filter(e => e.qname.prefixOption.isEmpty)
 
     require(allAtomElems.forall(e =>
-      e.scope.resolveQNameOption(e.qname) == Some(e.resolvedName)))
+      e.scope.resolveQNameOption(e.qname).contains(e.resolvedName)))
 
     // Indeed, the ENames are in the atom namespace
     require(allAtomElems.forall(e =>
-      e.resolvedName.namespaceUriOption == Some(atomNs)))
+      e.resolvedName.namespaceUriOption.contains(atomNs)))
 
-    val allXhtmlElems = allElems.filter(e => e.qname.prefixOption == Some("xhtml"))
+    val allXhtmlElems = allElems.filter(e => e.qname.prefixOption.contains("xhtml"))
 
     require(allXhtmlElems.forall(e =>
-      e.scope.resolveQNameOption(e.qname) == Some(e.resolvedName)))
+      e.scope.resolveQNameOption(e.qname).contains(e.resolvedName)))
 
     // Indeed, the ENames are in the xhtml namespace
     require(allXhtmlElems.forall(e =>
-      e.resolvedName.namespaceUriOption == Some(xhtmlNs)))
+      e.resolvedName.namespaceUriOption.contains(xhtmlNs)))
 
     require(feed1DocElem.findAllElemsOrSelf.forall(e =>
-      e.scope.resolveQNameOption(e.qname) == Some(e.resolvedName)))
+      e.scope.resolveQNameOption(e.qname).contains(e.resolvedName)))
 
     require(feed1DocElem.findAllElemsOrSelf.forall(e =>
       e.resolvedName.localPart == e.qname.localPart))
@@ -165,11 +165,11 @@ class Blog2Test extends FunSuite {
     // Get the rights child element of the root element
     val rights1Elem: Elem = feed1DocElem.getChildElem(withEName(atomNs, "rights"))
 
-    require(rights1Elem \@ EName("type") == Some("xhtml"))
+    require(rights1Elem \@ EName("type").contains("xhtml"))
 
     val examplesNs = "http://xmlportfolio.com/xmlguild-examples"
 
-    require(rights1Elem \@ EName(examplesNs, "type") == Some("silly"))
+    require(rights1Elem \@ EName(examplesNs, "type").contains("silly"))
 
     val rights1ElemAttrs = rights1Elem.attributes
 

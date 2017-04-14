@@ -115,7 +115,7 @@ class XbrlSchemaTest extends FunSuite {
     assertResult(true) {
       elemsContainingPlus forall { e =>
         val indexedElem = e.wrappedElem
-        indexedElem.underlyingRootElem.findElemOrSelfByPath(indexedElem.path) == Some(indexedElem.underlyingElem)
+        indexedElem.underlyingRootElem.findElemOrSelfByPath(indexedElem.path).contains(indexedElem.underlyingElem)
       }
     }
   }
@@ -141,7 +141,7 @@ class XbrlSchemaTest extends FunSuite {
     }
 
     val itemsTypeDefOption = ipoSchema.findChildElemOfType(classTag[XsdElem]) { elem =>
-      elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")) == Some("Items")
+      elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")).contains("Items")
     }
 
     assertResult(true) {
@@ -150,7 +150,7 @@ class XbrlSchemaTest extends FunSuite {
     assertResult(itemsTypeDefOption.get.wrappedElem) {
       val result =
         ipoSchema getChildElem { elem =>
-          elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")) == Some("Items")
+          elem.resolvedName == EName(xsNs, "complexType") && elem.attributeOption(EName("name")).contains("Items")
         }
       result.wrappedElem
     }

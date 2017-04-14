@@ -203,7 +203,7 @@ class ScalaXmlWrapperTest extends FunSuite {
         EName(ns, "notation"))
 
     assertResult(xsElmENames) {
-      val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     assertResult(Set(0, 1)) {
@@ -253,12 +253,12 @@ class ScalaXmlWrapperTest extends FunSuite {
         for {
           schemaElm <- rootElm filterElems { e =>
             e.resolvedName == EName(ns, "element") &&
-              e.attributeOption(EName("name")) == Some("schema") &&
-              e.attributeOption(EName("id")) == Some("schema")
+              e.attributeOption(EName("name")).contains("schema") &&
+              e.attributeOption(EName("id")).contains("schema")
           }
           idConstraintElm <- schemaElm filterChildElems { e =>
             e.resolvedName == EName(ns, "key") &&
-              e.attributeOption(EName("name")) == Some("identityConstraint")
+              e.attributeOption(EName("name")).contains("identityConstraint")
           }
         } yield idConstraintElm
 
@@ -283,8 +283,8 @@ class ScalaXmlWrapperTest extends FunSuite {
       val complexTypeElms =
         rootElm filterElems { e =>
           e.resolvedName == EName(ns, "complexType") &&
-            e.attributeOption(EName("name")) == Some("element") &&
-            e.attributeOption(EName("abstract")) == Some("true")
+            e.attributeOption(EName("name")).contains("element") &&
+            e.attributeOption(EName("abstract")).contains("true")
         }
 
       assertResult(1) {
@@ -344,8 +344,8 @@ class ScalaXmlWrapperTest extends FunSuite {
     def checkFieldPattern(rootElm: ScalaXmlElem): Unit = {
       val fieldElms = rootElm filterElems { e =>
         e.resolvedName == EName(ns, "element") &&
-          e.attributeOption(EName("name")) == Some("field") &&
-          e.attributeOption(EName("id")) == Some("field")
+          e.attributeOption(EName("name")).contains("field") &&
+          e.attributeOption(EName("id")).contains("field")
       }
 
       val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
@@ -593,7 +593,7 @@ class ScalaXmlWrapperTest extends FunSuite {
       e.resolvedName == EName(nsXmlSchema, "element")
     }
 
-    val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")) == Some("AddressRecord") }
+    val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")).contains("AddressRecord") }
 
     assertResult(Some("AddressRecord")) {
       anElementDeclOption flatMap { e => (e \@ EName("name")) }

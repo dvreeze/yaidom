@@ -95,11 +95,11 @@ class Blog2XbrlTest extends FunSuite {
       avgNumEmployeesFacts.size
     }
     assertResult(true) {
-      avgNumEmployeesFacts.forall(fact => fact.attributeOption(EName("unitRef")) == Some("U-Pure"))
+      avgNumEmployeesFacts.forall(fact => fact.attributeOption(EName("unitRef")).contains("U-Pure"))
     }
 
     val onlyUPure =
-      avgNumEmployeesFacts.forall(_.attributeOption(EName("unitRef")) == Some("U-Pure"))
+      avgNumEmployeesFacts.forall(_.attributeOption(EName("unitRef")).contains("U-Pure"))
 
     assertResult(true) {
       onlyUPure
@@ -108,7 +108,7 @@ class Blog2XbrlTest extends FunSuite {
     // Check the unit itself, minding the default namespace
 
     val uPureUnit =
-      docElem.getChildElem(e => e.resolvedName == EName(xbrliNs, "unit") && (e \@ EName("id")) == Some("U-Pure"))
+      docElem.getChildElem(e => e.resolvedName == EName(xbrliNs, "unit") && (e \@ EName("id")).contains("U-Pure"))
 
     assertResult("pure") {
       uPureUnit.getChildElem(withEName(XbrliNs, "measure")).text
@@ -150,7 +150,7 @@ class Blog2XbrlTest extends FunSuite {
     val fact =
       (idoc.documentElement findChildElem { e =>
         e.resolvedName == EName(GaapNs, "AverageNumberEmployees") &&
-          e.attributeOption(EName("contextRef")) == Some("D-2007")
+          e.attributeOption(EName("contextRef")).contains("D-2007")
       }).head
 
     assertResult(240) {

@@ -89,7 +89,7 @@ class CreationTest extends FunSuite {
 
     assertResult(Some(expectedResolvedBookElm)) {
       resolvedRootElm1.removeAllInterElementWhitespace findChildElem { e =>
-        e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some("ISBN-9-88-777777-6")
+        e.localName == "Book" && e.attributeOption(EName("ISBN")).contains("ISBN-9-88-777777-6")
       }
     }
 
@@ -223,22 +223,22 @@ class CreationTest extends FunSuite {
 
     val isbn = "ISBN-9-88-777777-6"
     val bookElm1 = doc1.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm1 = bookElm1.getChildElem(_.localName == "Authors")
 
     val doc2: simple.Document = simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.Empty))
     val bookElm2 = doc2.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm2 = bookElm2.getChildElem(_.localName == "Authors")
 
     val doc3: simple.Document = simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore")))
     val bookElm3 = doc3.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm3 = bookElm3.getChildElem(_.localName == "Authors")
 
     val doc4: simple.Document = simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://abc")))
     val bookElm4 = doc4.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")) == Some(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm4 = bookElm4.getChildElem(_.localName == "Authors")
 
     assertResult((bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) -- Set("books")) {

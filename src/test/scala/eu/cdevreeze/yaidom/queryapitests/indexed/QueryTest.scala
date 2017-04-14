@@ -85,8 +85,8 @@ class QueryTest extends AbstractElemLikeQueryTest {
     val bookOrMagazineTitles =
       for {
         title <- bookstore filterElems { _.resolvedName == EName("Title") }
-        if (title.path.parentPath.elementNameOption == Some(EName("Book"))) ||
-          (title.path.parentPath.elementNameOption == Some(EName("Magazine")))
+        if (title.path.parentPath.elementNameOption.contains(EName("Book"))) ||
+          (title.path.parentPath.elementNameOption.contains(EName("Magazine")))
       } yield title
 
     assertResult(Set(
@@ -164,7 +164,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         authorElem <- bookstore filterElemsOrSelf { _.resolvedName == EName("Author") }
         (lastName, firstName) = authorLastAndFirstName(authorElem.underlyingElem)
         if lastName == "Ullman" && firstName == "Jeffrey"
-        bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
+        bookElem <- authorElem.path findAncestorPath { _.elementNameOption.contains(EName("Book")) } map { p =>
           bookstore.getElemOrSelfByPath(p)
         }
         if bookElem.attributeOption(EName("Price")).map(_.toInt).getOrElse(0) < 90
@@ -182,7 +182,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         authorElem <- bookstore \\ EName("Author")
         (lastName, firstName) = authorLastAndFirstName(authorElem.underlyingElem)
         if lastName == "Ullman" && firstName == "Jeffrey"
-        bookElem <- authorElem.path findAncestorPath { _.elementNameOption == Some(EName("Book")) } map { p =>
+        bookElem <- authorElem.path findAncestorPath { _.elementNameOption.contains(EName("Book")) } map { p =>
           bookstore.getElemOrSelfByPath(p)
         }
         if (bookElem \@ EName("Price")).map(_.toInt).getOrElse(0) < 90

@@ -39,7 +39,7 @@ package eu.cdevreeze.yaidom
  * val scalaBookAuthors =
  *   for {
  *     bookElem <- resolvedBookstoreElem \ EName("{http://bookstore/book}Book")
- *     if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *     if (bookElem \@ EName("ISBN")).contains("978-0981531649")
  *     authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
  *   } yield authorElem
  * }}}

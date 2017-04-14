@@ -296,7 +296,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
     val expectedTopLevelItems =
       doc.documentElement.filterChildElems(e => !Set(XbrliNs, LinkNs).contains(e.resolvedName.namespaceUriOption.getOrElse(""))).
         filter(e => e.attributeOption(EName("contextRef")).isDefined).
-        filter(e => e.localName == "AverageNumberEmployees" && e.resolvedName.namespaceUriOption == Some("http://xasb.org/gaap"))
+        filter(e => e.localName == "AverageNumberEmployees" && e.resolvedName.namespaceUriOption.contains("http://xasb.org/gaap"))
 
     assertResult(expectedTopLevelItems.size) {
       domElems.size

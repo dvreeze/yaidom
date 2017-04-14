@@ -307,7 +307,7 @@ class NamespaceTest extends FunSuite {
     }
 
     assertResult(List(feedElmOption.get, titleElmOption.get, rightsElmOption.get)) {
-      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsAtom) }
+      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption.contains(nsAtom) }
     }
 
     val divElmOption = rootElm findElemOrSelf { e => e.resolvedName == EName(nsXhtml, "div") }
@@ -326,7 +326,7 @@ class NamespaceTest extends FunSuite {
     }
 
     assertResult(List(divElmOption.get, strongElmOption.get, emElmOption.get)) {
-      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsXhtml) }
+      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption.contains(nsXhtml) }
     }
     assertResult("verbally process") {
       strongElmOption.get.text
@@ -399,8 +399,8 @@ class NamespaceTest extends FunSuite {
       rootElm.findAllElemsOrSelf map { e => resolved.Elem(e) }
     }
 
-    assertResult(resolved.Elem(rootElm) filterElemsOrSelf (_.resolvedName.namespaceUriOption == Some(nsAtom))) {
-      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption == Some(nsAtom) } map { e => resolved.Elem(e) }
+    assertResult(resolved.Elem(rootElm) filterElemsOrSelf (_.resolvedName.namespaceUriOption.contains(nsAtom))) {
+      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption.contains(nsAtom) } map { e => resolved.Elem(e) }
     }
   }
 }

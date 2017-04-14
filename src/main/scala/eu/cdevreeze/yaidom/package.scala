@@ -244,7 +244,7 @@ package eu.cdevreeze
  * {{{
  * for {
  *   bookElem <- bookstoreElem filterChildElems (elem => elem.resolvedName == EName("{http://bookstore/book}Book"))
- *   if bookElem.attributeOption(EName("ISBN")) == Some("978-0981531649")
+ *   if bookElem.attributeOption(EName("ISBN")).contains("978-0981531649")
  *   authorElem <- bookElem filterElems (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
  * } yield authorElem
  * }}}
@@ -252,7 +252,7 @@ package eu.cdevreeze
  * {{{
  * for {
  *   bookElem <- bookstoreElem.filterChildElems(EName("{http://bookstore/book}Book"))
- *   if bookElem.attributeOption(EName("ISBN")) == Some("978-0981531649")
+ *   if bookElem.attributeOption(EName("ISBN")).contains("978-0981531649")
  *   authorElem <- bookElem.filterElems(EName("{http://bookstore/author}Author"))
  * } yield authorElem
  * }}}
@@ -261,7 +261,7 @@ package eu.cdevreeze
  * {{{
  * for {
  *   bookElem <- bookstoreElem \ (elem => elem.resolvedName == EName("{http://bookstore/book}Book"))
- *   if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *   if (bookElem \@ EName("ISBN")).contains("978-0981531649")
  *   authorElem <- bookElem \\ (elem => elem.resolvedName == EName("{http://bookstore/author}Author"))
  * } yield authorElem
  * }}}
@@ -269,7 +269,7 @@ package eu.cdevreeze
  * {{{
  * for {
  *   bookElem <- bookstoreElem \ EName("{http://bookstore/book}Book")
- *   if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *   if (bookElem \@ EName("ISBN")).contains("978-0981531649")
  *   authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
  * } yield authorElem
  * }}}
@@ -283,7 +283,7 @@ package eu.cdevreeze
  *   bookstoreElem <- Vector(bookstoreElem)
  *   if bookstoreElem.resolvedName == EName("{http://bookstore/book}Bookstore")
  *   bookElem <- bookstoreElem \ EName("{http://bookstore/book}Book")
- *   if (bookElem \@ EName("ISBN")) == Some("978-0981531649")
+ *   if (bookElem \@ EName("ISBN")).contains("978-0981531649")
  *   authorElem <- bookElem \\ EName("{http://bookstore/author}Author")
  * } yield authorElem
  * }}}

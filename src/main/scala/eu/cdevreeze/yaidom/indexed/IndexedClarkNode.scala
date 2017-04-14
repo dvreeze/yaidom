@@ -69,7 +69,7 @@ object IndexedClarkNode {
    * val iTheBookAuthors =
    *   for {
    *     iAuthor <- iBookstore.filterElems(withLocalName("Author"))
-   *     bookPath <- iAuthor.path.findAncestorPath(_.elementNameOption.map(_.localPart) == Some("Book"))
+   *     bookPath <- iAuthor.path.findAncestorPath(_.elementNameOption.map(_.localPart).contains("Book"))
    *     iBook <- iBookstore.findElem(_.path == bookPath)
    *     if iBook.getChildElem(withLocalName("Title")).elem.text.startsWith("Programming in Scala")
    *   } yield iAuthor

@@ -255,7 +255,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     def isSchemaRef(ev: EventWithAncestry): Boolean =
-      ev.event.isStartElement() && ev.enames.headOption == Some(EName(LinkNamespace, "schemaRef"))
+      ev.event.isStartElement() && ev.enames.headOption.contains(EName(LinkNamespace, "schemaRef"))
 
     def dropWhileNotSchemaRef(): Unit = {
       dropWhileNot(it, e => isSchemaRef(e))

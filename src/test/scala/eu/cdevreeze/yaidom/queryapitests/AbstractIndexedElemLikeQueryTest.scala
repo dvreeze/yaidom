@@ -43,7 +43,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
     val theBookAuthors =
       for {
         author <- bookstore.filterElems(withLocalName("Author"))
-        bookPath <- author.path.findAncestorPath(_.elementNameOption.map(_.localPart) == Some("Book"))
+        bookPath <- author.path.findAncestorPath(_.elementNameOption.map(_.localPart).contains("Book"))
         book <- bookstore.findElem(_.path == bookPath)
         if book.getChildElem(withLocalName("Title")).underlyingElem.text.startsWith("A First Course in Database Systems")
       } yield author

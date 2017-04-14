@@ -136,7 +136,7 @@ abstract class AbstractUpdateTest extends FunSuite {
     val newRootElem = rootElem transformElems {
       case e if e.resolvedName == EName(XbrliNs, "unit") =>
         updateUnitId(e)
-      case e if e.attributeOption(EName("unitRef")) == Some("U-Monetary") =>
+      case e if e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
         updateUnitRef(e)
       case e => e
     }
@@ -157,7 +157,7 @@ abstract class AbstractUpdateTest extends FunSuite {
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
           Some(Vector(updateUnitId(e)))
-        case (e, p) if e.attributeOption(EName("unitRef")) == Some("U-Monetary") =>
+        case (e, p) if e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
           Some(Vector(updateUnitRef(e)))
         case (e, p) => None
       }
@@ -172,14 +172,14 @@ abstract class AbstractUpdateTest extends FunSuite {
     val elems =
       pathAwareClarkElem filterElems {
         case e if e.elem.resolvedName == EName(XbrliNs, "unit") => true
-        case e if e.elem.attributeOption(EName("unitRef")) == Some("U-Monetary") => true
+        case e if e.elem.attributeOption(EName("unitRef")).contains("U-Monetary") => true
         case e => false
       }
     val paths: Set[Path] = elems.map(_.path).toSet
 
     val newRootElem = rootElem.updateElemsOrSelf(paths) {
       case (e, p) if e.resolvedName == EName(XbrliNs, "unit") => updateUnitId(e)
-      case (e, p) if e.attributeOption(EName("unitRef")) == Some("U-Monetary") => updateUnitRef(e)
+      case (e, p) if e.attributeOption(EName("unitRef")).contains("U-Monetary") => updateUnitRef(e)
       case (e, p) => e
     }
 
@@ -191,7 +191,7 @@ abstract class AbstractUpdateTest extends FunSuite {
       (e, p) match {
         case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
           Some(updateUnitId(e))
-        case (e, p) if e.attributeOption(EName("unitRef")) == Some("U-Monetary") =>
+        case (e, p) if e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
           Some(updateUnitRef(e))
         case (e, p) => None
       }
@@ -250,7 +250,7 @@ abstract class AbstractUpdateTest extends FunSuite {
 
     val newRootElem = rootElem.updateElemsOrSelf(paths) {
       case (e, p) if e.resolvedName == EName(XbrliNs, "context") => updateContextId(e)
-      case (e, p) if e.attributeOption(EName("contextRef")) == Some("D-2007-PPE-Other") => updateContextRef(e)
+      case (e, p) if e.attributeOption(EName("contextRef")).contains("D-2007-PPE-Other") => updateContextRef(e)
       case (e, p) => e
     }
 
@@ -314,8 +314,8 @@ abstract class AbstractUpdateTest extends FunSuite {
     val elems =
       ElemWithPath(rootElem) filterChildElems { e =>
         e.elem.resolvedName == EName(gaapNs, "AverageNumberEmployees") &&
-          e.elem.attributeOption(EName("contextRef")) == Some("D-2003") &&
-          e.elem.attributeOption(EName("unitRef")) == Some("U-Pure")
+          e.elem.attributeOption(EName("contextRef")).contains("D-2003") &&
+          e.elem.attributeOption(EName("unitRef")).contains("U-Pure")
       }
     val paths = elems.map(_.path)
 

@@ -522,7 +522,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
         namespaceURI match {
           case XMLConstants.XML_NS_URI => XMLConstants.XML_NS_PREFIX
           case XMLConstants.XMLNS_ATTRIBUTE_NS_URI => XMLConstants.XMLNS_ATTRIBUTE
-          case nsUri if defaultNamespaceOption == Some(nsUri) => XMLConstants.DEFAULT_NS_PREFIX
+          case nsUri if defaultNamespaceOption.contains(nsUri) => XMLConstants.DEFAULT_NS_PREFIX
           case nsUri => inverseWithoutDefaultNs.get(nsUri).map(_.iterator.next).orNull
         }
       }

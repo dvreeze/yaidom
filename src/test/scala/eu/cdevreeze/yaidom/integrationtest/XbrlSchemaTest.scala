@@ -53,7 +53,7 @@ class XbrlSchemaTest extends FunSuite {
 
     assertResult(true) {
       // We query each element definition for the target namespace of the root (!) element
-      elmDefs forall { e => e.rootElem.attributeOption(EName("targetNamespace")) == Some(tns) }
+      elmDefs forall { e => e.rootElem.attributeOption(EName("targetNamespace")).contains(tns) }
     }
 
     assertResult(Set(EName(tns, "AMinusMinusMember"), EName(tns, "APlusPlusPlusMember"))) {
@@ -85,7 +85,7 @@ class XbrlSchemaTest extends FunSuite {
     }
 
     assertResult(true) {
-      elemsContainingPlus forall { e => xbrlSchema.underlyingElem.findElemOrSelfByPath(e.path) == Some(e.underlyingElem) }
+      elemsContainingPlus forall { e => xbrlSchema.underlyingElem.findElemOrSelfByPath(e.path).contains(e.underlyingElem) }
     }
   }
 }

@@ -105,7 +105,7 @@ final case class Declarations(prefixNamespaceMap: Map[String, String]) extends I
   /** Creates a `String` representation of this `Declarations`, as it is shown in an XML element */
   def toStringInXml: String = {
     val declaredString = properDeclarationsToStringInXml
-    val defaultNamespaceUndeclared: Boolean = prefixNamespaceMap.get(DefaultNsPrefix) == Some("")
+    val defaultNamespaceUndeclared: Boolean = prefixNamespaceMap.get(DefaultNsPrefix).contains("")
     val defaultNsUndeclaredString = if (defaultNamespaceUndeclared) """xmlns=""""" else ""
     val undeclaredPrefixes: Set[String] = ((prefixNamespaceMap - DefaultNsPrefix) filter (kv => kv._2 == "")).keySet
     val undeclaredPrefixesString = undeclaredPrefixes map { pref => """xmlns:%s=""""".format(pref) } mkString (" ")

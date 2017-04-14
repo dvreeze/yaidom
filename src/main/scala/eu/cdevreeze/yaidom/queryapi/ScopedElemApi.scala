@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.core.QName
  *
  * Scopes resolve QNames as ENames, so some properties are expected to hold for the element "name":
  * {{{
- * this.scope.resolveQNameOption(this.qname) == Some(this.resolvedName)
+ * this.scope.resolveQNameOption(this.qname).contains(this.resolvedName)
  *
  * // Therefore:
  * this.resolvedName.localPart == this.qname.localPart

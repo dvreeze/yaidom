@@ -37,7 +37,7 @@ abstract class AbstractI18nQueryTest extends FunSuite {
   type E <: ScopedElemLike.Aux[E]
 
   test("testI18n") {
-    val facts = rootElem.filterChildElems(e => e.qname.prefixOption == Some("tx"))
+    val facts = rootElem.filterChildElems(e => e.qname.prefixOption.contains("tx"))
 
     assertResult(List("la_á", "la_é", "la_í", "ó", "la_ú", "España1").map(s => QName("tx", s))) {
       facts.map(_.qname)
@@ -75,7 +75,7 @@ abstract class AbstractI18nQueryTest extends FunSuite {
     }
 
     assertResult(List("30")) {
-      rootElem.filterElems(e => e.resolvedName == EName(txNs, "la_í") && e.attributeOption(EName("unitRef")) == Some("ÑÁÉ")).map(_.text).distinct
+      rootElem.filterElems(e => e.resolvedName == EName(txNs, "la_í") && e.attributeOption(EName("unitRef")).contains("ÑÁÉ")).map(_.text).distinct
     }
   }
 

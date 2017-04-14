@@ -203,7 +203,7 @@ class EqualityTest extends FunSuite {
         EName(ns, "notation"))
 
     assertResult(xsElmENames) {
-      val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
 
@@ -212,7 +212,7 @@ class EqualityTest extends FunSuite {
     val resolvedRoot = resolved.Elem(root)
 
     assertResult(xsElmENames) {
-      val result = resolvedRoot \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = resolvedRoot \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
   }

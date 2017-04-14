@@ -104,13 +104,13 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
       avgNumEmployeesFacts.size
     }
     assertResult(true) {
-      avgNumEmployeesFacts.forall(fact => fact.attributeOption(EName("unitRef")) == Some("U-Pure"))
+      avgNumEmployeesFacts.forall(fact => fact.attributeOption(EName("unitRef")).contains("U-Pure"))
     }
 
     // Check the unit itself, minding the default namespace
 
     val uPureUnit =
-      doc.documentElement.getChildElem(e => e.resolvedName == EName(XbrliNs, "unit") && (e \@ EName("id")) == Some("U-Pure"))
+      doc.documentElement.getChildElem(e => e.resolvedName == EName(XbrliNs, "unit") && (e \@ EName("id")).contains("U-Pure"))
 
     assertResult("pure") {
       uPureUnit.getChildElem(withEName(XbrliNs, "measure")).text

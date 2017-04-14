@@ -125,7 +125,7 @@ sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
  * require(schemaElem.findAllElemsOrSelf.flatMap(_.attributes.toMap.keySet.map(_.prefixOption)).distinct == List(None))
  *
  * // All descendant-or-self elements with "type" attributes contain only QNames with prefix "xsd" in the values of those attributes.
- * require(schemaElem.filterElemsOrSelf(e => (e \@ EName("type")).isDefined).forall(e => e.attributeAsQName(EName("type")).prefixOption == Some("xsd")))
+ * require(schemaElem.filterElemsOrSelf(e => (e \@ EName("type")).isDefined).forall(e => e.attributeAsQName(EName("type")).prefixOption.contains("xsd")))
  *
  * // Replaces prefix "xsd" by "xs" throughout the element tree, including in "type" attributes.
  * val editedSchemaElem = schemaElem transformElemsOrSelf { elem =>

@@ -351,7 +351,7 @@ class StaxInteropTest extends FunSuite {
         EName(ns, "notation"))
 
     assertResult(xsElmENames) {
-      val result = root \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     // Remember, coalescing is set to true!
@@ -402,12 +402,12 @@ class StaxInteropTest extends FunSuite {
         for {
           schemaElm <- rootElm filterElems { e =>
             e.resolvedName == EName(ns, "element") &&
-              e.attributeOption(EName("name")) == Some("schema") &&
-              e.attributeOption(EName("id")) == Some("schema")
+              e.attributeOption(EName("name")).contains("schema") &&
+              e.attributeOption(EName("id")).contains("schema")
           }
           idConstraintElm <- schemaElm filterChildElems { e =>
             e.resolvedName == EName(ns, "key") &&
-              e.attributeOption(EName("name")) == Some("identityConstraint")
+              e.attributeOption(EName("name")).contains("identityConstraint")
           }
         } yield idConstraintElm
 
@@ -432,8 +432,8 @@ class StaxInteropTest extends FunSuite {
       val complexTypeElms =
         rootElm filterElems { e =>
           e.resolvedName == EName(ns, "complexType") &&
-            e.attributeOption(EName("name")) == Some("element") &&
-            e.attributeOption(EName("abstract")) == Some("true")
+            e.attributeOption(EName("name")).contains("element") &&
+            e.attributeOption(EName("abstract")).contains("true")
         }
 
       assertResult(1) {
@@ -493,8 +493,8 @@ class StaxInteropTest extends FunSuite {
     def checkFieldPattern(rootElm: Elem): Unit = {
       val fieldElms = rootElm filterElems { e =>
         e.resolvedName == EName(ns, "element") &&
-          e.attributeOption(EName("name")) == Some("field") &&
-          e.attributeOption(EName("id")) == Some("field")
+          e.attributeOption(EName("name")).contains("field") &&
+          e.attributeOption(EName("id")).contains("field")
       }
 
       val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
@@ -525,7 +525,7 @@ class StaxInteropTest extends FunSuite {
     // 4. Perform the checks of the parsed XML string as Elem against the originally parsed XML file as Elem
 
     assertResult(xsElmENames) {
-      val result = root2 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root2 \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     assertResult(Set(0, 1)) {
@@ -544,7 +544,7 @@ class StaxInteropTest extends FunSuite {
     val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
 
     assertResult(xsElmENames) {
-      val result = root3 \\ { e => e.resolvedName.namespaceUriOption == Some(nsXmlSchema) } map { e => e.resolvedName }
+      val result = root3 \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
       result.toSet
     }
     assertResult(Set(0, 1)) {

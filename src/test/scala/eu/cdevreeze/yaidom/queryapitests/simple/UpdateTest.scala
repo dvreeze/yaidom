@@ -62,7 +62,7 @@ class UpdateTest extends AbstractUpdateTest {
   }
 
   protected def updateUnitRef(e: E): E = {
-    if (e.attributeOption(EName("unitRef")) == Some("U-Monetary")) {
+    if (e.attributeOption(EName("unitRef")).contains("U-Monetary")) {
       e.plusAttribute(QName("unitRef"), "U-USD")
     } else {
       e
@@ -78,7 +78,7 @@ class UpdateTest extends AbstractUpdateTest {
   }
 
   protected def updateContextRef(e: E): E = {
-    if (localNamesForContextUpdate.contains(e.localName) && e.attributeOption(EName("contextRef")) == Some("D-2007-PPE-Other")) {
+    if (localNamesForContextUpdate.contains(e.localName) && e.attributeOption(EName("contextRef")).contains("D-2007-PPE-Other")) {
       e.plusAttribute(QName("contextRef"), "D-2007-Other-PPE")
     } else {
       e
