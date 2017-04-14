@@ -88,7 +88,7 @@ class SimpleQueryTest extends FunSuite {
       accProductElems flatMap (e => e \@ EName("dept"))
     }
 
-    assertResult(catalogDoc.documentElement.filterChildElems(_ \@ EName("dept").contains("ACC"))) {
+    assertResult(catalogDoc.documentElement.filterChildElems((_ \@ EName("dept")).contains("ACC"))) {
       accProductElems
     }
   }

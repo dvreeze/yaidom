@@ -165,11 +165,11 @@ class Blog2Test extends FunSuite {
     // Get the rights child element of the root element
     val rights1Elem: Elem = feed1DocElem.getChildElem(withEName(atomNs, "rights"))
 
-    require(rights1Elem \@ EName("type").contains("xhtml"))
+    require((rights1Elem \@ EName("type")).contains("xhtml"))
 
     val examplesNs = "http://xmlportfolio.com/xmlguild-examples"
 
-    require(rights1Elem \@ EName(examplesNs, "type").contains("silly"))
+    require((rights1Elem \@ EName(examplesNs, "type")).contains("silly"))
 
     val rights1ElemAttrs = rights1Elem.attributes
 
