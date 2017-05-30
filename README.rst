@@ -36,7 +36,7 @@ as follows (in an SBT or Maven build):
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
       <artifactId>yaidom_2.11</artifactId>
-      <version>1.6.0/version>
+      <version>1.6.0</version>
     </dependency>
 
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.
