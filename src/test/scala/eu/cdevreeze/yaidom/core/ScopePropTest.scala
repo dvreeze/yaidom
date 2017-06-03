@@ -25,8 +25,8 @@ import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
 import org.scalatest.FunSuite
-import org.scalatest.check.Checkers
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.prop.Checkers
 
 /**
  * Scope properties test case.
