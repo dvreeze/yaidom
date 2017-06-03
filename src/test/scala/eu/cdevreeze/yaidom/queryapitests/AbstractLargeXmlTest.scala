@@ -79,7 +79,12 @@ abstract class AbstractLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     val ContactEName = EName("contact")
     val EmailEName = EName("email")
 
-    for (i <- (0 until 200).par) {
+    // TODO Fix, and re-introduce the par method call again.
+    // The par method is problematic in Scala 2.13.0-M1. See https://github.com/scala/scala-parallel-collections/issues/22
+    // for a workaround. Yet that workaround causes the linter to complain about unused imports.
+    // Let's not bother for now, especially because this test method is ignored anyway.
+
+    for (i <- (0 until 200)) {
       logger.info(s"Queried Document (run ${i + 1}) in thread ${Thread.currentThread.getName}")
 
       (i % 5) match {
