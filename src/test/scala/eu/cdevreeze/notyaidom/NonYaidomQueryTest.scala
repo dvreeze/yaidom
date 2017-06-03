@@ -16,11 +16,9 @@
 
 package eu.cdevreeze.notyaidom
 
-import java.{ util => jutil, io => jio }
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 /**

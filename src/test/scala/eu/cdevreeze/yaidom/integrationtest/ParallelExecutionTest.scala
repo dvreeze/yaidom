@@ -28,10 +28,8 @@ import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Ignore
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 

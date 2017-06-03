@@ -21,7 +21,6 @@ import java.{ util => jutil }
 
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -36,7 +35,6 @@ import eu.cdevreeze.yaidom.dom.DomComment
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.dom.DomEntityRef
-import eu.cdevreeze.yaidom.dom.DomNode
 import eu.cdevreeze.yaidom.dom.DomProcessingInstruction
 import eu.cdevreeze.yaidom.dom.DomText
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
@@ -721,8 +719,6 @@ class DomWrapperTest extends FunSuite {
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithDifferentKindsOfNodes.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
-
-    val root: DomElem = domDoc.documentElement
 
     assertResult(2) {
       domDoc.comments.size

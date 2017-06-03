@@ -223,6 +223,4 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     val attrValue: String = v.getValue
     (prefixOption, attrValue)
   }
-
-  private def empty2Null(s: String): String = if (s == "") null else s
 }

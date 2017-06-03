@@ -24,7 +24,6 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
@@ -123,14 +122,12 @@ class XbrlSchemaTest extends FunSuite {
   test("testQueryMultipleXsds") {
     val parser = DocumentParserUsingSax.newInstance()
     val ipoDoc: Document = parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("ipo.xsd"))
-    val addressDoc: Document =
-      parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("address.xsd"))
+
+    // Why parse and not use this XSD?
+    parser.parse(classOf[XbrlSchemaTest].getResourceAsStream("address.xsd"))
 
     val ipoSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(ipoDoc)
     val ipoSchema: XsdRootElem = new XsdRootElem(ipoSchemaDoc.documentElement)
-
-    val addressSchemaDoc = eu.cdevreeze.yaidom.indexed.Document(addressDoc)
-    val addressSchema: XsdRootElem = new XsdRootElem(addressSchemaDoc.documentElement)
 
     val tns = ipoSchema.targetNamespaceOption.getOrElse("")
 

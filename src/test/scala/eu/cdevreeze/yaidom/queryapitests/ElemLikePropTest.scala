@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import scala.Vector
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
@@ -43,8 +42,6 @@ import eu.cdevreeze.yaidom.parse
  */
 @RunWith(classOf[JUnitRunner])
 class ElemLikePropTest extends FunSuite with Checkers {
-
-  import Arbitrary.arbitrary
 
   // Simple "definitions"
 
@@ -169,8 +166,6 @@ class ElemLikePropTest extends FunSuite with Checkers {
   }
 
   private val genElem: Gen[Elem] = {
-    val allElems = docs.flatMap(_.documentElement.findAllElemsOrSelf)
-
     for {
       doc <- oneOf(docs)
       elems <- someOf(doc.documentElement.findAllElemsOrSelf)

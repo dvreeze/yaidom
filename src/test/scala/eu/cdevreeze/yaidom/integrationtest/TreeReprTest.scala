@@ -16,13 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.core.Declarations
@@ -30,11 +26,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.Text
-import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -55,13 +47,6 @@ class TreeReprTest extends FunSuite {
 
   import DocBuilder._
   import NodeBuilder._
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
-
-  private val nsBookstore = "http://bookstore"
-  private val nsGoogle = "http://www.google.com"
-  private val nsFooBar = "urn:foo:bar"
-  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
   test("testCreateTreeForBooks") {
     val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
@@ -749,15 +734,6 @@ class TreeReprTest extends FunSuite {
     assertResult(doc.transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText).toString) {
       doc2.toString
     }
-  }
-
-  private def printTreeReprs(doc: Document, doc2: Document): Unit = {
-    println()
-    println()
-    println()
-    println(doc.transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText).toString)
-    println()
-    println(doc2.transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText).toString)
   }
 
   private def addUtf8Bom(ba: Array[Byte]): Array[Byte] = Array[Byte](0xEF.toByte, 0xBB.toByte, 0xBF.toByte) ++ ba

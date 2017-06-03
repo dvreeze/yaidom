@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
@@ -118,8 +117,6 @@ class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
   }
 
   private def runXPath(xpathExpr: String, scope: Scope): immutable.IndexedSeq[Node] = {
-    val ns = "http://bookstore"
-
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val namespaceContext = scope.toNamespaceContext
 

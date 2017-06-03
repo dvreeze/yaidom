@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapi
 
-import scala.collection.immutable
-
 /**
  * Abstract node (marker) trait hierarchy. It offers a common minimal API for different kinds of nodes. It also shows
  * what yaidom typically considers to be nodes, and what it does not consider to be nodes. For example, documents

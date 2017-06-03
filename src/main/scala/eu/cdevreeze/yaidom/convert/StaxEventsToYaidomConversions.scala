@@ -27,9 +27,6 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.collection.immutable
 import scala.collection.mutable
 
-import eu.cdevreeze.yaidom.core.Declarations
-import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.AncestryPath
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.XmlDeclaration
@@ -42,13 +39,9 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
-import javax.xml.XMLConstants
-import javax.xml.namespace.{ QName => JQName }
 import javax.xml.stream.XMLEventReader
-import javax.xml.stream.events.Attribute
 import javax.xml.stream.events.Characters
 import javax.xml.stream.events.EntityReference
-import javax.xml.stream.events.Namespace
 import javax.xml.stream.events.StartDocument
 import javax.xml.stream.events.StartElement
 import javax.xml.stream.events.XMLEvent
@@ -174,7 +167,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   final def takeDocument(eventStateIterator: BufferedIterator[EventWithAncestry]): Document = {
     require(eventStateIterator.hasNext, s"Empty event iterator")
 
-    var it = eventStateIterator
+    val it = eventStateIterator
 
     val head = it.next()
     require(head.event.isStartDocument, s"Not a StartDocument event: ${head.event}")
@@ -248,12 +241,11 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   final def takeElem(eventStateIterator: BufferedIterator[EventWithAncestry]): Elem = {
     require(eventStateIterator.hasNext, s"Empty event iterator")
 
-    var it = eventStateIterator
+    val it = eventStateIterator
 
     val head = it.next()
     require(head.event.isStartElement, s"Not a StartElement event: ${head.event}")
 
-    val startElement: StartElement = head.event.asStartElement
     require(head.ancestryPathAfterEventOption.nonEmpty)
 
     val entry: AncestryPath.Entry = head.ancestryPathAfterEventOption.get.firstEntry
@@ -331,7 +323,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
     if (!eventStateIterator.hasNext) {
       Vector()
     } else {
-      var it = eventStateIterator
+      val it = eventStateIterator
 
       require(it.head.event.isStartElement, s"Not a StartElement event: ${it.head.event}")
 

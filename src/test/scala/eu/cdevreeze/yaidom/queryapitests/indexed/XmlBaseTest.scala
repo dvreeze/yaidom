@@ -23,12 +23,10 @@ import scala.collection.immutable
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
-import eu.cdevreeze.yaidom.simple
 
 /**
  * XML Base test case for indexed Elems.
@@ -37,8 +35,6 @@ import eu.cdevreeze.yaidom.simple
  */
 @RunWith(classOf[JUnitRunner])
 class XmlBaseTest extends AbstractXmlBaseTest {
-
-  private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
 
   type D = indexed.Document
 

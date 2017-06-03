@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.collection.immutable
 import scala.reflect.classTag
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName

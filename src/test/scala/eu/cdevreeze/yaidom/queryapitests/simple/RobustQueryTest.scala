@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.simple
 
-import java.{ util => jutil }
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -33,8 +31,6 @@ import eu.cdevreeze.yaidom.simple.Elem
  */
 @RunWith(classOf[JUnitRunner])
 class RobustQueryTest extends AbstractRobustQueryTest {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.simple")
 
   final type E = Elem
 

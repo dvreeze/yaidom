@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import scala.Vector
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -310,27 +309,6 @@ class SimpleQueryTest extends FunSuite {
           <desc>Our <i>favorite</i> shirt!</desc>
         </product>
       </catalog>
-
-    Document(convertToElem(xml))
-  }
-
-  private val pricesDoc: Document = {
-    val xml =
-      <prices>
-        <priceList effDate="2006-11-15">
-          <prod num="557">
-            <price currency="USD">29.99</price>
-            <discount type="CLR">10.00</discount>
-          </prod>
-          <prod num="563">
-            <price currency="USD">69.99</price>
-          </prod>
-          <prod num="443">
-            <price currency="USD">39.99</price>
-            <discount type="CLR">3.99</discount>
-          </prod>
-        </priceList>
-      </prices>
 
     Document(convertToElem(xml))
   }

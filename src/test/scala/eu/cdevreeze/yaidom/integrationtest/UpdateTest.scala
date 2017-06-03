@@ -20,7 +20,6 @@ import java.{ util => jutil }
 
 import scala.Vector
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -51,8 +50,6 @@ import javax.xml.transform.TransformerFactory
 class UpdateTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
-
-  private val scope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
 
   private val docParser = DocumentParserUsingDom.newInstance()
 

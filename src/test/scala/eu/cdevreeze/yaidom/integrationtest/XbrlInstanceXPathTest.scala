@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
@@ -24,13 +23,11 @@ import org.scalatest.junit.JUnitRunner
 import org.w3c.dom.NodeList
 
 import eu.cdevreeze.yaidom.convert
-import eu.cdevreeze.yaidom.convert.DomConversions.convertToElem
 import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.parse
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import javax.xml.xpath.XPathFunction

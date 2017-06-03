@@ -22,7 +22,6 @@ import java.{ util => jutil }
 import scala.collection.immutable
 
 import org.ccil.cowan.tagsoup.jaxp.{ SAXFactoryImpl => TagSoupSAXFactoryImpl }
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -345,23 +344,7 @@ class SaxInteropTest extends FunSuite {
 
     val spf = SAXParserFactory.newInstance().makeNamespaceAndPrefixAware
 
-    // One possible EntityResolver, namely one that tries to find the needed DTDs locally
-    trait EntityResolverUsingLocalDtds extends EntityResolver {
-      override def resolveEntity(publicId: String, systemId: String): InputSource = {
-        logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
-
-        if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
-          new InputSource(classOf[SaxInteropTest].getResourceAsStream("XMLSchema.dtd"))
-        } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
-          new InputSource(classOf[SaxInteropTest].getResourceAsStream("datatypes.dtd"))
-        } else {
-          // Default behaviour
-          null
-        }
-      }
-    }
-
-    // Another possible EntityResolver, namely one that suppresses DTD resolution
+    // One possible EntityResolver, namely one that suppresses DTD resolution
     trait SuppressingEntityResolver extends EntityResolver {
       override def resolveEntity(publicId: String, systemId: String): InputSource = {
         logger.info(s"Trying to resolve entity (but suppressing it). Public ID: $publicId. System ID: $systemId")

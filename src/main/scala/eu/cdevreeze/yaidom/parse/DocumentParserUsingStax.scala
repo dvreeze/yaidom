@@ -17,10 +17,8 @@
 package eu.cdevreeze.yaidom.parse
 
 import java.{ io => jio }
-import java.{ util => jutil }
 
 import scala.collection.Iterator
-import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.util.control.Exception.ignoring
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
@@ -78,8 +76,8 @@ import javax.xml.transform.stream.StreamSource
  * @author Chris de Vreeze
  */
 final class DocumentParserUsingStax(
-  val inputFactory: XMLInputFactory,
-  val converterToDocument: ConverterToDocument[Iterator[XMLEvent]]) extends AbstractDocumentParser {
+    val inputFactory: XMLInputFactory,
+    val converterToDocument: ConverterToDocument[Iterator[XMLEvent]]) extends AbstractDocumentParser {
 
   /**
    * Returns an adapted copy having the passed ConverterToDocument. This method makes it possible to use an adapted

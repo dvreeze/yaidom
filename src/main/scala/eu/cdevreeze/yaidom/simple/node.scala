@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.simple
 
-import java.io.ObjectStreamException
-
 import scala.Vector
 import scala.collection.immutable
 import scala.collection.mutable
@@ -173,10 +171,10 @@ sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
  */
 @SerialVersionUID(1L)
 final class Elem(
-  val qname: QName,
-  val attributes: immutable.IndexedSeq[(QName, String)],
-  val scope: Scope,
-  override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with ResolvedNodes.Elem with ScopedElemLike with UpdatableElemLike with TransformableElemLike {
+    val qname: QName,
+    val attributes: immutable.IndexedSeq[(QName, String)],
+    val scope: Scope,
+    override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with ResolvedNodes.Elem with ScopedElemLike with UpdatableElemLike with TransformableElemLike {
 
   require(qname ne null)
   require(attributes ne null)
@@ -717,10 +715,10 @@ final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Com
 object Elem {
 
   private[yaidom] final class ElemSerializationProxy(
-    val qname: QName,
-    val attributes: immutable.IndexedSeq[(QName, String)],
-    val scope: Scope,
-    val children: immutable.IndexedSeq[Node]) extends Serializable {
+      val qname: QName,
+      val attributes: immutable.IndexedSeq[(QName, String)],
+      val scope: Scope,
+      val children: immutable.IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
     def readResolve(): Any = new Elem(qname, attributes, scope, children)

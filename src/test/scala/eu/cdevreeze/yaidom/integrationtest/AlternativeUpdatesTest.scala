@@ -16,12 +16,8 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import scala.reflect.classTag
-import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll, Ignore }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 import eu.cdevreeze.yaidom.convert
@@ -43,8 +39,6 @@ import eu.cdevreeze.yaidom.simple.Elem
  */
 @RunWith(classOf[JUnitRunner])
 class AlternativeUpdatesTest extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   test("testRetainFirstAuthorsUsingTransformElemsOrSelf") {
     val updatedElem = bookstore transformElemsOrSelf {

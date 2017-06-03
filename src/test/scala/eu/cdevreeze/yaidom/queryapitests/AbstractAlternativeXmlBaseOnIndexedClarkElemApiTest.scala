@@ -20,7 +20,6 @@ import java.net.URI
 
 import scala.Vector
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom
@@ -44,9 +43,6 @@ import eu.cdevreeze.yaidom.simple.Node.emptyElem
 abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends FunSuite {
 
   import yaidom.simple.Node._
-
-  private val XmlNs = "http://www.w3.org/XML/1998/namespace"
-  private val XmlBaseEName = EName(XmlNs, "base")
 
   private val XLinkNs = "http://www.w3.org/1999/xlink"
   private val XLinkHrefEName = EName(XLinkNs, "href")

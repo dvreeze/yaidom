@@ -16,15 +16,12 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import scala.reflect.classTag
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 

@@ -17,34 +17,23 @@
 package eu.cdevreeze.yaidom.blogcode
 
 import scala.Vector
-import scala.collection.immutable
 
 import org.joda.time.LocalDate
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
-import AbstractBlogXbrlTestSupport.XbrliNs
-import AbstractBlogXbrlTestSupport.XmlNs
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
-import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
-import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
-import eu.cdevreeze.yaidom.utils.TextENameExtractor
 
 /**
  * Code of yaidom XBRL blog ("XBRL, Scala and yaidom"). The blog introduces yaidom in the context
@@ -65,7 +54,6 @@ class Blog2XbrlTest extends FunSuite {
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
   private val XbrldiNs = "http://xbrl.org/2006/xbrldi"
   private val LinkNs = "http://www.xbrl.org/2003/linkbase"
-  private val XLinkNs = "http://www.w3.org/1999/xlink"
 
   private val GaapNs = "http://xasb.org/gaap"
   private val FrmNs = "http://www.xbrlsite.com/Schemas/frm"
@@ -84,7 +72,6 @@ class Blog2XbrlTest extends FunSuite {
 
     // Check that all gaap:AverageNumberEmployees facts have unit U-Pure.
 
-    val xmlNs = "http://www.w3.org/XML/1998/namespace"
     val xbrliNs = "http://www.xbrl.org/2003/instance"
     val gaapNs = "http://xasb.org/gaap"
 

@@ -29,7 +29,6 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.indexed
-import java.net.URI
 import AbstractBlogXbrlTestSupport._
 
 /**

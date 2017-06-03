@@ -24,7 +24,6 @@ import org.xml.sax.InputSource
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert
-import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved

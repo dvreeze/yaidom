@@ -22,7 +22,6 @@ import java.{ util => jutil }
 
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -600,8 +599,6 @@ class XomWrapperTest extends FunSuite {
     val d = db.parse(is)
     val doc = nu.xom.converters.DOMConverter.convert(d)
     val domDoc: XomDocument = XomNode.wrapDocument(doc)
-
-    val root: XomElem = domDoc.documentElement
 
     assertResult("records") {
       domDoc.documentElement.localName

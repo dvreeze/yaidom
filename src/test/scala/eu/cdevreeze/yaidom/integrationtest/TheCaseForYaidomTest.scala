@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream
 import scala.Vector
 import scala.xml.NodeSeq.seqToNodeSeq
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
@@ -572,7 +571,6 @@ class TheCaseForYaidomTest extends FunSuite {
     }
 
     val nsXLink = "http://www.w3.org/1999/xlink"
-    val nsLink = "http://www.xbrl.org/2003/linkbase"
 
     assertResult(None) {
       scalaElem.attribute(nsXLink, "arcrole")

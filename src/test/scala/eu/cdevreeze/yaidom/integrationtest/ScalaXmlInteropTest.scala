@@ -16,11 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Ignore
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
@@ -52,12 +48,9 @@ import eu.cdevreeze.yaidom.resolved
 @RunWith(classOf[JUnitRunner])
 class ScalaXmlInteropTest extends FunSuite {
 
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
-
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsFooBar = "urn:foo:bar"
-  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
   test("testConvert") {
     // 1. Convert XML to Elem

@@ -16,15 +16,11 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**

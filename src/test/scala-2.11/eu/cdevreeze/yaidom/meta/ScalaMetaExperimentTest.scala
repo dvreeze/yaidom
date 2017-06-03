@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.meta
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -203,7 +202,7 @@ class ScalaMetaExperimentTest extends FunSuite {
 
     // Dissecting the import statement (without pattern matching on quasi-quotes)
 
-    assertResult(List("eu.cdevreeze.yaidom.indexed.{ Elem => IndexedElem }")) {
+    assertResult(List("eu.cdevreeze.yaidom.indexed.{Elem => IndexedElem}")) {
       import1 collect { case imp: Importer => imp } map (_.syntax)
     }
     assertResult(List("eu.cdevreeze.yaidom.indexed")) {
@@ -353,7 +352,7 @@ object Elems {
                 Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
                 Term.Block(
                   List(
-                    Term.Apply(Term.Name("filterChildElems"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit(true))))))),
+                    Term.Apply(Term.Name("filterChildElems"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit.Boolean(true))))))),
               Defn.Def(
                 List(Mod.Final()),
                 Term.Name("filterElemsOrSelf"),
@@ -381,7 +380,7 @@ object Elems {
                 Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
                 Term.Block(
                   List(
-                    Term.Apply(Term.Name("filterElemsOrSelf"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit(true)))))))))))
+                    Term.Apply(Term.Name("filterElemsOrSelf"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit.Boolean(true)))))))))))
 
     val expectedSource =
       Source(

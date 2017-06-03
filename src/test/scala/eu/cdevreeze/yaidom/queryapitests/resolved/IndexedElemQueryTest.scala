@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.queryapitests.resolved
 
 import scala.Vector
-import scala.reflect.classTag
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -26,7 +25,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder

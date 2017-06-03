@@ -17,12 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.ByteArrayInputStream
-import java.nio.charset.Charset
 
-import scala.io.Codec
-import scala.reflect.classTag
-
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -31,24 +26,15 @@ import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
-import eu.cdevreeze.yaidom.parse.DocumentParser
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem

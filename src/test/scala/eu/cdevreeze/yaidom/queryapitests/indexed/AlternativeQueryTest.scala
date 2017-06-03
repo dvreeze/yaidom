@@ -18,17 +18,13 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
-import scala.reflect.classTag
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.indexed.Elem
-import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 
 /**

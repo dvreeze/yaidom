@@ -16,15 +16,12 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.w3c.dom.{ Element }
-import org.xml.sax.{ EntityResolver, InputSource, ErrorHandler, SAXParseException }
-import javax.xml.transform.stream.StreamSource
+import java.{ util => jutil }
+import org.xml.sax.{ EntityResolver, InputSource }
 import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.parse
@@ -50,7 +47,6 @@ class EqualityTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
@@ -273,8 +269,8 @@ class EqualityTest extends FunSuite {
           n match {
             case er: EntityRef if er.entity == "hello" => Some(Text("hi", false))
             // This is very counter-intuitive, but it seems that the entity reference is there as well as (!) the expansion
-            case t: Text if t.text.startsWith("hi") => Some(Text(t.text.drop(2), t.isCData))
-            case n: Node => Some(n)
+            case t: Text if t.text.startsWith("hi")    => Some(Text(t.text.drop(2), t.isCData))
+            case n: Node                               => Some(n)
           }
         }
         e.withChildren(newChildren)

@@ -16,23 +16,13 @@
 
 package eu.cdevreeze.yaidom.utils
 
-import java.{ util => jutil }
-
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
-import NamespaceUtils.pushUpPrefixedNamespaces
-import NamespaceUtils.stripUnusedNamespaces
-import NamespaceUtils.findAllENames
-import NamespaceUtils.findAllNamespaces
-import NamespaceUtils.findENamesInElementItself
-import NamespaceUtils.findNamespacesInElementItself
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple

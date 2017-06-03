@@ -50,11 +50,6 @@ class PrettifyTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
-  private val nsBookstore = "http://bookstore"
-  private val nsGoogle = "http://www.google.com"
-  private val nsFooBar = "urn:foo:bar"
-  private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
-
   test("testPrettifyBooks") {
     val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
     val is = classOf[PrettifyTest].getResourceAsStream("books.xml")
@@ -265,11 +260,6 @@ class PrettifyTest extends FunSuite {
     assertResult(true) {
       hasNoInterElementWhitespace(prettifiedDoc.documentElement.removeAllInterElementWhitespace)
     }
-  }
-
-  private def printNonFormattedTreeRepr(doc: Document): Unit = {
-    println()
-    println(doc.transformingDocumentElement(_.removeAllInterElementWhitespace).toString)
   }
 
   private def isPrettified(elem: Elem, indentStep: Int, currentIndent: Int): Boolean = {

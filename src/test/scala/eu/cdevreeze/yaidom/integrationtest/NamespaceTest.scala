@@ -17,9 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
-import java.{ util => jutil }
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -43,8 +41,6 @@ import eu.cdevreeze.yaidom.resolved
  */
 @RunWith(classOf[JUnitRunner])
 class NamespaceTest extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   val nsAtom = "http://www.w3.org/2005/Atom"
   val nsXhtml = "http://www.w3.org/1999/xhtml"

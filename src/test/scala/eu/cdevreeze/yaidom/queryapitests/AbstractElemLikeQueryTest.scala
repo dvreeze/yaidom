@@ -19,9 +19,7 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName

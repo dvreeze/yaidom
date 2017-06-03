@@ -16,12 +16,8 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.transform.stream.StreamSource
-import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.simple.NodeBuilder._
@@ -43,10 +39,6 @@ import eu.cdevreeze.yaidom.simple
  */
 @RunWith(classOf[JUnitRunner])
 class CreationTest extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
-
-  private val nsBookstore = "http://bookstore"
 
   test("testCreation") {
     // 1. Parse XML file into Elem
@@ -219,7 +211,6 @@ class CreationTest extends FunSuite {
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
 
     val doc1: simple.Document = docParser.parse(is)
-    val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
 
     val isbn = "ISBN-9-88-777777-6"
     val bookElm1 = doc1.documentElement.findElem(e =>

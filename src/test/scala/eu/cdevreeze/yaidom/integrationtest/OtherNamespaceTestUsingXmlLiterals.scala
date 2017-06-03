@@ -16,12 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import org.junit.Test
-import org.scalatest.Ignore
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
@@ -41,8 +36,6 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   test("testNamespaceDeclaration") {
     val xml =

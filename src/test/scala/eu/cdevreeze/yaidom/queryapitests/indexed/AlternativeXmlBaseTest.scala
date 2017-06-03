@@ -23,7 +23,6 @@ import scala.collection.immutable
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
@@ -38,8 +37,6 @@ import eu.cdevreeze.yaidom
  */
 @RunWith(classOf[JUnitRunner])
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
-
-  private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
 
   type D = yaidom.indexed.Document
 

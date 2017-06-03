@@ -19,13 +19,11 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.Vector
 import scala.reflect.ClassTag
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
@@ -34,7 +32,6 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Text
 
 /**
  * Update test, using different yaidom methods of updating.

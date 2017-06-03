@@ -16,10 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.annotation.elidable
-import scala.annotation.elidable.ASSERTION
-
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -178,9 +174,9 @@ object XmlDiffTest {
   }
 
   final case class Diffs(
-    val onlyInFirstElem: Set[Path],
-    val onlyInSecondElem: Set[Path],
-    val inBothElemsButDiffering: Set[Path]) {
+      val onlyInFirstElem: Set[Path],
+      val onlyInSecondElem: Set[Path],
+      val inBothElemsButDiffering: Set[Path]) {
 
     def allDiffs = onlyInFirstElem.union(onlyInSecondElem).union(inBothElemsButDiffering)
   }

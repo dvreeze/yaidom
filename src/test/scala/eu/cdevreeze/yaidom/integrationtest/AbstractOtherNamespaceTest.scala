@@ -17,9 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
-import java.{ util => jutil }
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
@@ -41,8 +39,6 @@ import eu.cdevreeze.yaidom.resolved
  * @author Chris de Vreeze
  */
 abstract class AbstractOtherNamespaceTest extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   def documentParser: DocumentParser
 

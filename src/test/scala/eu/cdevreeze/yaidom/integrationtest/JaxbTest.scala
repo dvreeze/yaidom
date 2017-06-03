@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -54,7 +53,6 @@ class JaxbTest extends FunSuite {
 
     val doc = docParser.parse(classOf[JaxbTest].getResourceAsStream("sample-xbrl-instance.xml"))
 
-    val elemAdapter = new JaxbTest.ElemAdapter
     val wrapper1 = new JaxbTest.Wrapper
     wrapper1.setData(doc.documentElement)
 

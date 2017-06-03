@@ -17,15 +17,12 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
-import java.net.URI
 import java.{ util => jutil }
 
 import scala.Vector
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Ignore
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
@@ -270,7 +267,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Finding the fast way
     val start2Ms = System.currentTimeMillis()
-    val foundElm2 = {
+
+    {
       val result = rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
@@ -279,7 +277,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Finding the fast way (again)
     val start3Ms = System.currentTimeMillis()
-    val foundElm3 = {
+
+    {
       val result = rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
@@ -288,7 +287,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Finding the slower way
     val start4Ms = System.currentTimeMillis()
-    val foundElm4 = {
+
+    {
       val result = rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
@@ -297,7 +297,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Finding the still slower way (in theory)
     val start5Ms = System.currentTimeMillis()
-    val foundElm5 = {
+
+    {
       val result = rootElm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
@@ -306,7 +307,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Finding the slowest way (in theory)
     val start6Ms = System.currentTimeMillis()
-    val foundElm6 = {
+
+    {
       val result = rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }
       result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
     }
@@ -430,8 +432,6 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
-    // Arbitrarily adding root path as extra (ignored) update path
-    val paths = Set(path, Path.Empty)
 
     val newPhone = "012-34567890"
 

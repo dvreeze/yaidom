@@ -16,16 +16,11 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
 import java.{ util => jutil }
 
-import scala.collection.JavaConverters._
-import scala.collection.immutable
 import scala.xml.parsing.ConstructingParser
 
-import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.InputSource
@@ -630,8 +625,6 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val domDoc: ScalaXmlDocument = ScalaXmlDocument.wrapDocument(doc)
 
-    val root: ScalaXmlElem = domDoc.documentElement
-
     assertResult(2) {
       domDoc.comments.size
     }
@@ -649,14 +642,14 @@ class ScalaXmlWrapperTest extends FunSuite {
     assertResult(true) {
       domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
         case t: ScalaXmlCData if t.text == "Piet & co" => true
-        case _ => false
+        case _                                         => false
       })
     }
 
     assertResult(true) {
       !domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
         case t: ScalaXmlAtom => true
-        case _ => false
+        case _               => false
       })
     }
 

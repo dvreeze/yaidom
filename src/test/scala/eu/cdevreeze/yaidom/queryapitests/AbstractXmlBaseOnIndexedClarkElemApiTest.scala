@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import java.net.URI
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName

@@ -16,13 +16,10 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import java.net.URI
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.indexed.Document
-import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapitests.AbstractBackingElemTest
 

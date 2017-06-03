@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import java.{ util => jutil }
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -35,8 +33,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 @RunWith(classOf[JUnitRunner])
 class I18nQueryTest extends AbstractI18nQueryTest {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.dom")
 
   final type E = DomElem
 

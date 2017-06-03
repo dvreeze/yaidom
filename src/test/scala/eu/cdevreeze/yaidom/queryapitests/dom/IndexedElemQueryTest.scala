@@ -17,15 +17,11 @@
 package eu.cdevreeze.yaidom.queryapitests.dom
 
 import scala.Vector
-import scala.collection.immutable
-import scala.reflect.classTag
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
@@ -34,10 +30,7 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.dom.DomElem
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 

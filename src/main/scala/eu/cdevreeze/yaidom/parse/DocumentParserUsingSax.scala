@@ -22,7 +22,6 @@ import scala.util.Try
 
 import org.xml.sax.InputSource
 import org.xml.sax.ext.LexicalHandler
-import org.xml.sax.helpers.DefaultHandler
 
 import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.parsers.SAXParser
@@ -96,9 +95,9 @@ import javax.xml.parsers.SAXParserFactory
  * @author Chris de Vreeze
  */
 final class DocumentParserUsingSax(
-  val parserFactory: SAXParserFactory,
-  val parserCreator: SAXParserFactory => SAXParser,
-  val handlerCreator: () => ElemProducingSaxHandler) extends AbstractDocumentParser {
+    val parserFactory: SAXParserFactory,
+    val parserCreator: SAXParserFactory => SAXParser,
+    val handlerCreator: () => ElemProducingSaxHandler) extends AbstractDocumentParser {
 
   /**
    * Parses the input stream into a yaidom `Document`. Closes the input stream afterwards.

@@ -25,7 +25,6 @@ import java.{ util => jutil }
 import scala.collection.immutable
 import scala.collection.mutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
@@ -96,7 +95,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
     var elemCount = 0
@@ -148,7 +147,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contactCount = 0
     var elemCount = 0
@@ -200,7 +199,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var enterpriseCount = 0
 
@@ -252,7 +251,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     def isSchemaRef(ev: EventWithAncestry): Boolean =
       ev.event.isStartElement() && ev.enames.headOption.contains(EName(LinkNamespace, "schemaRef"))
@@ -329,7 +328,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     val contextBuffer = mutable.ArrayBuffer[Elem]()
     val unitBuffer = mutable.ArrayBuffer[Elem]()
@@ -370,7 +369,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it2 = convertToEventWithAncestryIterator(asIterator(xmlEventReader2)).buffered
+    val it2 = convertToEventWithAncestryIterator(asIterator(xmlEventReader2)).buffered
 
     def isTopLevelFact(ev: EventWithAncestry): Boolean = {
       ev.event.isStartElement &&
@@ -434,7 +433,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var contextMap = Map[String, Elem]()
     var unitMap = Map[String, Elem]()
@@ -521,7 +520,7 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     // Creating this buffered iterator is done only once! Low level methods hasNext, head and next are
     // called to advance the iterator.
 
-    var it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
+    val it = convertToEventWithAncestryIterator(asIterator(xmlEventReader)).buffered
 
     var docCount = 0
     var elemCount = 0

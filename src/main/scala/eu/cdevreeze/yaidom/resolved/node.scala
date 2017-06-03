@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.resolved
 
-import java.io.ObjectStreamException
-
 import scala.Vector
 import scala.collection.immutable
 import scala.collection.mutable
@@ -123,9 +121,9 @@ sealed trait Node extends ResolvedNodes.Node with Immutable
  * }}}
  */
 final case class Elem(
-  override val resolvedName: EName,
-  override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike with UpdatableElemLike with TransformableElemLike {
+    override val resolvedName: EName,
+    override val resolvedAttributes: Map[EName, String],
+    override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike with UpdatableElemLike with TransformableElemLike {
 
   require(resolvedName ne null)
   require(resolvedAttributes ne null)
@@ -397,9 +395,9 @@ object Node {
 object Elem {
 
   private[resolved] final class ElemSerializationProxy(
-    val resolvedName: EName,
-    val resolvedAttributes: Map[EName, String],
-    val children: immutable.IndexedSeq[Node]) extends Serializable {
+      val resolvedName: EName,
+      val resolvedAttributes: Map[EName, String],
+      val children: immutable.IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)

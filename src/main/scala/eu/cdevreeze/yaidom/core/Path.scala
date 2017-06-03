@@ -353,7 +353,6 @@ object Path {
           val result = scope.prefixNamespaceMap.toList collectFirst {
             case pair if pair._2 == nsUri =>
               val prefix: String = pair._1
-              val ns: String = pair._2
               prefix
           }
           require(result.isDefined)

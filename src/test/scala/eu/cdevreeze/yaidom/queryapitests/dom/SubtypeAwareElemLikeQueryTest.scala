@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.queryapitests.dom
 
 import java.io.File
-import java.{ util => jutil }
 
 import scala.collection.immutable
 
@@ -42,8 +41,6 @@ import SubtypeAwareElemLikeQueryTest.BridgeElemTakingDomElem
  */
 @RunWith(classOf[JUnitRunner])
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.dom")
 
   final type E = BridgeElemTakingDomElem
 

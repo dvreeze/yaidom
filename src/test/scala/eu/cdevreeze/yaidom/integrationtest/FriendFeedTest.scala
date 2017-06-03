@@ -21,7 +21,6 @@ import java.{ util => jutil }
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -146,7 +145,7 @@ class FriendFeedTest extends FunSuite {
             EName("UserList"),
             Map(),
             Vector(
-              Elem(EName("nickname"), Map(), Vector(resolved.Text("misterjt")))))))
+              Elem(EName("nickname"), Map(), Vector(Text("misterjt")))))))
     }
 
     assertResult(expectedGoogleReaderSummaryElm) {

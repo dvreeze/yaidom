@@ -16,9 +16,8 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
@@ -56,13 +55,8 @@ class Blog1Test extends FunSuite {
    */
   test("testIntroductionToYaidomQuerying") {
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
-    import eu.cdevreeze.yaidom.core._
     import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse._
-
-    val ns = "http://bookstore"
 
     // Using a yaidom DocumentParser that used DOM internally
     val docParser = DocumentParserUsingDom.newInstance
@@ -74,9 +68,6 @@ class Blog1Test extends FunSuite {
       docParser.parse(new File(parentDir, "books.xml"))
 
     val docElem = doc.documentElement
-
-    val magazineElems =
-      docElem.filterChildElems(e => e.localName == "Magazine")
 
     val bookElems1 =
       docElem.filterChildElems(e => e.localName == "Book")
@@ -99,12 +90,13 @@ class Blog1Test extends FunSuite {
 
     import HasENameApi._
 
-    val bookElems4 =
-      docElem filterElemsOrSelf withLocalName("Book")
+    // What's the point of not using the following 3 expressions?
 
-    val bookElems5 = docElem \ withLocalName("Book")
+    docElem filterElemsOrSelf withLocalName("Book")
 
-    val bookElems6 = docElem \\ withLocalName("Book")
+    docElem \ withLocalName("Book")
+
+    docElem \\ withLocalName("Book")
   }
 
   /**
@@ -116,7 +108,6 @@ class Blog1Test extends FunSuite {
     import java.io.File
     import javax.xml.parsers._
     import scala.collection.immutable
-    import eu.cdevreeze.yaidom.core._
     import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse._
     import eu.cdevreeze.yaidom.resolved
@@ -133,8 +124,6 @@ class Blog1Test extends FunSuite {
 
     val doc: Document =
       docParser.parse(new File(parentDir, "books.xml"))
-
-    val docElem = doc.documentElement
 
     // End of section that does not need to be copied again
 
@@ -214,13 +203,8 @@ class Blog1Test extends FunSuite {
     // Start of section that does not need to be copied again
 
     import java.io.File
-    import javax.xml.parsers._
-    import scala.collection.immutable
-    import eu.cdevreeze.yaidom.core._
     import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse._
-
-    val ns = "http://bookstore"
 
     // Using a yaidom DocumentParser that used DOM internally
     val docParser = DocumentParserUsingDom.newInstance
@@ -230,8 +214,6 @@ class Blog1Test extends FunSuite {
 
     val doc: Document =
       docParser.parse(new File(parentDir, "books.xml"))
-
-    val docElem = doc.documentElement
 
     // End of section that does not need to be copied again
 

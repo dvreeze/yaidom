@@ -20,15 +20,12 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * XML Base test case. It tests some expectations about XML Base support for different element implementations.

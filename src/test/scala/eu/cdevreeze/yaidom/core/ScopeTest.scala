@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.core
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

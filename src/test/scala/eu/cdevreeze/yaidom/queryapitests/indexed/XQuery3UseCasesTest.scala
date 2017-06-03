@@ -21,7 +21,6 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Elem
-import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.simple
 

@@ -74,7 +74,6 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
 
     val attributes = convertAttributes(elm.attributes)
 
-    val decls = toScope(parentNamespaceBinding).relativize(elm.scope)
     val nsBinding = convertScope(elm.scope, parentNamespaceBinding)
 
     val children: immutable.IndexedSeq[scala.xml.Node] = elm.children.map(ch => convertNode(ch, nsBinding))

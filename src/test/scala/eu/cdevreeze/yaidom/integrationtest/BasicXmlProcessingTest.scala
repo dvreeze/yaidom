@@ -16,14 +16,11 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers._
-import javax.xml.transform.TransformerFactory
+import java.{ io => jio }
 import scala.collection.immutable
 import scala.io.Codec
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder._
@@ -50,8 +47,6 @@ import eu.cdevreeze.yaidom.resolved
 class BasicXmlProcessingTest extends FunSuite {
 
   import BasicXmlProcessingTest._
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   test("testBasicQuerying") {
     // No XML literals for yaidom, but making the structure of the XML explicit, using NodeBuilders

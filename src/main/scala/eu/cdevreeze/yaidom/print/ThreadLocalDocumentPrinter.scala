@@ -39,11 +39,6 @@ final class ThreadLocalDocumentPrinter(val docPrinterCreator: () => DocumentPrin
     protected override def initialValue(): DocumentPrinter = docPrinterCreator()
   }
 
-  private val threadLocalDocPrinterOmittingXmlDeclaration: ThreadLocal[DocumentPrinter] = new ThreadLocal[DocumentPrinter] {
-
-    protected override def initialValue(): DocumentPrinter = docPrinterCreator().omittingXmlDeclaration
-  }
-
   /**
    * Returns the DocumentPrinter instance attached to the current thread.
    */

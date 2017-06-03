@@ -16,9 +16,8 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
@@ -46,9 +45,6 @@ class Blog2Test extends FunSuite {
    * The code of the entire article.
    */
   test("testFindNamesInFeed1") {
-    import java.net.URI
-    import javax.xml.parsers._
-    import scala.collection.immutable
     import eu.cdevreeze.yaidom.core._
     import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse
@@ -203,8 +199,6 @@ class Blog2Test extends FunSuite {
       docParser.parse(new java.io.File(pathToParentDir, "feed2.txt"))
 
     val feed2DocElem = feed2Doc.documentElement
-
-    val div2Elem = feed2DocElem.findElem(withEName(xhtmlNs, "div")).get
 
     val feed2ElemDecls = Declarations.from("" -> atomNs)
     val rights2ElemDecls = Declarations.from("example" -> examplesNs)

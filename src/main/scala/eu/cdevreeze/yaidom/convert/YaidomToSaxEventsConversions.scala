@@ -16,13 +16,12 @@
 
 package eu.cdevreeze.yaidom.convert
 
-import scala.collection.JavaConverters.bufferAsJavaListConverter
-
 import org.xml.sax.Attributes
 import org.xml.sax.ContentHandler
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.AttributesImpl
 
+import YaidomToSaxEventsConversions.SaxEventsProducer
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Comment
@@ -34,7 +33,6 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.ProcessingInstruction
 import eu.cdevreeze.yaidom.simple.Text
-import YaidomToSaxEventsConversions.SaxEventsProducer
 
 /**
  * Converter from yaidom nodes to SAX event producers, in particular from [[eu.cdevreeze.yaidom.simple.Elem]] to `SaxEventsProducer`,

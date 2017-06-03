@@ -18,10 +18,7 @@ package eu.cdevreeze.yaidom.indexed
 
 import java.net.URI
 
-import scala.reflect.classTag
-
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple
 
 /**

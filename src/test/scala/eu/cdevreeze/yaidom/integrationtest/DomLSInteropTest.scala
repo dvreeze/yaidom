@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.{ io => jio }
 import java.{ util => jutil }
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

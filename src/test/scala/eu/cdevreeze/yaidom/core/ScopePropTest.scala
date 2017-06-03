@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.core
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
@@ -36,8 +35,6 @@ import org.scalatest.prop.Checkers
  */
 @RunWith(classOf[JUnitRunner])
 class ScopePropTest extends FunSuite with Checkers {
-
-  import Arbitrary.arbitrary
 
   test("testResolveProperty") {
     check({ (scope1: Scope, scope2: Scope) =>

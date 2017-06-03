@@ -23,9 +23,7 @@ import java.{ util => jutil }
 import scala.collection.JavaConverters._
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.xml.sax.EntityResolver
@@ -664,8 +662,6 @@ class JDomWrapperTest extends FunSuite {
     val doc = domBuilder.build(d)
     val domDoc: JDomDocument = JDomNode.wrapDocument(doc)
 
-    val root: JDomElem = domDoc.documentElement
-
     assertResult("records") {
       domDoc.documentElement.localName
     }
@@ -826,7 +822,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with BackingElemApi with ScopedElemLike with HasParent {
+      override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with BackingElemApi with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 

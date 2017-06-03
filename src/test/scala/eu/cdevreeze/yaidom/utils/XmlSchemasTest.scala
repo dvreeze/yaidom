@@ -20,7 +20,6 @@ import java.{ util => jutil }
 
 import scala.reflect.classTag
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -116,7 +115,6 @@ class XmlSchemasTest extends FunSuite {
     // Global attribute declarations
 
     val globalAttrDecls = schemaRoot.findAllGlobalAttributeDeclarations
-    val globalAttrDeclENames = globalAttrDecls.map(_.targetEName).toSet
 
     assertResult(Set[EName]()) {
       globalAttrDecls.map(_.targetEName).toSet
@@ -142,7 +140,6 @@ class XmlSchemasTest extends FunSuite {
     // Local element declarations
 
     val localElemDecls = schemaRoot.findAllLocalElementDeclarations
-    val localElemDeclENames = localElemDecls.map(_.targetEName).toSet
 
     assertResult(true) {
       localElemDecls exists { e =>
@@ -174,7 +171,6 @@ class XmlSchemasTest extends FunSuite {
     // Element references
 
     val elemRefs = schemaRoot.findAllElemsOfType(classTag[ElementReference])
-    val elemRefENames = elemRefs.map(_.ref).toSet
 
     assertResult(true) {
       elemRefs.filter(e => e.ref == QName("xs:annotation").res).size >= 10

@@ -16,12 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -45,8 +42,6 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 class ValidationTest extends FunSuite {
 
   import ValidationTest._
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   // Specific validators for this "schema", putting the DSL into action. In other words, the functions below ARE the "schema".
 

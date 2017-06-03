@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite

@@ -21,7 +21,6 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.resolved
 

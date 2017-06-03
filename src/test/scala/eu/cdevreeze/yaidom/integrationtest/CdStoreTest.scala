@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
@@ -42,8 +39,6 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
  */
 @RunWith(classOf[JUnitRunner])
 class CdStoreTest extends FunSuite with BeforeAndAfterAll {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   test("testQueryArtistElems") {
     val parser = DocumentParserUsingSax.newInstance

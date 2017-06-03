@@ -16,13 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.TransformerFactory
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -31,7 +27,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.core.QName
@@ -49,8 +44,6 @@ import eu.cdevreeze.yaidom.core.QName
 class AirportExampleTest extends FunSuite {
 
   import AirportExampleTest._
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val nsWebServiceX = "http://www.webserviceX.NET"
 
@@ -337,22 +330,6 @@ class AirportExampleTest extends FunSuite {
       }
 
     val airportSummaryRoot = Elem(qname = QName("Airports"), scope = scope, children = airportSummaryElms.toIndexedSeq)
-
-    val domPrinter = {
-      val dbf = DocumentBuilderFactory.newInstance
-      val tf = TransformerFactory.newInstance
-
-      try {
-        tf.getAttribute("indent-number") // Throws an exception if "indent-number" is not supported
-        tf.setAttribute("indent-number", java.lang.Integer.valueOf(2))
-      } catch {
-        case e: Exception => () // Ignore
-      }
-
-      DocumentPrinterUsingDom.newInstance(dbf, tf)
-    }
-
-    val summaryXmlString = domPrinter.print(Document(airportSummaryRoot))
 
     val distanceFrankfurtBrussels: Double = {
       val airportElms =

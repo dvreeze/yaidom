@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.utils
 
-import java.{ util => jutil }
-
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -44,8 +41,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  */
 @RunWith(classOf[JUnitRunner])
 class NamespaceUtilsTest extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.utils")
 
   private val docParser = DocumentParserUsingSax.newInstance
 

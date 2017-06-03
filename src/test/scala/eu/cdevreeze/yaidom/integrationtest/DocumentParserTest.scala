@@ -21,7 +21,6 @@ import java.nio.charset.Charset
 
 import scala.io.Codec
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -35,7 +34,6 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlDocument
 import eu.cdevreeze.yaidom.simple.DocBuilder
-import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**

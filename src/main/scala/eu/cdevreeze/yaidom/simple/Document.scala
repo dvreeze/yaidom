@@ -29,7 +29,6 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
  * `Document`. Although at first sight the document root element seems to be the root node, this is not entirely true.
@@ -54,9 +53,9 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
  */
 @SerialVersionUID(1L)
 final class Document(
-  val uriOption: Option[URI],
-  val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi with Immutable with Serializable {
+    val uriOption: Option[URI],
+    val xmlDeclarationOption: Option[XmlDeclaration],
+    val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi with Immutable with Serializable {
 
   require(uriOption ne null)
   require(xmlDeclarationOption ne null)

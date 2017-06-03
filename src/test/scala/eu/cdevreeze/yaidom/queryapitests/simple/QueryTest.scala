@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.queryapitests.simple
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -470,8 +469,6 @@ class QueryTest extends AbstractElemLikeQueryTest {
     // Transforms the XML tree, giving a namespace to Author elements
 
     require(bookstore.localName == "Bookstore")
-
-    import NodeBuilder._
 
     val updatedBookstoreElm: Elem =
       bookstore transformElemsOrSelf {

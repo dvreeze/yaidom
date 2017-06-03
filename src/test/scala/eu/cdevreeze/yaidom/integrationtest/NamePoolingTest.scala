@@ -16,11 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Ignore
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
@@ -46,8 +42,6 @@ class NamePoolingTest extends FunSuite {
 
   import NamePoolingTest._
   import HasENameApi._
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   // TODO Fix!
   ignore("testNamePooling") {

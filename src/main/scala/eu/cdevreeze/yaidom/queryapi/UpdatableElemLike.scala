@@ -236,14 +236,13 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
     // Code repetition, but clear
     val mutableEditsByPaths = mutable.Map[Path, ThisElem]()
 
-    val foundElems =
-      ElemWithPath(thisElem) findTopmostElemsOrSelf { elm =>
-        val optResult = f(elm.elem, elm.path)
-        if (optResult.isDefined) {
-          mutableEditsByPaths += (elm.path -> optResult.get)
-        }
-        optResult.isDefined
+    ElemWithPath(thisElem) findTopmostElemsOrSelf { elm =>
+      val optResult = f(elm.elem, elm.path)
+      if (optResult.isDefined) {
+        mutableEditsByPaths += (elm.path -> optResult.get)
       }
+      optResult.isDefined
+    }
 
     val editsByPaths = mutableEditsByPaths.toMap
 
@@ -256,14 +255,13 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
     // Code repetition, but clear
     val mutableEditsByPaths = mutable.Map[Path, ThisElem]()
 
-    val foundElems =
-      ElemWithPath(thisElem) findTopmostElems { elm =>
-        val optResult = f(elm.elem, elm.path)
-        if (optResult.isDefined) {
-          mutableEditsByPaths += (elm.path -> optResult.get)
-        }
-        optResult.isDefined
+    ElemWithPath(thisElem) findTopmostElems { elm =>
+      val optResult = f(elm.elem, elm.path)
+      if (optResult.isDefined) {
+        mutableEditsByPaths += (elm.path -> optResult.get)
       }
+      optResult.isDefined
+    }
 
     val editsByPaths = mutableEditsByPaths.toMap
 
@@ -276,14 +274,13 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
     // Code repetition, but clear
     val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[ThisNode]]()
 
-    val foundElems =
-      ElemWithPath(thisElem) findTopmostElemsOrSelf { elm =>
-        val optResult = f(elm.elem, elm.path)
-        if (optResult.isDefined) {
-          mutableEditsByPaths += (elm.path -> optResult.get)
-        }
-        optResult.isDefined
+    ElemWithPath(thisElem) findTopmostElemsOrSelf { elm =>
+      val optResult = f(elm.elem, elm.path)
+      if (optResult.isDefined) {
+        mutableEditsByPaths += (elm.path -> optResult.get)
       }
+      optResult.isDefined
+    }
 
     val editsByPaths = mutableEditsByPaths.toMap
 
@@ -296,14 +293,13 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
     // Code repetition, but clear
     val mutableEditsByPaths = mutable.Map[Path, immutable.IndexedSeq[ThisNode]]()
 
-    val foundElems =
-      ElemWithPath(thisElem) findTopmostElems { elm =>
-        val optResult = f(elm.elem, elm.path)
-        if (optResult.isDefined) {
-          mutableEditsByPaths += (elm.path -> optResult.get)
-        }
-        optResult.isDefined
+    ElemWithPath(thisElem) findTopmostElems { elm =>
+      val optResult = f(elm.elem, elm.path)
+      if (optResult.isDefined) {
+        mutableEditsByPaths += (elm.path -> optResult.get)
       }
+      optResult.isDefined
+    }
 
     val editsByPaths = mutableEditsByPaths.toMap
 

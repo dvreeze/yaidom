@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.queryapitests.resolved
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -32,7 +31,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved.Elem
-import eu.cdevreeze.yaidom.resolved.Node
 import eu.cdevreeze.yaidom.resolved.Text
 
 /**

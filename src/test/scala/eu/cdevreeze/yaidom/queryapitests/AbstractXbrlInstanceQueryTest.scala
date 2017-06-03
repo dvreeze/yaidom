@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
@@ -27,7 +26,6 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * ElemLike-based query test case, using an XBRL instance as sample data.
@@ -42,7 +40,6 @@ abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
   private val LinkNs = "http://www.xbrl.org/2003/linkbase"
-  private val XLinkNs = "http://www.w3.org/1999/xlink"
 
   test("testSimpleQueries") {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
@@ -54,8 +51,7 @@ abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
         e.resolvedName == EName(XbrliNs, "context")
       }
 
-    val units =
-      xbrlInstance.filterChildElems(withEName(XbrliNs, "unit"))
+    xbrlInstance.filterChildElems(withEName(XbrliNs, "unit"))
 
     val optNamespaces = Set(Option(XbrliNs), Option(LinkNs))
     val topLevelFacts =
@@ -146,7 +142,6 @@ abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
   test("testBulkNavigation") {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
-    val uriResolver = XmlBaseSupport.JdkUriResolver
     val indexedElemBuilder = IndexedClarkElem
 
     val indexedInstance = indexedElemBuilder(xbrlInstance)

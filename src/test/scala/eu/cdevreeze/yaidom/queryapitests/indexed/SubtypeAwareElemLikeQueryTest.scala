@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import java.{ util => jutil }
-
 import scala.collection.immutable
 
 import org.junit.runner.RunWith
@@ -39,8 +37,6 @@ import SubtypeAwareElemLikeQueryTest.BridgeElemTakingIndexedElem
  */
 @RunWith(classOf[JUnitRunner])
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.indexed")
 
   final type E = BridgeElemTakingIndexedElem
 

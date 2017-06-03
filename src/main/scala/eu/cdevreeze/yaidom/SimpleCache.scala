@@ -32,7 +32,7 @@ import scala.collection.mutable
  */
 private[yaidom] abstract class SimpleCache[K, V] {
 
-  private var cache = mutable.Map[K, V]()
+  private val cache = mutable.Map[K, V]()
 
   protected def convertKeyToValue(key: K): V
 

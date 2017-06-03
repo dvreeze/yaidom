@@ -17,7 +17,6 @@ package eu.cdevreeze.yaidom.meta
 
 import java.io.File
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

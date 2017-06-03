@@ -2,7 +2,6 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import java.io.File
 
-import org.junit.Test
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -21,45 +20,14 @@ abstract class AbstractBackingElemTest extends FunSuite {
   private val XbrliNamespace = "http://www.xbrl.org/2003/instance"
 
   private val XbrliItemEName = EName(XbrliNamespace, "item")
-  private val XbrliTupleEName = EName(XbrliNamespace, "tuple")
 
   private val XsSchemaEName = EName(XsNamespace, "schema")
   private val XsElementEName = EName(XsNamespace, "element")
-  private val XsAttributeEName = EName(XsNamespace, "attribute")
-  private val XsComplexTypeEName = EName(XsNamespace, "complexType")
-  private val XsSimpleTypeEName = EName(XsNamespace, "simpleType")
   private val XsAnnotationEName = EName(XsNamespace, "annotation")
-  private val XsComplexContentEName = EName(XsNamespace, "complexContent")
-  private val XsSimpleContentEName = EName(XsNamespace, "simpleContent")
-  private val XsGroupEName = EName(XsNamespace, "group")
-  private val XsAllEName = EName(XsNamespace, "all")
-  private val XsChoiceEName = EName(XsNamespace, "choice")
-  private val XsSequenceEName = EName(XsNamespace, "sequence")
-  private val XsAttributeGroupEName = EName(XsNamespace, "attributeGroup")
-  private val XsAnyAttributeEName = EName(XsNamespace, "anyAttribute")
-  private val XsUniqueEName = EName(XsNamespace, "unique")
-  private val XsKeyEName = EName(XsNamespace, "key")
-  private val XsKeyrefEName = EName(XsNamespace, "keyref")
-  private val XsNotationEName = EName(XsNamespace, "notation")
   private val XsImportEName = EName(XsNamespace, "import")
-  private val XsIncludeEName = EName(XsNamespace, "include")
-  private val XsRedefineEName = EName(XsNamespace, "redefine")
-  private val XsRestrictionEName = EName(XsNamespace, "restriction")
-  private val XsExtensionEName = EName(XsNamespace, "extension")
-  private val XsListEName = EName(XsNamespace, "list")
-  private val XsUnionEName = EName(XsNamespace, "union")
   private val XsAppinfoEName = EName(XsNamespace, "appinfo")
-  private val XsDocumentationEName = EName(XsNamespace, "documentation")
-  private val XsSelectorEName = EName(XsNamespace, "selector")
-  private val XsFieldEName = EName(XsNamespace, "field")
-  private val XsAnyEName = EName(XsNamespace, "any")
 
-  private val LinkLinkbaseEName = EName(LinkNamespace, "linkbase")
-
-  private val LinkSchemaRefEName = EName(LinkNamespace, "schemaRef")
   private val LinkLinkbaseRefEName = EName(LinkNamespace, "linkbaseRef")
-  private val LinkRoleRefEName = EName(LinkNamespace, "roleRef")
-  private val LinkArcroleRefEName = EName(LinkNamespace, "arcroleRef")
 
   private val SubstitutionGroupEName = EName("substitutionGroup")
   private val TargetNamespaceEName = EName("targetNamespace")

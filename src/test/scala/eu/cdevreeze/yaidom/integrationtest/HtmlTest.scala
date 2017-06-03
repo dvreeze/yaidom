@@ -17,10 +17,8 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil, io => jio }
-import scala.collection.immutable
-import org.junit.{ Test, Before }
 import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll, Ignore }
+import org.scalatest.{ FunSuite, BeforeAndAfterAll }
 import org.scalatest.junit.JUnitRunner
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
 import eu.cdevreeze.yaidom.queryapi.HasENameApi._

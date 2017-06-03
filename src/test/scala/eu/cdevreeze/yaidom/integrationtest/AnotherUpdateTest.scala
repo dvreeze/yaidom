@@ -16,12 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -44,8 +41,6 @@ import eu.cdevreeze.yaidom.resolved
  */
 @RunWith(classOf[JUnitRunner])
 class AnotherUpdateTest extends FunSuite {
-
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
   private val docParser = DocumentParserUsingDom.newInstance()
 

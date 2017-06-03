@@ -20,7 +20,6 @@ import java.{ util => jutil }
 
 import scala.Vector
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -47,8 +46,6 @@ class NameProvidersTest extends FunSuite {
   test("testNameCaching") {
     val scope = Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")
     import scope._
-
-    import XmlSchemas._
 
     val dbf = DocumentBuilderFactory.newInstance
 

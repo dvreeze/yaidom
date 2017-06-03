@@ -18,10 +18,8 @@ package eu.cdevreeze.yaidom.utils
 
 import scala.collection.immutable
 
-import XmlSchemas.SchemaRoot
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 
 /**

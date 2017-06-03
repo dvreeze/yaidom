@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.queryapitests.scalaxml
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 

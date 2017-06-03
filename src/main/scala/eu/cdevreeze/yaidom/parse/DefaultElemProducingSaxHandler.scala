@@ -201,7 +201,6 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   final def resultingDocument: Document = {
-    val docElem = resultingElem
     new Document(None, xmlDeclarationOption, docChildren.map(n => n.toNode))
   }
 
@@ -297,11 +296,11 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   }
 
   private[parse] final class InternalElemNode(
-    var parentOption: Option[InternalElemNode],
-    val qname: QName,
-    val attributes: immutable.IndexedSeq[(QName, String)],
-    val scope: Scope,
-    var children: mutable.IndexedSeq[InternalNode]) extends CanBeInternalDocumentChild {
+      var parentOption: Option[InternalElemNode],
+      val qname: QName,
+      val attributes: immutable.IndexedSeq[(QName, String)],
+      val scope: Scope,
+      var children: mutable.IndexedSeq[InternalNode]) extends CanBeInternalDocumentChild {
 
     type NodeType = Elem
 

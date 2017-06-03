@@ -20,7 +20,6 @@ import scala.collection.immutable
 
 import org.w3c.dom.Element
 
-import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple

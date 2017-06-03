@@ -19,8 +19,6 @@ package eu.cdevreeze.yaidom.java8.queryapi
 import java.util.Optional
 import java.util.stream.Stream
 
-import scala.annotation.elidable
-import scala.annotation.elidable.ASSERTION
 import scala.collection.mutable
 import scala.compat.java8.FunctionConverters.asJavaFunction
 import scala.compat.java8.FunctionConverters.asJavaPredicate

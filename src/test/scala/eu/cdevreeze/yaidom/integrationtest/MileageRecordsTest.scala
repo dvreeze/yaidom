@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
 import scala.collection.immutable
 import scala.math.BigDecimal
 import scala.math.BigDecimal.double2bigDecimal
@@ -27,7 +25,6 @@ import scala.math.floor
 
 import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -38,7 +35,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
@@ -50,11 +46,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
 class MileageRecordsTest extends FunSuite {
   import MileageRecordsTest.MileageRecords
 
-  private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
-
   test("testReferentialIntegrity") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
@@ -94,8 +86,6 @@ class MileageRecordsTest extends FunSuite {
   }
 
   test("testSucceedingTrips") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
@@ -128,8 +118,6 @@ class MileageRecordsTest extends FunSuite {
   }
 
   test("testTripLengths") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
@@ -159,8 +147,6 @@ class MileageRecordsTest extends FunSuite {
   }
 
   test("testTotalPrivateKms") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
@@ -181,8 +167,6 @@ class MileageRecordsTest extends FunSuite {
   }
 
   test("testConvertToCsv") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {
@@ -225,10 +209,8 @@ class MileageRecordsTest extends FunSuite {
   }
 
   test("testUpdateKms") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
-    val docPrinter = DocumentPrinterUsingDom.newInstance
+    // val docPrinter = DocumentPrinterUsingDom.newInstance
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -267,8 +249,6 @@ class MileageRecordsTest extends FunSuite {
   }
 
   test("testNoWorkTripsInWeekends") {
-    import HasENameApi._
-
     val docParser = DocumentParserUsingSax.newInstance
 
     val doc: Document = {

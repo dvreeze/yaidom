@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import scala.collection.immutable
 
-import org.junit.Test
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
@@ -47,7 +45,6 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
         book <- bookstore.findElem(_.path == bookPath)
         if book.getChildElem(withLocalName("Title")).underlyingElem.text.startsWith("A First Course in Database Systems")
       } yield author
-    val elems = bookstore.findAllElemsOrSelf
 
     assertResult(List("Ullman", "Widom")) {
       theBookAuthors.map(_.getChildElem(withLocalName("Last_Name")).text)

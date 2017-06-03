@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ util => jutil }
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -36,7 +35,6 @@ import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.dom.NodeOverNodeInfo
 import net.sf.saxon.lib.ParseOptions
-import net.sf.saxon.s9api.Processor
 
 /**
  * Saxon DOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around Saxon DOMNodeWrapper Elements.
@@ -485,8 +483,6 @@ class SaxonDomWrapperTest extends FunSuite with SaxonTestSupport {
     val parseOptions = new ParseOptions
     val domDoc: DomDocument =
       DomNode.wrapDocument(processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
-
-    val root: DomElem = domDoc.documentElement
 
     assertResult("records") {
       domDoc.documentElement.localName

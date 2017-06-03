@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import scala.Vector
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -26,7 +25,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
@@ -42,8 +40,6 @@ import eu.cdevreeze.yaidom.simple.Node
 class SimulateXsltTest extends FunSuite {
 
   import Node._
-
-  private val docParser = DocumentParserUsingDom.newInstance()
 
   test("testTransformHelloElem") {
     // Here we use updateTopmostXXX twice, once for the child elements and once for the root element

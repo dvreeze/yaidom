@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.resolved
 
 import java.net.URI
 
-import scala.reflect.classTag
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
