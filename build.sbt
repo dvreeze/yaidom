@@ -43,10 +43,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % "test"
 
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.5" % "test"
 
-libraryDependencies <++= scalaBinaryVersion apply { version =>
-  if (version.contains("2.11")) Seq("org.scalameta" % "scalameta_2.11" % "1.8.0" % "test")
-  else Seq()
-}
+libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % "test"
 
 libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
 
