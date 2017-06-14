@@ -19,8 +19,7 @@ package eu.cdevreeze.yaidom.utils
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.ENameProvider
-import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 
 /**
  * Utility for creating ENameProviders by parsing XML schema files.
@@ -37,10 +36,10 @@ object ENameProviderUtils {
    * It is possible to use the returned ENameProvider only for its set of ENames, which can be saved to file, and used later
    * to directly create an ENameProvider.ENameProviderUsingImmutableCache from it.
    */
-  def newENameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): ENameProvider.ENameProviderUsingImmutableCache = {
+  def newENameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[BackingElemApi]): ENameProvider.ENameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem(e)))
+    val schemaRoots = schemaElems.map(e => SchemaRoot(e))
 
     val globalElemDeclENames = schemaRoots.flatMap(e => e.findAllGlobalElementDeclarations.map(_.targetEName)).toSet
 

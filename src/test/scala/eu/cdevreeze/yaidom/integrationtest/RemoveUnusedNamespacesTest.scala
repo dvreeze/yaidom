@@ -27,6 +27,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
@@ -167,9 +168,9 @@ class RemoveUnusedNamespacesTest extends FunSuite {
 
     val enameExtractor = new DocumentENameExtractor {
 
-      def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor] = None
+      def findAttributeValueENameExtractor(elem: BackingElemApi, attributeEName: EName): Option[TextENameExtractor] = None
 
-      def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor] = {
+      def findElemTextENameExtractor(elem: BackingElemApi): Option[TextENameExtractor] = {
         if (elem.resolvedName == EName("http://www.test.org", "faultcode")) Some(SimpleTextENameExtractor)
         else None
       }

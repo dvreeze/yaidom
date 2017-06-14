@@ -31,6 +31,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 
@@ -229,12 +230,12 @@ class NamespaceUtilsTest extends FunSuite {
 
   final class XbrliDocumentENameExtractor extends DocumentENameExtractor {
 
-    def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor] = {
+    def findElemTextENameExtractor(elem: BackingElemApi): Option[TextENameExtractor] = {
       if (elem.rootElem.resolvedName == EName(XbrliNs, "xbrl") && elem.resolvedName == EName(XbrliNs, "measure")) {
         Some(xbrliMeasureENameExtractor)
       } else None
     }
 
-    def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor] = None
+    def findAttributeValueENameExtractor(elem: BackingElemApi, attributeEName: EName): Option[TextENameExtractor] = None
   }
 }

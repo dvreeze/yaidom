@@ -31,6 +31,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 import eu.cdevreeze.yaidom.resolved
@@ -60,7 +61,7 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
 
     new DocumentENameExtractor {
 
-      def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor] = elem.resolvedName match {
+      def findElemTextENameExtractor(elem: BackingElemApi): Option[TextENameExtractor] = elem.resolvedName match {
         case EName(Some(xbrliNs), "measure") if elem.path.containsName(EName(xbrliNs, "unit")) =>
           Some(SimpleTextENameExtractor)
         case EName(Some(xbrldiNs), "explicitMember") =>
@@ -68,7 +69,7 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
         case _ => None
       }
 
-      def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor] = elem.resolvedName match {
+      def findAttributeValueENameExtractor(elem: BackingElemApi, attributeEName: EName): Option[TextENameExtractor] = elem.resolvedName match {
         case EName(Some(xbrldiNs), "explicitMember") if attributeEName == EName("dimension") =>
           Some(SimpleTextENameExtractor)
         case _ => None

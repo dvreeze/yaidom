@@ -20,8 +20,7 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
-import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 
 /**
  * Utility for creating QNameProviders by parsing XML schema files.
@@ -38,10 +37,10 @@ object QNameProviderUtils {
    * It is possible to use the returned QNameProvider only for its set of QNames, which can be saved to file, and used later
    * to directly create an QNameProvider.QNameProviderUsingImmutableCache from it.
    */
-  def newQNameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[Elem]): QNameProvider.QNameProviderUsingImmutableCache = {
+  def newQNameProviderUsingSchemas(schemaElems: immutable.IndexedSeq[BackingElemApi]): QNameProvider.QNameProviderUsingImmutableCache = {
     import XmlSchemas._
 
-    val schemaRoots = schemaElems.map(e => SchemaRoot(indexed.Elem(e)))
+    val schemaRoots = schemaElems.map(e => SchemaRoot(e))
 
     require(
       schemaRoots forall (e => e.targetNamespacePrefixOption.isDefined),

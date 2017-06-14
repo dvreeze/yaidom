@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.utils
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 
 /**
  * Strategy trait for finding TextENameExtractors in a document. Hence implementations of this trait
@@ -30,22 +30,22 @@ trait DocumentENameExtractor {
   /**
    * Finds the optional `TextENameExtractor` for the element text content in the given element.
    *
-   * The root element of the given indexed element must be the root element of the document.
+   * The root element of the given `BackingElemApi` element must be the root element of the document.
    *
    * If there is a corresponding XML Schema, and it specifies that this element text is of type xs:QName,
    * then this optional TextENameExtractor should be `SimpleTextENameExtractor`.
    */
-  def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor]
+  def findElemTextENameExtractor(elem: BackingElemApi): Option[TextENameExtractor]
 
   /**
    * Finds the optional `TextENameExtractor` for the attribute with the given name in the given element.
    *
-   * The root element of the given indexed element must be the root element of the document.
+   * The root element of the given `BackingElemApi` element must be the root element of the document.
    *
    * If there is a corresponding XML Schema, and it specifies that this attribute value is of type xs:QName,
    * then this optional TextENameExtractor should be `SimpleTextENameExtractor`.
    */
-  def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor]
+  def findAttributeValueENameExtractor(elem: BackingElemApi, attributeEName: EName): Option[TextENameExtractor]
 }
 
 object DocumentENameExtractor {
@@ -55,8 +55,8 @@ object DocumentENameExtractor {
    */
   val NoOp = new DocumentENameExtractor {
 
-    def findElemTextENameExtractor(elem: indexed.Elem): Option[TextENameExtractor] = None
+    def findElemTextENameExtractor(elem: BackingElemApi): Option[TextENameExtractor] = None
 
-    def findAttributeValueENameExtractor(elem: indexed.Elem, attributeEName: EName): Option[TextENameExtractor] = None
+    def findAttributeValueENameExtractor(elem: BackingElemApi, attributeEName: EName): Option[TextENameExtractor] = None
   }
 }

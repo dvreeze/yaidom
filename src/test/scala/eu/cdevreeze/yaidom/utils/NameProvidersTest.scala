@@ -28,6 +28,7 @@ import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import javax.xml.parsers.DocumentBuilder
@@ -74,9 +75,9 @@ class NameProvidersTest extends FunSuite {
 
     val root: Elem = domParser.parse(is).documentElement
 
-    val enameProvider = ENameProviderUtils.newENameProviderUsingSchemas(Vector(root))
+    val enameProvider = ENameProviderUtils.newENameProviderUsingSchemas(Vector(indexed.Elem(root)))
 
-    val qnameProvider = QNameProviderUtils.newQNameProviderUsingSchemas(Vector(root))
+    val qnameProvider = QNameProviderUtils.newQNameProviderUsingSchemas(Vector(indexed.Elem(root)))
 
     val xsElementQName = QName("xs:element")
     val xsElementEName = xsElementQName.res

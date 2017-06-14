@@ -20,6 +20,8 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
 /**
  * Utility for manipulating and finding namespaces.
@@ -27,6 +29,8 @@ import eu.cdevreeze.yaidom.indexed
  * @author Chris de Vreeze
  */
 object NamespaceUtils {
+
+  // TODO No dependency on simple.Elem
 
   /**
    * Pushes up prefixed namespace declarations as far to the root element as possible.
@@ -55,7 +59,7 @@ object NamespaceUtils {
    * elements higher in the tree take precedence, and conflicting Scopes in sibling elements are combined by choosing
    * one of the namespaces for the prefix in question.
    */
-  def findCombinedScopeWithoutDefaultNamespace(elem: Elem): Scope = {
+  def findCombinedScopeWithoutDefaultNamespace(elem: ScopedElemApi): Scope = {
     // Recursive calls
     val combinedChildScope =
       elem.findAllChildElems.foldLeft(Scope.Empty) {
@@ -65,6 +69,8 @@ object NamespaceUtils {
     assert(combinedChildScope.defaultNamespaceOption.isEmpty)
     combinedChildScope ++ elem.scope.withoutDefaultNamespace
   }
+
+  // TODO No dependency on indexed.Elem and simple.Elem
 
   /**
    * Returns an adapted copy (as simple Elem) where all unused namespaces have been removed from the Scopes (of the
@@ -91,7 +97,7 @@ object NamespaceUtils {
    *
    * The root element of the given indexed element must be the root element of the document.
    */
-  def findAllENames(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
+  def findAllENames(elem: BackingElemApi, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
     val enames =
       elem.findAllElemsOrSelf.flatMap(e => findENamesInElementItself(e, documentENameExtractor)).toSet
     enames
@@ -103,7 +109,7 @@ object NamespaceUtils {
    *
    * The root element of the given indexed element must be the root element of the document.
    */
-  def findAllNamespaces(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[String] = {
+  def findAllNamespaces(elem: BackingElemApi, documentENameExtractor: DocumentENameExtractor): Set[String] = {
     findAllENames(elem, documentENameExtractor).flatMap(_.namespaceUriOption)
   }
 
@@ -114,7 +120,7 @@ object NamespaceUtils {
    *
    * The root element of the given indexed element must be the root element of the document.
    */
-  def findENamesInElementItself(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
+  def findENamesInElementItself(elem: BackingElemApi, documentENameExtractor: DocumentENameExtractor): Set[EName] = {
     val scope = elem.scope
 
     val enamesInElemText: Set[EName] =
@@ -135,7 +141,7 @@ object NamespaceUtils {
    *
    * The root element of the given indexed element must be the root element of the document.
    */
-  def findNamespacesInElementItself(elem: indexed.Elem, documentENameExtractor: DocumentENameExtractor): Set[String] = {
+  def findNamespacesInElementItself(elem: BackingElemApi, documentENameExtractor: DocumentENameExtractor): Set[String] = {
     findENamesInElementItself(elem, documentENameExtractor).flatMap(_.namespaceUriOption)
   }
 }

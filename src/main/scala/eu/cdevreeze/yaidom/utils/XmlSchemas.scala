@@ -22,7 +22,7 @@ import scala.reflect.classTag
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 
@@ -38,7 +38,7 @@ private[utils] object XmlSchemas {
   /**
    * Any element in an xs:schema (including xs:schema itself).
    */
-  sealed class XsdElem private[utils] (val elem: indexed.Elem) extends SubtypeAwareElemLike with ClarkElemLike {
+  sealed class XsdElem private[utils] (val elem: BackingElemApi) extends SubtypeAwareElemLike with ClarkElemLike {
 
     type ThisElem = XsdElem
 
@@ -58,7 +58,7 @@ private[utils] object XmlSchemas {
   /**
    * The xs:schema element
    */
-  final class SchemaRoot private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class SchemaRoot private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -107,7 +107,7 @@ private[utils] object XmlSchemas {
   /**
    * A top-level xs:element
    */
-  final class GlobalElementDeclaration private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class GlobalElementDeclaration private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -115,7 +115,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size == 1, s"Expected top-level element declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name in ${elem.resolvedName}"))
 
     def targetEName: EName = {
       val tnsOption = (elem.rootElem \@ QName("targetNamespace").res)
@@ -134,7 +134,7 @@ private[utils] object XmlSchemas {
   /**
    * A local xs:element
    */
-  final class LocalElementDeclaration private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class LocalElementDeclaration private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -142,7 +142,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size > 1, s"Expected local element declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name in ${elem.resolvedName}"))
 
     def targetEName: EName = {
       val elementFormDefaultOption = (elem.rootElem \@ QName("elementFormDefault").res).map(s => s == "qualified")
@@ -161,7 +161,7 @@ private[utils] object XmlSchemas {
   /**
    * An xs:element referring to a global element declaration
    */
-  final class ElementReference private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class ElementReference private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -176,7 +176,7 @@ private[utils] object XmlSchemas {
   /**
    * A top-level xs:attribute
    */
-  final class GlobalAttributeDeclaration private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class GlobalAttributeDeclaration private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -184,7 +184,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size == 1, s"Expected top-level attribute declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name in ${elem.resolvedName}"))
 
     def targetEName: EName = {
       val tnsOption = (elem.rootElem \@ QName("targetNamespace").res)
@@ -199,7 +199,7 @@ private[utils] object XmlSchemas {
   /**
    * A local xs:attribute
    */
-  final class LocalAttributeDeclaration private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class LocalAttributeDeclaration private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -207,7 +207,7 @@ private[utils] object XmlSchemas {
     require(elem.path.entries.size > 1, s"Expected local attribute declaration, but found path ${elem.path}")
 
     def name: String =
-      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name, but found ${elem.underlyingElem}"))
+      (this \@ QName("name").res).getOrElse(sys.error(s"Expected @name in ${elem.resolvedName}"))
 
     def targetEName: EName = {
       val attributeFormDefaultOption = (elem.rootElem \@ QName("attributeFormDefault").res).map(s => s == "qualified")
@@ -226,7 +226,7 @@ private[utils] object XmlSchemas {
   /**
    * An xs:attribute referring to a global attribute declaration
    */
-  final class AttributeReference private[utils] (elem: indexed.Elem) extends XsdElem(elem) {
+  final class AttributeReference private[utils] (elem: BackingElemApi) extends XsdElem(elem) {
     import scope._
 
     require(elem.rootElem.resolvedName == QName("xs", "schema").res, s"Expected root element xs:schema, but found ${elem.rootElem.resolvedName}")
@@ -240,12 +240,12 @@ private[utils] object XmlSchemas {
 
   trait XsdElemFactory[B <: XsdElem] {
 
-    def tryToCreate(elem: indexed.Elem): Option[B]
+    def tryToCreate(elem: BackingElemApi): Option[B]
   }
 
   object XsdElem {
 
-    def apply(elem: indexed.Elem): XsdElem = {
+    def apply(elem: BackingElemApi): XsdElem = {
       SchemaRoot.tryToCreate(elem).
         orElse(GlobalElementDeclaration.tryToCreate(elem)).
         orElse(LocalElementDeclaration.tryToCreate(elem)).
@@ -259,9 +259,9 @@ private[utils] object XmlSchemas {
 
   object SchemaRoot extends XsdElemFactory[SchemaRoot] {
 
-    def apply(elem: indexed.Elem): SchemaRoot = new SchemaRoot(elem)
+    def apply(elem: BackingElemApi): SchemaRoot = new SchemaRoot(elem)
 
-    def tryToCreate(elem: indexed.Elem): Option[SchemaRoot] = {
+    def tryToCreate(elem: BackingElemApi): Option[SchemaRoot] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "schema").res) Some(new SchemaRoot(elem)) else None
@@ -270,7 +270,7 @@ private[utils] object XmlSchemas {
 
   object GlobalElementDeclaration extends XsdElemFactory[GlobalElementDeclaration] {
 
-    def tryToCreate(elem: indexed.Elem): Option[GlobalElementDeclaration] = {
+    def tryToCreate(elem: BackingElemApi): Option[GlobalElementDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "element").res && elem.path.entries.size == 1)
@@ -281,7 +281,7 @@ private[utils] object XmlSchemas {
 
   object LocalElementDeclaration extends XsdElemFactory[LocalElementDeclaration] {
 
-    def tryToCreate(elem: indexed.Elem): Option[LocalElementDeclaration] = {
+    def tryToCreate(elem: BackingElemApi): Option[LocalElementDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "element").res &&
@@ -292,7 +292,7 @@ private[utils] object XmlSchemas {
 
   object ElementReference extends XsdElemFactory[ElementReference] {
 
-    def tryToCreate(elem: indexed.Elem): Option[ElementReference] = {
+    def tryToCreate(elem: BackingElemApi): Option[ElementReference] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "element").res &&
@@ -303,7 +303,7 @@ private[utils] object XmlSchemas {
 
   object GlobalAttributeDeclaration extends XsdElemFactory[GlobalAttributeDeclaration] {
 
-    def tryToCreate(elem: indexed.Elem): Option[GlobalAttributeDeclaration] = {
+    def tryToCreate(elem: BackingElemApi): Option[GlobalAttributeDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "attribute").res && elem.path.entries.size == 1)
@@ -314,7 +314,7 @@ private[utils] object XmlSchemas {
 
   object LocalAttributeDeclaration extends XsdElemFactory[LocalAttributeDeclaration] {
 
-    def tryToCreate(elem: indexed.Elem): Option[LocalAttributeDeclaration] = {
+    def tryToCreate(elem: BackingElemApi): Option[LocalAttributeDeclaration] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "attribute").res &&
@@ -325,7 +325,7 @@ private[utils] object XmlSchemas {
 
   object AttributeReference extends XsdElemFactory[AttributeReference] {
 
-    def tryToCreate(elem: indexed.Elem): Option[AttributeReference] = {
+    def tryToCreate(elem: BackingElemApi): Option[AttributeReference] = {
       import scope._
 
       if (elem.resolvedName == QName("xs", "attribute").res &&
