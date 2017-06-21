@@ -178,18 +178,18 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     doQueryTest(doc.documentElement, "testPrettify: simple.Elem")
   }
 
-  /** A heavy test (now disabled) printing/parsing using the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
-  ignore("testProcessLargeTreeRepr") {
+  /** A heavy test printing out the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
+  test("testPrintLargeTreeRepr") {
     val startMs = System.currentTimeMillis()
     val treeRepr: String = doc.toString
     val endMs = System.currentTimeMillis()
-    logger.info(s"[testProcessLargeTreeRepr] Calling toString took ${endMs - startMs} ms")
+    logger.info(s"[testPrintLargeTreeRepr] Calling toString took ${endMs - startMs} ms")
 
     assertResult("document(") {
       treeRepr.take("document(".length)
     }
 
-    doQueryTest(doc.documentElement, "testProcessLargeTreeRepr: simple.Elem")
+    doQueryTest(doc.documentElement, "testPrintLargeTreeRepr: simple.Elem")
   }
 
   ignore("testSerializeLargeNodeBuilder") {
