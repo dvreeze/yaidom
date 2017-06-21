@@ -20,7 +20,6 @@ import scala.collection.{ immutable, mutable }
 
 /**
  * Pretty printing utility, used in Node (and indirectly NodeBuilder) (sub)classes to print the tree representation.
- * The utility is centered around operations on groups of lines, such as shifting.
  *
  * This API is safe to use, because of the use of "immutability everywhere". On the down-side, this very likely negatively
  * affects performance. On the other hand, the design is such that repeated nested indentation (shifting) does not cause
@@ -91,45 +90,8 @@ private[yaidom] object PrettyPrinting {
     def from(lineParts: immutable.IndexedSeq[String]): Line = new Line(lineParts)
   }
 
-  /** Collection of lines, on which operations such as `shift` can be performed */
+  /** Collection of lines */
   final class LineSeq(val lines: immutable.IndexedSeq[Line]) {
-
-    /** Shifts each of the lines `spaces` spaces to the right */
-    def shift(spaces: Int): LineSeq = {
-      require(spaces >= 0, "spaces must be >= 0")
-
-      val result = lines map { line => line.plusIndent(spaces) }
-      new LineSeq(result)
-    }
-
-    /**
-     * Appends the given String (which is typically a separator) to the last line, if any.
-     * The parameter String must not contain any newlines.
-     */
-    def append(s: String): LineSeq = {
-      require(s.indexOf('\n') < 0, "The string to append must not have any newlines")
-
-      if (lines.isEmpty) this else {
-        val result = lines.dropRight(1) :+ (lines.last.append(s))
-        new LineSeq(result)
-      }
-    }
-
-    /**
-     * Prepends the given String to the first line, if any, and indenting the other lines with the size of the parameter String.
-     * The parameter String must not contain any newlines.
-     */
-    def prepend(s: String): LineSeq = {
-      require(s.indexOf('\n') < 0, "The string to prepend must not have any newlines")
-
-      if (lines.isEmpty) this else {
-        val indent = s.length
-
-        val firstLine = lines(0).prepend(s)
-        val linesButFirstOne = lines.drop(1) map { line => line.plusIndent(indent) }
-        new LineSeq(firstLine +: linesButFirstOne)
-      }
-    }
 
     /** Returns the LineSeq consisting of these lines followed by the lines of `otherLineSeq` */
     def ++(otherLineSeq: LineSeq): LineSeq = new LineSeq(this.lines ++ otherLineSeq.lines)

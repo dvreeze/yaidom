@@ -169,41 +169,45 @@ final class Document(
   override def toString: String = toTreeRepr
 
   private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): LineSeq = {
+    val innerIndent = indent + indentStep
+
     val parentScope = Scope.Empty
 
     val uriOptionLineSeq: LineSeq =
       if (this.uriOption.isEmpty) {
-        val line = Line("uriOption = None")
+        val line = new Line(innerIndent, "uriOption = None")
         LineSeq(line)
       } else {
-        val line = Line.from(toStringLiteralAsSeq(this.uriOption.get.toString)).prepend("uriOption = Some(").append(")")
+        val line =
+          Line.from(toStringLiteralAsSeq(this.uriOption.get.toString)).prepend("uriOption = Some(").append(")").plusIndent(innerIndent)
         LineSeq(line)
       }
 
     val childrenLineSeq: LineSeq = {
-      val firstLine = LineSeq(Line("children = Vector("))
+      val firstLine = LineSeq(new Line(innerIndent, "children = Vector("))
 
       val contentLines = {
         val groups =
           this.children map { ch =>
-            ch.toTreeReprAsLineSeq(parentScope, indentStep)(indentStep)
+            // Mind the indentation below.
+            ch.toTreeReprAsLineSeq(parentScope, innerIndent + indentStep)(indentStep)
           }
         val result = LineSeqSeq(groups: _*).mkLineSeq(",")
         result
       }
 
-      val lastLine = LineSeq(Line(")"))
+      val lastLine = LineSeq(new Line(innerIndent, ")"))
 
       LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq
     }
 
     val contentParts: Vector[LineSeq] = Vector(uriOptionLineSeq, childrenLineSeq)
-    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",").shift(indentStep)
+    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",")
 
     LineSeqSeq(
-      LineSeq(Line("document(")),
+      LineSeq(new Line(indent, "document(")),
       content,
-      LineSeq(Line(")"))).mkLineSeq.shift(indent)
+      LineSeq(new Line(indent, ")"))).mkLineSeq
   }
 }
 
