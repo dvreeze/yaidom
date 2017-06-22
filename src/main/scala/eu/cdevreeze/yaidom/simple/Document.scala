@@ -161,30 +161,30 @@ final class Document(
 
   def toTreeRepr(): String = {
     val sb = new StringBuilder
-    toTreeReprAsLineSeq(0)(2).addToStringBuilder(sb)
+    LineSeq.addToStringBuilder(toTreeReprAsLineSeq(0)(2), sb)
     sb.toString
   }
 
   /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
   override def toString: String = toTreeRepr
 
-  private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val innerIndent = indent + indentStep
 
     val parentScope = Scope.Empty
 
-    val uriOptionLineSeq: LineSeq =
+    val uriOptionLineSeq: immutable.IndexedSeq[Line] =
       if (this.uriOption.isEmpty) {
         val line = new Line(innerIndent, "uriOption = None")
-        LineSeq(line)
+        immutable.IndexedSeq(line)
       } else {
         val line =
-          Line.from(toStringLiteralAsSeq(this.uriOption.get.toString)).prepend("uriOption = Some(").append(")").plusIndent(innerIndent)
-        LineSeq(line)
+          Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "uriOption = Some(", toStringLiteralAsSeq(this.uriOption.get.toString), ")")
+        immutable.IndexedSeq(line)
       }
 
-    val childrenLineSeq: LineSeq = {
-      val firstLine = LineSeq(new Line(innerIndent, "children = Vector("))
+    val childrenLineSeq: immutable.IndexedSeq[Line] = {
+      val firstLine = immutable.IndexedSeq(new Line(innerIndent, "children = Vector("))
 
       val contentLines = {
         val groups =
@@ -196,13 +196,13 @@ final class Document(
         result
       }
 
-      val lastLine = LineSeq(new Line(innerIndent, ")"))
+      val lastLine = immutable.IndexedSeq(new Line(innerIndent, ")"))
 
       LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq
     }
 
-    val contentParts: Vector[LineSeq] = Vector(uriOptionLineSeq, childrenLineSeq)
-    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",")
+    val contentParts: Vector[immutable.IndexedSeq[Line]] = Vector(uriOptionLineSeq, childrenLineSeq)
+    val content: immutable.IndexedSeq[Line] = LineSeqSeq(contentParts: _*).mkLineSeq(",")
 
     LineSeqSeq(
       LineSeq(new Line(indent, "document(")),

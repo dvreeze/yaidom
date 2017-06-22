@@ -59,7 +59,7 @@ sealed trait Node extends ResolvedNodes.Node with Immutable with Serializable {
    */
   final def toTreeRepr(parentScope: Scope): String = {
     val sb = new StringBuilder
-    toTreeReprAsLineSeq(parentScope, 0)(2).addToStringBuilder(sb)
+    LineSeq.addToStringBuilder(toTreeReprAsLineSeq(parentScope, 0)(2), sb)
     sb.toString
   }
 
@@ -75,7 +75,7 @@ sealed trait Node extends ResolvedNodes.Node with Immutable with Serializable {
   final override def toString: String = toTreeRepr
 
   /** Returns the tree representation as LineSeq, shifted indent spaces to the right */
-  private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq
+  private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line]
 }
 
 sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
@@ -538,24 +538,24 @@ final class Elem(
     prettify(this.removeAllInterElementWhitespace, 0).transformElemsOrSelf(fixIfWhitespaceOnly _)
   }
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     // Given that this method is recursive, using structural recursion on the element tree, the non-recursive part
     // must be as fast as possible. This implies that for example we must not iterate over the lines of a LineSeq
     // and create a new Line object from each line found.
 
     val innerIndent = indent + indentStep
 
-    val qnameLineSeq: LineSeq = {
-      val line = Line.from(toStringLiteralAsSeq(this.qname.toString)).prepend("qname = QName(").append(")").plusIndent(innerIndent)
-      LineSeq(line)
+    val qnameLineSeq: immutable.IndexedSeq[Line] = {
+      val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "qname = QName(", toStringLiteralAsSeq(this.qname.toString), ")")
+      immutable.IndexedSeq(line)
     }
 
-    val attributesLineSeqOption: Option[LineSeq] =
+    val attributesLineSeqOption: Option[immutable.IndexedSeq[Line]] =
       if (this.attributes.isEmpty) {
         None
       } else {
         def attributeEntryStringSeq(qn: QName, attrValue: String): immutable.IndexedSeq[String] = {
-          Vector("QName(") ++ toStringLiteralAsSeq(qn.toString) ++ Vector(") -> ") ++ toStringLiteralAsSeq(attrValue)
+          ("QName(" +: toStringLiteralAsSeq(qn.toString) :+ ") -> ") ++ toStringLiteralAsSeq(attrValue)
         }
 
         val attributeEntryStrings: immutable.IndexedSeq[String] = {
@@ -566,18 +566,18 @@ final class Elem(
           rawResult.dropRight(1)
         }
 
-        val line = Line.from(attributeEntryStrings).prepend("attributes = Vector(").append(")").plusIndent(innerIndent)
-        Some(LineSeq(line))
+        val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "attributes = Vector(", attributeEntryStrings, ")")
+        Some(immutable.IndexedSeq(line))
       }
 
     val declarations: Declarations = parentScope.relativize(thisElem.scope)
 
-    val namespacesLineSeqOption: Option[LineSeq] = {
+    val namespacesLineSeqOption: Option[immutable.IndexedSeq[Line]] = {
       if (declarations.prefixNamespaceMap.isEmpty) {
         None
       } else {
         def namespaceEntryStringSeq(prefix: String, nsUri: String): immutable.IndexedSeq[String] = {
-          toStringLiteralAsSeq(prefix) ++ Vector(" -> ") ++ toStringLiteralAsSeq(nsUri)
+          (toStringLiteralAsSeq(prefix) :+ " -> ") ++ toStringLiteralAsSeq(nsUri)
         }
 
         val namespaceEntryStrings: immutable.IndexedSeq[String] = {
@@ -588,20 +588,20 @@ final class Elem(
           rawResult.dropRight(1)
         }
 
-        val line = Line.from(namespaceEntryStrings).prepend("namespaces = Declarations.from(").append(")").plusIndent(innerIndent)
-        Some(LineSeq(line))
+        val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "namespaces = Declarations.from(", namespaceEntryStrings, ")")
+        Some(immutable.IndexedSeq(line))
       }
     }
 
-    val childrenLineSeqOption: Option[LineSeq] =
+    val childrenLineSeqOption: Option[immutable.IndexedSeq[Line]] =
       if (this.children.isEmpty) {
         None
       } else {
-        val firstLine = LineSeq(new Line(innerIndent, "children = Vector("))
+        val firstLine = immutable.IndexedSeq(new Line(innerIndent, "children = Vector("))
 
-        val contentLines: LineSeq = {
+        val contentLines: immutable.IndexedSeq[Line] = {
           // Recursive calls
-          val groups: immutable.IndexedSeq[LineSeq] = {
+          val groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]] = {
             thisElem.children map { child =>
               // Mind the indentation below.
               child.toTreeReprAsLineSeq(thisElem.scope, innerIndent + indentStep)(indentStep)
@@ -611,16 +611,16 @@ final class Elem(
           val result = LineSeqSeq(groups: _*).mkLineSeq(",")
           result
         }
-        val lastLine = LineSeq(new Line(innerIndent, ")"))
+        val lastLine = immutable.IndexedSeq(new Line(innerIndent, ")"))
 
         Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
       }
 
-    val contentParts: Vector[LineSeq] =
+    val contentParts: Vector[immutable.IndexedSeq[Line]] =
       Vector(Some(qnameLineSeq), attributesLineSeqOption, namespacesLineSeqOption, childrenLineSeqOption).flatten
 
     // All content parts must now be properly indented
-    val content: LineSeq = LineSeqSeq(contentParts: _*).mkLineSeq(",")
+    val content: immutable.IndexedSeq[Line] = LineSeqSeq(contentParts: _*).mkLineSeq(",")
 
     val elemFunctionNameWithOpeningBracket: String = if (childrenLineSeqOption.isEmpty) "emptyElem(" else "elem("
 
@@ -673,15 +673,15 @@ final case class Text(text: String, isCData: Boolean) extends Node with Resolved
   /** Returns `XmlStringUtils.normalizeString(text)` .*/
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val parts = toStringLiteralAsSeq(text)
 
     val prefix = if (isCData) "cdata(" else "text("
 
     if (parts.forall(_.isEmpty)) {
-      LineSeq()
+      immutable.IndexedSeq()
     } else {
-      LineSeq((new Line(indent, parts)).prepend(prefix).append(")"))
+      immutable.IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, prefix, parts, ")"))
     }
   }
 }
@@ -691,12 +691,12 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
   require(target ne null)
   require(data ne null)
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val targetStringLiteral = toStringLiteralAsSeq(target)
     val dataStringLiteral = toStringLiteralAsSeq(data)
     val partOfLine = Line.from((targetStringLiteral :+ ", ") ++ dataStringLiteral)
     val line = partOfLine.prepend("processingInstruction(").append(")")
-    LineSeq(line.plusIndent(indent))
+    immutable.IndexedSeq(line.plusIndent(indent))
   }
 }
 
@@ -714,10 +714,10 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
 final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
   require(entity ne null)
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val entityStringLiteral = toStringLiteralAsSeq(entity)
     val line = Line.from(entityStringLiteral).prepend("entityRef(").append(")")
-    LineSeq(line.plusIndent(indent))
+    immutable.IndexedSeq(line.plusIndent(indent))
   }
 }
 
@@ -725,13 +725,13 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
   require(text ne null)
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): LineSeq = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val parts = toStringLiteralAsSeq(text)
 
     if (parts.forall(_.isEmpty)) {
-      LineSeq()
+      immutable.IndexedSeq()
     } else {
-      LineSeq((new Line(indent, parts)).prepend("comment(").append(")"))
+      immutable.IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "comment(", parts, ")"))
     }
   }
 }

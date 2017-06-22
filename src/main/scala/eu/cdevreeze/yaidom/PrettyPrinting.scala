@@ -88,20 +88,32 @@ private[yaidom] object PrettyPrinting {
     def apply(lineParts: String*): Line = new Line(Vector(lineParts: _*))
 
     def from(lineParts: immutable.IndexedSeq[String]): Line = new Line(lineParts)
+
+    def fromIndexAndPrefixAndPartsAndSuffix(
+      indent: Int,
+      prefix: String,
+      otherLineParts: immutable.IndexedSeq[String],
+      suffix: String): Line = {
+
+      new Line(indent, (prefix +: otherLineParts :+ suffix))
+    }
   }
 
-  /** Collection of lines */
-  final class LineSeq(val lines: immutable.IndexedSeq[Line]) {
+  /** Operations on collections of lines */
+  object LineSeq {
 
-    /** Returns the LineSeq consisting of these lines followed by the lines of `otherLineSeq` */
-    def ++(otherLineSeq: LineSeq): LineSeq = new LineSeq(this.lines ++ otherLineSeq.lines)
+    def apply(lines: Line*): immutable.IndexedSeq[Line] = lines.toIndexedSeq
+
+    def singletonOrEmptyLineSeq(parts: immutable.IndexedSeq[String]): immutable.IndexedSeq[Line] = {
+      if (parts.forall(_.isEmpty)) immutable.IndexedSeq() else immutable.IndexedSeq(new Line(parts))
+    }
 
     /**
-     * Adds the string representation of this line to the given StringBuilder, without creating any new string literals.
+     * Adds the string representation of the line collection to the given StringBuilder, without creating any new string literals.
      *
      * That is, equivalent to appending `lines.map(_.toString).mkString(NewLine)`
      */
-    def addToStringBuilder(sb: StringBuilder): Unit = {
+    def addToStringBuilder(lines: immutable.IndexedSeq[Line], sb: StringBuilder): Unit = {
       if (lines.nonEmpty) {
         lines.head.addToStringBuilder(sb)
 
@@ -113,27 +125,17 @@ private[yaidom] object PrettyPrinting {
     }
   }
 
-  object LineSeq {
+  /** Collection of Line sequence instances, on which operations such as `mkLineSeq` can be performed */
+  final class LineSeqSeq(val groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]]) {
 
-    def apply(lines: Line*): LineSeq = new LineSeq(Vector(lines: _*))
-
-    def singletonOrEmptyLineSeq(parts: immutable.IndexedSeq[String]): LineSeq = {
-      if (parts.forall(_.isEmpty)) LineSeq() else LineSeq(new Line(parts))
-    }
-  }
-
-  /** Collection of LineSeq instances, on which operations such as `mkLineSeq` can be performed */
-  final class LineSeqSeq(val groups: immutable.IndexedSeq[LineSeq]) {
-
-    /** Flattens this LineSeqSeq into a LineSeq */
-    def mkLineSeq: LineSeq = {
-      val result = groups flatMap { grp => grp.lines }
-      new LineSeq(result)
+    /** Flattens this LineSeqSeq into a Line sequence */
+    def mkLineSeq: immutable.IndexedSeq[Line] = {
+      groups.flatten
     }
 
-    /** Flattens this LineSeqSeq into a LineSeq, but first appends the separator to each non-last group */
-    def mkLineSeq(separator: String): LineSeq = {
-      if (groups.isEmpty) LineSeq() else {
+    /** Flattens this LineSeqSeq into a Line sequence, but first appends the separator to each non-last group */
+    def mkLineSeq(separator: String): immutable.IndexedSeq[Line] = {
+      if (groups.isEmpty) immutable.IndexedSeq() else {
         val lines = mutable.ArrayBuffer[Line]()
 
         val nonLastGroups = groups.dropRight(1)
@@ -142,21 +144,21 @@ private[yaidom] object PrettyPrinting {
         for (grp <- nonLastGroups) {
           // Same as: lines ++= (grp.append(separator).lines)
 
-          if (grp.lines.nonEmpty) {
-            lines ++= grp.lines.dropRight(1)
-            lines += (grp.lines.last.append(separator))
+          if (grp.nonEmpty) {
+            lines ++= grp.dropRight(1)
+            lines += (grp.last.append(separator))
           }
         }
-        lines ++= lastGroup.lines
+        lines ++= lastGroup
 
-        new LineSeq(lines.toIndexedSeq)
+        lines.toIndexedSeq
       }
     }
   }
 
   object LineSeqSeq {
 
-    def apply(groups: LineSeq*): LineSeqSeq = new LineSeqSeq(Vector(groups: _*))
+    def apply(groups: immutable.IndexedSeq[Line]*): LineSeqSeq = new LineSeqSeq(groups.toIndexedSeq)
   }
 
   /**
