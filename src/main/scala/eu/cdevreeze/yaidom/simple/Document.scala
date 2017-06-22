@@ -22,8 +22,6 @@ import scala.Vector
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.PrettyPrinting.Line
-import eu.cdevreeze.yaidom.PrettyPrinting.LineSeq
-import eu.cdevreeze.yaidom.PrettyPrinting.LineSeqSeq
 import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteralAsSeq
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.Scope
@@ -161,7 +159,7 @@ final class Document(
 
   def toTreeRepr(): String = {
     val sb = new StringBuilder
-    LineSeq.addToStringBuilder(toTreeReprAsLineSeq(0)(2), sb)
+    Line.addLinesToStringBuilder(toTreeReprAsLineSeq(0)(2), sb)
     sb.toString
   }
 
@@ -184,7 +182,7 @@ final class Document(
       }
 
     val childrenLineSeq: immutable.IndexedSeq[Line] = {
-      val firstLine = immutable.IndexedSeq(new Line(innerIndent, "children = Vector("))
+      val firstLine = new Line(innerIndent, "children = Vector(")
 
       val contentLines = {
         val groups =
@@ -192,22 +190,22 @@ final class Document(
             // Mind the indentation below.
             ch.toTreeReprAsLineSeq(parentScope, innerIndent + indentStep)(indentStep)
           }
-        val result = LineSeqSeq(groups: _*).mkLineSeq(",")
+        val result = Line.mkLineSeq(groups, ",")
         result
       }
 
-      val lastLine = immutable.IndexedSeq(new Line(innerIndent, ")"))
+      val lastLine = new Line(innerIndent, ")")
 
-      LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq
+      (firstLine +: contentLines) :+ lastLine
     }
 
-    val contentParts: Vector[immutable.IndexedSeq[Line]] = Vector(uriOptionLineSeq, childrenLineSeq)
-    val content: immutable.IndexedSeq[Line] = LineSeqSeq(contentParts: _*).mkLineSeq(",")
+    val content: immutable.IndexedSeq[Line] =
+      Line.mkLineSeq(immutable.IndexedSeq(uriOptionLineSeq, childrenLineSeq), ",")
 
-    LineSeqSeq(
-      LineSeq(new Line(indent, "document(")),
-      content,
-      LineSeq(new Line(indent, ")"))).mkLineSeq
+    val firstLine = new Line(indent, "document(")
+    val lastLine = new Line(indent, ")")
+
+    (firstLine +: content) :+ lastLine
   }
 }
 

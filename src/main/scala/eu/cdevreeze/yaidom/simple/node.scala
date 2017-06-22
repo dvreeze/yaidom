@@ -21,8 +21,6 @@ import scala.collection.immutable
 import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.PrettyPrinting.Line
-import eu.cdevreeze.yaidom.PrettyPrinting.LineSeq
-import eu.cdevreeze.yaidom.PrettyPrinting.LineSeqSeq
 import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteralAsSeq
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Declarations
@@ -59,7 +57,7 @@ sealed trait Node extends ResolvedNodes.Node with Immutable with Serializable {
    */
   final def toTreeRepr(parentScope: Scope): String = {
     val sb = new StringBuilder
-    LineSeq.addToStringBuilder(toTreeReprAsLineSeq(parentScope, 0)(2), sb)
+    Line.addLinesToStringBuilder(toTreeReprAsLineSeq(parentScope, 0)(2), sb)
     sb.toString
   }
 
@@ -540,8 +538,7 @@ final class Elem(
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     // Given that this method is recursive, using structural recursion on the element tree, the non-recursive part
-    // must be as fast as possible. This implies that for example we must not iterate over the lines of a LineSeq
-    // and create a new Line object from each line found.
+    // must be as fast as possible. This implies that for example we must not repeatedly "shift" the same group of lines multiple times.
 
     val innerIndent = indent + indentStep
 
@@ -597,7 +594,7 @@ final class Elem(
       if (this.children.isEmpty) {
         None
       } else {
-        val firstLine = immutable.IndexedSeq(new Line(innerIndent, "children = Vector("))
+        val firstLine = new Line(innerIndent, "children = Vector(")
 
         val contentLines: immutable.IndexedSeq[Line] = {
           // Recursive calls
@@ -608,26 +605,26 @@ final class Elem(
             }
           }
 
-          val result = LineSeqSeq(groups: _*).mkLineSeq(",")
+          val result = Line.mkLineSeq(groups, ",")
           result
         }
-        val lastLine = immutable.IndexedSeq(new Line(innerIndent, ")"))
+        val lastLine = new Line(innerIndent, ")")
 
-        Some(LineSeqSeq(firstLine, contentLines, lastLine).mkLineSeq)
+        Some((firstLine +: contentLines) :+ lastLine)
       }
 
-    val contentParts: Vector[immutable.IndexedSeq[Line]] =
-      Vector(Some(qnameLineSeq), attributesLineSeqOption, namespacesLineSeqOption, childrenLineSeqOption).flatten
+    val contentParts: immutable.IndexedSeq[immutable.IndexedSeq[Line]] =
+      immutable.IndexedSeq(Some(qnameLineSeq), attributesLineSeqOption, namespacesLineSeqOption, childrenLineSeqOption).flatten
 
     // All content parts must now be properly indented
-    val content: immutable.IndexedSeq[Line] = LineSeqSeq(contentParts: _*).mkLineSeq(",")
+    val content: immutable.IndexedSeq[Line] = Line.mkLineSeq(contentParts, ",")
 
     val elemFunctionNameWithOpeningBracket: String = if (childrenLineSeqOption.isEmpty) "emptyElem(" else "elem("
 
-    LineSeqSeq(
-      LineSeq(new Line(indent, elemFunctionNameWithOpeningBracket)),
-      content,
-      LineSeq(new Line(indent, ")"))).mkLineSeq
+    val firstLine = new Line(indent, elemFunctionNameWithOpeningBracket)
+    val lastLine = new Line(indent, ")")
+
+    (firstLine +: content) :+ lastLine
   }
 
   private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {

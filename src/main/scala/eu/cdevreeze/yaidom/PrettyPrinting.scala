@@ -17,14 +17,12 @@
 package eu.cdevreeze.yaidom
 
 import scala.collection.immutable
-import scala.collection.mutable
 
 /**
- * Pretty printing utility, used in Node (and indirectly NodeBuilder) (sub)classes to print the tree representation.
+ * Very simple pretty printing utility, used in Node (and indirectly NodeBuilder) (sub)classes to print the tree representation.
  *
  * This API is safe to use, because of the use of "immutability everywhere". On the down-side, this very likely negatively
- * affects performance. On the other hand, the design is such that repeated nested indentation (shifting) does not cause
- * many unnecessary string concatenations.
+ * affects performance. On the other hand, the design is such that unnecessary string concatenations are prevented as much as possible.
  *
  * @author Chris de Vreeze
  */
@@ -35,14 +33,13 @@ private[yaidom] object PrettyPrinting {
   /**
    * Line, consisting of an indent, followed by the "real" (non-empty) content of the line as a sequence of strings.
    *
-   * This class is designed to make `LineSeq` operations such as `append` and `prepend` efficient, without creating any
-   * unnecessary string literals. It is also designed to possibly contain multiple successive non-concatenated line parts,
-   * in order to prevent unnecessary string concatenation.
-   *
    * The line may have newlines, but if the line contains any newlines, there will be no indentation at these line breaks.
    * Thus XML attributes and their values can be modeled as part of one Line object, even if they contain line breaks.
    *
-   * Appending and prepending, on the other hand, may not introduce any line breaks!
+   * Appending, on the other hand, may not introduce any line breaks!
+   *
+   * The API is not powerful. It does not directly support indentation of groups of lines. This is to protect the user from
+   * introducing performance bottlenecks caused by repeated "indentation shifts" for the same groups of lines.
    */
   final class Line(val indent: Int, val lineParts: immutable.IndexedSeq[String]) {
     require(lineParts ne null)
@@ -74,7 +71,7 @@ private[yaidom] object PrettyPrinting {
 
   object Line {
 
-    def apply(lineParts: String*): Line = new Line(Vector(lineParts: _*))
+    def apply(lineParts: String*): Line = new Line(immutable.IndexedSeq(lineParts: _*))
 
     def from(lineParts: immutable.IndexedSeq[String]): Line = new Line(lineParts)
 
@@ -84,17 +81,10 @@ private[yaidom] object PrettyPrinting {
       otherLineParts: immutable.IndexedSeq[String],
       suffix: String): Line = {
 
+      require(prefix.indexOf('\n') < 0, "The string to prepend must not have any newlines")
+      require(suffix.indexOf('\n') < 0, "The string to append must not have any newlines")
+
       new Line(indent, (prefix +: otherLineParts :+ suffix))
-    }
-  }
-
-  /** Operations on collections of lines */
-  object LineSeq {
-
-    def apply(lines: Line*): immutable.IndexedSeq[Line] = lines.toIndexedSeq
-
-    def singletonOrEmptyLineSeq(parts: immutable.IndexedSeq[String]): immutable.IndexedSeq[Line] = {
-      if (parts.forall(_.isEmpty)) immutable.IndexedSeq() else immutable.IndexedSeq(new Line(parts))
     }
 
     /**
@@ -102,52 +92,43 @@ private[yaidom] object PrettyPrinting {
      *
      * That is, equivalent to appending `lines.map(_.toString).mkString(NewLine)`
      */
-    def addToStringBuilder(lines: immutable.IndexedSeq[Line], sb: StringBuilder): Unit = {
+    def addLinesToStringBuilder(lines: immutable.IndexedSeq[Line], sb: StringBuilder): Unit = {
       if (lines.nonEmpty) {
         lines.head.addToStringBuilder(sb)
 
         for (line <- lines.drop(1)) {
-          sb ++= NewLine
+          sb.append(NewLine)
           line.addToStringBuilder(sb)
         }
       }
     }
-  }
 
-  /** Collection of Line sequence instances, on which operations such as `mkLineSeq` can be performed */
-  final class LineSeqSeq(val groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]]) {
+    /**
+     * Flattens a sequence of Line groups into a Line sequence, separating the groups by the given separator.
+     */
+    def mkLineSeq(
+      groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]],
+      separator: String): immutable.IndexedSeq[Line] = {
 
-    /** Flattens this LineSeqSeq into a Line sequence */
-    def mkLineSeq: immutable.IndexedSeq[Line] = {
-      groups.flatten
-    }
-
-    /** Flattens this LineSeqSeq into a Line sequence, but first appends the separator to each non-last group */
-    def mkLineSeq(separator: String): immutable.IndexedSeq[Line] = {
-      if (groups.isEmpty) immutable.IndexedSeq() else {
-        val lines = mutable.ArrayBuffer[Line]()
-
+      if (groups.isEmpty) {
+        immutable.IndexedSeq()
+      } else {
         val nonLastGroups = groups.dropRight(1)
         val lastGroup = groups.last
 
-        for (grp <- nonLastGroups) {
-          // Same as: lines ++= (grp.append(separator).lines)
-
-          if (grp.nonEmpty) {
-            lines ++= grp.dropRight(1)
-            lines += (grp.last.append(separator))
+        val flattenedEditedNonLastGroups =
+          nonLastGroups flatMap { grp =>
+            if (grp.isEmpty) {
+              immutable.IndexedSeq()
+            } else {
+              val lastLine = grp.last
+              grp.updated(grp.size - 1, lastLine.append(separator))
+            }
           }
-        }
-        lines ++= lastGroup
 
-        lines.toIndexedSeq
+        flattenedEditedNonLastGroups ++ lastGroup
       }
     }
-  }
-
-  object LineSeqSeq {
-
-    def apply(groups: immutable.IndexedSeq[Line]*): LineSeqSeq = new LineSeqSeq(groups.toIndexedSeq)
   }
 
   /**
