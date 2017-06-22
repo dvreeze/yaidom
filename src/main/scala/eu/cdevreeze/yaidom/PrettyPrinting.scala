@@ -16,7 +16,8 @@
 
 package eu.cdevreeze.yaidom
 
-import scala.collection.{ immutable, mutable }
+import scala.collection.immutable
+import scala.collection.mutable
 
 /**
  * Pretty printing utility, used in Node (and indirectly NodeBuilder) (sub)classes to print the tree representation.
@@ -54,23 +55,11 @@ private[yaidom] object PrettyPrinting {
 
     def this(line: String) = this(0, line)
 
-    /** Functionally adds an indent */
-    def plusIndent(addedIndent: Int): Line = {
-      if (addedIndent == 0) this else new Line(addedIndent + indent, lineParts)
-    }
-
     /** Functionally appends a trailing string (which must contain no newline) to this line */
     def append(s: String): Line = {
       require(s.indexOf('\n') < 0, "The string to append must not have any newlines")
 
       if (s.isEmpty) this else new Line(indent, lineParts :+ s)
-    }
-
-    /** Functionally prepends a string (which must contain no newline) to this line */
-    def prepend(s: String): Line = {
-      require(s.indexOf('\n') < 0, "The string to prepend must not have any newlines")
-
-      if (s.isEmpty) this else new Line(indent, s +: lineParts)
     }
 
     /**

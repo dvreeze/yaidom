@@ -694,9 +694,10 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val targetStringLiteral = toStringLiteralAsSeq(target)
     val dataStringLiteral = toStringLiteralAsSeq(data)
-    val partOfLine = Line.from((targetStringLiteral :+ ", ") ++ dataStringLiteral)
-    val line = partOfLine.prepend("processingInstruction(").append(")")
-    immutable.IndexedSeq(line.plusIndent(indent))
+    val partOfLine = (targetStringLiteral :+ ", ") ++ dataStringLiteral
+
+    immutable.IndexedSeq(
+      Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "processingInstruction(", partOfLine, ")"))
   }
 }
 
@@ -716,8 +717,7 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val entityStringLiteral = toStringLiteralAsSeq(entity)
-    val line = Line.from(entityStringLiteral).prepend("entityRef(").append(")")
-    immutable.IndexedSeq(line.plusIndent(indent))
+    immutable.IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "entityRef(", entityStringLiteral, ")"))
   }
 }
 
