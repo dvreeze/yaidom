@@ -56,7 +56,7 @@ object Elem {
     IndexedScopedNode.Elem(docUri, underlyingRootElem, path)
   }
 
-  object ElemTransformations extends queryapi.ElemTransformationApi {
+  object ElemTransformations extends queryapi.ElemTransformationLike {
 
     // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.
 
@@ -104,22 +104,6 @@ object Elem {
 
       // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
       newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
-    }
-
-    def transformElemsOrSelf(elem: Elem, f: Elem => Elem): Elem = {
-      f(transformChildElems(elem, { e => transformElemsOrSelf(e, f) }))
-    }
-
-    def transformElems(elem: Elem, f: Elem => Elem): Elem = {
-      transformChildElems(elem, { e => transformElemsOrSelf(e, f) })
-    }
-
-    def transformElemsOrSelfToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node] = {
-      f(transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f)))
-    }
-
-    def transformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
-      transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f))
     }
 
     private def getUnderlyingNode(node: Node): simple.Node = {
