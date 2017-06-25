@@ -95,7 +95,7 @@ object Elem {
         elem.underlyingRootElem.updateElemsWithNodeSeq(oldPathToElemMap.keySet) { (elm, path) =>
           assert(oldPathToElemMap.contains(path))
 
-          // Apply the function, and return the underlying element, thus losing "ancestry data" resulting from the function application.
+          // Apply the function, and return the underlying nodes, thus losing "ancestry data" resulting from the function application.
           f(oldPathToElemMap(path)).map(n => getUnderlyingNode(n))
         }
 

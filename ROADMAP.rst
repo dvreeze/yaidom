@@ -3,6 +3,17 @@ ROAD MAP
 ========
 
 
+The vision is to grow yaidom into a generic element querying, update/transformation and element creation
+API.
+
+The library should be like an hour glass, with multiple element implementations at the bottom, but also
+supporting multiple XML dialects at the top (abstracting from the element implementations). At the center
+of the hour glass is the small generic element querying, update/transformations and element creation API.
+
+This is the vision of yaidom 2.X. Yaidom 1.X already comes very close to this vision in its query API,
+but much less so in its update/transformation API, let alone in its element creation API.
+
+
 Towards version 1.6
 ===================
 
