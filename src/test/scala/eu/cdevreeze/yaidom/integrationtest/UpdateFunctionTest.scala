@@ -523,6 +523,32 @@ class UpdateFunctionTest extends FunSuite {
     }
   }
 
+  test("testFastUpdateOfSpecificBook") {
+    // This shows a technique of fast updates of specific elements (in potentially very large XML documents).
+    // The idea is to first find the local element tree to update, and then transform only that element and its descendants.
+
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    val bookElem =
+      doc.documentElement.findElem(e => e.localName == "Book" && e.attribute(EName("ISBN")) == "ISBN-0-13-815504-6").get
+
+    val updatedBookElem = transformChildElems(bookElem, updateRemark)
+
+    assertResult(bookElem.resolvedName) {
+      updatedBookElem.resolvedName
+    }
+
+    val docElem1 = updatedBookElem.rootElem
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).transformElems(updateRemark).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).removeAllInterElementWhitespace
+    }
+  }
+
   private def updateNameElementName(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
@@ -645,6 +671,18 @@ class UpdateFunctionTest extends FunSuite {
     }
   }
 
+  private def updateRemark(elm: indexed.Elem): indexed.Elem = {
+    elm.qname match {
+      case qn @ UnprefixedName("Remark") if elm.parent.attribute(EName("ISBN")) == "ISBN-0-13-815504-6" =>
+        val newRemark = "Get a discount on this book commbined with \"A First Course\""
+
+        val newElm = elm.underlyingElem.copy(children = Vector(simple.Text(newRemark, false)))
+        indexed.Elem(newElm)
+      case qn =>
+        elm
+    }
+  }
+
   private def undoIsbnUpdate(elm: resolved.Elem): resolved.Elem = {
     elm match {
       case elm @ resolved.Elem(EName(Some("http://bookstore"), "Book"), attrs, children) =>
@@ -662,6 +700,23 @@ class UpdateFunctionTest extends FunSuite {
         elm.copy(resolvedName = EName(elm.resolvedName.namespaceUriOption, "First_Name"))
       case elm @ resolved.Elem(EName(Some("http://bookstore"), "LastName"), attrs, children) =>
         elm.copy(resolvedName = EName(elm.resolvedName.namespaceUriOption, "Last_Name"))
+      case elm =>
+        elm
+    }
+  }
+
+  private def updateRemark(elm: resolved.Elem): resolved.Elem = {
+    elm match {
+      case elm @ resolved.Elem(EName(Some("http://bookstore"), "Book"), attrs, children) if elm.attribute(EName("ISBN")) == "ISBN-0-13-815504-6" =>
+        val newRemark = "Get a discount on this book commbined with \"A First Course\""
+
+        elm transformChildElems { che =>
+          if (che.localName == "Remark") {
+            che.copy(children = Vector(resolved.Text(newRemark)))
+          } else {
+            che
+          }
+        }
       case elm =>
         elm
     }
