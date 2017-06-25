@@ -59,6 +59,7 @@ object Elem {
   object ElemTransformations extends queryapi.ElemTransformationLike {
 
     // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.
+    // In particular, ancestor elements cannot trust Paths of descendant elements after updates.
 
     type Node = IndexedScopedNode.Node
 

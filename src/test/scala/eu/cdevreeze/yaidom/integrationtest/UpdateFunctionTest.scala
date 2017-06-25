@@ -22,12 +22,14 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.UnprefixedName
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple
 
 /**
  * XML functional update function test case.
@@ -121,33 +123,37 @@ class UpdateFunctionTest extends FunSuite {
     }
   }
 
-  test("testUpdateAttributeNames") {
+  test("testUpdateNames") {
     val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
     import indexed.Elem.ElemTransformations._
 
-    val docElem1 = transformElems(doc.documentElement, updateNameAttributeName)
+    val docElem1 = transformElems(doc.documentElement, updateNameElementName)
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
     }
 
-    val docElem2 = transformElemsOrSelf(doc.documentElement, updateNameAttributeName)
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    val docElem2 = transformElemsOrSelf(doc.documentElement, updateNameElementName)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
     }
 
-    val unchangedDocElem = transformChildElems(doc.documentElement, updateNameAttributeName)
+    val unchangedDocElem = transformChildElems(doc.documentElement, updateNameElementName)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(unchangedDocElem.underlyingElem)
     }
 
     val docElem3 = transformChildElems(doc.documentElement, { che =>
-      transformElems(che, updateNameAttributeName)
+      transformElems(che, updateNameElementName)
     })
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -155,7 +161,7 @@ class UpdateFunctionTest extends FunSuite {
     }
 
     val docElem4 = transformChildElems(doc.documentElement, { che =>
-      transformElemsOrSelf(che, updateNameAttributeName)
+      transformElemsOrSelf(che, updateNameElementName)
     })
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -163,20 +169,24 @@ class UpdateFunctionTest extends FunSuite {
     }
   }
 
-  test("testUpdateAttributeNamesReturningNodeSeqs") {
+  test("testUpdateNamesReturningNodeSeqs") {
     val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
     import indexed.Elem.ElemTransformations._
 
-    val docElem1 = transformElemsToNodeSeq(doc.documentElement, updateNameAttributeNameReturningNodeSeq)
+    val docElem1 = transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
     }
 
-    val docElems2 = transformElemsOrSelfToNodeSeq(doc.documentElement, updateNameAttributeNameReturningNodeSeq)
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    val docElems2 = transformElemsOrSelfToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
 
     assertResult(1) {
       docElems2.size
@@ -191,14 +201,14 @@ class UpdateFunctionTest extends FunSuite {
       resolved.Elem(docElem2.underlyingElem)
     }
 
-    val unchangedDocElem = transformChildElemsToNodeSeq(doc.documentElement, updateNameAttributeNameReturningNodeSeq)
+    val unchangedDocElem = transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(unchangedDocElem.underlyingElem)
     }
 
     val docElem3 = transformChildElems(doc.documentElement, { che =>
-      transformElemsToNodeSeq(che, updateNameAttributeNameReturningNodeSeq)
+      transformElemsToNodeSeq(che, updateNameElementNameReturningNodeSeq)
     })
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -206,7 +216,7 @@ class UpdateFunctionTest extends FunSuite {
     }
 
     val docElem4 = transformChildElemsToNodeSeq(doc.documentElement, { che =>
-      transformElemsOrSelfToNodeSeq(che, updateNameAttributeNameReturningNodeSeq)
+      transformElemsOrSelfToNodeSeq(che, updateNameElementNameReturningNodeSeq)
     })
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -214,7 +224,306 @@ class UpdateFunctionTest extends FunSuite {
     }
   }
 
-  private def updateNameAttributeName(elm: indexed.Elem): indexed.Elem = {
+  test("testUpdateIsbnAndNames") {
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    val docElem1 =
+      transformElems(
+        transformElems(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElement)
+
+    assertResult(Set("FirstName", "LastName")) {
+      docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+
+    // Now using transformElemsOrSelf twice
+    val docElem2 =
+      transformElemsOrSelf(
+        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElement)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem2.underlyingElem)
+    }
+
+    val partiallyChangedDocElem =
+      transformChildElems(
+        transformChildElems(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElement)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(partiallyChangedDocElem.underlyingElem).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+
+    // Changing the order of updates
+    val docElem3 =
+      transformElems(
+        transformElems(doc.documentElement, turnIsbnIntoElement),
+        updateNameElementName)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem3.underlyingElem)
+    }
+
+    // Changing the order of updates
+    val docElem4 =
+      transformElemsOrSelf(
+        transformElemsOrSelf(doc.documentElement, turnIsbnIntoElement),
+        updateNameElementName)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem4.underlyingElem)
+    }
+
+    // Combining transformChildElems with transformElems
+    val docElem5 =
+      transformChildElems(
+        transformElems(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElement)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem5.underlyingElem)
+    }
+
+    // Combining transformChildElems with transformElemsOrSelf
+    val docElem6 =
+      transformChildElems(
+        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElement)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem6.underlyingElem)
+    }
+  }
+
+  test("testUpdateIsbnAndNamesReturningNodeSeqs") {
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    val docElem1 =
+      transformElemsToNodeSeq(
+        transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
+        turnIsbnIntoElementReturningNodeSeq)
+
+    assertResult(Set("FirstName", "LastName")) {
+      docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+
+    // Now using transformElemsOrSelfToNodeSeq twice
+    val docElem2 =
+      transformElemsOrSelfToNodeSeq(
+        transformElemsOrSelfToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem],
+        turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem]
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem2.underlyingElem)
+    }
+
+    val partiallyChangedDocElem =
+      transformChildElemsToNodeSeq(
+        transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
+        turnIsbnIntoElementReturningNodeSeq)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(partiallyChangedDocElem.underlyingElem).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+
+    // Changing the order of updates
+    val docElem3 =
+      transformElemsToNodeSeq(
+        transformElemsToNodeSeq(doc.documentElement, turnIsbnIntoElementReturningNodeSeq),
+        updateNameElementNameReturningNodeSeq)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem3.underlyingElem)
+    }
+
+    // Changing the order of updates
+    val docElem4 =
+      transformElemsOrSelfToNodeSeq(
+        transformElemsOrSelfToNodeSeq(doc.documentElement, turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem],
+        updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem]
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem4.underlyingElem)
+    }
+
+    // Combining transformChildElemsToNodeSeq with transformElemsToNodeSeq
+    val docElem5 =
+      transformChildElemsToNodeSeq(
+        transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
+        turnIsbnIntoElementReturningNodeSeq)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem5.underlyingElem)
+    }
+
+    // Combining transformChildElemsToNodeSeq with transformElemsOrSelf
+    val docElem6 =
+      transformChildElemsToNodeSeq(
+        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElementReturningNodeSeq)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem6.underlyingElem)
+    }
+  }
+
+  test("testUpdateIsbnIfNamesUpdated") {
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    // First update names, then update ISBN if names have been updated (which they have)
+    val docElem1 =
+      transformElemsOrSelf(
+        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElementIfNamesUpdated)
+
+    assertResult(Set("FirstName", "LastName")) {
+      docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+
+    // Update ISBN if names have been updated (which they haven't)
+    val docElem2 = transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
+      resolved.Elem(docElem2.underlyingElem)
+    }
+
+    // Changing the order of updates, resulting in a name update, but no ISBN update
+    val docElem3 =
+      transformElemsOrSelf(
+        transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated),
+        updateNameElementName)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem3.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    // Doing less work
+    val docElem4 =
+      transformChildElems(
+        transformElems(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElementIfNamesUpdated)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem4.underlyingElem)
+    }
+  }
+
+  test("testUpdateIsbnIfNamesNotUpdated") {
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    // First update ISBN if names have not been updated (which is indeed the case), then update names
+    val docElem1 =
+      transformElemsOrSelf(
+        transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
+        updateNameElementName)
+
+    assertResult(Set("FirstName", "LastName")) {
+      docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+
+    // First update names, then update ISBN if names have not been updated (which is not the case)
+    val docElem2 =
+      transformElemsOrSelf(
+        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+        turnIsbnIntoElementIfNamesNotUpdated)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem2.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    // Doing less work
+    val docElem3 =
+      transformElems(
+        transformChildElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
+        updateNameElementName)
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem3.underlyingElem)
+    }
+  }
+
+  test("testEffectivelyUpdateNamesAndIsbn") {
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
+    }
+  }
+
+  test("testEffectivelyUpdateNamesOnly") {
+    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+
+    val doc: indexed.Document = indexed.Document(docParser.parse(is))
+
+    import indexed.Elem.ElemTransformations._
+
+    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames)
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
+      resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+  }
+
+  private def updateNameElementName(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
         indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
@@ -225,7 +534,7 @@ class UpdateFunctionTest extends FunSuite {
     }
   }
 
-  private def updateNameAttributeNameReturningNodeSeq(elm: indexed.Elem): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
+  private def updateNameElementNameReturningNodeSeq(elm: indexed.Elem): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
         immutable.IndexedSeq(indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName"))))
@@ -233,6 +542,128 @@ class UpdateFunctionTest extends FunSuite {
         immutable.IndexedSeq(indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName"))))
       case qn =>
         immutable.IndexedSeq(elm)
+    }
+  }
+
+  private def turnIsbnIntoElement(elm: indexed.Elem): indexed.Elem = {
+    elm.qname match {
+      case qn @ UnprefixedName("Book") =>
+        val isbn = elm.attribute(EName("ISBN"))
+
+        val newElm =
+          elm.underlyingElem.
+            plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
+            minusAttribute(QName("ISBN"))
+        indexed.Elem(newElm)
+      case qn =>
+        elm
+    }
+  }
+
+  private def turnIsbnIntoElementReturningNodeSeq(elm: indexed.Elem): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
+    elm.qname match {
+      case qn @ UnprefixedName("Book") =>
+        val isbn = elm.attribute(EName("ISBN"))
+
+        val newElm =
+          elm.underlyingElem.
+            plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
+            minusAttribute(QName("ISBN"))
+        immutable.IndexedSeq(indexed.Elem(newElm))
+      case qn =>
+        immutable.IndexedSeq(elm)
+    }
+  }
+
+  private def turnIsbnIntoElementIfNamesUpdated(elm: indexed.Elem): indexed.Elem = {
+    elm.qname match {
+      case qn @ UnprefixedName("Book") if elm.filterElems(_.localName == "LastName").nonEmpty =>
+        val isbn = elm.attribute(EName("ISBN"))
+
+        val newElm =
+          elm.underlyingElem.
+            plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
+            minusAttribute(QName("ISBN"))
+        indexed.Elem(newElm)
+      case qn =>
+        elm
+    }
+  }
+
+  private def turnIsbnIntoElementIfNamesNotUpdated(elm: indexed.Elem): indexed.Elem = {
+    elm.qname match {
+      case qn @ UnprefixedName("Book") if elm.filterElems(_.localName == "LastName").isEmpty =>
+        val isbn = elm.attribute(EName("ISBN"))
+
+        val newElm =
+          elm.underlyingElem.
+            plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
+            minusAttribute(QName("ISBN"))
+        indexed.Elem(newElm)
+      case qn =>
+        elm
+    }
+  }
+
+  // Effectively update names and ISBN. After all, the nested elements are updated first.
+  private def turnIsbnIntoElementIfNamesUpdatedAndUpdateNames(elm: indexed.Elem): indexed.Elem = {
+    elm.qname match {
+      case qn @ UnprefixedName("Book") if elm.filterElems(_.localName == "LastName").nonEmpty =>
+        val isbn = elm.attribute(EName("ISBN"))
+
+        val newElm =
+          elm.underlyingElem.
+            plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
+            minusAttribute(QName("ISBN"))
+        indexed.Elem(newElm)
+      case qn @ UnprefixedName("First_Name") =>
+        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+      case qn @ UnprefixedName("Last_Name") =>
+        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+      case qn =>
+        elm
+    }
+  }
+
+  // Effectively update names but not ISBN. After all, the nested elements are updated first.
+  private def turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames(elm: indexed.Elem): indexed.Elem = {
+    elm.qname match {
+      case qn @ UnprefixedName("Book") if elm.filterElems(_.localName == "LastName").isEmpty =>
+        val isbn = elm.attribute(EName("ISBN"))
+
+        val newElm =
+          elm.underlyingElem.
+            plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
+            minusAttribute(QName("ISBN"))
+        indexed.Elem(newElm)
+      case qn @ UnprefixedName("First_Name") =>
+        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+      case qn @ UnprefixedName("Last_Name") =>
+        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+      case qn =>
+        elm
+    }
+  }
+
+  private def undoIsbnUpdate(elm: resolved.Elem): resolved.Elem = {
+    elm match {
+      case elm @ resolved.Elem(EName(Some("http://bookstore"), "Book"), attrs, children) =>
+        elm.
+          copy(resolvedAttributes = elm.resolvedAttributes + (EName("ISBN") -> elm.getChildElem(_.resolvedName == EName("http://bookstore", "ISBN")).text)).
+          transformChildElemsToNodeSeq(e => if (e.resolvedName == EName("http://bookstore", "ISBN")) Vector() else Vector(e))
+      case elm =>
+        elm
+    }
+  }
+
+  private def undoNameUpdate(elm: resolved.Elem): resolved.Elem = {
+    elm match {
+      case elm @ resolved.Elem(EName(Some("http://bookstore"), "FirstName"), attrs, children) =>
+        elm.copy(resolvedName = EName(elm.resolvedName.namespaceUriOption, "First_Name"))
+      case elm @ resolved.Elem(EName(Some("http://bookstore"), "LastName"), attrs, children) =>
+        elm.copy(resolvedName = EName(elm.resolvedName.namespaceUriOption, "Last_Name"))
+      case elm =>
+        elm
     }
   }
 }
