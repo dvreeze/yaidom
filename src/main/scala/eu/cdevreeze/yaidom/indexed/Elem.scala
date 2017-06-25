@@ -18,11 +18,15 @@ package eu.cdevreeze.yaidom.indexed
 
 import java.net.URI
 
+import scala.collection.immutable
+
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.queryapi
 import eu.cdevreeze.yaidom.simple
 
 /**
  * Factory object for `Elem` instances, where `Elem` is a type alias for `IndexedScopedElem[simple.Elem]`.
+ * This object also contains an `ElemTransformationApi` implementation for these elements.
  *
  * @author Chris de Vreeze
  */
@@ -50,5 +54,87 @@ object Elem {
 
   def apply(docUri: URI, underlyingRootElem: simple.Elem, path: Path): Elem = {
     IndexedScopedNode.Elem(docUri, underlyingRootElem, path)
+  }
+
+  object ElemTransformations extends queryapi.ElemTransformationApi {
+
+    // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.
+
+    type Node = IndexedScopedNode.Node
+
+    type Elem = IndexedScopedNode.Elem[simple.Elem]
+
+    def transformChildElems(elem: Elem, f: Elem => Elem): Elem = {
+      val oldPathToElemMap: Map[Path, Elem] =
+        elem.findAllChildElems.map(e => (e.path -> e)).toMap.ensuring(!_.contains(Path.Empty))
+
+      // Updating the underlying root element (ignoring the root element)
+
+      val newUnderlyingRootElem: simple.Elem =
+        elem.underlyingRootElem.updateElems(oldPathToElemMap.keySet) { (elm, path) =>
+          assert(oldPathToElemMap.contains(path))
+
+          // Apply the function, and return the underlying element, thus losing "ancestry data" resulting from the function application.
+          f(oldPathToElemMap(path)).underlyingElem
+        }
+
+      val newRootElem =
+        apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
+
+      // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
+      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
+    }
+
+    def transformChildElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
+      val oldPathToElemMap: Map[Path, Elem] =
+        elem.findAllChildElems.map(e => (e.path -> e)).toMap.ensuring(!_.contains(Path.Empty))
+
+      // Updating the underlying root element (ignoring the root element)
+
+      val newUnderlyingRootElem: simple.Elem =
+        elem.underlyingRootElem.updateElemsWithNodeSeq(oldPathToElemMap.keySet) { (elm, path) =>
+          assert(oldPathToElemMap.contains(path))
+
+          // Apply the function, and return the underlying element, thus losing "ancestry data" resulting from the function application.
+          f(oldPathToElemMap(path)).map(n => getUnderlyingNode(n))
+        }
+
+      val newRootElem =
+        apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
+
+      // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
+      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
+    }
+
+    def transformElemsOrSelf(elem: Elem, f: Elem => Elem): Elem = {
+      f(transformChildElems(elem, { e => transformElemsOrSelf(e, f) }))
+    }
+
+    def transformElems(elem: Elem, f: Elem => Elem): Elem = {
+      transformChildElems(elem, { e => transformElemsOrSelf(e, f) })
+    }
+
+    def transformElemsOrSelfToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node] = {
+      f(transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f)))
+    }
+
+    def transformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
+      transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f))
+    }
+
+    private def getUnderlyingNode(node: Node): simple.Node = {
+      node match {
+        case e: IndexedScopedNode.Elem[_] =>
+          e.asInstanceOf[IndexedScopedNode.Elem[simple.Elem]].underlyingElem
+        case t: IndexedScopedNode.Text =>
+          simple.Text(t.text, false)
+        case c: IndexedScopedNode.Comment =>
+          simple.Comment(c.text)
+        case pi: IndexedScopedNode.ProcessingInstruction =>
+          simple.ProcessingInstruction(pi.target, pi.data)
+        case er: IndexedScopedNode.EntityRef =>
+          simple.EntityRef(er.entity)
+      }
+    }
   }
 }
