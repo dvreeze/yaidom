@@ -4,14 +4,22 @@ ROAD MAP
 
 
 The vision is to grow yaidom into a generic element querying, update/transformation and element creation
-API.
+API. This API is essentially EName-based rather than QName-based, even in its element creation API.
+In other words, like always, namespaces are central in yaidom.
 
 The library should be like an hour glass, with multiple element implementations at the bottom, but also
 supporting multiple XML dialects at the top (abstracting from the element implementations). At the center
-of the hour glass is the small generic element querying, update/transformations and element creation API.
+of the hour glass is the small generic element querying, update/transformation and element creation API.
 
 This is the vision of yaidom 2.X. Yaidom 1.X already comes very close to this vision in its query API,
 but much less so in its update/transformation API, let alone in its element creation API.
+
+Note that standards like XQuery and XSLT miss the XML dialect support that yaidom offers, because they
+are not (libraries in) OO languages (such as Scala). XQuery and XSLT use custom XPath functions (such as custom
+XBRL XPath functions) instead. Future versions of yaidom should also integrate well with XPath (whether
+in yaidom itself or not). For example, with Saxon JAXP XPath evaluators and Saxon-backed yaidom wrappers
+around XPath evaluation results and XPath context items, yaidom could even play a role in implementing
+custom XPath functions.
 
 
 Towards version 1.6
