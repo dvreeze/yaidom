@@ -3,23 +3,51 @@ ROAD MAP
 ========
 
 
-The vision is to grow yaidom into a generic element querying, update/transformation and element creation
+The vision is to grow yaidom into a generic **element query API**, update/transformation API and element creation
 API. This API is essentially EName-based rather than QName-based, even in its element creation API.
 In other words, like always, namespaces are central in yaidom.
 
-The library should be like an hour glass, with multiple element implementations at the bottom, but also
-supporting multiple XML dialects at the top (abstracting from the element implementations). At the center
+The library should be like an **hour glass**, with **multiple element implementations** at the bottom, but also
+supporting **multiple XML dialects** at the top (abstracting from the element implementations). At the center
 of the hour glass is the small generic element querying, update/transformation and element creation API.
+The XML dialects at the top are thus decoupled from the element implementations at the bottom, to the
+extent possible. Of course the yaidom XML dialects are not part of the yaidom distribution.
 
-This is the vision of yaidom 2.X. Yaidom 1.X already comes very close to this vision in its query API,
-but much less so in its update/transformation API, let alone in its element creation API.
+The most important element implementation is a yaidom Saxon NodeInfo wrapper, although it is not part of the
+core yaidom distribution, due to its dependence on specific Saxon versions. It is the best performing
+yaidom element implementation in production.
 
 Note that standards like XQuery and XSLT miss the XML dialect support that yaidom offers, because they
 are not (libraries in) OO languages (such as Scala). XQuery and XSLT use custom XPath functions (such as custom
-XBRL XPath functions) instead. Future versions of yaidom should also integrate well with XPath (whether
-in yaidom itself or not). For example, with Saxon JAXP XPath evaluators and Saxon-backed yaidom wrappers
-around XPath evaluation results and XPath context items, yaidom could even play a role in implementing
-custom XPath functions.
+XBRL XPath functions) instead.
+
+Future versions of yaidom should also integrate well with XPath (whether in yaidom itself or not). For
+example, with Saxon JAXP XPath evaluators and Saxon-backed yaidom wrappers around XPath evaluation results
+and XPath context items, yaidom could even play a role in implementing custom XPath functions.
+
+Moreover, yaidom should remain useful in streaming scenarios for processing very large XML files, although
+yaidom's query API is itself not a streaming API.
+
+Yaidom should also become somewhat easier to use. This can be realized easily. For example, it is easy
+to support EName construction from QNames and implicit Scopes. It is also easy to better support pattern
+matching on XML trees, as Johan Walters has shown in his use of the yaidom transformation API.
+
+This is the general vision of yaidom 2.X. Yaidom 1.X already comes very close to this vision in its query API,
+but much less so in its update/transformation API, let alone in its element creation API.
+
+A few notes about the general element creation API are in order. Maybe we could treat native yaidom simple
+elements (which can be built declaratively) as generic element builders, for arbitrary element implementations. 
+Especially for small XML trees this could work out nicely, thus using the same element creation code for
+arbitrary element implementations.
+
+This could also work for yaidom Saxon NodeInfo wrappers. After all, similar to trait YaidomToSaxEventsConversions,
+we could use a TinyBuilder that takes SAX-like events and quickly constructs a NodeInfo object corresponding
+to a yaidom simple element. If additional data is needed, such as schema type info, we could think of
+specific processing instructions that we use in the input yaidom simple element tree. Hence, yaidom simple
+elements could well be the needed "general element creation API", as long as we do not build very large
+yaidom simple elements as builders for elements having other element tree implementations.
+
+The road map for this vision on future yaidom versions has not been written yet in this road map document.
 
 
 Towards version 1.6
