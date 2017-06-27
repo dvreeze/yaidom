@@ -35,10 +35,10 @@ matching on XML trees, as Johan Walters has shown in his use of the yaidom trans
 This is the general vision of yaidom 2.X. Yaidom 1.X already comes very close to this vision in its query API,
 but much less so in its update/transformation API, let alone in its element creation API.
 
-A few notes about the general element creation API are in order. Maybe we could treat native yaidom simple
-elements (which can be built declaratively) as generic element builders, for arbitrary element implementations. 
-Especially for small XML trees this could work out nicely, thus using the same element creation code for
-arbitrary element implementations.
+A few notes about the general element creation API are in order. Maybe under the hood we could treat native
+yaidom simple elements (which can be built declaratively) as generic element builders, for arbitrary element
+implementations. Especially for small XML trees this could work out nicely, thus using the same element creation
+code for arbitrary element implementations.
 
 This could also work for yaidom Saxon NodeInfo wrappers. After all, similar to trait YaidomToSaxEventsConversions,
 we could use a TinyBuilder that takes SAX-like events and quickly constructs a NodeInfo object corresponding
