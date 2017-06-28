@@ -29,7 +29,7 @@ object SimpleTextENameExtractor extends TextENameExtractor {
 
   def extractENames(scope: Scope, text: String): Set[EName] = {
     val ename =
-      Try(scope.resolveQNameOption(QName(text)).get).toOption.getOrElse(
+      Try(scope.resolveQNameOption(QName(text)).get).getOrElse(
         sys.error(s"String '${text}' could not be resolved in scope $scope"))
 
     Set(ename)
