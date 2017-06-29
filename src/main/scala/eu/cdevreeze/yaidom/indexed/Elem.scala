@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.simple
 
 /**
  * Factory object for `Elem` instances, where `Elem` is a type alias for `IndexedScopedElem[simple.Elem]`.
- * This object also contains an `ElemTransformationApi` implementation for these elements.
+ * This object also contains `ElemTransformationApi` and `ElemUpdateApi` implementations for these elements.
  *
  * @author Chris de Vreeze
  */
@@ -106,20 +106,77 @@ object Elem {
       // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
       newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
     }
+  }
 
-    private def getUnderlyingNode(node: Node): simple.Node = {
-      node match {
-        case e: IndexedScopedNode.Elem[_] =>
-          e.asInstanceOf[IndexedScopedNode.Elem[simple.Elem]].underlyingElem
-        case t: IndexedScopedNode.Text =>
-          simple.Text(t.text, false)
-        case c: IndexedScopedNode.Comment =>
-          simple.Comment(c.text)
-        case pi: IndexedScopedNode.ProcessingInstruction =>
-          simple.ProcessingInstruction(pi.target, pi.data)
-        case er: IndexedScopedNode.EntityRef =>
-          simple.EntityRef(er.entity)
-      }
+  object ElemUpdates extends queryapi.ElemUpdateLike {
+
+    // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.
+    // In particular, ancestor elements cannot trust Paths of descendant elements after updates.
+
+    type Node = IndexedScopedNode.Node
+
+    type Elem = IndexedScopedNode.Elem[simple.Elem]
+
+    def children(elem: Elem): immutable.IndexedSeq[Node] = {
+      var childElems = elem.findAllChildElems.toList
+
+      val resultNodes: immutable.IndexedSeq[Node] =
+        elem.underlyingElem.children map {
+          case e: simple.Elem =>
+            val hd :: tail = childElems
+            childElems = tail
+            assert(hd.resolvedName == e.resolvedName)
+            hd
+          case simple.Text(text, isCData) =>
+            IndexedScopedNode.Text(text, isCData)
+          case simple.Comment(comment) =>
+            IndexedScopedNode.Comment(comment)
+          case simple.ProcessingInstruction(target, data) =>
+            IndexedScopedNode.ProcessingInstruction(target, data)
+          case simple.EntityRef(entity) =>
+            IndexedScopedNode.EntityRef(entity)
+        }
+
+      assert(childElems.isEmpty)
+      resultNodes
+    }
+
+    def withChildren(elem: Elem, newChildren: immutable.IndexedSeq[Node]): Elem = {
+      // Updating the underlying root element
+
+      val newUnderlyingRootElem: simple.Elem =
+        elem.underlyingRootElem.updateElemOrSelf(elem.path) { e =>
+          e.withChildren(newChildren.map(ch => getUnderlyingNode(ch)))
+        }
+
+      val newRootElem =
+        apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
+
+      // The updates were only for child nodes of elem, so its Path must still be valid for the result element.
+      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
+    }
+
+    def collectChildNodeIndexes(elem: Elem, pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
+      elem.underlyingElem.collectChildNodeIndexes(pathEntries)
+    }
+
+    def findAllChildElemsWithPathEntries(elem: Elem): immutable.IndexedSeq[(Elem, Path.Entry)] = {
+      elem.findAllChildElems.map(e => (e, e.path.lastEntry))
+    }
+  }
+
+  private def getUnderlyingNode(node: IndexedScopedNode.Node): simple.Node = {
+    node match {
+      case e: IndexedScopedNode.Elem[_] =>
+        e.asInstanceOf[IndexedScopedNode.Elem[simple.Elem]].underlyingElem
+      case t: IndexedScopedNode.Text =>
+        simple.Text(t.text, false)
+      case c: IndexedScopedNode.Comment =>
+        simple.Comment(c.text)
+      case pi: IndexedScopedNode.ProcessingInstruction =>
+        simple.ProcessingInstruction(pi.target, pi.data)
+      case er: IndexedScopedNode.EntityRef =>
+        simple.EntityRef(er.entity)
     }
   }
 }
