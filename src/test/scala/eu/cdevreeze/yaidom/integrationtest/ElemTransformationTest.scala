@@ -32,19 +32,19 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 
 /**
- * XML functional update function test case.
+ * XML functional update function test case, using the ElemTransformationApi for indexed elements.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class UpdateFunctionTest extends FunSuite {
+class ElemTransformationTest extends FunSuite {
 
   private val docParser = DocumentParserUsingDom.newInstance()
 
   test("testShowVisitedPaths") {
     // Showing that paths are visited in reverse document order, in order not to break them during transformations
 
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -85,7 +85,7 @@ class UpdateFunctionTest extends FunSuite {
   test("testShowVisitedPathsForNodeSeqTransformations") {
     // Showing that paths are visited in reverse document order, in order not to break them during transformations
 
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -124,7 +124,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testUpdateNames") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -170,7 +170,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testUpdateNamesReturningNodeSeqs") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -225,7 +225,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testUpdateIsbnAndNames") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -309,7 +309,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testUpdateIsbnAndNamesReturningNodeSeqs") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -393,7 +393,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testUpdateIsbnIfNamesUpdated") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -446,7 +446,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testUpdateIsbnIfNamesNotUpdated") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -492,7 +492,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testEffectivelyUpdateNamesAndIsbn") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -510,7 +510,7 @@ class UpdateFunctionTest extends FunSuite {
   }
 
   test("testEffectivelyUpdateNamesOnly") {
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
@@ -527,7 +527,7 @@ class UpdateFunctionTest extends FunSuite {
     // This shows a technique of fast updates of specific elements (in potentially very large XML documents).
     // The idea is to first find the local element tree to update, and then transform only that element and its descendants.
 
-    val is = classOf[UpdateFunctionTest].getResourceAsStream("books.xml")
+    val is = classOf[ElemTransformationTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
