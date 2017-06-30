@@ -643,6 +643,7 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem3.underlyingElem)
     }
   }
+  */
 
   test("testEffectivelyUpdateNamesAndIsbn") {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
@@ -651,7 +652,10 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
-    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames)
+    val docElem1 = updateElems(
+      doc.documentElement,
+      doc.documentElement.findAllElems.map(_.path.skippingPath(doc.documentElement.path)).toSet)(
+        toFunctionTakingElemAndPath(turnIsbnIntoElementIfNamesUpdatedAndUpdateNames))
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
@@ -669,13 +673,15 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
-    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames)
+    val docElem1 = updateElems(
+      doc.documentElement,
+      doc.documentElement.findAllElems.map(_.path.skippingPath(doc.documentElement.path)).toSet)(
+        toFunctionTakingElemAndPath(turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames))
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
     }
   }
-  */
 
   test("testFastUpdateOfSpecificBook") {
     // This shows a (sensitive!) technique of fast updates of specific elements (in potentially very large XML documents).
