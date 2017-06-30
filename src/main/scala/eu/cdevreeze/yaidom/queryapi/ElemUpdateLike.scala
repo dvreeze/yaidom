@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.queryapi
 
 import scala.collection.immutable
-import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.core.Path
 
