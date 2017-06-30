@@ -156,14 +156,15 @@ trait ElemApi extends AnyElemApi {
   def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
   /**
-   * Returns all descendant elements (not including this element). This method could be defined as `filterElems { e => true }`.
+   * Returns all descendant elements (not including this element), in document order.
+   * This method could be defined as `filterElems { e => true }`.
    * Equivalent to `findAllElemsOrSelf.drop(1)`.
    */
   def findAllElems: immutable.IndexedSeq[ThisElem]
 
   /**
-   * Returns this element followed by all descendant elements (that is, the descendant-or-self elements).
-   * This method could be defined as `filterElemsOrSelf { e => true }`.
+   * Returns this element followed by all descendant elements (that is, the descendant-or-self elements),
+   * in document order. This method could be defined as `filterElemsOrSelf { e => true }`.
    */
   def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem]
 
@@ -177,7 +178,7 @@ trait ElemApi extends AnyElemApi {
   def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
 
   /**
-   * Returns the descendant elements obeying the given predicate.
+   * Returns the descendant elements obeying the given predicate, in document order.
    * This method could be defined as:
    * {{{
    * this.findAllChildElems flatMap (_.filterElemsOrSelf(p))
@@ -186,7 +187,7 @@ trait ElemApi extends AnyElemApi {
   def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
 
   /**
-   * Returns the descendant-or-self elements obeying the given predicate. This method could be defined as:
+   * Returns the descendant-or-self elements obeying the given predicate, in document order. This method could be defined as:
    * {{{
    * def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] =
    *   Vector(this).filter(p) ++ (this.findAllChildElems flatMap (_.filterElemsOrSelf(p)))

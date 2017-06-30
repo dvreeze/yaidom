@@ -57,11 +57,13 @@ class ElemUpdateTest extends FunSuite {
       elm
     }
 
+    val rootPath = doc.documentElement.path.ensuring(_.isEmpty)
+
     visitedPaths = Vector()
 
     updateElems(
       doc.documentElement,
-      doc.documentElement.findAllElems.map(_.path).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
+      doc.documentElement.findAllElems.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
 
     assertResult(doc.documentElement.findAllElems.map(_.path).reverse) {
       visitedPaths
@@ -71,7 +73,7 @@ class ElemUpdateTest extends FunSuite {
 
     updateElemsOrSelf(
       doc.documentElement,
-      doc.documentElement.findAllElemsOrSelf.map(_.path).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
+      doc.documentElement.findAllElemsOrSelf.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
 
     assertResult(doc.documentElement.findAllElemsOrSelf.map(_.path).reverse) {
       visitedPaths
@@ -81,9 +83,30 @@ class ElemUpdateTest extends FunSuite {
 
     updateChildElems(
       doc.documentElement,
-      doc.documentElement.findAllChildElems.map(_.path.lastEntry).toSet)(toFunctionTakingElemAndPathEntry(accumulatePaths))
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet)(toFunctionTakingElemAndPathEntry(accumulatePaths))
 
     assertResult(doc.documentElement.findAllChildElems.map(_.path).reverse) {
+      visitedPaths
+    }
+
+    visitedPaths = Vector()
+
+    updateElemsOrSelf(
+      doc.documentElement,
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
+
+    assertResult(doc.documentElement.findAllChildElems.map(_.path).reverse) {
+      visitedPaths
+    }
+
+    visitedPaths = Vector()
+
+    updateElemsOrSelf(
+      doc.documentElement,
+      doc.documentElement.filterElems(_.localName.startsWith("Author")).map(_.path.skippingPath(rootPath)).toSet)(
+        toFunctionTakingElemAndPath(accumulatePaths))
+
+    assertResult(doc.documentElement.filterElems(_.localName.startsWith("Author")).map(_.path).reverse) {
       visitedPaths
     }
   }
@@ -104,11 +127,13 @@ class ElemUpdateTest extends FunSuite {
       immutable.IndexedSeq(elm)
     }
 
+    val rootPath = doc.documentElement.path.ensuring(_.isEmpty)
+
     visitedPaths = Vector()
 
     updateElemsWithNodeSeq(
       doc.documentElement,
-      doc.documentElement.findAllElems.map(_.path).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
+      doc.documentElement.findAllElems.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
 
     assertResult(doc.documentElement.findAllElems.map(_.path).reverse) {
       visitedPaths
@@ -118,7 +143,7 @@ class ElemUpdateTest extends FunSuite {
 
     updateElemsOrSelfWithNodeSeq(
       doc.documentElement,
-      doc.documentElement.findAllElemsOrSelf.map(_.path).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
+      doc.documentElement.findAllElemsOrSelf.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
 
     assertResult(doc.documentElement.findAllElemsOrSelf.map(_.path).reverse) {
       visitedPaths
@@ -128,9 +153,31 @@ class ElemUpdateTest extends FunSuite {
 
     updateChildElemsWithNodeSeq(
       doc.documentElement,
-      doc.documentElement.findAllChildElems.map(_.path.lastEntry).toSet)(toFunctionTakingElemAndPathEntry(accumulatePaths))
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet)(
+        toFunctionTakingElemAndPathEntry(accumulatePaths))
 
     assertResult(doc.documentElement.findAllChildElems.map(_.path).reverse) {
+      visitedPaths
+    }
+
+    visitedPaths = Vector()
+
+    updateElemsOrSelfWithNodeSeq(
+      doc.documentElement,
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(accumulatePaths))
+
+    assertResult(doc.documentElement.findAllChildElems.map(_.path).reverse) {
+      visitedPaths
+    }
+
+    visitedPaths = Vector()
+
+    updateElemsOrSelfWithNodeSeq(
+      doc.documentElement,
+      doc.documentElement.filterElems(_.localName.startsWith("Author")).map(_.path.skippingPath(rootPath)).toSet)(
+        toFunctionTakingElemAndPath(accumulatePaths))
+
+    assertResult(doc.documentElement.filterElems(_.localName.startsWith("Author")).map(_.path).reverse) {
       visitedPaths
     }
   }
@@ -142,9 +189,13 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
+    // Clumsy ways of updating name element names
+
+    val rootPath = doc.documentElement.path.ensuring(_.isEmpty)
+
     val docElem1 = updateElems(
       doc.documentElement,
-      doc.documentElement.findAllElems.map(_.path).toSet)(toFunctionTakingElemAndPath(updateNameElementName))
+      doc.documentElement.findAllElems.map(_.path.skippingPath(rootPath)).toSet)(toFunctionTakingElemAndPath(updateNameElementName))
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -156,7 +207,8 @@ class ElemUpdateTest extends FunSuite {
 
     val docElem2 = updateElemsOrSelf(
       doc.documentElement,
-      doc.documentElement.findAllElemsOrSelf.map(_.path).toSet)(toFunctionTakingElemAndPath(updateNameElementName))
+      doc.documentElement.findAllElemsOrSelf.map(_.path.skippingPath(rootPath)).toSet)(
+        toFunctionTakingElemAndPath(updateNameElementName))
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
@@ -164,20 +216,31 @@ class ElemUpdateTest extends FunSuite {
 
     val unchangedDocElem = updateChildElems(
       doc.documentElement,
-      doc.documentElement.findAllChildElems.map(_.path.lastEntry).toSet)(toFunctionTakingElemAndPathEntry(updateNameElementName))
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet)(
+        toFunctionTakingElemAndPathEntry(updateNameElementName))
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(unchangedDocElem.underlyingElem)
     }
 
+    val unchangedDocElem2 = updateElems(
+      doc.documentElement,
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath)).toSet)(
+        toFunctionTakingElemAndPath(updateNameElementName))
+
+    assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
+      resolved.Elem(unchangedDocElem2.underlyingElem)
+    }
+
     val docElem3 = updateElemsOrSelf(
       doc.documentElement,
-      doc.documentElement.findAllChildElems.map(_.path).toSet) { (che, path) =>
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath)).toSet) { (che, path) =>
 
         require(che.path == path)
+
         updateElems(
           che,
-          che.findAllElems.map(_.path.withoutFirstEntry).toSet)(toFunctionTakingElemAndPath(updateNameElementName))
+          che.findAllElems.map(_.path.skippingPath(che.path)).toSet)(toFunctionTakingElemAndPath(updateNameElementName))
       }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -186,20 +249,34 @@ class ElemUpdateTest extends FunSuite {
 
     val docElem4 = updateChildElems(
       doc.documentElement,
-      doc.documentElement.findAllChildElems.map(_.path.lastEntry).toSet) { (che, pathEntry) =>
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet) { (che, pathEntry) =>
 
         require(che.path.lastEntry == pathEntry)
+
         updateElemsOrSelf(
           che,
-          che.findAllElemsOrSelf.map(_.path.withoutFirstEntry).toSet)(toFunctionTakingElemAndPath(updateNameElementName))
+          che.findAllElemsOrSelf.map(_.path.skippingPath(che.path)).toSet)(
+            toFunctionTakingElemAndPath(updateNameElementName))
       }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
     }
+
+    // Finally a more natural way of updating name element names, limiting the paths for which to update
+
+    val authorPaths =
+      doc.documentElement.filterElems(e => e.localName == "First_Name" || e.localName == "Last_Name").map(_.path).toSet
+
+    val docElem5 = updateElemsOrSelf(
+      doc.documentElement,
+      authorPaths.map(_.skippingPath(rootPath)))(toFunctionTakingElemAndPath(updateNameElementName))
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem5.underlyingElem)
+    }
   }
 
-  /*
   test("testUpdateNamesReturningNodeSeqs") {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
 
@@ -207,7 +284,14 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
-    val docElem1 = transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
+    // Clumsy ways of updating name element names
+
+    val rootPath = doc.documentElement.path.ensuring(_.isEmpty)
+
+    val docElem1 = updateElemsWithNodeSeq(
+      doc.documentElement,
+      doc.documentElement.findAllElems.map(_.path.skippingPath(rootPath)).toSet)(
+        toFunctionTakingElemAndPath(updateNameElementNameReturningNodeSeq))
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -217,7 +301,10 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
     }
 
-    val docElems2 = transformElemsOrSelfToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
+    val docElems2 = updateElemsOrSelfWithNodeSeq(
+      doc.documentElement,
+      doc.documentElement.findAllElemsOrSelf.map(_.path.skippingPath(rootPath)).toSet)(
+        toFunctionTakingElemAndPath(updateNameElementNameReturningNodeSeq))
 
     assertResult(1) {
       docElems2.size
@@ -232,29 +319,64 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem2.underlyingElem)
     }
 
-    val unchangedDocElem = transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
+    val unchangedDocElem = updateChildElemsWithNodeSeq(
+      doc.documentElement,
+      doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet)(
+        toFunctionTakingElemAndPathEntry(updateNameElementNameReturningNodeSeq))
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(unchangedDocElem.underlyingElem)
     }
 
-    val docElem3 = transformChildElems(doc.documentElement, { che =>
-      transformElemsToNodeSeq(che, updateNameElementNameReturningNodeSeq)
-    })
+    val docElem3 =
+      updateChildElems(
+        doc.documentElement,
+        doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet) { (che, pathEntry) =>
+
+          require(che.path.lastEntry == pathEntry)
+
+          updateElemsWithNodeSeq(
+            che,
+            che.findAllElems.map(_.path.skippingPath(che.path)).toSet)(
+              toFunctionTakingElemAndPath(updateNameElementNameReturningNodeSeq))
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem3.underlyingElem)
     }
 
-    val docElem4 = transformChildElemsToNodeSeq(doc.documentElement, { che =>
-      transformElemsOrSelfToNodeSeq(che, updateNameElementNameReturningNodeSeq)
-    })
+    val docElem4 =
+      updateChildElemsWithNodeSeq(
+        doc.documentElement,
+        doc.documentElement.findAllChildElems.map(_.path.skippingPath(rootPath).lastEntry).toSet) { (che, pathEntry) =>
+
+          require(che.path.lastEntry == pathEntry)
+
+          updateElemsOrSelfWithNodeSeq(
+            che,
+            che.findAllElemsOrSelf.map(_.path.skippingPath(che.path)).toSet)(
+              toFunctionTakingElemAndPath(updateNameElementNameReturningNodeSeq))
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
     }
+
+    // Finally a more natural way of updating name element names, limiting the paths for which to update
+
+    val authorPaths =
+      doc.documentElement.filterElems(e => e.localName == "First_Name" || e.localName == "Last_Name").map(_.path).toSet
+
+    val docElem5 = updateElemsWithNodeSeq(
+      doc.documentElement,
+      authorPaths.map(_.skippingPath(rootPath)))(toFunctionTakingElemAndPath(updateNameElementNameReturningNodeSeq))
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(docElem5.underlyingElem)
+    }
   }
 
+  /*
   test("testUpdateIsbnAndNames") {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
 
@@ -553,10 +675,11 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
     }
   }
+  */
 
   test("testFastUpdateOfSpecificBook") {
-    // This shows a technique of fast updates of specific elements (in potentially very large XML documents).
-    // The idea is to first find the local element tree to update, and then transform only that element and its descendants.
+    // This shows a (sensitive!) technique of fast updates of specific elements (in potentially very large XML documents).
+    // The idea is to first find the local element tree to update, and then update only that element and its descendants.
 
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
 
@@ -567,7 +690,13 @@ class ElemUpdateTest extends FunSuite {
     val bookElem =
       doc.documentElement.findElem(e => e.localName == "Book" && e.attribute(EName("ISBN")) == "ISBN-0-13-815504-6").get
 
-    val updatedBookElem = transformChildElems(bookElem, updateRemark)
+    // Mind the Paths passed, as always. It is safer to use ElemTransformationApi.transformChildElems on bookElem.
+
+    val updatedBookElem =
+      updateChildElems(
+        bookElem,
+        bookElem.findAllChildElems.map(_.path.skippingPath(bookElem.path).lastEntry).toSet)(
+          toFunctionTakingElemAndPathEntry(updateRemark))
 
     assertResult(bookElem.resolvedName) {
       updatedBookElem.resolvedName
@@ -579,11 +708,11 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem1.underlyingElem).removeAllInterElementWhitespace
     }
   }
-  */
 
   private def toFunctionTakingElemAndPath[A](f: indexed.Elem => A): ((indexed.Elem, Path) => A) = {
     { (elm, path) =>
-      // TODO Require that elm.path has path as a descendant-or-self path
+      // When called by functions like ElemUpdateApi.updateElemsOrSelf, we can trust the following property to hold
+      require(Path(elm.path.entries.takeRight(path.entries.size)) == path)
 
       f(elm)
     }
@@ -591,6 +720,7 @@ class ElemUpdateTest extends FunSuite {
 
   private def toFunctionTakingElemAndPathEntry[A](f: indexed.Elem => A): ((indexed.Elem, Path.Entry) => A) = {
     { (elm, pathEntry) =>
+      // When called by functions like ElemUpdateApi.updateChildElems, we can trust the following property to hold
       require(elm.path.lastEntryOption.contains(pathEntry))
 
       f(elm)

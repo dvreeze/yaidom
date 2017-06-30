@@ -191,6 +191,18 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   /** Convenience method returning true if at least one entry has the given element name */
   def containsName(ename: EName): Boolean = entries exists { entry => entry.elementName == ename }
 
+  /**
+   * Returns the Path resulting from skipping ("consuming") the entries of the parameter Path.
+   * If this Path does not start with the parameter Path, an exception is thrown.
+   */
+  def skippingPath(otherPath: Path): Path = {
+    require(
+      this.entries.take(otherPath.entries.size) == otherPath.entries,
+      s"Expected this path $this to start with path $otherPath")
+
+    Path(entries.drop(otherPath.entries.size))
+  }
+
   override def equals(obj: Any): Boolean = obj match {
     case other: Path =>
       if (hashCode != other.hashCode) false else entries == other.entries
