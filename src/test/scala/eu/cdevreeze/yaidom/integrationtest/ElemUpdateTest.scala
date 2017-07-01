@@ -376,13 +376,14 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
-  /*
   test("testUpdateIsbnAndNames") {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
     import indexed.Elem.ElemUpdates._
+
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     val docElem1 =
       transformElems(
@@ -468,6 +469,8 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
+
     val docElem1 =
       transformElemsToNodeSeq(
         transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
@@ -552,6 +555,8 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
+
     // First update names, then update ISBN if names have been updated (which they have)
     val docElem1 =
       transformElemsOrSelf(
@@ -605,6 +610,8 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
+
     // First update ISBN if names have not been updated (which is indeed the case), then update names
     val docElem1 =
       transformElemsOrSelf(
@@ -643,7 +650,6 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem3.underlyingElem)
     }
   }
-  */
 
   test("testEffectivelyUpdateNamesAndIsbn") {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
@@ -904,5 +910,64 @@ class ElemUpdateTest extends FunSuite {
       case elm =>
         elm
     }
+  }
+
+  // Redefining ElemTransformationApi methods in terms of ElemUpdateApi methods
+
+  private def transformChildElems(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
+    import indexed.Elem.ElemUpdates._
+
+    val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
+
+    updateChildElems(elem, pathEntries)(toFunctionTakingElemAndPathEntry(f))
+  }
+
+  private def transformChildElemsToNodeSeq(
+    elem: indexed.Elem,
+    f: indexed.Elem => immutable.IndexedSeq[indexed.IndexedScopedNode.Node]): indexed.Elem = {
+
+    import indexed.Elem.ElemUpdates._
+
+    val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
+
+    updateChildElemsWithNodeSeq(elem, pathEntries)(toFunctionTakingElemAndPathEntry(f))
+  }
+
+  private def transformElemsOrSelf(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
+    import indexed.Elem.ElemUpdates._
+
+    val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path).toSet
+
+    updateElemsOrSelf(elem, paths)(toFunctionTakingElemAndPath(f))
+  }
+
+  private def transformElems(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
+    import indexed.Elem.ElemUpdates._
+
+    val paths: Set[Path] = elem.findAllElems.map(_.path).toSet
+
+    updateElems(elem, paths)(toFunctionTakingElemAndPath(f))
+  }
+
+  private def transformElemsOrSelfToNodeSeq(
+    elem: indexed.Elem,
+    f: indexed.Elem => immutable.IndexedSeq[indexed.IndexedScopedNode.Node]): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
+
+    import indexed.Elem.ElemUpdates._
+
+    val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path).toSet
+
+    updateElemsOrSelfWithNodeSeq(elem, paths)(toFunctionTakingElemAndPath(f))
+  }
+
+  private def transformElemsToNodeSeq(
+    elem: indexed.Elem,
+    f: indexed.Elem => immutable.IndexedSeq[indexed.IndexedScopedNode.Node]): indexed.Elem = {
+
+    import indexed.Elem.ElemUpdates._
+
+    val paths: Set[Path] = elem.findAllElems.map(_.path).toSet
+
+    updateElemsWithNodeSeq(elem, paths)(toFunctionTakingElemAndPath(f))
   }
 }
