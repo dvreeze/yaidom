@@ -381,8 +381,6 @@ class ElemUpdateTest extends FunSuite {
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
-    import indexed.Elem.ElemUpdates._
-
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     val docElem1 =
@@ -466,8 +464,6 @@ class ElemUpdateTest extends FunSuite {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
-
-    import indexed.Elem.ElemUpdates._
 
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
@@ -553,8 +549,6 @@ class ElemUpdateTest extends FunSuite {
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
 
-    import indexed.Elem.ElemUpdates._
-
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     // First update names, then update ISBN if names have been updated (which they have)
@@ -607,8 +601,6 @@ class ElemUpdateTest extends FunSuite {
     val is = classOf[ElemUpdateTest].getResourceAsStream("books.xml")
 
     val doc: indexed.Document = indexed.Document(docParser.parse(is))
-
-    import indexed.Elem.ElemUpdates._
 
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
