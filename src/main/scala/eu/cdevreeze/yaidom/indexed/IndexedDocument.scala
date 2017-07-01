@@ -35,11 +35,11 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  * @author Chris de Vreeze
  */
 abstract class IndexedDocument(
-  val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends DocumentApi with Immutable { self =>
+    val xmlDeclarationOption: Option[XmlDeclaration],
+    val children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends DocumentApi with Immutable { self =>
 
-  require(xmlDeclarationOption ne null)
-  require(children ne null)
+  require(xmlDeclarationOption ne null) // scalastyle:off null
+  require(children ne null) // scalastyle:off null
 
   require(
     children.collect({ case elm: IndexedScopedElem[_] => elm }).size == 1,

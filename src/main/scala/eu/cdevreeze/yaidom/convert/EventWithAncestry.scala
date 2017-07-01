@@ -85,7 +85,12 @@ object EventWithAncestry {
         EventWithAncestry.convertStartElemEventToAncestryPathEntry(startElemEvent, currentScope)
 
       val nextAncestryPathOption =
-        if (ancestryPathAfterPreviousEventOption.isEmpty) Some(AncestryPath.fromEntry(entry)) else ancestryPathAfterPreviousEventOption.map(_.prepend(entry))
+        if (ancestryPathAfterPreviousEventOption.isEmpty) {
+          Some(AncestryPath.fromEntry(entry))
+        } else {
+          ancestryPathAfterPreviousEventOption.map(_.prepend(entry))
+        }
+
       nextAncestryPathOption
     } else if (event.isEndElement) {
       val endElemEvent = event.asEndElement
@@ -103,40 +108,17 @@ object EventWithAncestry {
     }
   }
 
-  def convertStartElemEventToAncestryPathEntry(startElement: StartElement, parentScope: Scope)(implicit qnameProvider: QNameProvider): AncestryPath.Entry = {
+  def convertStartElemEventToAncestryPathEntry(
+    startElement: StartElement,
+    parentScope: Scope)(implicit qnameProvider: QNameProvider): AncestryPath.Entry = {
+
     val declarations: Declarations = {
       val namespaces: List[Namespace] = startElement.getNamespaces.asScala.toList collect { case ns: Namespace => ns }
       // The Namespaces can also hold namespace undeclarations (with null or the empty string as namespace URI)
 
-      val declaredScope: Scope = {
-        val defaultNs = {
-          val result = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ != "" }
-          result.headOption
-        }
-        val prefScope = {
-          val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 != "" }
-          result.toMap
-        }
-        val defaultNsMap: Map[String, String] = if (defaultNs.isEmpty) Map() else Map("" -> defaultNs.get)
-        Scope.from(defaultNsMap ++ prefScope)
-      }
-      val undeclaredOptionalPrefixes: Set[Option[String]] = {
-        val defaultNs = {
-          val result = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ == "" }
-          result.headOption
-        }
-        val defaultNsUndeclared = defaultNs.isDefined
+      val declaredScope: Scope = getDeclaredScope(namespaces)
+      val undeclaredOptionalPrefixes: Set[Option[String]] = getUndeclaredOptionalPrefixes(namespaces)
 
-        val undeclaredPrefixOptions: Set[Option[String]] = {
-          val result = namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns => (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse("")) } filter { _._2 == "" } map { kv => Some(kv._1) }
-          result.toSet
-        }
-
-        if (defaultNsUndeclared)
-          Set(None) ++ undeclaredPrefixOptions
-        else
-          undeclaredPrefixOptions
-      }
       val undeclaredMap: Map[String, String] =
         (undeclaredOptionalPrefixes map (prefOption => if (prefOption.isEmpty) "" -> "" else prefOption.get -> "")).toMap
       Declarations.from(declaredScope.prefixNamespaceMap ++ undeclaredMap)
@@ -180,8 +162,52 @@ object EventWithAncestry {
   }
 
   /** Gets an optional prefix from a `javax.xml.namespace.QName` */
+  // scalastyle:off null
   private def prefixOptionFromJavaQName(jqname: JQName): Option[String] = {
     val prefix: String = jqname.getPrefix
     if ((prefix eq null) || (prefix == XMLConstants.DEFAULT_NS_PREFIX)) None else Some(prefix)
+  }
+
+  private def getDeclaredScope(namespaces: List[Namespace]): Scope = {
+    val defaultNs = {
+      val result =
+        namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ != "" }
+
+      result.headOption
+    }
+    val prefScope = {
+      val result =
+        namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns =>
+          (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse(""))
+        } filter { _._2 != "" }
+
+      result.toMap
+    }
+    val defaultNsMap: Map[String, String] = if (defaultNs.isEmpty) Map() else Map("" -> defaultNs.get)
+
+    Scope.from(defaultNsMap ++ prefScope)
+  }
+
+  private def getUndeclaredOptionalPrefixes(namespaces: List[Namespace]): Set[Option[String]] = {
+    val defaultNs = {
+      val result = namespaces filter { _.isDefaultNamespaceDeclaration } map { ns => Option(ns.getNamespaceURI).getOrElse("") } filter { _ == "" }
+      result.headOption
+    }
+    val defaultNsUndeclared = defaultNs.isDefined
+
+    val undeclaredPrefixOptions: Set[Option[String]] = {
+      val result =
+        namespaces filterNot { _.isDefaultNamespaceDeclaration } map { ns =>
+          (ns.getPrefix -> Option(ns.getNamespaceURI).getOrElse(""))
+        } filter { _._2 == "" } map { kv => Some(kv._1) }
+
+      result.toSet
+    }
+
+    if (defaultNsUndeclared) {
+      Set(None) ++ undeclaredPrefixOptions
+    } else {
+      undeclaredPrefixOptions
+    }
   }
 }

@@ -50,6 +50,7 @@ import net.jcip.annotations.NotThreadSafe
  * @author Chris de Vreeze
  */
 @NotThreadSafe
+// scalastyle:off null
 trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with LexicalHandler with SaxHandlerWithLocator {
 
   // This content handler has a relatively simple state space, so is rather easy to reason about.

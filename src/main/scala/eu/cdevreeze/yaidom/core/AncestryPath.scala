@@ -35,7 +35,7 @@ import scala.collection.mutable
  * @author Chris de Vreeze
  */
 final case class AncestryPath(val ancestorOrSelfEntries: List[AncestryPath.Entry]) extends Immutable { self =>
-  require(ancestorOrSelfEntries ne null)
+  require(ancestorOrSelfEntries ne null) // scalastyle:off null
   require(ancestorOrSelfEntries.size >= 1, s"Ancestry paths must have at least one entry")
 
   /**
@@ -131,9 +131,9 @@ object AncestryPath {
 
   /** An entry in an `AncestryPath`, as an element without children. */
   final case class Entry(val qname: QName, val attributes: immutable.IndexedSeq[(QName, String)], val scope: Scope) extends Immutable {
-    require(qname ne null)
-    require(attributes ne null)
-    require(scope ne null)
+    require(qname ne null) // scalastyle:off null
+    require(attributes ne null) // scalastyle:off null
+    require(scope ne null) // scalastyle:off null
 
     def ename: EName = {
       scope.resolveQNameOption(qname).getOrElse(sys.error(s"Corrupt element. QName $qname could not be resolved in scope $scope"))

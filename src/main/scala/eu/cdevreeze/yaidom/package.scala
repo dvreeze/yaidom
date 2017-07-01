@@ -354,7 +354,8 @@ package eu.cdevreeze
  * <li>This makes it easy to compose these elements, as long as scopes are passed explicitly throughout the element tree</li>
  * <li>Equality is reference equality, because it is hard to come up with a sensible equality for this element class</li>
  * <li>Roundtripping cannot be entirely lossless, but this class does try to retain the attribute order (although irrelevant according to XML Infoset)</li>
- * <li>Packages `parse` and `print` offer `DocumentParser` and `DocumentPrinter` classes for parsing/serializing these default `Elem` (and `Document`) instances</li>
+ * <li>Packages `parse` and `print` offer `DocumentParser` and `DocumentPrinter` classes for parsing/serializing these default
+ * `Elem` (and `Document`) instances</li>
  * </ul>
  *
  * Creating such `Elem` trees by hand is a bit cumbersome, partly because scopes have to be passed to each `Elem` in the tree.
@@ -460,14 +461,19 @@ package eu.cdevreeze
  * <ol>
  * <li>Package [[eu.cdevreeze.yaidom.core]], with the core concepts described above. It depends on no other yaidom packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.queryapi]], with the query API traits described above. It only depends on the `core` package.</li>
- * <li>Package [[eu.cdevreeze.yaidom.resolved]], with a minimal "James Clark" element implementation. It only depends on the `core` and `queryapi` packages.</li>
- * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core`, `queryapi` and `resolved` packages.</li>
- * <li>Package [[eu.cdevreeze.yaidom.indexed]], supporting "indexed" elements. It only depends on the `core`, `queryapi`, `resolved` and `simple` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.resolved]], with a minimal "James Clark" element implementation. It only depends on the `core` and
+ * `queryapi` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core`, `queryapi`
+ * and `resolved` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.indexed]], supporting "indexed" elements. It only depends on the `core`, `queryapi`, `resolved` and `simple`
+ * packages.</li>
  * <li>Package [[eu.cdevreeze.yaidom.convert]]. It contains conversions between default yaidom nodes on the one hand and DOM,
- * Scala XML, etc. on the other hand. Like the `indexed` package, the `convert` package depends on the yaidom `core`, `queryapi`, `resolved` and `simple` packages.</li>
+ * Scala XML, etc. on the other hand. Like the `indexed` package, the `convert` package depends on the yaidom `core`, `queryapi`, `resolved`
+ * and `simple` packages.</li>
  * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
  * the packages mentioned above, except for `indexed`.</li>
- * <li>The other packages (except `utils`), such as [[eu.cdevreeze.yaidom.dom]] and [[eu.cdevreeze.yaidom.scalaxml]]. They depend on (some of) the packages mentioned above,
+ * <li>The other packages (except `utils`), such as [[eu.cdevreeze.yaidom.dom]] and [[eu.cdevreeze.yaidom.scalaxml]]. They depend on (some of)
+ * the packages mentioned above,
  * but not on each other.</li>
  * <li>Package [[eu.cdevreeze.yaidom.utils]], which depends on all the packages above.</li>
  * </ol>

@@ -42,7 +42,7 @@ private[yaidom] object PrettyPrinting {
    * introducing performance bottlenecks caused by repeated "indentation shifts" for the same groups of lines.
    */
   final class Line(val indent: Int, val lineParts: immutable.IndexedSeq[String]) {
-    require(lineParts ne null)
+    require(lineParts ne null) // scalastyle:off null
     require(lineParts.nonEmpty, s"Empty line content (ignoring prefixes and suffixes) not allowed")
     require(lineParts.head.nonEmpty, s"Empty line content (ignoring prefixes and suffixes) not allowed")
 
@@ -150,8 +150,11 @@ private[yaidom] object PrettyPrinting {
    * it reduces the dependencies of yaidom on other libraries.
    */
   final def toStringLiteralAsSeq(s: String): immutable.IndexedSeq[String] = {
-    if (useJavaStringLiteral(s)) toJavaStringLiteralAsSeq(s)
-    else toMultilineStringLiteralAsSeq(s)
+    if (useJavaStringLiteral(s)) {
+      toJavaStringLiteralAsSeq(s)
+    } else {
+      toMultilineStringLiteralAsSeq(s)
+    }
   }
 
   final def toMultilineStringLiteralAsSeq(s: String): immutable.IndexedSeq[String] = {

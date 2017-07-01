@@ -125,9 +125,9 @@ final case class Elem(
     override val resolvedAttributes: Map[EName, String],
     override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike with UpdatableElemLike with TransformableElemLike {
 
-  require(resolvedName ne null)
-  require(resolvedAttributes ne null)
-  require(children ne null)
+  require(resolvedName ne null) // scalastyle:off null
+  require(resolvedAttributes ne null) // scalastyle:off null
+  require(children ne null) // scalastyle:off null
 
   type ThisNode = Node
 
@@ -338,7 +338,7 @@ final case class Elem(
 }
 
 final case class Text(text: String) extends Node with ResolvedNodes.Text {
-  require(text ne null)
+  require(text ne null) // scalastyle:off null
 
   /** Returns `text.trim`. */
   def trimmedText: String = text.trim

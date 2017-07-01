@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * @author Chris de Vreeze
  */
 final class ScalaXmlDocument(val wrappedDocument: scala.xml.Document) extends DocumentApi {
-  require(wrappedDocument ne null)
+  require(wrappedDocument ne null) // scalastyle:off null
 
   type ThisDoc = ScalaXmlDocument
 

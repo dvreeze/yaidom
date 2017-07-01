@@ -123,6 +123,7 @@ final case class Declarations(prefixNamespaceMap: Map[String, String]) extends I
 
 object Declarations {
 
+  // scalastyle:off null
   private def validate(prefixNamespaceMap: Map[String, String]): Unit = {
     require(prefixNamespaceMap ne null)
 

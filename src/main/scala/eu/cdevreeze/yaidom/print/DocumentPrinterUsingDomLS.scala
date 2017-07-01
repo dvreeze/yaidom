@@ -57,11 +57,11 @@ import DocumentPrinterUsingDomLS.DocumentProducer
  * @author Chris de Vreeze
  */
 final class DocumentPrinterUsingDomLS(
-  val docBuilderFactory: DocumentBuilderFactory,
-  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
-  val domImplementation: DOMImplementationLS,
-  val serializerCreator: DOMImplementationLS => LSSerializer,
-  val documentConverter: DocumentConverter[DocumentProducer]) extends AbstractDocumentPrinter { self =>
+    val docBuilderFactory: DocumentBuilderFactory,
+    val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
+    val domImplementation: DOMImplementationLS,
+    val serializerCreator: DOMImplementationLS => LSSerializer,
+    val documentConverter: DocumentConverter[DocumentProducer]) extends AbstractDocumentPrinter { self =>
 
   /**
    * Returns an adapted copy having the passed DocumentConverter. This method makes it possible to use an adapted
@@ -142,7 +142,7 @@ object DocumentPrinterUsingDomLS {
   def newInstance(): DocumentPrinterUsingDomLS = {
     val registry = DOMImplementationRegistry.newInstance
     val domImpl = registry.getDOMImplementation("LS 3.0")
-    require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'")
+    require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'") // scalastyle:off null
     require(domImpl.hasFeature("LS", "3.0"), "Expected DOM Implementation to have feature 'LS 3.0'")
     require(domImpl.isInstanceOf[DOMImplementationLS], "Expected DOM Implementation of type DOMImplementationLS")
     val domImplLS = domImpl.asInstanceOf[DOMImplementationLS]

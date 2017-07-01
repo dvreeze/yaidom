@@ -37,13 +37,13 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  */
 @SerialVersionUID(1L)
 final class DocBuilder(
-  val uriOption: Option[URI],
-  val xmlDeclarationOption: Option[XmlDeclaration],
-  val children: immutable.IndexedSeq[CanBeDocBuilderChild]) extends DocumentApi with Immutable with Serializable {
+    val uriOption: Option[URI],
+    val xmlDeclarationOption: Option[XmlDeclaration],
+    val children: immutable.IndexedSeq[CanBeDocBuilderChild]) extends DocumentApi with Immutable with Serializable {
 
-  require(uriOption ne null)
-  require(xmlDeclarationOption ne null)
-  require(children ne null)
+  require(uriOption ne null) // scalastyle:off null
+  require(xmlDeclarationOption ne null) // scalastyle:off null
+  require(children ne null) // scalastyle:off null
 
   require(
     children.collect({ case elm: ElemBuilder => elm }).size == 1,

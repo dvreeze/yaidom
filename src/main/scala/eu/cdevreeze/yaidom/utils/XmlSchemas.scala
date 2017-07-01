@@ -273,9 +273,11 @@ private[utils] object XmlSchemas {
     def tryToCreate(elem: BackingElemApi): Option[GlobalElementDeclaration] = {
       import scope._
 
-      if (elem.resolvedName == QName("xs", "element").res && elem.path.entries.size == 1)
+      if (elem.resolvedName == QName("xs", "element").res && elem.path.entries.size == 1) {
         Some(new GlobalElementDeclaration(elem))
-      else None
+      } else {
+        None
+      }
     }
   }
 
@@ -286,7 +288,11 @@ private[utils] object XmlSchemas {
 
       if (elem.resolvedName == QName("xs", "element").res &&
         elem.path.entries.size >= 2 &&
-        elem.attributeOption(EName("ref")).isEmpty) Some(new LocalElementDeclaration(elem)) else None
+        elem.attributeOption(EName("ref")).isEmpty) {
+        Some(new LocalElementDeclaration(elem))
+      } else {
+        None
+      }
     }
   }
 
@@ -297,7 +303,11 @@ private[utils] object XmlSchemas {
 
       if (elem.resolvedName == QName("xs", "element").res &&
         elem.path.entries.size >= 2 &&
-        elem.attributeOption(EName("ref")).isDefined) Some(new ElementReference(elem)) else None
+        elem.attributeOption(EName("ref")).isDefined) {
+        Some(new ElementReference(elem))
+      } else {
+        None
+      }
     }
   }
 
@@ -306,9 +316,11 @@ private[utils] object XmlSchemas {
     def tryToCreate(elem: BackingElemApi): Option[GlobalAttributeDeclaration] = {
       import scope._
 
-      if (elem.resolvedName == QName("xs", "attribute").res && elem.path.entries.size == 1)
+      if (elem.resolvedName == QName("xs", "attribute").res && elem.path.entries.size == 1) {
         Some(new GlobalAttributeDeclaration(elem))
-      else None
+      } else {
+        None
+      }
     }
   }
 
@@ -319,7 +331,11 @@ private[utils] object XmlSchemas {
 
       if (elem.resolvedName == QName("xs", "attribute").res &&
         elem.path.entries.size >= 2 &&
-        elem.attributeOption(EName("ref")).isEmpty) Some(new LocalAttributeDeclaration(elem)) else None
+        elem.attributeOption(EName("ref")).isEmpty) {
+        Some(new LocalAttributeDeclaration(elem))
+      } else {
+        None
+      }
     }
   }
 
@@ -330,7 +346,11 @@ private[utils] object XmlSchemas {
 
       if (elem.resolvedName == QName("xs", "attribute").res &&
         elem.path.entries.size >= 2 &&
-        elem.attributeOption(EName("ref")).isDefined) Some(new AttributeReference(elem)) else None
+        elem.attributeOption(EName("ref")).isDefined) {
+        Some(new AttributeReference(elem))
+      } else {
+        None
+      }
     }
   }
 }

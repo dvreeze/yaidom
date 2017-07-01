@@ -112,15 +112,15 @@ sealed trait CanBeDocBuilderChild extends NodeBuilder {
  */
 @SerialVersionUID(1L)
 final class ElemBuilder(
-  val qname: QName,
-  val attributes: immutable.IndexedSeq[(QName, String)],
-  val namespaces: Declarations,
-  val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi with HasText {
+    val qname: QName,
+    val attributes: immutable.IndexedSeq[(QName, String)],
+    val namespaces: Declarations,
+    val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi with HasText {
 
-  require(qname ne null)
-  require(attributes ne null)
-  require(namespaces ne null)
-  require(children ne null)
+  require(qname ne null) // scalastyle:off null
+  require(attributes ne null) // scalastyle:off null
+  require(namespaces ne null) // scalastyle:off null
+  require(children ne null) // scalastyle:off null
 
   require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
 
@@ -256,7 +256,7 @@ final class ElemBuilder(
 
 @SerialVersionUID(1L)
 final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder {
-  require(text ne null)
+  require(text ne null) // scalastyle:off null
   if (isCData) require(!text.containsSlice("]]>"))
 
   type NodeType = Text
@@ -266,8 +266,8 @@ final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder
 
 @SerialVersionUID(1L)
 final case class ProcessingInstructionBuilder(target: String, data: String) extends CanBeDocBuilderChild {
-  require(target ne null)
-  require(data ne null)
+  require(target ne null) // scalastyle:off null
+  require(data ne null) // scalastyle:off null
 
   type NodeType = ProcessingInstruction
 
@@ -277,7 +277,7 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
 
 @SerialVersionUID(1L)
 final case class EntityRefBuilder(entity: String) extends NodeBuilder {
-  require(entity ne null)
+  require(entity ne null) // scalastyle:off null
 
   type NodeType = EntityRef
 
@@ -286,7 +286,7 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
 
 @SerialVersionUID(1L)
 final case class CommentBuilder(text: String) extends CanBeDocBuilderChild {
-  require(text ne null)
+  require(text ne null) // scalastyle:off null
 
   type NodeType = Comment
 

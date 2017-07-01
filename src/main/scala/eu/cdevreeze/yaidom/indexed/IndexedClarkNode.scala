@@ -153,7 +153,7 @@ object IndexedClarkNode {
   }
 
   final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
-    require(text ne null)
+    require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 
     /** Returns `text.trim`. */

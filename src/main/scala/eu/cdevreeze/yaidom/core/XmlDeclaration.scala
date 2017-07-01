@@ -24,13 +24,13 @@ import java.nio.charset.Charset
  * @author Chris de Vreeze
  */
 final case class XmlDeclaration(
-  val version: String,
-  val encodingOption: Option[Charset],
-  val standaloneOption: Option[Boolean]) extends Immutable {
+    val version: String,
+    val encodingOption: Option[Charset],
+    val standaloneOption: Option[Boolean]) extends Immutable {
 
-  require(version ne null)
-  require(encodingOption ne null)
-  require(standaloneOption ne null)
+  require(version ne null) // scalastyle:off null
+  require(encodingOption ne null) // scalastyle:off null
+  require(standaloneOption ne null) // scalastyle:off null
 
   def withEncodingOption(encodingOption: Option[Charset]): XmlDeclaration =
     this.copy(encodingOption = encodingOption)

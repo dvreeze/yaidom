@@ -54,8 +54,8 @@ import javax.xml.namespace.{ QName => JQName }
  * @author Chris de Vreeze
  */
 final case class EName(namespaceUriOption: Option[String], localPart: String) extends Immutable {
-  require(namespaceUriOption ne null)
-  require(localPart ne null)
+  require(namespaceUriOption ne null) // scalastyle:off null
+  require(localPart ne null) // scalastyle:off null
 
   /** Given an optional prefix, creates a `QName` from this `EName` */
   def toQName(prefixOption: Option[String]): QName = {
@@ -84,6 +84,7 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
    * It is the responsibility of the user of this class to call this method, if needed.
    * Fortunately, this method facilitates method chaining, because the EName itself is returned.
    */
+  // scalastyle:off null
   def validated: EName = {
     require(
       namespaceUriOption.forall(ns => (ns ne null) && (ns.length > 0)),

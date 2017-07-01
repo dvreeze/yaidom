@@ -92,9 +92,9 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 final class DocumentParserUsingDom(
-  val docBuilderFactory: DocumentBuilderFactory,
-  val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
-  val converterToDocument: ConverterToDocument[org.w3c.dom.Document]) extends AbstractDocumentParser {
+    val docBuilderFactory: DocumentBuilderFactory,
+    val docBuilderCreator: DocumentBuilderFactory => DocumentBuilder,
+    val converterToDocument: ConverterToDocument[org.w3c.dom.Document]) extends AbstractDocumentParser {
 
   /**
    * Returns an adapted copy having the passed ConverterToDocument. This method makes it possible to use an adapted
@@ -118,7 +118,7 @@ final class DocumentParserUsingDom(
 
       converterToDocument.convertToDocument(domDoc)
     } finally {
-      if (inputStream ne null) inputStream.close()
+      if (inputStream ne null) inputStream.close() // scalastyle:off null
     }
   }
 }

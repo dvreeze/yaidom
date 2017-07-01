@@ -55,9 +55,9 @@ final class Document(
     val xmlDeclarationOption: Option[XmlDeclaration],
     val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi with Immutable with Serializable {
 
-  require(uriOption ne null)
-  require(xmlDeclarationOption ne null)
-  require(children ne null)
+  require(uriOption ne null) // scalastyle:off null
+  require(xmlDeclarationOption ne null) // scalastyle:off null
+  require(children ne null) // scalastyle:off null
 
   require(
     children.collect({ case elm: Elem => elm }).size == 1,

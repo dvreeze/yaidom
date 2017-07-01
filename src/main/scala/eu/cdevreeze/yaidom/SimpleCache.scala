@@ -43,8 +43,9 @@ private[yaidom] abstract class SimpleCache[K, V] {
     cache.synchronized {
       val cachedValueOption = cache.get(key)
 
-      if (cachedValueOption.isDefined) cachedValueOption.get
-      else {
+      if (cachedValueOption.isDefined) {
+        cachedValueOption.get
+      } else {
         val newValue = convertKeyToValue(key)
         cache += (key -> newValue)
         newValue

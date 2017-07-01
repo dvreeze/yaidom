@@ -35,20 +35,27 @@ import eu.cdevreeze.yaidom.java8.ResolvedAttr
  *
  * @author Chris de Vreeze
  */
-trait StreamingClarkElemLike[E <: StreamingClarkElemLike[E]] extends StreamingClarkElemApi[E] with StreamingElemLike[E] with StreamingIsNavigable[E] { self: E =>
+trait StreamingClarkElemLike[E <: StreamingClarkElemLike[E]]
+    extends StreamingClarkElemApi[E]
+    with StreamingElemLike[E]
+    with StreamingIsNavigable[E] { self: E =>
 
   final override def findChildElemByPathEntry(entry: Path.Entry): Optional[E] = {
     var sameENameIdx = 0
 
     val matchingChildElems = findAllChildElems filter (asJavaPredicate({ e =>
       val ename = e.resolvedName
+
       if (ename == entry.elementName) {
-        if (entry.index == sameENameIdx) true
-        else {
+        if (entry.index == sameENameIdx) {
+          true
+        } else {
           sameENameIdx += 1
           false
         }
-      } else false
+      } else {
+        false
+      }
     }))
 
     assert(matchingChildElems.allMatch(asJavaPredicate(_.resolvedName == entry.elementName)))

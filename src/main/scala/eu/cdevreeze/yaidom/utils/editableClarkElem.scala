@@ -165,8 +165,11 @@ final class EditableResolvedElem(val elem: resolved.Elem) extends AnyVal with Ed
 
   def plusResolvedAttributeOption(attrEName: EName, attrValueOption: Option[String]): EditableResolvedElem = {
     val newAttrs =
-      if (attrValueOption.isEmpty) elem.resolvedAttributes.toMap
-      else elem.resolvedAttributes.toMap ++ Map(attrEName -> attrValueOption.get)
+      if (attrValueOption.isEmpty) {
+        elem.resolvedAttributes.toMap
+      } else {
+        elem.resolvedAttributes.toMap ++ Map(attrEName -> attrValueOption.get)
+      }
 
     withResolvedAttributes(newAttrs)
   }
@@ -216,8 +219,8 @@ final class EditableResolvedElem(val elem: resolved.Elem) extends AnyVal with Ed
  * introduced.
  */
 final class EditableSimpleElem(
-  val elem: simple.Elem,
-  val getFallbackPrefixForNamespace: String => String) extends EditableClarkElem {
+    val elem: simple.Elem,
+    val getFallbackPrefixForNamespace: String => String) extends EditableClarkElem {
 
   type N = simple.Node
 
@@ -288,8 +291,12 @@ final class EditableSimpleElem(
 
   def plusResolvedAttributeOption(attrEName: EName, attrValueOption: Option[String]): EditableSimpleElem = {
     val newAttrs =
-      if (attrValueOption.isEmpty) elem.resolvedAttributes.toMap
-      else elem.resolvedAttributes.toMap ++ Map(attrEName -> attrValueOption.get)
+      if (attrValueOption.isEmpty) {
+        elem.resolvedAttributes.toMap
+      } else {
+        elem.resolvedAttributes.toMap ++ Map(attrEName -> attrValueOption.get)
+      }
+
     withResolvedAttributes(newAttrs)
   }
 

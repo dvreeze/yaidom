@@ -75,9 +75,9 @@ sealed trait CanBeScalaXmlDocumentChild extends ScalaXmlNode with Nodes.CanBeDoc
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemLike {
+    override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemLike {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   type ThisNode = ScalaXmlNode
 
@@ -140,7 +140,7 @@ final class ScalaXmlElem(
 }
 
 final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode with ResolvedNodes.Text {
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.Text
 
@@ -152,7 +152,7 @@ final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends Scala
 }
 
 final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends ScalaXmlNode with ResolvedNodes.Text {
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.PCData
 
@@ -167,7 +167,7 @@ final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends Sc
  * Wrapper around a Scala XML Atom that is not Text or PCData
  */
 final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends ScalaXmlNode {
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.Atom[_]
 
@@ -175,9 +175,9 @@ final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends Sc
 }
 
 final class ScalaXmlProcessingInstruction(
-  override val wrappedNode: scala.xml.ProcInstr) extends CanBeScalaXmlDocumentChild with Nodes.ProcessingInstruction {
+    override val wrappedNode: scala.xml.ProcInstr) extends CanBeScalaXmlDocumentChild with Nodes.ProcessingInstruction {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.ProcInstr
 
@@ -187,9 +187,9 @@ final class ScalaXmlProcessingInstruction(
 }
 
 final class ScalaXmlEntityRef(
-  override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode with Nodes.EntityRef {
+    override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode with Nodes.EntityRef {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.EntityRef
 
@@ -197,9 +197,9 @@ final class ScalaXmlEntityRef(
 }
 
 final class ScalaXmlComment(
-  override val wrappedNode: scala.xml.Comment) extends CanBeScalaXmlDocumentChild with Nodes.Comment {
+    override val wrappedNode: scala.xml.Comment) extends CanBeScalaXmlDocumentChild with Nodes.Comment {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.Comment
 

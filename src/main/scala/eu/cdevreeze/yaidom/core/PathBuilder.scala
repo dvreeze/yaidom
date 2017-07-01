@@ -32,7 +32,7 @@ import scala.collection.immutable
  * @author Chris de Vreeze
  */
 final class PathBuilder(val entries: immutable.IndexedSeq[PathBuilder.Entry]) extends Immutable { self =>
-  require(entries ne null)
+  require(entries ne null) // scalastyle:off null
 
   /** Returns true if this is the empty `PathBuilder`, so if it has no entries */
   def isEmpty: Boolean = entries.isEmpty
@@ -86,7 +86,7 @@ object PathBuilder {
 
   /** An entry in an `PathBuilder`, as an qname plus zero-based index of the elem as child (with that name) of the parent. */
   final case class Entry(qname: QName, index: Int) extends Immutable {
-    require(qname ne null)
+    require(qname ne null) // scalastyle:off null
     require(index >= 0)
 
     /** Builds the `Path.Entry`, using the passed `Scope`, which must be invertible */

@@ -51,7 +51,10 @@ sealed abstract class CanBeDocumentChild(override val underlyingNode: IndexedSco
 /**
  * Wrapper around native yaidom indexed element, offering the streaming element query API.
  */
-final class IndexedElem(override val underlyingNode: indexed.Elem) extends CanBeDocumentChild(underlyingNode) with StreamingBackingElemApi[IndexedElem] with StreamingScopedElemLike[IndexedElem] {
+final class IndexedElem(override val underlyingNode: indexed.Elem)
+    extends CanBeDocumentChild(underlyingNode)
+    with StreamingBackingElemApi[IndexedElem]
+    with StreamingScopedElemLike[IndexedElem] {
 
   def findAllChildElems: Stream[IndexedElem] = {
     val underlyingResult: Stream[indexed.Elem] =

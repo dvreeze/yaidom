@@ -130,7 +130,7 @@ final class DocumentParserUsingSax(
         doc.withXmlDeclarationOption(doc.xmlDeclarationOption.map(_.withStandaloneOption(Some(isStandalone))))
       docWithStandaloneSet
     } finally {
-      if (inputStream ne null) inputStream.close()
+      if (inputStream ne null) inputStream.close() // scalastyle:off null
     }
   }
 }

@@ -52,7 +52,8 @@ sealed trait Node extends ResolvedNodes.Node with Immutable with Serializable {
    * <li>The parsed XML tree is made explicit, which makes debugging far easier, especially since method toString invokes this method</li>
    * <li>The output of method `toTreeRepr` clearly corresponds to a `NodeBuilder`, and can indeed be parsed into one</li>
    * <li>That `toTreeRepr` output is even valid Scala code</li>
-   * <li>When parsing the string into a `NodeBuilder`, the following is out of scope: character escaping (for XML), entity resolving, "ignorable" whitespace handling, etc.</li>
+   * <li>When parsing the string into a `NodeBuilder`, the following is out of scope: character escaping (for XML), entity resolving,
+   * "ignorable" whitespace handling, etc.</li>
    * </ul>
    */
   final def toTreeRepr(parentScope: Scope): String = {
@@ -169,15 +170,20 @@ sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
  */
 @SerialVersionUID(1L)
 final class Elem(
-    val qname: QName,
-    val attributes: immutable.IndexedSeq[(QName, String)],
-    val scope: Scope,
-    override val children: immutable.IndexedSeq[Node]) extends CanBeDocumentChild with ResolvedNodes.Elem with ScopedElemLike with UpdatableElemLike with TransformableElemLike {
+  val qname: QName,
+  val attributes: immutable.IndexedSeq[(QName, String)],
+  val scope: Scope,
+  override val children: immutable.IndexedSeq[Node])
+    extends CanBeDocumentChild
+    with ResolvedNodes.Elem
+    with ScopedElemLike
+    with UpdatableElemLike
+    with TransformableElemLike {
 
-  require(qname ne null)
-  require(attributes ne null)
-  require(scope ne null)
-  require(children ne null)
+  require(qname ne null) // scalastyle:off null
+  require(attributes ne null) // scalastyle:off null
+  require(scope ne null) // scalastyle:off null
+  require(children ne null) // scalastyle:off null
 
   require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
 
@@ -194,7 +200,10 @@ final class Elem(
   override val resolvedName: EName =
     scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
 
-  /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
+  /**
+   * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against
+   * the attribute scope
+   */
   override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = attributeScope
 
@@ -267,8 +276,11 @@ final class Elem(
   def plusAttribute(attributeName: QName, attributeValue: String): Elem = {
     val idx = attributes indexWhere { case (attr, value) => attr == attributeName }
 
-    if (idx < 0) withAttributes(attributes :+ (attributeName -> attributeValue))
-    else withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))
+    if (idx < 0) {
+      withAttributes(attributes :+ (attributeName -> attributeValue))
+    } else {
+      withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))
+    }
   }
 
   /**
@@ -479,11 +491,6 @@ final class Elem(
       newLine.size >= 1 && newLine.size <= 2 && (newLine.forall(c => c == '\n' || c == '\r')),
       "The newline must be a valid newline")
 
-    def isText(n: Node): Boolean = n match {
-      case t: Text => true
-      case _       => false
-    }
-
     val tabOrSpace = if (useTab) "\t" else " "
 
     def indentToIndentString(totalIndent: Int): String = {
@@ -496,33 +503,6 @@ final class Elem(
 
     val indentStringsByIndent = mutable.Map[Int, String]()
 
-    def prettify(elm: Elem, currentIndent: Int): Elem = {
-      val childNodes = elm.children
-      val hasElemChild = elm.findChildElem(e => true).isDefined
-      val doPrettify = hasElemChild && (childNodes forall (n => !isText(n)))
-
-      if (doPrettify) {
-        val newIndent = currentIndent + indent
-
-        val indentTextString = indentStringsByIndent.getOrElseUpdate(newIndent, indentToIndentString(newIndent))
-        val endIndentTextString = indentStringsByIndent.getOrElseUpdate(currentIndent, indentToIndentString(currentIndent))
-
-        // Recursive calls
-        val prettifiedChildNodes = childNodes map {
-          case e: Elem => prettify(e, newIndent)
-          case n       => n
-        }
-
-        val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(Text(indentTextString, false), n) }
-        val newChildNodes = prefixedPrettifiedChildNodes :+ Text(endIndentTextString, false)
-
-        elm.withChildren(newChildNodes)
-      } else {
-        // Once we have encountered text-only content or mixed content, the formatting stops right there for that part of the DOM tree.
-        elm
-      }
-    }
-
     def containsWhitespaceOnly(elem: Elem): Boolean = {
       elem.children forall {
         case t: Text if t.text.trim.isEmpty => true
@@ -533,7 +513,46 @@ final class Elem(
     def fixIfWhitespaceOnly(elem: Elem): Elem =
       if (containsWhitespaceOnly(elem)) elem.withChildren(Vector()) else elem
 
-    prettify(this.removeAllInterElementWhitespace, 0).transformElemsOrSelf(fixIfWhitespaceOnly _)
+    prettify(this.removeAllInterElementWhitespace, 0, indent, indentStringsByIndent, indentToIndentString).
+      transformElemsOrSelf(fixIfWhitespaceOnly _)
+  }
+
+  private def prettify(
+    elm: Elem,
+    currentIndent: Int,
+    indent: Int,
+    indentStringsByIndent: mutable.Map[Int, String],
+    indentToIndentString: Int => String): Elem = {
+
+    def isText(n: Node): Boolean = n match {
+      case t: Text => true
+      case _       => false
+    }
+
+    val childNodes = elm.children
+    val hasElemChild = elm.findChildElem(e => true).isDefined
+    val doPrettify = hasElemChild && (childNodes forall (n => !isText(n)))
+
+    if (doPrettify) {
+      val newIndent = currentIndent + indent
+
+      val indentTextString = indentStringsByIndent.getOrElseUpdate(newIndent, indentToIndentString(newIndent))
+      val endIndentTextString = indentStringsByIndent.getOrElseUpdate(currentIndent, indentToIndentString(currentIndent))
+
+      // Recursive calls
+      val prettifiedChildNodes = childNodes map {
+        case e: Elem => prettify(e, newIndent, indent, indentStringsByIndent, indentToIndentString)
+        case n       => n
+      }
+
+      val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(Text(indentTextString, false), n) }
+      val newChildNodes = prefixedPrettifiedChildNodes :+ Text(endIndentTextString, false)
+
+      elm.withChildren(newChildNodes)
+    } else {
+      // Once we have encountered text-only content or mixed content, the formatting stops right there for that part of the DOM tree.
+      elm
+    }
   }
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
@@ -542,53 +561,13 @@ final class Elem(
 
     val innerIndent = indent + indentStep
 
-    val qnameLineSeq: immutable.IndexedSeq[Line] = {
-      val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "qname = QName(", toStringLiteralAsSeq(this.qname.toString), ")")
-      immutable.IndexedSeq(line)
-    }
+    val qnameLineSeq: immutable.IndexedSeq[Line] =
+      immutable.IndexedSeq(
+        Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "qname = QName(", toStringLiteralAsSeq(this.qname.toString), ")"))
 
-    val attributesLineSeqOption: Option[immutable.IndexedSeq[Line]] =
-      if (this.attributes.isEmpty) {
-        None
-      } else {
-        def attributeEntryStringSeq(qn: QName, attrValue: String): immutable.IndexedSeq[String] = {
-          ("QName(" +: toStringLiteralAsSeq(qn.toString) :+ ") -> ") ++ toStringLiteralAsSeq(attrValue)
-        }
+    val attributesLineSeqOption: Option[immutable.IndexedSeq[Line]] = getAttributesLineSeqOption(innerIndent)
 
-        val attributeEntryStrings: immutable.IndexedSeq[String] = {
-          val rawResult = this.attributes flatMap { kv => attributeEntryStringSeq(kv._1, kv._2) :+ ", " }
-
-          assert(rawResult.nonEmpty)
-          assert(rawResult.last == ", ")
-          rawResult.dropRight(1)
-        }
-
-        val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "attributes = Vector(", attributeEntryStrings, ")")
-        Some(immutable.IndexedSeq(line))
-      }
-
-    val declarations: Declarations = parentScope.relativize(thisElem.scope)
-
-    val namespacesLineSeqOption: Option[immutable.IndexedSeq[Line]] = {
-      if (declarations.prefixNamespaceMap.isEmpty) {
-        None
-      } else {
-        def namespaceEntryStringSeq(prefix: String, nsUri: String): immutable.IndexedSeq[String] = {
-          (toStringLiteralAsSeq(prefix) :+ " -> ") ++ toStringLiteralAsSeq(nsUri)
-        }
-
-        val namespaceEntryStrings: immutable.IndexedSeq[String] = {
-          val rawResult = declarations.prefixNamespaceMap.toIndexedSeq flatMap { kv => namespaceEntryStringSeq(kv._1, kv._2) :+ ", " }
-
-          assert(rawResult.nonEmpty)
-          assert(rawResult.last == ", ")
-          rawResult.dropRight(1)
-        }
-
-        val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "namespaces = Declarations.from(", namespaceEntryStrings, ")")
-        Some(immutable.IndexedSeq(line))
-      }
-    }
+    val namespacesLineSeqOption: Option[immutable.IndexedSeq[Line]] = getNamespacesLineSeqOption(innerIndent, parentScope)
 
     val childrenLineSeqOption: Option[immutable.IndexedSeq[Line]] =
       if (this.children.isEmpty) {
@@ -598,12 +577,11 @@ final class Elem(
 
         val contentLines: immutable.IndexedSeq[Line] = {
           // Recursive calls
-          val groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]] = {
+          val groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]] =
             thisElem.children map { child =>
               // Mind the indentation below.
               child.toTreeReprAsLineSeq(thisElem.scope, innerIndent + indentStep)(indentStep)
             }
-          }
 
           val result = Line.mkLineSeq(groups, ",")
           result
@@ -625,6 +603,44 @@ final class Elem(
     val lastLine = new Line(indent, ")")
 
     (firstLine +: content) :+ lastLine
+  }
+
+  private def getAttributesLineSeqOption(innerIndent: Int): Option[immutable.IndexedSeq[Line]] = {
+    if (this.attributes.isEmpty) {
+      None
+    } else {
+      val attributeEntryStrings: immutable.IndexedSeq[String] = {
+        val rawResult = this.attributes flatMap { kv => attributeEntryStringSeq(kv._1, kv._2) :+ ", " }
+        rawResult.ensuring(_.nonEmpty).ensuring(_.last == ", ").dropRight(1)
+      }
+
+      val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "attributes = Vector(", attributeEntryStrings, ")")
+      Some(immutable.IndexedSeq(line))
+    }
+  }
+
+  private def getNamespacesLineSeqOption(innerIndent: Int, parentScope: Scope): Option[immutable.IndexedSeq[Line]] = {
+    val declarations: Declarations = parentScope.relativize(thisElem.scope)
+
+    if (declarations.prefixNamespaceMap.isEmpty) {
+      None
+    } else {
+      val namespaceEntryStrings: immutable.IndexedSeq[String] = {
+        val rawResult = declarations.prefixNamespaceMap.toIndexedSeq flatMap { kv => namespaceEntryStringSeq(kv._1, kv._2) :+ ", " }
+        rawResult.ensuring(_.nonEmpty).ensuring(_.last == ", ").dropRight(1)
+      }
+
+      val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "namespaces = Declarations.from(", namespaceEntryStrings, ")")
+      Some(immutable.IndexedSeq(line))
+    }
+  }
+
+  private def attributeEntryStringSeq(qn: QName, attrValue: String): immutable.IndexedSeq[String] = {
+    ("QName(" +: toStringLiteralAsSeq(qn.toString) :+ ") -> ") ++ toStringLiteralAsSeq(attrValue)
+  }
+
+  private def namespaceEntryStringSeq(prefix: String, nsUri: String): immutable.IndexedSeq[String] = {
+    (toStringLiteralAsSeq(prefix) :+ " -> ") ++ toStringLiteralAsSeq(nsUri)
   }
 
   private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {
@@ -661,7 +677,7 @@ final class Elem(
 
 @SerialVersionUID(1L)
 final case class Text(text: String, isCData: Boolean) extends Node with ResolvedNodes.Text {
-  require(text ne null)
+  require(text ne null) // scalastyle:off null
   if (isCData) require(!text.containsSlice("]]>"))
 
   /** Returns `text.trim`. */
@@ -685,8 +701,8 @@ final case class Text(text: String, isCData: Boolean) extends Node with Resolved
 
 @SerialVersionUID(1L)
 final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
-  require(target ne null)
-  require(data ne null)
+  require(target ne null) // scalastyle:off null
+  require(data ne null) // scalastyle:off null
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val targetStringLiteral = toStringLiteralAsSeq(target)
@@ -710,7 +726,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
  */
 @SerialVersionUID(1L)
 final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
-  require(entity ne null)
+  require(entity ne null) // scalastyle:off null
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val entityStringLiteral = toStringLiteralAsSeq(entity)
@@ -720,7 +736,7 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 
 @SerialVersionUID(1L)
 final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
-  require(text ne null)
+  require(text ne null) // scalastyle:off null
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val parts = toStringLiteralAsSeq(text)

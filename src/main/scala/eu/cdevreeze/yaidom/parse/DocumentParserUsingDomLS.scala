@@ -79,9 +79,9 @@ import eu.cdevreeze.yaidom.simple.Document
  * @author Chris de Vreeze
  */
 final class DocumentParserUsingDomLS(
-  val domImplementation: DOMImplementationLS,
-  val parserCreator: DOMImplementationLS => LSParser,
-  val converterToDocument: ConverterToDocument[org.w3c.dom.Document]) extends AbstractDocumentParser {
+    val domImplementation: DOMImplementationLS,
+    val parserCreator: DOMImplementationLS => LSParser,
+    val converterToDocument: ConverterToDocument[org.w3c.dom.Document]) extends AbstractDocumentParser {
 
   /**
    * Returns an adapted copy having the passed ConverterToDocument. This method makes it possible to use an adapted
@@ -106,7 +106,7 @@ final class DocumentParserUsingDomLS(
 
       converterToDocument.convertToDocument(domDoc)
     } finally {
-      if (inputStream ne null) inputStream.close()
+      if (inputStream ne null) inputStream.close() // scalastyle:off null
     }
   }
 

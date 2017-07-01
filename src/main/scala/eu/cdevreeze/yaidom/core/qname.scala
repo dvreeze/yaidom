@@ -69,7 +69,7 @@ sealed trait QName extends Immutable with Serializable {
 }
 
 final case class UnprefixedName(override val localPart: String) extends QName {
-  require(localPart ne null)
+  require(localPart ne null) // scalastyle:off null
 
   override def prefixOption: Option[String] = None
 
@@ -83,8 +83,8 @@ final case class UnprefixedName(override val localPart: String) extends QName {
 }
 
 final case class PrefixedName(prefix: String, override val localPart: String) extends QName {
-  require(prefix ne null)
-  require(localPart ne null)
+  require(prefix ne null) // scalastyle:off null
+  require(localPart ne null) // scalastyle:off null
 
   override def prefixOption: Option[String] = Some(prefix)
 

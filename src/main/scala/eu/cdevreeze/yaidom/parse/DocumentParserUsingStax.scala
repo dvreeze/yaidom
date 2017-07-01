@@ -99,10 +99,10 @@ final class DocumentParserUsingStax(
       converterToDocument.convertToDocument(StaxConversions.asIterator(xmlEventReader))
     } finally {
       ignoring(classOf[Exception]) {
-        if (xmlEventReader ne null) xmlEventReader.close()
+        if (xmlEventReader ne null) xmlEventReader.close() // scalastyle:off null
       }
       ignoring(classOf[Exception]) {
-        if (inputStream ne null) inputStream.close()
+        if (inputStream ne null) inputStream.close() // scalastyle:off null
       }
     }
   }

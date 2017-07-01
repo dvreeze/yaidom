@@ -53,7 +53,8 @@ Other checks (w.r.t. documentation and bookkeeping) are:
 * Sensible versioning strategy.
 * Proper dependency management (e.g., supporting use of the library in an sbt or Maven build).
 * Issue tracking.
-* Test coverage.
+* Check the code coverage.
+* Run scalastyle (and/or similar tools) against the code base, and check the results.
 * Builds against different JDKs, including at least one IBM JDK.
 * Scala code can be used relatively easily from Java (distinguish between Java < 8 and >= 8).
 * All sources contain the license info, and there is a license file.

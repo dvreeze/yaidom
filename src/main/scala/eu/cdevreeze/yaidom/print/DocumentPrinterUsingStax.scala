@@ -46,9 +46,9 @@ import DocumentPrinterUsingStax.XmlEventsProducer
  * @author Chris de Vreeze
  */
 sealed class DocumentPrinterUsingStax(
-  val eventFactory: XMLEventFactory,
-  val outputFactory: XMLOutputFactory,
-  val documentConverter: DocumentConverter[XmlEventsProducer]) extends AbstractDocumentPrinter {
+    val eventFactory: XMLEventFactory,
+    val outputFactory: XMLOutputFactory,
+    val documentConverter: DocumentConverter[XmlEventsProducer]) extends AbstractDocumentPrinter {
 
   val omitXmlDeclaration: Boolean = false
 
@@ -75,12 +75,16 @@ sealed class DocumentPrinterUsingStax(
       newDocumentConverter)
   }
 
+  // scalastyle:off null
   def print(doc: Document, encoding: String, outputStream: jio.OutputStream): Unit = {
     val events: immutable.IndexedSeq[XMLEvent] = {
       val result = documentConverter.convertDocument(doc)(eventFactory)
 
-      if (omitXmlDeclaration) result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
-      else result
+      if (omitXmlDeclaration) {
+        result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
+      } else {
+        result
+      }
     }
 
     var xmlEventWriter: XMLEventWriter = null
@@ -96,12 +100,16 @@ sealed class DocumentPrinterUsingStax(
     }
   }
 
+  // scalastyle:off null
   def print(doc: Document): String = {
     val events: immutable.IndexedSeq[XMLEvent] = {
       val result = documentConverter.convertDocument(doc)(eventFactory)
 
-      if (omitXmlDeclaration) result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
-      else result
+      if (omitXmlDeclaration) {
+        result.filterNot(ev => ev.isStartDocument() || ev.isEndDocument)
+      } else {
+        result
+      }
     }
 
     val sw = new jio.StringWriter

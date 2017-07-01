@@ -114,7 +114,7 @@ object IndexedScopedNode {
   }
 
   final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
-    require(text ne null)
+    require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 
     /** Returns `text.trim`. */
@@ -125,8 +125,8 @@ object IndexedScopedNode {
   }
 
   final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
-    require(target ne null)
-    require(data ne null)
+    require(target ne null) // scalastyle:off null
+    require(data ne null) // scalastyle:off null
   }
 
   /**
@@ -140,11 +140,11 @@ object IndexedScopedNode {
    * }}}
    */
   final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
-    require(entity ne null)
+    require(entity ne null) // scalastyle:off null
   }
 
   final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
-    require(text ne null)
+    require(text ne null) // scalastyle:off null
   }
 
   object Elem {

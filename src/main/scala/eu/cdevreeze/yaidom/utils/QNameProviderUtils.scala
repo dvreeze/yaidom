@@ -50,8 +50,12 @@ object QNameProviderUtils {
       val result = schemaRoots flatMap { elem =>
         elem.findAllGlobalElementDeclarations map { e =>
           val ename = e.targetEName
-          if (ename.namespaceUriOption.isEmpty) QName(ename.localPart)
-          else QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+
+          if (ename.namespaceUriOption.isEmpty) {
+            QName(ename.localPart)
+          } else {
+            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+          }
         }
       }
       result.toSet
@@ -61,8 +65,12 @@ object QNameProviderUtils {
       val result = schemaRoots flatMap { elem =>
         elem.findAllGlobalAttributeDeclarations map { e =>
           val ename = e.targetEName
-          if (ename.namespaceUriOption.isEmpty) QName(ename.localPart)
-          else QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+
+          if (ename.namespaceUriOption.isEmpty) {
+            QName(ename.localPart)
+          } else {
+            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+          }
         }
       }
       result.toSet
@@ -72,8 +80,12 @@ object QNameProviderUtils {
       val result = schemaRoots flatMap { elem =>
         elem.findAllLocalElementDeclarations map { e =>
           val ename = e.targetEName
-          if (ename.namespaceUriOption.isEmpty) QName(ename.localPart)
-          else QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+
+          if (ename.namespaceUriOption.isEmpty) {
+            QName(ename.localPart)
+          } else {
+            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+          }
         }
       }
       result.toSet
@@ -83,8 +95,12 @@ object QNameProviderUtils {
       val result = schemaRoots flatMap { elem =>
         elem.findAllLocalAttributeDeclarations map { e =>
           val ename = e.targetEName
-          if (ename.namespaceUriOption.isEmpty) QName(ename.localPart)
-          else QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+
+          if (ename.namespaceUriOption.isEmpty) {
+            QName(ename.localPart)
+          } else {
+            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
+          }
         }
       }
       result.toSet

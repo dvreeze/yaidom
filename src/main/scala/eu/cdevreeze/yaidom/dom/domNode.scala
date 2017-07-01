@@ -82,9 +82,9 @@ sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
+    override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   type ThisElem = DomElem
 
@@ -101,14 +101,19 @@ final class DomElem(
     scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
   }
 
-  /** The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against the attribute scope */
+  /**
+   * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against
+   * the attribute scope
+   */
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = attributeScope
 
     attributes map { kv =>
       val attName = kv._1
       val attValue = kv._2
-      val expandedName = attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
+      val expandedName =
+        attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
+
       (expandedName -> attValue)
     }
   }
@@ -163,7 +168,7 @@ final class DomElem(
 }
 
 final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with ResolvedNodes.Text {
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = w3c.dom.Text
 
@@ -177,9 +182,9 @@ final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with
 }
 
 final class DomProcessingInstruction(
-  override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
+    override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = w3c.dom.ProcessingInstruction
 
@@ -189,9 +194,9 @@ final class DomProcessingInstruction(
 }
 
 final class DomEntityRef(
-  override val wrappedNode: w3c.dom.EntityReference) extends DomNode with Nodes.EntityRef {
+    override val wrappedNode: w3c.dom.EntityReference) extends DomNode with Nodes.EntityRef {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = w3c.dom.EntityReference
 
@@ -199,9 +204,9 @@ final class DomEntityRef(
 }
 
 final class DomComment(
-  override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
+    override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
 
-  require(wrappedNode ne null)
+  require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = w3c.dom.Comment
 
@@ -262,8 +267,9 @@ object DomElem {
       case _                  => null
     }
 
-    if (parentElement eq null) List(elem)
-    else {
+    if (parentElement eq null) {
+      List(elem)
+    } else {
       // Recursive call
       elem :: getAncestorsOrSelf(parentElement)
     }
