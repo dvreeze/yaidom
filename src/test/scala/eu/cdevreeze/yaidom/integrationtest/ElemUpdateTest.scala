@@ -662,6 +662,12 @@ class ElemUpdateTest extends FunSuite {
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
     }
+
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(transformElems(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames).underlyingElem)
+    }
   }
 
   test("testEffectivelyUpdateNamesOnly") {
@@ -678,6 +684,12 @@ class ElemUpdateTest extends FunSuite {
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
+    }
+
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
+
+    assertResult(resolved.Elem(docElem1.underlyingElem)) {
+      resolved.Elem(transformElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames).underlyingElem)
     }
   }
 
@@ -700,7 +712,13 @@ class ElemUpdateTest extends FunSuite {
       updateChildElems(
         bookElem,
         bookElem.findAllChildElems.map(_.path.skippingPath(bookElem.path).lastEntry).toSet)(
-          toFunctionTakingElemAndPathEntry(updateRemark))
+          toFunctionTakingElemAndPathEntry(updateRemark)) ensuring { updatedBook =>
+
+            resolved.Elem(updatedBook.underlyingElem) ==
+              resolved.Elem(indexed.Elem.ElemTransformations.transformChildElems(
+                bookElem,
+                updateRemark).underlyingElem)
+          }
 
     assertResult(bookElem.resolvedName) {
       updatedBookElem.resolvedName
@@ -710,6 +728,16 @@ class ElemUpdateTest extends FunSuite {
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).transformElems(updateRemark).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).removeAllInterElementWhitespace
+    }
+
+    // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
+
+    assert(bookElem.path.nonEmpty)
+
+    val updatedBookElem2 = transformElems(bookElem, updateRemark)
+
+    assertResult(resolved.Elem(updatedBookElem.underlyingElem)) {
+      resolved.Elem(updatedBookElem2.underlyingElem)
     }
   }
 
@@ -911,7 +939,10 @@ class ElemUpdateTest extends FunSuite {
 
     val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
 
-    updateChildElems(elem, pathEntries)(toFunctionTakingElemAndPathEntry(f))
+    updateChildElems(elem, pathEntries)(toFunctionTakingElemAndPathEntry(f)) ensuring { resultElem =>
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(indexed.Elem.ElemTransformations.transformChildElems(elem, f).underlyingElem)
+    }
   }
 
   private def transformChildElemsToNodeSeq(
@@ -922,23 +953,32 @@ class ElemUpdateTest extends FunSuite {
 
     val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
 
-    updateChildElemsWithNodeSeq(elem, pathEntries)(toFunctionTakingElemAndPathEntry(f))
+    updateChildElemsWithNodeSeq(elem, pathEntries)(toFunctionTakingElemAndPathEntry(f)) ensuring { resultElem =>
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(indexed.Elem.ElemTransformations.transformChildElemsToNodeSeq(elem, f).underlyingElem)
+    }
   }
 
   private def transformElemsOrSelf(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
     import indexed.Elem.ElemUpdates._
 
-    val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path).toSet
+    val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElemsOrSelf(elem, paths)(toFunctionTakingElemAndPath(f))
+    updateElemsOrSelf(elem, paths)(toFunctionTakingElemAndPath(f)) ensuring { resultElem =>
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(indexed.Elem.ElemTransformations.transformElemsOrSelf(elem, f).underlyingElem)
+    }
   }
 
   private def transformElems(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
     import indexed.Elem.ElemUpdates._
 
-    val paths: Set[Path] = elem.findAllElems.map(_.path).toSet
+    val paths: Set[Path] = elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElems(elem, paths)(toFunctionTakingElemAndPath(f))
+    updateElems(elem, paths)(toFunctionTakingElemAndPath(f)) ensuring { resultElem =>
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(indexed.Elem.ElemTransformations.transformElems(elem, f).underlyingElem)
+    }
   }
 
   private def transformElemsOrSelfToNodeSeq(
@@ -947,9 +987,19 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
-    val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path).toSet
+    val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElemsOrSelfWithNodeSeq(elem, paths)(toFunctionTakingElemAndPath(f))
+    updateElemsOrSelfWithNodeSeq(elem, paths)(toFunctionTakingElemAndPath(f)) ensuring { resultNodes =>
+      val resultElems =
+        resultNodes collect { case e: indexed.IndexedScopedNode.Elem[_] => e.asInstanceOf[indexed.Elem] }
+
+      val expectedResultElems =
+        indexed.Elem.ElemTransformations.transformElemsOrSelfToNodeSeq(elem, f) collect {
+          case e: indexed.IndexedScopedNode.Elem[_] => e.asInstanceOf[indexed.Elem]
+        }
+
+      resultElems.map(e => resolved.Elem(e.underlyingElem)) == expectedResultElems.map(e => resolved.Elem(e.underlyingElem))
+    }
   }
 
   private def transformElemsToNodeSeq(
@@ -958,8 +1008,11 @@ class ElemUpdateTest extends FunSuite {
 
     import indexed.Elem.ElemUpdates._
 
-    val paths: Set[Path] = elem.findAllElems.map(_.path).toSet
+    val paths: Set[Path] = elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElemsWithNodeSeq(elem, paths)(toFunctionTakingElemAndPath(f))
+    updateElemsWithNodeSeq(elem, paths)(toFunctionTakingElemAndPath(f)) ensuring { resultElem =>
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(indexed.Elem.ElemTransformations.transformElemsToNodeSeq(elem, f).underlyingElem)
+    }
   }
 }
