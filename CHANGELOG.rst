@@ -3,6 +3,32 @@ CHANGELOG
 =========
 
 
+1.7.0-M1
+========
+
+Version 1.7.0-M1 is the first milestone release for yaidom 1.7.0. It tries to bring the vision of yaidom
+as generic XML query, update/transformation and creation API one step closer. It does so by offering
+functional update/transformation support for indexed elements, which by their nature know their ancestry.
+It turns out that the known properties about yaidom functional updates and transformations still hold
+for elements that know their ancestry.
+
+There are breaking changes in this release, but with re-compilation not too many changes should be needed
+in application code using yaidom.
+
+The main changes are:
+
+* Introduction of ``ElemTransformationApi`` and ``ElemUpdateApi`` traits, for "arbitrary elements"
+
+  * This is an API of functions on elements, and not an OO API like ``TransformableElemApi``
+  * Corresponding ``ElemTransformationLike`` and ``ElemUpdateLike`` partial implementations
+  * Indexed elements (with simple underlying elements) now supporting those traits
+  * Some properties about ``ElemTransformationApi`` in terms of ``ElemUpdateApi`` made explicit (and proven)
+
+* Faster ``simple.Elem.toString``
+* ``NamespaceUtils`` more generic in the query part
+* Some refactorings leading to cleaner and more idiomatic Scala code
+
+
 1.6.2
 =====
 
