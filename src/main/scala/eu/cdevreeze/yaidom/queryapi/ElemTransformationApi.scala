@@ -38,6 +38,113 @@ import scala.collection.immutable
  * paths etc., these altered values will be ignored. After all, it is the functions of this API that will transform the entire underlying
  * root element tree, and that will determine the `Path` and (document and base) URI of each element after the transformation.
  *
+ * ==ElemTransformationApi more formally==
+ *
+ * '''In order to get started using the API, this more formal section can safely be skipped. On the other hand, this section
+ * may provide a deeper understanding of the API.'''
+ *
+ * Some provable properties hold about this `ElemTransformationApi` API in terms of the more low level `ElemUpdateApi` API.
+ *
+ * Let's first try to define the methods of `ElemTransformationApi` in terms of the `ElemUpdateApi` API. Below their equivalence
+ * will be proven. We define the following, assuming type `Elem` to be a yaidom "indexed element" type:
+ *
+ * {{{
+ * def addPathParameter[A](f: Elem => A): ((Elem, Path) => A) = {
+ *   { (elm, path) => f(elm) } // Unused path
+ * }
+ *
+ * def addPathEntryParameter[A](f: Elem => A): ((Elem, Path.Entry) => A) = {
+ *   { (elm, pathEntry) => f(elm) } // unused path entry
+ * }
+ *
+ * def findAllChildPathEntries(elem: Elem): Set[Path.Entry] = {
+ *   elem.findAllChildElems.map(_.path.lastEntry).toSet
+ * }
+ *
+ * def findAllRelativeElemOrSelfPaths(elem: Elem): Set[Path] = {
+ *   elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
+ * }
+ *
+ * def findAllRelativeElemPaths(elem: Elem): Set[Path] = {
+ *   elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
+ * }
+ *
+ * // The transformation functions, defined in terms of the ElemUpdateApi
+ *
+ * def transformChildElems2(elem: Elem, f: Elem => Elem): Elem = {
+ *   updateChildElems(elem, findAllChildPathEntries(elem))(addPathEntryParameter(f))
+ * }
+ *
+ * def transformElemsOrSelf2(elem: Elem, f: Elem => Elem): Elem = {
+ *   updateElemsOrSelf(elem, findAllRelativeElemOrSelfPaths(elem))(addPathParameter(f))
+ * }
+ *
+ * def transformElems2(elem: Elem, f: Elem => Elem): Elem = {
+ *   updateElems(elem, findAllRelativeElemPaths(elem))(addPathParameter(f))
+ * }
+ * }}}
+ *
+ * ===1. Property about transformChildElems in terms of transformChildElems2===
+ *
+ * The following property must hold, for all elements and (pure) element transformation functions:
+ * {{{
+ * transformChildElems(elem, f) == transformChildElems2(elem, f)
+ * }}}
+ *
+ * No proof is provided, but this property must obviously hold, since `transformChildElems` replaces
+ * child element nodes by applying the given function, and leaves the other child nodes alone, and
+ * method `transformChildElems2` does the same. The latter function does it via child path entries
+ * (translated to child node indexes), iterating over child nodes in reverse order (in order not
+ * to invalidate the next processed path entry), but the net effect is the same.
+ *
+ * ===2. Property about transformElemsOrSelf in terms of transformElemsOrSelf2===
+ *
+ * The following property holds, for all elements and (pure) element transformation functions:
+ * {{{
+ * transformElemsOrSelf(elem, f) == transformElemsOrSelf2(elem, f)
+ * }}}
+ *
+ * Below follows a proof of this property by structural induction.
+ *
+ * __Base case__
+ *
+ * If `elem` has no child elements, then the LHS can be rewritten as follows:
+ * {{{
+ * transformElemsOrSelf(elem, f)
+ * f(transformChildElems(elem, e => transformElemsOrSelf(e, f))) // definition of transformElemsOrSelf
+ * f(elem) // there are no child element nodes, so transformChildElems is an identity function in this case
+ * updateElemsOrSelf(elem, Set(Path.Empty))(addPathParameter(f)) // only updates elem
+ * transformElemsOrSelf2(elem, f) // definition of transformElemsOrSelf2, and absence of descendant paths
+ * f()
+ * }}}
+ * which is the RHS.
+ *
+ * __Inductive step__
+ *
+ * If `elm` does have child elements, the LHS can be rewritten as:
+ * {{{
+ * transformElemsOrSelf(elem, f)
+ * f(transformChildElems(elem, e => transformElemsOrSelf(e, f))) // definition of transformElemsOrSelf
+ * f(transformChildElems(elem, e => transformElemsOrSelf2(e, f))) // induction hypothesis
+ * f(transformChildElems2(elem, e => transformElemsOrSelf2(e, f))) // property above
+ * f(transformChildElems2(elem, e => updateElemsOrSelf(e, findAllRelativeElemOrSelfPaths(e))(addPathParameter(f))))
+ *   // definition of transformElemsOrSelf2
+ *
+ * f(updateChildElems(elem, findAllChildPathEntries(elem))(addPathEntryParameter(
+ *   e => updateElemsOrSelf(e, findAllRelativeElemOrSelfPaths(e))(addPathParameter(f))))
+ * ) // definition of transformChildElems2
+ *
+ * f(updateElems(elem, findAllRelativeElemOrSelfPaths(elem))(addPathParameter(f)))
+ *   // property about updateElems, and knowing that the added path and path entry parameters do nothing here
+ *
+ * updateElemsOrSelf(elem, findAllRelativeElemOrSelfPaths(elem))(addPathParameter(f))
+ *   // (indirect) definition of updateElemsOrSelf
+ * transformElemsOrSelf2(elem, f) // definition of transformElemsOrSelf2
+ * }}}
+ * which is the RHS.
+ *
+ * This completes the proof. For the other `ElemTransformationApi` methods, analogous provable properties hold.
+ *
  * @author Chris de Vreeze
  */
 trait ElemTransformationApi {
