@@ -115,7 +115,6 @@ import scala.collection.immutable
  * f(elem) // there are no child element nodes, so transformChildElems is an identity function in this case
  * updateElemsOrSelf(elem, Set(Path.Empty))(addPathParameter(f)) // only updates elem
  * transformElemsOrSelf2(elem, f) // definition of transformElemsOrSelf2, and absence of descendant paths
- * f()
  * }}}
  * which is the RHS.
  *
