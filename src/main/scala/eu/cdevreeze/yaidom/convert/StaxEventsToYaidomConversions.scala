@@ -332,7 +332,9 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   }
 
   private def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithAncestry], head: EventWithAncestry): Boolean = {
-    if (!eventIterator.hasNext) false else {
+    if (!eventIterator.hasNext) {
+      false
+    } else {
       val hd: EventWithAncestry = eventIterator.head
       (hd.event.isEndElement) && (hd.qnames == head.qnames.tail)
     }
