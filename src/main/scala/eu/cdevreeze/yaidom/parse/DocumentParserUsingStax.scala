@@ -91,7 +91,7 @@ final class DocumentParserUsingStax(
 
   /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
   def parse(inputStream: jio.InputStream): Document = {
-    var xmlEventReader: XMLEventReader = null
+    var xmlEventReader: XMLEventReader = null // scalastyle:off null
     try {
       val streamSource = new StreamSource(inputStream)
       xmlEventReader = inputFactory.createXMLEventReader(streamSource)

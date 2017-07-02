@@ -68,8 +68,10 @@ import scala.collection.mutable
  * immutable.IndexedSeq(elm).filter(p) ++ Seq() // flatMap on empty sequence returns empty sequence
  * immutable.IndexedSeq(elm).filter(p) // property of concatenation: xs ++ Seq() == xs
  * (immutable.IndexedSeq(elm) ++ Seq()).filter(p) // property of concatenation: xs ++ Seq() == xs
- * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // flatMap on empty sequence (of child elements) returns empty sequence
- * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // filtering with predicate that is always true
+ * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p
+ *   // flatMap on empty sequence (of child elements) returns empty sequence
+ * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p
+ *   // filtering with predicate that is always true
  * elm.filterElemsOrSelf(e => true) filter p // definition of filterElemsOrSelf
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
@@ -94,7 +96,8 @@ import scala.collection.mutable
  * immutable.IndexedSeq(elm).filter(p) ++ ((elm.findAllChildElems.flatMap(ch => ch.findAllElemsOrSelf)) filter p) // property (b)
  * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) filter p // property (a)
  * (immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // definition of findAllElemsOrSelf
- * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p // filtering with predicate that is always true
+ * (immutable.IndexedSeq(elm).filter(e => true) ++ (elm.findAllChildElems flatMap (_ filterElemsOrSelf (e => true)))) filter p
+ *   // filtering with predicate that is always true
  * elm.filterElemsOrSelf(e => true) filter p // definition of filterElemsOrSelf
  * elm.findAllElemsOrSelf filter p // definition of findAllElemsOrSelf
  * }}}
@@ -152,11 +155,13 @@ import scala.collection.mutable
  * If `elm` does have child elements, and `p(elm)` does not hold, the LHS can be rewritten as:
  * {{{
  * (elm.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p)))
- * (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p)) // definition of findTopmostElemsOrSelf, knowing that p(elm) does not hold
+ * (elm.findAllChildElems flatMap (_.findTopmostElemsOrSelf(p))) flatMap (_.filterElemsOrSelf(p))
+ *   // definition of findTopmostElemsOrSelf, knowing that p(elm) does not hold
  * elm.findAllChildElems flatMap (ch => ch.findTopmostElemsOrSelf(p) flatMap (_.filterElemsOrSelf(p))) // property (c)
  * elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)) // induction hypothesis
  * immutable.IndexedSeq() ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of concatenation
- * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p))) // definition of filter, knowing that p(elm) does not hold
+ * immutable.IndexedSeq(elm).filter(p) ++ (elm.findAllChildElems flatMap (_.filterElemsOrSelf(p)))
+ *   // definition of filter, knowing that p(elm) does not hold
  * elm.filterElemsOrSelf(p) // definition of filterElems
  * }}}
  * which is the RHS.

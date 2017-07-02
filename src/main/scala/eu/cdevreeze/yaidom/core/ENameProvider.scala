@@ -144,10 +144,11 @@ object ENameProvider {
     }
 
     def getEName(namespaceUriOption: Option[String], localPart: String): EName = {
-      if (cacheFilter(namespaceUriOption, localPart))
+      if (cacheFilter(namespaceUriOption, localPart)) {
         cache.get((namespaceUriOption, localPart))
-      else
+      } else {
         EName(namespaceUriOption, localPart)
+      }
     }
 
     def getEName(namespaceUri: String, localPart: String): EName =

@@ -158,7 +158,9 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
 
-      if (isNamespaceDeclaration(attr)) None else {
+      if (isNamespaceDeclaration(attr)) {
+        None
+      } else {
         val qname: QName = toQName(attr)
         Some(qname -> attr.getValue)
       }
@@ -174,7 +176,9 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
         if (isNamespaceDeclaration(attr)) {
           val result = extractNamespaceDeclaration(attr)
           Some(result) map { pair => (pair._1.getOrElse(""), pair._2) }
-        } else None
+        } else {
+          None
+        }
       }
       result.toMap
     }

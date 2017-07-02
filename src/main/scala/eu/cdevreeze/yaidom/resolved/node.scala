@@ -121,9 +121,14 @@ sealed trait Node extends ResolvedNodes.Node with Immutable
  * }}}
  */
 final case class Elem(
-    override val resolvedName: EName,
-    override val resolvedAttributes: Map[EName, String],
-    override val children: immutable.IndexedSeq[Node]) extends Node with ResolvedNodes.Elem with ClarkElemLike with UpdatableElemLike with TransformableElemLike {
+  override val resolvedName: EName,
+  override val resolvedAttributes: Map[EName, String],
+  override val children: immutable.IndexedSeq[Node])
+    extends Node
+    with ResolvedNodes.Elem
+    with ClarkElemLike
+    with UpdatableElemLike
+    with TransformableElemLike {
 
   require(resolvedName ne null) // scalastyle:off null
   require(resolvedAttributes ne null) // scalastyle:off null

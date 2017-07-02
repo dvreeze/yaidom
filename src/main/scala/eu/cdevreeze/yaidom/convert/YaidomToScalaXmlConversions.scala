@@ -133,10 +133,11 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
    */
   private def convertScope(scope: Scope): scala.xml.NamespaceBinding = {
     def editedPrefix(pref: String): String =
-      if ((pref ne null) && pref.isEmpty) null.asInstanceOf[String] else pref
+      if ((pref ne null) && pref.isEmpty) null.asInstanceOf[String] else pref // scalastyle:off null
 
-    if (scope.isEmpty) scala.xml.TopScope
-    else {
+    if (scope.isEmpty) {
+      scala.xml.TopScope
+    } else {
       val scopeAsSeq = scope.prefixNamespaceMap.toSeq map {
         case (pref, uri) => (editedPrefix(pref) -> uri)
       }
@@ -159,6 +160,7 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
    * See method scala.xml.NamespaceBinding.buildString(StringBuilder, scala.xml.NamespaceBinding) for how (implicit) namespace
    * declarations are inferred from a NamespaceBinding and one of its ancestors.
    */
+  // scalastyle:off null
   private def convertScope(scope: Scope, parentNamespaceBinding: scala.xml.NamespaceBinding): scala.xml.NamespaceBinding = {
     val decls = toScope(parentNamespaceBinding).relativize(scope)
 
@@ -186,9 +188,11 @@ trait YaidomToScalaXmlConversions extends ElemConverter[scala.xml.Elem] {
    * This method is the same as extractScope in ScalaXmlToYaidomConversions, but repeated here in order not to depend on that
    * other trait.
    */
+  // scalastyle:off null
   private def toScope(scope: scala.xml.NamespaceBinding): Scope = {
-    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) Scope.Empty
-    else {
+    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) {
+      Scope.Empty
+    } else {
       val prefix = if (scope.prefix eq null) "" else scope.prefix
 
       // Recursive call (not tail-recursive), and working around the above-mentioned bug

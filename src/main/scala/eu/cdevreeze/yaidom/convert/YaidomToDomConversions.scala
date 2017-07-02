@@ -166,7 +166,7 @@ trait YaidomToDomConversions extends ElemConverter[ElementProducer] with Documen
         // We use setAttributeNS and not setAttribute here.
         // According to Johan Walters, when using setAttribute, schema validation may fail in sufficiently
         // recent Xerces distributions, which is related to the distinction between implementation types Attr and AttrNS.
-        element.setAttributeNS(null, attrQName.localPart, attrValue)
+        element.setAttributeNS(null, attrQName.localPart, attrValue) // scalastyle:off null
       } else {
         val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
           s"Attribute name '${attrQName}' should resolve to an EName in scope [${attrScope}]"))

@@ -109,11 +109,14 @@ object IndexedClarkNode {
    * @author Chris de Vreeze
    */
   final class Elem[U <: ClarkElemApi.Aux[U]] private[IndexedClarkNode] (
-      docUriOption: Option[URI],
-      parentBaseUriOption: Option[URI],
-      underlyingRootElem: U,
-      path: Path,
-      underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem) with Node with Nodes.Elem {
+    docUriOption: Option[URI],
+    parentBaseUriOption: Option[URI],
+    underlyingRootElem: U,
+    path: Path,
+    underlyingElem: U)
+      extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
+      with Node
+      with Nodes.Elem {
 
     type ThisElem = Elem[U]
 

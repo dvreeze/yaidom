@@ -113,7 +113,8 @@ import javax.xml.namespace.NamespaceContext
  * Method `resolve` resolves a `Declarations` against this Scope, returning a new Scope. It could be defined by the following equality:
  * {{{
  * scope.resolve(declarations) == {
- *   val m = (scope.prefixNamespaceMap ++ declarations.withoutUndeclarations.prefixNamespaceMap) -- declarations.retainingUndeclarations.prefixNamespaceMap.keySet
+ *   val m = (scope.prefixNamespaceMap ++ declarations.withoutUndeclarations.prefixNamespaceMap) --
+ *     declarations.retainingUndeclarations.prefixNamespaceMap.keySet
  *   Scope(m)
  * }
  * }}}
@@ -461,8 +462,9 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
         }
 
         pref
-      } else if (prefixes == Set("")) ""
-      else (prefixes - "").head
+      } else {
+        if (prefixes == Set("")) "" else (prefixes - "").head
+      }
     }
   }
 

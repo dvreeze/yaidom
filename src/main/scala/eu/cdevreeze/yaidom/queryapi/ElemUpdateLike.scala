@@ -63,8 +63,11 @@ trait ElemUpdateLike extends ElemUpdateApi {
       index <= childNodes.size,
       s"Expected index $index to be at most the number of children: ${childNodes.size}")
 
-    if (index == childNodes.size) plusChild(elem, child)
-    else withPatchedChildren(elem, index, Vector(child, childNodes(index)), 1)
+    if (index == childNodes.size) {
+      plusChild(elem, child)
+    } else {
+      withPatchedChildren(elem, index, Vector(child, childNodes(index)), 1)
+    }
   }
 
   final def plusChild(elem: Elem, child: Node): Elem = {
@@ -128,8 +131,9 @@ trait ElemUpdateLike extends ElemUpdateApi {
   final def updateChildElems(elem: Elem, pathEntries: Set[Path.Entry])(f: (Elem, Path.Entry) => Elem): Elem = {
     // For efficiency, not delegating to updateChildElemsWithNodeSeq
 
-    if (pathEntries.isEmpty) elem
-    else {
+    if (pathEntries.isEmpty) {
+      elem
+    } else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         collectChildNodeIndexes(elem, pathEntries).toSeq.sortBy(_._2)
 
@@ -144,8 +148,9 @@ trait ElemUpdateLike extends ElemUpdateApi {
   }
 
   final def updateChildElemsWithNodeSeq(elem: Elem, pathEntries: Set[Path.Entry])(f: (Elem, Path.Entry) => immutable.IndexedSeq[Node]): Elem = {
-    if (pathEntries.isEmpty) elem
-    else {
+    if (pathEntries.isEmpty) {
+      elem
+    } else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         collectChildNodeIndexes(elem, pathEntries).toSeq.sortBy(_._2)
 

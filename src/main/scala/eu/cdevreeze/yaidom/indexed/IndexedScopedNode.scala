@@ -55,11 +55,17 @@ object IndexedScopedNode {
    * @author Chris de Vreeze
    */
   final class Elem[U <: ScopedElemApi.Aux[U]] private[IndexedScopedNode] (
-      docUriOption: Option[URI],
-      parentBaseUriOption: Option[URI],
-      underlyingRootElem: U,
-      path: Path,
-      underlyingElem: U) extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem) with CanBeDocumentChild with BackingElemApi with ScopedElemLike with HasParent with Nodes.Elem {
+    docUriOption: Option[URI],
+    parentBaseUriOption: Option[URI],
+    underlyingRootElem: U,
+    path: Path,
+    underlyingElem: U)
+      extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
+      with CanBeDocumentChild
+      with BackingElemApi
+      with ScopedElemLike
+      with HasParent
+      with Nodes.Elem {
 
     type ThisElem = Elem[U]
 

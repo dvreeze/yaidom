@@ -171,46 +171,32 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
 
     val head = it.next()
     require(head.event.isStartDocument, s"Not a StartDocument event: ${head.event}")
-
     val startDocument: StartDocument = head.event.asInstanceOf[StartDocument]
 
-    def startsWithEndDocument(eventIterator: BufferedIterator[EventWithAncestry]): Boolean = {
-      if (!eventIterator.hasNext) false else {
-        val hd: EventWithAncestry = eventIterator.head
-        hd.event.isEndDocument
-      }
-    }
-
-    val xmlVersionOption = Option(startDocument.getVersion)
-    val xmlDeclOption = xmlVersionOption map { xmlVersion =>
+    val xmlDeclOption = Option(startDocument.getVersion) map { xmlVersion =>
       XmlDeclaration.fromVersion(xmlVersion).
         withEncodingOption(if (startDocument.encodingSet()) Some(Charset.forName(startDocument.getCharacterEncodingScheme)) else None).
         withStandaloneOption(if (startDocument.standaloneSet) Some(startDocument.isStandalone) else None)
     }
 
-    val docChildren = mutable.Buffer[CanBeDocumentChild]()
+    val docChildren = mutable.Buffer[CanBeDocumentChild]() // Imperative code
 
-    // Imperative code
     while (it.hasNext && !startsWithEndDocument(it)) {
       val nextHead = it.head
 
       nextHead.event match {
-        case ev if ev.isStartElement => {
+        case ev if ev.isStartElement =>
           require(docChildren.collect({ case e: Elem => e }).isEmpty, "Only 1 document element allowed and required")
           val docElem = takeElem(it)
           docChildren += docElem
-        }
-        case ev: javax.xml.stream.events.ProcessingInstruction => {
+        case ev: javax.xml.stream.events.ProcessingInstruction =>
           val pi = convertToProcessingInstruction(ev)
           docChildren += pi
-
           it.next()
-        }
-        case ev: javax.xml.stream.events.Comment => {
+        case ev: javax.xml.stream.events.Comment =>
           val com = convertToComment(ev)
           docChildren += com
           it.next()
-        }
         case _ => it.next()
       }
     }
@@ -220,15 +206,13 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
     it.next()
 
     val uriOption: Option[URI] =
-      if ((startDocument.getSystemId eq null) || (startDocument.getSystemId == "")) None else {
+      if ((startDocument.getSystemId eq null) || (startDocument.getSystemId == "")) { // scalastyle:off null
+        None
+      } else {
         Some(new URI(startDocument.getSystemId))
       }
 
-    val doc: Document = new Document(
-      uriOption = uriOption,
-      xmlDeclarationOption = xmlDeclOption,
-      children = docChildren.toVector)
-    doc
+    new Document(uriOption = uriOption, xmlDeclarationOption = xmlDeclOption, children = docChildren.toVector)
   }
 
   /**
@@ -245,55 +229,41 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
 
     val head = it.next()
     require(head.event.isStartElement, s"Not a StartElement event: ${head.event}")
-
     require(head.ancestryPathAfterEventOption.nonEmpty)
 
     val entry: AncestryPath.Entry = head.ancestryPathAfterEventOption.get.firstEntry
     val elem: Elem = Elem(entry.qname, entry.attributes, entry.scope, immutable.IndexedSeq())
 
-    def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithAncestry]): Boolean = {
-      if (!eventIterator.hasNext) false else {
-        val hd: EventWithAncestry = eventIterator.head
-        (hd.event.isEndElement) && (hd.qnames == head.qnames.tail)
-      }
-    }
+    val children = mutable.Buffer[Node]() // Imperative code
 
-    val children = mutable.Buffer[Node]()
-
-    // Imperative code
-    while (it.hasNext && !startsWithMatchingEndElement(it)) {
+    while (it.hasNext && !startsWithMatchingEndElement(it, head)) {
       val nextHead = it.head
 
       nextHead.event match {
-        case ev: StartElement => {
+        case ev: StartElement =>
           // Recursive call (not tail-recursive, but recursion depth is rather limited)
           val ch = takeElem(it)
           children += ch
-        }
-        case ev: Characters => {
+        case ev: Characters =>
           val ch = convertToText(ev)
           children += ch
           it.next()
-        }
-        case ev: EntityReference => {
+        case ev: EntityReference =>
           val ch = convertToEntityRef(ev)
           children += ch
           it.next()
-        }
-        case ev: javax.xml.stream.events.ProcessingInstruction => {
+        case ev: javax.xml.stream.events.ProcessingInstruction =>
           val ch = convertToProcessingInstruction(ev)
           children += ch
           it.next()
-        }
-        case ev: javax.xml.stream.events.Comment => {
+        case ev: javax.xml.stream.events.Comment =>
           val ch = convertToComment(ev)
           children += ch
           it.next()
-        }
         case _ => it.next()
       }
     }
-    require(startsWithMatchingEndElement(it))
+    require(startsWithMatchingEndElement(it, head))
     val endElementEv = it.next.event.asEndElement
     require(
       endElementEv.getName == head.event.asStartElement.getName,
@@ -350,5 +320,21 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
   final def asIterator(xmlEventReader: XMLEventReader): Iterator[XMLEvent] = {
     val it = xmlEventReader.asInstanceOf[jutil.Iterator[XMLEvent]]
     it.asScala
+  }
+
+  private def startsWithEndDocument(eventIterator: BufferedIterator[EventWithAncestry]): Boolean = {
+    if (!eventIterator.hasNext) {
+      false
+    } else {
+      val hd: EventWithAncestry = eventIterator.head
+      hd.event.isEndDocument
+    }
+  }
+
+  private def startsWithMatchingEndElement(eventIterator: BufferedIterator[EventWithAncestry], head: EventWithAncestry): Boolean = {
+    if (!eventIterator.hasNext) false else {
+      val hd: EventWithAncestry = eventIterator.head
+      (hd.event.isEndElement) && (hd.qnames == head.qnames.tail)
+    }
   }
 }

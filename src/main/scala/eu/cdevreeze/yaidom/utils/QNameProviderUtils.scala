@@ -46,68 +46,43 @@ object QNameProviderUtils {
       schemaRoots forall (e => e.targetNamespacePrefixOption.isDefined),
       "All schemas must have a @targetNamespace and a prefix corresponding to that target namespace")
 
-    val globalElemDeclQNames = {
-      val result = schemaRoots flatMap { elem =>
+    val globalElemDeclQNames =
+      (schemaRoots flatMap { elem =>
         elem.findAllGlobalElementDeclarations map { e =>
           val ename = e.targetEName
 
-          if (ename.namespaceUriOption.isEmpty) {
-            QName(ename.localPart)
-          } else {
-            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
-          }
+          ename.namespaceUriOption.map(_ => QName(elem.targetNamespacePrefixOption.get, ename.localPart)).getOrElse(QName(ename.localPart))
         }
-      }
-      result.toSet
-    }
+      }).toSet
 
-    val globalAttrDeclQNames = {
-      val result = schemaRoots flatMap { elem =>
+    val globalAttrDeclQNames =
+      (schemaRoots flatMap { elem =>
         elem.findAllGlobalAttributeDeclarations map { e =>
           val ename = e.targetEName
 
-          if (ename.namespaceUriOption.isEmpty) {
-            QName(ename.localPart)
-          } else {
-            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
-          }
+          ename.namespaceUriOption.map(_ => QName(elem.targetNamespacePrefixOption.get, ename.localPart)).getOrElse(QName(ename.localPart))
         }
-      }
-      result.toSet
-    }
+      }).toSet
 
-    val localElemDeclQNames = {
-      val result = schemaRoots flatMap { elem =>
+    val localElemDeclQNames =
+      (schemaRoots flatMap { elem =>
         elem.findAllLocalElementDeclarations map { e =>
           val ename = e.targetEName
 
-          if (ename.namespaceUriOption.isEmpty) {
-            QName(ename.localPart)
-          } else {
-            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
-          }
+          ename.namespaceUriOption.map(_ => QName(elem.targetNamespacePrefixOption.get, ename.localPart)).getOrElse(QName(ename.localPart))
         }
-      }
-      result.toSet
-    }
+      }).toSet
 
-    val localAttrDeclQNames = {
-      val result = schemaRoots flatMap { elem =>
+    val localAttrDeclQNames =
+      (schemaRoots flatMap { elem =>
         elem.findAllLocalAttributeDeclarations map { e =>
           val ename = e.targetEName
 
-          if (ename.namespaceUriOption.isEmpty) {
-            QName(ename.localPart)
-          } else {
-            QName(elem.targetNamespacePrefixOption.get, ename.localPart)
-          }
+          ename.namespaceUriOption.map(_ => QName(elem.targetNamespacePrefixOption.get, ename.localPart)).getOrElse(QName(ename.localPart))
         }
-      }
-      result.toSet
-    }
+      }).toSet
 
-    val qnames =
-      globalElemDeclQNames union globalAttrDeclQNames union localElemDeclQNames union localAttrDeclQNames
+    val qnames = globalElemDeclQNames union globalAttrDeclQNames union localElemDeclQNames union localAttrDeclQNames
 
     val qnameProvider = new QNameProvider.QNameProviderUsingImmutableCache(qnames)
     qnameProvider

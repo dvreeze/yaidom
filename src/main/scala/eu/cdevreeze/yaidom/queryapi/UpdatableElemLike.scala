@@ -65,8 +65,11 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
       index <= thisElem.children.size,
       s"Expected index $index to be at most the number of children: ${thisElem.children.size}")
 
-    if (index == children.size) plusChild(child)
-    else withPatchedChildren(index, Vector(child, children(index)), 1)
+    if (index == children.size) {
+      plusChild(child)
+    } else {
+      withPatchedChildren(index, Vector(child, children(index)), 1)
+    }
   }
 
   final def plusChild(child: ThisNode): ThisElem = withChildren(children :+ child)
@@ -125,8 +128,9 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
   final def updateChildElems(pathEntries: Set[Path.Entry])(f: (ThisElem, Path.Entry) => ThisElem): ThisElem = {
     // For efficiency, not delegating to updateChildElemsWithNodeSeq
 
-    if (pathEntries.isEmpty) thisElem
-    else {
+    if (pathEntries.isEmpty) {
+      thisElem
+    } else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
 
@@ -141,8 +145,9 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
   }
 
   final def updateChildElemsWithNodeSeq(pathEntries: Set[Path.Entry])(f: (ThisElem, Path.Entry) => immutable.IndexedSeq[ThisNode]): ThisElem = {
-    if (pathEntries.isEmpty) thisElem
-    else {
+    if (pathEntries.isEmpty) {
+      thisElem
+    } else {
       val indexesByPathEntries: Seq[(Path.Entry, Int)] =
         collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
 

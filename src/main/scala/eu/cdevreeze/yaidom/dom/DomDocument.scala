@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * @author Chris de Vreeze
  */
 final class DomDocument(val wrappedDocument: w3c.dom.Document) extends DocumentApi {
-  require(wrappedDocument ne null)
+  require(wrappedDocument ne null) // scalastyle:off null
 
   type ThisDoc = DomDocument
 

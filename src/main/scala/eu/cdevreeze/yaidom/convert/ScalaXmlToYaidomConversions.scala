@@ -145,9 +145,11 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
    * (see https://issues.scala-lang.org/browse/SI-6939 and https://github.com/scala/scala/pull/1858). Still, this implementation
    * tries to work around that bug.
    */
+  // scalastyle:off null
   final def extractScope(scope: scala.xml.NamespaceBinding): Scope = {
-    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) Scope.Empty
-    else {
+    if ((scope eq null) || (scope.uri eq null) || (scope == scala.xml.TopScope)) {
+      Scope.Empty
+    } else {
       val prefix = if (scope.prefix eq null) "" else scope.prefix
 
       // Recursive call (not tail-recursive), and working around the above-mentioned bug
@@ -166,6 +168,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   }
 
   /** Extracts the `QName` of an `scala.xml.Elem` */
+  // scalastyle:off null
   final def toQName(v: scala.xml.Elem)(implicit qnameProvider: QNameProvider): QName = {
     if (v.prefix eq null) qnameProvider.getUnprefixedQName(v.label) else qnameProvider.getQName(v.prefix, v.label)
   }

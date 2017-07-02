@@ -48,13 +48,17 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable with Has
     var sameENameIdx = 0
     val childElemOption = findAllChildElems find { e =>
       val ename = e.resolvedName
+
       if (ename == entry.elementName) {
-        if (entry.index == sameENameIdx) true
-        else {
+        if (entry.index == sameENameIdx) {
+          true
+        } else {
           sameENameIdx += 1
           false
         }
-      } else false
+      } else {
+        false
+      }
     }
     assert(childElemOption.forall(_.resolvedName == entry.elementName))
     childElemOption

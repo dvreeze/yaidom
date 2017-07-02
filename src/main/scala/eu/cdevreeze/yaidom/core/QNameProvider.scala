@@ -145,10 +145,11 @@ object QNameProvider {
     }
 
     def getQName(prefixOption: Option[String], localPart: String): QName = {
-      if (cacheFilter(prefixOption, localPart))
+      if (cacheFilter(prefixOption, localPart)) {
         cache.get((prefixOption, localPart))
-      else
+      } else {
         QName(prefixOption, localPart)
+      }
     }
 
     def getQName(prefix: String, localPart: String): QName =
