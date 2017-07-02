@@ -54,7 +54,7 @@ import scala.collection.immutable
  * }
  *
  * def addPathEntryParameter[A](f: Elem => A): ((Elem, Path.Entry) => A) = {
- *   { (elm, pathEntry) => f(elm) } // unused path entry
+ *   { (elm, pathEntry) => f(elm) } // Unused path entry
  * }
  *
  * def findAllChildPathEntries(elem: Elem): Set[Path.Entry] = {
