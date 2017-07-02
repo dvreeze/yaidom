@@ -384,8 +384,8 @@ class ElemUpdateTest extends FunSuite {
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     val docElem1 =
-      transformElems(
-        transformElems(doc.documentElement, updateNameElementName),
+      transformElems2(
+        transformElems2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElement)
 
     assertResult(Set("FirstName", "LastName")) {
@@ -400,10 +400,10 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
     }
 
-    // Now using transformElemsOrSelf twice
+    // Now using transformElemsOrSelf2 twice
     val docElem2 =
-      transformElemsOrSelf(
-        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+      transformElemsOrSelf2(
+        transformElemsOrSelf2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElement)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -411,8 +411,8 @@ class ElemUpdateTest extends FunSuite {
     }
 
     val partiallyChangedDocElem =
-      transformChildElems(
-        transformChildElems(doc.documentElement, updateNameElementName),
+      transformChildElems2(
+        transformChildElems2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElement)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
@@ -421,8 +421,8 @@ class ElemUpdateTest extends FunSuite {
 
     // Changing the order of updates
     val docElem3 =
-      transformElems(
-        transformElems(doc.documentElement, turnIsbnIntoElement),
+      transformElems2(
+        transformElems2(doc.documentElement, turnIsbnIntoElement),
         updateNameElementName)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -431,28 +431,28 @@ class ElemUpdateTest extends FunSuite {
 
     // Changing the order of updates
     val docElem4 =
-      transformElemsOrSelf(
-        transformElemsOrSelf(doc.documentElement, turnIsbnIntoElement),
+      transformElemsOrSelf2(
+        transformElemsOrSelf2(doc.documentElement, turnIsbnIntoElement),
         updateNameElementName)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
     }
 
-    // Combining transformChildElems with transformElems
+    // Combining transformChildElems2 with transformElems2
     val docElem5 =
-      transformChildElems(
-        transformElems(doc.documentElement, updateNameElementName),
+      transformChildElems2(
+        transformElems2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElement)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem5.underlyingElem)
     }
 
-    // Combining transformChildElems with transformElemsOrSelf
+    // Combining transformChildElems2 with transformElemsOrSelf2
     val docElem6 =
-      transformChildElems(
-        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+      transformChildElems2(
+        transformElemsOrSelf2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElement)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -468,8 +468,8 @@ class ElemUpdateTest extends FunSuite {
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     val docElem1 =
-      transformElemsToNodeSeq(
-        transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
+      transformElemsToNodeSeq2(
+        transformElemsToNodeSeq2(doc.documentElement, updateNameElementNameReturningNodeSeq),
         turnIsbnIntoElementReturningNodeSeq)
 
     assertResult(Set("FirstName", "LastName")) {
@@ -484,10 +484,10 @@ class ElemUpdateTest extends FunSuite {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
     }
 
-    // Now using transformElemsOrSelfToNodeSeq twice
+    // Now using transformElemsOrSelfToNodeSeq2 twice
     val docElem2 =
-      transformElemsOrSelfToNodeSeq(
-        transformElemsOrSelfToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem],
+      transformElemsOrSelfToNodeSeq2(
+        transformElemsOrSelfToNodeSeq2(doc.documentElement, updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem],
         turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem]
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -495,8 +495,8 @@ class ElemUpdateTest extends FunSuite {
     }
 
     val partiallyChangedDocElem =
-      transformChildElemsToNodeSeq(
-        transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
+      transformChildElemsToNodeSeq2(
+        transformChildElemsToNodeSeq2(doc.documentElement, updateNameElementNameReturningNodeSeq),
         turnIsbnIntoElementReturningNodeSeq)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
@@ -505,8 +505,8 @@ class ElemUpdateTest extends FunSuite {
 
     // Changing the order of updates
     val docElem3 =
-      transformElemsToNodeSeq(
-        transformElemsToNodeSeq(doc.documentElement, turnIsbnIntoElementReturningNodeSeq),
+      transformElemsToNodeSeq2(
+        transformElemsToNodeSeq2(doc.documentElement, turnIsbnIntoElementReturningNodeSeq),
         updateNameElementNameReturningNodeSeq)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -515,28 +515,28 @@ class ElemUpdateTest extends FunSuite {
 
     // Changing the order of updates
     val docElem4 =
-      transformElemsOrSelfToNodeSeq(
-        transformElemsOrSelfToNodeSeq(doc.documentElement, turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem],
+      transformElemsOrSelfToNodeSeq2(
+        transformElemsOrSelfToNodeSeq2(doc.documentElement, turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem],
         updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem]
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
     }
 
-    // Combining transformChildElemsToNodeSeq with transformElemsToNodeSeq
+    // Combining transformChildElemsToNodeSeq2 with transformElemsToNodeSeq2
     val docElem5 =
-      transformChildElemsToNodeSeq(
-        transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
+      transformChildElemsToNodeSeq2(
+        transformElemsToNodeSeq2(doc.documentElement, updateNameElementNameReturningNodeSeq),
         turnIsbnIntoElementReturningNodeSeq)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem5.underlyingElem)
     }
 
-    // Combining transformChildElemsToNodeSeq with transformElemsOrSelf
+    // Combining transformChildElemsToNodeSeq2 with transformElemsOrSelf2
     val docElem6 =
-      transformChildElemsToNodeSeq(
-        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+      transformChildElemsToNodeSeq2(
+        transformElemsOrSelf2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElementReturningNodeSeq)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -553,8 +553,8 @@ class ElemUpdateTest extends FunSuite {
 
     // First update names, then update ISBN if names have been updated (which they have)
     val docElem1 =
-      transformElemsOrSelf(
-        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+      transformElemsOrSelf2(
+        transformElemsOrSelf2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElementIfNamesUpdated)
 
     assertResult(Set("FirstName", "LastName")) {
@@ -570,7 +570,7 @@ class ElemUpdateTest extends FunSuite {
     }
 
     // Update ISBN if names have been updated (which they haven't)
-    val docElem2 = transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated)
+    val docElem2 = transformElemsOrSelf2(doc.documentElement, turnIsbnIntoElementIfNamesUpdated)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
@@ -578,8 +578,8 @@ class ElemUpdateTest extends FunSuite {
 
     // Changing the order of updates, resulting in a name update, but no ISBN update
     val docElem3 =
-      transformElemsOrSelf(
-        transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated),
+      transformElemsOrSelf2(
+        transformElemsOrSelf2(doc.documentElement, turnIsbnIntoElementIfNamesUpdated),
         updateNameElementName)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
@@ -588,8 +588,8 @@ class ElemUpdateTest extends FunSuite {
 
     // Doing less work
     val docElem4 =
-      transformChildElems(
-        transformElems(doc.documentElement, updateNameElementName),
+      transformChildElems2(
+        transformElems2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElementIfNamesUpdated)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -606,8 +606,8 @@ class ElemUpdateTest extends FunSuite {
 
     // First update ISBN if names have not been updated (which is indeed the case), then update names
     val docElem1 =
-      transformElemsOrSelf(
-        transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
+      transformElemsOrSelf2(
+        transformElemsOrSelf2(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
         updateNameElementName)
 
     assertResult(Set("FirstName", "LastName")) {
@@ -624,8 +624,8 @@ class ElemUpdateTest extends FunSuite {
 
     // First update names, then update ISBN if names have not been updated (which is not the case)
     val docElem2 =
-      transformElemsOrSelf(
-        transformElemsOrSelf(doc.documentElement, updateNameElementName),
+      transformElemsOrSelf2(
+        transformElemsOrSelf2(doc.documentElement, updateNameElementName),
         turnIsbnIntoElementIfNamesNotUpdated)
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
@@ -634,8 +634,8 @@ class ElemUpdateTest extends FunSuite {
 
     // Doing less work
     val docElem3 =
-      transformElems(
-        transformChildElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
+      transformElems2(
+        transformChildElems2(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
         updateNameElementName)
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
@@ -666,7 +666,7 @@ class ElemUpdateTest extends FunSuite {
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
-      resolved.Elem(transformElems(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames).underlyingElem)
+      resolved.Elem(transformElems2(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames).underlyingElem)
     }
   }
 
@@ -689,7 +689,7 @@ class ElemUpdateTest extends FunSuite {
     // Using the transformXXX methods defined below, implemented in terms of ElemUpdateApi methods
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
-      resolved.Elem(transformElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames).underlyingElem)
+      resolved.Elem(transformElems2(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames).underlyingElem)
     }
   }
 
@@ -734,7 +734,7 @@ class ElemUpdateTest extends FunSuite {
 
     assert(bookElem.path.nonEmpty)
 
-    val updatedBookElem2 = transformElems(bookElem, updateRemark)
+    val updatedBookElem2 = transformElems2(bookElem, updateRemark)
 
     assertResult(resolved.Elem(updatedBookElem.underlyingElem)) {
       resolved.Elem(updatedBookElem2.underlyingElem)
@@ -934,7 +934,7 @@ class ElemUpdateTest extends FunSuite {
 
   // Redefining ElemTransformationApi methods in terms of ElemUpdateApi methods
 
-  private def transformChildElems(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
+  private def transformChildElems2(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
     import indexed.Elem.ElemUpdates._
 
     val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
@@ -945,7 +945,7 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
-  private def transformChildElemsToNodeSeq(
+  private def transformChildElemsToNodeSeq2(
     elem: indexed.Elem,
     f: indexed.Elem => immutable.IndexedSeq[indexed.IndexedScopedNode.Node]): indexed.Elem = {
 
@@ -959,7 +959,7 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
-  private def transformElemsOrSelf(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
+  private def transformElemsOrSelf2(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
     import indexed.Elem.ElemUpdates._
 
     val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
@@ -970,7 +970,7 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
-  private def transformElems(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
+  private def transformElems2(elem: indexed.Elem, f: indexed.Elem => indexed.Elem): indexed.Elem = {
     import indexed.Elem.ElemUpdates._
 
     val paths: Set[Path] = elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
@@ -981,7 +981,7 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
-  private def transformElemsOrSelfToNodeSeq(
+  private def transformElemsOrSelfToNodeSeq2(
     elem: indexed.Elem,
     f: indexed.Elem => immutable.IndexedSeq[indexed.IndexedScopedNode.Node]): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
 
@@ -1002,7 +1002,7 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
-  private def transformElemsToNodeSeq(
+  private def transformElemsToNodeSeq2(
     elem: indexed.Elem,
     f: indexed.Elem => immutable.IndexedSeq[indexed.IndexedScopedNode.Node]): indexed.Elem = {
 
