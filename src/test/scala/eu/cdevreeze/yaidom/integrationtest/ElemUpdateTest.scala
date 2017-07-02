@@ -939,7 +939,9 @@ class ElemUpdateTest extends FunSuite {
 
     val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
 
-    updateChildElems(elem, pathEntries)(addPathEntryParameter(f)) ensuring { resultElem =>
+    val result = updateChildElems(elem, pathEntries)(addPathEntryParameter(f))
+
+    result ensuring { resultElem =>
       resolved.Elem(resultElem.underlyingElem) ==
         resolved.Elem(indexed.Elem.ElemTransformations.transformChildElems(elem, f).underlyingElem)
     }
@@ -953,7 +955,9 @@ class ElemUpdateTest extends FunSuite {
 
     val pathEntries: Set[Path.Entry] = elem.findAllChildElems.map(_.path.lastEntry).toSet
 
-    updateChildElemsWithNodeSeq(elem, pathEntries)(addPathEntryParameter(f)) ensuring { resultElem =>
+    val result = updateChildElemsWithNodeSeq(elem, pathEntries)(addPathEntryParameter(f))
+
+    result ensuring { resultElem =>
       resolved.Elem(resultElem.underlyingElem) ==
         resolved.Elem(indexed.Elem.ElemTransformations.transformChildElemsToNodeSeq(elem, f).underlyingElem)
     }
@@ -964,9 +968,16 @@ class ElemUpdateTest extends FunSuite {
 
     val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElemsOrSelf(elem, paths)(addPathParameter(f)) ensuring { resultElem =>
+    val result = updateElemsOrSelf(elem, paths)(addPathParameter(f))
+
+    result ensuring { resultElem =>
       resolved.Elem(resultElem.underlyingElem) ==
         resolved.Elem(indexed.Elem.ElemTransformations.transformElemsOrSelf(elem, f).underlyingElem)
+    } ensuring { resultElem =>
+      val reversePaths = elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).reverse
+
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(reversePaths.foldLeft(elem)({ case (accElem, path) => updateElemOrSelf(accElem, path)(f) }).underlyingElem)
     }
   }
 
@@ -975,9 +986,16 @@ class ElemUpdateTest extends FunSuite {
 
     val paths: Set[Path] = elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElems(elem, paths)(addPathParameter(f)) ensuring { resultElem =>
+    val result = updateElems(elem, paths)(addPathParameter(f))
+
+    result ensuring { resultElem =>
       resolved.Elem(resultElem.underlyingElem) ==
         resolved.Elem(indexed.Elem.ElemTransformations.transformElems(elem, f).underlyingElem)
+    } ensuring { resultElem =>
+      val reversePaths = elem.findAllElems.map(_.path.skippingPath(elem.path)).reverse
+
+      resolved.Elem(resultElem.underlyingElem) ==
+        resolved.Elem(reversePaths.foldLeft(elem)({ case (accElem, path) => updateElemOrSelf(accElem, path)(f) }).underlyingElem)
     }
   }
 
@@ -989,7 +1007,9 @@ class ElemUpdateTest extends FunSuite {
 
     val paths: Set[Path] = elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElemsOrSelfWithNodeSeq(elem, paths)(addPathParameter(f)) ensuring { resultNodes =>
+    val result = updateElemsOrSelfWithNodeSeq(elem, paths)(addPathParameter(f))
+
+    result ensuring { resultNodes =>
       val resultElems =
         resultNodes collect { case e: indexed.IndexedScopedNode.Elem[_] => e.asInstanceOf[indexed.Elem] }
 
@@ -1010,7 +1030,9 @@ class ElemUpdateTest extends FunSuite {
 
     val paths: Set[Path] = elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
 
-    updateElemsWithNodeSeq(elem, paths)(addPathParameter(f)) ensuring { resultElem =>
+    val result = updateElemsWithNodeSeq(elem, paths)(addPathParameter(f))
+
+    result ensuring { resultElem =>
       resolved.Elem(resultElem.underlyingElem) ==
         resolved.Elem(indexed.Elem.ElemTransformations.transformElemsToNodeSeq(elem, f).underlyingElem)
     }
