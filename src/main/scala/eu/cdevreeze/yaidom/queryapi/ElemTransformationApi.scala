@@ -120,7 +120,7 @@ import scala.collection.immutable
  *
  * __Inductive step__
  *
- * If `elm` does have child elements, the LHS can be rewritten as:
+ * If `elem` does have child elements, the LHS can be rewritten as:
  * {{{
  * transformElemsOrSelf(elem, f)
  * f(transformChildElems(elem, e => transformElemsOrSelf(e, f))) // definition of transformElemsOrSelf
