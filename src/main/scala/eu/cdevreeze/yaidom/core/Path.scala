@@ -229,20 +229,6 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
     val entryXPaths = entries map { entry => entry.toResolvedCanonicalXPath }
     "/" + "*" + entryXPaths.mkString
   }
-
-  /**
-   * Given an invertible `Scope`, returns the corresponding canonical XPath, but modified for the root element (which is unknown in the `Path`).
-   * The modification is that the root element is written as a slash followed by an asterisk.
-   *
-   * See http://ns.inria.org/active-tags/glossary/glossary.html#canonical-path.
-   */
-  @deprecated(message = "Use 'toResolvedCanonicalXPath' instead", since = "1.6.2")
-  def toCanonicalXPath(scope: Scope): String = {
-    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
-
-    val entryXPaths = entries map { entry => entry.toCanonicalXPath(scope) }
-    "/" + "*" + entryXPaths.mkString
-  }
 }
 
 object Path {
@@ -250,14 +236,6 @@ object Path {
   val Empty: Path = Path(immutable.IndexedSeq())
 
   def apply(entries: immutable.IndexedSeq[Path.Entry]): Path = new Path(entries)
-
-  /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
-  @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
-  def apply(s: String)(scope: Scope): Path = {
-    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
-
-    fromCanonicalXPath(s)(scope)
-  }
 
   /** Easy to use factory method for `Path` instances */
   def from(entries: (EName, Int)*): Path = {
@@ -304,34 +282,6 @@ object Path {
     Path(entries)
   }
 
-  /** Parses a String, which must be in the `toCanonicalXPath` format, into an `Path`. The passed scope must be invertible. */
-  @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
-  def fromCanonicalXPath(s: String)(scope: Scope): Path = {
-    require(scope.isInvertible, s"Scope '${scope}' is not invertible")
-
-    // We use the fact that "/", "*", "[" and "]" are never part of qualified names!
-
-    require(s.startsWith("/"), "The canonical XPath must start with a slash")
-    require(s.drop(1).startsWith("*"), "The canonical XPath must have an asterisk after the starting slash")
-    val remainder = s.drop(2)
-    require(remainder.headOption.forall(_ == '/'), "The canonical XPath's third character, if any, must be a slash")
-
-    def getEntryStrings(str: String): List[String] = str match {
-      case "" => Nil
-      case _ =>
-        val idx = str indexWhere { c => c == ']' }
-        require(idx > 0, "The canonical XPath must have positions for each 'entry', such as [1]")
-        val curr = str.take(idx + 1)
-        val rest = str.drop(idx + 1)
-        require(rest.size == 0 || rest.startsWith("/"), "In the canonical XPath, after a position, either nothing or a slash follows")
-        curr :: getEntryStrings(rest)
-    }
-
-    val entryStrings = getEntryStrings(remainder).toIndexedSeq
-    val entries = entryStrings map { entryString => Path.Entry.fromCanonicalXPath(entryString)(scope) }
-    Path(entries)
-  }
-
   /**
    * Extractor turning a Path into a sequence of entries.
    */
@@ -352,41 +302,10 @@ object Path {
       s"/${elementName.toString}[${position}]"
     }
 
-    /** Given an invertible `Scope`, returns the corresponding canonical XPath */
-    @deprecated(message = "Use 'toResolvedCanonicalXPath' instead", since = "1.6.2")
-    def toCanonicalXPath(scope: Scope): String = {
-      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
-
-      val prefixOption: Option[String] = {
-        if (elementName.namespaceUriOption.isEmpty) None else {
-          val nsUri: String = elementName.namespaceUriOption.get
-          require(scope.namespaces.contains(nsUri), s"Expected at least one (possibly empty) prefix for namespace URI '${nsUri}'")
-
-          val result = scope.prefixNamespaceMap.toList collectFirst {
-            case pair if pair._2 == nsUri =>
-              val prefix: String = pair._1
-              prefix
-          }
-          require(result.isDefined)
-          if (result.get.isEmpty) None else result
-        }
-      }
-
-      s"/${elementName.toQName(prefixOption).toString}[${position}]"
-    }
-
     def localName: String = elementName.localPart
   }
 
   object Entry {
-
-    /** Returns `fromCanonicalXPath(s)(scope)`. The passed scope must be invertible. */
-    @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
-    def apply(s: String)(scope: Scope): Entry = {
-      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
-
-      fromCanonicalXPath(s)(scope)
-    }
 
     /** Parses a `String`, which must be in the `toResolvedCanonicalXPath` format, into an `Path.Entry` */
     def fromResolvedCanonicalXPath(s: String): Entry = {
@@ -402,28 +321,6 @@ object Path {
       val elementName = EName.parse(enameString)
 
       val position = s.substring(positionIndex + 1, s.size - 1).toInt
-
-      Entry(elementName, position - 1)
-    }
-
-    /** Parses a `String`, which must be in the `toCanonicalXPath` format, into an `Path.Entry`, given an invertible `Scope` */
-    @deprecated(message = "Use 'fromResolvedCanonicalXPath' instead", since = "1.6.2")
-    def fromCanonicalXPath(s: String)(scope: Scope): Entry = {
-      require(scope.isInvertible, s"Scope '${scope}' is not invertible")
-
-      // We use the fact that "/", "[" and "]" are never part of qualified names!
-
-      require(s.startsWith("/"), "The canonical XPath for the 'entry' must start with a slash")
-      val remainder = s.drop(1)
-      require(remainder.size > 3, "The canonical XPath for the 'entry' must contain at least 4 characters")
-      val (qnameString, positionString) = remainder span { c => c != '[' }
-      require(positionString.size >= 3, "The canonical XPath for the 'entry' must have a position of at least 3 characters, such as [1]")
-      require(positionString.startsWith("["), "The canonical XPath for the 'entry' must have a position starting with '[', such as [1]")
-      require(positionString.endsWith("]"), "The canonical XPath for the 'entry' must have a position ending with ']', such as [1]")
-
-      val qname = QName.parse(qnameString)
-      val elementName = scope.resolveQNameOption(qname).getOrElse(sys.error(s"Could not resolve QName '${qname}'"))
-      val position = positionString.drop(1).dropRight(1).toInt
 
       Entry(elementName, position - 1)
     }

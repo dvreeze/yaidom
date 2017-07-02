@@ -44,9 +44,6 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemApi.Aux[U]](
 
   type ThisElem <: AbstractIndexedClarkElem.Aux[ThisElem, U]
 
-  @deprecated(message = "Use 'underlyingElem' instead", since = "1.6.0")
-  final def elem: U = underlyingElem
-
   /**
    * Asserts internal consistency of the element. That is, asserts that the redundant fields are mutually consistent.
    * These assertions are not invoked during element construction, for performance reasons. Test code may invoke this

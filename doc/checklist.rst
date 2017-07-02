@@ -36,6 +36,7 @@ Other code checks are:
 * Scala packages contain package objects, containing documentation relevant to the package/namespace.
 * Only clear unidirectional dependencies among packages (and classes).
 * Proper deprecation of changes that are not backward compatible.
+* Sometimes remove deprecated code.
 * Avoidance of deprecated or soon to be deprecated language features, such as procedure syntax in Scala.
 * Avoidance of problematic language features or language feature combinations, such as the use of val or var in a trait.
 * Avoidance of problematic dependencies; the fewer JARs the API depends on, the better; the more common they are, the better.
