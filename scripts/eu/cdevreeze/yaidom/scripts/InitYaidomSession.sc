@@ -54,5 +54,12 @@ val defaultParser = parse.DocumentParserUsingSax.newInstance()
 
 val defaultPrinter = print.DocumentPrinterUsingDom.newInstance()
 
+// Convenience method to update indexed Elems by updating simple Elems.
+// Note that we could offer TransformableElemApi-like methods that call this convenience method themselves.
+
+def takingAndReturningIndexedElems(f: simple.Elem => simple.Elem): (indexed.Elem => indexed.Elem) = {
+  { (e: indexed.Elem) => indexed.Elem(e.underlyingRootElem.updateElemOrSelf(e.path)(f)).getElemOrSelfByPath(e.path) }
+}
+
 // Now the REPL has been set up for ad-hoc yaidom querying and transformations
 // Do not forget to provide an implicit Scope if we want to create ENames with the "en" or "an" postfix operator!
