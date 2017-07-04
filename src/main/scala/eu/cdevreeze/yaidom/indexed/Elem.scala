@@ -56,6 +56,34 @@ object Elem {
     IndexedScopedNode.Elem(docUri, underlyingRootElem, path)
   }
 
+  /**
+   * Returns the given simple element as indexed element, ignoring
+   * the ancestry (Path) and document URI. In other words, returns
+   * `apply(elem)`.
+   */
+  def ignoringAncestry(elem: simple.Elem): Elem = {
+    apply(elem)
+  }
+
+  /**
+   * Returns the given simple node as indexed node, ignoring
+   * the ancestry (Path) and document URI.
+   */
+  def ignoringAncestry(node: simple.Node): IndexedScopedNode.Node = {
+    node match {
+      case e: simple.Elem =>
+        Elem(e)
+      case simple.Text(text, isCData) =>
+        IndexedScopedNode.Text(text, isCData)
+      case simple.Comment(text) =>
+        IndexedScopedNode.Comment(text)
+      case simple.ProcessingInstruction(target, data) =>
+        IndexedScopedNode.ProcessingInstruction(target, data)
+      case simple.EntityRef(entity) =>
+        IndexedScopedNode.EntityRef(entity)
+    }
+  }
+
   object ElemTransformations extends queryapi.ElemTransformationLike {
 
     // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.

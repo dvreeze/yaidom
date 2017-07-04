@@ -762,9 +762,9 @@ class ElemUpdateTest extends FunSuite {
   private def updateNameElementName(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -773,9 +773,9 @@ class ElemUpdateTest extends FunSuite {
   private def updateNameElementNameReturningNodeSeq(elm: indexed.Elem): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
-        immutable.IndexedSeq(indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName"))))
+        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName"))))
       case qn @ UnprefixedName("Last_Name") =>
-        immutable.IndexedSeq(indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName"))))
+        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName"))))
       case qn =>
         immutable.IndexedSeq(elm)
     }
@@ -790,7 +790,7 @@ class ElemUpdateTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -805,7 +805,7 @@ class ElemUpdateTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        immutable.IndexedSeq(indexed.Elem(newElm))
+        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(newElm))
       case qn =>
         immutable.IndexedSeq(elm)
     }
@@ -820,7 +820,7 @@ class ElemUpdateTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -835,7 +835,7 @@ class ElemUpdateTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -851,11 +851,11 @@ class ElemUpdateTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -871,11 +871,11 @@ class ElemUpdateTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -884,10 +884,10 @@ class ElemUpdateTest extends FunSuite {
   private def updateRemark(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("Remark") if elm.parent.attribute(EName("ISBN")) == "ISBN-0-13-815504-6" =>
-        val newRemark = "Get a discount on this book commbined with \"A First Course\""
+        val newRemark = "Get a discount on this book combined with \"A First Course\""
 
         val newElm = elm.underlyingElem.copy(children = Vector(simple.Text(newRemark, false)))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -918,7 +918,7 @@ class ElemUpdateTest extends FunSuite {
   private def updateRemark(elm: resolved.Elem): resolved.Elem = {
     elm match {
       case elm @ resolved.Elem(EName(Some("http://bookstore"), "Book"), attrs, children) if elm.attribute(EName("ISBN")) == "ISBN-0-13-815504-6" =>
-        val newRemark = "Get a discount on this book commbined with \"A First Course\""
+        val newRemark = "Get a discount on this book combined with \"A First Course\""
 
         elm transformChildElems { che =>
           if (che.localName == "Remark") {
