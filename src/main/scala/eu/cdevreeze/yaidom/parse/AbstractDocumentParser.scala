@@ -18,7 +18,10 @@ package eu.cdevreeze.yaidom.parse
 
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.net.URI
+
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.simple.Document
 
@@ -28,6 +31,13 @@ import eu.cdevreeze.yaidom.simple.Document
  * @author Chris de Vreeze
  */
 abstract class AbstractDocumentParser extends DocumentParser {
+
+  /** Parses the content of the given input stream into a [[eu.cdevreeze.yaidom.simple.Document]]. */
+  final def parse(inputStream: InputStream): Document = {
+    // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/best.html
+    val inputSource = new InputSource(inputStream)
+    parse(inputSource)
+  }
 
   /** Parses the content of the given URI into a [[eu.cdevreeze.yaidom.simple.Document]]. */
   final def parse(uri: URI): Document = parse(uri.toURL.openStream())

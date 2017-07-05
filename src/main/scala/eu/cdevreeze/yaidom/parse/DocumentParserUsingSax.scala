@@ -16,9 +16,8 @@
 
 package eu.cdevreeze.yaidom.parse
 
-import java.{ io => jio }
-
 import scala.util.Try
+import scala.util.control.Exception.ignoring
 
 import org.xml.sax.InputSource
 import org.xml.sax.ext.LexicalHandler
@@ -100,12 +99,12 @@ final class DocumentParserUsingSax(
     val handlerCreator: () => ElemProducingSaxHandler) extends AbstractDocumentParser {
 
   /**
-   * Parses the input stream into a yaidom `Document`. Closes the input stream afterwards.
+   * Parses the input source into a yaidom `Document`. Closes the input stream or reader afterwards.
    *
    * If the created `DefaultHandler` is a `LexicalHandler`, this `LexicalHandler` is registered. In practice all SAX parsers
    * should support LexicalHandlers.
    */
-  def parse(inputStream: jio.InputStream): Document = {
+  def parse(inputSource: InputSource): Document = {
     try {
       val sp: SAXParser = parserCreator(parserFactory)
       val handler = handlerCreator()
@@ -116,8 +115,6 @@ final class DocumentParserUsingSax(
         sp.getXMLReader().setProperty("http://xml.org/sax/properties/lexical-handler", handler)
       }
 
-      // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/best.html
-      val inputSource = new InputSource(inputStream)
       sp.parse(inputSource, handler)
 
       // Now all event handler methods have been called, including endDocument. The standalone value is still available.
@@ -130,7 +127,12 @@ final class DocumentParserUsingSax(
         doc.withXmlDeclarationOption(doc.xmlDeclarationOption.map(_.withStandaloneOption(Some(isStandalone))))
       docWithStandaloneSet
     } finally {
-      if (inputStream ne null) inputStream.close() // scalastyle:off null
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getByteStream).foreach(bs => bs.close())
+      }
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getCharacterStream).foreach(cs => cs.close())
+      }
     }
   }
 }

@@ -20,6 +20,8 @@ import java.io.File
 import java.io.InputStream
 import java.net.URI
 
+import org.xml.sax.InputSource
+
 import eu.cdevreeze.yaidom.simple.Document
 
 /**
@@ -33,14 +35,15 @@ import eu.cdevreeze.yaidom.simple.Document
  * typical usage is easy, and complex scenarios are still possible. The idea is that the parser is configured once, and
  * that it should be re-usable multiple times.
  *
- * One of the `parse` methods takes an `InputStream` instead of `Source` object, because that works better with a DOM implementation.
- *
  * Although `DocumentParser` instances should be re-usable multiple times, implementing classes are encouraged to indicate
  * to what extent re-use of a parser instance is indeed supported (single-threaded, or even multi-threaded).
  *
  * @author Chris de Vreeze
  */
 trait DocumentParser {
+
+  /** Parses the `InputSource` into a [[eu.cdevreeze.yaidom.simple.Document]]. This method should close the input stream or reader afterwards. */
+  def parse(inputSource: InputSource): Document
 
   /** Parses the input stream into a [[eu.cdevreeze.yaidom.simple.Document]]. This method should close the input stream afterwards. */
   def parse(inputStream: InputStream): Document

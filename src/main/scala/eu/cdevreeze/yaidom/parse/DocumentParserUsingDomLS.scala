@@ -16,12 +16,13 @@
 
 package eu.cdevreeze.yaidom.parse
 
-import java.{ io => jio }
+import scala.util.control.Exception.ignoring
 
 import org.w3c.dom.bootstrap.DOMImplementationRegistry
 import org.w3c.dom.ls.DOMImplementationLS
 import org.w3c.dom.ls.LSInput
 import org.w3c.dom.ls.LSParser
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.simple.ConverterToDocument
@@ -68,8 +69,6 @@ import eu.cdevreeze.yaidom.simple.Document
  *
  * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
  * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingDomLS`, but adapts the `parse` method.
- * This would make it possible to set an encoding on the `LSInput`, for example. As another example, this would
- * allow for adapting the conversion from a DOM `Document` to yaidom `Document`.
  *
  * A `DocumentParserUsingDomLS` instance can be re-used multiple times, from the same thread.
  * If the `DOMImplementationLS` is thread-safe, it can even be re-used from multiple threads.
@@ -94,19 +93,43 @@ final class DocumentParserUsingDomLS(
       newConverterToDocument)
   }
 
-  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
-  def parse(inputStream: jio.InputStream): Document = {
+  /** Parses the input source into a yaidom `Document`. Closes the input stream or reader afterwards. */
+  def parse(inputSource: InputSource): Document = {
     try {
       val parser: LSParser = parserCreator(domImplementation)
 
       val input: LSInput = domImplementation.createLSInput
-      input.setByteStream(inputStream)
+
+      if (Option(inputSource.getByteStream).nonEmpty) {
+        input.setByteStream(inputSource.getByteStream)
+      }
+
+      if (Option(inputSource.getCharacterStream).nonEmpty) {
+        input.setCharacterStream(inputSource.getCharacterStream)
+      }
+
+      if (Option(inputSource.getEncoding).nonEmpty) {
+        input.setEncoding(inputSource.getEncoding)
+      }
+
+      if (Option(inputSource.getSystemId).nonEmpty) {
+        input.setSystemId(inputSource.getSystemId)
+      }
+
+      if (Option(inputSource.getPublicId).nonEmpty) {
+        input.setPublicId(inputSource.getPublicId)
+      }
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
 
       converterToDocument.convertToDocument(domDoc)
     } finally {
-      if (inputStream ne null) inputStream.close() // scalastyle:off null
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getByteStream).foreach(bs => bs.close())
+      }
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getCharacterStream).foreach(cs => cs.close())
+      }
     }
   }
 

@@ -16,10 +16,10 @@
 
 package eu.cdevreeze.yaidom.parse
 
-import java.{ io => jio }
-
 import scala.collection.Iterator
 import scala.util.control.Exception.ignoring
+
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
 import eu.cdevreeze.yaidom.simple.ConverterToDocument
@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.stream.XMLEventReader
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.stream.StreamSource
+import javax.xml.transform.sax.SAXSource
 
 /**
  * StAX-based `Document` parser.
@@ -66,7 +66,6 @@ import javax.xml.transform.stream.StreamSource
  *
  * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
  * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingStax`, but adapts the `parse` method.
- * This would make it possible to adapt the conversion from StAX events to yaidom `Document`, for example.
  *
  * A `DocumentParserUsingStax` instance can be re-used multiple times, from the same thread.
  * If the `XMLInputFactory` is thread-safe, it can even be re-used from multiple threads.
@@ -89,12 +88,12 @@ final class DocumentParserUsingStax(
       newConverterToDocument)
   }
 
-  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
-  def parse(inputStream: jio.InputStream): Document = {
+  /** Parses the input source into a yaidom `Document`. Closes the input stream or reader afterwards. */
+  def parse(inputSource: InputSource): Document = {
     var xmlEventReader: XMLEventReader = null // scalastyle:off null
     try {
-      val streamSource = new StreamSource(inputStream)
-      xmlEventReader = inputFactory.createXMLEventReader(streamSource)
+      val saxSource = new SAXSource(inputSource)
+      xmlEventReader = inputFactory.createXMLEventReader(saxSource)
 
       converterToDocument.convertToDocument(StaxConversions.asIterator(xmlEventReader))
     } finally {
@@ -102,7 +101,10 @@ final class DocumentParserUsingStax(
         if (xmlEventReader ne null) xmlEventReader.close() // scalastyle:off null
       }
       ignoring(classOf[Exception]) {
-        if (inputStream ne null) inputStream.close() // scalastyle:off null
+        Option(inputSource.getByteStream).foreach(bs => bs.close())
+      }
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getCharacterStream).foreach(cs => cs.close())
       }
     }
   }

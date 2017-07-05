@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.yaidom.parse
 
-import java.{ io => jio }
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.simple.Document
 
@@ -44,6 +44,6 @@ final class ThreadLocalDocumentParser(val docParserCreator: () => DocumentParser
    */
   def documentParserOfCurrentThread: DocumentParser = threadLocalDocParser.get
 
-  /** Parses the input stream into a yaidom `Document`, using the DocumentParser attached to the current thread. */
-  def parse(inputStream: jio.InputStream): Document = documentParserOfCurrentThread.parse(inputStream)
+  /** Parses the input source into a yaidom `Document`, using the DocumentParser attached to the current thread. */
+  def parse(inputSource: InputSource): Document = documentParserOfCurrentThread.parse(inputSource)
 }

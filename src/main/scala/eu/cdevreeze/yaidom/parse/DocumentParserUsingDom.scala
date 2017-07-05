@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.yaidom.parse
 
-import java.{ io => jio }
+import scala.util.control.Exception.ignoring
 
 import org.xml.sax.InputSource
 
@@ -82,7 +82,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * If more flexibility is needed in configuring the `DocumentParser` than offered by this class, consider
  * writing a wrapper `DocumentParser` which wraps a `DocumentParserUsingDom`, but adapts the `parse` method.
- * This would make it possible to adapt the conversion from a DOM `Document` to yaidom `Document`, for example.
  *
  * A `DocumentParserUsingDom` instance can be re-used multiple times, from the same thread.
  * If the `DocumentBuilderFactory` is thread-safe, it can even be re-used from multiple threads.
@@ -107,18 +106,21 @@ final class DocumentParserUsingDom(
       newConverterToDocument)
   }
 
-  /** Parses the input stream into a yaidom `Document`. Closes the input stream afterwards. */
-  def parse(inputStream: jio.InputStream): Document = {
+  /** Parses the input source into a yaidom `Document`. Closes the input stream or reader afterwards. */
+  def parse(inputSource: InputSource): Document = {
     try {
       val db: DocumentBuilder = docBuilderCreator(docBuilderFactory)
 
-      // See http://docs.oracle.com/cd/E13222_01/wls/docs90/xml/best.html
-      val inputSource = new InputSource(inputStream)
       val domDoc: org.w3c.dom.Document = db.parse(inputSource)
 
       converterToDocument.convertToDocument(domDoc)
     } finally {
-      if (inputStream ne null) inputStream.close() // scalastyle:off null
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getByteStream).foreach(bs => bs.close())
+      }
+      ignoring(classOf[Exception]) {
+        Option(inputSource.getCharacterStream).foreach(cs => cs.close())
+      }
     }
   }
 }

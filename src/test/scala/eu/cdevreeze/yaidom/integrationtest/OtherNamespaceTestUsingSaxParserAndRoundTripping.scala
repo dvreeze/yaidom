@@ -16,18 +16,18 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.io.InputStream
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import org.xml.sax.InputSource
+
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
-import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.AbstractDocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Document
 
 /**
  * See AbstractOtherNamespaceTest.
@@ -44,8 +44,8 @@ class OtherNamespaceTestUsingSaxParserAndRoundTripping extends AbstractOtherName
 
     private val wrappedDocumentParser: DocumentParser = DocumentParserUsingSax.newInstance
 
-    override def parse(inputStream: InputStream): Document = {
-      val doc = wrappedDocumentParser.parse(inputStream)
+    override def parse(inputSource: InputSource): Document = {
+      val doc = wrappedDocumentParser.parse(inputSource)
 
       val result = doc.withDocumentElement(convertToElem(convertElem(doc.documentElement)))
 
@@ -61,8 +61,8 @@ class OtherNamespaceTestUsingSaxParserAndRoundTripping extends AbstractOtherName
 
     private val wrappedDocumentParser: DocumentParser = DocumentParserUsingSax.newInstance
 
-    override def parse(inputStream: InputStream): Document = {
-      val doc = wrappedDocumentParser.parse(inputStream)
+    override def parse(inputSource: InputSource): Document = {
+      val doc = wrappedDocumentParser.parse(inputSource)
 
       val result = doc.withDocumentElement(convertToElem(convertElem(doc.documentElement)))
 
