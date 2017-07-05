@@ -100,25 +100,11 @@ final class DocumentParserUsingDomLS(
 
       val input: LSInput = domImplementation.createLSInput
 
-      if (Option(inputSource.getByteStream).nonEmpty) {
-        input.setByteStream(inputSource.getByteStream)
-      }
-
-      if (Option(inputSource.getCharacterStream).nonEmpty) {
-        input.setCharacterStream(inputSource.getCharacterStream)
-      }
-
-      if (Option(inputSource.getEncoding).nonEmpty) {
-        input.setEncoding(inputSource.getEncoding)
-      }
-
-      if (Option(inputSource.getSystemId).nonEmpty) {
-        input.setSystemId(inputSource.getSystemId)
-      }
-
-      if (Option(inputSource.getPublicId).nonEmpty) {
-        input.setPublicId(inputSource.getPublicId)
-      }
+      Option(inputSource.getByteStream).foreach(bs => input.setByteStream(bs))
+      Option(inputSource.getCharacterStream).foreach(cs => input.setCharacterStream(cs))
+      Option(inputSource.getEncoding).foreach(enc => input.setEncoding(enc))
+      Option(inputSource.getSystemId).foreach(sysId => input.setSystemId(sysId))
+      Option(inputSource.getPublicId).foreach(pubId => input.setPublicId(pubId))
 
       val domDoc: org.w3c.dom.Document = parser.parse(input)
 
