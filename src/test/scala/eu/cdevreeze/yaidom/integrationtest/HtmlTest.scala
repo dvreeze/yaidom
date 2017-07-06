@@ -16,18 +16,23 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil, io => jio }
-import org.junit.runner.RunWith
-import org.scalatest.{ FunSuite, BeforeAndAfterAll }
-import org.scalatest.junit.JUnitRunner
+import java.{ io => jio }
+import java.{ util => jutil }
+
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
-import eu.cdevreeze.yaidom.queryapi.HasENameApi._
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.simple.Elem
+import org.junit.runner.RunWith
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
+
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.withNoNsEName
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * HTML support test case.
@@ -79,7 +84,7 @@ class HtmlTest extends FunSuite with BeforeAndAfterAll {
 
     logger.info(s"HTML after parsing and printing:\n$htmlString")
 
-    val doc2 = docParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("UTF-8")))
+    val doc2 = docParser.parse(new InputSource(new jio.StringReader(htmlString)))
 
     assertResult(4) {
       (doc2.documentElement \\! withNoNsEName("li")).size

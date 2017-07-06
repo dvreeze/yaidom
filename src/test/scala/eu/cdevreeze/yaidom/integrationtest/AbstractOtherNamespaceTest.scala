@@ -19,16 +19,17 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.{ io => jio }
 
 import org.scalatest.FunSuite
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 
 /**
  * Test case testing the use of namespaces in immutable Documents.
@@ -52,7 +53,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</prod:product>
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
@@ -102,7 +103,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -172,7 +173,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -242,7 +243,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val equivalentDoc = documentParser.parse(new jio.ByteArrayInputStream(equivalentXml.getBytes("UTF-8")))
+    val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
     val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
 
@@ -281,7 +282,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -351,7 +352,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val equivalentDoc = documentParser.parse(new jio.ByteArrayInputStream(equivalentXml.getBytes("UTF-8")))
+    val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
     val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
 
@@ -395,7 +396,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |""".stripMargin.trim
 
     intercept[java.lang.Exception] {
-      documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+      documentParser.parse(new InputSource(new jio.StringReader(xml)))
     }
   }
 
@@ -414,7 +415,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -485,7 +486,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val almostEquivalentDoc = documentParser.parse(new jio.ByteArrayInputStream(almostEquivalentXml.getBytes("UTF-8")))
+    val almostEquivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(almostEquivalentXml)))
 
     val resolvedAlmostEquivalentElem = resolved.Elem(almostEquivalentDoc.documentElement)
 
@@ -534,7 +535,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -604,7 +605,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val equivalentDoc = documentParser.parse(new jio.ByteArrayInputStream(equivalentXml.getBytes("UTF-8")))
+    val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
     val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
 
@@ -643,7 +644,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -712,7 +713,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val doc = documentParserForXml11.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParserForXml11.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -782,7 +783,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val equivalentDoc = documentParser.parse(new jio.ByteArrayInputStream(equivalentXml.getBytes("UTF-8")))
+    val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
     val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
 
@@ -817,7 +818,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</product>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("product"), QName("number"), QName("size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
@@ -863,7 +864,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</product>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("product"), QName("number"), QName("size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
@@ -909,7 +910,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |""".stripMargin.trim
 
     intercept[java.lang.Exception] {
-      documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+      documentParser.parse(new InputSource(new jio.StringReader(xml)))
     }
   }
 
@@ -932,7 +933,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</envelope>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -1029,7 +1030,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</envelope>      
          |""".stripMargin.trim
 
-    val equivalentDoc = documentParser.parse(new jio.ByteArrayInputStream(equivalentXml.getBytes("UTF-8")))
+    val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
     val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
 
@@ -1066,7 +1067,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</prod:product>
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
       doc.documentElement.findAllElemsOrSelf map { _.qname }
@@ -1103,7 +1104,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</ord:order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -1155,7 +1156,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -1206,7 +1207,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -1263,7 +1264,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -1319,7 +1320,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(
@@ -1374,7 +1375,7 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
          |</order>      
          |""".stripMargin.trim
 
-    val doc = documentParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(
       List(

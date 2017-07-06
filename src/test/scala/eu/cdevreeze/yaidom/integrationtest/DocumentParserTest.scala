@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.ByteArrayInputStream
+import java.io.StringReader
 import java.nio.charset.Charset
 
 import scala.io.Codec
@@ -24,6 +25,7 @@ import scala.io.Codec
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.dom.DomDocument
@@ -178,7 +180,7 @@ class DocumentParserTest extends FunSuite {
 
     val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
     val doc = DomDocument(
-      db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
+      db.parse(new InputSource(new StringReader(xml))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -216,7 +218,7 @@ class DocumentParserTest extends FunSuite {
 
     val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
     val doc = DomDocument(
-      db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
+      db.parse(new InputSource(new StringReader(xml))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -252,7 +254,7 @@ class DocumentParserTest extends FunSuite {
          |<!-- Bogus comment at the end -->
          |""".stripMargin.trim
 
-    val doc = docParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = docParser.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -300,7 +302,7 @@ class DocumentParserTest extends FunSuite {
          |</prod:product>
          |""".stripMargin.trim
 
-    val doc = docParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = docParser.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)

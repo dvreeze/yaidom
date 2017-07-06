@@ -19,6 +19,7 @@ package eu.cdevreeze.yaidom.integrationtest
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.core.Declarations
@@ -26,7 +27,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -45,8 +45,8 @@ import javax.xml.parsers.DocumentBuilderFactory
 @RunWith(classOf[JUnitRunner])
 class TreeReprTest extends FunSuite {
 
-  import DocBuilder._
-  import NodeBuilder._
+  import eu.cdevreeze.yaidom.simple.DocBuilder._
+  import eu.cdevreeze.yaidom.simple.NodeBuilder._
 
   test("testCreateTreeForBooks") {
     val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
@@ -705,7 +705,7 @@ class TreeReprTest extends FunSuite {
 </rootElem>
 """
 
-    val doc = parser.parse(new java.io.ByteArrayInputStream(xmlString.getBytes("UTF-8")))
+    val doc = parser.parse(new InputSource(new java.io.StringReader(xmlString)))
 
     val docBuilder: DocBuilder =
       document(

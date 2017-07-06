@@ -24,12 +24,17 @@ import scala.collection.immutable
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
@@ -37,10 +42,6 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.resolved
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLResolver
 
@@ -95,7 +96,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -150,7 +151,7 @@ class StaxInteropTest extends FunSuite {
     assert(!xmlString3.startsWith("<?xml "))
     assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
 
-    val doc2 = staxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+    val doc2 = staxParser.parse(new InputSource(new jio.StringReader(xmlString2)))
 
     val root4 = doc2.documentElement
 
@@ -215,7 +216,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -271,7 +272,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val document2: Document = staxParser.parse(bis)
     val root2: Elem = document2.documentElement
@@ -517,7 +518,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -601,7 +602,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -679,7 +680,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -728,7 +729,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -802,7 +803,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = staxParser.parse(bis).documentElement
 
@@ -957,7 +958,7 @@ class StaxInteropTest extends FunSuite {
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
 
-    val htmlRoot: Elem = staxParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
+    val htmlRoot: Elem = staxParser.parse(new InputSource(new jio.StringReader(htmlString))).documentElement
 
     // 4. Check the parsed HTML
 
@@ -995,7 +996,7 @@ class StaxInteropTest extends FunSuite {
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 
-    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+    val is = new InputSource(new jio.StringReader(brokenXmlString))
 
     intercept[Exception] {
       staxParser.parse(is).documentElement

@@ -558,7 +558,7 @@ class XomWrapperTest extends FunSuite {
     val htmlRoot: XomElem =
       XomNode.wrapDocument(
         nu.xom.converters.DOMConverter.convert(
-          dbf.newDocumentBuilder.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))))).documentElement
+          dbf.newDocumentBuilder.parse(new InputSource(new jio.StringReader(htmlString))))).documentElement
 
     val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
 
@@ -732,7 +732,7 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemLike with HasParent {
+      override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 

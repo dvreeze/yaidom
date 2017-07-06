@@ -16,15 +16,16 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.io.ByteArrayInputStream
+import java.{ io => jio }
 
 import scala.Vector
 import scala.xml.NodeSeq.seqToNodeSeq
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 import org.w3c.dom.DOMException
+import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
@@ -104,7 +105,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingSax.newInstance
 
     intercept[SAXParseException] {
-      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml)))
     }
   }
 
@@ -115,7 +116,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingStax.newInstance
 
     intercept[Exception] {
-      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml)))
     }
   }
 
@@ -126,7 +127,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingDom.newInstance
 
     intercept[SAXParseException] {
-      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml)))
     }
   }
 
@@ -137,7 +138,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingDomLS.newInstance
 
     intercept[RuntimeException] {
-      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml)))
     }
   }
 
@@ -153,7 +154,7 @@ class TheCaseForYaidomTest extends FunSuite {
 
     // SAX parsing succeeds, but yaidom Elem creation does not
     intercept[RuntimeException] {
-      parser.parse(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml)))
     }
   }
 
@@ -164,7 +165,7 @@ class TheCaseForYaidomTest extends FunSuite {
    * not namespace-well-formed.
    */
   test("testTryParsingWrongXmlUsingScalaXml") {
-    val scalaElem = scala.xml.XML.load(new ByteArrayInputStream(wrongXml.getBytes("UTF-8")))
+    val scalaElem = scala.xml.XML.load(new InputSource(new jio.StringReader(wrongXml)))
 
     // Why null? Why not an Option?
     assertResult(null) {
@@ -370,7 +371,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingSax.newInstance
 
     intercept[SAXParseException] {
-      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
     }
   }
 
@@ -381,7 +382,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingStax.newInstance
 
     intercept[Exception] {
-      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
     }
   }
 
@@ -392,7 +393,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingDom.newInstance
 
     intercept[SAXParseException] {
-      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
     }
   }
 
@@ -403,7 +404,7 @@ class TheCaseForYaidomTest extends FunSuite {
     val parser = DocumentParserUsingDomLS.newInstance
 
     intercept[RuntimeException] {
-      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
     }
   }
 
@@ -419,7 +420,7 @@ class TheCaseForYaidomTest extends FunSuite {
 
     // SAX parsing succeeds, but yaidom Elem creation does not
     intercept[RuntimeException] {
-      parser.parse(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+      parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
     }
   }
 
@@ -430,7 +431,7 @@ class TheCaseForYaidomTest extends FunSuite {
    * not namespace-well-formed.
    */
   test("testTryParsingWrongXml2UsingScalaXml") {
-    val scalaElem = scala.xml.XML.load(new ByteArrayInputStream(wrongXml2.getBytes("UTF-8")))
+    val scalaElem = scala.xml.XML.load(new InputSource(new jio.StringReader(wrongXml2)))
 
     assertResult("link") {
       scalaElem.prefix

@@ -18,9 +18,11 @@ package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.StringReader
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
@@ -29,7 +31,7 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
-import javax.xml.transform.stream.StreamSource
+import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.XdmNode
 
@@ -176,11 +178,13 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupp
     val docPrinter = DocumentPrinterUsingDom.newInstance
     val xmlString = docPrinter.print(d)
 
-    val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
+    val is = new InputSource(new StringReader(xmlString))
+    is.setSystemId(d.uriOption.map(_.toString).getOrElse(""))
+
     val doc: DomDocument =
       DomNode.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(
-          new StreamSource(is, d.uriOption.map(_.toString).getOrElse("")), parseOptions))
+          new SAXSource(is), parseOptions))
     doc
   }
 }

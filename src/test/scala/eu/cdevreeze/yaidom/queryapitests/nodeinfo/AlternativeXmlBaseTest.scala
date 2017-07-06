@@ -16,20 +16,21 @@
 
 package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
-import java.io.ByteArrayInputStream
+import java.io.StringReader
 import java.net.URI
 
 import scala.collection.immutable
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
 import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
-import javax.xml.transform.stream.StreamSource
+import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
 
 /**
@@ -51,11 +52,13 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTe
     val xmlString = docPrinter.print(elem)
 
     val parseOptions = new ParseOptions
-    val is = new ByteArrayInputStream(xmlString.getBytes("UTF-8"))
+    val is = new InputSource(new StringReader(xmlString))
+    is.setSystemId(Option(docUri).map(_.toString).getOrElse(null))
+
     val doc: DomDocument =
       DomNode.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(
-          new StreamSource(is, Option(docUri).map(_.toString).getOrElse(null)), parseOptions))
+          new SAXSource(is), parseOptions))
     doc
   }
 

@@ -21,16 +21,17 @@ import java.{ io => jio }
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 
 /**
  * Test case testing the use of namespaces in immutable Documents.
@@ -174,7 +175,7 @@ class NamespaceTest extends FunSuite {
                |  <my:bar xmlns:my="http://example.com/uri2"/>
                |</my:foo>""".stripMargin
 
-    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
 
     assertResult(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
@@ -190,7 +191,7 @@ class NamespaceTest extends FunSuite {
                |  <my2:bar xmlns:my2="http://EXAMPLE.COM/uri2/"><my3:baz xmlns:my3="../uri3"/></my2:bar>
                |</my1:foo>""".stripMargin
 
-    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
 
     val enames =
@@ -218,7 +219,7 @@ class NamespaceTest extends FunSuite {
                |  <my2:bar xmlns:my="" xmlns:my2="http://example.com/uri2"/>
                |</my:foo>""".stripMargin
 
-    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
 
     assertResult(List(EName("{http://example.com/uri1}foo"), EName("{http://example.com/uri2}bar"))) {
@@ -233,7 +234,7 @@ class NamespaceTest extends FunSuite {
                |  <my:bar xml:lang="en"/>
                |</my:foo>""".stripMargin
 
-    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
 
     assertResult(List(EName("{http://example.com/uri}foo"), EName("{http://example.com/uri}bar"))) {
@@ -258,7 +259,7 @@ class NamespaceTest extends FunSuite {
                |  </simple>
                |</my:doc>""".stripMargin
 
-    val doc = docParser.parse(new jio.ByteArrayInputStream(s.getBytes("utf-8")))
+    val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
 
     assertResult(Scope.from("my" -> "http://xmlportfolio.com/xmlguild-examples")) {
@@ -385,7 +386,7 @@ class NamespaceTest extends FunSuite {
     val docPrinter = DocumentPrinterUsingSax.newInstance
 
     val xml = docPrinter.print(doc)
-    val doc6 = docParser.parse(new jio.ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc6 = docParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(resolved.Elem(rootElm)) {
       resolved.Elem(doc6.documentElement)

@@ -17,20 +17,24 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.{ io => jio }
+
 import scala.collection.immutable
-import scala.io.Codec
+
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder._
-import eu.cdevreeze.yaidom.parse._
-import eu.cdevreeze.yaidom.print._
+import org.xml.sax.InputSource
+
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.parse
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
+import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
+import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 
 /**
  * Example http://www.javacodegeeks.com/2012/05/scala-basic-xml-processing.html (for Scala's XML library) "ported" to
@@ -140,8 +144,8 @@ class BasicXmlProcessingTest extends FunSuite {
     val fooString = """<foo><bar type="greet">hi</bar><bar type="count">1</bar><bar type="color">yellow</bar></foo>"""
 
     // Using JAXP parsers (with all the possible parser configuration whenever needed) instead of drinking the Kool-Aid
-    val docParser = parse.DocumentParserUsingSax.newInstance
-    val fooElemFromString: Elem = docParser.parse(new jio.ByteArrayInputStream(fooString.getBytes("utf-8"))).documentElement
+    val docParser = DocumentParserUsingSax.newInstance
+    val fooElemFromString: Elem = docParser.parse(new InputSource(new jio.StringReader(fooString))).documentElement
 
     // No, I do not believe in some magic implicit notion of equality for XML, for many reasons
     // (whitespace handling, namespaces/prefixes, dependency on external files, comments, etc. etc.)
@@ -232,7 +236,7 @@ class BasicXmlProcessingTest extends FunSuite {
     val docPrinter = DocumentPrinterUsingSax.newInstance
     val musicXml = docPrinter.print(musicElm2)
 
-    val musicElm3 = docParser.parse(new jio.ByteArrayInputStream(musicXml.getBytes(Codec.UTF8.toString))).documentElement
+    val musicElm3 = docParser.parse(new InputSource(new jio.StringReader(musicXml))).documentElement
 
     val musicElmWithoutLinks: Elem =
       musicElm transformElemsOrSelf {

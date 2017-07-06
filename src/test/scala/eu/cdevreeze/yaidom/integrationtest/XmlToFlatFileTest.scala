@@ -23,10 +23,11 @@ import scala.Vector
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * Test case that "ports" http://www.jroller.com/jurberg/entry/converting_xml_to_flat_files to Scala.
@@ -66,7 +67,7 @@ class XmlToFlatFileTest extends FunSuite {
 </catalog>
       """
 
-    val rootElem = docParser.parse(new jio.ByteArrayInputStream(xmlData.getBytes("utf-8"))).documentElement
+    val rootElem = docParser.parse(new InputSource(new jio.StringReader(xmlData))).documentElement
 
     val columnMapping = Vector(
       { bookElem: Elem =>

@@ -16,11 +16,12 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.io.ByteArrayInputStream
+import java.io.StringReader
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
@@ -201,7 +202,7 @@ class IndexedElemTest extends FunSuite {
          |<!-- Bogus comment at the end -->
          |""".stripMargin.trim
 
-    val doc = docParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = docParser.parse(new InputSource(new StringReader(xml)))
     doc
   }
 
@@ -217,7 +218,7 @@ class IndexedElemTest extends FunSuite {
          |</prod:product>
          |""".stripMargin.trim
 
-    val doc = docParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")))
+    val doc = docParser.parse(new InputSource(new StringReader(xml)))
     doc
   }
 }

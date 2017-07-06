@@ -32,12 +32,10 @@ import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.ENameProvider
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Text
 import eu.cdevreeze.yaidom.parse.DocumentParser
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
@@ -51,6 +49,9 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax
 import eu.cdevreeze.yaidom.print.ThreadLocalDocumentPrinter
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Text
 
 /**
  * Parallel execution test. It starts 10 "threads of execution", in which elements are serialized, parsed, and transformed.
@@ -157,12 +158,10 @@ class ParallelExecutionTest extends FunSuite with BeforeAndAfterAll {
 
     implicit val execContext = ExecutionContext.fromExecutor(threadPool)
 
-    val encoding = "UTF-8"
-
     val futures: Vector[Future[Elem]] =
       (1 to 10).toVector map { i =>
         Future { docPrinter.print(rootElem) } map { xmlString =>
-          docParser.parse(new jio.ByteArrayInputStream(xmlString.getBytes(encoding))).documentElement
+          docParser.parse(new InputSource(new jio.StringReader(xmlString))).documentElement
         } map { elem =>
           elem transformElems { e =>
             if (e.localName == "grandChild")
@@ -172,7 +171,7 @@ class ParallelExecutionTest extends FunSuite with BeforeAndAfterAll {
         } map { elem =>
           docPrinter.print(elem)
         } map { xmlString =>
-          docParser.parse(new jio.ByteArrayInputStream(xmlString.getBytes(encoding))).documentElement
+          docParser.parse(new InputSource(new jio.StringReader(xmlString))).documentElement
         } map { elem =>
           elem transformElems { e =>
             if (e.localName == "grandChild")

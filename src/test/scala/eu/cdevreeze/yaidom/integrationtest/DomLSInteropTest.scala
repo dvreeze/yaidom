@@ -29,6 +29,7 @@ import org.w3c.dom.ls.LSException
 import org.w3c.dom.ls.LSInput
 import org.w3c.dom.ls.LSParser
 import org.w3c.dom.ls.LSResourceResolver
+import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.DomConversions.convertDocument
@@ -38,6 +39,10 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDomLS
+import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
@@ -45,10 +50,6 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDomLS
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
-import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -157,7 +158,7 @@ class DomLSInteropTest extends FunSuite {
     assert(!xmlString3.startsWith("<?xml "))
     assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
 
-    val bis = new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString2))
     val doc2 = domParser.parse(bis)
 
     val root4 = doc2.documentElement
@@ -1010,7 +1011,7 @@ class DomLSInteropTest extends FunSuite {
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 
-    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+    val is = new InputSource(new jio.StringReader(brokenXmlString))
 
     intercept[LSException] {
       domParser.parse(is).documentElement
@@ -1101,7 +1102,7 @@ class DomLSInteropTest extends FunSuite {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val xmlString = """<root><a> a <![CDATA[b]]> c </a></root>"""
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new InputSource(new jio.StringReader(xmlString)))
 
     val aElm = doc.documentElement.getChildElem(_.localName == "a")
 
@@ -1123,7 +1124,7 @@ class DomLSInteropTest extends FunSuite {
     val parser = DocumentParserUsingDomLS.newInstance
 
     val xmlString = """<root><a></a><b><![CDATA[]]></b><c/></root>"""
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new InputSource(new jio.StringReader(xmlString)))
 
     val aElm = doc.documentElement.getChildElem(_.localName == "a")
     val bElm = doc.documentElement.getChildElem(_.localName == "b")
@@ -1157,9 +1158,9 @@ class DomLSInteropTest extends FunSuite {
 
     val xmlString = """<root><a><![CDATA[abc def]]></a></root>"""
 
-    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val doc2 = parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc1 = parser1.parse(new InputSource(new jio.StringReader(xmlString)))
+    val doc2 = parser2.parse(new InputSource(new jio.StringReader(xmlString)))
+    val doc3 = parser3.parse(new InputSource(new jio.StringReader(xmlString)))
 
     val aElm1 = doc1.documentElement.getChildElem(_.localName == "a")
     val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
@@ -1210,9 +1211,9 @@ class DomLSInteropTest extends FunSuite {
 
     val xmlString = """<root><a>abc <!-- abc def --> def</a></root>"""
 
-    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val doc2 = parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc1 = parser1.parse(new InputSource(new jio.StringReader(xmlString)))
+    val doc2 = parser2.parse(new InputSource(new jio.StringReader(xmlString)))
+    val doc3 = parser3.parse(new InputSource(new jio.StringReader(xmlString)))
 
     val aElm1 = doc1.documentElement.getChildElem(_.localName == "a")
     val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
@@ -1273,9 +1274,9 @@ class DomLSInteropTest extends FunSuite {
          |<root><a><b></b>   </a></root>
          |""".stripMargin
 
-    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val doc2 = parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
-    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc1 = parser1.parse(new InputSource(new jio.StringReader(xmlString)))
+    val doc2 = parser2.parse(new InputSource(new jio.StringReader(xmlString)))
+    val doc3 = parser3.parse(new InputSource(new jio.StringReader(xmlString)))
 
     val aElm1 = doc1.documentElement.getChildElem(_.localName == "a")
     val aElm2 = doc2.documentElement.getChildElem(_.localName == "a")
@@ -1335,13 +1336,13 @@ class DomLSInteropTest extends FunSuite {
          |<root><a><b></b></a></root>
          |""".stripMargin
 
-    val doc1 = parser1.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc1 = parser1.parse(new InputSource(new jio.StringReader(xmlString)))
 
     intercept[Exception] {
-      parser2.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+      parser2.parse(new InputSource(new jio.StringReader(xmlString)))
     }
 
-    val doc3 = parser3.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc3 = parser3.parse(new InputSource(new jio.StringReader(xmlString)))
 
     assertResult(3) {
       doc1.documentElement.findAllElemsOrSelf.size
@@ -1363,7 +1364,7 @@ class DomLSInteropTest extends FunSuite {
          |<root><a><b></b></a></root>
          |""".stripMargin
 
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new InputSource(new jio.StringReader(xmlString)))
 
     assertResult("") {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
@@ -1391,8 +1392,8 @@ class DomLSInteropTest extends FunSuite {
     assert(xmlString1.size < xmlString2.size)
     assert(xmlString1.trim.size < xmlString2.trim.size)
 
-    val doc1 = parser.parse(new jio.ByteArrayInputStream(xmlString1.getBytes("utf-8")))
-    val doc2 = parser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+    val doc1 = parser.parse(new InputSource(new jio.StringReader(xmlString1)))
+    val doc2 = parser.parse(new InputSource(new jio.StringReader(xmlString2)))
 
     logger.info("Non-prettified xmlString1 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc1)))
     logger.info("Prettified xmlString2 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc2)))
@@ -1411,7 +1412,7 @@ class DomLSInteropTest extends FunSuite {
          |<root><a><b></b></a></root>
          |""".stripMargin
 
-    val doc = parser.parse(new jio.ByteArrayInputStream(xmlString.getBytes("utf-8")))
+    val doc = parser.parse(new InputSource(new jio.StringReader(xmlString)))
 
     assertResult("") {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
@@ -1439,8 +1440,8 @@ class DomLSInteropTest extends FunSuite {
     assert(xmlString1.size < xmlString2.size)
     assert(xmlString1.trim.size < xmlString2.trim.size)
 
-    val doc1 = parser.parse(new jio.ByteArrayInputStream(xmlString1.getBytes("utf-8")))
-    val doc2 = parser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+    val doc1 = parser.parse(new InputSource(new jio.StringReader(xmlString1)))
+    val doc2 = parser.parse(new InputSource(new jio.StringReader(xmlString2)))
 
     logger.info("Non-prettified xmlString1 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc1)))
     logger.info("Prettified xmlString2 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc2)))
