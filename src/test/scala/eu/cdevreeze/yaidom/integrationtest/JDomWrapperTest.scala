@@ -615,8 +615,7 @@ class JDomWrapperTest extends FunSuite {
 
     val domBuilder2 = new org.jdom2.input.DOMBuilder
     val doc2 = domBuilder2.build(
-      dbf.newDocumentBuilder.parse(
-        new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))))
+      dbf.newDocumentBuilder.parse(new InputSource(new jio.StringReader(htmlString))))
     val domDoc2: JDomDocument = JDomNode.wrapDocument(doc2)
 
     val htmlRoot: JDomElem = domDoc2.documentElement

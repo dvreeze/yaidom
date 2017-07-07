@@ -106,7 +106,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 
@@ -161,7 +161,7 @@ class SaxInteropTest extends FunSuite {
     assert(!xmlString3.startsWith("<?xml "))
     assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
 
-    val doc2 = saxParser.parse(new jio.ByteArrayInputStream(xmlString2.getBytes("utf-8")))
+    val doc2 = saxParser.parse(new InputSource(new jio.StringReader(xmlString2)))
 
     val root4 = doc2.documentElement
 
@@ -231,7 +231,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 
@@ -292,7 +292,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val document2: Document = saxParser.parse(bis)
     val root2: Elem = document2.documentElement
@@ -539,7 +539,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 
@@ -613,7 +613,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 
@@ -666,7 +666,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 
@@ -741,7 +741,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 
@@ -903,7 +903,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse HTML string (which is also valid XML in this case) into Document
 
-    val htmlRoot: Elem = saxParser.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8"))).documentElement
+    val htmlRoot: Elem = saxParser.parse(new InputSource(new jio.StringReader(htmlString))).documentElement
 
     // 4. Check the parsed HTML
 
@@ -970,7 +970,7 @@ class SaxInteropTest extends FunSuite {
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 
-    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+    val is = new InputSource(new jio.StringReader(brokenXmlString))
 
     intercept[SAXParseException] {
       saxParser.parse(is).documentElement
@@ -1098,7 +1098,7 @@ class SaxInteropTest extends FunSuite {
 
     // 3. Parse XML/HTML string into Elem
 
-    val bis = new jio.ByteArrayInputStream(xmlString.getBytes("utf-8"))
+    val bis = new InputSource(new jio.StringReader(xmlString))
 
     val root2: Elem = saxParser.parse(bis).documentElement
 

@@ -202,7 +202,7 @@ class PrettifyTest extends FunSuite {
 </rootElem>
 """
 
-    val doc = parser.parse(new java.io.ByteArrayInputStream(xmlString.getBytes("UTF-8")))
+    val doc = parser.parse(new InputSource(new java.io.StringReader(xmlString)))
 
     doTest(doc)
   }
@@ -223,7 +223,7 @@ class PrettifyTest extends FunSuite {
 </tag1>
 """
 
-    val doc = parser.parse(new java.io.ByteArrayInputStream(xmlString.getBytes("UTF-8")))
+    val doc = parser.parse(new InputSource(new java.io.StringReader(xmlString)))
 
     assertResult(true) {
       doc.documentElement.filterElems(_.localName == "tag2").flatMap(_.textChildren).size >= 3

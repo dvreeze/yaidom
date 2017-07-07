@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.ByteArrayInputStream
-import java.io.StringReader
 import java.nio.charset.Charset
 
 import scala.io.Codec
@@ -180,7 +179,7 @@ class DocumentParserTest extends FunSuite {
 
     val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
     val doc = DomDocument(
-      db.parse(new InputSource(new StringReader(xml))))
+      db.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8")))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -218,7 +217,7 @@ class DocumentParserTest extends FunSuite {
 
     val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
     val doc = DomDocument(
-      db.parse(new InputSource(new StringReader(xml))))
+      db.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("iso-8859-1")))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -302,7 +301,7 @@ class DocumentParserTest extends FunSuite {
          |</prod:product>
          |""".stripMargin.trim
 
-    val doc = docParser.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
+    val doc = docParser.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("iso-8859-1"))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)

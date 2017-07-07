@@ -551,7 +551,7 @@ class DomWrapperTest extends FunSuite {
     val htmlString = htmlFormatString.format(booksHtmlString)
 
     val htmlRoot: DomElem =
-      DomDocument.wrapDocument(dbf.newDocumentBuilder.parse(new jio.ByteArrayInputStream(htmlString.getBytes("utf-8")))).documentElement
+      DomDocument.wrapDocument(dbf.newDocumentBuilder.parse(new InputSource(new jio.StringReader(htmlString)))).documentElement
 
     val tableRowElms = htmlRoot.filterElems(EName("tr")).drop(1)
 
@@ -604,7 +604,7 @@ class DomWrapperTest extends FunSuite {
     val db = createDocumentBuilder(dbf)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
-    val is = new jio.ByteArrayInputStream(brokenXmlString.getBytes("utf-8"))
+    val is = new InputSource(new jio.StringReader(brokenXmlString))
 
     intercept[SAXParseException] {
       db.parse(is)

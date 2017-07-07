@@ -214,13 +214,11 @@ class ParallelExecutionTest extends FunSuite with BeforeAndAfterAll {
       }
     })
 
-    val encoding = "UTF-8"
-
     val futures: Vector[Future[Document]] =
       (1 to 10).toVector map { i =>
         Future {
           val xmlString = docPrinter.print(rootElem)
-          val doc = docParser.parse(new jio.ByteArrayInputStream(xmlString.getBytes(encoding)))
+          val doc = docParser.parse(new InputSource(new jio.StringReader(xmlString)))
           doc
         }
       }
