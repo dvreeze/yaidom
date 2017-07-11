@@ -90,7 +90,77 @@ object Elem {
   // them from the input elements instead. This approach gives us the best of 2 worlds: the mathematical elegance of the
   // undecorated implementation, and the safety and usability of the decorated implementation.
 
+  /**
+   * Safe ElemTransformationApi implementation. It is safe in that it decorates an UnsafeElemTransformations
+   * object with the additional behavior of changing the element transformation functions into safe ones that
+   * make sure that the optional document URI and the ancestry remain the same after the transformation.
+   */
+  object SafeElemTransformations extends queryapi.ElemTransformationApi {
+
+    // TODO Rename to ElemTransformations
+
+    type Node = IndexedScopedNode.Node
+
+    type Elem = IndexedScopedNode.Elem[simple.Elem]
+
+    def transformChildElems(elem: Elem, f: Elem => Elem): Elem = {
+      // No fixing needed, due to knowledge about the implementation
+      UnsafeElemTransformations.transformChildElems(elem, f)
+    }
+
+    def transformChildElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
+      // No fixing needed, due to knowledge about the implementation
+      UnsafeElemTransformations.transformChildElemsToNodeSeq(elem, f)
+    }
+
+    def transformElemsOrSelf(elem: Elem, f: Elem => Elem): Elem = {
+      UnsafeElemTransformations.transformElemsOrSelf(elem, fixElemTransformation(f))
+    }
+
+    def transformElems(elem: Elem, f: Elem => Elem): Elem = {
+      UnsafeElemTransformations.transformElems(elem, fixElemTransformation(f))
+    }
+
+    def transformElemsOrSelfToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node] = {
+      UnsafeElemTransformations.transformElemsOrSelfToNodeSeq(elem, fixElemToNodeSeqTransformation(f))
+    }
+
+    def transformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
+      UnsafeElemTransformations.transformElemsToNodeSeq(elem, fixElemToNodeSeqTransformation(f))
+    }
+
+    private def fixElemTransformation(f: Elem => Elem): (Elem => Elem) = {
+      { elm =>
+        val newUnderlyingElem = f(elm).underlyingElem
+        val newEName = newUnderlyingElem.resolvedName
+
+        val newUnderlyingRootElem: simple.Elem =
+          elm.underlyingRootElem.updateElemOrSelf(elm.path, newUnderlyingElem)
+
+        val newRootElem =
+          apply(elm.rootElem.docUri, newUnderlyingRootElem, elm.rootElem.path.ensuring(_.isEmpty))
+
+        val parentPathOption = elm.path.parentPathOption // Parent Path stable
+
+        val newParentElemOption =
+          parentPathOption.map(ppath => newRootElem.findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
+
+        ???
+      }
+    }
+
+    private def fixElemToNodeSeqTransformation(f: Elem => immutable.IndexedSeq[Node]): (Elem => immutable.IndexedSeq[Node]) = {
+      ???
+    }
+  }
+
+  /**
+   * Unsafe ElemTransformationApi implementation. It is unsafe in that the passed element transformation functions
+   * are called as-is, even if they lead to corrupt transformation results.
+   */
   object ElemTransformations extends queryapi.ElemTransformationLike {
+
+    // TODO Rename to UnsafeElemTransformations
 
     // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.
     // In particular, ancestor elements cannot trust Paths of descendant elements after updates.
