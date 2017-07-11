@@ -111,7 +111,7 @@ object Elem {
         apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
 
       // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
-      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
+      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get.ensuring(_.path == elem.path)
     }
 
     def transformChildElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
@@ -132,7 +132,7 @@ object Elem {
         apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
 
       // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
-      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
+      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get.ensuring(_.path == elem.path)
     }
   }
 
@@ -181,7 +181,7 @@ object Elem {
         apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
 
       // The updates were only for child nodes of elem, so its Path must still be valid for the result element.
-      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get
+      newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get.ensuring(_.path == elem.path)
     }
 
     def collectChildNodeIndexes(elem: Elem, pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
