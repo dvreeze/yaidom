@@ -84,6 +84,12 @@ object Elem {
     }
   }
 
+  // TODO Rename ElemTransformations to UnsafeElemTransformations, and add a new singleton object ElemTransformations that extends
+  // queryapi.ElemTransformationApi directly and decorates calls to UnsafeElemTransformations with safe versions of the provided
+  // element functions. The safe versions ignore the ancestry and document URI of the returned element nodes, and take
+  // them from the input elements instead. This approach gives us the best of 2 worlds: the mathematical elegance of the
+  // undecorated implementation, and the safety and usability of the decorated implementation.
+
   object ElemTransformations extends queryapi.ElemTransformationLike {
 
     // The challenge below is in dealing with Paths that are volatile, and in calling function f at the right time with the right arguments.
