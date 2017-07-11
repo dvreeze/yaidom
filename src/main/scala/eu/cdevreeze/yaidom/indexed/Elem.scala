@@ -105,28 +105,28 @@ object Elem {
 
     def transformChildElems(elem: Elem, f: Elem => Elem): Elem = {
       // No fixing needed, due to knowledge about the implementation
-      UnsafeElemTransformations.transformChildElems(elem, f)
+      ElemTransformations.transformChildElems(elem, f)
     }
 
     def transformChildElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
       // No fixing needed, due to knowledge about the implementation
-      UnsafeElemTransformations.transformChildElemsToNodeSeq(elem, f)
+      ElemTransformations.transformChildElemsToNodeSeq(elem, f)
     }
 
     def transformElemsOrSelf(elem: Elem, f: Elem => Elem): Elem = {
-      UnsafeElemTransformations.transformElemsOrSelf(elem, fixElemTransformation(f))
+      ElemTransformations.transformElemsOrSelf(elem, fixElemTransformation(f))
     }
 
     def transformElems(elem: Elem, f: Elem => Elem): Elem = {
-      UnsafeElemTransformations.transformElems(elem, fixElemTransformation(f))
+      ElemTransformations.transformElems(elem, fixElemTransformation(f))
     }
 
     def transformElemsOrSelfToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node] = {
-      UnsafeElemTransformations.transformElemsOrSelfToNodeSeq(elem, fixElemToNodeSeqTransformation(f))
+      ElemTransformations.transformElemsOrSelfToNodeSeq(elem, fixElemToNodeSeqTransformation(f))
     }
 
     def transformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
-      UnsafeElemTransformations.transformElemsToNodeSeq(elem, fixElemToNodeSeqTransformation(f))
+      ElemTransformations.transformElemsToNodeSeq(elem, fixElemToNodeSeqTransformation(f))
     }
 
     private def fixElemTransformation(f: Elem => Elem): (Elem => Elem) = {
