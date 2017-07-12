@@ -58,21 +58,28 @@ object Elem {
 
   /**
    * Returns the given simple element as indexed element, ignoring
-   * the ancestry (Path) and document URI. In other words, returns
-   * `apply(elem)`.
+   * the Path. In other words, returns `apply(docUriOption, elem)`.
    */
-  def ignoringAncestry(elem: simple.Elem): Elem = {
-    apply(elem)
+  def ignoringPath(elem: simple.Elem, docUriOption: Option[URI]): Elem = {
+    apply(docUriOption, elem)
   }
 
   /**
-   * Returns the given simple node as indexed node, ignoring
-   * the ancestry (Path) and document URI.
+   * Returns the given simple element as indexed element, ignoring
+   * the ancestry (Path) and document URI. In other words, returns
+   * `ignoringPath(elem, None)`.
    */
-  def ignoringAncestry(node: simple.Node): IndexedScopedNode.Node = {
+  def ignoringAncestry(elem: simple.Elem): Elem = {
+    ignoringPath(elem, None)
+  }
+
+  /**
+   * Returns the given simple node as indexed node, ignoring the Path.
+   */
+  def ignoringPath(node: simple.Node, docUriOption: Option[URI]): IndexedScopedNode.Node = {
     node match {
       case e: simple.Elem =>
-        Elem(e)
+        Elem(docUriOption, e)
       case simple.Text(text, isCData) =>
         IndexedScopedNode.Text(text, isCData)
       case simple.Comment(text) =>
@@ -82,6 +89,13 @@ object Elem {
       case simple.EntityRef(entity) =>
         IndexedScopedNode.EntityRef(entity)
     }
+  }
+
+  /**
+   * Returns the given simple node as indexed node, ignoring the ancestry (Path) and document URI.
+   */
+  def ignoringAncestry(node: simple.Node): IndexedScopedNode.Node = {
+    ignoringPath(node, None)
   }
 
   // TODO Rename ElemTransformations to UnsafeElemTransformations, and add a new singleton object ElemTransformations that extends
@@ -130,9 +144,19 @@ object Elem {
     }
 
     private def fixElemTransformation(f: Elem => Elem): (Elem => Elem) = {
-      { elm =>
+      { (elm: Elem) =>
+        val childNodeIndex =
+          elm.parentOption.map(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry)).
+            getOrElse(-1)).getOrElse(-1)
+
+        assert(elm.parentOption.isEmpty || childNodeIndex >= 0)
+
+        val oldUnderlyingSiblingOrSelfNodes = elm.parentOption.map(pe => pe.underlyingElem.children).getOrElse(Vector())
+
+        val childElemIndex =
+          if (childNodeIndex < 0) -1 else (0 until childNodeIndex).count(idx => oldUnderlyingSiblingOrSelfNodes(idx).isInstanceOf[simple.Elem])
+
         val newUnderlyingElem = f(elm).underlyingElem
-        val newEName = newUnderlyingElem.resolvedName
 
         val newUnderlyingRootElem: simple.Elem =
           elm.underlyingRootElem.updateElemOrSelf(elm.path, newUnderlyingElem)
@@ -140,17 +164,46 @@ object Elem {
         val newRootElem =
           apply(elm.rootElem.docUri, newUnderlyingRootElem, elm.rootElem.path.ensuring(_.isEmpty))
 
-        val parentPathOption = elm.path.parentPathOption // Parent Path stable
+        // Parent Path stable before/after transformation
+        val parentPathOption = elm.path.parentPathOption
 
         val newParentElemOption =
           parentPathOption.map(ppath => newRootElem.findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
 
-        ???
+        newParentElemOption.map(_.findAllChildElems.apply(childElemIndex)).getOrElse(newRootElem)
       }
     }
 
     private def fixElemToNodeSeqTransformation(f: Elem => immutable.IndexedSeq[Node]): (Elem => immutable.IndexedSeq[Node]) = {
-      ???
+      { (elm: Elem) =>
+        val childNodeIndex =
+          elm.parentOption.map(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry)).
+            getOrElse(-1)).getOrElse(-1)
+
+        assert(elm.parentOption.isEmpty || childNodeIndex >= 0)
+
+        val oldUnderlyingSiblingOrSelfNodes = elm.parentOption.map(pe => pe.underlyingElem.children).getOrElse(Vector())
+
+        val childElemIndex =
+          if (childNodeIndex < 0) -1 else (0 until childNodeIndex).count(idx => oldUnderlyingSiblingOrSelfNodes(idx).isInstanceOf[simple.Elem])
+
+        val newUnderlyingNodeSeq = f(elm).map(n => getUnderlyingNode(n))
+
+        val newUnderlyingRootNodeSeq: immutable.IndexedSeq[simple.Node] =
+          elm.underlyingRootElem.updateElemsOrSelfWithNodeSeq(Set(elm.path)) { case (e, path) => newUnderlyingNodeSeq }
+
+        val newRootNodeSeq = newUnderlyingRootNodeSeq.map(n => ignoringPath(n, elm.rootElem.docUriOption))
+
+        // Parent Path stable before/after transformation
+        val parentPathOption = elm.path.parentPathOption
+
+        assert(parentPathOption.isEmpty || (newRootNodeSeq.size == 1 && newRootNodeSeq.head.isInstanceOf[IndexedScopedNode.Elem[_]]))
+
+        val newParentElemOption =
+          parentPathOption.map(ppath => newRootNodeSeq.head.asInstanceOf[Elem].findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
+
+        newParentElemOption.map(e => Vector(e.findAllChildElems.apply(childElemIndex))).getOrElse(newRootNodeSeq)
+      }
     }
   }
 
