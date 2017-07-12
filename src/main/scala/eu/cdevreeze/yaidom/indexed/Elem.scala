@@ -146,8 +146,7 @@ object Elem {
     private def fixElemTransformation(f: Elem => Elem): (Elem => Elem) = {
       { (elm: Elem) =>
         val childNodeIndex =
-          elm.parentOption.map(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry)).
-            getOrElse(-1)).getOrElse(-1)
+          elm.parentOption.flatMap(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry))).getOrElse(-1)
 
         assert(elm.parentOption.isEmpty || childNodeIndex >= 0)
 
@@ -177,8 +176,7 @@ object Elem {
     private def fixElemToNodeSeqTransformation(f: Elem => immutable.IndexedSeq[Node]): (Elem => immutable.IndexedSeq[Node]) = {
       { (elm: Elem) =>
         val childNodeIndex =
-          elm.parentOption.map(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry)).
-            getOrElse(-1)).getOrElse(-1)
+          elm.parentOption.flatMap(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry))).getOrElse(-1)
 
         assert(elm.parentOption.isEmpty || childNodeIndex >= 0)
 
@@ -202,6 +200,7 @@ object Elem {
         val newParentElemOption =
           parentPathOption.map(ppath => newRootNodeSeq.head.asInstanceOf[Elem].findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
 
+        // TODO Fix the following line of code, because this is not correct!
         newParentElemOption.map(e => Vector(e.findAllChildElems.apply(childElemIndex))).getOrElse(newRootNodeSeq)
       }
     }
