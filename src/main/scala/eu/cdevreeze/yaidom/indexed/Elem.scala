@@ -150,8 +150,6 @@ object Elem {
 
         assert(elm.parentOption.isEmpty || ownChildNodeIndex >= 0)
 
-        val oldUnderlyingSiblingOrSelfNodes = elm.parentOption.map(pe => pe.underlyingElem.children).getOrElse(Vector())
-
         val newUnderlyingElem = f(elm).underlyingElem
 
         val newUnderlyingRootElem: simple.Elem =
@@ -177,8 +175,6 @@ object Elem {
           elm.parentOption.flatMap(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry))).getOrElse(-1)
 
         assert(elm.parentOption.isEmpty || ownChildNodeIndex >= 0)
-
-        val oldUnderlyingSiblingOrSelfNodes = elm.parentOption.map(pe => pe.underlyingElem.children).getOrElse(Vector())
 
         val newUnderlyingNodeSeq = f(elm).map(n => getUnderlyingNode(n))
 
