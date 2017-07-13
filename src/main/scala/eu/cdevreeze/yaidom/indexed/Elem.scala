@@ -148,7 +148,7 @@ object Elem {
           elm.underlyingRootElem.updateElemOrSelf(elm.path, newUnderlyingElem)
 
         val newRootElem =
-          apply(elm.rootElem.docUri, newUnderlyingRootElem, elm.rootElem.path.ensuring(_.isEmpty))
+          apply(elm.rootElem.docUriOption, newUnderlyingRootElem, elm.rootElem.path.ensuring(_.isEmpty))
 
         // Parent Path stable before/after transformation
         val parentPathOption = elm.path.parentPathOption
@@ -156,7 +156,8 @@ object Elem {
         val newParentElemOption =
           parentPathOption.map(ppath => newRootElem.findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
 
-        newParentElemOption.map(e => findAllChildren(e).apply(ownChildNodeIndex).asInstanceOf[Elem]).getOrElse(newRootElem).
+        // Dependence on ElemUpdates!
+        newParentElemOption.map(e => ElemUpdates.children(e).apply(ownChildNodeIndex).asInstanceOf[Elem]).getOrElse(newRootElem).
           ensuring(_.path.parentPathOption == elm.path.parentPathOption)
       }
     }
@@ -183,14 +184,10 @@ object Elem {
         val newParentElemOption =
           parentPathOption.map(ppath => newRootNodeSeq.head.asInstanceOf[Elem].findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
 
-        newParentElemOption.map(e => findAllChildren(e).slice(ownChildNodeIndex, ownChildNodeIndex + newUnderlyingNodeSeq.size)).
+        // Dependence on ElemUpdates!
+        newParentElemOption.map(e => ElemUpdates.children(e).slice(ownChildNodeIndex, ownChildNodeIndex + newUnderlyingNodeSeq.size)).
           getOrElse(newRootNodeSeq)
       }
-    }
-
-    private def findAllChildren(elem: Elem): immutable.IndexedSeq[Node] = {
-      // Dependence on ElemUpdates!
-      ElemUpdates.children(elem)
     }
   }
 
@@ -222,7 +219,7 @@ object Elem {
         }
 
       val newRootElem =
-        apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
+        apply(elem.rootElem.docUriOption, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
 
       // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
       newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get.ensuring(_.path == elem.path)
@@ -243,7 +240,7 @@ object Elem {
         }
 
       val newRootElem =
-        apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
+        apply(elem.rootElem.docUriOption, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
 
       // The transformations were only for child elements of elem, so its Path must still be valid for the result element.
       newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get.ensuring(_.path == elem.path)
@@ -292,7 +289,7 @@ object Elem {
         }
 
       val newRootElem =
-        apply(elem.rootElem.docUri, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
+        apply(elem.rootElem.docUriOption, newUnderlyingRootElem, elem.rootElem.path.ensuring(_.isEmpty))
 
       // The updates were only for child nodes of elem, so its Path must still be valid for the result element.
       newRootElem.findElemOrSelfByPath(elem.path).ensuring(_.isDefined).get.ensuring(_.path == elem.path)

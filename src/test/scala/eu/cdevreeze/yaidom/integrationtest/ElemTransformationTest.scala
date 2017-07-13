@@ -130,7 +130,9 @@ class ElemTransformationTest extends FunSuite {
 
     import indexed.Elem.ElemTransformations._
 
-    val docElem1 = transformElems(doc.documentElement, updateNameElementName)
+    val docElem1 = transformElems(doc.documentElement, updateNameElementName) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -140,13 +142,17 @@ class ElemTransformationTest extends FunSuite {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
     }
 
-    val docElem2 = transformElemsOrSelf(doc.documentElement, updateNameElementName)
+    val docElem2 = transformElemsOrSelf(doc.documentElement, updateNameElementName) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
     }
 
-    val unchangedDocElem = transformChildElems(doc.documentElement, updateNameElementName)
+    val unchangedDocElem = transformChildElems(doc.documentElement, updateNameElementName) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(unchangedDocElem.underlyingElem)
@@ -154,7 +160,9 @@ class ElemTransformationTest extends FunSuite {
 
     val docElem3 = transformChildElems(doc.documentElement, { che =>
       transformElems(che, updateNameElementName)
-    })
+    }) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem3.underlyingElem)
@@ -162,7 +170,9 @@ class ElemTransformationTest extends FunSuite {
 
     val docElem4 = transformChildElems(doc.documentElement, { che =>
       transformElemsOrSelf(che, updateNameElementName)
-    })
+    }) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
@@ -176,7 +186,9 @@ class ElemTransformationTest extends FunSuite {
 
     import indexed.Elem.ElemTransformations._
 
-    val docElem1 = transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
+    val docElem1 = transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -201,7 +213,9 @@ class ElemTransformationTest extends FunSuite {
       resolved.Elem(docElem2.underlyingElem)
     }
 
-    val unchangedDocElem = transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq)
+    val unchangedDocElem = transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(unchangedDocElem.underlyingElem)
@@ -209,7 +223,9 @@ class ElemTransformationTest extends FunSuite {
 
     val docElem3 = transformChildElems(doc.documentElement, { che =>
       transformElemsToNodeSeq(che, updateNameElementNameReturningNodeSeq)
-    })
+    }) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem3.underlyingElem)
@@ -217,7 +233,9 @@ class ElemTransformationTest extends FunSuite {
 
     val docElem4 = transformChildElemsToNodeSeq(doc.documentElement, { che =>
       transformElemsOrSelfToNodeSeq(che, updateNameElementNameReturningNodeSeq)
-    })
+    }) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
@@ -234,7 +252,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem1 =
       transformElems(
         transformElems(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElement)
+        turnIsbnIntoElement) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -252,7 +273,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem2 =
       transformElemsOrSelf(
         transformElemsOrSelf(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElement)
+        turnIsbnIntoElement) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
@@ -261,7 +285,10 @@ class ElemTransformationTest extends FunSuite {
     val partiallyChangedDocElem =
       transformChildElems(
         transformChildElems(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElement)
+        turnIsbnIntoElement) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(partiallyChangedDocElem.underlyingElem).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
@@ -271,7 +298,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem3 =
       transformElems(
         transformElems(doc.documentElement, turnIsbnIntoElement),
-        updateNameElementName)
+        updateNameElementName) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem3.underlyingElem)
@@ -281,7 +311,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem4 =
       transformElemsOrSelf(
         transformElemsOrSelf(doc.documentElement, turnIsbnIntoElement),
-        updateNameElementName)
+        updateNameElementName) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
@@ -291,7 +324,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem5 =
       transformChildElems(
         transformElems(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElement)
+        turnIsbnIntoElement) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem5.underlyingElem)
@@ -301,7 +337,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem6 =
       transformChildElems(
         transformElemsOrSelf(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElement)
+        turnIsbnIntoElement) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem6.underlyingElem)
@@ -318,7 +357,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem1 =
       transformElemsToNodeSeq(
         transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
-        turnIsbnIntoElementReturningNodeSeq)
+        turnIsbnIntoElementReturningNodeSeq) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -336,7 +378,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem2 =
       transformElemsOrSelfToNodeSeq(
         transformElemsOrSelfToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem],
-        turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem]
+        turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem] ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
@@ -345,7 +390,10 @@ class ElemTransformationTest extends FunSuite {
     val partiallyChangedDocElem =
       transformChildElemsToNodeSeq(
         transformChildElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
-        turnIsbnIntoElementReturningNodeSeq)
+        turnIsbnIntoElementReturningNodeSeq) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(partiallyChangedDocElem.underlyingElem).transformElems(undoIsbnUpdate).removeAllInterElementWhitespace
@@ -355,7 +403,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem3 =
       transformElemsToNodeSeq(
         transformElemsToNodeSeq(doc.documentElement, turnIsbnIntoElementReturningNodeSeq),
-        updateNameElementNameReturningNodeSeq)
+        updateNameElementNameReturningNodeSeq) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem3.underlyingElem)
@@ -365,7 +416,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem4 =
       transformElemsOrSelfToNodeSeq(
         transformElemsOrSelfToNodeSeq(doc.documentElement, turnIsbnIntoElementReturningNodeSeq).head.asInstanceOf[indexed.Elem],
-        updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem]
+        updateNameElementNameReturningNodeSeq).head.asInstanceOf[indexed.Elem] ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
@@ -375,7 +429,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem5 =
       transformChildElemsToNodeSeq(
         transformElemsToNodeSeq(doc.documentElement, updateNameElementNameReturningNodeSeq),
-        turnIsbnIntoElementReturningNodeSeq)
+        turnIsbnIntoElementReturningNodeSeq) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem5.underlyingElem)
@@ -385,7 +442,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem6 =
       transformChildElemsToNodeSeq(
         transformElemsOrSelf(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElementReturningNodeSeq)
+        turnIsbnIntoElementReturningNodeSeq) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem6.underlyingElem)
@@ -403,7 +463,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem1 =
       transformElemsOrSelf(
         transformElemsOrSelf(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElementIfNamesUpdated)
+        turnIsbnIntoElementIfNamesUpdated) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -418,7 +481,9 @@ class ElemTransformationTest extends FunSuite {
     }
 
     // Update ISBN if names have been updated (which they haven't)
-    val docElem2 = transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated)
+    val docElem2 = transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem)) {
       resolved.Elem(docElem2.underlyingElem)
@@ -428,7 +493,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem3 =
       transformElemsOrSelf(
         transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesUpdated),
-        updateNameElementName)
+        updateNameElementName) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem3.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
@@ -438,7 +506,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem4 =
       transformChildElems(
         transformElems(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElementIfNamesUpdated)
+        turnIsbnIntoElementIfNamesUpdated) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem4.underlyingElem)
@@ -456,7 +527,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem1 =
       transformElemsOrSelf(
         transformElemsOrSelf(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
-        updateNameElementName)
+        updateNameElementName) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(Set("FirstName", "LastName")) {
       docElem1.findAllElemsOrSelf.map(_.resolvedName.localPart).toSet.filter(_.contains("Name"))
@@ -474,7 +548,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem2 =
       transformElemsOrSelf(
         transformElemsOrSelf(doc.documentElement, updateNameElementName),
-        turnIsbnIntoElementIfNamesNotUpdated)
+        turnIsbnIntoElementIfNamesNotUpdated) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem2.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
@@ -484,7 +561,10 @@ class ElemTransformationTest extends FunSuite {
     val docElem3 =
       transformElems(
         transformChildElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdated),
-        updateNameElementName)
+        updateNameElementName) ensuring { e =>
+
+          haveMatchingAncestry(e, doc.documentElement)
+        }
 
     assertResult(resolved.Elem(docElem1.underlyingElem)) {
       resolved.Elem(docElem3.underlyingElem)
@@ -498,7 +578,9 @@ class ElemTransformationTest extends FunSuite {
 
     import indexed.Elem.ElemTransformations._
 
-    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames)
+    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesUpdatedAndUpdateNames) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoIsbnUpdate).transformElems(undoNameUpdate).removeAllInterElementWhitespace
@@ -516,7 +598,9 @@ class ElemTransformationTest extends FunSuite {
 
     import indexed.Elem.ElemTransformations._
 
-    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames)
+    val docElem1 = transformElems(doc.documentElement, turnIsbnIntoElementIfNamesNotUpdatedAndUpdateNames) ensuring { e =>
+      haveMatchingAncestry(e, doc.documentElement)
+    }
 
     assertResult(resolved.Elem(doc.documentElement.underlyingElem).removeAllInterElementWhitespace) {
       resolved.Elem(docElem1.underlyingElem).transformElems(undoNameUpdate).removeAllInterElementWhitespace
@@ -536,7 +620,9 @@ class ElemTransformationTest extends FunSuite {
     val bookElem =
       doc.documentElement.findElem(e => e.localName == "Book" && e.attribute(EName("ISBN")) == "ISBN-0-13-815504-6").get
 
-    val updatedBookElem = transformChildElems(bookElem, updateRemark)
+    val updatedBookElem = transformChildElems(bookElem, updateRemark) ensuring { e =>
+      haveMatchingAncestry(e, bookElem)
+    }
 
     assertResult(bookElem.resolvedName) {
       updatedBookElem.resolvedName
@@ -549,12 +635,16 @@ class ElemTransformationTest extends FunSuite {
     }
   }
 
+  private def haveMatchingAncestry(elem1: indexed.Elem, elem2: indexed.Elem): Boolean = {
+    elem1.docUriOption == elem2.docUriOption && elem1.path.parentPathOption == elem2.path.parentPathOption
+  }
+
   private def updateNameElementName(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -563,9 +653,9 @@ class ElemTransformationTest extends FunSuite {
   private def updateNameElementNameReturningNodeSeq(elm: indexed.Elem): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
-        immutable.IndexedSeq(indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName"))))
+        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName"))))
       case qn @ UnprefixedName("Last_Name") =>
-        immutable.IndexedSeq(indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName"))))
+        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName"))))
       case qn =>
         immutable.IndexedSeq(elm)
     }
@@ -580,7 +670,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -595,7 +685,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        immutable.IndexedSeq(indexed.Elem(newElm))
+        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(newElm))
       case qn =>
         immutable.IndexedSeq(elm)
     }
@@ -610,7 +700,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -625,7 +715,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -641,11 +731,11 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -661,11 +751,11 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -674,10 +764,10 @@ class ElemTransformationTest extends FunSuite {
   private def updateRemark(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("Remark") if elm.parent.attribute(EName("ISBN")) == "ISBN-0-13-815504-6" =>
-        val newRemark = "Get a discount on this book commbined with \"A First Course\""
+        val newRemark = "Get a discount on this book combined with \"A First Course\""
 
         val newElm = elm.underlyingElem.copy(children = Vector(simple.Text(newRemark, false)))
-        indexed.Elem(newElm)
+        indexed.Elem.ignoringAncestry(newElm)
       case qn =>
         elm
     }
@@ -708,7 +798,7 @@ class ElemTransformationTest extends FunSuite {
   private def updateRemark(elm: resolved.Elem): resolved.Elem = {
     elm match {
       case elm @ resolved.Elem(EName(Some("http://bookstore"), "Book"), attrs, children) if elm.attribute(EName("ISBN")) == "ISBN-0-13-815504-6" =>
-        val newRemark = "Get a discount on this book commbined with \"A First Course\""
+        val newRemark = "Get a discount on this book combined with \"A First Course\""
 
         elm transformChildElems { che =>
           if (che.localName == "Remark") {

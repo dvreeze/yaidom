@@ -759,6 +759,8 @@ class ElemUpdateTest extends FunSuite {
     }
   }
 
+  // Private specific element update methods used above
+
   private def updateNameElementName(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
