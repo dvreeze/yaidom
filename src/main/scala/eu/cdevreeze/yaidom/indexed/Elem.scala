@@ -145,15 +145,12 @@ object Elem {
 
     private def fixElemTransformation(f: Elem => Elem): (Elem => Elem) = {
       { (elm: Elem) =>
-        val childNodeIndex =
+        val ownChildNodeIndex =
           elm.parentOption.flatMap(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry))).getOrElse(-1)
 
-        assert(elm.parentOption.isEmpty || childNodeIndex >= 0)
+        assert(elm.parentOption.isEmpty || ownChildNodeIndex >= 0)
 
         val oldUnderlyingSiblingOrSelfNodes = elm.parentOption.map(pe => pe.underlyingElem.children).getOrElse(Vector())
-
-        val childElemIndex =
-          if (childNodeIndex < 0) -1 else (0 until childNodeIndex).count(idx => oldUnderlyingSiblingOrSelfNodes(idx).isInstanceOf[simple.Elem])
 
         val newUnderlyingElem = f(elm).underlyingElem
 
@@ -169,21 +166,19 @@ object Elem {
         val newParentElemOption =
           parentPathOption.map(ppath => newRootElem.findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
 
-        newParentElemOption.map(_.findAllChildElems.apply(childElemIndex)).getOrElse(newRootElem)
+        newParentElemOption.map(e => findAllChildren(e).apply(ownChildNodeIndex).asInstanceOf[Elem]).getOrElse(newRootElem).
+          ensuring(_.path.parentPathOption == elm.path.parentPathOption)
       }
     }
 
     private def fixElemToNodeSeqTransformation(f: Elem => immutable.IndexedSeq[Node]): (Elem => immutable.IndexedSeq[Node]) = {
       { (elm: Elem) =>
-        val childNodeIndex =
+        val ownChildNodeIndex =
           elm.parentOption.flatMap(pe => elm.path.lastEntryOption.map(entry => pe.underlyingElem.childNodeIndex(entry))).getOrElse(-1)
 
-        assert(elm.parentOption.isEmpty || childNodeIndex >= 0)
+        assert(elm.parentOption.isEmpty || ownChildNodeIndex >= 0)
 
         val oldUnderlyingSiblingOrSelfNodes = elm.parentOption.map(pe => pe.underlyingElem.children).getOrElse(Vector())
-
-        val childElemIndex =
-          if (childNodeIndex < 0) -1 else (0 until childNodeIndex).count(idx => oldUnderlyingSiblingOrSelfNodes(idx).isInstanceOf[simple.Elem])
 
         val newUnderlyingNodeSeq = f(elm).map(n => getUnderlyingNode(n))
 
@@ -200,9 +195,14 @@ object Elem {
         val newParentElemOption =
           parentPathOption.map(ppath => newRootNodeSeq.head.asInstanceOf[Elem].findElemOrSelfByPath(ppath).ensuring(_.isDefined).get)
 
-        // TODO Fix the following line of code, because this is not correct!
-        newParentElemOption.map(e => Vector(e.findAllChildElems.apply(childElemIndex))).getOrElse(newRootNodeSeq)
+        newParentElemOption.map(e => findAllChildren(e).slice(ownChildNodeIndex, ownChildNodeIndex + newUnderlyingNodeSeq.size)).
+          getOrElse(newRootNodeSeq)
       }
+    }
+
+    private def findAllChildren(elem: Elem): immutable.IndexedSeq[Node] = {
+      // Dependence on ElemUpdates!
+      ElemUpdates.children(elem)
     }
   }
 
