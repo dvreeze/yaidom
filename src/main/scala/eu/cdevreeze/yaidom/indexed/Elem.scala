@@ -69,7 +69,7 @@ object Elem {
    * the ancestry (Path) and document URI. In other words, returns
    * `ignoringPath(elem, None)`.
    */
-  def ignoringAncestry(elem: simple.Elem): Elem = {
+  def ignoringPathAndDocUri(elem: simple.Elem): Elem = {
     ignoringPath(elem, None)
   }
 
@@ -94,7 +94,7 @@ object Elem {
   /**
    * Returns the given simple node as indexed node, ignoring the ancestry (Path) and document URI.
    */
-  def ignoringAncestry(node: simple.Node): IndexedScopedNode.Node = {
+  def ignoringPathAndDocUri(node: simple.Node): IndexedScopedNode.Node = {
     ignoringPath(node, None)
   }
 

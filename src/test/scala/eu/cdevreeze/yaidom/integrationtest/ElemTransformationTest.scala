@@ -642,9 +642,9 @@ class ElemTransformationTest extends FunSuite {
   private def updateNameElementName(elm: indexed.Elem): indexed.Elem = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -653,9 +653,9 @@ class ElemTransformationTest extends FunSuite {
   private def updateNameElementNameReturningNodeSeq(elm: indexed.Elem): immutable.IndexedSeq[indexed.IndexedScopedNode.Node] = {
     elm.qname match {
       case qn @ UnprefixedName("First_Name") =>
-        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName"))))
+        immutable.IndexedSeq(indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("FirstName"))))
       case qn @ UnprefixedName("Last_Name") =>
-        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName"))))
+        immutable.IndexedSeq(indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("LastName"))))
       case qn =>
         immutable.IndexedSeq(elm)
     }
@@ -670,7 +670,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem.ignoringAncestry(newElm)
+        indexed.Elem.ignoringPathAndDocUri(newElm)
       case qn =>
         elm
     }
@@ -685,7 +685,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        immutable.IndexedSeq(indexed.Elem.ignoringAncestry(newElm))
+        immutable.IndexedSeq(indexed.Elem.ignoringPathAndDocUri(newElm))
       case qn =>
         immutable.IndexedSeq(elm)
     }
@@ -700,7 +700,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem.ignoringAncestry(newElm)
+        indexed.Elem.ignoringPathAndDocUri(newElm)
       case qn =>
         elm
     }
@@ -715,7 +715,7 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem.ignoringAncestry(newElm)
+        indexed.Elem.ignoringPathAndDocUri(newElm)
       case qn =>
         elm
     }
@@ -731,11 +731,11 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem.ignoringAncestry(newElm)
+        indexed.Elem.ignoringPathAndDocUri(newElm)
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -751,11 +751,11 @@ class ElemTransformationTest extends FunSuite {
           elm.underlyingElem.
             plusChild(0, simple.Node.textElem(QName("ISBN"), elm.scope, isbn)).
             minusAttribute(QName("ISBN"))
-        indexed.Elem.ignoringAncestry(newElm)
+        indexed.Elem.ignoringPathAndDocUri(newElm)
       case qn @ UnprefixedName("First_Name") =>
-        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("FirstName")))
+        indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("FirstName")))
       case qn @ UnprefixedName("Last_Name") =>
-        indexed.Elem.ignoringAncestry(elm.underlyingElem.copy(qname = QName("LastName")))
+        indexed.Elem.ignoringPathAndDocUri(elm.underlyingElem.copy(qname = QName("LastName")))
       case qn =>
         elm
     }
@@ -767,7 +767,7 @@ class ElemTransformationTest extends FunSuite {
         val newRemark = "Get a discount on this book combined with \"A First Course\""
 
         val newElm = elm.underlyingElem.copy(children = Vector(simple.Text(newRemark, false)))
-        indexed.Elem.ignoringAncestry(newElm)
+        indexed.Elem.ignoringPathAndDocUri(newElm)
       case qn =>
         elm
     }
