@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.InitYaidomSession"
 
-// Taking yaidom version 1.7.0-M1
+// Taking yaidom version 1.6.3
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.7.0-M1`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.6.3`
 
 // Imports that (must) remain available after this initialization script
 
@@ -53,13 +53,6 @@ import queryapi.HasENameApi._
 val defaultParser = parse.DocumentParserUsingSax.newInstance()
 
 val defaultPrinter = print.DocumentPrinterUsingDom.newInstance()
-
-// Convenience method to update indexed Elems by updating simple Elems.
-// Note that we could offer TransformableElemApi-like methods that call this convenience method themselves.
-
-def takingAndReturningIndexedElems(f: simple.Elem => simple.Elem): (indexed.Elem => indexed.Elem) = {
-  { (e: indexed.Elem) => indexed.Elem(e.underlyingRootElem.updateElemOrSelf(e.path)(f)).getElemOrSelfByPath(e.path) }
-}
 
 // Now the REPL has been set up for ad-hoc yaidom querying and transformations
 // Do not forget to provide an implicit Scope if we want to create ENames with the "en" or "an" postfix operator!

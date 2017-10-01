@@ -3,6 +3,29 @@ CHANGELOG
 =========
 
 
+1.6.3
+=====
+
+Version 1.6.3 improves on version 1.6.2, and incorporates the functional element transformation and
+update APIs of version 1.7.0-M1, but leaves out their implementations (for indexed elements).
+The reason is that we are not close enough to version 1.7.0, but we want to have a release with other
+improvements, while the 4 new API traits might just as well be included now.
+
+This release "should" be a drop-in replacement for version 1.6.2, without the need for recompilation.
+Only code directly inheriting from AbstractDocumentParser would case the need for recompilation, so
+checking for this before using version 1.6.3 without recompilation would be appropriate.
+
+There is another catch, though, and that is that deprecated methods have been removed.
+
+The main changes are:
+
+* Introduction of ``ElemTransformationApi`` and ``ElemUpdateApi`` traits (see version 1.7.0-M1), without using them
+* Faster ``simple.Elem.toString``
+* Document parsers can now take a SAX InputSource
+* ``NamespaceUtils`` more generic in the query part
+* Some refactorings leading to cleaner and more idiomatic Scala code
+
+
 1.7.0-M1
 ========
 
