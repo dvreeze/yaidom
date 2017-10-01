@@ -533,25 +533,6 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     assertResult(newPhone) {
       newPhoneElm.text
     }
-
-    val start4Ms = System.currentTimeMillis()
-
-    val indexedRootElem = indexed.Document(doc).documentElement
-
-    val contactElemToUpdate = indexedRootElem.getElemOrSelfByPath(path.parentPath)
-
-    val updatedContactElem =
-      indexed.Elem.ElemTransformations.transformElemsOrSelf(contactElemToUpdate, elm => indexed.Elem(doUpdate(elm.underlyingElem)))
-
-    val end4Ms = System.currentTimeMillis()
-    logger.info(
-      s"Transforming an element in the document (using method ElemTransformations.transformElemsOrSelf on the contact element) took ${end4Ms - start4Ms} ms")
-
-    val updatedPhoneElem = updatedContactElem.getChildElem(_.localName == "phone")
-
-    assertResult(newPhone) {
-      updatedPhoneElem.text
-    }
   }
 
   test("testNavigation") {

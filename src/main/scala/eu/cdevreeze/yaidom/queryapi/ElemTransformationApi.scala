@@ -31,12 +31,11 @@ import scala.collection.immutable
  * When using this API for elements that carry context such as "ancestry state", be careful when writing transformation functions
  * that are passed to the functions of this API. For example, if the element type is `BackingElemApi` or a sub-type, such sensitive
  * state includes the base URI, document URI, the `Path` relative to the root element, and most important of all, the root element itself.
- * During transformations, the `Path` of an element is very volatile, so depending on the `Path` in a transformation function may
- * affect the result in unexpected ways.
+ * It is up to the user of the API to keep such state consistent during transformations, and to be careful when depending on state
+ * that is volatile during transformations.
  *
  * Also note for `BackingElemApi` elements, if a transformation function alters "ancestry state" such as (base and document) URIs,
- * paths etc., these altered values will be ignored. After all, it is the functions of this API that will transform the entire underlying
- * root element tree, and that will determine the `Path` and (document and base) URI of each element after the transformation.
+ * paths etc., these altered values may be ignored, depending on the API calls made.
  *
  * ==ElemTransformationApi more formally==
  *
