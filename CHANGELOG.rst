@@ -12,7 +12,7 @@ The reason is that we are not close enough to version 1.7.0, but we want to have
 improvements, while the 4 new API traits might just as well be included now.
 
 This release "should" be a drop-in replacement for version 1.6.2, without the need for recompilation.
-Only code directly inheriting from AbstractDocumentParser would case the need for recompilation, so
+Only code directly inheriting from AbstractDocumentParser would cause the need for recompilation, so
 checking for this before using version 1.6.3 without recompilation would be appropriate.
 
 There is another catch, though, and that is that deprecated methods have been removed.

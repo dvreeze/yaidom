@@ -14,7 +14,7 @@ scalaVersion := "2.11.11"
 // TODO Cross-compile for Scala 2.13.0-M1. Yet org.scalatest.prop.Checkers is deprecated (but it should not
 // be in scalatest 3.0.3), and parallel collections are packaged differently.
 
-crossScalaVersions := Seq("2.11.11", "2.12.2")
+crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 // See: Toward a safer Scala
 // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
