@@ -3,6 +3,15 @@ CHANGELOG
 =========
 
 
+1.6.4
+=====
+
+Version 1.6.4 fixes a bug introduced in version 1.6.3. The DocumentParserUsingStax of version 1.6.3
+created an XMLEventReader from a SAXSource, which may not work in some XML stacks.
+
+There are no breaking changes.
+
+
 1.6.3
 =====
 
@@ -13,7 +22,7 @@ improvements, while the 4 new API traits might just as well be included now.
 
 This release "should" be a drop-in replacement for version 1.6.2, without the need for recompilation.
 Only code directly inheriting from AbstractDocumentParser would cause the need for recompilation, so
-checking for this before using version 1.6.3 without recompilation would be appropriate.
+make sure this is not the case before using version 1.6.3 without recompilation.
 
 There is another catch, though, and that is that deprecated methods have been removed.
 

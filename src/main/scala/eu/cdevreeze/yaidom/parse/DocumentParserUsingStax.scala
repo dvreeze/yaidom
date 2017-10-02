@@ -100,7 +100,7 @@ final class DocumentParserUsingStax(
         } else {
           require(
             inputSource.getCharacterStream != null, // scalastyle:off null
-            s"The InputSource neither has an InputStream nor a Reader.")
+            s"The InputSource has neither InputStream nor Reader.")
 
           inputFactory.createXMLEventReader(inputSource.getCharacterStream)
         }
