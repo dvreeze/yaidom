@@ -27,7 +27,6 @@ import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.stream.XMLEventReader
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
-import javax.xml.transform.sax.SAXSource
 
 /**
  * StAX-based `Document` parser.
@@ -92,8 +91,19 @@ final class DocumentParserUsingStax(
   def parse(inputSource: InputSource): Document = {
     var xmlEventReader: XMLEventReader = null // scalastyle:off null
     try {
-      val saxSource = new SAXSource(inputSource)
-      xmlEventReader = inputFactory.createXMLEventReader(saxSource)
+      // Some StAX implementations only accept a StreamSource as javax.xml.transform.Source input.
+      // To circumvent this issue, we offer an input stream or reader instead.
+
+      xmlEventReader =
+        if (inputSource.getByteStream != null) { // scalastyle:off null
+          inputFactory.createXMLEventReader(inputSource.getByteStream)
+        } else {
+          require(
+            inputSource.getCharacterStream != null, // scalastyle:off null
+            s"The InputSource neither has an InputStream nor a Reader.")
+
+          inputFactory.createXMLEventReader(inputSource.getCharacterStream)
+        }
 
       converterToDocument.convertToDocument(StaxConversions.asIterator(xmlEventReader))
     } finally {
