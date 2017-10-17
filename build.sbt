@@ -37,10 +37,12 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warning
   else if (vers.contains("2.11")) Seq(base / "src" / "test" / "scala-2.11") else Seq()
 }
 
-excludeFilter in (Compile, unmanagedSources) := {
+def isJava7: Boolean = {
   // Brittle
-  val isJava7 = System.getProperty("java.home").contains("1.7")
+  scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
+}
 
+excludeFilter in (Compile, unmanagedSources) := {
   val base = baseDirectory.value
 
   if (isJava7) {
@@ -51,9 +53,6 @@ excludeFilter in (Compile, unmanagedSources) := {
 }
 
 excludeFilter in (Test, unmanagedSources) := {
-  // Brittle
-  val isJava7 = System.getProperty("java.home").contains("1.7")
-
   val base = baseDirectory.value
 
   if (isJava7) {
