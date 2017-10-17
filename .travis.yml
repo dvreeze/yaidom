@@ -6,6 +6,14 @@ scala:
 
 jdk:
  - oraclejdk8
+ - openjdk7
+
+matrix:
+  include:
+  - env: SBT_VERSION="0.13.16"
+    jdk: openjdk7
+  - env: SBT_VERSION="1.0.2"
+    jdk: oraclejdk8
 
 script:
- - sbt -jvm-opts travis/jvmopts.test ++$TRAVIS_SCALA_VERSION test
+ - sbt "^^${SBT_VERSION}" -jvm-opts travis/jvmopts.test ++$TRAVIS_SCALA_VERSION test
