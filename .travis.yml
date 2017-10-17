@@ -15,6 +15,10 @@ matrix:
     scala: 2.11.11
   - env: SBT_VERSION="1.0.2"
     jdk: oraclejdk8
+    scala: 2.11.11
+  - env: SBT_VERSION="1.0.2"
+    jdk: oraclejdk8
+    scala: 2.12.3
 
 script:
  - sbt "^^${SBT_VERSION}" -jvm-opts travis/jvmopts.test ++$TRAVIS_SCALA_VERSION test
