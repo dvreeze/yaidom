@@ -9,26 +9,58 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "1.6.5-SNAPSHOT"
 
-scalaVersion := "2.11.11"
+scalaVersion := "2.12.3"
 
 // TODO Cross-compile for Scala 2.13.0-M1. Yet org.scalatest.prop.Checkers is deprecated (but it should not
 // be in scalatest 3.0.3), and parallel collections are packaged differently.
 
-crossScalaVersions := Seq("2.11.11", "2.12.3")
+crossScalaVersions := Seq("2.12.3", "2.11.11")
 
 // See: Toward a safer Scala
 // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
-(unmanagedSourceDirectories in Compile) <++= (scalaBinaryVersion, baseDirectory) apply { case (version, base) =>
-  if (version.contains("2.12")) Seq(base / "src" / "main" / "scala-2.12")
-  else if (version.contains("2.11")) Seq(base / "src" / "main" / "scala-2.11") else Seq()
+(unmanagedSourceDirectories in Compile) ++= {
+  val vers = scalaBinaryVersion.value
+  val base = baseDirectory.value
+
+  if (vers.contains("2.12")) Seq(base / "src" / "main" / "scala-2.12")
+  else if (vers.contains("2.11")) Seq(base / "src" / "main" / "scala-2.11") else Seq()
 }
 
-(unmanagedSourceDirectories in Test) <++= (scalaBinaryVersion, baseDirectory) apply { case (version, base) =>
-  if (version.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12")
-  else if (version.contains("2.11")) Seq(base / "src" / "test" / "scala-2.11") else Seq()
+(unmanagedSourceDirectories in Test) ++= {
+  val vers = scalaBinaryVersion.value
+  val base = baseDirectory.value
+
+  if (vers.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12")
+  else if (vers.contains("2.11")) Seq(base / "src" / "test" / "scala-2.11") else Seq()
+}
+
+excludeFilter in (Compile, unmanagedSources) := {
+  // Brittle
+  val isJava7 = System.getProperty("java.home").contains("1.7")
+
+  val base = baseDirectory.value
+
+  if (isJava7) {
+    new SimpleFileFilter(_.toString.contains("java8"))
+  } else {
+    NothingFilter
+  }
+}
+
+excludeFilter in (Test, unmanagedSources) := {
+  // Brittle
+  val isJava7 = System.getProperty("java.home").contains("1.7")
+
+  val base = baseDirectory.value
+
+  if (isJava7) {
+    new SimpleFileFilter(_.toString.contains("java8"))
+  } else {
+    NothingFilter
+  }
 }
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
@@ -72,9 +104,11 @@ libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.0.0" % "test"
 
 publishMavenStyle := true
 
-publishTo <<= version { (v: String) =>
+publishTo := {
+  val vers = version.value
+
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT"))
+  if (vers.trim.endsWith("SNAPSHOT"))
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
