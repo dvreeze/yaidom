@@ -1,14 +1,6 @@
 
 language: scala
 
-scala:
- - 2.11.11
- - 2.12.3
-
-jdk:
- - oraclejdk8
- - openjdk7
-
 matrix:
   include:
   - jdk: oraclejdk8
@@ -17,10 +9,7 @@ matrix:
     scala: 2.11.11
   - jdk: openjdk7
     scala: 2.11.11
-  exclude:
-  - jdk: openjdk7
-    scala: 2.12.3
 
 script:
- - sbt -jvm-opts travis/jvmopts.test ++$TRAVIS_SCALA_VERSION test
+ - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx4G test
 
