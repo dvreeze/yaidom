@@ -60,6 +60,7 @@ excludeFilter in (Test, unmanagedSources) := {
 
     new SimpleFileFilter(f => f.toString.contains("java8") ||
       f.toString.contains("ScalaMetaExperimentTest") ||
+      f.toString.contains("PackageDependencyTest") ||
       f.toString.contains("NamePoolingTest"))
   } else {
     NothingFilter
