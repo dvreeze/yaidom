@@ -37,7 +37,7 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warning
   else if (vers.contains("2.11")) Seq(base / "src" / "test" / "scala-2.11") else Seq()
 }
 
-def isJava7: Boolean = {
+def isBeforeJava8: Boolean = {
   // Brittle
   scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
 }
@@ -45,7 +45,7 @@ def isJava7: Boolean = {
 excludeFilter in (Compile, unmanagedSources) := {
   val base = baseDirectory.value
 
-  if (isJava7) {
+  if (isBeforeJava8) {
     new SimpleFileFilter(_.toString.contains("java8"))
   } else {
     NothingFilter
@@ -55,8 +55,12 @@ excludeFilter in (Compile, unmanagedSources) := {
 excludeFilter in (Test, unmanagedSources) := {
   val base = baseDirectory.value
 
-  if (isJava7) {
-    new SimpleFileFilter(_.toString.contains("java8"))
+  if (isBeforeJava8) {
+    // Exclude tests with Java 8 dependencies
+
+    new SimpleFileFilter(f => f.toString.contains("java8") ||
+      f.toString.contains("ScalaMetaExperimentTest") ||
+      f.toString.contains("NamePoolingTest"))
   } else {
     NothingFilter
   }
@@ -107,10 +111,12 @@ publishTo := {
   val vers = version.value
 
   val nexus = "https://oss.sonatype.org/"
-  if (vers.trim.endsWith("SNAPSHOT"))
+
+  if (vers.trim.endsWith("SNAPSHOT")) {
     Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
+  } else {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  }
 }
 
 publishArtifact in Test := false
