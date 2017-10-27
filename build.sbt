@@ -1,149 +1,137 @@
 
-// Keep in sync with the Maven pom.xml file!
-// See http://www.scala-sbt.org/release/docs/Community/Using-Sonatype.html for how to publish to
-// Sonatype, using sbt only.
-
-name := "yaidom"
-
-organization := "eu.cdevreeze.yaidom"
-
-version := "1.6.5-SNAPSHOT"
-
-scalaVersion := "2.12.3"
-
 // TODO Cross-compile for Scala 2.13.0-M1. Yet org.scalatest.prop.Checkers is deprecated (but it should not
 // be in scalatest 3.0.3), and parallel collections are packaged differently.
 
-crossScalaVersions := Seq("2.12.3", "2.11.11")
+lazy val root = project.in(file(".")).
+  aggregate(yaidomJS, yaidomJVM).
+  settings(
+    name := "yaidom",
 
-// See: Toward a safer Scala
-// http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
+    organization := "eu.cdevreeze.yaidom",
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
+    version := "1.6.5-SNAPSHOT",
 
-(unmanagedSourceDirectories in Compile) ++= {
-  val vers = scalaBinaryVersion.value
-  val base = baseDirectory.value
+    scalaVersion in ThisBuild := "2.12.3",
 
-  if (vers.contains("2.12")) Seq(base / "src" / "main" / "scala-2.12")
-  else if (vers.contains("2.11")) Seq(base / "src" / "main" / "scala-2.11") else Seq()
-}
+    crossScalaVersions := Seq("2.12.3", "2.11.11"),
 
-(unmanagedSourceDirectories in Test) ++= {
-  val vers = scalaBinaryVersion.value
-  val base = baseDirectory.value
+    // See: Toward a safer Scala
+    // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
 
-  if (vers.contains("2.12")) Seq(base / "src" / "test" / "scala-2.12")
-  else if (vers.contains("2.11")) Seq(base / "src" / "test" / "scala-2.11") else Seq()
-}
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
+  )
+
+lazy val yaidomJVM = yaidom.jvm
+lazy val yaidomJS = yaidom.js
 
 def isBeforeJava8: Boolean = {
   // Brittle
   scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
 }
 
-excludeFilter in (Compile, unmanagedSources) := {
-  val base = baseDirectory.value
+lazy val yaidom = crossProject.in(file(".")).
+  settings(
+    // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases",
 
-  if (isBeforeJava8) {
-    new SimpleFileFilter(_.toString.contains("java8"))
-  } else {
-    NothingFilter
-  }
-}
+    // addCompilerPlugin("com.artima.supersafe" %%% "supersafe" % "1.0.3"),
 
-excludeFilter in (Test, unmanagedSources) := {
-  val base = baseDirectory.value
+    publishMavenStyle := true,
 
-  if (isBeforeJava8) {
-    // Exclude tests with Java 8 dependencies
+    publishTo := {
+      val vers = version.value
 
-    new SimpleFileFilter(f => f.toString.contains("java8") ||
-      f.toString.contains("ScalaMetaExperimentTest") ||
-      f.toString.contains("PackageDependencyTest") ||
-      f.toString.contains("NamePoolingTest"))
-  } else {
-    NothingFilter
-  }
-}
+      val nexus = "https://oss.sonatype.org/"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
+      if (vers.trim.endsWith("SNAPSHOT")) {
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      } else {
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      }
+    },
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0" % "optional"
+    publishArtifact in Test := false,
 
-libraryDependencies += "net.jcip" % "jcip-annotations" % "1.0"
+    pomIncludeRepository := { repo => false },
 
-libraryDependencies += "junit" % "junit" % "4.12" % "test"
+    pomExtra := {
+      <url>https://github.com/dvreeze/yaidom</url>
+      <licenses>
+        <license>
+          <name>Apache License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <distribution>repo</distribution>
+          <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
+        </license>
+      </licenses>
+      <scm>
+        <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
+        <url>https://github.com/dvreeze/yaidom.git</url>
+        <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
+      </scm>
+      <developers>
+        <developer>
+          <id>dvreeze</id>
+          <name>Chris de Vreeze</name>
+          <email>chris.de.vreeze@caiway.net</email>
+        </developer>
+      </developers>
+    }
+  ).
+  jvmSettings(
+    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % "test"
+    libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0" % "optional",
 
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.5" % "test"
+    libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
-libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % "test"
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.3" % "test",
 
-libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test"
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test",
 
-libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test"
+    libraryDependencies += "org.scalameta" %%% "scalameta" % "1.8.0" % "test",
 
-libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive()
+    libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test",
 
-libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.7.0-18" % "test"
+    libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test",
 
-libraryDependencies += ("joda-time" % "joda-time" % "2.9.9" % "test").intransitive()
+    libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
 
-libraryDependencies += ("org.joda" % "joda-convert" % "1.8.1" % "test").intransitive()
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.7.0-18" % "test",
 
-libraryDependencies += "com.google.guava" % "guava" % "22.0" % "test"
+    libraryDependencies += ("joda-time" % "joda-time" % "2.9.9" % "test").intransitive(),
 
-libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test"
+    libraryDependencies += ("org.joda" % "joda-convert" % "1.8.1" % "test").intransitive(),
 
-libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "test").intransitive()
+    libraryDependencies += "com.google.guava" % "guava" % "22.0" % "test",
 
-libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.0.0" % "test"
+    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test",
 
+    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "test").intransitive(),
 
-// resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
+    libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.0.0" % "test",
 
-// addCompilerPlugin("com.artima.supersafe" %% "supersafe" % "1.0.3")
+    excludeFilter in (Compile, unmanagedSources) := {
+      val base = baseDirectory.value
 
-publishMavenStyle := true
+      if (isBeforeJava8) {
+        new SimpleFileFilter(_.toString.contains("java8"))
+      } else {
+        NothingFilter
+      }
+    },
 
-publishTo := {
-  val vers = version.value
+    excludeFilter in (Test, unmanagedSources) := {
+      val base = baseDirectory.value
 
-  val nexus = "https://oss.sonatype.org/"
+      if (isBeforeJava8) {
+        // Exclude tests with Java 8 dependencies
 
-  if (vers.trim.endsWith("SNAPSHOT")) {
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  } else {
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  }
-}
-
-publishArtifact in Test := false
-
-pomIncludeRepository := { repo => false }
-
-pomExtra := {
-  <url>https://github.com/dvreeze/yaidom</url>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-      <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
-    </license>
-  </licenses>
-  <scm>
-    <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
-    <url>https://github.com/dvreeze/yaidom.git</url>
-    <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
-  </scm>
-  <developers>
-    <developer>
-      <id>dvreeze</id>
-      <name>Chris de Vreeze</name>
-      <email>chris.de.vreeze@caiway.net</email>
-    </developer>
-  </developers>
-}
+        new SimpleFileFilter(f => f.toString.contains("java8") ||
+          f.toString.contains("ScalaMetaExperimentTest") ||
+          f.toString.contains("PackageDependencyTest") ||
+          f.toString.contains("NamePoolingTest"))
+      } else {
+        NothingFilter
+      }
+    }
+  )
