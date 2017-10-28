@@ -153,7 +153,21 @@ lazy val yaidom = crossProject.in(file(".")).
     }
   ).
   jsSettings(
-    crossScalaVersions := Seq("2.12.4", "2.11.11"),
+    excludeFilter in (Compile, unmanagedSources) := {
+      if (scalaBinaryVersion.value == "2.13.0-M2") {
+        new SimpleFileFilter(f => true)
+      } else {
+        NothingFilter
+      }
+    },
+
+    excludeFilter in (Test, unmanagedSources) := {
+      if (scalaBinaryVersion.value == "2.13.0-M2") {
+        new SimpleFileFilter(f => true)
+      } else {
+        NothingFilter
+      }
+    },
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
