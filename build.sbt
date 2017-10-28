@@ -11,7 +11,7 @@ lazy val root = project.in(file(".")).
 
     version := "1.6.5-SNAPSHOT",
 
-    scalaVersion in ThisBuild := "2.12.3",
+    scalaVersion := "2.12.3",
 
     crossScalaVersions := Seq("2.12.3", "2.11.11"),
 

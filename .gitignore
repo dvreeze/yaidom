@@ -4,8 +4,14 @@
 .classpath
 .project
 .settings/
-project/
 target/
 temp/
 .history
 scalastyle-config.xml
+
+# /project/
+/project/boot
+/project/project/
+/project/target/
+/project/build/target
+
