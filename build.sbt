@@ -11,9 +11,9 @@ lazy val root = project.in(file(".")).
 
     version := "1.6.5-SNAPSHOT",
 
-    scalaVersion := "2.12.3",
+    scalaVersion := "2.12.4",
 
-    crossScalaVersions := Seq("2.12.3", "2.11.11"),
+    crossScalaVersions := Seq("2.12.4", "2.11.11"),
 
     // See: Toward a safer Scala
     // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
