@@ -1,7 +1,4 @@
 
-// TODO Cross-compile for Scala 2.13.0-M1. Yet org.scalatest.prop.Checkers is deprecated (but it should not
-// be in scalatest 3.0.3), and parallel collections are packaged differently.
-
 lazy val root = project.in(file(".")).
   aggregate(yaidomJS, yaidomJVM).
   settings(
@@ -9,6 +6,29 @@ lazy val root = project.in(file(".")).
 
     organization := "eu.cdevreeze.yaidom",
 
+    // Seems superfluous at root level, but guards against unresolved dependencies
+    scalaVersion := "2.12.4",
+    crossScalaVersions := Seq("2.12.4", "2.11.11", "2.13.0-M2"),
+
+    // Trying to switch off publishing for root artifacts (the ones other than in the jvm and js projects)
+
+    publish := {},
+    publishLocal := {},
+
+    publishArtifact := false,
+
+    // Additionally, see https://stackoverflow.com/questions/8786708/how-to-disable-package-and-publish-tasks-for-root-aggregate-module-in-multi-modu
+
+    packageBin := { new File("") },
+    packageDoc := { new File("") },
+    packageSrc := { new File("") }
+  )
+
+
+// The jvm and js projects
+
+lazy val yaidom = crossProject.in(file(".")).
+  settings(
     version := "1.6.5-SNAPSHOT",
 
     scalaVersion := "2.12.4",
@@ -18,19 +38,8 @@ lazy val root = project.in(file(".")).
     // See: Toward a safer Scala
     // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
 
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
-  )
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint"),
 
-lazy val yaidomJVM = yaidom.jvm
-lazy val yaidomJS = yaidom.js
-
-def isBeforeJava8: Boolean = {
-  // Brittle
-  scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
-}
-
-lazy val yaidom = crossProject.in(file(".")).
-  settings(
     // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases",
 
     // addCompilerPlugin("com.artima.supersafe" %%% "supersafe" % "1.0.3"),
@@ -78,20 +87,20 @@ lazy val yaidom = crossProject.in(file(".")).
     }
   ).
   jvmSettings(
-    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.0.6",
 
-    libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0" % "optional",
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0" % "optional",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.4" % "test",
 
-    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13.0-M2" => Seq()
-        case _           => Seq("org.scalameta" %% "scalameta" % "1.8.0" % "test")
+        case _           => Seq("org.scalameta" %%% "scalameta" % "1.8.0" % "test")
       }
     },
 
@@ -142,4 +151,26 @@ lazy val yaidom = crossProject.in(file(".")).
         NothingFilter
       }
     }
+  ).
+  jsSettings(
+    crossScalaVersions := Seq("2.12.4", "2.11.11"),
+
+    libraryDependencies ++= {
+      scalaBinaryVersion.value match {
+        case "2.13.0-M2" => Seq()
+        case _           => Seq("org.scala-js" %%% "scalajs-dom" % "0.9.2")
+      }
+    }
   )
+
+
+lazy val yaidomJVM = yaidom.jvm
+lazy val yaidomJS = yaidom.js
+
+
+// Helper functions
+
+def isBeforeJava8: Boolean = {
+  // Brittle
+  scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
+}
