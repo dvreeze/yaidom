@@ -13,7 +13,7 @@ lazy val root = project.in(file(".")).
 
     scalaVersion := "2.12.4",
 
-    crossScalaVersions := Seq("2.12.4", "2.11.11"),
+    crossScalaVersions := Seq("2.12.4", "2.11.11", "2.13.0-M2"),
 
     // See: Toward a safer Scala
     // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
@@ -84,11 +84,16 @@ lazy val yaidom = crossProject.in(file(".")).
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.3" % "test",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test",
 
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test",
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
 
-    libraryDependencies += "org.scalameta" %%% "scalameta" % "1.8.0" % "test",
+    libraryDependencies ++= {
+      scalaBinaryVersion.value match {
+        case "2.13.0-M2" => Seq()
+        case _           => Seq("org.scalameta" %% "scalameta" % "1.8.0" % "test")
+      }
+    },
 
     libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test",
 
@@ -130,6 +135,9 @@ lazy val yaidom = crossProject.in(file(".")).
           f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("PackageDependencyTest") ||
           f.toString.contains("NamePoolingTest"))
+      } else if (scalaBinaryVersion.value == "2.13.0-M2") {
+        new SimpleFileFilter(f => f.toString.contains("ScalaMetaExperimentTest") ||
+          f.toString.contains("PackageDependencyTest"))
       } else {
         NothingFilter
       }
