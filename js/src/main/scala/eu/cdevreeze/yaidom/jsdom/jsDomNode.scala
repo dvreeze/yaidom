@@ -21,10 +21,10 @@ import scala.collection.immutable
 import org.scalajs.dom.{ raw => sjsdom }
 
 import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.convert.JsDomConversions
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
@@ -109,9 +109,11 @@ final class JsDomElem(
     }
   }
 
-  override def qname: QName = toQName(wrappedNode)
+  override def qname: QName = JsDomConversions.toQName(wrappedNode)
 
-  override def attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(wrappedNode.attributes)
+  override def attributes: immutable.IndexedSeq[(QName, String)] = {
+    JsDomConversions.extractAttributes(wrappedNode.attributes)
+  }
 
   override def scope: Scope = {
     val ancestryOrSelf = JsDomElem.getAncestorsOrSelf(this.wrappedNode)
@@ -119,7 +121,7 @@ final class JsDomElem(
     val resultScope =
       ancestryOrSelf.foldRight(Scope.Empty) {
         case (wrappedElem, accScope) =>
-          val decls = extractNamespaceDeclarations(wrappedElem.attributes)
+          val decls = JsDomConversions.extractNamespaceDeclarations(wrappedElem.attributes)
           accScope.resolve(decls)
       }
     resultScope
@@ -128,13 +130,15 @@ final class JsDomElem(
   def children: immutable.IndexedSeq[JsDomNode] = {
     val childrenNodeList = wrappedNode.childNodes
 
-    nodeListToIndexedSeq(childrenNodeList) flatMap { node => JsDomNode.wrapNodeOption(node) }
+    JsDomConversions.nodeListToIndexedSeq(childrenNodeList) flatMap { node => JsDomNode.wrapNodeOption(node) }
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
   def attributeScope: Scope = scope.withoutDefaultNamespace
 
-  def declarations: Declarations = extractNamespaceDeclarations(wrappedNode.attributes)
+  def declarations: Declarations = {
+    JsDomConversions.extractNamespaceDeclarations(wrappedNode.attributes)
+  }
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[JsDomText] = children collect { case t: JsDomText => t }
@@ -155,81 +159,6 @@ final class JsDomElem(
     val parentNodeOption = Option(wrappedNode.parentNode)
     val parentElemOption = parentNodeOption collect { case e: sjsdom.Element => e }
     parentElemOption map { e => JsDomNode.wrapElement(e) }
-  }
-
-  /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */
-  private def extractAttributes(domAttributes: sjsdom.NamedNodeMap): immutable.IndexedSeq[(QName, String)] = {
-    (0 until domAttributes.length).flatMap(i => {
-      val attr = domAttributes.item(i).asInstanceOf[sjsdom.Attr]
-
-      if (isNamespaceDeclaration(attr)) {
-        None
-      } else {
-        val qname: QName = toQName(attr)
-        Some(qname -> attr.value)
-      }
-    }).toIndexedSeq
-  }
-
-  /** Converts the namespace declarations in a `NamedNodeMap` to a `Declarations` */
-  private def extractNamespaceDeclarations(domAttributes: sjsdom.NamedNodeMap): Declarations = {
-    val nsMap = {
-      val result = (0 until domAttributes.length) flatMap { i =>
-        val attr = domAttributes.item(i).asInstanceOf[sjsdom.Attr]
-
-        if (isNamespaceDeclaration(attr)) {
-          val result = extractNamespaceDeclaration(attr)
-          Some(result) map { pair => (pair._1.getOrElse(""), pair._2) }
-        } else {
-          None
-        }
-      }
-      result.toMap
-    }
-    Declarations.from(nsMap)
-  }
-
-  /** Helper method that converts a `NodeList` to an `IndexedSeq[org.scalajs.dom.raw.Node]` */
-  private def nodeListToIndexedSeq(nodeList: sjsdom.NodeList): immutable.IndexedSeq[sjsdom.Node] = {
-    val result = (0 until nodeList.length) map { i => nodeList.item(i) }
-    result.toIndexedSeq
-  }
-
-  /** Extracts the `QName` of an `org.scalajs.dom.raw.Element` */
-  private def toQName(v: sjsdom.Element)(implicit qnameProvider: QNameProvider): QName = {
-    val name: String = v.tagName
-    val arr = name.split(':')
-    assert(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) qnameProvider.getUnprefixedQName(arr(0)) else qnameProvider.getQName(arr(0), arr(1))
-  }
-
-  /** Extracts the `QName` of an `org.scalajs.dom.raw.Attr`. If the `Attr` is a namespace declaration, an exception is thrown. */
-  private def toQName(v: sjsdom.Attr)(implicit qnameProvider: QNameProvider): QName = {
-    require(!isNamespaceDeclaration(v), "Namespace declaration not allowed")
-    val name: String = v.name
-    val arr = name.split(':')
-    assert(arr.length >= 1 && arr.length <= 2)
-    if (arr.length == 1) qnameProvider.getUnprefixedQName(arr(0)) else qnameProvider.getQName(arr(0), arr(1))
-  }
-
-  /** Returns true if the `org.scalajs.dom.raw.Attr` is a namespace declaration */
-  private def isNamespaceDeclaration(v: sjsdom.Attr): Boolean = {
-    val name: String = v.name
-    val arr = name.split(':')
-    assert(arr.length >= 1 && arr.length <= 2)
-    val result = arr(0) == "xmlns"
-    result
-  }
-
-  /** Extracts (optional) prefix and namespace. Call only if `isNamespaceDeclaration(v)`, since otherwise an exception is thrown. */
-  private def extractNamespaceDeclaration(v: sjsdom.Attr): (Option[String], String) = {
-    val name: String = v.name
-    val arr = name.split(':')
-    assert(arr.length >= 1 && arr.length <= 2)
-    require(arr(0) == "xmlns")
-    val prefixOption: Option[String] = if (arr.length == 1) None else Some(arr(1))
-    val attrValue: String = v.value
-    (prefixOption, attrValue)
   }
 }
 

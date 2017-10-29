@@ -21,9 +21,14 @@ import org.scalajs.dom.experimental.domparser.SupportedType
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 
+import eu.cdevreeze.yaidom.convert.JsDomConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple
 
 /**
  * DOM wrapper test case.
@@ -162,34 +167,7 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  //  /**
-  //   * Example of finding elements and their ancestors.
-  //   */
-  //  test("testParseSchemaExample") {
-  //    val db = new DOMParser()
-  //    val is = classOf[JsDomWrapperTest].getResourceAsStream("gaap.xsd")
-  //    val src = scala.io.Source.fromInputStream(is, "UTF-8")
-  //    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(src.mkString, SupportedType.`text/xml`))
-  //
-  //    val elementDecls = domDoc.documentElement filterElems { e =>
-  //      e.resolvedName == EName(nsXmlSchema, "element")
-  //    }
-  //
-  //    val anElementDeclOption = elementDecls find { e => e.attributeOption(EName("name")).contains("AddressRecord") }
-  //
-  //    assertResult(Some("AddressRecord")) {
-  //      anElementDeclOption flatMap { e => (e \@ EName("name")) }
-  //    }
-  //
-  //    val tnsOption = anElementDeclOption flatMap { e =>
-  //      val ancestorOption = e findAncestor (ancestorElm => ancestorElm.resolvedName == EName(nsXmlSchema, "schema"))
-  //      ancestorOption flatMap { e => (e \@ EName("targetNamespace")) }
-  //    }
-  //
-  //    assertResult(Some("http://xasb.org/gaap")) {
-  //      tnsOption
-  //    }
-  //  }
+  // TODO Larger XML example, such as gaap.xsd
 
   /**
    * Example of parsing a document with multiple kinds of nodes.
@@ -228,6 +206,254 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
     assertResult(1) {
       domDoc.documentElement.findAllElemsOrSelf.
         flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
+    }
+  }
+
+  // Now add conversions to simple and indexed elements into the mix
+
+  test("testParseAndConvert") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+
+    assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+      (root.findAllElems map (e => e.localName)).toSet
+    }
+    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+      (root.findAllElemsOrSelf map (e => e.localName)).toSet
+    }
+    assertResult(8) {
+      root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
+    }
+    assertResult(3) {
+      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(root)
+    }
+
+    val iroot = indexed.Elem(root)
+
+    assertResult((root.findAllElems map (e => e.localName)).toSet) {
+      (iroot.findAllElems map (e => e.localName)).toSet
+    }
+    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
+      (iroot.findAllElemsOrSelf map (e => e.localName)).toSet
+    }
+    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
+      iroot.filterElemsOrSelf(EName(nsBookstore, "Title")).size
+    }
+    assertResult((root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }).size) {
+      val result = iroot \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      result.size
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(iroot.underlyingElem)
+    }
+  }
+
+  test("testParseAndConvertStrangeXml") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(strangeXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
+      val result = iroot.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(iroot.underlyingElem)
+    }
+  }
+
+  test("testParseAndConvertDefaultNamespaceXml") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(trivialXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
+      val result = iroot.findAllElemsOrSelf map { e => e.resolvedName }
+      result.toSet
+    }
+    assertResult(Set(QName("root"), QName("child"))) {
+      val result = iroot.findAllElemsOrSelf map { e => e.qname }
+      result.toSet
+    }
+    assertResult("Trivial XML") {
+      val result = iroot.findAllElemsOrSelf flatMap { e => e.underlyingElem.commentChildren.map(_.text.trim) }
+      result.mkString
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(iroot.underlyingElem)
+    }
+  }
+
+  /**
+   * See http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser. The Groovy example is less verbose.
+   * The Scala counterpart is more type-safe.
+   */
+  test("testParseAndConvertGroovyXmlExample") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(carsXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    assertResult("records") {
+      domDoc.documentElement.localName
+    }
+
+    assertResult(3) {
+      (iroot \ (_.localName == "car")).size
+    }
+
+    assertResult(10) {
+      iroot.findAllElemsOrSelf.size
+    }
+
+    val firstRecordElm = (iroot \ (_.localName == "car"))(0)
+
+    assertResult("car") {
+      firstRecordElm.localName
+    }
+
+    assertResult("Holden") {
+      firstRecordElm.attribute(EName("make"))
+    }
+
+    assertResult("Australia") {
+      firstRecordElm.getChildElem(_.localName == "country").trimmedText
+    }
+
+    assertResult(2) {
+      val carElms = iroot \ (_.localName == "car")
+      val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
+      result.size
+    }
+
+    assertResult(Set("Holden", "Peel")) {
+      val carElms = iroot \ (_.localName == "car")
+      val pattern = ".*s.*a.*".r.pattern
+
+      val resultElms = carElms filter { e =>
+        val s = e.getChildElem(_.localName == "country").trimmedText
+        pattern.matcher(s).matches
+      }
+
+      (resultElms map (e => e.attribute(EName("make")))).toSet
+    }
+
+    assertResult(Set("speed", "size", "price")) {
+      val result = iroot.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
+      result.toSet
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(iroot.underlyingElem)
+    }
+  }
+
+  /**
+   * Example of parsing a document with multiple kinds of nodes.
+   */
+  test("testParseAndConvertMultipleNodeKinds") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(
+      db.parseFromString(trivialXmlWithDifferentKindsOfNodes, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val doc: simple.Document = JsDomConversions.convertToDocument(domDoc.wrappedDocument)
+    val root: simple.Elem = doc.documentElement
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    assertResult(2) {
+      doc.comments.size
+    }
+    assertResult(1) {
+      doc.processingInstructions.size
+    }
+
+    assertResult("Some comment") {
+      doc.comments(1).text.trim
+    }
+    assertResult("pi") {
+      doc.processingInstructions.head.target
+    }
+
+    assertResult(1) {
+      root.findAllElemsOrSelf.
+        flatMap(_.children collect { case c: simple.Comment if c.text.trim == "Another comment" => c }).size
+    }
+    assertResult(1) {
+      root.findAllElemsOrSelf.
+        flatMap(_.children collect { case pi: simple.ProcessingInstruction if pi.target == "some_pi" => pi }).size
+    }
+    assertResult(1) {
+      root.findAllElemsOrSelf.
+        flatMap(_.children collect { case t: simple.Text if t.text.trim.contains("Some Text") => t }).size
+    }
+    assertResult(1) {
+      root.findAllElemsOrSelf.
+        flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(iroot.underlyingElem)
+    }
+  }
+
+  // Querying for ancestry
+
+  test("testAncestry") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    assertResult(false) {
+      val firstDescendant = domRoot.findAllElems.head
+      resolved.Elem(firstDescendant.parent) == resolved.Elem(firstDescendant)
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(domRoot.findAllElems.head.parent)
+    }
+
+    assertResult(domRoot.findAllElems.map(_.parent).map(e => resolved.Elem(e))) {
+      iroot.findAllElems.map(_.parent).map(e => resolved.Elem(e.underlyingElem))
+    }
+  }
+
+  // Testing navigation
+
+  test("testNavigation") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    val paths = iroot.findAllElemsOrSelf.map(_.path).ensuring(_.head.isEmpty).ensuring(_.tail.head.nonEmpty)
+
+    assertResult(paths.map(path => resolved.Elem(domRoot.getElemOrSelfByPath(path)))) {
+      paths.map(path => resolved.Elem(root.getElemOrSelfByPath(path)))
     }
   }
 
