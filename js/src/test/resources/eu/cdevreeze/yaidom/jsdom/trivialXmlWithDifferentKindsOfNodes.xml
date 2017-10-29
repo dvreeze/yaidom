@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE root [
+  <!ENTITY hello "hi there">
+  <!ELEMENT RootElement (FirstElement, SecondElement, ThirdElement, FourthElement)>
+  <!ELEMENT FirstElement (#PCDATA)>
+  <!ELEMENT SecondElement (#PCDATA|Inline)*>
+  <!ELEMENT ThirdElement (#PCDATA)>
+  <!ELEMENT FourthElement (#PCDATA)>
+  <!ELEMENT Inline (#PCDATA)>
+  <!ATTLIST RootElement xmlns CDATA #REQUIRED>
+  <!ATTLIST RootElement param CDATA #REQUIRED>
+  <!ATTLIST SecondElement param2 CDATA #REQUIRED>
+]>
+<!-- See http://en.wikipedia.org/wiki/Simple_API_for_XML -->
+<!-- Some comment -->
+<?pi some_value?>
+<RootElement param="value" xmlns="http://bla">
+	<!-- Another comment -->
+	<FirstElement>
+		Some Text
+	</FirstElement>
+    <?some_pi some_value?>
+	<SecondElement param2="something">
+		Pre-Text <Inline>Inlined text</Inline> Post-text.
+	</SecondElement>
+	<ThirdElement>
+		<![CDATA[Piet & co]]>
+	</ThirdElement>
+	<FourthElement>
+		This text contains an entity reference, viz. &hello;.
+	The entity is defined in the included DTD.
+	</FourthElement>
+</RootElement>

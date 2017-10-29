@@ -153,6 +153,10 @@ lazy val yaidom = crossProject.in(file(".")).
     }
   ).
   jsSettings(
+    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
+
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.4" % "test",
+
     excludeFilter in (Compile, unmanagedSources) := {
       if (scalaBinaryVersion.value == "2.13.0-M2") {
         new SimpleFileFilter(f => true)

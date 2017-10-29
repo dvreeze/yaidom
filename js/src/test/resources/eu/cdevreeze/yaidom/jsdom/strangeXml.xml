@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bar xmlns:ns="http://www.yahoo.com">
+	<ns:foo xmlns:ns="http://www.google.com" />
+</bar>
