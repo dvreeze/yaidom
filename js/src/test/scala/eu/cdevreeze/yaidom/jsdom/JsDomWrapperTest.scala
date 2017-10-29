@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
  *
  * @author Chris de Vreeze
  */
-class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
+class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -51,9 +51,9 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   test("testParse") {
     val db = new DOMParser()
-    val domDoc: DomDocument = DomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
 
-    val root: DomElem = domDoc.documentElement
+    val root: JsDomElem = domDoc.documentElement
 
     assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
@@ -72,9 +72,9 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   test("testParseStrangeXml") {
     val db = new DOMParser()
-    val domDoc: DomDocument = DomDocument.wrapDocument(db.parseFromString(strangeXml, SupportedType.`text/xml`))
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(strangeXml, SupportedType.`text/xml`))
 
-    val root: DomElem = domDoc.documentElement
+    val root: JsDomElem = domDoc.documentElement
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -84,9 +84,9 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   test("testParseDefaultNamespaceXml") {
     val db = new DOMParser()
-    val domDoc: DomDocument = DomDocument.wrapDocument(db.parseFromString(trivialXml, SupportedType.`text/xml`))
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(trivialXml, SupportedType.`text/xml`))
 
-    val root: DomElem = domDoc.documentElement
+    val root: JsDomElem = domDoc.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -108,7 +108,7 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
    */
   test("testParseGroovyXmlExample") {
     val db = new DOMParser()
-    val domDoc: DomDocument = DomDocument.wrapDocument(db.parseFromString(carsXml, SupportedType.`text/xml`))
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(carsXml, SupportedType.`text/xml`))
 
     assertResult("records") {
       domDoc.documentElement.localName
@@ -167,9 +167,9 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
   //   */
   //  test("testParseSchemaExample") {
   //    val db = new DOMParser()
-  //    val is = classOf[DomWrapperTest].getResourceAsStream("gaap.xsd")
+  //    val is = classOf[JsDomWrapperTest].getResourceAsStream("gaap.xsd")
   //    val src = scala.io.Source.fromInputStream(is, "UTF-8")
-  //    val domDoc: DomDocument = DomDocument.wrapDocument(db.parseFromString(src.mkString, SupportedType.`text/xml`))
+  //    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(src.mkString, SupportedType.`text/xml`))
   //
   //    val elementDecls = domDoc.documentElement filterElems { e =>
   //      e.resolvedName == EName(nsXmlSchema, "element")
@@ -196,7 +196,7 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
    */
   test("testParseMultipleNodeKinds") {
     val db = new DOMParser()
-    val domDoc: DomDocument = DomDocument.wrapDocument(
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(
       db.parseFromString(trivialXmlWithDifferentKindsOfNodes, SupportedType.`text/xml`))
 
     assertResult(2) {
@@ -215,15 +215,15 @@ class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
     assertResult(1) {
       domDoc.documentElement.findAllElemsOrSelf.
-        flatMap(_.children collect { case c: DomComment if c.text.trim == "Another comment" => c }).size
+        flatMap(_.children collect { case c: JsDomComment if c.text.trim == "Another comment" => c }).size
     }
     assertResult(1) {
       domDoc.documentElement.findAllElemsOrSelf.
-        flatMap(_.children collect { case pi: DomProcessingInstruction if pi.wrappedNode.target == "some_pi" => pi }).size
+        flatMap(_.children collect { case pi: JsDomProcessingInstruction if pi.wrappedNode.target == "some_pi" => pi }).size
     }
     assertResult(1) {
       domDoc.documentElement.findAllElemsOrSelf.
-        flatMap(_.children collect { case t: DomText if t.text.trim.contains("Some Text") => t }).size
+        flatMap(_.children collect { case t: JsDomText if t.text.trim.contains("Some Text") => t }).size
     }
     assertResult(1) {
       domDoc.documentElement.findAllElemsOrSelf.

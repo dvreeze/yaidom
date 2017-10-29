@@ -47,44 +47,44 @@ import eu.cdevreeze.yaidom.resolved.ResolvedNodes
  *
  * @author Chris de Vreeze
  */
-sealed trait DomNode extends ResolvedNodes.Node {
+sealed trait JsDomNode extends ResolvedNodes.Node {
 
   type DomType <: sjsdom.Node
 
   def wrappedNode: DomType
 }
 
-sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
+sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChild
 
 /**
  * Wrapper around `org.scalajs.dom.raw.Element`, conforming to the `eu.cdevreeze.yaidom.queryapi.ElemLike` API.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
- * By design the only state of the DomElem is the wrapped element. Otherwise it would be easy to cause any inconsistency
+ * By design the only state of the JsDomElem is the wrapped element. Otherwise it would be easy to cause any inconsistency
  * between this wrapper element and the wrapped element. The down-side is that computing the resolved name or resolved
  * attributes is expensive, because on each call first the in-scope namespaces are computed (by following namespace
  * declarations in the ancestry and in the element itself). This is done for reliable namespace support, independent
  * of namespace-awareness of the underlying element's document.
  *
  * This choice for reliable namespace support (see the documented properties of `ScopedElemApi`) and defensive handling
- * of mutable state makes this DomElem slower (when querying for resolved names or attributes) than other wrapper
+ * of mutable state makes this JsDomElem slower (when querying for resolved names or attributes) than other wrapper
  * element implementations, such as `ScalaXmlElem`. On the other hand, if the use of `org.w3c.dom` is a given, then
- * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
+ * this JsDomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
-final class DomElem(
+final class JsDomElem(
     override val wrappedNode: sjsdom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null) // scalastyle:off null
 
-  type ThisElem = DomElem
+  type ThisElem = JsDomElem
 
   def thisElem: ThisElem = this
 
   override type DomType = sjsdom.Element
 
   /** Returns the element children */
-  override def findAllChildElems: immutable.IndexedSeq[DomElem] = children collect { case e: DomElem => e }
+  override def findAllChildElems: immutable.IndexedSeq[JsDomElem] = children collect { case e: JsDomElem => e }
 
   override def resolvedName: EName = {
     // Not efficient, because of expensive Scope computation
@@ -114,7 +114,7 @@ final class DomElem(
   override def attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(wrappedNode.attributes)
 
   override def scope: Scope = {
-    val ancestryOrSelf = DomElem.getAncestorsOrSelf(this.wrappedNode)
+    val ancestryOrSelf = JsDomElem.getAncestorsOrSelf(this.wrappedNode)
 
     val resultScope =
       ancestryOrSelf.foldRight(Scope.Empty) {
@@ -125,10 +125,10 @@ final class DomElem(
     resultScope
   }
 
-  def children: immutable.IndexedSeq[DomNode] = {
+  def children: immutable.IndexedSeq[JsDomNode] = {
     val childrenNodeList = wrappedNode.childNodes
 
-    nodeListToIndexedSeq(childrenNodeList) flatMap { node => DomNode.wrapNodeOption(node) }
+    nodeListToIndexedSeq(childrenNodeList) flatMap { node => JsDomNode.wrapNodeOption(node) }
   }
 
   /** The attribute `Scope`, which is the same `Scope` but without the default namespace (which is not used for attributes) */
@@ -137,10 +137,10 @@ final class DomElem(
   def declarations: Declarations = extractNamespaceDeclarations(wrappedNode.attributes)
 
   /** Returns the text children */
-  def textChildren: immutable.IndexedSeq[DomText] = children collect { case t: DomText => t }
+  def textChildren: immutable.IndexedSeq[JsDomText] = children collect { case t: JsDomText => t }
 
   /** Returns the comment children */
-  def commentChildren: immutable.IndexedSeq[DomComment] = children collect { case c: DomComment => c }
+  def commentChildren: immutable.IndexedSeq[JsDomComment] = children collect { case c: JsDomComment => c }
 
   /**
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
@@ -151,10 +151,10 @@ final class DomElem(
     textStrings.mkString
   }
 
-  override def parentOption: Option[DomElem] = {
+  override def parentOption: Option[JsDomElem] = {
     val parentNodeOption = Option(wrappedNode.parentNode)
     val parentElemOption = parentNodeOption collect { case e: sjsdom.Element => e }
-    parentElemOption map { e => DomNode.wrapElement(e) }
+    parentElemOption map { e => JsDomNode.wrapElement(e) }
   }
 
   /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */
@@ -233,7 +233,7 @@ final class DomElem(
   }
 }
 
-final class DomText(override val wrappedNode: sjsdom.Text) extends DomNode with ResolvedNodes.Text {
+final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode with ResolvedNodes.Text {
   override type DomType = sjsdom.Text
 
   require(wrappedNode ne null) // scalastyle:off null
@@ -247,7 +247,7 @@ final class DomText(override val wrappedNode: sjsdom.Text) extends DomNode with 
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 }
 
-final class DomProcessingInstruction(
+final class JsDomProcessingInstruction(
     override val wrappedNode: sjsdom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
 
   require(wrappedNode ne null) // scalastyle:off null
@@ -259,7 +259,7 @@ final class DomProcessingInstruction(
   def data: String = wrappedNode.data
 }
 
-final class DomComment(
+final class JsDomComment(
     override val wrappedNode: sjsdom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
 
   require(wrappedNode ne null) // scalastyle:off null
@@ -269,28 +269,28 @@ final class DomComment(
   def text: String = wrappedNode.data
 }
 
-object DomNode {
+object JsDomNode {
 
-  def wrapNodeOption(node: sjsdom.Node): Option[DomNode] = {
+  def wrapNodeOption(node: sjsdom.Node): Option[JsDomNode] = {
     // Pattern matching on the DOM interface type alone does not work for Saxon DOM adapters such as TextOverNodeInfo.
     // Hence the check on node type as well.
 
     node match {
       case e: sjsdom.Element =>
-        Some(new DomElem(e))
+        Some(new JsDomElem(e))
       case cdata: sjsdom.CDATASection =>
-        Some(new DomText(cdata))
+        Some(new JsDomText(cdata))
       case t: sjsdom.Text =>
-        Some(new DomText(t))
+        Some(new JsDomText(t))
       case pi: sjsdom.ProcessingInstruction =>
-        Some(new DomProcessingInstruction(pi))
+        Some(new JsDomProcessingInstruction(pi))
       case c: sjsdom.Comment =>
-        Some(new DomComment(c))
+        Some(new JsDomComment(c))
       case _ => None
     }
   }
 
-  def wrapElement(elm: sjsdom.Element): DomElem = new DomElem(elm)
+  def wrapElement(elm: sjsdom.Element): JsDomElem = new JsDomElem(elm)
 }
 
 object CanBeDomDocumentChild {
@@ -301,19 +301,19 @@ object CanBeDomDocumentChild {
 
     node match {
       case e: sjsdom.Element =>
-        Some(new DomElem(e))
+        Some(new JsDomElem(e))
       case pi: sjsdom.ProcessingInstruction =>
-        Some(new DomProcessingInstruction(pi))
+        Some(new JsDomProcessingInstruction(pi))
       case c: sjsdom.Comment =>
-        Some(new DomComment(c))
+        Some(new JsDomComment(c))
       case _ => None
     }
   }
 }
 
-object DomElem {
+object JsDomElem {
 
-  def apply(wrappedNode: sjsdom.Element): DomElem = new DomElem(wrappedNode)
+  def apply(wrappedNode: sjsdom.Element): JsDomElem = new JsDomElem(wrappedNode)
 
   private def getAncestorsOrSelf(elem: sjsdom.Element): List[sjsdom.Element] = {
     val parentElement: sjsdom.Element = elem.parentNode match {
@@ -330,18 +330,18 @@ object DomElem {
   }
 }
 
-object DomText {
+object JsDomText {
 
-  def apply(wrappedNode: sjsdom.Text): DomText = new DomText(wrappedNode)
+  def apply(wrappedNode: sjsdom.Text): JsDomText = new JsDomText(wrappedNode)
 }
 
-object DomProcessingInstruction {
+object JsDomProcessingInstruction {
 
-  def apply(wrappedNode: sjsdom.ProcessingInstruction): DomProcessingInstruction =
-    new DomProcessingInstruction(wrappedNode)
+  def apply(wrappedNode: sjsdom.ProcessingInstruction): JsDomProcessingInstruction =
+    new JsDomProcessingInstruction(wrappedNode)
 }
 
-object DomComment {
+object JsDomComment {
 
-  def apply(wrappedNode: sjsdom.Comment): DomComment = new DomComment(wrappedNode)
+  def apply(wrappedNode: sjsdom.Comment): JsDomComment = new JsDomComment(wrappedNode)
 }

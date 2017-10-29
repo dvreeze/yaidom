@@ -172,7 +172,7 @@ lazy val yaidom = crossProject.in(file(".")).
         // We do not want to hit the TimeoutException (on Travis) described here:
         // https://github.com/orbeon/orbeon-forms/issues/2743
 
-        new SimpleFileFilter(f => f.toString.contains("jsdom"))
+        new SimpleFileFilter(f => true)
       } else {
         NothingFilter
       }

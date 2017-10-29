@@ -33,12 +33,12 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  *
  * @author Chris de Vreeze
  */
-final class DomDocument(val wrappedDocument: sjsdom.Document) extends DocumentApi {
+final class JsDomDocument(val wrappedDocument: sjsdom.Document) extends DocumentApi {
   require(wrappedDocument ne null) // scalastyle:off null
 
-  type ThisDoc = DomDocument
+  type ThisDoc = JsDomDocument
 
-  type DocElemType = DomElem
+  type DocElemType = JsDomElem
 
   final def children: immutable.IndexedSeq[CanBeDomDocumentChild] = {
     val childrenNodeList = wrappedDocument.childNodes
@@ -48,16 +48,16 @@ final class DomDocument(val wrappedDocument: sjsdom.Document) extends DocumentAp
     }
   }
 
-  def documentElement: DomElem = DomNode.wrapElement(wrappedDocument.documentElement)
+  def documentElement: JsDomElem = JsDomNode.wrapElement(wrappedDocument.documentElement)
 
   def uriOption: Option[URI] = Option(wrappedDocument.documentURI).map(s => new URI(s))
 
-  def comments: immutable.IndexedSeq[DomComment] = {
-    children.collect({ case c: DomComment => c })
+  def comments: immutable.IndexedSeq[JsDomComment] = {
+    children.collect({ case c: JsDomComment => c })
   }
 
-  def processingInstructions: immutable.IndexedSeq[DomProcessingInstruction] = {
-    children.collect({ case pi: DomProcessingInstruction => pi })
+  def processingInstructions: immutable.IndexedSeq[JsDomProcessingInstruction] = {
+    children.collect({ case pi: JsDomProcessingInstruction => pi })
   }
 
   /** Helper method that converts a `NodeList` to an `IndexedSeq[org.scalajs.dom.raw.Node]` */
@@ -67,9 +67,9 @@ final class DomDocument(val wrappedDocument: sjsdom.Document) extends DocumentAp
   }
 }
 
-object DomDocument {
+object JsDomDocument {
 
-  def apply(wrappedDoc: sjsdom.Document): DomDocument = new DomDocument(wrappedDoc)
+  def apply(wrappedDoc: sjsdom.Document): JsDomDocument = new JsDomDocument(wrappedDoc)
 
-  def wrapDocument(doc: sjsdom.Document): DomDocument = new DomDocument(doc)
+  def wrapDocument(doc: sjsdom.Document): JsDomDocument = new JsDomDocument(doc)
 }
