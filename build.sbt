@@ -168,6 +168,11 @@ lazy val yaidom = crossProject.in(file(".")).
     excludeFilter in (Test, unmanagedSources) := {
       if (scalaBinaryVersion.value == "2.13.0-M2") {
         new SimpleFileFilter(f => true)
+      } else if (isBeforeJava8) {
+        // We do not want to hit the TimeoutException (on Travis) described here:
+        // https://github.com/orbeon/orbeon-forms/issues/2743
+
+        new SimpleFileFilter(f => f.toString.contains("jsdom"))
       } else {
         NothingFilter
       }
