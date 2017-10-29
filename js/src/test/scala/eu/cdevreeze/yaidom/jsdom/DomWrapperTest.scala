@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.jsdom
 
 import org.scalajs.dom.experimental.domparser.DOMParser
 import org.scalajs.dom.experimental.domparser.SupportedType
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
@@ -35,11 +36,18 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
  *
  * @author Chris de Vreeze
  */
-class DomWrapperTest extends FunSuite {
+class DomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsFooBar = "urn:foo:bar"
+
+  protected override def afterAll(): Unit = {
+    // See https://github.com/orbeon/orbeon-forms/issues/2743, and the reason for the Travis build
+    // to fail if we do not close the window afterwards.
+
+    org.scalajs.dom.window.close()
+  }
 
   test("testParse") {
     val db = new DOMParser()

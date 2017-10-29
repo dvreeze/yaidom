@@ -75,6 +75,8 @@ sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
 final class DomElem(
     override val wrappedNode: sjsdom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
 
+  require(wrappedNode ne null) // scalastyle:off null
+
   type ThisElem = DomElem
 
   def thisElem: ThisElem = this
@@ -233,6 +235,8 @@ final class DomElem(
 
 final class DomText(override val wrappedNode: sjsdom.Text) extends DomNode with ResolvedNodes.Text {
   override type DomType = sjsdom.Text
+
+  require(wrappedNode ne null) // scalastyle:off null
 
   def text: String = wrappedNode.data
 
