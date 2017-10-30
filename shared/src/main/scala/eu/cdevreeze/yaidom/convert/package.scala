@@ -27,7 +27,7 @@ package eu.cdevreeze.yaidom
  *
  * This package depends on the [[eu.cdevreeze.yaidom.core]], [[eu.cdevreeze.yaidom.queryapi]] and
  * [[eu.cdevreeze.yaidom.simple]] packages, and not the other way around.
- * The [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] packages depend on this package.
+ * The `eu.cdevreeze.yaidom.parse` and `eu.cdevreeze.yaidom.print` packages depend on this package.
  *
  * @author Chris de Vreeze
  */

@@ -84,7 +84,7 @@ sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
  * element implementation among several alternative element implementations, it strikes a balance between loss-less roundtripping
  * and composability.
  *
- * The parsers and serializers in packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]] return and take
+ * The parsers and serializers in packages `eu.cdevreeze.yaidom.parse` and `eu.cdevreeze.yaidom.print` return and take
  * these default elements (or the corresponding `Document` instances), respectively.
  *
  * As for its <em>query API</em>, class [[eu.cdevreeze.yaidom.simple.Elem]] is among the most powerful element implementations offered

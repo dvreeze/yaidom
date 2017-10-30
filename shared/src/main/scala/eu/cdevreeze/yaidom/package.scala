@@ -467,7 +467,7 @@ package eu.cdevreeze
  * <li>Package `convert`. It contains conversions between default yaidom nodes on the one hand and DOM,
  * Scala XML, etc. on the other hand. Like the `indexed` package, the `convert` package depends on the yaidom `core`, `queryapi`, `resolved`
  * and `simple` packages.</li>
- * <li>Packages [[eu.cdevreeze.yaidom.parse]] and [[eu.cdevreeze.yaidom.print]], for parsing/printing Elems. They depend on
+ * <li>Packages `eu.cdevreeze.yaidom.parse` and [eu.cdevreeze.yaidom.print`, for parsing/printing Elems. They depend on
  * the packages mentioned above, except for `indexed`.</li>
  * <li>The other packages (except `utils`), such as `dom` and `scalaxml`. They depend on (some of)
  * the packages mentioned above,

@@ -68,8 +68,8 @@ import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
  * instance (for each element) twice (first without children, and finally as a copy with children added).
  *
  * When using `NodeBuilder`s to create a `Document`, this `Document` typically contains no "ignorable whitespace". This may cause
- * the `Document` not to be pretty-printed when using a (default) [[eu.cdevreeze.yaidom.print.DocumentPrinter]] to convert the `Document`
- * to an XML string. See also the classes in package [[eu.cdevreeze.yaidom.print]].
+ * the `Document` not to be pretty-printed when using a (default) `eu.cdevreeze.yaidom.print.DocumentPrinter` to convert the `Document`
+ * to an XML string. See also the classes in package `eu.cdevreeze.yaidom.print`.
  *
  * @author Chris de Vreeze
  */
