@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+1.7.0-M3
+========
+
+Same as 1.7.0-M2, except for some changes in build.sbt, in an attempt to publish artifacts to Nexus.
+
+
 1.7.0-M2
 ========
 
