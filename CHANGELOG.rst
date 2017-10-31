@@ -12,8 +12,7 @@ improved update/transformation support, but support for "yaidom in the browser",
 This milestone release uses Scala.js. The yaidom code base is split among a shared part, a jvm part and
 a js part (respecting the main differences between JVMs and JavaScript runtimes):
 
-* The shared code contains the core and queryapi packages, as well as the native yaidom simple,
-indexed and resolved element implementations.
+* The shared code contains the core and queryapi packages, as well as the native yaidom simple, indexed and resolved element implementations.
 * The jvm code contains DOM and Scala XML wrappers, as well as conversions and document parsers and printers (and Java 8 bridges).
 * The js code contains JS DOM wrappers and related conversions.
 
