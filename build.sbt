@@ -10,23 +10,14 @@ lazy val root = project.in(file(".")).
     scalaVersion := "2.12.4",
     crossScalaVersions := Seq("2.12.4", "2.11.11", "2.13.0-M2"),
 
-    // Trying to switch off publishing for root artifacts (the ones other than in the jvm and js projects)
-
-    publish := {},
-    publishLocal := {},
-
     // See https://github.com/sbt/sbt/issues/3136
     skip in publish := true,
 
-    // Additionally, see https://stackoverflow.com/questions/8786708/how-to-disable-package-and-publish-tasks-for-root-aggregate-module-in-multi-modu
+    // Skipping publishing (see issue 3136 above) does not work. Desperately trying to please Nexus.
 
-    packageBin := { new File("") },
-    packageDoc := { new File("") },
-    packageSrc := { new File("") },
+    version := "1.7.0-SNAPSHOT",
 
-    // Desperately trying to please Nexus. See issue 3136 above.
-
-    version := "1.7.0-M4",
+    publishMavenStyle := true,
 
     publishTo := {
       val vers = version.value
@@ -38,6 +29,34 @@ lazy val root = project.in(file(".")).
       } else {
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
       }
+    },
+
+    publishArtifact in Test := false,
+
+    pomIncludeRepository := { repo => false },
+
+    pomExtra := {
+      <url>https://github.com/dvreeze/yaidom</url>
+      <licenses>
+        <license>
+          <name>Apache License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <distribution>repo</distribution>
+          <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
+        </license>
+      </licenses>
+      <scm>
+        <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
+        <url>https://github.com/dvreeze/yaidom.git</url>
+        <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
+      </scm>
+      <developers>
+        <developer>
+          <id>dvreeze</id>
+          <name>Chris de Vreeze</name>
+          <email>chris.de.vreeze@caiway.net</email>
+        </developer>
+      </developers>
     }
   )
 
@@ -46,7 +65,7 @@ lazy val root = project.in(file(".")).
 
 lazy val yaidom = crossProject.in(file(".")).
   settings(
-    version := "1.7.0-M4",
+    version := "1.7.0-SNAPSHOT",
 
     scalaVersion := "2.12.4",
 
