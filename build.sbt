@@ -44,7 +44,7 @@ lazy val root = project.in(file(".")).
 
 lazy val yaidom = crossProject.in(file(".")).
   settings(
-    version := "1.7.0-M2",
+    version := "1.7.0-M3",
 
     scalaVersion := "2.12.4",
 
