@@ -29,7 +29,7 @@ lazy val root = project.in(file(".")).
 
 lazy val yaidom = crossProject.in(file(".")).
   settings(
-    version := "1.6.5-SNAPSHOT",
+    version := "1.7.0-M2",
 
     scalaVersion := "2.12.4",
 
