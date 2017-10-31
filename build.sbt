@@ -26,6 +26,8 @@ lazy val root = project.in(file(".")).
 
     // Desperately trying to please Nexus. See issue 3136 above.
 
+    version := "1.7.0-M4",
+
     publishTo := {
       val vers = version.value
 
@@ -44,7 +46,7 @@ lazy val root = project.in(file(".")).
 
 lazy val yaidom = crossProject.in(file(".")).
   settings(
-    version := "1.7.0-M3",
+    version := "1.7.0-M4",
 
     scalaVersion := "2.12.4",
 
