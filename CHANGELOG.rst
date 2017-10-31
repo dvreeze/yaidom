@@ -3,6 +3,21 @@ CHANGELOG
 =========
 
 
+1.7.0-M2
+========
+
+Version 1.7.0-M2 is the second milestone release for yaidom 1.7.0. The theme of yaidom 1.7.X is no longer
+improved update/transformation support, but support for "yaidom in the browser", through Scala.js.
+
+This milestone release uses Scala.js. The yaidom code base is split among a shared part, a jvm part and
+a js part (respecting the main differences between JVMs and JavaScript runtimes):
+
+* The shared code contains the core and queryapi packages, as well as the native yaidom simple,
+indexed and resolved element implementations.
+* The jvm code contains DOM and Scala XML wrappers, as well as conversions and document parsers and printers (and Java 8 bridges).
+* The js code contains JS DOM wrappers and related conversions.
+
+
 1.6.4
 =====
 
