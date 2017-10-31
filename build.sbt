@@ -15,7 +15,8 @@ lazy val root = project.in(file(".")).
     publish := {},
     publishLocal := {},
 
-    publishArtifact := false,
+    // See https://github.com/sbt/sbt/issues/3136
+    skip in publish := true,
 
     // Additionally, see https://stackoverflow.com/questions/8786708/how-to-disable-package-and-publish-tasks-for-root-aggregate-module-in-multi-modu
 
