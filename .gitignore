@@ -3,6 +3,7 @@
 .cache-tests
 .classpath
 .project
+.worksheet/
 .settings/
 target/
 temp/
