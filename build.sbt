@@ -22,7 +22,21 @@ lazy val root = project.in(file(".")).
 
     packageBin := { new File("") },
     packageDoc := { new File("") },
-    packageSrc := { new File("") }
+    packageSrc := { new File("") },
+
+    // Desperately trying to please Nexus. See issue 3136 above.
+
+    publishTo := {
+      val vers = version.value
+
+      val nexus = "https://oss.sonatype.org/"
+
+      if (vers.trim.endsWith("SNAPSHOT")) {
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      } else {
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      }
+    }
   )
 
 
