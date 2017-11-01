@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+1.7.0-M5
+========
+
+Same as 1.7.0-M3, except for a major overhaul of the build.sbt. Let's hope third time is a charm.
+
+
 1.7.0-M4
 ========
 
