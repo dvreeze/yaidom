@@ -1,135 +1,65 @@
 
-lazy val root = project.in(file(".")).
-  aggregate(yaidomJS, yaidomJVM).
-  settings(
-    name := "yaidom",
+// Building both for JVM and JavaScript runtimes.
 
-    organization := "eu.cdevreeze.yaidom",
+// To convince SBT not to publish any root level artifacts, I had a look at how scala-java-time does it.
+// See https://github.com/cquiroz/scala-java-time/blob/master/build.sbt as a "template" for this build file.
 
-    // Seems superfluous at root level, but guards against unresolved dependencies
-    scalaVersion := "2.12.4",
-    crossScalaVersions := Seq("2.12.4", "2.11.11", "2.13.0-M2"),
 
-    // See https://github.com/sbt/sbt/issues/3136
-    skip in publish := true,
+val scalaVer = "2.12.4"
+val crossScalaVer = Seq(scalaVer, "2.11.11", "2.13.0-M2")
 
-    // Skipping publishing (see issue 3136 above) does not work. Desperately trying to please Nexus.
+lazy val commonSettings = Seq(
+  name         := "yaidom",
+  description  := "Extensible XML query API with multiple DOM-like implementations",
+  organization := "eu.cdevreeze.yaidom",
+  version      := "1.7.0-SNAPSHOT",
 
-    version := "1.7.0-SNAPSHOT",
+  homepage     := Some(url("https://github.com/dvreeze/yaidom")),
 
-    publishMavenStyle := true,
+  scalaVersion       := scalaVer,
+  crossScalaVersions := crossScalaVer,
 
-    publishTo := {
-      val vers = version.value
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint"),
 
-      val nexus = "https://oss.sonatype.org/"
-
-      if (vers.trim.endsWith("SNAPSHOT")) {
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      } else {
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-      }
+  publishArtifact in Test := false,
+  publishMavenStyle := true,
+  
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
+    
+  pomExtra := pomData,
+  pomIncludeRepository := { _ => false },
 
-    publishArtifact in Test := false,
-
-    pomIncludeRepository := { repo => false },
-
-    pomExtra := {
-      <url>https://github.com/dvreeze/yaidom</url>
-      <licenses>
-        <license>
-          <name>Apache License, Version 2.0</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-          <distribution>repo</distribution>
-          <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
-        </license>
-      </licenses>
-      <scm>
-        <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
-        <url>https://github.com/dvreeze/yaidom.git</url>
-        <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
-      </scm>
-      <developers>
-        <developer>
-          <id>dvreeze</id>
-          <name>Chris de Vreeze</name>
-          <email>chris.de.vreeze@caiway.net</email>
-        </developer>
-      </developers>
-    }
+  libraryDependencies ++= Seq(
+    "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
   )
+)
 
+lazy val root = project.in(file("."))
+  .aggregate(yaidomJVM, yaidomJS)
+  .settings(commonSettings: _*)
+  .settings(
+    name                 := "yaidom",
+    // Thanks, scala-java-time, for showing us how to prevent any publishing of root level artifacts:
+    // No, SBT, we don't want any artifacts for root. No, not even an empty jar.
+    publish              := {},
+    publishLocal         := {},
+    publishArtifact      := false,
+    Keys.`package`       := file(""))
 
-// The jvm and js projects
-
-lazy val yaidom = crossProject.in(file(".")).
-  settings(
-    version := "1.7.0-SNAPSHOT",
-
-    scalaVersion := "2.12.4",
-
-    crossScalaVersions := Seq("2.12.4", "2.11.11", "2.13.0-M2"),
-
-    // See: Toward a safer Scala
-    // http://downloads.typesafe.com/website/presentations/ScalaDaysSF2015/Toward%20a%20Safer%20Scala%20@%20Scala%20Days%20SF%202015.pdf
-
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint"),
-
-    // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases",
-
-    // addCompilerPlugin("com.artima.supersafe" %%% "supersafe" % "1.0.3"),
-
-    publishMavenStyle := true,
-
-    publishTo := {
-      val vers = version.value
-
-      val nexus = "https://oss.sonatype.org/"
-
-      if (vers.trim.endsWith("SNAPSHOT")) {
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      } else {
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-      }
-    },
-
-    publishArtifact in Test := false,
-
-    pomIncludeRepository := { repo => false },
-
-    pomExtra := {
-      <url>https://github.com/dvreeze/yaidom</url>
-      <licenses>
-        <license>
-          <name>Apache License, Version 2.0</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-          <distribution>repo</distribution>
-          <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
-        </license>
-      </licenses>
-      <scm>
-        <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
-        <url>https://github.com/dvreeze/yaidom.git</url>
-        <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
-      </scm>
-      <developers>
-        <developer>
-          <id>dvreeze</id>
-          <name>Chris de Vreeze</name>
-          <email>chris.de.vreeze@caiway.net</email>
-        </developer>
-      </developers>
-    }
-  ).
-  jvmSettings(
+lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
+  .settings(commonSettings: _*)
+  .jvmSettings(
     libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.0.6",
 
     libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0" % "optional",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
-
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.4" % "test",
 
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test",
 
@@ -187,11 +117,10 @@ lazy val yaidom = crossProject.in(file(".")).
         NothingFilter
       }
     }
-  ).
-  jsSettings(
+  )
+  .jsSettings(
+    // Do we need this jsEnv?
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
-
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.4" % "test",
 
     excludeFilter in (Compile, unmanagedSources) := {
       if (scalaBinaryVersion.value == "2.13.0-M2") {
@@ -222,9 +151,31 @@ lazy val yaidom = crossProject.in(file(".")).
     }
   )
 
-
 lazy val yaidomJVM = yaidom.jvm
 lazy val yaidomJS = yaidom.js
+
+lazy val pomData =
+  <url>https://github.com/dvreeze/yaidom</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
+    <url>https://github.com/dvreeze/yaidom.git</url>
+    <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <id>dvreeze</id>
+      <name>Chris de Vreeze</name>
+      <email>chris.de.vreeze@caiway.net</email>
+    </developer>
+  </developers>
 
 
 // Helper functions

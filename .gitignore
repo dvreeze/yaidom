@@ -9,6 +9,7 @@ target/
 temp/
 .history
 scalastyle-config.xml
+node_modules/
 
 # /project/
 /project/boot
