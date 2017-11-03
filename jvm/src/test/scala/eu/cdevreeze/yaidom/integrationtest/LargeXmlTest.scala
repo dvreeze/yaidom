@@ -179,7 +179,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
   }
 
   /** A heavy test printing out the tree representation DSL. When running it, consider using jvisualvm to check on the JVM behavior */
-  test("testPrintLargeTreeRepr") {
+  // Ignoring test to lower memory footprint (in Travis CI)
+  ignore("testPrintLargeTreeRepr") {
     val startMs = System.currentTimeMillis()
     val treeRepr: String = doc.toString
     val endMs = System.currentTimeMillis()
