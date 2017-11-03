@@ -438,9 +438,13 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
     assertResult(domRoot.findAllElems.map(_.parent).map(e => resolved.Elem(e))) {
       iroot.findAllElems.map(_.parent).map(e => resolved.Elem(e.underlyingElem))
     }
+
+    assertResult(List(root.resolvedName)) {
+      domRoot.findAllElemsOrSelf.map(_.ancestorsOrSelf.last.resolvedName).distinct
+    }
   }
 
-  // Testing navigation
+  // Testing navigation and paths
 
   test("testNavigation") {
     val db = new DOMParser()
@@ -454,6 +458,14 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
     assertResult(paths.map(path => resolved.Elem(domRoot.getElemOrSelfByPath(path)))) {
       paths.map(path => resolved.Elem(root.getElemOrSelfByPath(path)))
+    }
+
+    assertResult(iroot.findAllElemsOrSelf.map(_.path)) {
+      domRoot.findAllElemsOrSelf.map(_.path)
+    }
+
+    assertResult(List(resolved.Elem(root))) {
+      domRoot.findAllElemsOrSelf.map(_.rootElem).map(e => resolved.Elem(e)).distinct
     }
   }
 
