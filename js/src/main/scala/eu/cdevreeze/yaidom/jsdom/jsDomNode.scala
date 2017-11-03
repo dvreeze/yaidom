@@ -187,7 +187,7 @@ final class JsDomElem(
     val parentPathOption = path.parentPathOption
 
     if (parentPathOption.isEmpty) {
-      None
+      docUriOption
     } else {
       XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, parentPathOption.get)(XmlBaseSupport.JdkUriResolver)
     }
