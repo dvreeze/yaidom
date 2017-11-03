@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.jsdom
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import org.scalajs.dom.{ raw => sjsdom }
@@ -24,11 +26,14 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.JsDomConversions
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
@@ -57,7 +62,7 @@ sealed trait JsDomNode extends ResolvedNodes.Node {
 sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChild
 
 /**
- * Wrapper around `org.scalajs.dom.raw.Element`, conforming to the `eu.cdevreeze.yaidom.queryapi.ElemLike` API.
+ * Wrapper around `org.scalajs.dom.raw.Element`, conforming to the `eu.cdevreeze.yaidom.queryapi.BackingElemApi` API.
  *
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
@@ -73,7 +78,8 @@ sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChi
  * this JsDomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class JsDomElem(
-    override val wrappedNode: sjsdom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
+  override val wrappedNode: sjsdom.Element)
+    extends CanBeDomDocumentChild with ResolvedNodes.Elem with BackingElemApi with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -159,6 +165,86 @@ final class JsDomElem(
     val parentNodeOption = Option(wrappedNode.parentNode)
     val parentElemOption = parentNodeOption collect { case e: sjsdom.Element => e }
     parentElemOption map { e => JsDomNode.wrapElement(e) }
+  }
+
+  override def docUriOption: Option[URI] = {
+    Option(wrappedNode.ownerDocument).flatMap(d => Option(d.documentURI)).map(u => URI.create(u))
+  }
+
+  override def docUri: URI = {
+    docUriOption.getOrElse(URI.create(""))
+  }
+
+  override def baseUriOption: Option[URI] = {
+    XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, path)(XmlBaseSupport.JdkUriResolver)
+  }
+
+  override def baseUri: URI = {
+    baseUriOption.getOrElse(URI.create(""))
+  }
+
+  override def parentBaseUriOption: Option[URI] = {
+    val parentPathOption = path.parentPathOption
+
+    if (parentPathOption.isEmpty) {
+      None
+    } else {
+      XmlBaseSupport.findBaseUriByDocUriAndPath(docUriOption, rootElem, parentPathOption.get)(XmlBaseSupport.JdkUriResolver)
+    }
+  }
+
+  override def namespaces: Declarations = {
+    val parentScope = parentOption map { _.scope } getOrElse (Scope.Empty)
+    parentScope.relativize(scope)
+  }
+
+  /**
+   * Extremely inefficient function to get the relative Path.
+   */
+  override def path: Path = {
+    val entriesReversed =
+      ancestorsOrSelf.dropRight(1) map { elem =>
+        val cnt =
+          findPreviousSiblingElements(elem.wrappedNode).filter(e => JsDomConversions.toQName(e).localPart == elem.localName).
+            filter(e => JsDomElem(e).resolvedName == elem.resolvedName).size
+        Path.Entry(elem.resolvedName, cnt)
+      }
+    Path(entriesReversed.reverse)
+  }
+
+  override def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
+    ancestorsOrSelf.reverse
+  }
+
+  override def reverseAncestry: immutable.IndexedSeq[ThisElem] = {
+    ancestors.reverse
+  }
+
+  override def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
+    reverseAncestryOrSelf.map(_.resolvedName)
+  }
+
+  override def reverseAncestryENames: immutable.IndexedSeq[EName] = {
+    reverseAncestryOrSelfENames.init
+  }
+
+  override def rootElem: ThisElem = {
+    // Recursive call
+
+    parentOption.map(_.rootElem).getOrElse(this)
+  }
+
+  private def findPreviousSiblingElements(elem: sjsdom.Element): List[sjsdom.Element] = {
+    findPreviousSiblings(elem) collect { case e: sjsdom.Element => e }
+  }
+
+  private def findPreviousSiblings(n: sjsdom.Node): List[sjsdom.Node] = {
+    val prev = n.previousSibling
+
+    if (prev eq null) Nil else {
+      // Recursive call
+      prev :: findPreviousSiblings(prev)
+    }
   }
 }
 
