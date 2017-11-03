@@ -92,6 +92,8 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       val base = baseDirectory.value
 
       if (isBeforeJava8) {
+        // Dangerous: the resulting JAR contents depends on the Java version!
+
         new SimpleFileFilter(_.toString.contains("java8"))
       } else {
         NothingFilter
@@ -120,33 +122,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     // Do we need this jsEnv?
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    excludeFilter in (Compile, unmanagedSources) := {
-      if (scalaBinaryVersion.value == "2.13.0-M2") {
-        new SimpleFileFilter(f => true)
-      } else {
-        NothingFilter
-      }
-    },
-
-    excludeFilter in (Test, unmanagedSources) := {
-      if (scalaBinaryVersion.value == "2.13.0-M2") {
-        new SimpleFileFilter(f => true)
-      } else if (isBeforeJava8) {
-        // We do not want to hit the TimeoutException (on Travis) described here:
-        // https://github.com/orbeon/orbeon-forms/issues/2743
-
-        new SimpleFileFilter(f => true)
-      } else {
-        NothingFilter
-      }
-    },
-
-    libraryDependencies ++= {
-      scalaBinaryVersion.value match {
-        case "2.13.0-M2" => Seq()
-        case _           => Seq("org.scala-js" %%% "scalajs-dom" % "0.9.2")
-      }
-    },
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.3",
 
     parallelExecution in Test := false
   )
