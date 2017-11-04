@@ -502,6 +502,8 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   /**
    * Returns the Java NamespaceContext corresponding to this Scope. Note that this method is very useful if we want to create
    * a NamespaceContext in an easy manner. Indeed, yaidom Scopes make excellent NamespaceContext factories.
+   *
+   * TODO Move this method to a JVM-specific utility, because it does not work on Scala.js.
    */
   // scalastyle:off null
   def toNamespaceContext: NamespaceContext = {

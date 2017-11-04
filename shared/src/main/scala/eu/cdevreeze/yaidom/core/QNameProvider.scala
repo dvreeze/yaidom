@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.core
 
-import eu.cdevreeze.yaidom.SimpleCache
-
 /**
  * Provider of QNames, possibly from a cache of QNames. Typical implementations cache QName instances, to prevent any explosion
  * of equal QName instances, thus unnecessarily increasing the memory footprint.
@@ -128,80 +126,5 @@ object QNameProvider {
       val qname = QName.parse(s)
       getQName(qname.prefixOption, qname.localPart)
     }
-  }
-
-  /**
-   * Simple caching QName provider. The underlying cache is based on a normal Map implementation, so the cache
-   * can only grow. Therefore this QName provider is not meant to be a "global" cache with application scope, but it should
-   * be rather short-lived.
-   */
-  final class SimpleCachingQNameProvider(val cacheFilter: (Option[String], String) => Boolean) extends QNameProvider {
-
-    def this() = this((prefixOption, localPart) => true)
-
-    private val cache = new SimpleCache[(Option[String], String), QName] {
-
-      protected def convertKeyToValue(key: (Option[String], String)): QName = QName(key._1, key._2)
-    }
-
-    def getQName(prefixOption: Option[String], localPart: String): QName = {
-      if (cacheFilter(prefixOption, localPart)) {
-        cache.get((prefixOption, localPart))
-      } else {
-        QName(prefixOption, localPart)
-      }
-    }
-
-    def getQName(prefix: String, localPart: String): QName =
-      getQName(Some(prefix), localPart)
-
-    def getUnprefixedQName(localPart: String): QName = getQName(None, localPart)
-
-    def parseQName(s: String): QName = {
-      // First creates a very short-lived QName instance
-      val qname = QName.parse(s)
-      getQName(qname.prefixOption, qname.localPart)
-    }
-  }
-
-  /**
-   * Thread-local QNameProvider. This class exists because there is precisely one globally used QNameProvider, and by using
-   * this thread-local QNameProvider it is possible to make the global QNameProvider configurable per thread again. Also note
-   * that the QNameProviders bound to a thread are local to that thread, so they do not suffer from any thread-safety issues
-   * (unless a non-thread-safe QName provider instance is shared).
-   *
-   * Note that each ThreadLocalQNameProvider instance (!) has its own thread-local QName provider. Typically it makes no sense
-   * to have more than one ThreadLocalQNameProvider instance in one application. In a Spring application, for example, a single
-   * instance of a ThreadLocalQNameProvider can be configured.
-   */
-  final class ThreadLocalQNameProvider(val qnameProviderCreator: () => QNameProvider) extends QNameProvider {
-
-    private val threadLocalQNameProvider: ThreadLocal[QNameProvider] = new ThreadLocal[QNameProvider] {
-
-      protected override def initialValue(): QNameProvider = qnameProviderCreator()
-    }
-
-    /**
-     * Returns the QNameProvider instance attached to the current thread.
-     */
-    def qnameProviderOfCurrentThread: QNameProvider = threadLocalQNameProvider.get
-
-    /**
-     * Updates the QNameProvider instance attached to the current thread.
-     */
-    def setQNameProviderOfCurrentThread(qnameProvider: QNameProvider): Unit = {
-      threadLocalQNameProvider.set(qnameProvider)
-    }
-
-    def getQName(prefixOption: Option[String], localPart: String): QName =
-      qnameProviderOfCurrentThread.getQName(prefixOption, localPart)
-
-    def getQName(prefix: String, localPart: String): QName =
-      qnameProviderOfCurrentThread.getQName(prefix, localPart)
-
-    def getUnprefixedQName(localPart: String): QName =
-      qnameProviderOfCurrentThread.getUnprefixedQName(localPart)
-
-    def parseQName(s: String): QName = qnameProviderOfCurrentThread.parseQName(s)
   }
 }

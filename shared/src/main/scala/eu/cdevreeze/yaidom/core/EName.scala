@@ -64,7 +64,11 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
     QName(prefixOption, localPart)
   }
 
-  /** Given an optional prefix, creates a `javax.xml.namespace.QName` from this EName */
+  /**
+   * Given an optional prefix, creates a `javax.xml.namespace.QName` from this EName.
+   *
+   * TODO Move this method to a JVM-specific utility, because it does not work on Scala.js.
+   */
   def toJavaQName(prefixOption: Option[String]): JQName = {
     require(
       namespaceUriOption.isDefined || prefixOption.isEmpty, s"Prefix only allowed if namespace non-empty in EName '${this}'")
@@ -102,7 +106,11 @@ object EName {
   /** Shorthand for `parse(s)` */
   def apply(s: String): EName = parse(s)
 
-  /** Creates an `EName` from a `javax.xml.namespace.QName` */
+  /**
+   * Creates an `EName` from a `javax.xml.namespace.QName`.
+   *
+   * TODO Move this method to a JVM-specific utility, because it does not work on Scala.js.
+   */
   def fromJavaQName(jqname: JQName): EName = EName(jqname.toString)
 
   /**
