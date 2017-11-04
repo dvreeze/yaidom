@@ -22,6 +22,7 @@ import org.w3c.dom.Element
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.jvm.JavaQNames
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.DocumentConverter
@@ -168,7 +169,7 @@ trait YaidomToDomConversions extends ElemConverter[YaidomToDomConversions.Elemen
       } else {
         val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
           s"Attribute name '${attrQName}' should resolve to an EName in scope [${attrScope}]"))
-        val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
+        val attrJavaQName = JavaQNames.enameToJavaQName(attrEName, attrQName.prefixOption)
         element.setAttributeNS(attrJavaQName.getNamespaceURI, attrQName.toString, attrValue)
       }
     }

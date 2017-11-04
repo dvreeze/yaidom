@@ -23,6 +23,7 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.jvm.JavaQNames
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.DocumentConverter
@@ -153,7 +154,7 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
   private def createStartElement(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): StartElement = {
     val namespaceDeclarations: Declarations = parentScope.relativize(elm.scope)
 
-    val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
+    val javaQName = JavaQNames.enameToJavaQName(elm.resolvedName, elm.qname.prefixOption)
 
     val attrScope = elm.attributeScope
 
@@ -163,7 +164,7 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
         val value = kv._2
         val attrEName = attrScope.resolveQNameOption(attrQName).getOrElse(sys.error(
           s"Attribute name '${attrQName}' should resolve to an EName in scope [${attrScope}]"))
-        val attrJavaQName = attrEName.toJavaQName(attrQName.prefixOption)
+        val attrJavaQName = JavaQNames.enameToJavaQName(attrEName, attrQName.prefixOption)
 
         xmlEventFactory.createAttribute(attrJavaQName, value)
       }
@@ -195,7 +196,7 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
   private def createEndElement(elm: Elem, xmlEventFactory: XMLEventFactory, parentScope: Scope): EndElement = {
     val namespaceDeclarations: Declarations = parentScope.relativize(elm.scope)
 
-    val javaQName = elm.resolvedName.toJavaQName(elm.qname.prefixOption)
+    val javaQName = JavaQNames.enameToJavaQName(elm.resolvedName, elm.qname.prefixOption)
 
     // scalastyle:off null
     val namespaceOutOfScopeIterable: Iterable[Namespace] = {

@@ -26,6 +26,8 @@ import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
+import eu.cdevreeze.yaidom.core.jvm.JavaQNames
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.parse
 import javax.xml.xpath.XPathConstants
@@ -64,7 +66,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
   test("testQueryForUnits") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs)
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     val xpathFactory =
       XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
@@ -94,7 +96,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
   test("testQueryForTopLevelFacts") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     val xpathFactory =
       XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
@@ -104,7 +106,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
     val functionResolver = new XPathFunctionResolver {
 
       def resolveFunction(functionQName: javax.xml.namespace.QName, arity: Int): XPathFunction = {
-        (EName.fromJavaQName(functionQName), arity) match {
+        (JavaQNames.javaQNameToEName(functionQName), arity) match {
           case (EName(Some(CustomFunctionNs), "find-top-level-facts-in-instance"), 1) =>
             XbrlInstanceXPathTest.FindTopLevelFactsInInstance
           case _ =>
@@ -145,7 +147,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
   test("testQueryForTopLevelItems") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     val xpathFactory =
       XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
@@ -155,7 +157,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
     val functionResolver = new XPathFunctionResolver {
 
       def resolveFunction(functionQName: javax.xml.namespace.QName, arity: Int): XPathFunction = {
-        (EName.fromJavaQName(functionQName), arity) match {
+        (JavaQNames.javaQNameToEName(functionQName), arity) match {
           case (EName(Some(CustomFunctionNs), "find-top-level-facts-in-instance"), 1) =>
             XbrlInstanceXPathTest.FindTopLevelFactsInInstance
           case (EName(Some(CustomFunctionNs), "is-item"), 1) =>
@@ -199,7 +201,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
   test("testQueryForTopLevelTuples") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     val xpathFactory =
       XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
@@ -209,7 +211,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
     val functionResolver = new XPathFunctionResolver {
 
       def resolveFunction(functionQName: javax.xml.namespace.QName, arity: Int): XPathFunction = {
-        (EName.fromJavaQName(functionQName), arity) match {
+        (JavaQNames.javaQNameToEName(functionQName), arity) match {
           case (EName(Some(CustomFunctionNs), "find-top-level-facts-in-instance"), 1) =>
             XbrlInstanceXPathTest.FindTopLevelFactsInInstance
           case _ =>
@@ -243,7 +245,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
   test("testQueryForSomeTopLevelItems") {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
     val scope = Scope.from("xbrli" -> XbrliNs, "link" -> LinkNs, "xlink" -> XLinkNs, "my" -> CustomFunctionNs)
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     val xpathFactory =
       XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
@@ -253,7 +255,7 @@ class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
     val functionResolver = new XPathFunctionResolver {
 
       def resolveFunction(functionQName: javax.xml.namespace.QName, arity: Int): XPathFunction = {
-        (EName.fromJavaQName(functionQName), arity) match {
+        (JavaQNames.javaQNameToEName(functionQName), arity) match {
           case (EName(Some(CustomFunctionNs), "find-top-level-facts-in-instance"), 1) =>
             XbrlInstanceXPathTest.FindTopLevelFactsInInstance
           case (EName(Some(CustomFunctionNs), "is-item"), 1) =>
