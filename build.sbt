@@ -64,7 +64,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13.0-M2" => Seq()
-        case _           => Seq("org.scalameta" %%% "scalameta" % "1.8.0" % "test")
+        case _           => Seq("org.scalameta" %%% "scalameta" % "2.0.1" % "test")
       }
     },
 
@@ -89,8 +89,6 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.0.0" % "test",
 
     excludeFilter in (Compile, unmanagedSources) := {
-      val base = baseDirectory.value
-
       if (isBeforeJava8) {
         // Dangerous: the resulting JAR contents depends on the Java version!
 
@@ -101,8 +99,6 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     },
 
     excludeFilter in (Test, unmanagedSources) := {
-      val base = baseDirectory.value
-
       if (isBeforeJava8) {
         // Exclude tests with Java 8 dependencies
 

@@ -274,113 +274,110 @@ object Elems {
         Nil,
         Type.Name("AnyElemApi"),
         Nil,
-        Ctor.Primary(Nil, Ctor.Ref.Name("this"), Nil),
+        Ctor.Primary(Nil, Name.Anonymous(), Nil),
         Template(
           Nil,
           Nil,
-          Term.Param(Nil, Name.Anonymous(), None, None),
-          Some(
-            List(
-              Decl.Type(Nil, Type.Name("ThisElem"), Nil, Type.Bounds(None, Some(Type.Name("AnyElemApi")))),
-              Decl.Def(Nil, Term.Name("thisElem"), Nil, Nil, Type.Name("ThisElem"))))))
+          Self(Name.Anonymous(), None),
+          List(
+            Decl.Type(Nil, Type.Name("ThisElem"), Nil, Type.Bounds(None, Some(Type.Name("AnyElemApi")))),
+            Decl.Def(Nil, Term.Name("thisElem"), Nil, Nil, Type.Name("ThisElem")))))
 
     val expectedTrait2 =
       Defn.Trait(
         Nil,
         Type.Name("ElemApi"),
         Nil,
-        Ctor.Primary(Nil, Ctor.Ref.Name("this"), Nil),
+        Ctor.Primary(Nil, Name.Anonymous(), Nil),
         Template(
           Nil,
-          List(Ctor.Ref.Name("AnyElemApi")),
-          Term.Param(Nil, Name.Anonymous(), None, None),
-          Some(
-            List(
-              Decl.Type(Nil, Type.Name("ThisElem"), Nil, Type.Bounds(None, Some(Type.Name("ElemApi")))),
-              Decl.Def(
-                Nil,
-                Term.Name("filterChildElems"),
-                Nil,
-                List(List(Term.Param(Nil, Term.Name("p"), Some(Type.Function(List(Type.Name("ThisElem")), Type.Name("Boolean"))), None))),
-                Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
-              Decl.Def(
-                Nil,
-                Term.Name("findAllChildElems"),
-                Nil,
-                List(List()),
-                Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
-              Decl.Def(
-                Nil,
-                Term.Name("filterElemsOrSelf"),
-                Nil,
-                List(List(Term.Param(Nil, Term.Name("p"), Some(Type.Function(List(Type.Name("ThisElem")), Type.Name("Boolean"))), None))),
-                Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
-              Decl.Def(
-                Nil,
-                Term.Name("findAllElemsOrSelf"),
-                Nil,
-                List(List()),
-                Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem"))))))))
+          List(Init(Type.Name("AnyElemApi"), Name.Anonymous(), Nil)),
+          Self(Name.Anonymous(), None),
+          List(
+            Decl.Type(Nil, Type.Name("ThisElem"), Nil, Type.Bounds(None, Some(Type.Name("ElemApi")))),
+            Decl.Def(
+              Nil,
+              Term.Name("filterChildElems"),
+              Nil,
+              List(List(Term.Param(Nil, Term.Name("p"), Some(Type.Function(List(Type.Name("ThisElem")), Type.Name("Boolean"))), None))),
+              Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
+            Decl.Def(
+              Nil,
+              Term.Name("findAllChildElems"),
+              Nil,
+              List(List()),
+              Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
+            Decl.Def(
+              Nil,
+              Term.Name("filterElemsOrSelf"),
+              Nil,
+              List(List(Term.Param(Nil, Term.Name("p"), Some(Type.Function(List(Type.Name("ThisElem")), Type.Name("Boolean"))), None))),
+              Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
+            Decl.Def(
+              Nil,
+              Term.Name("findAllElemsOrSelf"),
+              Nil,
+              List(List()),
+              Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))))))
 
     val expectedTrait3 =
       Defn.Trait(
         Nil,
         Type.Name("ElemLike"),
         Nil,
-        Ctor.Primary(Nil, Ctor.Ref.Name("this"), Nil),
+        Ctor.Primary(Nil, Name.Anonymous(), Nil),
         Template(
           Nil,
-          List(Ctor.Ref.Name("ElemApi")),
-          Term.Param(Nil, Term.Name("self"), None, None),
-          Some(
-            List(
-              Decl.Type(
-                Nil,
-                Type.Name("ThisElem"),
-                Nil,
-                Type.Bounds(
-                  None,
-                  Some(
-                    Type.Refine(
-                      Some(Type.Name("ElemLike")),
-                      List(Defn.Type(Nil, Type.Name("ThisElem"), Nil, Type.Select(Term.Name("self"), Type.Name("ThisElem")))))))),
-              Defn.Def(
-                List(Mod.Final()),
-                Term.Name("findAllChildElems"),
-                Nil,
-                List(List()),
-                Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
-                Term.Block(
-                  List(
-                    Term.Apply(Term.Name("filterChildElems"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit.Boolean(true))))))),
-              Defn.Def(
-                List(Mod.Final()),
-                Term.Name("filterElemsOrSelf"),
-                Nil,
-                List(List(Term.Param(Nil, Term.Name("p"), Some(Type.Function(List(Type.Name("ThisElem")), Type.Name("Boolean"))), None))),
-                Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
-                Term.Block(
-                  List(
-                    Term.ApplyInfix(
-                      Term.Apply(Term.Select(Term.Apply(Term.Name("Vector"), List(Term.Name("thisElem"))), Term.Name("filter")), List(Term.Name("p"))),
-                      Term.Name("++"),
-                      Nil,
-                      List(
-                        Term.Apply(
-                          Term.Select(Term.Name("findAllChildElems"), Term.Name("flatMap")),
-                          List(
-                            Term.Function(
-                              List(Term.Param(Nil, Term.Name("e"), None, None)),
-                              Term.Apply(Term.Select(Term.Name("e"), Term.Name("filterElemsOrSelf")), List(Term.Name("p"))))))))))),
-              Defn.Def(
-                List(Mod.Final()),
-                Term.Name("findAllElemsOrSelf"),
-                Nil,
-                List(List()),
-                Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
-                Term.Block(
-                  List(
-                    Term.Apply(Term.Name("filterElemsOrSelf"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit.Boolean(true)))))))))))
+          List(Init(Type.Name("ElemApi"), Name.Anonymous(), Nil)),
+          Self(Term.Name("self"), None),
+          List(
+            Decl.Type(
+              Nil,
+              Type.Name("ThisElem"),
+              Nil,
+              Type.Bounds(
+                None,
+                Some(
+                  Type.Refine(
+                    Some(Type.Name("ElemLike")),
+                    List(Defn.Type(Nil, Type.Name("ThisElem"), Nil, Type.Select(Term.Name("self"), Type.Name("ThisElem")))))))),
+            Defn.Def(
+              List(Mod.Final()),
+              Term.Name("findAllChildElems"),
+              Nil,
+              List(List()),
+              Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
+              Term.Block(
+                List(
+                  Term.Apply(Term.Name("filterChildElems"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit.Boolean(true))))))),
+            Defn.Def(
+              List(Mod.Final()),
+              Term.Name("filterElemsOrSelf"),
+              Nil,
+              List(List(Term.Param(Nil, Term.Name("p"), Some(Type.Function(List(Type.Name("ThisElem")), Type.Name("Boolean"))), None))),
+              Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
+              Term.Block(
+                List(
+                  Term.ApplyInfix(
+                    Term.Apply(Term.Select(Term.Apply(Term.Name("Vector"), List(Term.Name("thisElem"))), Term.Name("filter")), List(Term.Name("p"))),
+                    Term.Name("++"),
+                    Nil,
+                    List(
+                      Term.Apply(
+                        Term.Select(Term.Name("findAllChildElems"), Term.Name("flatMap")),
+                        List(
+                          Term.Function(
+                            List(Term.Param(Nil, Term.Name("e"), None, None)),
+                            Term.Apply(Term.Select(Term.Name("e"), Term.Name("filterElemsOrSelf")), List(Term.Name("p"))))))))))),
+            Defn.Def(
+              List(Mod.Final()),
+              Term.Name("findAllElemsOrSelf"),
+              Nil,
+              List(List()),
+              Some(Type.Apply(Type.Select(Term.Name("immutable"), Type.Name("IndexedSeq")), List(Type.Name("ThisElem")))),
+              Term.Block(
+                List(
+                  Term.Apply(Term.Name("filterElemsOrSelf"), List(Term.Function(List(Term.Param(Nil, Name.Anonymous(), None, None)), Lit.Boolean(true))))))))))
 
     val expectedSource =
       Source(
@@ -391,12 +388,11 @@ object Elems {
             Template(
               Nil,
               Nil,
-              Term.Param(Nil, Name.Anonymous(), None, None),
-              Some(
-                List(
-                  expectedTrait1,
-                  expectedTrait2,
-                  expectedTrait3))))))
+              Self(Name.Anonymous(), None),
+              List(
+                expectedTrait1,
+                expectedTrait2,
+                expectedTrait3)))))
 
     assertResult(expectedSource.structure) {
       source1.structure
