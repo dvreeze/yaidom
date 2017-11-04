@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.core
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
+import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -574,7 +575,7 @@ class ScopeTest extends FunSuite {
   test("testConvertToNamespaceContext") {
     val scope =
       Scope.from("" -> "http://a", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c", "d" -> "http://d", "dd" -> "http://d")
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     assertResult("http://a") {
       namespaceContext.getNamespaceURI("")
@@ -604,7 +605,7 @@ class ScopeTest extends FunSuite {
       namespaceContext.getNamespaceURI("xmlns")
     }
     assertResult("") {
-      scope.withoutDefaultNamespace.toNamespaceContext.getNamespaceURI("")
+      NamespaceContexts.scopeToNamespaceContext(scope.withoutDefaultNamespace).getNamespaceURI("")
     }
 
     assertResult(Set("a", "")) {

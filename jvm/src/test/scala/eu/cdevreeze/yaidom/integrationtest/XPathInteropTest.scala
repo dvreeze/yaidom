@@ -30,6 +30,7 @@ import eu.cdevreeze.yaidom.convert.DomConversions.convertToElem
 import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.parse
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
@@ -118,7 +119,7 @@ class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
 
   private def runXPath(xpathExpr: String, scope: Scope): immutable.IndexedSeq[Node] = {
     // Another good use case for Scopes, viz. as factories of JAXP NamespaceContext objects.
-    val namespaceContext = scope.toNamespaceContext
+    val namespaceContext = NamespaceContexts.scopeToNamespaceContext(scope)
 
     val xpathFactory =
       XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "net.sf.saxon.xpath.XPathFactoryImpl", null)
