@@ -57,6 +57,16 @@ sealed trait JsDomNode extends ResolvedNodes.Node {
   type DomType <: sjsdom.Node
 
   def wrappedNode: DomType
+
+  final override def toString: String = wrappedNode.toString
+
+  final override def equals(obj: Any): Boolean = obj match {
+    case other: JsDomNode =>
+      (other.wrappedNode == this.wrappedNode)
+    case _ => false
+  }
+
+  final override def hashCode: Int = wrappedNode.hashCode
 }
 
 sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChild
