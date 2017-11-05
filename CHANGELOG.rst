@@ -3,6 +3,18 @@ CHANGELOG
 =========
 
 
+1.7.0-M7
+========
+
+This milestone release improves on the support for yaidom in the browser:
+
+* The yaidom JS DOM wrapper now offers the ``BackingElemApi`` interface, making it useful in projects like TQA
+* Breaking changes: JVM-specific methods in classes ``EName`` and ``Scope`` have been moved to separate utilities
+* Fixed release bug: artifacts for Scala 2.13.0-M2 are no longer empty
+* Breaking changes: pruned some code, like some ``ENameProvider`` and ``QNameProvider`` implementations
+* Also removed or ignored some test code that made Travis builds fail on out-of-memory errors.
+
+
 1.7.0-M6
 ========
 
