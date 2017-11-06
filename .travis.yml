@@ -18,8 +18,6 @@ matrix:
     scala: 2.11.11
   - jdk: oraclejdk8
     scala: 2.13.0-M2
-  allow_failures:
-  - jdk: openjdk7
 
 script:
  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3G test
