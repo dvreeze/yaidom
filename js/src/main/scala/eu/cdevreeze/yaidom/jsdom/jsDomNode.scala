@@ -77,15 +77,7 @@ sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChi
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  *
  * By design the only state of the JsDomElem is the wrapped element. Otherwise it would be easy to cause any inconsistency
- * between this wrapper element and the wrapped element. The down-side is that computing the resolved name or resolved
- * attributes is expensive, because on each call first the in-scope namespaces are computed (by following namespace
- * declarations in the ancestry and in the element itself). This is done for reliable namespace support, independent
- * of namespace-awareness of the underlying element's document.
- *
- * This choice for reliable namespace support (see the documented properties of `ScopedElemApi`) and defensive handling
- * of mutable state makes this JsDomElem slower (when querying for resolved names or attributes) than other wrapper
- * element implementations, such as `ScalaXmlElem`. On the other hand, if the use of `org.w3c.dom` is a given, then
- * this JsDomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
+ * between this wrapper element and the wrapped element.
  */
 final class JsDomElem(
   override val wrappedNode: sjsdom.Element)
@@ -103,26 +95,18 @@ final class JsDomElem(
   override def findAllChildElems: immutable.IndexedSeq[JsDomElem] = children collect { case e: JsDomElem => e }
 
   override def resolvedName: EName = {
-    // Not efficient, because of expensive Scope computation
+    // Efficient, because it bypasses the expensive Scope computation
 
-    scope.resolveQNameOption(qname).getOrElse(sys.error(s"Element name '${qname}' should resolve to an EName in scope [${scope}]"))
+    JsDomConversions.toEName(wrappedNode)
   }
 
   /**
-   * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against
-   * the attribute scope
+   * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values
    */
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
-    val attrScope = attributeScope
+    // Efficient, because it bypasses the expensive Scope computation
 
-    attributes map { kv =>
-      val attName = kv._1
-      val attValue = kv._2
-      val expandedName =
-        attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
-
-      (expandedName -> attValue)
-    }
+    JsDomConversions.extractResolvedAttributes(wrappedNode.attributes)
   }
 
   override def qname: QName = JsDomConversions.toQName(wrappedNode)
@@ -131,6 +115,9 @@ final class JsDomElem(
     JsDomConversions.extractAttributes(wrappedNode.attributes)
   }
 
+  /**
+   * Returns the Scope. It is an expensive method for this element implementation.
+   */
   override def scope: Scope = {
     val ancestryOrSelf = JsDomElem.getAncestorsOrSelf(this.wrappedNode)
 
@@ -209,17 +196,16 @@ final class JsDomElem(
   }
 
   /**
-   * Extremely inefficient function to get the relative Path.
+   * Somewhat inefficient function to get the relative Path.
    */
   override def path: Path = {
-    val entriesReversed =
-      ancestorsOrSelf.dropRight(1) map { elem =>
-        val cnt =
-          findPreviousSiblingElements(elem.wrappedNode).filter(e => JsDomConversions.toQName(e).localPart == elem.localName).
-            filter(e => JsDomElem(e).resolvedName == elem.resolvedName).size
-        Path.Entry(elem.resolvedName, cnt)
+    val entriesReversed: List[Path.Entry] =
+      underlyingAncestorsOrSelf(wrappedNode).dropRight(1) map { elem =>
+        val ename = JsDomConversions.toEName(elem)
+        val cnt = findPreviousSiblingElements(elem).filter(e => JsDomConversions.toEName(e) == ename).size
+        Path.Entry(ename, cnt)
       }
-    Path(entriesReversed.reverse)
+    Path(entriesReversed.toIndexedSeq.reverse)
   }
 
   override def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
@@ -244,16 +230,23 @@ final class JsDomElem(
     parentOption.map(_.rootElem).getOrElse(this)
   }
 
-  private def findPreviousSiblingElements(elem: sjsdom.Element): List[sjsdom.Element] = {
-    findPreviousSiblings(elem) collect { case e: sjsdom.Element => e }
+  private def underlyingAncestorsOrSelf(elem: sjsdom.Element): List[sjsdom.Element] = {
+    val parentNodeOption = Option(elem.parentNode)
+    val parentElemOption = parentNodeOption collect { case e: sjsdom.Element => e }
+
+    // Recursive call
+    val underlyingParentAncestorsOrSelf: List[sjsdom.Element] =
+      parentElemOption.map(e => underlyingAncestorsOrSelf(e)).getOrElse(Nil)
+
+    elem :: underlyingParentAncestorsOrSelf
   }
 
-  private def findPreviousSiblings(n: sjsdom.Node): List[sjsdom.Node] = {
-    val prev = n.previousSibling
+  private def findPreviousSiblingElements(elem: sjsdom.Element): List[sjsdom.Element] = {
+    val prev = elem.previousElementSibling
 
     if (prev eq null) Nil else {
       // Recursive call
-      prev :: findPreviousSiblings(prev)
+      prev :: findPreviousSiblingElements(prev)
     }
   }
 }

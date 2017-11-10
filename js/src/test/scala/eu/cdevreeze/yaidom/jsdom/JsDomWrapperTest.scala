@@ -416,6 +416,45 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
+  test("testParseAndConvertLinkbase") {
+    val db = new DOMParser()
+    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(linkbaseXml, SupportedType.`text/xml`))
+
+    val domRoot: JsDomElem = domDoc.documentElement
+    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val iroot: indexed.Elem = indexed.Elem(root)
+
+    val xlinkNs = "http://www.w3.org/1999/xlink"
+    val linkNs = "http://www.xbrl.org/2003/linkbase"
+    val genNs = "http://xbrl.org/2008/generic"
+    val labelNs = "http://xbrl.org/2008/label"
+    val xmlNs = "http://www.w3.org/XML/1998/namespace"
+    val xsiNs = "http://www.w3.org/2001/XMLSchema-instance"
+
+    assertResult(Set(EName(linkNs, "linkbase"), EName(linkNs, "roleRef"), EName(linkNs, "arcroleRef"),
+      EName(genNs, "link"), EName(genNs, "arc"), EName(labelNs, "label"), EName(linkNs, "loc"))) {
+
+      domRoot.findAllElemsOrSelf.map(_.resolvedName).toSet
+    }
+    assertResult(domRoot.findAllElemsOrSelf.map(_.resolvedName).toSet) {
+      iroot.findAllElemsOrSelf.map(_.resolvedName).toSet
+    }
+
+    assertResult(Set(EName("roleURI"), EName("arcroleURI"), EName("id"), EName(xmlNs, "lang"), EName(xlinkNs, "href"), EName(xlinkNs, "type"),
+      EName(xlinkNs, "role"), EName(xlinkNs, "arcrole"), EName(xlinkNs, "from"), EName(xlinkNs, "to"), EName(xlinkNs, "label"),
+      EName(xsiNs, "schemaLocation"))) {
+
+      domRoot.findAllElemsOrSelf.flatMap(_.resolvedAttributes.toMap.keySet).toSet
+    }
+    assertResult(domRoot.findAllElemsOrSelf.flatMap(_.resolvedAttributes.toMap.keySet).toSet) {
+      iroot.findAllElemsOrSelf.flatMap(_.resolvedAttributes.toMap.keySet).toSet
+    }
+
+    assertResult(resolved.Elem(domRoot)) {
+      resolved.Elem(iroot.underlyingElem)
+    }
+  }
+
   // Querying for ancestry
 
   test("testAncestry") {
@@ -604,4 +643,23 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
 	The entity is defined in the included DTD.
 	</FourthElement>
 </RootElement>"""
+
+  private val linkbaseXml =
+    """<!--
+  This file is part of the Dutch Taxonomy (Nederlandse Taxonomie; NT)
+  Intellectual Property of the State of the Netherlands
+  Architecture: NT11
+  Version: 20161214
+  Release date: Wed Dec 14 09:00:00 2016
+-->
+<link:linkbase xmlns:gen="http://xbrl.org/2008/generic" xmlns:label="http://xbrl.org/2008/label" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd">
+  <link:roleRef roleURI="http://www.xbrl.org/2008/role/label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label" xlink:type="simple"/>
+  <link:roleRef roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role" xlink:type="simple"/>
+  <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2008/element-label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label" xlink:type="simple"/>
+  <gen:link xlink:role="http://www.xbrl.org/2008/role/link" xlink:type="extended">
+    <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label" xlink:from="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:to="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:type="arc"/>
+    <label:label id="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:role="http://www.xbrl.org/2008/role/label" xlink:type="resource" xml:lang="en">Dutch Corporate Governance Code</label:label>
+    <link:loc xlink:href="ez-ncgc-linkroles.xsd#ez-ncgc-lr_DutchCorporateGovernanceCode" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:type="locator"/>
+  </gen:link>
+</link:linkbase>"""
 }

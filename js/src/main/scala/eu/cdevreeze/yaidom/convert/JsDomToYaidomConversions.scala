@@ -17,12 +17,17 @@
 package eu.cdevreeze.yaidom.convert
 
 import java.net.URI
+
 import scala.collection.immutable
+
 import org.scalajs.dom.raw.Attr
 import org.scalajs.dom.raw.Element
 import org.scalajs.dom.raw.NamedNodeMap
 import org.scalajs.dom.raw.NodeList
+
 import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
@@ -204,5 +209,32 @@ trait JsDomToYaidomConversions extends ConverterToDocument[org.scalajs.dom.raw.D
     val prefixOption: Option[String] = if (arr.length == 1) None else Some(arr(1))
     val attrValue: String = v.value
     (prefixOption, attrValue)
+  }
+
+  /** Extracts the `EName` of an `org.scalajs.dom.raw.Element` */
+  final def toEName(v: org.scalajs.dom.raw.Element)(implicit enameProvider: ENameProvider): EName = {
+    val nsOption = Option(v.namespaceURI)
+    enameProvider.getEName(nsOption, v.localName)
+  }
+
+  /** Extracts the `EName` of an `org.scalajs.dom.raw.Attr`. If the `Attr` is a namespace declaration, an exception is thrown. */
+  final def toEName(v: org.scalajs.dom.raw.Attr)(implicit enameProvider: ENameProvider): EName = {
+    require(!isNamespaceDeclaration(v), "Namespace declaration not allowed")
+    val nsOption = Option(v.namespaceURI)
+    enameProvider.getEName(nsOption, v.localName)
+  }
+
+  /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(EName, String)]`. Namespace declarations are skipped. */
+  final def extractResolvedAttributes(domAttributes: NamedNodeMap): immutable.IndexedSeq[(EName, String)] = {
+    (0 until domAttributes.length).flatMap(i => {
+      val attr = domAttributes.item(i).asInstanceOf[Attr]
+
+      if (isNamespaceDeclaration(attr)) {
+        None
+      } else {
+        val ename: EName = toEName(attr)
+        Some(ename -> attr.value)
+      }
+    }).toIndexedSeq
   }
 }
