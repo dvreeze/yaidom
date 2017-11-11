@@ -105,9 +105,11 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
         new SimpleFileFilter(f => f.toString.contains("java8") ||
           f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("PackageDependencyTest") ||
+          f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("NamePoolingTest"))
       } else if (scalaBinaryVersion.value == "2.13.0-M2") {
         new SimpleFileFilter(f => f.toString.contains("ScalaMetaExperimentTest") ||
+          f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("PackageDependencyTest"))
       } else {
         NothingFilter
