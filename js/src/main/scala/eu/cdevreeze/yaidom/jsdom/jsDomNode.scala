@@ -95,7 +95,7 @@ final class JsDomElem(
   override def findAllChildElems: immutable.IndexedSeq[JsDomElem] = children collect { case e: JsDomElem => e }
 
   override def resolvedName: EName = {
-    // Efficient, because it bypasses the expensive Scope computation
+    // Efficient, mainly because it bypasses the expensive Scope computation
 
     JsDomConversions.toEName(wrappedNode)
   }
@@ -104,7 +104,7 @@ final class JsDomElem(
    * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values
    */
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
-    // Efficient, because it bypasses the expensive Scope computation
+    // Efficient, mainly because it bypasses the expensive Scope computation
 
     JsDomConversions.extractResolvedAttributes(wrappedNode.attributes)
   }
@@ -202,7 +202,7 @@ final class JsDomElem(
     val entriesReversed: List[Path.Entry] =
       underlyingAncestorsOrSelf(wrappedNode).dropRight(1) map { elem =>
         val ename = JsDomConversions.toEName(elem)
-        val cnt = findPreviousSiblingElements(elem).filter(e => JsDomConversions.toEName(e) == ename).size
+        val cnt = findPreviousSiblingElements(elem).count(e => JsDomConversions.toEName(e) == ename)
         Path.Entry(ename, cnt)
       }
     Path(entriesReversed.toIndexedSeq.reverse)
