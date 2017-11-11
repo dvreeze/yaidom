@@ -3,6 +3,16 @@ CHANGELOG
 =========
 
 
+1.7.0-M8
+========
+
+This milestone release further improves on the support for yaidom in the browser:
+
+* The yaidom JS DOM wrapper has value equality and much better performance
+* Upgraded Scala.js to version 0.6.21
+* Added test (using Scala.meta) to help prevent linking errors in Scala.js
+
+
 1.7.0-M7
 ========
 
