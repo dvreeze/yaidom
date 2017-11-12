@@ -3,6 +3,32 @@ CHANGELOG
 =========
 
 
+1.7.0
+=====
+
+This yaidom version is about bringing yaidom to Scala.js as second target platform. This fits very well
+in the vision of yaidom as "hour glass", with support for multiple XML dialects on one side and support for
+multiple element implementations on the other side. It also validates the overall design of yaidom, because
+without disciplined management of package dependencies in yaidom it would have been very hard to target
+Scala.js. Fortunately, the yaidom code shared by the JVM and JS platforms includes the core and queryapi
+packages, as well as the native simple, resolved and indexed element implementations.
+
+Although milestone release 1.7.0-M1 primarily tried to improve on support for element transformations and
+updates, the vision for versions 1.7.X has changed to support for Scala.js, as described above.
+
+Version 1.7.0 contains several breaking changes, but most of them of a rather trivial nature. Migrating from
+versions 1.6.X to 1.7.0 should therefore be rather easy, but does require recompilation of code using
+yaidom, maybe with a few trivial code changes here and there.
+
+The main changes in this version (compared to 1.6.4) are:
+
+* Support for Scala.js, sharing most of yaidom for both platforms (JVM and JS); see version 1.7.0-M2
+* Targeting Scala.js, a JS DOM wrapper implementation; see versions 1.7.0-M2, 1.7.0-M7 and 1.7.0-M8
+* JAXP-dependent methods in classes ``EName`` and ``Scope`` have been moved to JVM-dependent utilities
+
+This version is much like version 1.7.0-M8, but the JS DOM wrapper implementation has slightly improved since then.
+
+
 1.7.0-M8
 ========
 
@@ -75,7 +101,7 @@ for elements that know their ancestry.
 There are breaking changes in this release, but with re-compilation not too many changes should be needed
 in application code using yaidom.
 
-The main changes are:
+The main changes are (this was before version 1.6.3):
 
 * Introduction of ``ElemTransformationApi`` and ``ElemUpdateApi`` traits, for "arbitrary elements"
 
