@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.convert
 
 import scala.collection.immutable
+
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Comment
