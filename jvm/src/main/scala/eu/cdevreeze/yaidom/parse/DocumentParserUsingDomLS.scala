@@ -130,7 +130,7 @@ object DocumentParserUsingDomLS {
   def newInstance(): DocumentParserUsingDomLS = {
     val registry = DOMImplementationRegistry.newInstance
     val domImpl = registry.getDOMImplementation("LS 3.0")
-    require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'")
+    require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'") // scalastyle:off null
     require(domImpl.hasFeature("LS", "3.0"), "Expected DOM Implementation to have feature 'LS 3.0'")
     require(domImpl.isInstanceOf[DOMImplementationLS], "Expected DOM Implementation of type DOMImplementationLS")
     val domImplLS = domImpl.asInstanceOf[DOMImplementationLS]
@@ -142,7 +142,8 @@ object DocumentParserUsingDomLS {
    * Returns a new instance, using the given `DOMImplementationLS`, without any further configuration.
    */
   def newInstance(domImplementation: DOMImplementationLS): DocumentParserUsingDomLS = {
-    val parserCreator = (domImpl: DOMImplementationLS) => domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
+    val parserCreator =
+      (domImpl: DOMImplementationLS) => domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null) // scalastyle:off null
     newInstance(domImplementation, parserCreator)
   }
 
