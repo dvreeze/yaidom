@@ -27,7 +27,7 @@ package eu.cdevreeze.yaidom
  * the above-mentioned `ClarkElemApi` and `ScopedElemApi` traits.
  *
  * <em>Simplicity</em> and <em>consistency</em> of the entire query API are 2 important design considerations. For example, the query
- * API methods themselves use no generics. Note how the resulting API with type members is essentially the same as the
+ * API methods themselves use no parameterized types. Note how the resulting API with type members is essentially the same as the
  * "old" yaidom query API using type parameters, except that the purely abstract traits are less constrained in the type members.
  *
  * This package depends only on the core package in yaidom, but many other packages do depend on this one.
