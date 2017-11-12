@@ -114,9 +114,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       } else {
         NothingFilter
       }
-    },
-
-    coverageEnabled := true
+    }
   )
   .jsSettings(
     // Do we need this jsEnv?
