@@ -203,7 +203,7 @@ final class JsDomElem(
    */
   override def path: Path = {
     val entriesReversed: List[Path.Entry] =
-      underlyingAncestorsOrSelf(wrappedNode).dropRight(1) map { elem =>
+      JsDomElem.getAncestorsOrSelf(wrappedNode).dropRight(1) map { elem =>
         val ename = JsDomConversions.toEName(elem)
         val cnt = filterPreviousSiblingElements(elem, (e => JsDomConversions.toEName(e) == ename)).size
         Path.Entry(ename, cnt)
@@ -231,17 +231,6 @@ final class JsDomElem(
     // Recursive call
 
     parentOption.map(_.rootElem).getOrElse(this)
-  }
-
-  private def underlyingAncestorsOrSelf(elem: sjsdom.Element): List[sjsdom.Element] = {
-    val parentNodeOption = Option(elem.parentNode)
-    val parentElemOption = parentNodeOption collect { case e: sjsdom.Element => e }
-
-    // Recursive call
-    val underlyingParentAncestorsOrSelf: List[sjsdom.Element] =
-      parentElemOption.map(e => underlyingAncestorsOrSelf(e)).getOrElse(Nil)
-
-    elem :: underlyingParentAncestorsOrSelf
   }
 
   private def filterPreviousSiblingElements(elem: sjsdom.Element, p: sjsdom.Element => Boolean): List[sjsdom.Element] = {
