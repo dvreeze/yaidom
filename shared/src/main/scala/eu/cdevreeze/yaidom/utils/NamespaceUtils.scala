@@ -16,12 +16,12 @@
 
 package eu.cdevreeze.yaidom.utils
 
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * Utility for manipulating and finding namespaces.
