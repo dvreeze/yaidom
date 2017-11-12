@@ -345,7 +345,8 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * val descendantUpdateResult =
    *   updateChildElems(pathsByFirstEntry.keySet) {
@@ -357,13 +358,16 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    *       }
    *   }
    *
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else descendantUpdateResult
    * }}}
    *
    * In other words, returns:
    * {{{
    * val descendantUpdateResult = updateElems(paths)(f)
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
+   *
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else descendantUpdateResult
    * }}}
    *
    * If the set of paths is small, this method is rather efficient.
@@ -375,7 +379,8 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * updateChildElems(pathsByFirstEntry.keySet) {
    *   case (che, pathEntry) =>
@@ -395,25 +400,30 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * val descendantUpdateResult =
    *   updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
    *     case (che, pathEntry) =>
    *       // Recursive (but non-tail-recursive) call
-   *       che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *       che.updateElemsOrSelfWithNodeSeq(
+   *         pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
    *         case (elm, path) =>
    *           f(elm, path.prepend(pathEntry))
    *       }
    *   }
    *
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else Vector(descendantUpdateResult)
    * }}}
    *
    * In other words, returns:
    * {{{
    * val descendantUpdateResult = updateElemsWithNodeSeq(paths)(f)
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
+   *
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else Vector(descendantUpdateResult)
    * }}}
    *
    * If the set of paths is small, this method is rather efficient.
@@ -425,11 +435,13 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
    *   case (che, pathEntry) =>
-   *     che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *     che.updateElemsOrSelfWithNodeSeq(
+   *       pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
    *       case (elm, path) =>
    *         f(elm, path.prepend(pathEntry))
    *     }
@@ -444,9 +456,11 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    * Invokes `updateChildElems`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
    * val editsByPathEntries: Map[Path.Entry, ThisElem] =
-   *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
+   *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) =>
+   *     f(che, pe).map(newE => (pe, newE)) }).toMap
    *
-   * updateChildElems(editsByPathEntries.keySet) { case (che, pe) => editsByPathEntries.getOrElse(pe, che) }
+   * updateChildElems(editsByPathEntries.keySet) { case (che, pe) =>
+   *   editsByPathEntries.getOrElse(pe, che) }
    * }}}
    */
   def updateChildElems(f: (ThisElem, Path.Entry) => Option[ThisElem]): ThisElem
@@ -455,7 +469,8 @@ trait UpdatableElemApi extends AnyElemNodeApi with IsNavigableApi {
    * Invokes `updateChildElemsWithNodeSeq`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
    * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[ThisNode]] =
-   *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
+   *   findAllChildElemsWithPathEntries.flatMap({ case (che, pe) =>
+   *     f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
    *
    * updateChildElemsWithNodeSeq(editsByPathEntries.keySet) { case (che, pe) =>
    *   editsByPathEntries.getOrElse(pe, immutable.IndexedSeq(che))

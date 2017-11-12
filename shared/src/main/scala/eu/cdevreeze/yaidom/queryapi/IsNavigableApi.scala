@@ -68,7 +68,9 @@ trait IsNavigableApi extends AnyElemApi {
    *
    * Note that for each non-empty Path, we have:
    * {{{
-   * findElemOrSelfByPath(path) == findChildElemByPathEntry(path.firstEntry) flatMap (e => e.findElemOrSelfByPath(path.withoutFirstEntry))
+   * findElemOrSelfByPath(path) ==
+   *   findChildElemByPathEntry(path.firstEntry).
+   *     flatMap(_.findElemOrSelfByPath(path.withoutFirstEntry))
    * }}}
    */
   def findElemOrSelfByPath(path: Path): Option[ThisElem]

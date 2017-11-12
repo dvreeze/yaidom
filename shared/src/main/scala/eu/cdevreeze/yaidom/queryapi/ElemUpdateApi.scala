@@ -208,7 +208,8 @@ trait ElemUpdateApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * val descendantUpdateResult =
    *   updateChildElems(elem, pathsByFirstEntry.keySet) {
@@ -220,13 +221,16 @@ trait ElemUpdateApi {
    *       }
    *   }
    *
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else descendantUpdateResult
    * }}}
    *
    * In other words, returns:
    * {{{
    * val descendantUpdateResult = updateElems(elem, paths)(f)
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
+   *
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else descendantUpdateResult
    * }}}
    *
    * If the set of paths is small, this method is rather efficient.
@@ -238,7 +242,8 @@ trait ElemUpdateApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * updateChildElems(elem, pathsByFirstEntry.keySet) {
    *   case (che, pathEntry) =>
@@ -258,25 +263,30 @@ trait ElemUpdateApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * val descendantUpdateResult =
    *   updateChildElemsWithNodeSeq(elem, pathsByFirstEntry.keySet) {
    *     case (che, pathEntry) =>
    *       // Recursive (but non-tail-recursive) call
-   *       updateElemsOrSelfWithNodeSeq(che, pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *       updateElemsOrSelfWithNodeSeq(
+   *         che, pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
    *         case (elm, path) =>
    *           f(elm, path.prepend(pathEntry))
    *       }
    *   }
    *
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else Vector(descendantUpdateResult)
    * }}}
    *
    * In other words, returns:
    * {{{
    * val descendantUpdateResult = updateElemsWithNodeSeq(elem, paths)(f)
-   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
+   *
+   * if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty)
+   * else Vector(descendantUpdateResult)
    * }}}
    *
    * If the set of paths is small, this method is rather efficient.
@@ -288,11 +298,13 @@ trait ElemUpdateApi {
    *
    * That is, returns:
    * {{{
-   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
+   * val pathsByFirstEntry: Map[Path.Entry, Set[Path]] =
+   *   paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
    *
    * updateChildElemsWithNodeSeq(elem, pathsByFirstEntry.keySet) {
    *   case (che, pathEntry) =>
-   *     updateElemsOrSelfWithNodeSeq(che, pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+   *     updateElemsOrSelfWithNodeSeq(
+   *       che, pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
    *       case (elm, path) =>
    *         f(elm, path.prepend(pathEntry))
    *     }
@@ -307,9 +319,11 @@ trait ElemUpdateApi {
    * Invokes `updateChildElems`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
    * val editsByPathEntries: Map[Path.Entry, Elem] =
-   *   findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
+   *   findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) =>
+   *     f(che, pe).map(newE => (pe, newE)) }).toMap
    *
-   * updateChildElems(elem, editsByPathEntries.keySet) { case (che, pe) => editsByPathEntries.getOrElse(pe, che) }
+   * updateChildElems(elem, editsByPathEntries.keySet) { case (che, pe) =>
+   *   editsByPathEntries.getOrElse(pe, che) }
    * }}}
    */
   def updateChildElems(elem: Elem, f: (Elem, Path.Entry) => Option[Elem]): Elem
@@ -318,7 +332,8 @@ trait ElemUpdateApi {
    * Invokes `updateChildElemsWithNodeSeq`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
    * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[Node]] =
-   *   findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
+   *   findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) =>
+   *     f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
    *
    * updateChildElemsWithNodeSeq(elem, editsByPathEntries.keySet) { case (che, pe) =>
    *   editsByPathEntries.getOrElse(pe, immutable.IndexedSeq(che))
