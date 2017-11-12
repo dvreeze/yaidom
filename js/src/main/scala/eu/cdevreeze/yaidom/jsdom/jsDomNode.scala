@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.jsdom
 
 import java.net.URI
 
+import scala.annotation.tailrec
 import scala.collection.immutable
 
 import org.scalajs.dom.{ raw => sjsdom }
@@ -92,7 +93,9 @@ final class JsDomElem(
   override type DomType = sjsdom.Element
 
   /** Returns the element children */
-  override def findAllChildElems: immutable.IndexedSeq[JsDomElem] = children collect { case e: JsDomElem => e }
+  override def findAllChildElems: immutable.IndexedSeq[JsDomElem] = {
+    children collect { case e: JsDomElem => e }
+  }
 
   override def resolvedName: EName = {
     // Efficient, mainly because it bypasses the expensive Scope computation
@@ -202,7 +205,7 @@ final class JsDomElem(
     val entriesReversed: List[Path.Entry] =
       underlyingAncestorsOrSelf(wrappedNode).dropRight(1) map { elem =>
         val ename = JsDomConversions.toEName(elem)
-        val cnt = findPreviousSiblingElements(elem).count(e => JsDomConversions.toEName(e) == ename)
+        val cnt = filterPreviousSiblingElements(elem, (e => JsDomConversions.toEName(e) == ename)).size
         Path.Entry(ename, cnt)
       }
     Path(entriesReversed.toIndexedSeq.reverse)
@@ -241,13 +244,21 @@ final class JsDomElem(
     elem :: underlyingParentAncestorsOrSelf
   }
 
-  private def findPreviousSiblingElements(elem: sjsdom.Element): List[sjsdom.Element] = {
-    val prev = elem.previousElementSibling
+  private def filterPreviousSiblingElements(elem: sjsdom.Element, p: sjsdom.Element => Boolean): List[sjsdom.Element] = {
+    @tailrec
+    def doFilterPreviousSiblingElements(elem: sjsdom.Element, acc: List[sjsdom.Element]): List[sjsdom.Element] = {
+      val prev = elem.previousElementSibling
 
-    if (prev eq null) Nil else {
-      // Recursive call
-      prev :: findPreviousSiblingElements(prev)
+      if (prev eq null) {
+        acc
+      } else {
+        val newAcc = if (p(prev)) prev :: acc else acc
+        // Recursive call
+        doFilterPreviousSiblingElements(prev, newAcc)
+      }
     }
+
+    doFilterPreviousSiblingElements(elem, Nil)
   }
 }
 
