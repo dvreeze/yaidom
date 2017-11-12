@@ -336,7 +336,7 @@ package eu.cdevreeze
  * ==Some element implementations==
  *
  * The uniform query API traits, especially `ElemLike` and its sub-trait `ElemLike` are mixed in by many element
- * implementations. In this package there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.simple.ElemBuilder]]
+ * implementations. In package `simple` there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.simple.ElemBuilder]]
  * and [[eu.cdevreeze.yaidom.simple.Elem]].
  *
  * Class [[eu.cdevreeze.yaidom.simple.Elem]] is the <em>default element implementatio</em>n of yaidom. It extends class [[eu.cdevreeze.yaidom.simple.Node]].
@@ -438,7 +438,7 @@ package eu.cdevreeze
  * <li>Immutable class [[eu.cdevreeze.yaidom.simple.Elem]], the default (immutable) element implementation. See above.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.simple.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.resolved.Elem]], which takes namespace prefixes out of the equation, and therefore
- * makes useful (namespace-aware) equality comparisons feasible. It mixes in the same query API traits as the default
+ * makes useful (namespace-aware) equality comparisons feasible. It mixes in most of the same query API traits as the default
  * element implementation.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.indexed.Elem]], which offers views on default Elems that know the ancestry of
  * each element. It mixes in the `ElemLike` query API, but knows its ancestry, despite being immutable! This element implementation
