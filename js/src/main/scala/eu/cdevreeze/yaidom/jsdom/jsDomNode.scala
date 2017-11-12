@@ -51,6 +51,11 @@ import eu.cdevreeze.yaidom.resolved.ResolvedNodes
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped DOM node, so changes to
  * the state of that wrapped DOM node cannot corrupt the wrapper instance.
  *
+ * This does have a down-side, namely that Path (relative to the root element) and base URI computations are expensive.
+ * Therefore these JS DOM wrappers are not the best performing `BackingElemApi` element implementations if fast Path and
+ * base URI computations are required. Yaidom native indexed elements may be better in those cases, and JS DOM wrappers
+ * could be used as "builders" of those indexed elements.
+ *
  * @author Chris de Vreeze
  */
 sealed trait JsDomNode extends ResolvedNodes.Node {
