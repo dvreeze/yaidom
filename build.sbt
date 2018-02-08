@@ -110,7 +110,12 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       } else if (scalaBinaryVersion.value == "2.13.0-M2") {
         new SimpleFileFilter(f => f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("JvmIndependencyTest") ||
-          f.toString.contains("PackageDependencyTest"))
+          f.toString.contains("PackageDependencyTest") ||
+          f.toString.contains("JaxbTest"))
+      } else if (isAtLeastJava9) {
+        // Exclude tests with JAXB dependencies
+
+        new SimpleFileFilter(f => f.toString.contains("JaxbTest"))
       } else {
         NothingFilter
       }
@@ -157,4 +162,9 @@ lazy val pomData =
 def isBeforeJava8: Boolean = {
   // Brittle
   scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
+}
+
+def isAtLeastJava9: Boolean = {
+  // Brittle
+  scala.util.Try(Class.forName("javax.xml.catalog.Catalog")).toOption.nonEmpty
 }
