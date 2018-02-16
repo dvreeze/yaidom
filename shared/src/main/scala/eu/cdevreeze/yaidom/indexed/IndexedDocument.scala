@@ -22,6 +22,7 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.XmlDeclaration
+import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
@@ -35,8 +36,8 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  * @author Chris de Vreeze
  */
 abstract class IndexedDocument(
-    val xmlDeclarationOption: Option[XmlDeclaration],
-    val children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends DocumentApi with Immutable { self =>
+  val xmlDeclarationOption: Option[XmlDeclaration],
+  val children:             immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends BackingDocumentApi with Immutable { self =>
 
   require(xmlDeclarationOption ne null) // scalastyle:off null
   require(children ne null) // scalastyle:off null
