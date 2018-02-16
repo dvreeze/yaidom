@@ -3,6 +3,15 @@ CHANGELOG
 =========
 
 
+1.7.1
+=====
+
+Same as 1.7.0, except for the following changes:
+
+* Added ``BackingDocumentApi`` (containing a ``BackingElemApi`` document element)
+* Upgraded Scala.js to version 0.6.22
+
+
 1.7.0
 =====
 
