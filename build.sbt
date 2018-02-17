@@ -74,7 +74,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
 
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.7.0-18" % "test",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-8" % "test",
 
     libraryDependencies += ("joda-time" % "joda-time" % "2.9.9" % "test").intransitive(),
 
