@@ -22,7 +22,8 @@ import scala.collection.immutable
 
 import org.scalajs.dom.{ raw => sjsdom }
 
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import eu.cdevreeze.yaidom.core.XmlDeclaration
+import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
 
 /**
  * Wrapper around `org.scalajs.dom.raw.Document`. The yaidom wrapper is not considered to be a node, unlike the wrapped DOM
@@ -33,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  *
  * @author Chris de Vreeze
  */
-final class JsDomDocument(val wrappedDocument: sjsdom.Document) extends DocumentApi {
+final class JsDomDocument(val wrappedDocument: sjsdom.Document) extends BackingDocumentApi {
   require(wrappedDocument ne null) // scalastyle:off null
 
   type ThisDoc = JsDomDocument
@@ -59,6 +60,8 @@ final class JsDomDocument(val wrappedDocument: sjsdom.Document) extends Document
   def processingInstructions: immutable.IndexedSeq[JsDomProcessingInstruction] = {
     children.collect({ case pi: JsDomProcessingInstruction => pi })
   }
+
+  def xmlDeclarationOption: Option[XmlDeclaration] = None
 
   /** Helper method that converts a `NodeList` to an `IndexedSeq[org.scalajs.dom.raw.Node]` */
   private def nodeListToIndexedSeq(nodeList: sjsdom.NodeList): immutable.IndexedSeq[sjsdom.Node] = {
