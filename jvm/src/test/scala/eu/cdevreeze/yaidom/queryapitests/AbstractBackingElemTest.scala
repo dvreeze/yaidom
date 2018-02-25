@@ -230,9 +230,16 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
     // xs:appinfo child elements
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type stabilizer$28.ThisElem#ThisElem#ThisElem based on
+    // a collection of type scala.collection.immutable.IndexedSeq[stabilizer$28.ThisElem]
+    // Circumventing this compilation error by introducing an extra variable for the "start elements".
+
+    val annotationElems = docElem.filterElemsOrSelf(_.resolvedName == XsAnnotationEName)
+
     val appinfoChildElems =
       for {
-        annotElem <- docElem.filterElemsOrSelf(_.resolvedName == XsAnnotationEName)
+        annotElem <- annotationElems
         appinfoElem <- annotElem.filterElemsOrSelf(_.resolvedName == XsAppinfoEName)
         appinfoChildElem <- appinfoElem.filterElemsOrSelf((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
@@ -285,9 +292,16 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
     // xs:appinfo child elements
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type stabilizer$28.ThisElem#ThisElem#ThisElem based on
+    // a collection of type scala.collection.immutable.IndexedSeq[stabilizer$28.ThisElem]
+    // Circumventing this compilation error by introducing an extra variable for the "start elements".
+
+    val annotationElems = docElem.filterElems(_.resolvedName == XsAnnotationEName)
+
     val appinfoChildElems =
       for {
-        annotElem <- docElem.filterElems(_.resolvedName == XsAnnotationEName)
+        annotElem <- annotationElems
         appinfoElem <- annotElem.filterElems(_.resolvedName == XsAppinfoEName)
         appinfoChildElem <- appinfoElem.filterElems((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
@@ -336,9 +350,16 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
     // xs:appinfo child elements
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type stabilizer$28.ThisElem#ThisElem#ThisElem based on
+    // a collection of type scala.collection.immutable.IndexedSeq[stabilizer$28.ThisElem]
+    // Circumventing this compilation error by introducing an extra variable for the "start elements".
+
+    val annotationElems = docElem.filterChildElems(_.resolvedName == XsAnnotationEName)
+
     val appinfoChildElems =
       for {
-        annotElem <- docElem.filterChildElems(_.resolvedName == XsAnnotationEName)
+        annotElem <- annotationElems
         appinfoElem <- annotElem.filterChildElems(_.resolvedName == XsAppinfoEName)
         appinfoChildElem <- appinfoElem.filterChildElems((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
@@ -386,9 +407,16 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
     // xs:appinfo child elements
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type stabilizer$28.ThisElem#ThisElem#ThisElem based on
+    // a collection of type scala.collection.immutable.IndexedSeq[stabilizer$28.ThisElem]
+    // Circumventing this compilation error by introducing an extra variable for the "start elements".
+
+    val annotationElems = docElem \\ (_.resolvedName == XsAnnotationEName)
+
     val appinfoChildElems =
       for {
-        annotElem <- (docElem \\ (_.resolvedName == XsAnnotationEName))
+        annotElem <- annotationElems
         appinfoElem <- (annotElem \\ (_.resolvedName == XsAppinfoEName))
         appinfoChildElem <- appinfoElem \\ ((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem
@@ -425,9 +453,16 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
     // xs:appinfo child elements
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type stabilizer$28.ThisElem#ThisElem#ThisElem based on
+    // a collection of type scala.collection.immutable.IndexedSeq[stabilizer$28.ThisElem]
+    // Circumventing this compilation error by introducing an extra variable for the "start elements".
+
+    val annotationElems = docElem \ (_.resolvedName == XsAnnotationEName)
+
     val appinfoChildElems =
       for {
-        annotElem <- (docElem \ (_.resolvedName == XsAnnotationEName))
+        annotElem <- annotationElems
         appinfoElem <- (annotElem \ (_.resolvedName == XsAppinfoEName))
         appinfoChildElem <- appinfoElem \ ((e: E) => e.parent == appinfoElem)
       } yield appinfoChildElem

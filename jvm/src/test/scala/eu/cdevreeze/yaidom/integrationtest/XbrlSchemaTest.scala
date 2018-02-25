@@ -77,8 +77,15 @@ class XbrlSchemaTest extends FunSuite {
     }
 
     val elemsContainingPlus = xbrlSchema filterElems { e => e.attributeOption(EName("name")).getOrElse("").contains("Plus") }
+
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedSchemaElem = indexed.Elem(xbrlSchema.underlyingElem)
     val pathsOfElemsContainingPlus =
-      indexed.Elem(xbrlSchema.underlyingElem).filterElems(e => e.attributeOption(EName("name")).getOrElse("").contains("Plus")).map(_.path)
+      indexedSchemaElem.filterElems(e => e.attributeOption(EName("name")).getOrElse("").contains("Plus")).map(_.path)
 
     assertResult(pathsOfElemsContainingPlus) {
       elemsContainingPlus map (_.path)

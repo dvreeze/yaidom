@@ -45,6 +45,9 @@ abstract class AbstractUpdateTest extends FunSuite {
 
   implicit val clsTag: ClassTag[E]
 
+  // Does not compile in a Scala 2.13.0-M3 build, due to regression:
+  // "inferred type ... contains type selection from volatile type ..."
+
   // Below, we update the measure elements, replacing the unprefixed measures with prefixed ones (using prefix xbrli)
 
   test("testTransformElems") {

@@ -110,16 +110,28 @@ class AnotherUpdateTest extends FunSuite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedDocElem = indexed.Elem(doc.documentElement)
     val lastBookPath: Path =
-      indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
+      indexedDocElem.filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
       val result = doc.updateElemWithNodeSeq(lastBookPath) { e => Vector(e, newBook) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedDocWithScalaBookElem = indexed.Elem(docWithScalaBook.documentElement)
     val newLastBookPath: Path =
-      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
+      indexedDocWithScalaBookElem.filterChildElems(_.localName == "Book").map(_.path).last
     val newLastBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPath)
 
     assertResult("Programming in Scala") {
@@ -184,16 +196,28 @@ class AnotherUpdateTest extends FunSuite {
       convertToElem(scalaElem).notUndeclaringPrefixes(doc.documentElement.scope)
     }
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedDocElem = indexed.Elem(doc.documentElement)
     val lastBookPath: Path =
-      indexed.Elem(doc.documentElement).filterChildElems(_.localName == "Book").map(_.path).last
+      indexedDocElem.filterChildElems(_.localName == "Book").map(_.path).last
 
     val docWithScalaBook: Document = {
       val result = doc.updateElemWithNodeSeq(lastBookPath) { e => Vector(newBook, e) }
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedDocWithScalaBookElem = indexed.Elem(docWithScalaBook.documentElement)
     val newLastBookPathButOne: Path =
-      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).init.last
+      indexedDocWithScalaBookElem.filterChildElems(_.localName == "Book").map(_.path).init.last
     val newLastBookButOne: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newLastBookPathButOne)
 
     assertResult("Programming in Scala") {
@@ -268,8 +292,14 @@ class AnotherUpdateTest extends FunSuite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedDocWithScalaBookElem = indexed.Elem(docWithScalaBook.documentElement)
     val newFirstBookPath: Path =
-      indexed.Elem(docWithScalaBook.documentElement).filterChildElems(_.localName == "Book").map(_.path).head
+      indexedDocWithScalaBookElem.filterChildElems(_.localName == "Book").map(_.path).head
     val newFirstBook: Elem = docWithScalaBook.documentElement.getElemOrSelfByPath(newFirstBookPath)
 
     assertResult("Programming in Scala") {
@@ -413,8 +443,8 @@ class AnotherUpdateTest extends FunSuite {
 
   private def testSymmetryPropertyAboutTransformElemsToNodeSeq(
     elem: Elem,
-    f: Elem => immutable.IndexedSeq[Node],
-    g: resolved.Elem => immutable.IndexedSeq[resolved.Node]): Unit = {
+    f:    Elem => immutable.IndexedSeq[Node],
+    g:    resolved.Elem => immutable.IndexedSeq[resolved.Node]): Unit = {
 
     assertResult(resolved.Elem(elem).transformElemsToNodeSeq(g)) {
       resolved.Elem(elem.transformElemsToNodeSeq(f))

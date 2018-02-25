@@ -306,8 +306,14 @@ class UpdateTest extends FunSuite {
   }
 
   private def turnBookAttributeIntoElem(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedRootElm = indexed.Elem(rootElm)
     val matchingPaths =
-      indexed.Elem(rootElm) filterElems { e =>
+      indexedRootElm filterElems { e =>
         e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
       } map (_.path)
 
@@ -319,8 +325,14 @@ class UpdateTest extends FunSuite {
   }
 
   private def turnBookAttributeIntoElemUsingPathSet(rootElm: Elem, attrName: String, upd: (Elem, String) => Elem): Elem = {
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedRootElm = indexed.Elem(rootElm)
     val matchingPaths =
-      indexed.Elem(rootElm) filterElems { e =>
+      indexedRootElm filterElems { e =>
         e.attributeOption(EName(attrName)).isDefined && e.path.endsWithName(EName("{http://bookstore}Book"))
       } map (_.path)
 

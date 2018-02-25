@@ -6,7 +6,7 @@
 
 
 val scalaVer = "2.12.4"
-val crossScalaVer = Seq(scalaVer, "2.11.11", "2.13.0-M2")
+val crossScalaVer = Seq(scalaVer, "2.11.11", "2.13.0-M3")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
@@ -33,9 +33,12 @@ lazy val commonSettings = Seq(
   pomExtra := pomData,
   pomIncludeRepository := { _ => false },
 
-  libraryDependencies ++= Seq(
-    "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
-  )
+  libraryDependencies ++= {
+    scalaBinaryVersion.value match {
+      case "2.13.0-M3" => Seq("org.scalatest" %%% "scalatest" % "3.0.5-M1" % "test")
+      case _           => Seq("org.scalatest" %%% "scalatest" % "3.0.4" % "test")
+    }
+  }
 )
 
 lazy val root = project.in(file("."))
@@ -63,7 +66,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M2" => Seq()
+        case "2.13.0-M3" => Seq()
         case _           => Seq("org.scalameta" %%% "scalameta" % "2.0.1" % "test")
       }
     },
@@ -98,6 +101,9 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       }
     },
 
+    // Excluding UpdateTest in Scala 2.13.0-M3 build due to regression:
+    // "inferred type ... contains type selection from volatile type ..."
+
     excludeFilter in (Test, unmanagedSources) := {
       if (isBeforeJava8) {
         // Exclude tests with Java 8 dependencies
@@ -107,10 +113,11 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
           f.toString.contains("PackageDependencyTest") ||
           f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("NamePoolingTest"))
-      } else if (scalaBinaryVersion.value == "2.13.0-M2") {
+      } else if (scalaBinaryVersion.value == "2.13.0-M3") {
         new SimpleFileFilter(f => f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("PackageDependencyTest") ||
+          f.toString.contains("UpdateTest") ||
           f.toString.contains("JaxbTest"))
       } else if (isAtLeastJava9) {
         // Exclude tests with JAXB dependencies
@@ -119,7 +126,9 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       } else {
         NothingFilter
       }
-    }
+    },
+
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.7.1")
   )
   .jsSettings(
     // Do we need this jsEnv?
@@ -127,7 +136,9 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.4",
 
-    parallelExecution in Test := false
+    parallelExecution in Test := false,
+
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.7.1")
   )
 
 lazy val yaidomJVM = yaidom.jvm

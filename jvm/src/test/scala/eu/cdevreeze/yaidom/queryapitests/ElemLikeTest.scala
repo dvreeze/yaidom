@@ -443,8 +443,14 @@ class ElemLikeTest extends FunSuite {
     val bookElms = bookstore filterElems { _.localName == "Book" }
 
     assertResult(Set(bookstore)) {
+      // Regression in Scala 2.13.0-M3:
+      // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+      // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+      // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+      val indexedBookstoreElem = IElem(bookstore)
       val paths =
-        IElem(bookstore) filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
+        indexedBookstoreElem filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result
@@ -453,8 +459,14 @@ class ElemLikeTest extends FunSuite {
     val lastNameElms = bookstore filterElems { _.localName == "Last_Name" }
 
     assertResult(Set(EName(ns, "Author"))) {
+      // Regression in Scala 2.13.0-M3:
+      // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+      // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+      // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+      val indexedBookstoreElem = IElem(bookstore)
       val paths =
-        IElem(bookstore) filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
+        indexedBookstoreElem filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
       result map { e => e.resolvedName }
@@ -467,8 +479,15 @@ class ElemLikeTest extends FunSuite {
 
     assertResult(cheapBookAuthorElms.toSet) {
       // Taking cheapBookElm as root! Finding parents of lastNameElms.
+
+      // Regression in Scala 2.13.0-M3:
+      // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+      // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+      // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+      val indexedCheapBookElm = IElem(cheapBookElm)
       val paths =
-        IElem(cheapBookElm) filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
+        indexedCheapBookElm filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
       val parentPaths = paths flatMap { _.parentPathOption }
       val result: Set[Elem] = parentPaths.toSet map { (path: Path) => cheapBookElm.getElemOrSelfByPath(path) }
       result

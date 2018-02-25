@@ -84,7 +84,13 @@ class AlternativeUpdatesTest extends FunSuite {
   }
 
   test("testRetainFirstAuthorsUsingUpdatedAtPathsPassingSomePaths") {
-    val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedBookstoreElem = indexed.Elem(bookstore)
+    val paths = indexedBookstoreElem.filterElems(e => e.localName == "Authors").map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
       elem match {
@@ -101,7 +107,13 @@ class AlternativeUpdatesTest extends FunSuite {
   }
 
   test("testRetainFirstAuthorsUsingUpdatedAtPaths") {
-    val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Authors").map(_.path).toSet
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedBookstoreElem = indexed.Elem(bookstore)
+    val paths = indexedBookstoreElem.filterElems(e => e.localName == "Authors").map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsOrSelf(paths) { (elem, path) =>
       require(elem.localName == "Authors")
@@ -115,7 +127,13 @@ class AlternativeUpdatesTest extends FunSuite {
   }
 
   test("testRetainFirstAuthorsUsingUpdatedWithNodeSeqAtPaths") {
-    val paths = indexed.Elem(bookstore).filterElems(e => e.localName == "Author").map(_.path).toSet
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedBookstoreElem = indexed.Elem(bookstore)
+    val paths = indexedBookstoreElem.filterElems(e => e.localName == "Author").map(_.path).toSet
 
     val updatedElem = bookstore.updateElemsWithNodeSeq(paths) { (elem, path) =>
       require(elem.localName == "Author" && path.lastEntry.elementName.localPart == "Author")

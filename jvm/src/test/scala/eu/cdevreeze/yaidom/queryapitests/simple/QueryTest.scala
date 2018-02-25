@@ -118,9 +118,16 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedBookstoreElem = indexed.Elem(bookstore)
+
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- indexed.Elem(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
+        bookOrMagazinePath <- indexedBookstoreElem.filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
         bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
@@ -148,9 +155,16 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     require(bookstore.localName == "Bookstore")
 
+    // Regression in Scala 2.13.0-M3:
+    // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+    // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+    // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+    val indexedBookstoreElem = indexed.Elem(bookstore)
+
     val bookAndMagazinePaths =
       for {
-        bookOrMagazinePath <- indexed.Elem(bookstore).filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
+        bookOrMagazinePath <- indexedBookstoreElem.filterChildElems(e => Set("Book", "Magazine").contains(e.localName)).map(_.path)
         bookOrMagazine = bookstore.getElemOrSelfByPath(bookOrMagazinePath)
         title = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         nodeIndex = bookstore.childNodeIndex(bookOrMagazinePath.lastEntry)
@@ -414,11 +428,23 @@ class QueryTest extends AbstractElemLikeQueryTest {
       bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
     }
     assertResult(4) {
-      val paths = indexed.Elem(bookstore).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
+      // Regression in Scala 2.13.0-M3:
+      // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+      // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+      // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+      val indexedBookstoreElem = indexed.Elem(bookstore)
+      val paths = indexedBookstoreElem.findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
       paths.size
     }
     assertResult(0) {
-      val paths = indexed.Elem(bookstoreWithoutPrices).findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
+      // Regression in Scala 2.13.0-M3:
+      // Cannot construct a collection of type That with elements of type eu.cdevreeze.yaidom.core.Path based on
+      // a collection of type scala.collection.immutable.IndexedSeq[eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem[eu.cdevreeze.yaidom.simple.Elem]].
+      // Circumventing this compilation error by introducing an extra variable for the indexed.Elem.
+
+      val indexedBookstoreElem = indexed.Elem(bookstoreWithoutPrices)
+      val paths = indexedBookstoreElem.findTopmostElems(e => (e.resolvedName == EName("Book")) && (e.attributeOption(EName("Price")).isDefined)).map(_.path)
       paths.size
     }
   }

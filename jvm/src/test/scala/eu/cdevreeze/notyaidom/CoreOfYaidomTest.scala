@@ -836,6 +836,14 @@ class CoreOfYaidomTest extends FunSuite {
     // Taken from the XSLT demo
     require(bookstoreIndexedElem.name == "Bookstore")
 
+    // Below, had we written bookstoreIndexedElem.thisElem instead of just bookstoreIndexedElem,
+    // the Scala 2.13.0-M3 compiler would not have compiled this code successfully. The Scala 2.12.X
+    // and 2.11.X compilers have no issue with that code, so it seems that there is a regression in
+    // Scala 2.13.0-M3 (not even in version 2.13.0-M2).
+
+    // Had we stored bookstoreIndexedElem.thisElem in a variable first, and then used that variable,
+    // the compiler error for Scala 2.13.0-M3 would disappear again.
+
     val bookOrMagazineTitles =
       for {
         bookOrMagazine <- bookstoreIndexedElem filterChildElems { e => Set("Book", "Magazine").contains(e.name) }
