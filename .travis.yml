@@ -16,8 +16,6 @@ matrix:
     scala: 2.12.4
   - jdk: oraclejdk8
     scala: 2.11.11
-  - jdk: openjdk7
-    scala: 2.11.11
   - jdk: oraclejdk8
     scala: 2.13.0-M3
 
