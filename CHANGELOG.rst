@@ -3,6 +3,28 @@ CHANGELOG
 =========
 
 
+1.8.0-M1
+========
+
+The 1.8.X versions make the "core" element abstractions aware of child nodes (and therefore different
+kinds of nodes). The main changes in version 1.8.0-M1 are:
+
+* Added query API trait ``HasChildNodesApi``, containing method ``children``
+
+  * This query API trait extends ``AnyElemNodeApi``, and therefore is abstract in the node type (as well as the element type)
+  * There are sub-traits (top to bottom) ``ClarkElemNodeApi``, ``ScopedElemNodeApi`` and ``BackingElemNodeApi``
+  * For example, ``ClarkElemNodeApi`` extends ``ClarkElemApi`` and ``HasChildNodesApi``
+  * Traits ``ClarkElemNodeApi``, ``ScopedElemNodeApi`` and ``BackingElemNodeApi`` are now the important element abstractions
+  * Trait ``ResolvedNodes.Elem`` now extends ``ClarkElemNodeApi``, therefore having a (better defined) ``children`` method
+  * All yaidom element implementations now mix in (at least) ``ResolvedNodes.Elem``
+  * Moreover, most yaidom element implementations mix in ``ScopedElemNodeApi``, and some even ``BackingElemNodeApi``
+  * "Yaidom dialects" should now use ``BackingElemNodeApi`` as general element node abstraction
+  * Trait ``BackingDocumentApi`` now has a ``BackingElemNodeApi`` document element
+  * "Yaidom dialects" should now use this ``BackingDocumentApi`` as general document abstraction
+
+* Class ``JsDomDocument`` now mixes in trait ``BackingDocumentApi``
+
+
 1.7.1
 =====
 
