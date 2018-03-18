@@ -24,7 +24,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 
 /**
  * Document, containing an "indexed" document element.
@@ -50,7 +50,7 @@ abstract class IndexedDocument(
 
   type ThisDoc <: IndexedDocument
 
-  type UnderlyingElem <: ScopedElemApi.Aux[UnderlyingElem]
+  type UnderlyingElem <: ScopedElemNodeApi.Aux[_, UnderlyingElem]
 
   type UnderlyingDoc <: DocumentApi.Aux[UnderlyingDoc, UnderlyingElem]
 

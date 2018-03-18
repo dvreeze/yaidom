@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
@@ -82,11 +83,13 @@ sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-    override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemLike with HasParent {
+  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ResolvedNodes.Elem with ScopedElemNodeApi with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null) // scalastyle:off null
 
   type ThisElem = DomElem
+
+  type ThisNode = DomNode
 
   def thisElem: ThisElem = this
 
@@ -182,7 +185,7 @@ final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with
 }
 
 final class DomProcessingInstruction(
-    override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
+  override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -194,7 +197,7 @@ final class DomProcessingInstruction(
 }
 
 final class DomEntityRef(
-    override val wrappedNode: w3c.dom.EntityReference) extends DomNode with Nodes.EntityRef {
+  override val wrappedNode: w3c.dom.EntityReference) extends DomNode with Nodes.EntityRef {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -204,7 +207,7 @@ final class DomEntityRef(
 }
 
 final class DomComment(
-    override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
+  override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
 
   require(wrappedNode ne null) // scalastyle:off null
 

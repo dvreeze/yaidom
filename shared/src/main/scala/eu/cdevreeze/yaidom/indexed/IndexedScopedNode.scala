@@ -25,10 +25,11 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
+import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
@@ -40,7 +41,7 @@ object IndexedScopedNode {
    *
    * @author Chris de Vreeze
    */
-  sealed trait Node extends Nodes.Node
+  sealed trait Node extends ResolvedNodes.Node
 
   sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
 
@@ -54,22 +55,51 @@ object IndexedScopedNode {
    *
    * @author Chris de Vreeze
    */
-  final class Elem[U <: ScopedElemApi.Aux[U]] private[IndexedScopedNode] (
-    docUriOption: Option[URI],
+  final class Elem[U <: ScopedElemNodeApi.Aux[_, U]] private[IndexedScopedNode] (
+    docUriOption:        Option[URI],
     parentBaseUriOption: Option[URI],
-    underlyingRootElem: U,
-    path: Path,
-    underlyingElem: U)
-      extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
-      with CanBeDocumentChild
-      with BackingElemApi
-      with ScopedElemLike
-      with HasParent
-      with Nodes.Elem {
+    underlyingRootElem:  U,
+    path:                Path,
+    underlyingElem:      U)
+    extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
+    with CanBeDocumentChild
+    with BackingElemNodeApi
+    with IndexedScopedElemApi
+    with ScopedElemLike
+    with HasParent {
 
     type ThisElem = Elem[U]
 
+    type ThisNode = Node
+
     def thisElem: ThisElem = this
+
+    final def children: immutable.IndexedSeq[Node] = {
+      val childElems = findAllChildElems
+      var childElemIdx = 0
+
+      val children =
+        underlyingElem.children flatMap {
+          case che: Nodes.Elem =>
+            val e = childElems(childElemIdx)
+            childElemIdx += 1
+            Some(e)
+          case ch: Nodes.Text =>
+            Some(Text(ch.text, false))
+          case ch: Nodes.Comment =>
+            Some(Comment(ch.text))
+          case ch: Nodes.ProcessingInstruction =>
+            Some(ProcessingInstruction(ch.target, ch.data))
+          case ch: Nodes.EntityRef =>
+            Some(EntityRef(ch.entity))
+          case ch =>
+            None
+        }
+
+      assert(childElemIdx == childElems.size)
+
+      children
+    }
 
     final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
       val baseUriOpt = baseUriOption
@@ -119,7 +149,7 @@ object IndexedScopedNode {
     }
   }
 
-  final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
+  final case class Text(text: String, isCData: Boolean) extends Node with ResolvedNodes.Text {
     require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 
@@ -155,7 +185,7 @@ object IndexedScopedNode {
 
   object Elem {
 
-    def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
       val underlyingElem = underlyingRootElem.getElemOrSelfByPath(path)
 
       val parentBaseUriOption = path.parentPathOption map { pp =>
@@ -165,55 +195,24 @@ object IndexedScopedNode {
       new Elem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     }
 
-    def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
       apply(Some(docUri), underlyingRootElem, path)
     }
 
-    def apply[U <: ScopedElemApi.Aux[U]](underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ScopedElemNodeApi.Aux[_, U]](underlyingRootElem: U, path: Path): Elem[U] = {
       apply(None, underlyingRootElem, path)
     }
 
-    def apply[U <: ScopedElemApi.Aux[U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
       apply(docUriOption, underlyingRootElem, Path.Empty)
     }
 
-    def apply[U <: ScopedElemApi.Aux[U]](docUri: URI, underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUri: URI, underlyingRootElem: U): Elem[U] = {
       apply(Some(docUri), underlyingRootElem, Path.Empty)
     }
 
-    def apply[U <: ScopedElemApi.Aux[U]](underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ScopedElemNodeApi.Aux[_, U]](underlyingRootElem: U): Elem[U] = {
       apply(None, underlyingRootElem, Path.Empty)
-    }
-
-    /**
-     * Returns the child nodes of the given element, provided the underlying element knows its child nodes too
-     * (which is assured by the type restriction on the underlying element).
-     */
-    def getChildren[U <: ScopedElemApi.Aux[U] with ResolvedNodes.Elem](elem: Elem[U]): immutable.IndexedSeq[Node] = {
-      val childElems = elem.findAllChildElems
-      var childElemIdx = 0
-
-      val children =
-        elem.underlyingElem.children flatMap {
-          case che: Nodes.Elem =>
-            val e = childElems(childElemIdx)
-            childElemIdx += 1
-            Some(e)
-          case ch: Nodes.Text =>
-            Some(Text(ch.text, false))
-          case ch: Nodes.Comment =>
-            Some(Comment(ch.text))
-          case ch: Nodes.ProcessingInstruction =>
-            Some(ProcessingInstruction(ch.target, ch.data))
-          case ch: Nodes.EntityRef =>
-            Some(EntityRef(ch.entity))
-          case ch =>
-            None
-        }
-
-      assert(childElemIdx == childElems.size)
-
-      children
     }
   }
 }

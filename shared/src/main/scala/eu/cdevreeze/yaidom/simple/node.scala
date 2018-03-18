@@ -29,6 +29,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
@@ -170,15 +171,16 @@ sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
  */
 @SerialVersionUID(1L)
 final class Elem(
-  val qname: QName,
-  val attributes: immutable.IndexedSeq[(QName, String)],
-  val scope: Scope,
+  val qname:             QName,
+  val attributes:        immutable.IndexedSeq[(QName, String)],
+  val scope:             Scope,
   override val children: immutable.IndexedSeq[Node])
-    extends CanBeDocumentChild
-    with ResolvedNodes.Elem
-    with ScopedElemLike
-    with UpdatableElemLike
-    with TransformableElemLike {
+  extends CanBeDocumentChild
+  with ResolvedNodes.Elem
+  with ScopedElemNodeApi
+  with ScopedElemLike
+  with UpdatableElemLike
+  with TransformableElemLike {
 
   require(qname ne null) // scalastyle:off null
   require(attributes ne null) // scalastyle:off null
@@ -253,10 +255,10 @@ final class Elem(
    * Creates a copy, altered with the explicitly passed parameters (for qname, attributes, scope and children).
    */
   def copy(
-    qname: QName = this.qname,
+    qname:      QName                                 = this.qname,
     attributes: immutable.IndexedSeq[(QName, String)] = this.attributes,
-    scope: Scope = this.scope,
-    children: immutable.IndexedSeq[Node] = this.children): Elem = {
+    scope:      Scope                                 = this.scope,
+    children:   immutable.IndexedSeq[Node]            = this.children): Elem = {
 
     new Elem(qname, attributes, scope, children)
   }
@@ -518,11 +520,11 @@ final class Elem(
   }
 
   private def prettify(
-    elm: Elem,
-    currentIndent: Int,
-    indent: Int,
+    elm:                   Elem,
+    currentIndent:         Int,
+    indent:                Int,
     indentStringsByIndent: mutable.Map[Int, String],
-    indentToIndentString: Int => String): Elem = {
+    indentToIndentString:  Int => String): Elem = {
 
     def isText(n: Node): Boolean = n match {
       case t: Text => true
@@ -752,10 +754,10 @@ final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Com
 object Elem {
 
   private[yaidom] final class ElemSerializationProxy(
-      val qname: QName,
-      val attributes: immutable.IndexedSeq[(QName, String)],
-      val scope: Scope,
-      val children: immutable.IndexedSeq[Node]) extends Serializable {
+    val qname:      QName,
+    val attributes: immutable.IndexedSeq[(QName, String)],
+    val scope:      Scope,
+    val children:   immutable.IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
     def readResolve(): Any = new Elem(qname, attributes, scope, children)
@@ -768,10 +770,10 @@ object Elem {
    * To construct `Elem`s, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
    */
   def apply(
-    qname: QName,
+    qname:      QName,
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
-    scope: Scope = Scope.Empty,
-    children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
+    scope:      Scope                                 = Scope.Empty,
+    children:   immutable.IndexedSeq[Node]            = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 
   /**
    * Extractor of Elems, to be used for pattern matching.
@@ -825,18 +827,18 @@ object Elem {
 object Node {
 
   def elem(
-    qname: QName,
-    scope: Scope,
+    qname:    QName,
+    scope:    Scope,
     children: immutable.IndexedSeq[Node]): Elem = {
 
     elem(qname, Vector(), scope, children)
   }
 
   def elem(
-    qname: QName,
+    qname:      QName,
     attributes: immutable.IndexedSeq[(QName, String)],
-    scope: Scope,
-    children: immutable.IndexedSeq[Node]): Elem = {
+    scope:      Scope,
+    children:   immutable.IndexedSeq[Node]): Elem = {
 
     new Elem(qname, attributes, scope, children)
   }
@@ -857,10 +859,10 @@ object Node {
   }
 
   def textElem(
-    qname: QName,
+    qname:      QName,
     attributes: immutable.IndexedSeq[(QName, String)],
-    scope: Scope,
-    txt: String): Elem = {
+    scope:      Scope,
+    txt:        String): Elem = {
 
     new Elem(qname, attributes, scope, Vector(text(txt)))
   }
@@ -870,9 +872,9 @@ object Node {
   }
 
   def emptyElem(
-    qname: QName,
+    qname:      QName,
     attributes: immutable.IndexedSeq[(QName, String)],
-    scope: Scope): Elem = {
+    scope:      Scope): Elem = {
 
     new Elem(qname, attributes, scope, Vector())
   }

@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
@@ -87,11 +87,13 @@ sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChi
  */
 final class JsDomElem(
   override val wrappedNode: sjsdom.Element)
-    extends CanBeDomDocumentChild with ResolvedNodes.Elem with BackingElemApi with ScopedElemLike with HasParent {
+  extends CanBeDomDocumentChild with ResolvedNodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null) // scalastyle:off null
 
   type ThisElem = JsDomElem
+
+  type ThisNode = JsDomNode
 
   def thisElem: ThisElem = this
 
@@ -271,7 +273,7 @@ final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode w
 }
 
 final class JsDomProcessingInstruction(
-    override val wrappedNode: sjsdom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
+  override val wrappedNode: sjsdom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -283,7 +285,7 @@ final class JsDomProcessingInstruction(
 }
 
 final class JsDomComment(
-    override val wrappedNode: sjsdom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
+  override val wrappedNode: sjsdom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
 
   require(wrappedNode ne null) // scalastyle:off null
 

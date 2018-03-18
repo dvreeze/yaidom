@@ -113,7 +113,7 @@ class IndexedElemTest extends FunSuite {
     val rootElem = docWithCommentAtEnd.documentElement.prettify(2)
     val indexedElem = IndexedScopedElem(rootElem)
 
-    val docElemChildren = IndexedScopedElem.getChildren(indexedElem)
+    val docElemChildren = indexedElem.children
 
     assertResult(indexedElem.findAllChildElems) {
       docElemChildren collect { case che: IndexedScopedElem[_] => che }

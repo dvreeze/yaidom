@@ -24,7 +24,7 @@ import org.scalatest.FunSuite
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 
 /**
@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
  */
 abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
 
-  type E <: ClarkElemApi.Aux[E]
+  type E <: ClarkElemNodeApi.Aux[_, E]
 
   implicit val ttag: ClassTag[E] = classTag[E]
 

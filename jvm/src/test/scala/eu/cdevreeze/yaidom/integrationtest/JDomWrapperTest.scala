@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
-import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.queryapi.HasParent
@@ -821,11 +821,13 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-      override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with BackingElemApi with ScopedElemLike with HasParent {
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
     type ThisElem = JDomElem
+
+    type ThisNode = JDomNode
 
     override type DomType = org.jdom2.Element
 

@@ -21,13 +21,13 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 
 /**
- * Backing document API, representing a document that contains a `BackingElemApi` root element.
+ * Backing document API, representing a document that contains a `BackingElemNodeApi` root element.
  *
  * @author Chris de Vreeze
  */
 trait BackingDocumentApi extends DocumentApi {
 
-  type DocElemType <: BackingElemApi
+  type DocElemType <: BackingElemNodeApi
 
   /**
    * Returns the child nodes of the document. Precisely one of them must be the document element.
@@ -58,5 +58,5 @@ object BackingDocumentApi {
    * @tparam D The document type itself
    * @tparam E The document element type
    */
-  type Aux[D, E <: BackingElemApi] = BackingDocumentApi { type ThisDoc = D; type DocElemType = E }
+  type Aux[D, E <: BackingElemNodeApi] = BackingDocumentApi { type ThisDoc = D; type DocElemType = E }
 }

@@ -24,6 +24,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
@@ -75,7 +76,7 @@ sealed trait CanBeScalaXmlDocumentChild extends ScalaXmlNode with Nodes.CanBeDoc
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-    override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemLike {
+  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemNodeApi with ScopedElemLike {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -175,7 +176,7 @@ final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends Sc
 }
 
 final class ScalaXmlProcessingInstruction(
-    override val wrappedNode: scala.xml.ProcInstr) extends CanBeScalaXmlDocumentChild with Nodes.ProcessingInstruction {
+  override val wrappedNode: scala.xml.ProcInstr) extends CanBeScalaXmlDocumentChild with Nodes.ProcessingInstruction {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -187,7 +188,7 @@ final class ScalaXmlProcessingInstruction(
 }
 
 final class ScalaXmlEntityRef(
-    override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode with Nodes.EntityRef {
+  override val wrappedNode: scala.xml.EntityRef) extends ScalaXmlNode with Nodes.EntityRef {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -197,7 +198,7 @@ final class ScalaXmlEntityRef(
 }
 
 final class ScalaXmlComment(
-    override val wrappedNode: scala.xml.Comment) extends CanBeScalaXmlDocumentChild with Nodes.Comment {
+  override val wrappedNode: scala.xml.Comment) extends CanBeScalaXmlDocumentChild with Nodes.Comment {
 
   require(wrappedNode ne null) // scalastyle:off null
 

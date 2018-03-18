@@ -16,14 +16,13 @@
 
 package eu.cdevreeze.yaidom.resolved
 
-import scala.collection.immutable
-
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 
 /**
  * Abstract node trait hierarchy. It offers a common minimal API for different kinds of nodes that can be converted
- * (without any loss of information) to resolved nodes.
+ * (without any loss of information) to resolved nodes, such that elements implement the `ClarkElemNodeApi`
+ * at minimum.
  *
  * @author Chris de Vreeze
  */
@@ -35,12 +34,25 @@ object ResolvedNodes {
   trait Node extends Nodes.Node
 
   /**
-   * Arbitrary element node that offers the `HasENameApi` query API and know its child nodes. Typical implementations
-   * offer the `ScopedElemApi`, or at least the `ClarkElemApi`.
+   * Arbitrary element node that offers the `ClarkElemNodeApi` query API and know its child nodes. Typical implementations
+   * offer the `ScopedElemNodeApi` as well.
    */
-  trait Elem extends Node with Nodes.Elem with HasENameApi {
+  trait Elem extends Node with Nodes.Elem with ClarkElemNodeApi {
 
-    def children: immutable.IndexedSeq[Node]
+    type ThisElem <: Elem
+
+    type ThisNode >: ThisElem <: Node
+  }
+
+  object Elem {
+
+    /**
+     * This query API type, restricting Node and Elem to the passed type parameters.
+     *
+     * @tparam N The node type
+     * @tparam E The element type
+     */
+    type Aux[N, E] = Elem { type ThisNode = N; type ThisElem = E }
   }
 
   /**

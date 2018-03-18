@@ -38,6 +38,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
@@ -732,11 +733,13 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-      override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemLike with HasParent {
+    override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemNodeApi with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
     type ThisElem = XomElem
+
+    type ThisNode = XomNode
 
     override type DomType = nu.xom.Element
 

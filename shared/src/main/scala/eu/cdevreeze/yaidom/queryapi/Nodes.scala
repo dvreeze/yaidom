@@ -22,7 +22,7 @@ package eu.cdevreeze.yaidom.queryapi
  * are not nodes in yaidom, so it is thus prevented to create documents as element children. Moreover, attributes
  * are typically not nodes in yaidom, although custom element implementations may think otherwise.
  *
- * The down-side is that we have to consider mixing in these traits everywhere we create a node/element implementation.
+ * The down-side is that we have to consider mixing in (some or all of) these traits everywhere we create a node/element implementation.
  *
  * @author Chris de Vreeze
  */

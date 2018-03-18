@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.resolved.ResolvedNodes
@@ -140,12 +140,14 @@ trait SaxonTestSupport {
    * Saxon NodeInfo element wrapper. It is efficient, because of an entirely custom query API implementation tailored to Saxon.
    */
   final class DomElem(
-      override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with BackingElemApi {
+    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with BackingElemNodeApi {
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
 
     type ThisElem = DomElem
+
+    type ThisNode = DomNode
 
     def thisElem: ThisElem = this
 
@@ -255,8 +257,8 @@ trait SaxonTestSupport {
       val entryCount = path.entries.size
 
       def findReverseAncestryOrSelfByPath(
-        currentRoot: ThisElem,
-        entryIndex: Int,
+        currentRoot:     ThisElem,
+        entryIndex:      Int,
         reverseAncestry: immutable.IndexedSeq[ThisElem]): Option[immutable.IndexedSeq[ThisElem]] = {
 
         assert(entryIndex >= 0 && entryIndex <= entryCount)
