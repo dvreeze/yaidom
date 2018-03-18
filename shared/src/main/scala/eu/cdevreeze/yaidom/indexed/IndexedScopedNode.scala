@@ -27,7 +27,6 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
@@ -61,10 +60,9 @@ object IndexedScopedNode {
     underlyingRootElem:  U,
     path:                Path,
     underlyingElem:      U)
-    extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
+    extends AbstractIndexedClarkElem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     with CanBeDocumentChild
     with BackingElemNodeApi
-    with IndexedScopedElemApi
     with ScopedElemLike
     with HasParent {
 

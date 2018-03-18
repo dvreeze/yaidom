@@ -114,7 +114,7 @@ object IndexedClarkNode {
     underlyingRootElem:  U,
     path:                Path,
     underlyingElem:      U)
-    extends AbstractIndexedClarkElem(docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
+    extends AbstractIndexedClarkElem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     with Node {
 
     type ThisElem = Elem[U]
