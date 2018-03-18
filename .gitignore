@@ -6,6 +6,7 @@
 .worksheet/
 .settings/
 target/
+out/
 temp/
 .history
 scalastyle-config.xml
