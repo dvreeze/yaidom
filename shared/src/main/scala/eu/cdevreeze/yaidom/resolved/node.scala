@@ -23,7 +23,9 @@ import scala.collection.mutable
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -355,7 +357,8 @@ final case class Text(text: String) extends Node with ResolvedNodes.Text {
 object Node {
 
   /**
-   * Converts any `ResolvedNodes.Node` to a "resolved" `Node`.
+   * Converts any (element or text) `Nodes.Node` to a "resolved" `Node`.
+   * All descendant-or-self elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
    * Note that entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
    * Losing the qualified names means that prefixes are lost. Losing the prefixes not only affects serialization of
@@ -364,10 +367,11 @@ object Node {
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
-  def apply(n: ResolvedNodes.Node): Node = n match {
-    case e: ResolvedNodes.Elem => Elem(e)
-    case t: ResolvedNodes.Text => Text(t)
-    case n                     => sys.error(s"Not an element or text node: $n")
+  def apply(n: Nodes.Node): Node = n match {
+    case e: Nodes.Elem with ClarkElemNodeApi => Elem(e)
+    case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
+    case t: Nodes.Text                       => Text(t)
+    case n                                   => sys.error(s"Not an element or text node: $n")
   }
 
   def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
@@ -408,10 +412,11 @@ object Elem {
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
   }
 
-  def apply(e: ResolvedNodes.Elem): Elem = {
+  def apply(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
     val children = e.children collect {
-      case childElm: ResolvedNodes.Elem  => childElm
-      case childText: ResolvedNodes.Text => childText
+      case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
+      case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
+      case childText: Nodes.Text                      => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val resolvedChildren = children map { node => Node(node) }
@@ -422,5 +427,5 @@ object Elem {
 
 object Text {
 
-  def apply(t: ResolvedNodes.Text): Text = Text(t.text)
+  def apply(t: Nodes.Text): Text = Text(t.text)
 }
