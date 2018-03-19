@@ -27,6 +27,8 @@ import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
 import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.resolved
 
 /**
@@ -79,7 +81,7 @@ final class ResolvedText(override val underlyingNode: resolved.Text) extends Res
 
 object ResolvedElem {
 
-  def apply(elem: resolved.ResolvedNodes.Elem): ResolvedElem = {
+  def apply(elem: Nodes.Elem with ClarkElemNodeApi): ResolvedElem = {
     new ResolvedElem(resolved.Elem(elem))
   }
 }

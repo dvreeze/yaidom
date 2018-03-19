@@ -31,7 +31,6 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 object IndexedScopedNode {
 
@@ -40,7 +39,7 @@ object IndexedScopedNode {
    *
    * @author Chris de Vreeze
    */
-  sealed trait Node extends ResolvedNodes.Node
+  sealed trait Node extends Nodes.Node
 
   sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
 
@@ -147,7 +146,7 @@ object IndexedScopedNode {
     }
   }
 
-  final case class Text(text: String, isCData: Boolean) extends Node with ResolvedNodes.Text {
+  final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
     require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 

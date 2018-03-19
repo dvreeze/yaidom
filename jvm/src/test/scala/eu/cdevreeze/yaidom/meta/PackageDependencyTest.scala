@@ -77,15 +77,15 @@ class PackageDependencyTest extends FunSuite {
   test("testSimplePackage") {
     testPackageDependencies(
       Some(List("simple")),
-      Set(List("core"), List("queryapi"), List("resolved")),
-      Set(List("core"), List("queryapi"), List("resolved")))
+      Set(List("core"), List("queryapi")),
+      Set(List("core"), List("queryapi")))
   }
 
   test("testIndexedPackage") {
     testPackageDependencies(
       Some(List("indexed")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("simple")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("simple")))
+      Set(List("core"), List("queryapi"), List("simple")),
+      Set(List("core"), List("queryapi"), List("simple")))
   }
 
   test("testConvertPackage") {
@@ -112,15 +112,15 @@ class PackageDependencyTest extends FunSuite {
   test("testDomPackage") {
     testPackageDependencies(
       Some(List("dom")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("convert")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("convert")))
+      Set(List("core"), List("queryapi"), List("convert")),
+      Set(List("core"), List("queryapi"), List("convert")))
   }
 
   test("testScalaXmlPackage") {
     testPackageDependencies(
       Some(List("scalaxml")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("convert")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("convert")))
+      Set(List("core"), List("queryapi"), List("convert")),
+      Set(List("core"), List("queryapi"), List("convert")))
   }
 
   test("testJava8Package") {
@@ -174,8 +174,8 @@ class PackageDependencyTest extends FunSuite {
 
   private def testPackageDependencies(
     yaidomSubPackageOption: Option[SubPackage],
-    minimalSubPackages: Set[SubPackage],
-    allowedSubPackages: Set[SubPackage]): Unit = {
+    minimalSubPackages:     Set[SubPackage],
+    allowedSubPackages:     Set[SubPackage]): Unit = {
 
     require(minimalSubPackages.subsetOf(allowedSubPackages))
 

@@ -24,9 +24,9 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
  * Common super-class for IndexedClarkElem and IndexedScopedElem.
@@ -40,7 +40,7 @@ abstract class AbstractIndexedClarkElem[U <: ClarkElemNodeApi.Aux[_, U]](
   val parentBaseUriOption: Option[URI],
   val underlyingRootElem:  U,
   val path:                Path,
-  val underlyingElem:      U) extends ResolvedNodes.Elem with IndexedClarkElemApi with ClarkElemLike {
+  val underlyingElem:      U) extends Nodes.Elem with ClarkElemNodeApi with IndexedClarkElemApi with ClarkElemLike {
 
   type ThisElem <: AbstractIndexedClarkElem.Aux[ThisElem, U]
 

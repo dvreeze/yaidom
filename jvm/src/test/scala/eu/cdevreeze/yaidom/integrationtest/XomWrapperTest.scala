@@ -41,7 +41,6 @@ import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -709,7 +708,7 @@ class XomWrapperTest extends FunSuite {
 
 object XomWrapperTest {
 
-  sealed trait XomNode extends ResolvedNodes.Node {
+  sealed trait XomNode extends Nodes.Node {
 
     type DomType <: nu.xom.Node
 
@@ -733,7 +732,7 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomNode with ResolvedNodes.Elem with ScopedElemNodeApi with ScopedElemLike with HasParent {
+    override val wrappedNode: nu.xom.Element) extends XomNode with Nodes.Elem with ScopedElemNodeApi with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
@@ -820,7 +819,7 @@ object XomWrapperTest {
     }
   }
 
-  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode with ResolvedNodes.Text {
+  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode with Nodes.Text {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.Text

@@ -69,7 +69,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends ResolvedNodes.Node with Immutable
+sealed trait Node extends Nodes.Node with Immutable
 
 /**
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
@@ -123,14 +123,15 @@ sealed trait Node extends ResolvedNodes.Node with Immutable
  * }}}
  */
 final case class Elem(
-  override val resolvedName: EName,
+  override val resolvedName:       EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children: immutable.IndexedSeq[Node])
-    extends Node
-    with ResolvedNodes.Elem
-    with ClarkElemLike
-    with UpdatableElemLike
-    with TransformableElemLike {
+  override val children:           immutable.IndexedSeq[Node])
+  extends Node
+  with Nodes.Elem
+  with ClarkElemNodeApi
+  with ClarkElemLike
+  with UpdatableElemLike
+  with TransformableElemLike {
 
   require(resolvedName ne null) // scalastyle:off null
   require(resolvedAttributes ne null) // scalastyle:off null
@@ -344,7 +345,7 @@ final case class Elem(
   }
 }
 
-final case class Text(text: String) extends Node with ResolvedNodes.Text {
+final case class Text(text: String) extends Node with Nodes.Text {
   require(text ne null) // scalastyle:off null
 
   /** Returns `text.trim`. */
@@ -357,8 +358,9 @@ final case class Text(text: String) extends Node with ResolvedNodes.Text {
 object Node {
 
   /**
-   * Converts any (element or text) `Nodes.Node` to a "resolved" `Node`.
+   * Converts any element or text `Nodes.Node` to a "resolved" `Node`. For other kinds of nodes, an exception is thrown.
    * All descendant-or-self elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+   *
    * Note that entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
    * Losing the qualified names means that prefixes are lost. Losing the prefixes not only affects serialization of
@@ -370,6 +372,7 @@ object Node {
   def apply(n: Nodes.Node): Node = n match {
     case e: Nodes.Elem with ClarkElemNodeApi => Elem(e)
     case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
+    case e: ClarkElemNodeApi                 => sys.error(s"Not an element that implements Nodes.Elem")
     case t: Nodes.Text                       => Text(t)
     case n                                   => sys.error(s"Not an element or text node: $n")
   }
@@ -404,18 +407,23 @@ object Node {
 object Elem {
 
   private[resolved] final class ElemSerializationProxy(
-      val resolvedName: EName,
-      val resolvedAttributes: Map[EName, String],
-      val children: immutable.IndexedSeq[Node]) extends Serializable {
+    val resolvedName:       EName,
+    val resolvedAttributes: Map[EName, String],
+    val children:           immutable.IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
   }
 
+  /**
+   * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "resolved" `Elem`.
+   * All descendant-or-self elements must implement `Nodes.Elem with ClarkElemNodeApi`, or else an exception is thrown.
+   */
   def apply(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
     val children = e.children collect {
       case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
       case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
+      case childElem: ClarkElemNodeApi                => sys.error(s"Not an element that implements Nodes.Elem")
       case childText: Nodes.Text                      => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent

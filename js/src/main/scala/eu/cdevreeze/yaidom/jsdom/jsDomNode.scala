@@ -35,7 +35,6 @@ import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
  * Wrappers around `org.scalajs.dom.raw.Node` and subclasses, such that the wrapper around `org.scalajs.dom.raw.Element` conforms to the
@@ -58,7 +57,7 @@ import eu.cdevreeze.yaidom.resolved.ResolvedNodes
  *
  * @author Chris de Vreeze
  */
-sealed trait JsDomNode extends ResolvedNodes.Node {
+sealed trait JsDomNode extends Nodes.Node {
 
   type DomType <: sjsdom.Node
 
@@ -87,7 +86,7 @@ sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChi
  */
 final class JsDomElem(
   override val wrappedNode: sjsdom.Element)
-  extends CanBeDomDocumentChild with ResolvedNodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
+  extends CanBeDomDocumentChild with Nodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -258,7 +257,7 @@ final class JsDomElem(
   }
 }
 
-final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode with ResolvedNodes.Text {
+final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode with Nodes.Text {
   override type DomType = sjsdom.Text
 
   require(wrappedNode ne null) // scalastyle:off null

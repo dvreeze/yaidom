@@ -11,7 +11,7 @@ kinds of nodes). The main changes in version 1.8.0-M1 are:
 
 * Added query API trait ``HasChildNodesApi``, containing method ``children``
 
-  * This query API trait extends ``AnyElemNodeApi``, and therefore is abstract in the node type (as well as the element type)
+  * This query API trait extends ``AnyElemNodeApi``, and therefore it is abstract in the node type (as well as the element type)
   * There are sub-traits (top to bottom) ``ClarkElemNodeApi``, ``ScopedElemNodeApi`` and ``BackingElemNodeApi``
   * For example, ``ClarkElemNodeApi`` extends ``ClarkElemApi`` and ``HasChildNodesApi``
   * Traits ``ClarkElemNodeApi``, ``ScopedElemNodeApi`` and ``BackingElemNodeApi`` are now the important element abstractions

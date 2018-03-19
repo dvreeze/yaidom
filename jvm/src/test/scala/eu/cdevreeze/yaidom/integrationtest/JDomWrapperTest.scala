@@ -43,7 +43,6 @@ import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -796,7 +795,7 @@ class JDomWrapperTest extends FunSuite {
 
 object JDomWrapperTest {
 
-  sealed trait JDomNode extends ResolvedNodes.Node {
+  sealed trait JDomNode extends Nodes.Node {
 
     type DomType <: org.jdom2.Content
 
@@ -821,7 +820,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with ResolvedNodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with Nodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
@@ -989,7 +988,7 @@ object JDomWrapperTest {
     }
   }
 
-  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode with ResolvedNodes.Text {
+  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode with Nodes.Text {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.Text

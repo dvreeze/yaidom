@@ -25,7 +25,6 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 object IndexedClarkNode {
 
@@ -34,7 +33,7 @@ object IndexedClarkNode {
    *
    * @author Chris de Vreeze
    */
-  sealed trait Node extends ResolvedNodes.Node
+  sealed trait Node extends Nodes.Node
 
   /**
    * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
@@ -177,7 +176,7 @@ object IndexedClarkNode {
     }
   }
 
-  final case class Text(text: String, isCData: Boolean) extends Node with ResolvedNodes.Text {
+  final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
     require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 

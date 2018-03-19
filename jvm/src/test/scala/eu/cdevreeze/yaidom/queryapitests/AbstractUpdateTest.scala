@@ -26,11 +26,11 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
+import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import eu.cdevreeze.yaidom.simple.Elem
 
 /**
@@ -40,8 +40,8 @@ import eu.cdevreeze.yaidom.simple.Elem
  */
 abstract class AbstractUpdateTest extends FunSuite {
 
-  type N <: ResolvedNodes.Node
-  type E <: N with ResolvedNodes.Elem with ClarkElemApi.Aux[E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]
+  type N <: Nodes.Node
+  type E <: N with Nodes.Elem with ClarkElemNodeApi.Aux[N, E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]
 
   implicit val clsTag: ClassTag[E]
 

@@ -31,7 +31,6 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AbsolutePath
 import net.sf.saxon.om.AxisInfo
@@ -52,7 +51,7 @@ trait SaxonTestSupport {
   import ENameProvider.globalENameProvider._
   import QNameProvider.globalQNameProvider._
 
-  abstract class DomNode(val wrappedNode: NodeInfo) extends ResolvedNodes.Node {
+  abstract class DomNode(val wrappedNode: NodeInfo) extends Nodes.Node {
 
     final override def toString: String = wrappedNode.toString
 
@@ -140,7 +139,7 @@ trait SaxonTestSupport {
    * Saxon NodeInfo element wrapper. It is efficient, because of an entirely custom query API implementation tailored to Saxon.
    */
   final class DomElem(
-    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Elem with BackingElemNodeApi {
+    override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with Nodes.Elem with BackingElemNodeApi {
 
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.ELEMENT)
@@ -508,7 +507,7 @@ trait SaxonTestSupport {
     def commentChildren: immutable.IndexedSeq[DomComment] = children collect { case c: DomComment => c }
   }
 
-  final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with ResolvedNodes.Text {
+  final class DomText(override val wrappedNode: NodeInfo) extends DomNode(wrappedNode) with Nodes.Text {
     require(wrappedNode ne null)
     require(wrappedNode.getNodeKind == Type.TEXT || wrappedNode.getNodeKind == Type.WHITESPACE_TEXT)
 

@@ -26,7 +26,6 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
-import eu.cdevreeze.yaidom.resolved.ResolvedNodes
 
 /**
  * Wrappers around `scala.xml.Node` and subclasses, such that the wrapper around `scala.xml.Elem` conforms to the
@@ -43,7 +42,7 @@ import eu.cdevreeze.yaidom.resolved.ResolvedNodes
  *
  * @author Chris de Vreeze
  */
-sealed trait ScalaXmlNode extends ResolvedNodes.Node {
+sealed trait ScalaXmlNode extends Nodes.Node {
 
   type DomType <: scala.xml.Node
 
@@ -76,7 +75,7 @@ sealed trait CanBeScalaXmlDocumentChild extends ScalaXmlNode with Nodes.CanBeDoc
  * instances for the query results. By design, the only state of each wrapper instance is the wrapped Scala XML Elem.
  */
 final class ScalaXmlElem(
-  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with ResolvedNodes.Elem with ScopedElemNodeApi with ScopedElemLike {
+  override val wrappedNode: scala.xml.Elem) extends CanBeScalaXmlDocumentChild with Nodes.Elem with ScopedElemNodeApi with ScopedElemLike {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -140,7 +139,7 @@ final class ScalaXmlElem(
   }
 }
 
-final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode with ResolvedNodes.Text {
+final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends ScalaXmlNode with Nodes.Text {
   require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.Text
@@ -152,7 +151,7 @@ final class ScalaXmlText(override val wrappedNode: scala.xml.Text) extends Scala
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 }
 
-final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends ScalaXmlNode with ResolvedNodes.Text {
+final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends ScalaXmlNode with Nodes.Text {
   require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.PCData
