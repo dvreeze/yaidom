@@ -3,6 +3,15 @@ CHANGELOG
 =========
 
 
+1.8.0-M2
+========
+
+The main changes in version 1.8.0-M2 (compared with milestone 1) are:
+
+* Removed ``ResolvedNodes`` object
+* Java 6 and 7 as targets no longer supported
+
+
 1.8.0-M1
 ========
 
