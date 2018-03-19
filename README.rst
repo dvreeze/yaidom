@@ -42,4 +42,4 @@ as follows (in an SBT or Maven build):
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.
 Yaidom has been cross-built for several Scala versions, leading to artifactIds referring to different Scala (binary) versions.
 
-Yaidom requires Java version 1.6 or later. The java8 packages can only be used with Java version 1.8 or later.
+Yaidom (1.8.X and later) requires Java version 1.8 or later.

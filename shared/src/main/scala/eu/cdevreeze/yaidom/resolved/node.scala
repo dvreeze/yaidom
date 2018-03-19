@@ -372,7 +372,6 @@ object Node {
   def apply(n: Nodes.Node): Node = n match {
     case e: Nodes.Elem with ClarkElemNodeApi => Elem(e)
     case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-    case e: ClarkElemNodeApi                 => sys.error(s"Not an element that implements Nodes.Elem")
     case t: Nodes.Text                       => Text(t)
     case n                                   => sys.error(s"Not an element or text node: $n")
   }
@@ -417,13 +416,12 @@ object Elem {
 
   /**
    * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "resolved" `Elem`.
-   * All descendant-or-self elements must implement `Nodes.Elem with ClarkElemNodeApi`, or else an exception is thrown.
+   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
    */
   def apply(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
     val children = e.children collect {
       case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
       case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-      case childElem: ClarkElemNodeApi                => sys.error(s"Not an element that implements Nodes.Elem")
       case childText: Nodes.Text                      => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
