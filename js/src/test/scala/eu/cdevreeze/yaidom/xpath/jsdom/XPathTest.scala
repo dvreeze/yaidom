@@ -74,6 +74,18 @@ class XPathTest extends FunSuite {
     }
   }
 
+  test("testSimpleNonNamespaceAwareNodeXPath") {
+    val exprString =
+      "//*[local-name(.) = 'context'][1]/*[local-name(.) = 'entity'][1]" +
+        "/*[local-name(.) = 'segment'][1]/*[local-name(.) = 'explicitMember'][1]"
+
+    val result = xpathEvaluator.evaluateAsNode(exprString, Some(rootElem.wrappedNode))
+
+    assertResult("gaap:ABCCompanyDomain") {
+      yaidom.jsdom.JsDomElem(result.asInstanceOf[sjsdom.Element]).text.trim
+    }
+  }
+
   /*
   test("testSimpleNodeXPath") {
     val exprString = "//xbrli:context[1]/xbrli:entity/xbrli:segment/xbrldi:explicitMember[1]"

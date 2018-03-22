@@ -88,7 +88,7 @@ final class JsDomElem(
   override val wrappedNode: sjsdom.Element)
   extends CanBeDomDocumentChild with Nodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
 
-  require(wrappedNode ne null) // scalastyle:off null
+  require(wrappedNode ne null, s"Missing underlying element node") // scalastyle:off null
 
   type ThisElem = JsDomElem
 
@@ -260,7 +260,7 @@ final class JsDomElem(
 final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode with Nodes.Text {
   override type DomType = sjsdom.Text
 
-  require(wrappedNode ne null) // scalastyle:off null
+  require(wrappedNode ne null, s"Missing underlying text node") // scalastyle:off null
 
   def text: String = wrappedNode.data
 
@@ -274,7 +274,7 @@ final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode w
 final class JsDomProcessingInstruction(
   override val wrappedNode: sjsdom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
 
-  require(wrappedNode ne null) // scalastyle:off null
+  require(wrappedNode ne null, s"Missing underlying processing instruction node") // scalastyle:off null
 
   override type DomType = sjsdom.ProcessingInstruction
 
@@ -286,7 +286,7 @@ final class JsDomProcessingInstruction(
 final class JsDomComment(
   override val wrappedNode: sjsdom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
 
-  require(wrappedNode ne null) // scalastyle:off null
+  require(wrappedNode ne null, s"Missing underlying comment node") // scalastyle:off null
 
   override type DomType = sjsdom.Comment
 

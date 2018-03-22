@@ -49,7 +49,7 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
     val contextItem = contextItemOption.getOrElse(doc)
 
     val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.STRING_TYPE, null)
-    xpathResult.stringValue
+    xpathResult.ensuring(_ != null, "XPath result null not expected").stringValue
   }
 
   def evaluateAsNode(expr: XPathExpression, contextItemOption: Option[ContextItem]): Node = {
@@ -58,7 +58,7 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
     val contextItem = contextItemOption.getOrElse(doc)
 
     val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.FIRST_ORDERED_NODE_TYPE, null)
-    xpathResult.singleNodeValue
+    xpathResult.ensuring(_ != null, "XPath result null not expected").singleNodeValue
   }
 
   def evaluateAsNodeSeq(expr: XPathExpression, contextItemOption: Option[ContextItem]): immutable.IndexedSeq[Node] = {
@@ -66,9 +66,14 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
 
     val contextItem = contextItemOption.getOrElse(doc)
 
-    val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+    val xpathResult: sjsdom.XPathResult =
+      doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
 
-    (0 until xpathResult.snapshotLength).toIndexedSeq.map(i => xpathResult.snapshotItem((i)))
+    if (xpathResult == null) {
+      immutable.IndexedSeq()
+    } else {
+      (0 until xpathResult.snapshotLength).toIndexedSeq.map(i => xpathResult.snapshotItem((i)))
+    }
   }
 
   def evaluateAsBackingDocument(expr: XPathExpression, contextItemOption: Option[ContextItem]): BackingDocumentApi = {
@@ -114,7 +119,7 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
     val contextItem = contextItemOption.getOrElse(doc)
 
     val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.NUMBER_TYPE, null)
-    BigDecimal(xpathResult.numberValue)
+    BigDecimal(xpathResult.ensuring(_ != null, "XPath result null not expected").numberValue)
   }
 
   def evaluateAsBoolean(expr: XPathExpression, contextItemOption: Option[ContextItem]): Boolean = {
@@ -123,7 +128,7 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
     val contextItem = contextItemOption.getOrElse(doc)
 
     val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.BOOLEAN_TYPE, null)
-    xpathResult.booleanValue
+    xpathResult.ensuring(_ != null, "XPath result null not expected").booleanValue
   }
 
   def makeXPathExpression(xpathString: String): XPathExpression = {
