@@ -40,6 +40,14 @@ final class JsDomXPathEvaluatorFactoryBuilder private (
     new JsDomXPathEvaluatorFactoryBuilder(doc, Some(newNamespaceResolver))
   }
 
+  def withNamespaceResolverFromElement(elem: sjsdom.Element): JsDomXPathEvaluatorFactoryBuilder = {
+    val docElem = elem.ownerDocument.documentElement
+
+    val namespaceResolver = doc.createNSResolver(docElem)
+
+    withNamespaceResolver(namespaceResolver)
+  }
+
   def build(): XPathEvaluatorFactory.Aux[XPathExpression, Node, ContextItem] = {
     new JsDomXPathEvaluatorFactory(doc, namespaceResolverOption)
   }

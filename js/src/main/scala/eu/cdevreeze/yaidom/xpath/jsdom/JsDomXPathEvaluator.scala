@@ -28,6 +28,8 @@ import org.scalajs.dom.{ raw => sjsdom }
  * XPathEvaluator for JS-DOM XML (not HTML). It does not support compilation of XPath expressions and re-use of the compilation results.
  * Therefore, method `makeXPathExpression` is a no-op, returning the same expression string.
  *
+ * This is only an XPath 1.0 evaluator, and therefore a far cry from XPath 3.1 evaluators like Saxon on the JVM.
+ *
  * See for example https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_using_XPath_in_JavaScript.
  *
  * @author Chris de Vreeze
