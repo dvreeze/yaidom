@@ -22,6 +22,9 @@ package eu.cdevreeze.yaidom
  * many different implementations. This yaidom XPath API has even an implementation targeting Scala-JS,
  * so it has no dependencies on JAXP.
  *
+ * This API should be useful for any XPath version, even as old as 1.0. Indeed, there is no XDM (XPath Data Model)
+ * abstraction in this API.
+ *
  * Preferably implementations use (the same) yaidom element types for context items and returned nodes, or use
  * types for them that have yaidom wrappers. This would make it easy to mix XPath evaluations with
  * yaidom queries, at reasonably low runtime costs.

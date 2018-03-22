@@ -18,11 +18,12 @@ package eu.cdevreeze.yaidom.xpath.jsdom
 
 import scala.collection.immutable
 
+import org.scalajs.dom.{ raw => sjsdom }
+
 import eu.cdevreeze.yaidom
-import eu.cdevreeze.yaidom.xpath.XPathEvaluator
 import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
 import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
-import org.scalajs.dom.{ raw => sjsdom }
+import eu.cdevreeze.yaidom.xpath.XPathEvaluator
 
 /**
  * XPathEvaluator for JS-DOM XML (not HTML). It does not support compilation of XPath expressions and re-use of the compilation results.
@@ -31,6 +32,8 @@ import org.scalajs.dom.{ raw => sjsdom }
  * This is only an XPath 1.0 evaluator, and therefore a far cry from XPath 3.1 evaluators like Saxon on the JVM.
  *
  * See for example https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_using_XPath_in_JavaScript.
+ *
+ * The evaluation methods use the document passed to the constructor as fallback context item, if no context item is provided.
  *
  * @author Chris de Vreeze
  */
@@ -48,8 +51,11 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
 
     val contextItem = contextItemOption.getOrElse(doc)
 
-    val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.STRING_TYPE, null)
-    xpathResult.ensuring(_ != null, "XPath result null not expected").stringValue
+    val xpathResult =
+      doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.STRING_TYPE, null)
+        .ensuring(_ != null, "Null XPath result not expected")
+
+    xpathResult.stringValue
   }
 
   def evaluateAsNode(expr: XPathExpression, contextItemOption: Option[ContextItem]): Node = {
@@ -57,8 +63,11 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
 
     val contextItem = contextItemOption.getOrElse(doc)
 
-    val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.FIRST_ORDERED_NODE_TYPE, null)
-    xpathResult.ensuring(_ != null, "XPath result null not expected").singleNodeValue
+    val xpathResult =
+      doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+        .ensuring(_ != null, "Null XPath result not expected")
+
+    xpathResult.singleNodeValue
   }
 
   def evaluateAsNodeSeq(expr: XPathExpression, contextItemOption: Option[ContextItem]): immutable.IndexedSeq[Node] = {
@@ -118,8 +127,11 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
 
     val contextItem = contextItemOption.getOrElse(doc)
 
-    val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.NUMBER_TYPE, null)
-    BigDecimal(xpathResult.ensuring(_ != null, "XPath result null not expected").numberValue)
+    val xpathResult =
+      doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.NUMBER_TYPE, null)
+        .ensuring(_ != null, "Null XPath result not expected")
+
+    BigDecimal(xpathResult.numberValue)
   }
 
   def evaluateAsBoolean(expr: XPathExpression, contextItemOption: Option[ContextItem]): Boolean = {
@@ -127,8 +139,11 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val namespaceResolverO
 
     val contextItem = contextItemOption.getOrElse(doc)
 
-    val xpathResult = doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.BOOLEAN_TYPE, null)
-    xpathResult.ensuring(_ != null, "XPath result null not expected").booleanValue
+    val xpathResult =
+      doc.evaluate(expr, contextItem, namespaceResolverOption.orNull, sjsdom.XPathResult.BOOLEAN_TYPE, null)
+        .ensuring(_ != null, "Null XPath result not expected")
+
+    xpathResult.booleanValue
   }
 
   def makeXPathExpression(xpathString: String): XPathExpression = {

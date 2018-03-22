@@ -16,9 +16,9 @@
 
 package eu.cdevreeze.yaidom.xpath.jsdom
 
-import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactory
-import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactoryBuilder
 import org.scalajs.dom.{ raw => sjsdom }
+
+import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactoryBuilder
 
 /**
  * XPathEvaluatorFactory builder for JS-DOM XML (not HTML).
@@ -48,7 +48,7 @@ final class JsDomXPathEvaluatorFactoryBuilder private (
     withNamespaceResolver(namespaceResolver)
   }
 
-  def build(): XPathEvaluatorFactory.Aux[XPathExpression, Node, ContextItem] = {
+  def build(): JsDomXPathEvaluatorFactory = {
     new JsDomXPathEvaluatorFactory(doc, namespaceResolverOption)
   }
 }

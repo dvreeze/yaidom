@@ -16,9 +16,9 @@
 
 package eu.cdevreeze.yaidom.xpath.jsdom
 
-import eu.cdevreeze.yaidom.xpath.XPathEvaluator
-import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactory
 import org.scalajs.dom.{ raw => sjsdom }
+
+import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactory
 
 /**
  * XPathEvaluatorFactory for JS-DOM XML (not HTML).
@@ -26,7 +26,9 @@ import org.scalajs.dom.{ raw => sjsdom }
  * @author Chris de Vreeze
  */
 // scalastyle:off null
-final class JsDomXPathEvaluatorFactory(val doc: sjsdom.Document, val namespaceResolverOption: Option[sjsdom.XPathNSResolver]) extends XPathEvaluatorFactory {
+final class JsDomXPathEvaluatorFactory(
+  val doc:                     sjsdom.Document,
+  val namespaceResolverOption: Option[sjsdom.XPathNSResolver]) extends XPathEvaluatorFactory {
 
   type XPathExpression = String
 
@@ -34,7 +36,7 @@ final class JsDomXPathEvaluatorFactory(val doc: sjsdom.Document, val namespaceRe
 
   type ContextItem = sjsdom.Node
 
-  def newXPathEvaluator(): XPathEvaluator.Aux[XPathExpression, Node, ContextItem] = {
+  def newXPathEvaluator(): JsDomXPathEvaluator = {
     new JsDomXPathEvaluator(doc, namespaceResolverOption)
   }
 }
