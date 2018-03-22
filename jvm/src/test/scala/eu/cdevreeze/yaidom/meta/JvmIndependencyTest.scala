@@ -304,9 +304,18 @@ class JvmIndependencyTest extends FunSuite {
 
   private def isYaidomImporter(importer: Importer): Boolean = {
     val termNames = importer.ref collect { case tn: Term.Name => tn }
+    val importeeNames = importer collect { case n: Name.Indeterminate => n }
 
-    termNames.take(3).map(_.structure) ==
-      List(Term.Name("eu"), Term.Name("cdevreeze"), Term.Name("yaidom")).map(_.structure)
+    val isNormalYaidomImporter =
+      termNames.take(3).map(_.structure) ==
+        List(Term.Name("eu"), Term.Name("cdevreeze"), Term.Name("yaidom")).map(_.structure)
+
+    val isYaidomPackageImporter =
+      (termNames.map(_.structure) ==
+        List(Term.Name("eu"), Term.Name("cdevreeze")).map(_.structure)) &&
+        (importeeNames.map(_.structure) == List(Name.Indeterminate("yaidom")).map(_.structure))
+
+    isNormalYaidomImporter || isYaidomPackageImporter
   }
 
   private def isOtherAllowedImporter(importer: Importer): Boolean = {
