@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.jsdom
+package eu.cdevreeze.yaidom.scalaxml.js
 
-import org.scalajs.dom.experimental.domparser.DOMParser
-import org.scalajs.dom.experimental.domparser.SupportedType
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 
-import eu.cdevreeze.yaidom.convert.JsDomConversions
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlComment
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlProcessingInstruction
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlText
 import eu.cdevreeze.yaidom.simple
 
 /**
- * DOM wrapper test case.
+ * Scala XML wrapper test case.
  *
  * Acknowledgments: The sample XML is part of the online course "Introduction to Databases", by professor Widom at
  * Stanford University. Many thanks for letting me use this material. Other sample XML files are taken from Anti-XML
@@ -39,7 +40,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
+class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -53,10 +54,7 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testParse") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
-
-    val root: JsDomElem = domDoc.documentElement
+    val root: ScalaXmlElem = ScalaXmlElem(booksXml)
 
     assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
@@ -74,10 +72,7 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testParseStrangeXml") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(strangeXml, SupportedType.`text/xml`))
-
-    val root: JsDomElem = domDoc.documentElement
+    val root: ScalaXmlElem = ScalaXmlElem(strangeXml)
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -86,10 +81,7 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testParseDefaultNamespaceXml") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(trivialXml, SupportedType.`text/xml`))
-
-    val root: JsDomElem = domDoc.documentElement
+    val root: ScalaXmlElem = ScalaXmlElem(trivialXml)
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = root.findAllElemsOrSelf map { e => e.resolvedName }
@@ -110,14 +102,11 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
    * The Scala counterpart is more type-safe.
    */
   test("testParseGroovyXmlExample") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(carsXml, SupportedType.`text/xml`))
+    val recordsElm = ScalaXmlElem(carsXml)
 
     assertResult("records") {
-      domDoc.documentElement.localName
+      recordsElm.localName
     }
-
-    val recordsElm = domDoc.documentElement
 
     assertResult(3) {
       (recordsElm \ (_.localName == "car")).size
@@ -171,38 +160,22 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
    * Example of parsing a document with multiple kinds of nodes.
    */
   test("testParseMultipleNodeKinds") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(
-      db.parseFromString(trivialXmlWithDifferentKindsOfNodes, SupportedType.`text/xml`))
-
-    assertResult(2) {
-      domDoc.comments.size
-    }
-    assertResult(1) {
-      domDoc.processingInstructions.size
-    }
-
-    assertResult("Some comment") {
-      domDoc.comments(1).text.trim
-    }
-    assertResult("pi") {
-      domDoc.processingInstructions.head.wrappedNode.target
-    }
+    val domRoot: ScalaXmlElem = ScalaXmlElem(trivialXmlWithDifferentKindsOfNodes)
 
     assertResult(1) {
-      domDoc.documentElement.findAllElemsOrSelf.
-        flatMap(_.children collect { case c: JsDomComment if c.text.trim == "Another comment" => c }).size
+      domRoot.findAllElemsOrSelf.
+        flatMap(_.children collect { case c: ScalaXmlComment if c.text.trim == "Another comment" => c }).size
     }
     assertResult(1) {
-      domDoc.documentElement.findAllElemsOrSelf.
-        flatMap(_.children collect { case pi: JsDomProcessingInstruction if pi.wrappedNode.target == "some_pi" => pi }).size
+      domRoot.findAllElemsOrSelf.
+        flatMap(_.children collect { case pi: ScalaXmlProcessingInstruction if pi.wrappedNode.target == "some_pi" => pi }).size
     }
     assertResult(1) {
-      domDoc.documentElement.findAllElemsOrSelf.
-        flatMap(_.children collect { case t: JsDomText if t.text.trim.contains("Some Text") => t }).size
+      domRoot.findAllElemsOrSelf.
+        flatMap(_.children collect { case t: ScalaXmlText if t.text.trim.contains("Some Text") => t }).size
     }
     assertResult(1) {
-      domDoc.documentElement.findAllElemsOrSelf.
+      domRoot.findAllElemsOrSelf.
         flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
     }
   }
@@ -210,11 +183,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   // Now add conversions to simple and indexed elements into the mix
 
   test("testParseAndConvert") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val domRoot: ScalaXmlElem = ScalaXmlElem(booksXml)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
 
     assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
       (root.findAllElems map (e => e.localName)).toSet
@@ -256,11 +226,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testParseAndConvertStrangeXml") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(strangeXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val domRoot: ScalaXmlElem = ScalaXmlElem(strangeXml)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
     val iroot: indexed.Elem = indexed.Elem(root)
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
@@ -274,11 +241,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testParseAndConvertDefaultNamespaceXml") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(trivialXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val domRoot: ScalaXmlElem = ScalaXmlElem(trivialXml)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
     val iroot: indexed.Elem = indexed.Elem(root)
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
@@ -304,15 +268,12 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
    * The Scala counterpart is more type-safe.
    */
   test("testParseAndConvertGroovyXmlExample") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(carsXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val domRoot: ScalaXmlElem = ScalaXmlElem(carsXml)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
     val iroot: indexed.Elem = indexed.Elem(root)
 
     assertResult("records") {
-      domDoc.documentElement.localName
+      domRoot.localName
     }
 
     assertResult(3) {
@@ -369,28 +330,9 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
    * Example of parsing a document with multiple kinds of nodes.
    */
   test("testParseAndConvertMultipleNodeKinds") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(
-      db.parseFromString(trivialXmlWithDifferentKindsOfNodes, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val doc: simple.Document = JsDomConversions.convertToDocument(domDoc.wrappedDocument)
-    val root: simple.Elem = doc.documentElement
+    val domRoot: ScalaXmlElem = ScalaXmlElem(trivialXmlWithDifferentKindsOfNodes)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
     val iroot: indexed.Elem = indexed.Elem(root)
-
-    assertResult(2) {
-      doc.comments.size
-    }
-    assertResult(1) {
-      doc.processingInstructions.size
-    }
-
-    assertResult("Some comment") {
-      doc.comments(1).text.trim
-    }
-    assertResult("pi") {
-      doc.processingInstructions.head.target
-    }
 
     assertResult(1) {
       root.findAllElemsOrSelf.
@@ -415,11 +357,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testParseAndConvertLinkbase") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(linkbaseXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val domRoot: ScalaXmlElem = ScalaXmlElem(linkbaseXml)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
     val iroot: indexed.Elem = indexed.Elem(root)
 
     val xlinkNs = "http://www.w3.org/1999/xlink"
@@ -453,42 +392,11 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  // Querying for ancestry
-
-  test("testAncestry") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
-    val iroot: indexed.Elem = indexed.Elem(root)
-
-    assertResult(false) {
-      val firstDescendant = domRoot.findAllElems.head
-      resolved.Elem(firstDescendant.parent) == resolved.Elem(firstDescendant)
-    }
-
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(domRoot.findAllElems.head.parent)
-    }
-
-    assertResult(domRoot.findAllElems.map(_.parent).map(e => resolved.Elem(e))) {
-      iroot.findAllElems.map(_.parent).map(e => resolved.Elem(e.underlyingElem))
-    }
-
-    assertResult(List(root.resolvedName)) {
-      domRoot.findAllElemsOrSelf.map(_.ancestorsOrSelf.last.resolvedName).distinct
-    }
-  }
-
   // Testing navigation and paths
 
   test("testNavigation") {
-    val db = new DOMParser()
-    val domDoc: JsDomDocument = JsDomDocument.wrapDocument(db.parseFromString(booksXml, SupportedType.`text/xml`))
-
-    val domRoot: JsDomElem = domDoc.documentElement
-    val root: simple.Elem = JsDomConversions.convertToElem(domRoot.wrappedNode, Scope.Empty)
+    val domRoot: ScalaXmlElem = ScalaXmlElem(booksXml)
+    val root: simple.Elem = ScalaXmlConversions.convertToElem(domRoot.wrappedNode)
     val iroot: indexed.Elem = indexed.Elem(root)
 
     val paths = iroot.findAllElemsOrSelf.map(_.path).ensuring(_.head.isEmpty).ensuring(_.tail.head.nonEmpty)
@@ -496,168 +404,147 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
     assertResult(paths.map(path => resolved.Elem(domRoot.getElemOrSelfByPath(path)))) {
       paths.map(path => resolved.Elem(root.getElemOrSelfByPath(path)))
     }
-
-    assertResult(iroot.findAllElemsOrSelf.map(_.path)) {
-      domRoot.findAllElemsOrSelf.map(_.path)
-    }
-
-    assertResult(List(resolved.Elem(root))) {
-      domRoot.findAllElemsOrSelf.map(_.rootElem).map(e => resolved.Elem(e)).distinct
-    }
   }
 
   private val booksXml =
-    """<books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
-	<Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
-		<Title>A First Course in Database Systems</Title>
-		<Authors>
-			<Author>
-				<First_Name>Jeffrey</First_Name>
-				<Last_Name>Ullman</Last_Name>
-			</Author>
-			<Author>
-				<First_Name>Jennifer</First_Name>
-				<Last_Name>Widom</Last_Name>
-			</Author>
-		</Authors>
-	</Book>
-	<Book ISBN="ISBN-0-13-815504-6" Price="100">
-		<Title>Database Systems: The Complete Book</Title>
-		<Authors>
-			<Author>
-				<First_Name>Hector</First_Name>
-				<Last_Name>Garcia-Molina</Last_Name>
-			</Author>
-			<Author>
-				<First_Name>Jeffrey</First_Name>
-				<Last_Name>Ullman</Last_Name>
-			</Author>
-			<Author>
-				<First_Name>Jennifer</First_Name>
-				<Last_Name>Widom</Last_Name>
-			</Author>
-		</Authors>
-		<Remark>Buy this book bundled with "A First Course" - a great deal!
-		</Remark>
-	</Book>
-	<Book ISBN="ISBN-0-11-222222-3" Price="50">
-		<Title>Hector and Jeff's Database Hints</Title>
-		<Authors>
-			<Author>
-				<First_Name>Jeffrey</First_Name>
-				<Last_Name>Ullman</Last_Name>
-			</Author>
-			<Author>
-				<First_Name>Hector</First_Name>
-				<Last_Name>Garcia-Molina</Last_Name>
-			</Author>
-		</Authors>
-		<Remark>An indispensable companion to your textbook</Remark>
-	</Book>
-	<Book ISBN="ISBN-9-88-777777-6" Price="25">
-		<Title>Jennifer's Economical Database Hints</Title>
-		<Authors>
-			<Author>
-				<First_Name>Jennifer</First_Name>
-				<Last_Name>Widom</Last_Name>
-			</Author>
-		</Authors>
-	</Book>
-	<Magazine Month="January" Year="2009">
-		<Title>National Geographic</Title>
-	</Magazine>
-	<Magazine Month="February" Year="2009">
-		<Title>National Geographic</Title>
-	</Magazine>
-	<Magazine Month="February" Year="2009">
-		<Title>Newsweek</Title>
-	</Magazine>
-	<Magazine Month="March" Year="2009">
-		<Title>Hector and Jeff's Database Hints</Title>
-	</Magazine>
-</books:Bookstore>"""
+    <books:Bookstore xmlns="http://bookstore" xmlns:books="http://bookstore">
+      <Book ISBN="ISBN-0-13-713526-2" Price="85" Edition="3rd">
+        <Title>A First Course in Database Systems</Title>
+        <Authors>
+          <Author>
+            <First_Name>Jeffrey</First_Name>
+            <Last_Name>Ullman</Last_Name>
+          </Author>
+          <Author>
+            <First_Name>Jennifer</First_Name>
+            <Last_Name>Widom</Last_Name>
+          </Author>
+        </Authors>
+      </Book>
+      <Book ISBN="ISBN-0-13-815504-6" Price="100">
+        <Title>Database Systems: The Complete Book</Title>
+        <Authors>
+          <Author>
+            <First_Name>Hector</First_Name>
+            <Last_Name>Garcia-Molina</Last_Name>
+          </Author>
+          <Author>
+            <First_Name>Jeffrey</First_Name>
+            <Last_Name>Ullman</Last_Name>
+          </Author>
+          <Author>
+            <First_Name>Jennifer</First_Name>
+            <Last_Name>Widom</Last_Name>
+          </Author>
+        </Authors>
+        <Remark>
+          Buy this book bundled with "A First Course" - a great deal!
+        </Remark>
+      </Book>
+      <Book ISBN="ISBN-0-11-222222-3" Price="50">
+        <Title>Hector and Jeff's Database Hints</Title>
+        <Authors>
+          <Author>
+            <First_Name>Jeffrey</First_Name>
+            <Last_Name>Ullman</Last_Name>
+          </Author>
+          <Author>
+            <First_Name>Hector</First_Name>
+            <Last_Name>Garcia-Molina</Last_Name>
+          </Author>
+        </Authors>
+        <Remark>An indispensable companion to your textbook</Remark>
+      </Book>
+      <Book ISBN="ISBN-9-88-777777-6" Price="25">
+        <Title>Jennifer's Economical Database Hints</Title>
+        <Authors>
+          <Author>
+            <First_Name>Jennifer</First_Name>
+            <Last_Name>Widom</Last_Name>
+          </Author>
+        </Authors>
+      </Book>
+      <Magazine Month="January" Year="2009">
+        <Title>National Geographic</Title>
+      </Magazine>
+      <Magazine Month="February" Year="2009">
+        <Title>National Geographic</Title>
+      </Magazine>
+      <Magazine Month="February" Year="2009">
+        <Title>Newsweek</Title>
+      </Magazine>
+      <Magazine Month="March" Year="2009">
+        <Title>Hector and Jeff's Database Hints</Title>
+      </Magazine>
+    </books:Bookstore>
 
   private val strangeXml =
-    """<bar xmlns:ns="http://www.yahoo.com">
-	<ns:foo xmlns:ns="http://www.google.com" />
-</bar>"""
+    <bar xmlns:ns="http://www.yahoo.com">
+      <ns:foo xmlns:ns="http://www.google.com"/>
+    </bar>
 
   private val trivialXml =
-    """<!-- This is trivial XML -->
-<root xmlns="urn:foo:bar">
-	<!-- Trivial XML -->
-	<child />
-</root>"""
+    <root xmlns="urn:foo:bar">
+      <!-- Trivial XML -->
+      <child/>
+    </root>
 
+  //  Copied from http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser
   private val carsXml =
-    """<!-- Copied from http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser -->
-<records>
-	<car name='HSV Maloo' make='Holden' year='2006'>
-		<country>Australia</country>
-		<record type='speed'>Production Pickup Truck with speed of 271kph
-		</record>
-	</car>
-	<car name='P50' make='Peel' year='1962'>
-		<country>Isle of Man</country>
-		<record type='size'>Smallest Street-Legal Car at 99cm wide and 59 kg
-			in weight</record>
-	</car>
-	<car name='Royale' make='Bugatti' year='1931'>
-		<country>France</country>
-		<record type='price'>Most Valuable Car at $15 million</record>
-	</car>
-</records>"""
+    <records>
+      <car name='HSV Maloo' make='Holden' year='2006'>
+        <country>Australia</country>
+        <record type='speed'>
+          Production Pickup Truck with speed of 271kph
+        </record>
+      </car>
+      <car name='P50' make='Peel' year='1962'>
+        <country>Isle of Man</country>
+        <record type='size'>
+          Smallest Street-Legal Car at 99cm wide and 59 kg
+			in weight
+        </record>
+      </car>
+      <car name='Royale' make='Bugatti' year='1931'>
+        <country>France</country>
+        <record type='price'>Most Valuable Car at $15 million</record>
+      </car>
+    </records>
 
   private val trivialXmlWithDifferentKindsOfNodes =
-    """<!DOCTYPE root [
-  <!ENTITY hello "hi there">
-  <!ELEMENT RootElement (FirstElement, SecondElement, ThirdElement, FourthElement)>
-  <!ELEMENT FirstElement (#PCDATA)>
-  <!ELEMENT SecondElement (#PCDATA|Inline)*>
-  <!ELEMENT ThirdElement (#PCDATA)>
-  <!ELEMENT FourthElement (#PCDATA)>
-  <!ELEMENT Inline (#PCDATA)>
-  <!ATTLIST RootElement xmlns CDATA #REQUIRED>
-  <!ATTLIST RootElement param CDATA #REQUIRED>
-  <!ATTLIST SecondElement param2 CDATA #REQUIRED>
-]>
-<!-- See http://en.wikipedia.org/wiki/Simple_API_for_XML -->
-<!-- Some comment -->
-<?pi some_value?>
-<RootElement param="value" xmlns="http://bla">
-	<!-- Another comment -->
-	<FirstElement>
-		Some Text
-	</FirstElement>
-    <?some_pi some_value?>
-	<SecondElement param2="something">
-		Pre-Text <Inline>Inlined text</Inline> Post-text.
-	</SecondElement>
-	<ThirdElement>
-		<![CDATA[Piet & co]]>
-	</ThirdElement>
-	<FourthElement>
-		This text contains an entity reference, viz. &hello;.
+    <RootElement param="value" xmlns="http://bla">
+      <!-- Another comment -->
+      <FirstElement>
+        Some Text
+      </FirstElement>
+      <?some_pi some_value?>
+      <SecondElement param2="something">
+        Pre-Text<Inline>Inlined text</Inline>
+        Post-text.
+      </SecondElement>
+      <ThirdElement>
+        <![CDATA[Piet & co]]>
+      </ThirdElement>
+      <FourthElement>
+        This text contains an entity reference, viz. &hello;.
 	The entity is defined in the included DTD.
-	</FourthElement>
-</RootElement>"""
+      </FourthElement>
+    </RootElement>
 
+  //  This file is part of the Dutch Taxonomy (Nederlandse Taxonomie; NT)
+  //  Intellectual Property of the State of the Netherlands
+  //  Architecture: NT11
+  //  Version: 20161214
+  //  Release date: Wed Dec 14 09:00:00 2016
   private val linkbaseXml =
-    """<!--
-  This file is part of the Dutch Taxonomy (Nederlandse Taxonomie; NT)
-  Intellectual Property of the State of the Netherlands
-  Architecture: NT11
-  Version: 20161214
-  Release date: Wed Dec 14 09:00:00 2016
--->
-<link:linkbase xmlns:gen="http://xbrl.org/2008/generic" xmlns:label="http://xbrl.org/2008/label" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd">
-  <link:roleRef roleURI="http://www.xbrl.org/2008/role/label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label" xlink:type="simple"/>
-  <link:roleRef roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role" xlink:type="simple"/>
-  <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2008/element-label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label" xlink:type="simple"/>
-  <gen:link xlink:role="http://www.xbrl.org/2008/role/link" xlink:type="extended">
-    <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label" xlink:from="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:to="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:type="arc"/>
-    <label:label id="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:role="http://www.xbrl.org/2008/role/label" xlink:type="resource" xml:lang="en">Dutch Corporate Governance Code</label:label>
-    <link:loc xlink:href="ez-ncgc-linkroles.xsd#ez-ncgc-lr_DutchCorporateGovernanceCode" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:type="locator"/>
-  </gen:link>
-</link:linkbase>"""
+    <link:linkbase xmlns:gen="http://xbrl.org/2008/generic" xmlns:label="http://xbrl.org/2008/label" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd">
+      <link:roleRef roleURI="http://www.xbrl.org/2008/role/label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label" xlink:type="simple"/>
+      <link:roleRef roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role" xlink:type="simple"/>
+      <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2008/element-label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label" xlink:type="simple"/>
+      <gen:link xlink:role="http://www.xbrl.org/2008/role/link" xlink:type="extended">
+        <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label" xlink:from="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:to="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:type="arc"/>
+        <label:label id="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:role="http://www.xbrl.org/2008/role/label" xlink:type="resource" xml:lang="en">Dutch Corporate Governance Code</label:label>
+        <link:loc xlink:href="ez-ncgc-linkroles.xsd#ez-ncgc-lr_DutchCorporateGovernanceCode" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:type="locator"/>
+      </gen:link>
+    </link:linkbase>
 }
