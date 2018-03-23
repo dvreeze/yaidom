@@ -5,7 +5,7 @@
 // See https://github.com/cquiroz/scala-java-time/blob/master/build.sbt as a "template" for this build file.
 
 
-val scalaVer = "2.12.4"
+val scalaVer = "2.12.5"
 val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-M3")
 
 lazy val commonSettings = Seq(
@@ -39,7 +39,7 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= {
     scalaBinaryVersion.value match {
       case "2.13.0-M3" => Seq("org.scalatest" %%% "scalatest" % "3.0.5-M1" % "test")
-      case _           => Seq("org.scalatest" %%% "scalatest" % "3.0.4" % "test")
+      case _           => Seq("org.scalatest" %%% "scalatest" % "3.0.5" % "test")
     }
   }
 )
@@ -59,7 +59,7 @@ lazy val root = project.in(file("."))
 lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
   .settings(commonSettings: _*)
   .jvmSettings(
-    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.0.6",
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.1.0",
 
     libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0" % "optional",
 
@@ -70,7 +70,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13.0-M3" => Seq()
-        case _           => Seq("org.scalameta" %%% "scalameta" % "2.0.1" % "test")
+        case _           => Seq("org.scalameta" %%% "scalameta" % "3.6.0" % "test")
       }
     },
 
@@ -80,13 +80,15 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
 
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-8" % "test",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-10" % "test",
+
+    // no need for joda-time on Java 8, though
 
     libraryDependencies += ("joda-time" % "joda-time" % "2.9.9" % "test").intransitive(),
 
-    libraryDependencies += ("org.joda" % "joda-convert" % "1.8.1" % "test").intransitive(),
+    libraryDependencies += ("org.joda" % "joda-convert" % "2.0.1" % "test").intransitive(),
 
-    libraryDependencies += "com.google.guava" % "guava" % "22.0" % "test",
+    libraryDependencies += "com.google.guava" % "guava" % "24.1-jre" % "test",
 
     libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test",
 
@@ -137,7 +139,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     // Do we need this jsEnv?
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.4",
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.5",
 
     parallelExecution in Test := false,
 
