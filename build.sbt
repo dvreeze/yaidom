@@ -36,6 +36,8 @@ lazy val commonSettings = Seq(
   pomExtra := pomData,
   pomIncludeRepository := { _ => false },
 
+  libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.1.0",
+
   libraryDependencies ++= {
     scalaBinaryVersion.value match {
       case "2.13.0-M3" => Seq("org.scalatest" %%% "scalatest" % "3.0.5-M1" % "test")
@@ -59,8 +61,6 @@ lazy val root = project.in(file("."))
 lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
   .settings(commonSettings: _*)
   .jvmSettings(
-    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.1.0",
-
     libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0" % "optional",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
