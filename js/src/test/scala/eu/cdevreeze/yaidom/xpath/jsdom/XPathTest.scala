@@ -41,8 +41,6 @@ class XPathTest extends FunSuite {
       .ensuring(_.wrappedNode != null, "Corrupt document element (missing underlying node)")
   }
 
-  println(s"Scope: ${rootElem.scope}")
-
   private val xpathEvaluator =
     JsDomXPathEvaluatorFactoryBuilder(doc.wrappedDocument)
       .withScope(rootElem.scope)
@@ -168,7 +166,7 @@ class XPathTest extends FunSuite {
 
   // Below, we adapted the XBRL instance to not use the default namespace.
   // Otherwise the namespace-aware XPath queries using the 'xbrli' namespace do not work!
-  // Do we have to set namespace-awareness somewhere?
+  // Is this a bug in js-dom? Or do we have to set namespace-awareness somewhere?
 
   private def xmlString = """<?xml version="1.0" encoding="utf-8"?>
 <!-- Created by Charles Hoffman, CPA, 2008-03-27 -->
