@@ -18,6 +18,7 @@ package eu.cdevreeze.yaidom.xpath.jsdom
 
 import org.scalajs.dom.{ raw => sjsdom }
 
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactoryBuilder
 
 /**
@@ -27,8 +28,8 @@ import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactoryBuilder
  */
 // scalastyle:off null
 final class JsDomXPathEvaluatorFactoryBuilder private (
-  val doc:                     sjsdom.Document,
-  val namespaceResolverOption: Option[sjsdom.XPathNSResolver]) extends XPathEvaluatorFactoryBuilder {
+  val doc:   sjsdom.Document,
+  val scope: Scope) extends XPathEvaluatorFactoryBuilder {
 
   type XPathExpression = String
 
@@ -36,26 +37,18 @@ final class JsDomXPathEvaluatorFactoryBuilder private (
 
   type ContextItem = sjsdom.Node
 
-  def withNamespaceResolver(newNamespaceResolver: sjsdom.XPathNSResolver): JsDomXPathEvaluatorFactoryBuilder = {
-    new JsDomXPathEvaluatorFactoryBuilder(doc, Some(newNamespaceResolver))
-  }
-
-  def withNamespaceResolverFromElement(elem: sjsdom.Element): JsDomXPathEvaluatorFactoryBuilder = {
-    val docElem = elem.ownerDocument.documentElement
-
-    val namespaceResolver = doc.createNSResolver(docElem)
-
-    withNamespaceResolver(namespaceResolver)
+  def withScope(newScope: Scope): JsDomXPathEvaluatorFactoryBuilder = {
+    new JsDomXPathEvaluatorFactoryBuilder(doc, newScope)
   }
 
   def build(): JsDomXPathEvaluatorFactory = {
-    new JsDomXPathEvaluatorFactory(doc, namespaceResolverOption)
+    new JsDomXPathEvaluatorFactory(doc, scope)
   }
 }
 
 object JsDomXPathEvaluatorFactoryBuilder {
 
   def apply(doc: sjsdom.Document): JsDomXPathEvaluatorFactoryBuilder = {
-    new JsDomXPathEvaluatorFactoryBuilder(doc, None)
+    new JsDomXPathEvaluatorFactoryBuilder(doc, Scope.Empty)
   }
 }

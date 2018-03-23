@@ -20,8 +20,8 @@ import org.scalajs.dom.experimental.domparser.DOMParser
 import org.scalajs.dom.experimental.domparser.SupportedType
 import org.scalatest.FunSuite
 
-// import eu.cdevreeze.yaidom.core.EName
-// import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom
 import org.scalajs.dom.{ raw => sjsdom }
 
@@ -32,15 +32,20 @@ import org.scalajs.dom.{ raw => sjsdom }
  */
 class XPathTest extends FunSuite {
 
-  // private val XbrliNs = "http://www.xbrl.org/2003/instance"
+  private val XbrliNs = "http://www.xbrl.org/2003/instance"
 
   private val doc: yaidom.jsdom.JsDomDocument = getDocument()
 
-  private val rootElem: yaidom.jsdom.JsDomElem = doc.documentElement
+  private val rootElem: yaidom.jsdom.JsDomElem = {
+    doc.documentElement
+      .ensuring(_.wrappedNode != null, "Corrupt document element (missing underlying node)")
+  }
+
+  println(s"Scope: ${rootElem.scope}")
 
   private val xpathEvaluator =
     JsDomXPathEvaluatorFactoryBuilder(doc.wrappedDocument)
-      .withNamespaceResolverFromElement(rootElem.wrappedNode)
+      .withScope(rootElem.scope)
       .build()
       .newXPathEvaluator()
 
@@ -86,7 +91,6 @@ class XPathTest extends FunSuite {
     }
   }
 
-  /*
   test("testSimpleNodeXPath") {
     val exprString = "//xbrli:context[1]/xbrli:entity/xbrli:segment/xbrldi:explicitMember[1]"
 
@@ -136,7 +140,7 @@ class XPathTest extends FunSuite {
 
     assertResult(true) {
       val someDimQNames =
-        Set(QName("gaap:EntityAxis"), QName("gaap:VerificationAxis"), QName("gaap:PremiseAxis"), QName("gaap:ShareOwnershipPlanIdentifierAxis"))
+        Set(QName("gaap:EntityAxis"), QName("gaap:VerificationAxis"), QName("gaap:PremiseAxis"), QName("gaap:ReportDateAxis"))
 
       val someDimENames = someDimQNames.map(qn => rootElem.scope.resolveQNameOption(qn).get)
 
@@ -161,12 +165,15 @@ class XPathTest extends FunSuite {
       resultElems.map(e => e.rootElem.getElemOrSelfByPath(e.path))
     }
   }
-  */
+
+  // Below, we adapted the XBRL instance to not use the default namespace.
+  // Otherwise the namespace-aware XPath queries using the 'xbrli' namespace do not work!
+  // Do we have to set namespace-awareness somewhere?
 
   private def xmlString = """<?xml version="1.0" encoding="utf-8"?>
 <!-- Created by Charles Hoffman, CPA, 2008-03-27 -->
 <!-- See http://www.xbrlsite.com/examples/comprehensiveexample/2008-04-18/sample-Instance-Proof.xml. -->
-<xbrl xmlns='http://www.xbrl.org/2003/instance' xmlns:xbrli='http://www.xbrl.org/2003/instance'
+<xbrli:xbrl xmlns='http://www.xbrl.org/2003/instance' xmlns:xbrli='http://www.xbrl.org/2003/instance'
 	xmlns:link='http://www.xbrl.org/2003/linkbase' xmlns:xlink='http://www.w3.org/1999/xlink'
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xbrldi="http://xbrl.org/2006/xbrldi"
@@ -185,11 +192,11 @@ class XPathTest extends FunSuite {
 
 
 	<!-- General Contexts -->
-	<context id='I-2007'>
+	<xbrli:context id='I-2007'>
 		<!-- Consolidated Group, Current Period, As of -->
-		<entity>
-			<identifier scheme='http://www.sec.gov/CIK'>1234567890</identifier>
-			<segment>
+		<xbrli:entity>
+			<xbrli:identifier scheme='http://www.sec.gov/CIK'>1234567890</xbrli:identifier>
+			<xbrli:segment>
 				<xbrldi:explicitMember dimension="gaap:EntityAxis">gaap:ABCCompanyDomain
 				</xbrldi:explicitMember>
 				<xbrldi:explicitMember dimension="gaap:BusinessSegmentAxis">gaap:ConsolidatedGroupDomain
@@ -200,17 +207,17 @@ class XPathTest extends FunSuite {
 				</xbrldi:explicitMember>
 				<xbrldi:explicitMember dimension="gaap:ReportDateAxis">gaap:ReportedAsOfMarch182008Member
 				</xbrldi:explicitMember>
-			</segment>
-		</entity>
-		<period>
-			<instant>2007-12-31</instant>
-		</period>
-	</context>
-	<context id='I-2006'>
+			</xbrli:segment>
+		</xbrli:entity>
+		<xbrli:period>
+			<xbrli:instant>2007-12-31</xbrli:instant>
+		</xbrli:period>
+	</xbrli:context>
+	<xbrli:context id='I-2006'>
 		<!-- Consolodated Group, Prior Period, As of -->
-		<entity>
-			<identifier scheme='http://www.sec.gov/CIK'>1234567890</identifier>
-			<segment>
+		<xbrli:entity>
+			<xbrli:identifier scheme='http://www.sec.gov/CIK'>1234567890</xbrli:identifier>
+			<xbrli:segment>
 				<xbrldi:explicitMember dimension="gaap:EntityAxis">gaap:ABCCompanyDomain
 				</xbrldi:explicitMember>
 				<xbrldi:explicitMember dimension="gaap:BusinessSegmentAxis">gaap:ConsolidatedGroupDomain
@@ -221,26 +228,26 @@ class XPathTest extends FunSuite {
 				</xbrldi:explicitMember>
 				<xbrldi:explicitMember dimension="gaap:ReportDateAxis">gaap:ReportedAsOfMarch182008Member
 				</xbrldi:explicitMember>
-			</segment>
-		</entity>
-		<period>
-			<instant>2006-12-31</instant>
-		</period>
-	</context>
+			</xbrli:segment>
+		</xbrli:entity>
+		<xbrli:period>
+			<xbrli:instant>2006-12-31</xbrli:instant>
+		</xbrli:period>
+	</xbrli:context>
 
 	<!-- Units -->
-	<unit id='U-Monetary'>
+	<xbrli:unit id='U-Monetary'>
 		<!-- US Dollars -->
-		<measure>iso4217:USD</measure>
-	</unit>
-	<unit id="U-Shares">
+		<xbrli:measure>iso4217:USD</xbrli:measure>
+	</xbrli:unit>
+	<xbrli:unit id="U-Shares">
 		<!-- Shares -->
-		<measure>shares</measure>
-	</unit>
-	<unit id="U-Pure">
+		<xbrli:measure>shares</xbrli:measure>
+	</xbrli:unit>
+	<xbrli:unit id="U-Pure">
 		<!-- Pure; no measure, pure number -->
-		<measure>pure</measure>
-	</unit>
+		<xbrli:measure>pure</xbrli:measure>
+	</xbrli:unit>
 
 
 	<!-- Balance Sheet -->
@@ -256,13 +263,16 @@ class XPathTest extends FunSuite {
 	<gaap:ReceivablesNetCurrent contextRef="I-2006"
 		unitRef="U-Monetary" decimals="INF">1000</gaap:ReceivablesNetCurrent>
 
-</xbrl>
+</xbrli:xbrl>
 """.trim
 
   private def getDocument(): yaidom.jsdom.JsDomDocument = {
     val db = new DOMParser()
+
     val domDoc: yaidom.jsdom.JsDomDocument =
-      yaidom.jsdom.JsDomDocument.wrapDocument(db.parseFromString(xmlString, SupportedType.`text/xml`))
+      yaidom.jsdom.JsDomDocument.wrapDocument(
+        db.parseFromString(xmlString, SupportedType.`text/xml`))
+
     domDoc.ensuring(_.documentElement.findAllElemsOrSelf.size >= 10)
   }
 }
