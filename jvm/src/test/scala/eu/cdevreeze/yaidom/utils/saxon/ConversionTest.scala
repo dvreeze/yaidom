@@ -46,7 +46,7 @@ class ConversionTest extends FunSuite {
   private val simpleToSaxonElemConverter = new SimpleElemToSaxonElemConverter(processor)
 
   val doc: SaxonDocument = {
-    val docUri = classOf[ConversionTest].getResource("../some-data.xsd").toURI
+    val docUri = classOf[ConversionTest].getResource("some-data.xsd").toURI
     val inputSource = new StreamSource(new File(docUri))
     val doc = processor.getUnderlyingConfiguration.buildDocumentTree(inputSource)
 
@@ -79,7 +79,7 @@ class ConversionTest extends FunSuite {
   test("testRoundtrippingStartingWithNativeYaidom") {
     val docParser = DocumentParserUsingSax.newInstance()
 
-    val docUri = classOf[ConversionTest].getResource("../some-data.xsd").toURI
+    val docUri = classOf[ConversionTest].getResource("some-data.xsd").toURI
     val simpleDoc =
       docParser.parse(docUri).withUriOption(Some(docUri)).
         ensuring(_.documentElement.findAllElemsOrSelf.size > 100).
