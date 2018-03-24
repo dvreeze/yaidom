@@ -21,8 +21,6 @@ package eu.cdevreeze.yaidom.java8
  * It can be implemented for yaidom element implementations, but also for other ones, including element implementations
  * that do not offer a yaidom query API, like Saxon NodeInfo, XOM, or JDOM.
  *
- * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
- *
  * This API is experimental!
  *
  * @author Chris de Vreeze

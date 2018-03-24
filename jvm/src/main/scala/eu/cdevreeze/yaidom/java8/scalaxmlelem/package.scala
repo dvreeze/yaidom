@@ -19,8 +19,6 @@ package eu.cdevreeze.yaidom.java8
 /**
  * The streaming element query API that can be used in Java 8, implemented for Scala XML elements.
  *
- * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
- *
  * This API is experimental!
  *
  * @author Chris de Vreeze

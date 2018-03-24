@@ -116,6 +116,13 @@ class PackageDependencyTest extends FunSuite {
       Set(List("core"), List("queryapi"), List("convert")))
   }
 
+  test("testSaxonPackage") {
+    testPackageDependencies(
+      Some(List("saxon")),
+      Set(List("core"), List("queryapi")),
+      Set(List("core"), List("queryapi"), List("convert")))
+  }
+
   test("testScalaXmlPackage") {
     testPackageDependencies(
       Some(List("scalaxml")),
@@ -149,6 +156,13 @@ class PackageDependencyTest extends FunSuite {
       Some(List("java8", "indexedelem")),
       Set(List("core"), List("java8"), List("java8", "queryapi"), List("indexed")),
       Set(List("core"), List("java8"), List("java8", "queryapi"), List("indexed"), List("queryapi"), List("resolved"), List("convert")))
+  }
+
+  test("testJava8SaxonElemPackage") {
+    testPackageDependencies(
+      Some(List("java8", "saxonelem")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("saxon")),
+      Set(List("core"), List("java8"), List("java8", "queryapi"), List("saxon"), List("queryapi"), List("resolved"), List("convert")))
   }
 
   test("testJava8ScalaXmlElemPackage") {
@@ -253,6 +267,7 @@ class PackageDependencyTest extends FunSuite {
       List("java8", "indexedelem"),
       List("java8", "queryapi"),
       List("java8", "resolvedelem"),
+      List("java8", "saxonelem"),
       List("java8", "scalaxmlelem"),
       List("java8", "simpleelem"),
       List("parse"),
@@ -260,6 +275,7 @@ class PackageDependencyTest extends FunSuite {
       List("queryapi"),
       List("resolved"),
       List("scalaxml"),
+      List("saxon"),
       List("simple"),
       List("utils"))
   }

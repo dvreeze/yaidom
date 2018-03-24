@@ -17,10 +17,10 @@
 package eu.cdevreeze.yaidom.java8
 
 /**
- * The streaming element query API that can be used in Java 8, implemented for native yaidom indexed elements.
+ * The streaming element query API that can be used in Java 8, implemented for Saxon wrapper elements.
  *
  * This API is experimental!
  *
  * @author Chris de Vreeze
  */
-package object indexedelem
+package object saxonelem

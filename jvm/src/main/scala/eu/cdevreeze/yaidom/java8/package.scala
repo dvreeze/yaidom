@@ -20,8 +20,6 @@ package eu.cdevreeze.yaidom
  * The streaming element query API that can be used in Java 8, in this package and its sub-packages. This package
  * itself contains some common data structures shared by the API.
  *
- * DO NOT USE THIS PACKAGE WHEN RUNNING ON JAVA BEFORE VERSION 8!
- *
  * This API is experimental!
  *
  * @author Chris de Vreeze

@@ -14,13 +14,28 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.java8
+package eu.cdevreeze.yaidom.java8.saxonelem
+
+import java.net.URI
+import java.util.Optional
+
+import scala.compat.java8.OptionConverters.RichOptionForJava8
+
+import eu.cdevreeze.yaidom.saxon
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingDocumentApi
 
 /**
- * The streaming element query API that can be used in Java 8, implemented for native yaidom indexed elements.
- *
- * This API is experimental!
+ * Wrapper around Saxon wrapper document.
  *
  * @author Chris de Vreeze
  */
-package object indexedelem
+final class SaxonDocument(val underlyingDocument: saxon.SaxonDocument) extends StreamingDocumentApi[SaxonElem] {
+
+  def documentElement: SaxonElem = {
+    new SaxonElem(underlyingDocument.documentElement)
+  }
+
+  def uriOption: Optional[URI] = {
+    underlyingDocument.uriOption.asJava
+  }
+}
