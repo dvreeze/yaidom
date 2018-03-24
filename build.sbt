@@ -61,6 +61,8 @@ lazy val root = project.in(file("."))
 lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
   .settings(commonSettings: _*)
   .jvmSettings(
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-10",
+
     libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0" % "optional",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
@@ -79,8 +81,6 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test",
 
     libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
-
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-10" % "test",
 
     // no need for joda-time on Java 8, though
 
