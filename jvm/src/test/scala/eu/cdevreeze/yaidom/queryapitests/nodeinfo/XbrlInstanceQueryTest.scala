@@ -25,9 +25,11 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
+import eu.cdevreeze.yaidom.saxon.SaxonElem
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
+import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.XdmNode
 
 /**
@@ -36,17 +38,19 @@ import net.sf.saxon.s9api.XdmNode
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest with SaxonTestSupport {
+class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
 
-  final type E = DomElem
+  final type E = SaxonElem
 
-  protected final val xbrlInstance: DomElem = {
+  private val processor = new Processor(false)
+
+  protected final val xbrlInstance: SaxonElem = {
     val parseOptions = new ParseOptions
 
     val is = classOf[XbrlInstanceQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/sample-xbrl-instance.xml")
 
-    val doc: DomDocument =
-      DomNode.wrapDocument(
+    val doc: SaxonDocument =
+      SaxonDocument.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
     doc.documentElement
   }
@@ -56,7 +60,7 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest with SaxonTest
 
     val bos = new ByteArrayOutputStream
     val serializer = processor.newSerializer(bos)
-    serializer.serializeNode(new XdmNode(elem.asInstanceOf[DomElem].wrappedNode))
+    serializer.serializeNode(new XdmNode(elem.asInstanceOf[SaxonElem].wrappedNode))
     val xmlBytes = bos.toByteArray
 
     val docParser = DocumentParserUsingStax.newInstance

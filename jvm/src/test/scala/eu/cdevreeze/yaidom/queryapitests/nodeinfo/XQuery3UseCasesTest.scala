@@ -28,11 +28,13 @@ import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
+import eu.cdevreeze.yaidom.saxon.SaxonElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
+import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.XdmNode
 
 /**
@@ -41,9 +43,11 @@ import net.sf.saxon.s9api.XdmNode
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupport {
+class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
-  final type E = DomElem
+  final type E = SaxonElem
+
+  private val processor = new Processor(false)
 
   protected val productsElem: E = {
     val xml =
@@ -163,7 +167,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupp
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
     val bos = new ByteArrayOutputStream
     val serializer = processor.newSerializer(bos)
-    serializer.serializeNode(new XdmNode(elem.asInstanceOf[DomElem].wrappedNode))
+    serializer.serializeNode(new XdmNode(elem.asInstanceOf[SaxonElem].wrappedNode))
     val xmlBytes = bos.toByteArray
 
     val docParser = DocumentParserUsingStax.newInstance
@@ -173,7 +177,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupp
   protected def fromSimpleElem(elem: Elem): E =
     fromSimpleDocument(Document(elem)).documentElement
 
-  private def fromSimpleDocument(d: Document): DomDocument = {
+  private def fromSimpleDocument(d: Document): SaxonDocument = {
     val parseOptions = new ParseOptions
     val docPrinter = DocumentPrinterUsingDom.newInstance
     val xmlString = docPrinter.print(d)
@@ -181,8 +185,8 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest with SaxonTestSupp
     val is = new InputSource(new StringReader(xmlString))
     is.setSystemId(d.uriOption.map(_.toString).getOrElse(""))
 
-    val doc: DomDocument =
-      DomNode.wrapDocument(
+    val doc: SaxonDocument =
+      SaxonDocument.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(
           new SAXSource(is), parseOptions))
     doc

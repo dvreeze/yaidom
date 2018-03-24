@@ -22,8 +22,9 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractBackingElemTest
-import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import javax.xml.transform.stream.StreamSource
+import net.sf.saxon.s9api.Processor
 
 /**
  * Backing element test for Saxon Elems.
@@ -31,12 +32,14 @@ import javax.xml.transform.stream.StreamSource
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class BackingElemTest extends AbstractBackingElemTest with SaxonTestSupport {
+class BackingElemTest extends AbstractBackingElemTest {
+
+  private val processor = new Processor(false)
 
   val docElem: E = {
     val docUri = classOf[AbstractBackingElemTest].getResource("some-data.xsd").toURI
     val inputSource = new StreamSource(new File(docUri))
     val doc = processor.getUnderlyingConfiguration.buildDocumentTree(inputSource)
-    DomNode.wrapDocument(doc).documentElement
+    SaxonDocument.wrapDocument(doc).documentElement
   }
 }

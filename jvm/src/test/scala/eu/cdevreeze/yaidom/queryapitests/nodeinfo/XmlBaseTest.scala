@@ -26,9 +26,11 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
-import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
+import eu.cdevreeze.yaidom.saxon.SaxonElem
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
+import net.sf.saxon.s9api.Processor
 
 /**
  * XML Base test case for Saxon wrapper Elems.
@@ -36,23 +38,25 @@ import net.sf.saxon.lib.ParseOptions
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XmlBaseTest extends AbstractXmlBaseTest with SaxonTestSupport {
+class XmlBaseTest extends AbstractXmlBaseTest {
 
-  type D = DomDocument
+  type D = SaxonDocument
 
-  type E = DomElem
+  type E = SaxonElem
 
-  protected def getDocument(path: String, docUri: URI): DomDocument = {
+  private val processor = new Processor(false)
+
+  protected def getDocument(path: String, docUri: URI): SaxonDocument = {
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
     val parseOptions = new ParseOptions
     val is = new FileInputStream(new File(parsedDocUri))
-    val doc: DomDocument =
-      DomNode.wrapDocument(
+    val doc: SaxonDocument =
+      SaxonDocument.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is, docUri.toString), parseOptions))
     doc
   }
 
-  protected def getDocument(path: String): DomDocument = {
+  protected def getDocument(path: String): SaxonDocument = {
     getDocument(path, classOf[XmlBaseTest].getResource(path).toURI)
   }
 

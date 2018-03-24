@@ -29,9 +29,11 @@ import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
-import eu.cdevreeze.yaidom.testsupport.SaxonTestSupport
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
+import eu.cdevreeze.yaidom.saxon.SaxonElem
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
+import net.sf.saxon.s9api.Processor
 
 /**
  * Alternative XML Base test case for Saxon wrapper Elems. This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
@@ -41,11 +43,13 @@ import net.sf.saxon.lib.ParseOptions
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTestSupport {
+class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
-  type D = DomDocument
+  type D = SaxonDocument
 
-  type E = DomElem
+  type E = SaxonElem
+
+  private val processor = new Processor(false)
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E] = {
     val docPrinter = DocumentPrinterUsingDom.newInstance
@@ -55,8 +59,8 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest with SaxonTe
     val is = new InputSource(new StringReader(xmlString))
     is.setSystemId(Option(docUri).map(_.toString).getOrElse(null))
 
-    val doc: DomDocument =
-      DomNode.wrapDocument(
+    val doc: SaxonDocument =
+      SaxonDocument.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(
           new SAXSource(is), parseOptions))
     doc

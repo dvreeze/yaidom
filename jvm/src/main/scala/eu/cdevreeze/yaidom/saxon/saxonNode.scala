@@ -39,7 +39,19 @@ import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.pattern.NodeKindTest
 
 /**
- * Saxon yaidom BackingElemNodeApi wrapper around Saxon (9.7+) NodeInfo backends.
+ * Saxon yaidom BackingElemNodeApi wrapper around Saxon (9.7+) NodeInfo backends. Saxon-HE is the minimal
+ * requirement, but Saxon-EE can be used instead, of course.
+ *
+ * Typically the wrapped NodeInfo uses the tiny tree model, in which case these yaidom
+ * wrapper nodes for Saxon are quite fast in query processing and especially quite memory-efficient.
+ *
+ * Be careful to cautiously manage the underlying Saxon Processor (or Configuration) objects in the application
+ * using these Saxon node wrappers. Do not shared them naively, and also do not use new instances of them naively.
+ *
+ * Yaidom `EName` and `QName` instances are created from Saxon `NodeInfo` objects using the
+ * global `ENameProvider.globalENameProvider` and `QNameProvider.globalQNameProvider`, respectively.
+ * Consider using efficient implementations for those name providers that use name pooling (at least
+ * for commonly used names).
  *
  * @author Chris de Vreeze
  */
