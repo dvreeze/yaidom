@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011-2017 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package eu.cdevreeze.yaidom.queryapitests
 
 import java.io.File
@@ -10,8 +26,14 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.Nodes
 
+/**
+ * BackingElemNodeApi test case.
+ *
+ * @author Chris de Vreeze
+ */
 abstract class AbstractBackingElemTest extends FunSuite {
 
   private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
@@ -35,8 +57,8 @@ abstract class AbstractBackingElemTest extends FunSuite {
   private val AttributeFormDefaultEName = EName("attributeFormDefault")
 
   // Nice, just the "raw" type without generics. There is a small price, though, and that is that some lambdas need explicit parameter types.
-  // That is the case because BackingElemApi "overrides" some super-trait methods, restricting the ThisElem type member to the one of BackingElemApi.
-  type E = BackingElemApi
+  // That is the case because BackingElemNodeApi "overrides" some super-trait methods, restricting the ThisElem type member to the one of BackingElemNodeApi.
+  type E = BackingElemNodeApi
 
   def docElem: E
 
@@ -44,6 +66,7 @@ abstract class AbstractBackingElemTest extends FunSuite {
     assertResult(XsSchemaEName)(docElem.resolvedName)
     assertResult(Some(XsNamespace))(docElem.resolvedName.namespaceUriOption)
     assertResult("schema")(docElem.resolvedName.localPart)
+    assertResult(docElem.resolvedName.localPart)(docElem.localName)
   }
 
   test("testQName") {
@@ -620,6 +643,36 @@ abstract class AbstractBackingElemTest extends FunSuite {
       docElem.filterElems(_.resolvedName == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
   }
 
+  test("testFindChildElem") {
+    // Non-existing elements
+
+    val bogusElems = docElem.findChildElem(_.resolvedName == EName("schema"))
+
+    assertResult(
+      docElem.filterChildElems(_.resolvedName == EName("schema")).headOption)(bogusElems)
+
+    // xs:schema elements
+
+    val xsSchemaElems = docElem.findChildElem(_.resolvedName == XsSchemaEName)
+
+    assertResult(
+      docElem.filterChildElems(_.resolvedName == XsSchemaEName).headOption)(xsSchemaElems)
+
+    // xs:import elements
+
+    val xsImportElems = docElem.findChildElem(_.resolvedName == XsImportEName)
+
+    assertResult(
+      docElem.filterChildElems(_.resolvedName == XsImportEName).headOption)(xsImportElems)
+
+    // link:linkbaseRef elements
+
+    val linkbaseRefElems = docElem.findChildElem(_.resolvedName == LinkLinkbaseRefEName)
+
+    assertResult(
+      docElem.filterChildElems(_.resolvedName == LinkLinkbaseRefEName).headOption)(linkbaseRefElems)
+  }
+
   test("testPathNavigation") {
     val linkbaseRefElems = docElem.filterElemsOrSelf(_.resolvedName == LinkLinkbaseRefEName)
 
@@ -706,6 +759,13 @@ abstract class AbstractBackingElemTest extends FunSuite {
     assertResult(allElemsOrSelf) {
       allElemsOrSelf.map(e => e.parentOption.flatMap(_.findChildElemByPathEntry(e.path.lastEntry)).getOrElse(docElem))
     }
+
+    assertResult(docElem.findAllChildElems) {
+      docElem.findAllChildElemsWithPathEntries.map(_._1)
+    }
+    assertResult(docElem.findAllChildElems) {
+      docElem.findAllChildElemsWithPathEntries.map(pair => docElem.getChildElemByPathEntry(pair._2))
+    }
   }
 
   test("testPathConversions") {
@@ -717,6 +777,18 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
     assertResult(paths1) {
       paths2
+    }
+  }
+
+  test("testComments") {
+    assertResult(Set("Some linkbase")) {
+      docElem.findAllElemsOrSelf.flatMap(e => e.children.collect({ case c: Nodes.Comment => c }).map(_.text.trim)).toSet
+    }
+  }
+
+  test("testProcessingInstructions") {
+    assertResult(Set(("PITarget", "PIContent"))) {
+      docElem.findAllElemsOrSelf.flatMap(e => e.children.collect({ case pi: Nodes.ProcessingInstruction => pi }).map(pi => (pi.target, pi.data))).toSet
     }
   }
 }

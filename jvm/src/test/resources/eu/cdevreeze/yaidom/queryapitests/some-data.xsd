@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.sometaxonomy/0.1/basis/some2/items/some-data" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:nl-types="http://www.sometaxonomy/0.1/basis/sbr/types/nl-types" xmlns:some2-codes="http://www.sometaxonomy/0.1/basis/some2/types/some2-codes" xmlns:num="http://www.xbrl.org/dtr/type/numeric" xmlns:some2-types="http://www.sometaxonomy/0.1/basis/some2/types/some2-types" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:nl-codes="http://www.sometaxonomy/0.1/basis/sbr/types/nl-codes" xmlns:some-i="http://www.sometaxonomy/0.1/basis/some2/items/some-data">
+  <?PITarget PIContent?>
+  <!-- Some linkbase -->
   <xs:annotation>
     <xs:appinfo>
       <link:linkbaseRef xlink:type="simple" xlink:href="some-data-documentation-lab-en.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"/>

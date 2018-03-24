@@ -18,7 +18,8 @@ package eu.cdevreeze.yaidom
 
 /**
  * Support for conversions from/to yaidom. This package mostly contains conversions between yaidom objects and JAXP DOM or StAX objects,
- * in both directions.
+ * in both directions. This package does not support conversions between different yaidom element
+ * implementations. It is too low level a package for that.
  *
  * This conversion support is used by the Document parsers and printers in the `parse` and `print` packages, respectively.
  * This package can also be used directly by consumers of the yaidom API.
