@@ -22,6 +22,7 @@ import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom
 import org.scalajs.dom.{ raw => sjsdom }
 
@@ -39,11 +40,12 @@ class XPathTest extends FunSuite {
   private val rootElem: yaidom.jsdom.JsDomElem = {
     doc.documentElement
       .ensuring(_.wrappedNode != null, "Corrupt document element (missing underlying node)")
+      .ensuring(_.resolvedName.namespaceUriOption.contains(XbrliNs))
   }
 
   private val xpathEvaluator =
     JsDomXPathEvaluatorFactoryBuilder(doc.wrappedDocument)
-      .withScope(rootElem.scope)
+      .withScope(rootElem.scope ++ Scope.from("ns" -> "http://www.xbrl.org/2003/instance"))
       .build()
       .newXPathEvaluator()
 
@@ -77,10 +79,25 @@ class XPathTest extends FunSuite {
     }
   }
 
-  test("testSimpleNonNamespaceAwareNodeXPath") {
+  test("testVerboseNonNamespaceAwareNodeXPath") {
     val exprString =
       "//*[local-name(.) = 'context'][1]/*[local-name(.) = 'entity'][1]" +
         "/*[local-name(.) = 'segment'][1]/*[local-name(.) = 'explicitMember'][1]"
+
+    val result = xpathEvaluator.evaluateAsNode(exprString, Some(rootElem.wrappedNode))
+
+    assertResult("gaap:ABCCompanyDomain") {
+      yaidom.jsdom.JsDomElem(result.asInstanceOf[sjsdom.Element]).text.trim
+    }
+  }
+
+  // Ignored, because function namespace-uri has not yet been implemented
+  ignore("testVerboseNamespaceAwareNodeXPath") {
+    val exprString =
+      "//*[local-name(.) = 'context' and namespace-uri(.) = 'http://www.xbrl.org/2003/instance'][1]" +
+        "/*[local-name(.) = 'entity' and namespace-uri(.) = 'http://www.xbrl.org/2003/instance'][1]" +
+        "/*[local-name(.) = 'segment' and namespace-uri(.) = 'http://www.xbrl.org/2003/instance'][1]" +
+        "/*[local-name(.) = 'explicitMember' and namespace-uri(.) = 'http://www.xbrl.org/2003/instance'][1]"
 
     val result = xpathEvaluator.evaluateAsNode(exprString, Some(rootElem.wrappedNode))
 
@@ -164,9 +181,9 @@ class XPathTest extends FunSuite {
     }
   }
 
-  // Below, we adapted the XBRL instance to not use the default namespace.
-  // Otherwise the namespace-aware XPath queries using the 'xbrli' namespace do not work!
-  // Is this a bug in js-dom? Or do we have to set namespace-awareness somewhere?
+  // Below, we adapted the XBRL instance to not use the default namespace, but use the exact same
+  // namespace prefix as in the XPath expressions. Otherwise the namespace-aware XPath queries do not work!
+  // Is this a bug in js-dom? Or do we have to set namespace-awareness somewhere for XPath evaluation?
 
   private def xmlString = """<?xml version="1.0" encoding="utf-8"?>
 <!-- Created by Charles Hoffman, CPA, 2008-03-27 -->
