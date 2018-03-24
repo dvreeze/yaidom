@@ -37,15 +37,18 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.saxon.SaxonElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Text
+import eu.cdevreeze.yaidom.utils.saxon.SimpleElemToSaxonElemConverter
 import javax.xml.parsers.DocumentBuilderFactory
+import net.sf.saxon.s9api.Processor
 
 /**
  * Large XML test case.
@@ -67,6 +70,10 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(enames))
   QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(qnames))
+
+  private val processor = new Processor(false)
+
+  private val simpleElemToSaxonElemConverter = new SimpleElemToSaxonElemConverter(processor)
 
   protected override def beforeAll(): Unit = {
     val zipFileUrl = classOf[LargeXmlTest].getResource("veryBigFile.zip")
@@ -146,6 +153,12 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     val resolvedElem = resolved.Elem(doc.documentElement)
 
     doQueryTest(resolvedElem, "resolved.Elem")
+  }
+
+  test("testQuerySaxonElem") {
+    val saxonElem: SaxonElem = simpleElemToSaxonElemConverter.convertSimpleElem(doc.documentElement)
+
+    doQueryTest(saxonElem, "saxon.SaxonElem")
   }
 
   // Ignoring test to lower memory footprint (in Travis CI)
@@ -568,7 +581,7 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     doNavigationTest(ScalaXmlElem(scalaElem), "scalaxml.ScalaXmlElem")
   }
 
-  private def doQueryTest[E <: ClarkElemLike.Aux[E]](elm: E, msg: String): Unit = {
+  private def doQueryTest[E <: ClarkElemApi.Aux[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
@@ -586,7 +599,7 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
     logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms ($msg)")
   }
 
-  private def doNavigationTest[E <: ClarkElemLike.Aux[E]](elm: E, msg: String): Unit = {
+  private def doNavigationTest[E <: ClarkElemApi.Aux[E]](elm: E, msg: String): Unit = {
     val startMs = System.currentTimeMillis()
 
     val path = PathBuilder.from(QName("contact") -> 19500, QName("phone") -> 0).build(Scope.Empty)
