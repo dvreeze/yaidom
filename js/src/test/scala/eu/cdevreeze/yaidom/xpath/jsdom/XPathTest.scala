@@ -44,9 +44,8 @@ class XPathTest extends FunSuite {
   }
 
   private val xpathEvaluator =
-    JsDomXPathEvaluatorFactoryBuilder(doc.wrappedDocument)
+    JsDomXPathEvaluatorFactory(doc.wrappedDocument)
       .withScope(rootElem.scope ++ Scope.from("ns" -> "http://www.xbrl.org/2003/instance"))
-      .build()
       .newXPathEvaluator()
 
   test("testVerySimpleXPathWithoutContextItem") {

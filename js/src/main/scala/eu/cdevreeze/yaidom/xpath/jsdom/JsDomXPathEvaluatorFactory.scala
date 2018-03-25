@@ -37,7 +37,22 @@ final class JsDomXPathEvaluatorFactory(
 
   type ContextItem = sjsdom.Node
 
+  def withScope(newScope: Scope): JsDomXPathEvaluatorFactory = {
+    new JsDomXPathEvaluatorFactory(doc, newScope)
+  }
+
   def newXPathEvaluator(): JsDomXPathEvaluator = {
     new JsDomXPathEvaluator(doc, scope)
+  }
+}
+
+object JsDomXPathEvaluatorFactory {
+
+  def apply(doc: sjsdom.Document, scope: Scope): JsDomXPathEvaluatorFactory = {
+    new JsDomXPathEvaluatorFactory(doc, scope)
+  }
+
+  def apply(doc: sjsdom.Document): JsDomXPathEvaluatorFactory = {
+    apply(doc, Scope.Empty)
   }
 }
