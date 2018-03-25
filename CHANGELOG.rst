@@ -3,6 +3,35 @@ CHANGELOG
 =========
 
 
+1.8.0-M3
+========
+
+The main changes in version 1.8.0-M3 (compared with milestone 2) are:
+
+* A yaidom Saxon wrapper implementation of `BackingElemNodeApi` has been added
+
+  * It has been copied from TQA, where it will no longer live
+  * It requires Saxon 9.8 or 9.7, and works for Saxon-HE, Saxon-PE and Saxon-EE
+  * It has good query performance, and is quite memory-efficient, when using the default Saxon tiny tree implementation
+  * If future Saxon major versions require breaking changes in the yaidom wrappers, we may have to deploy separate artifacts for them
+  * On the other hand, the Saxon wrappers are overall the best and most powerful yaidom implementations, so they should be included in yaidom
+
+* An XPath evaluation API has been added
+
+  * It has been inspired by the JAXP XPath API, but it is more Scala-friendly, more type-safe, and more yaidom-friendly
+  * It is not as complete as the JAXP standard XPath API, because it does not yet model functions and variables
+  * There is a Saxon JAXP backed implementation of this API (JVM-only)
+  * Therefore we can use XPath 3.1 (also standard functions, even JSON support), and use yaidom queries on XPath evaluation results, etc.
+  * There is also an implementation for JS DOM  (JS-only), but that one only offers basic XPath 1.0 support
+  * It may seem that expanding yaidom with (error-prone) XPath support may make yaidom less "stable"
+  * On the other hand, nothing else in yaidom depends on its XPath support, and the API is rather clean
+  * Moreover, this opens up so many possibilities (especially on the JVM), mixing yaidom and XPath queries at will
+  * It also fits in the overall vision of yaidom as an "hour glass" easily integrating with XPath
+
+* The Scala XML wrappers are now common code shared by JVM and JS (although not all of Scala XML runs on JS runtimes
+* Upgraded many dependencies, given that Java 6 and 7 are no longer supported
+
+
 1.8.0-M2
 ========
 

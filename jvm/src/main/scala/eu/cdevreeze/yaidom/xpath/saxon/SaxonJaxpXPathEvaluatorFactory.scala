@@ -70,7 +70,9 @@ final class SaxonJaxpXPathEvaluatorFactory(
   }
 
   /**
-   * Creates an XPathEvaluator from the constructor argument.
+   * Creates an XPathEvaluator from the constructor argument. If this factory has an underlying Saxon
+   * `com.saxonica.config.EnterpriseXPathFactory`, then the created XPathEvaluator can use Saxon enterprise
+   * features.
    */
   def newXPathEvaluator(): SaxonJaxpXPathEvaluator = {
     val saxonXPathEvaluator =
@@ -116,10 +118,28 @@ object SaxonJaxpXPathEvaluatorFactory {
     }
   }
 
+  /**
+   * Creates a `SaxonJaxpXPathEvaluatorFactory` using the underlying `net.sf.saxon.xpath.XPathFactoryImpl`
+   * passed as parameter. This works for Saxon-HE, Saxon-PE and Saxon-EE. The scope and optional base URI
+   * are left empty, but can be adapted afterwards.
+   */
   def apply(underlyingEvaluatorFactory: net.sf.saxon.xpath.XPathFactoryImpl): SaxonJaxpXPathEvaluatorFactory = {
     new SaxonJaxpXPathEvaluatorFactory(underlyingEvaluatorFactory, Scope.Empty, None)
   }
 
+  /**
+   * Creates a `SaxonJaxpXPathEvaluatorFactory` using an underlying `net.sf.saxon.xpath.XPathFactoryImpl`,
+   * and configures it with the passed JAXP `URIResolver`.
+   *
+   * When using Saxon-EE, consider using an underlying `com.saxonica.config.EnterpriseXPathFactory`,
+   * and instead of calling this `apply` function, use the following instantiation code:
+   * {{{
+   * val underlyingEvaluatorFactory =
+   *   new com.saxonica.config.EnterpriseXPathFactory(enterpriseConfiguration)
+   * underlyingEvaluatorFactory.getConfiguration.setURIResolver(jaxpUriResolver)
+   * apply(underlyingEvaluatorFactory)
+   * }}}
+   */
   def apply(configuration: Configuration, jaxpUriResolver: URIResolver): SaxonJaxpXPathEvaluatorFactory = {
     val underlyingEvaluatorFactory = new net.sf.saxon.xpath.XPathFactoryImpl(configuration)
 
@@ -128,6 +148,17 @@ object SaxonJaxpXPathEvaluatorFactory {
     apply(underlyingEvaluatorFactory)
   }
 
+  /**
+   * Creates a `SaxonJaxpXPathEvaluatorFactory` using an underlying `net.sf.saxon.xpath.XPathFactoryImpl`.
+   *
+   * When using Saxon-EE, consider using an underlying `com.saxonica.config.EnterpriseXPathFactory`,
+   * and instead of calling this `apply` function, use the following instantiation code:
+   * {{{
+   * val underlyingEvaluatorFactory =
+   *   new com.saxonica.config.EnterpriseXPathFactory(enterpriseConfiguration)
+   * apply(underlyingEvaluatorFactory)
+   * }}}
+   */
   def apply(configuration: Configuration): SaxonJaxpXPathEvaluatorFactory = {
     val underlyingEvaluatorFactory = new net.sf.saxon.xpath.XPathFactoryImpl(configuration)
     apply(underlyingEvaluatorFactory)

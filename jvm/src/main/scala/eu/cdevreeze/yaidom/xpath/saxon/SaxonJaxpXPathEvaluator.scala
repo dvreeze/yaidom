@@ -100,7 +100,7 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
             }
           }
         case _ =>
-          sys.error(s"Unsupported result type: ${result.getClass}. Only java.util.List is supported (we do not allow org.w3c.dom.NodeList).")
+          sys.error(s"Unsupported result type: ${result.getClass}. Only java.util.List is supported (we do not support org.w3c.dom.NodeList).")
       }
     }
   }
@@ -131,7 +131,7 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
 
     transformXPathException {
       val result = expr.evaluate(adaptNoneContextItem(contextItemOption), XPathConstants.NUMBER)
-      BigDecimal(result.toString)
+      BigDecimal(result.asInstanceOf[java.lang.Double].doubleValue)
     }
   }
 
@@ -165,7 +165,8 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
   }
 
   /**
-   * Turns an absent item into an "empty" item that Saxon can handle.
+   * Turns an absent item into an "empty" item that Saxon can handle. We should not even try to create a context
+   * item, if there is none. See https://saxonica.com/html/documentation/xpath-api/jaxp-xpath/context-node.html.
    */
   private def adaptNoneContextItem(itemOption: Option[ContextItem]): ContextItem = {
     if (itemOption.isEmpty) {

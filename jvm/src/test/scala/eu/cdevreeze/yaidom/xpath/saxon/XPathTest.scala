@@ -68,7 +68,7 @@ class XPathTest extends FunSuite {
 
   private val rootElem: SaxonElem =
     SaxonDocument.wrapDocument(docBuilder.build(docFile).getUnderlyingNode.getTreeInfo).documentElement
-      .ensuring(_.baseUri.toString.trim.nonEmpty, s"Expected non-empty base URI")
+      .ensuring(_.baseUri.toString.contains("saxon"), s"Expected non-empty base URI containing the string 'saxon'")
 
   private def useXbrliPrefix(e: SaxonElem): SaxonElem = {
     require(
@@ -310,6 +310,9 @@ class XPathTest extends FunSuite {
 
     assertResult(true) {
       resultAsString.contains("sample-xbrl-instance.xml")
+    }
+    assertResult(true) {
+      resultAsString.contains("saxon")
     }
     assertResult(result) {
       rootElem.baseUri

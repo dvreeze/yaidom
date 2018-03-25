@@ -24,22 +24,22 @@ and Anti-XML. Indeed, yaidom has several nice properties:
 Usage
 =====
 
-Yaidom versions can be found in the Maven central repository. Assuming version 1.8.0-M2, yaidom can be added as dependency
+Yaidom versions can be found in the Maven central repository. Assuming version 1.8.0-M3, yaidom can be added as dependency
 as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    libraryDependencies += "eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.0-M2"
+    libraryDependencies += "eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.0-M3"
 
 **Maven2**::
 
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
       <artifactId>yaidom_2.12</artifactId>
-      <version>1.8.0-M2</version>
+      <version>1.8.0-M3</version>
     </dependency>
 
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.
 Yaidom has been cross-built for several Scala versions, leading to artifactIds referring to different Scala (binary) versions.
 
-Yaidom (1.8.X and later) requires Java version 1.8 or later.
+Yaidom (1.8.X and later) requires Java version 1.8 or later!

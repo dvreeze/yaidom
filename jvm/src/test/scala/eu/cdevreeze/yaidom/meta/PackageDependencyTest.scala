@@ -277,7 +277,10 @@ class PackageDependencyTest extends FunSuite {
       List("scalaxml"),
       List("saxon"),
       List("simple"),
-      List("utils"))
+      List("utils"),
+      List("utils", "saxon"),
+      List("xpath"),
+      List("xpath", "saxon"))
   }
 
   private def getProjectDir(dir: File): File = {
