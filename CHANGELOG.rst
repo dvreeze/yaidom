@@ -28,7 +28,7 @@ The main changes in version 1.8.0-M3 (compared with milestone 2) are:
   * Moreover, this opens up so many possibilities (especially on the JVM), mixing yaidom and XPath queries at will
   * It also fits in the overall vision of yaidom as an "hour glass" easily integrating with XPath
 
-* The Scala XML wrappers are now common code shared by JVM and JS (although not all of Scala XML runs on JS runtimes
+* The Scala XML wrappers are now common code shared by JVM and JS (although not all of Scala XML runs on JS runtimes)
 * Upgraded many dependencies, given that Java 6 and 7 are no longer supported
 
 
