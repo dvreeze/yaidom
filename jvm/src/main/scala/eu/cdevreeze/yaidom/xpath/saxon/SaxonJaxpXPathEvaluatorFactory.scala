@@ -20,6 +20,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.net.URI
 
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.xpath.XPathEvaluatorFactory
 import javax.xml.transform.Source
 import javax.xml.transform.URIResolver
@@ -28,6 +29,7 @@ import javax.xml.{ xpath => jxpath }
 import net.sf.saxon.Configuration
 import net.sf.saxon.event.Builder
 import net.sf.saxon.om.NodeInfo
+import net.sf.saxon.pull.NamespaceContextImpl
 
 /**
  * XPathEvaluatorFactory using the JAXP XPath API and backed by a Saxon implementation.
@@ -41,7 +43,9 @@ import net.sf.saxon.om.NodeInfo
  * @author Chris de Vreeze
  */
 final class SaxonJaxpXPathEvaluatorFactory(
-  val underlyingEvaluatorFactory: net.sf.saxon.xpath.XPathFactoryImpl) extends XPathEvaluatorFactory {
+  val underlyingEvaluatorFactory: net.sf.saxon.xpath.XPathFactoryImpl,
+  val extraScope:                 Scope,
+  val baseUriOption:              Option[URI]) extends XPathEvaluatorFactory {
 
   require(
     underlyingEvaluatorFactory.getConfiguration.getTreeModel == Builder.TINY_TREE,
@@ -53,16 +57,16 @@ final class SaxonJaxpXPathEvaluatorFactory(
 
   type ContextItem = NodeInfo
 
-  /**
-   * Returns the same object, but mutated in-place by setting the JAXP URIResolver on the underlying
-   * Saxon XPath evaluator factory.
-   *
-   * The URIResolver should build Saxon tiny trees using the same Configuration as the one underlying this factory.
-   * Consider passing a SimpleUriResolver.
-   */
-  def settingJaxpUriResolver(newUriResolver: URIResolver): SaxonJaxpXPathEvaluatorFactory = {
-    underlyingEvaluatorFactory.getConfiguration.setURIResolver(newUriResolver)
-    this
+  def withExtraScope(newExtraScope: Scope): SaxonJaxpXPathEvaluatorFactory = {
+    new SaxonJaxpXPathEvaluatorFactory(underlyingEvaluatorFactory, newExtraScope, baseUriOption)
+  }
+
+  def withBaseUriOption(newBaseUriOption: Option[URI]): SaxonJaxpXPathEvaluatorFactory = {
+    new SaxonJaxpXPathEvaluatorFactory(underlyingEvaluatorFactory, extraScope, newBaseUriOption)
+  }
+
+  def withBaseUri(newBaseUri: URI): SaxonJaxpXPathEvaluatorFactory = {
+    withBaseUriOption(Some(newBaseUri))
   }
 
   /**
@@ -71,6 +75,19 @@ final class SaxonJaxpXPathEvaluatorFactory(
   def newXPathEvaluator(): SaxonJaxpXPathEvaluator = {
     val saxonXPathEvaluator =
       underlyingEvaluatorFactory.newXPath().asInstanceOf[net.sf.saxon.xpath.XPathEvaluator]
+
+    // Just passing scope.toNamespaceContext will lead to an UnsupportedOperationException in
+    // net.sf.saxon.xpath.JAXPXPathStaticContext.iteratePrefixes later on. Hence we create a Saxon NamespaceResolver
+    // and turn that into a JAXP NamespaceContext that is also a Saxon NamespaceResolver.
+
+    saxonXPathEvaluator.setNamespaceContext(
+      new NamespaceContextImpl(
+        SaxonJaxpXPathEvaluator.makeSaxonNamespaceResolver(
+          extraScope.withoutDefaultNamespace ++ SaxonJaxpXPathEvaluator.MinimalScope)))
+
+    baseUriOption foreach { baseUri =>
+      saxonXPathEvaluator.getStaticContext().setBaseURI(baseUri.toString)
+    }
 
     new SaxonJaxpXPathEvaluator(saxonXPathEvaluator)
   }
@@ -100,10 +117,19 @@ object SaxonJaxpXPathEvaluatorFactory {
   }
 
   def apply(underlyingEvaluatorFactory: net.sf.saxon.xpath.XPathFactoryImpl): SaxonJaxpXPathEvaluatorFactory = {
-    new SaxonJaxpXPathEvaluatorFactory(underlyingEvaluatorFactory)
+    new SaxonJaxpXPathEvaluatorFactory(underlyingEvaluatorFactory, Scope.Empty, None)
+  }
+
+  def apply(configuration: Configuration, jaxpUriResolver: URIResolver): SaxonJaxpXPathEvaluatorFactory = {
+    val underlyingEvaluatorFactory = new net.sf.saxon.xpath.XPathFactoryImpl(configuration)
+
+    underlyingEvaluatorFactory.getConfiguration.setURIResolver(jaxpUriResolver)
+
+    apply(underlyingEvaluatorFactory)
   }
 
   def apply(configuration: Configuration): SaxonJaxpXPathEvaluatorFactory = {
-    apply(new net.sf.saxon.xpath.XPathFactoryImpl(configuration))
+    val underlyingEvaluatorFactory = new net.sf.saxon.xpath.XPathFactoryImpl(configuration)
+    apply(underlyingEvaluatorFactory)
   }
 }

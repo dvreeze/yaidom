@@ -16,18 +16,13 @@
 
 package eu.cdevreeze.yaidom.xpath.saxon
 
-import java.net.URI
-
 import scala.collection.JavaConverters.asScalaBufferConverter
-import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.collection.JavaConverters.setAsJavaSetConverter
 import scala.collection.immutable
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
 import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
@@ -35,14 +30,12 @@ import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.saxon.SaxonElem
 import eu.cdevreeze.yaidom.saxon.SaxonNode
 import eu.cdevreeze.yaidom.xpath.XPathEvaluator
-import javax.xml.namespace.NamespaceContext
 import javax.xml.xpath
 import javax.xml.xpath.XPathConstants
 import net.sf.saxon
 import net.sf.saxon.event.Builder
 import net.sf.saxon.om.NamespaceResolver
 import net.sf.saxon.om.NodeInfo
-import net.sf.saxon.pull.NamespaceContextImpl
 import net.sf.saxon.tree.linked.DocumentImpl
 import net.sf.saxon.value.AtomicValue
 
@@ -71,58 +64,6 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
   type Node = NodeInfo
 
   type ContextItem = NodeInfo
-
-  // Configuration methods
-
-  /**
-   * Returns the same object, but mutated in-place by setting the optional base URI on the underlying
-   * Saxon XPath evaluator.
-   */
-  def settingBaseUriOption(newDocUriOption: Option[URI]): SaxonJaxpXPathEvaluator = {
-    newDocUriOption foreach { docUri =>
-      underlyingEvaluator.getStaticContext().setBaseURI(docUri.toString)
-    }
-    this
-  }
-
-  /**
-   * Returns `settingBaseUriOption(Some(newDocUri))`.
-   */
-  def settingBaseUri(newDocUri: URI): SaxonJaxpXPathEvaluator = {
-    settingBaseUriOption(Some(newDocUri))
-  }
-
-  /**
-   * Returns the same object, but mutated in-place by setting the namespace context on the underlying
-   * Saxon XPath evaluator. The default namespace is always set to "http://www.w3.org/2005/xpath-functions", however.
-   */
-  def settingScope(newScope: Scope): SaxonJaxpXPathEvaluator = {
-    // Just passing scope.toNamespaceContext will lead to an UnsupportedOperationException in
-    // net.sf.saxon.xpath.JAXPXPathStaticContext.iteratePrefixes later on. Hence we create a Saxon NamespaceResolver
-    // and turn that into a JAXP NamespaceContext that is also a Saxon NamespaceResolver.
-
-    underlyingEvaluator.setNamespaceContext(
-      new NamespaceContextImpl(
-        SaxonJaxpXPathEvaluator.makeSaxonNamespaceResolver(
-          scope.withoutDefaultNamespace ++ Scope.from("" -> "http://www.w3.org/2005/xpath-functions"))))
-    this
-  }
-
-  /**
-   * Returns `settingScope(SaxonJaxpXPathEvaluator.MinimalScope)`.
-   */
-  def settingMinimalScope(): SaxonJaxpXPathEvaluator = {
-    settingScope(SaxonJaxpXPathEvaluator.MinimalScope)
-  }
-
-  /**
-   * Returns `settingScope(scope ++ addedScope)`.
-   */
-  def addingScope(addedScope: Scope): SaxonJaxpXPathEvaluator = {
-    settingScope(scope ++ addedScope)
-  }
-
-  // Evaluation methods
 
   def evaluateAsString(expr: XPathExpression, contextItemOption: Option[ContextItem]): String = {
     require(!contextItemOption.contains(null), s"Null context not allowed. Use empty Option instead.")
@@ -203,26 +144,6 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
     }
   }
 
-  def evaluateAsEName(expr: XPathExpression, contextItemOption: Option[ContextItem]): EName = {
-    transformXPathException {
-      val stringResult = evaluateAsString(expr, contextItemOption)
-
-      // Is the string result a lexical QName or James Clark notation for an EName? I don't know, so let's handle both cases.
-      if (stringResult.contains("{") || !stringResult.contains(":")) {
-        EName.parse(stringResult)
-      } else {
-        val qname = QName(stringResult)
-
-        val msg =
-          s"Could not resolve QName $qname. Expression: '${toString(expr)}'. " +
-            s"Base URI: ${underlyingEvaluator.getStaticContext.getStaticBaseURI}.\n\tScope: $scope"
-        scope.resolveQNameOption(qname) getOrElse {
-          sys.error(msg)
-        }
-      }
-    }
-  }
-
   def makeXPathExpression(xpathString: String): XPathExpression = {
     transformXPathException {
       underlyingEvaluator.compile(xpathString)
@@ -234,33 +155,6 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
       expr.getInternalExpression.toString
     case expr =>
       expr.toString
-  }
-
-  def scope: Scope = {
-    val defaultNamespace = "http://www.w3.org/2005/xpath-functions"
-
-    if (underlyingEvaluator.getNamespaceContext == null) {
-      Scope.from("" -> defaultNamespace)
-    } else if (!underlyingEvaluator.getNamespaceContext.isInstanceOf[NamespaceContext with NamespaceResolver]) {
-      // Cannot deal with such a NamespaceContext now
-      Scope.from("" -> defaultNamespace)
-    } else {
-      val namespaceContext = underlyingEvaluator.getNamespaceContext.asInstanceOf[NamespaceContext with NamespaceResolver]
-      val scope = getScope(namespaceContext)
-      scope ++ Scope.from("" -> defaultNamespace)
-    }
-  }
-
-  private def getScope(namespaceContext: NamespaceContext with NamespaceResolver): Scope = {
-    val unfilteredPrefixes: immutable.IndexedSeq[String] =
-      Try(namespaceContext.iteratePrefixes.asInstanceOf[java.util.Iterator[String]].asScala.toIndexedSeq).getOrElse(Vector())
-
-    val filteredPrefixes = unfilteredPrefixes.filterNot(Set("xml", "xmlns"))
-
-    val prefNsPairs: Map[String, String] =
-      filteredPrefixes.map(pref => (pref -> namespaceContext.getNamespaceURI(pref))).filter(_._2.nonEmpty).toMap
-
-    Scope.from(prefNsPairs)
   }
 
   private def transformXPathException[A](block: => A): A = {
@@ -287,13 +181,17 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
 
 object SaxonJaxpXPathEvaluator {
 
+  val DefaultNamespace = "http://www.w3.org/2005/xpath-functions"
+  val SaxonNamespace = "http://saxon.sf.net/"
+
   /**
    * Minimal scope used for XPath processing.
    */
   val MinimalScope: Scope = {
     Scope.from(
-      "" -> "http://www.w3.org/2005/xpath-functions",
-      "fn" -> "http://www.w3.org/2005/xpath-functions",
+      "" -> DefaultNamespace,
+      "fn" -> DefaultNamespace,
+      "saxon" -> SaxonNamespace,
       "math" -> "http://www.w3.org/2005/xpath-functions/math",
       "map" -> "http://www.w3.org/2005/xpath-functions/map",
       "array" -> "http://www.w3.org/2005/xpath-functions/array",
