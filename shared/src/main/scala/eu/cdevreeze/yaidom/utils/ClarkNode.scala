@@ -18,15 +18,15 @@ package eu.cdevreeze.yaidom.utils
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 
-object FastNode {
+object ClarkNode {
 
   /**
-   * Node super-type of "fast" elements.
+   * Node super-type of "Clark" elements.
    *
    * @author Chris de Vreeze
    */
@@ -35,8 +35,11 @@ object FastNode {
   sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
 
   /**
-   * "Fast element". Like simple elements in the API, but more like resolved elements internally.
-   * In other words, the state is like that of simple elements except for replacing QNames by ENames.
+   * "Clark element". Like resolved elements in the API, but adding more node types and keeping
+   * order of attributes (although the latter is semantically not important).
+   *
+   * The purpose of this element implementation is element creation and transformation/update,
+   * without having to worry about namespace prefixes and default namespaces.
    *
    * TODO Make this a final class, and implement it.
    *
@@ -45,8 +48,8 @@ object FastNode {
   trait Elem
     extends CanBeDocumentChild
     with Nodes.Elem
-    with ScopedElemNodeApi
-    with ScopedElemApi
+    with ClarkElemNodeApi
+    with ClarkElemApi
     with UpdatableElemApi
     with TransformableElemApi {
 
