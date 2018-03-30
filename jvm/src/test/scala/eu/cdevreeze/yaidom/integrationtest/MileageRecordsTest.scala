@@ -32,10 +32,12 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.resolved
 
 /**
  * Test case using yaidom for mileage records.
@@ -291,7 +293,7 @@ object MileageRecordsTest {
 
     def toElem: Elem = {
       val xml = <tripCategory isPrivate={ isPrivate.toString }>{ name }</tripCategory>
-      convertToElem(xml)
+      convertToElem(xml).ensuring(e => resolved.Elem(e) == resolved.Elem(ScalaXmlElem(xml)))
     }
   }
 
@@ -307,12 +309,12 @@ object MileageRecordsTest {
   }
 
   final class Address(
-      val name: String,
-      val street: String,
-      val houseNumber: String,
-      val city: String,
-      val zipCode: String,
-      val country: String) {
+    val name:        String,
+    val street:      String,
+    val houseNumber: String,
+    val city:        String,
+    val zipCode:     String,
+    val country:     String) {
 
     def toElem(qname: QName): Elem = {
       val xml =
@@ -342,11 +344,11 @@ object MileageRecordsTest {
   }
 
   final class KnownTrip(
-      val name: String,
-      val categoryName: String,
-      val fromAddressName: String,
-      val toAddressName: String,
-      val km: BigDecimal) {
+    val name:            String,
+    val categoryName:    String,
+    val fromAddressName: String,
+    val toAddressName:   String,
+    val km:              BigDecimal) {
 
     require(km >= 0, s"${km} must be >= 0")
 
@@ -382,10 +384,10 @@ object MileageRecordsTest {
   }
 
   final class Trip(
-      val date: LocalDate,
-      val tripName: String,
-      val startKm: Int,
-      val endKm: Int) {
+    val date:     LocalDate,
+    val tripName: String,
+    val startKm:  Int,
+    val endKm:    Int) {
 
     require(startKm <= endKm, s"${startKm} must be <= ${endKm} on date ${date}")
 
@@ -429,10 +431,10 @@ object MileageRecordsTest {
   }
 
   final class MileageRecords(
-      val tripCategories: immutable.IndexedSeq[TripCategory],
-      val knownAddresses: immutable.IndexedSeq[Address],
-      val knownTrips: immutable.IndexedSeq[KnownTrip],
-      val trips: immutable.IndexedSeq[Trip]) {
+    val tripCategories: immutable.IndexedSeq[TripCategory],
+    val knownAddresses: immutable.IndexedSeq[Address],
+    val knownTrips:     immutable.IndexedSeq[KnownTrip],
+    val trips:          immutable.IndexedSeq[Trip]) {
 
     val tripCategoriesByName: Map[String, TripCategory] =
       tripCategories.map(tripCat => (tripCat.name -> tripCat)).toMap

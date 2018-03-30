@@ -77,6 +77,8 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
    * Converts an `scala.xml.Elem` to an [[eu.cdevreeze.yaidom.simple.Elem]].
    *
    * If the input Scala XML Elem is not namespace-valid, an exception will be thrown.
+   *
+   * The result must be the same as `simple.Elem(ScalaXmlElem(v))`.
    */
   final def convertToElem(v: scala.xml.Elem): Elem = {
     val qname: QName = toQName(v)

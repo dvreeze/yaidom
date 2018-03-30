@@ -780,6 +780,25 @@ object Elem {
   def unapply(e: Elem): Option[(QName, immutable.IndexedSeq[(QName, String)], Scope, immutable.IndexedSeq[Node])] = {
     Some((e.qname, e.attributes, e.scope, e.children))
   }
+
+  /**
+   * Converts any `Nodes.Elem with ScopedElemNodeApi` element to a "simple" `Elem`.
+   * All descendant-or-self (`Nodes.Elem`) elements must implement `ScopedElemNodeApi`, or else an exception is thrown.
+   */
+  def apply(e: Nodes.Elem with ScopedElemNodeApi): Elem = {
+    val children = e.children collect {
+      case childElm: Nodes.Elem with ScopedElemNodeApi => childElm
+      case childElm: Nodes.Elem                        => sys.error(s"Not an element that implements ScopedElemNodeApi")
+      case childText: Nodes.Text                       => childText
+      case childComment: Nodes.Comment                 => childComment
+      case childPi: Nodes.ProcessingInstruction        => childPi
+      case childEr: Nodes.EntityRef                    => childEr
+    }
+    // Recursion, with Node.apply and Elem.apply being mutually dependent
+    val simpleChildren = children map { node => Node(node) }
+
+    Elem(e.qname, e.attributes.toIndexedSeq, e.scope, simpleChildren)
+  }
 }
 
 /**
@@ -824,6 +843,20 @@ object Elem {
  * }}}
  */
 object Node {
+
+  /**
+   * Converts any element, text, comment, PI or entity reference `Nodes.Node` to a "simple" `Node`.
+   * All descendant-or-self elements must implement `ScopedElemNodeApi`, or else an exception is thrown.
+   */
+  def apply(n: Nodes.Node): Node = n match {
+    case e: Nodes.Elem with ScopedElemNodeApi => Elem(e)
+    case e: Nodes.Elem                        => sys.error(s"Not an element that implements ScopedElemNodeApi")
+    case t: Nodes.Text                        => Text(t.text, false)
+    case c: Nodes.Comment                     => Comment(c.text)
+    case pi: Nodes.ProcessingInstruction      => ProcessingInstruction(pi.target, pi.data)
+    case er: Nodes.EntityRef                  => EntityRef(er.entity)
+    case n                                    => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
+  }
 
   def elem(
     qname:    QName,
