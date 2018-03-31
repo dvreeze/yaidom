@@ -446,6 +446,15 @@ object Elem {
 
     Elem(e.resolvedName, e.resolvedAttributes.toMap, resolvedChildren)
   }
+
+  /**
+   * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "resolved" `Elem`.
+   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+   */
+  @deprecated(message = "Use method 'from' instead", since = "1.8.0")
+  def apply(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
+    from(e)
+  }
 }
 
 object Text {
