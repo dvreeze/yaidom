@@ -26,6 +26,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple
 
 /**
  * ClarkElem test case.
@@ -70,6 +71,27 @@ class ClarkElemTest extends FunSuite {
 
     assertResult(resolved.Elem.from(filteredInstance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
       resolved.Elem.from(instance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    }
+  }
+
+  test("testConvertXbrlInstance") {
+    val uri = classOf[ClarkElemTest].getResource("sample-xbrl-instance.xml").toURI
+
+    val parsedInstance = docParser.parse(uri).documentElement
+
+    val clarkInstance = ClarkNode.Elem.from(parsedInstance)
+
+    val adaptedScope =
+      scope.withoutDefaultNamespace ++ Scope.from("xbrli" -> "http://www.xbrl.org/2003/instance")
+
+    val convertedInstance = simple.Elem.from(clarkInstance, adaptedScope)
+
+    assertResult(resolved.Elem.from(parsedInstance)) {
+      resolved.Elem.from(clarkInstance)
+    }
+
+    assertResult(resolved.Elem.from(convertedInstance)) {
+      resolved.Elem.from(clarkInstance)
     }
   }
 

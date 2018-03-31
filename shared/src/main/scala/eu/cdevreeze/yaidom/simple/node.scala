@@ -29,6 +29,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
@@ -799,6 +800,40 @@ object Elem {
 
     Elem(e.qname, e.attributes.toIndexedSeq, e.scope, simpleChildren)
   }
+
+  /**
+   * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "simple" `Elem`, given a Scope needed for
+   * computing QNames from ENames (of elements and attributes). The passed Scope must not contain the default namespace.
+   *
+   * Preferably the passed Scope is invertible.
+   *
+   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+   *
+   * The resulting element has its attributes sorted on the name (QName), throughout the element tree.
+   */
+  def from(e: Nodes.Elem with ClarkElemNodeApi, scope: Scope): Elem = {
+    require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
+
+    val children = e.children collect {
+      case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
+      case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
+      case childText: Nodes.Text                      => childText
+      case childComment: Nodes.Comment                => childComment
+      case childPi: Nodes.ProcessingInstruction       => childPi
+      case childEr: Nodes.EntityRef                   => childEr
+    }
+    // Recursion, with Node.apply and Elem.apply being mutually dependent
+    val simpleChildren = children map { node => Node.from(node, scope) }
+
+    val qname = Node.enameToQName(e.resolvedName, scope)
+
+    assert(scope.defaultNamespaceOption.isEmpty)
+
+    val attributes =
+      e.resolvedAttributes.toIndexedSeq map { case (en, v) => Node.enameToQName(en, scope) -> v }
+
+    Elem(qname, attributes.sortBy(_._1.toString), scope, simpleChildren)
+  }
 }
 
 /**
@@ -858,6 +893,28 @@ object Node {
     case n                                    => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
   }
 
+  /**
+   * Converts any element, text, comment, PI or entity reference `Nodes.Node` to a "simple" `Node`, given a Scope needed for
+   * computing QNames from ENames (of elements and attributes). The passed Scope must not contain the default namespace.
+   *
+   * Preferably the passed Scope is invertible.
+   *
+   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+   */
+  def from(node: Nodes.Node, scope: Scope): Node = {
+    require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
+
+    node match {
+      case e: Nodes.Elem with ClarkElemNodeApi => Elem.from(e, scope)
+      case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
+      case t: Nodes.Text                       => Text(t.text, false)
+      case c: Nodes.Comment                    => Comment(c.text)
+      case pi: Nodes.ProcessingInstruction     => ProcessingInstruction(pi.target, pi.data)
+      case er: Nodes.EntityRef                 => EntityRef(er.entity)
+      case n                                   => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
+    }
+  }
+
   def elem(
     qname:    QName,
     scope:    Scope,
@@ -910,4 +967,24 @@ object Node {
   def entityRef(entity: String): EntityRef = EntityRef(entity)
 
   def comment(textValue: String): Comment = Comment(textValue)
+
+  /**
+   * Converts an EName to a QName, using the passed scope.
+   *
+   * The scope must have no default namespace (so a created QName without prefix will have no namespace),
+   * and it must find a prefix for the namespaces used in the EName.
+   */
+  private[simple] def enameToQName(ename: EName, scope: Scope): QName = {
+    assert(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
+
+    // TODO Use QNameProvider
+
+    ename.namespaceUriOption match {
+      case None =>
+        QName(ename.localPart)
+      case Some(ns) =>
+        val prefix = scope.prefixForNamespace(ns, () => sys.error(s"No prefix found for namespace '$ns'"))
+        QName(prefix, ename.localPart)
+    }
+  }
 }

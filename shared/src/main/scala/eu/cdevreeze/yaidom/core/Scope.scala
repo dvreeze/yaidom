@@ -289,6 +289,14 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   }
 
   /**
+   * Returns `resolveQNameOption(qname)(enameProvider).get`.
+   */
+  def resolveQName(qname: QName)(implicit enameProvider: ENameProvider): EName = {
+    resolveQNameOption(qname)(enameProvider)
+      .getOrElse(sys.error(s"Could not resolve QName '$qname' in scope '${Scope.this}'"))
+  }
+
+  /**
    * Tries to resolve the given `QName` against this `Scope`, returning `None` for prefixed names whose prefixes are unknown
    * to this `Scope`.
    *
@@ -401,6 +409,16 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
     assert(result.values forall (prefixes => !prefixes.isEmpty))
     result
+  }
+
+  /**
+   * Returns an invertible Scope having the same namespaces but only one prefix per namespace.
+   * If this Scope has a default namespace, the returned Scope possibly has that default namespace
+   * as well.
+   */
+  def makeInvertible: Scope = {
+    val prefixNsMap = inverse.mapValues(_.head).collect { case (ns, pref) => pref -> ns }.toMap
+    Scope.from(prefixNsMap).ensuring(_.isInvertible)
   }
 
   /**
