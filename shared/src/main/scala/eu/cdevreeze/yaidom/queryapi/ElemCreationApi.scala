@@ -28,38 +28,38 @@ import eu.cdevreeze.yaidom.core.EName
  */
 trait ElemCreationApi {
 
-  type Node
+  type NodeType
 
-  type Elem <: Node
+  type ElemType <: NodeType
 
-  def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem
+  def elem(ename: EName, children: immutable.IndexedSeq[NodeType]): ElemType
 
   def elem(
     ename:      EName,
     attributes: immutable.IndexedSeq[(EName, String)],
-    children:   immutable.IndexedSeq[Node]): Elem
+    children:   immutable.IndexedSeq[NodeType]): ElemType
 
-  def textElem(ename: EName, txt: String): Elem
+  def textElem(ename: EName, txt: String): ElemType
 
   def textElem(
     ename:      EName,
     attributes: immutable.IndexedSeq[(EName, String)],
-    txt:        String): Elem
+    txt:        String): ElemType
 
-  def emptyElem(ename: EName): Elem
+  def emptyElem(ename: EName): ElemType
 
   def emptyElem(
     ename:      EName,
-    attributes: immutable.IndexedSeq[(EName, String)]): Elem
+    attributes: immutable.IndexedSeq[(EName, String)]): ElemType
 }
 
 object ElemCreationApi {
 
   /**
-   * This element creation API type, restricting Node and Elem to the passed type parameters.
+   * This element creation API type, restricting NodeType and ElemType to the passed type parameters.
    *
    * @tparam N The node type
    * @tparam E The element type
    */
-  type Aux[N, E] = ElemCreationApi { type Node = N; type Elem = E }
+  type Aux[N, E] = ElemCreationApi { type NodeType = N; type ElemType = E }
 }

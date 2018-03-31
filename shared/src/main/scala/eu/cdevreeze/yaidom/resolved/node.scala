@@ -25,6 +25,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ElemCreationApi
 import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
@@ -355,7 +356,11 @@ final case class Text(text: String) extends Node with Nodes.Text {
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 }
 
-object Node {
+object Node extends ElemCreationApi {
+
+  type NodeType = Node
+
+  type ElemType = Elem
 
   /**
    * Converts any element or text `Nodes.Node` to a "resolved" `Node`. For other kinds of nodes, an exception is thrown.
@@ -377,29 +382,41 @@ object Node {
   }
 
   def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
-    elem(ename, Map(), children)
+    elem(ename, Map[EName, String](), children)
   }
 
   def elem(ename: EName, attributes: Map[EName, String], children: immutable.IndexedSeq[Node]): Elem = {
     Elem(ename, attributes, children)
   }
 
+  def elem(ename: EName, attributes: immutable.IndexedSeq[(EName, String)], children: immutable.IndexedSeq[Node]): Elem = {
+    elem(ename, attributes.toMap, children)
+  }
+
   def text(textValue: String): Text = Text(textValue)
 
   def textElem(ename: EName, txt: String): Elem = {
-    textElem(ename, Map(), txt)
+    textElem(ename, Map[EName, String](), txt)
   }
 
   def textElem(ename: EName, attributes: Map[EName, String], txt: String): Elem = {
     Elem(ename, attributes, Vector(text(txt)))
   }
 
+  def textElem(ename: EName, attributes: immutable.IndexedSeq[(EName, String)], txt: String): Elem = {
+    textElem(ename, attributes.toMap, txt)
+  }
+
   def emptyElem(ename: EName): Elem = {
-    emptyElem(ename, Map())
+    emptyElem(ename, Map[EName, String]())
   }
 
   def emptyElem(ename: EName, attributes: Map[EName, String]): Elem = {
     Elem(ename, attributes, Vector())
+  }
+
+  def emptyElem(ename: EName, attributes: immutable.IndexedSeq[(EName, String)]): Elem = {
+    emptyElem(ename, attributes.toMap)
   }
 }
 

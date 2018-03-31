@@ -45,40 +45,40 @@ import scala.collection.immutable
  * Some provable properties hold about this `ElemTransformationApi` API in terms of the more low level `ElemUpdateApi` API.
  *
  * Let's first try to define the methods of `ElemTransformationApi` in terms of the `ElemUpdateApi` API. Below their equivalence
- * will be proven. We define the following, assuming type `Elem` to be a yaidom "indexed element" type:
+ * will be proven. We define the following, assuming type `ElemType` to be a yaidom "indexed element" type:
  *
  * {{{
- * def addPathParameter[A](f: Elem => A): ((Elem, Path) => A) = {
+ * def addPathParameter[A](f: ElemType => A): ((ElemType, Path) => A) = {
  *   { (elm, path) => f(elm) } // Unused path
  * }
  *
- * def addPathEntryParameter[A](f: Elem => A): ((Elem, Path.Entry) => A) = {
+ * def addPathEntryParameter[A](f: ElemType => A): ((ElemType, Path.Entry) => A) = {
  *   { (elm, pathEntry) => f(elm) } // Unused path entry
  * }
  *
- * def findAllChildPathEntries(elem: Elem): Set[Path.Entry] = {
+ * def findAllChildPathEntries(elem: ElemType): Set[Path.Entry] = {
  *   elem.findAllChildElems.map(_.path.lastEntry).toSet
  * }
  *
- * def findAllRelativeElemOrSelfPaths(elem: Elem): Set[Path] = {
+ * def findAllRelativeElemOrSelfPaths(elem: ElemType): Set[Path] = {
  *   elem.findAllElemsOrSelf.map(_.path.skippingPath(elem.path)).toSet
  * }
  *
- * def findAllRelativeElemPaths(elem: Elem): Set[Path] = {
+ * def findAllRelativeElemPaths(elem: ElemType): Set[Path] = {
  *   elem.findAllElems.map(_.path.skippingPath(elem.path)).toSet
  * }
  *
  * // The transformation functions, defined in terms of the ElemUpdateApi
  *
- * def transformChildElems2(elem: Elem, f: Elem => Elem): Elem = {
+ * def transformChildElems2(elem: ElemType, f: ElemType => ElemType): ElemType = {
  *   updateChildElems(elem, findAllChildPathEntries(elem))(addPathEntryParameter(f))
  * }
  *
- * def transformElemsOrSelf2(elem: Elem, f: Elem => Elem): Elem = {
+ * def transformElemsOrSelf2(elem: ElemType, f: ElemType => ElemType): ElemType = {
  *   updateElemsOrSelf(elem, findAllRelativeElemOrSelfPaths(elem))(addPathParameter(f))
  * }
  *
- * def transformElems2(elem: Elem, f: Elem => Elem): Elem = {
+ * def transformElems2(elem: ElemType, f: ElemType => ElemType): ElemType = {
  *   updateElems(elem, findAllRelativeElemPaths(elem))(addPathParameter(f))
  * }
  * }}}
@@ -147,21 +147,21 @@ import scala.collection.immutable
  */
 trait ElemTransformationApi {
 
-  type Node
+  type NodeType
 
-  type Elem <: Node
-
-  /**
-   * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
-   * child nodes occur in the result element unaltered.
-   */
-  def transformChildElems(elem: Elem, f: Elem => Elem): Elem
+  type ElemType <: NodeType
 
   /**
    * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
    * child nodes occur in the result element unaltered.
    */
-  def transformChildElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem
+  def transformChildElems(elem: ElemType, f: ElemType => ElemType): ElemType
+
+  /**
+   * Returns the same element, except that child elements have been replaced by applying the given function. Non-element
+   * child nodes occur in the result element unaltered.
+   */
+  def transformChildElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Transforms the element by applying the given function to all its descendant-or-self elements, in a bottom-up manner.
@@ -176,7 +176,7 @@ trait ElemTransformationApi {
    * f(transformElems(elem, f))
    * }}}
    */
-  def transformElemsOrSelf(elem: Elem, f: Elem => Elem): Elem
+  def transformElemsOrSelf(elem: ElemType, f: ElemType => ElemType): ElemType
 
   /**
    * Transforms the element by applying the given function to all its descendant elements, in a bottom-up manner.
@@ -186,7 +186,7 @@ trait ElemTransformationApi {
    * transformChildElems(elem, e => transformElemsOrSelf(e, f))
    * }}}
    */
-  def transformElems(elem: Elem, f: Elem => Elem): Elem
+  def transformElems(elem: ElemType, f: ElemType => ElemType): ElemType
 
   /**
    * Transforms each descendant element to a node sequence by applying the given function to all its descendant-or-self elements,
@@ -202,7 +202,7 @@ trait ElemTransformationApi {
    * f(transformElemsToNodeSeq(elem, f))
    * }}}
    */
-  def transformElemsOrSelfToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node]
+  def transformElemsOrSelfToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType]
 
   /**
    * Transforms each descendant element to a node sequence by applying the given function to all its descendant elements,
@@ -218,16 +218,16 @@ trait ElemTransformationApi {
    * transformElemsOrSelf(elem, { e => transformChildElemsToNodeSeq(e, f) })
    * }}}
    */
-  def transformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem
+  def transformElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType
 }
 
 object ElemTransformationApi {
 
   /**
-   * This query API type, restricting Node and Elem to the passed type parameters.
+   * This query API type, restricting NodeType and ElemType to the passed type parameters.
    *
    * @tparam N The node type
    * @tparam E The element type
    */
-  type Aux[N, E] = ElemTransformationApi { type Node = N; type Elem = E }
+  type Aux[N, E] = ElemTransformationApi { type NodeType = N; type ElemType = E }
 }

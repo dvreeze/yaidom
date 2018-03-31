@@ -37,27 +37,27 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait ElemUpdateApi {
 
-  type Node
+  type NodeType
 
-  type Elem <: Node
+  type ElemType <: NodeType
 
   /** Returns the child nodes of this element, in the correct order */
-  def children(elem: Elem): immutable.IndexedSeq[Node]
+  def children(elem: ElemType): immutable.IndexedSeq[NodeType]
 
   /** Returns an element with the same name, attributes and scope as this element, but with the given child nodes */
-  def withChildren(elem: Elem, newChildren: immutable.IndexedSeq[Node]): Elem
+  def withChildren(elem: ElemType, newChildren: immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Filters the child elements with the given path entries, and returns a Map from the path entries of those filtered
    * elements to the child node indexes. The result Map has no entries for path entries that cannot be resolved.
    * This method should be fast, especially if the passed path entry set is small.
    */
-  def collectChildNodeIndexes(elem: Elem, pathEntries: Set[Path.Entry]): Map[Path.Entry, Int]
+  def collectChildNodeIndexes(elem: ElemType, pathEntries: Set[Path.Entry]): Map[Path.Entry, Int]
 
   /**
    * Returns all child elements paired with their path entries.
    */
-  def findAllChildElemsWithPathEntries(elem: Elem): immutable.IndexedSeq[(Elem, Path.Entry)]
+  def findAllChildElemsWithPathEntries(elem: ElemType): immutable.IndexedSeq[(ElemType, Path.Entry)]
 
   /**
    * Finds the child node index of the given path entry, or -1 if not found. More precisely, returns:
@@ -65,16 +65,16 @@ trait ElemUpdateApi {
    * collectChildNodeIndexes(elem, Set(pathEntry)).getOrElse(pathEntry, -1)
    * }}}
    */
-  def childNodeIndex(elem: Elem, pathEntry: Path.Entry): Int
+  def childNodeIndex(elem: ElemType, pathEntry: Path.Entry): Int
 
   /** Shorthand for `withChildren(elem, newChildSeqs.flatten)` */
-  def withChildSeqs(elem: Elem, newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[Node]]): Elem
+  def withChildSeqs(elem: ElemType, newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[NodeType]]): ElemType
 
   /** Shorthand for `withChildren(elem, children(elem).updated(index, newChild))` */
-  def withUpdatedChildren(elem: Elem, index: Int, newChild: Node): Elem
+  def withUpdatedChildren(elem: ElemType, index: Int, newChild: NodeType): ElemType
 
   /** Shorthand for `withChildren(elem, children(elem).patch(from, newChildren, replace))` */
-  def withPatchedChildren(elem: Elem, from: Int, newChildren: immutable.IndexedSeq[Node], replace: Int): Elem
+  def withPatchedChildren(elem: ElemType, from: Int, newChildren: immutable.IndexedSeq[NodeType], replace: Int): ElemType
 
   /**
    * Returns a copy in which the given child has been inserted at the given position (0-based).
@@ -82,31 +82,31 @@ trait ElemUpdateApi {
    *
    * Afterwards, the resulting element indeed has the given child at position `index` (0-based).
    */
-  def plusChild(elem: Elem, index: Int, child: Node): Elem
+  def plusChild(elem: ElemType, index: Int, child: NodeType): ElemType
 
   /** Returns a copy in which the given child has been inserted at the end */
-  def plusChild(elem: Elem, child: Node): Elem
+  def plusChild(elem: ElemType, child: NodeType): ElemType
 
   /**
    * Returns a copy in which the given child, if any, has been inserted at the given position (0-based).
    * That is, returns `plusChild(elem, index, childOption.get)` if the given optional child element is non-empty.
    */
-  def plusChildOption(elem: Elem, index: Int, childOption: Option[Node]): Elem
+  def plusChildOption(elem: ElemType, index: Int, childOption: Option[NodeType]): ElemType
 
   /**
    * Returns a copy in which the given child, if any, has been inserted at the end.
    * That is, returns `plusChild(elem, childOption.get)` if the given optional child element is non-empty.
    */
-  def plusChildOption(elem: Elem, childOption: Option[Node]): Elem
+  def plusChildOption(elem: ElemType, childOption: Option[NodeType]): ElemType
 
   /** Returns a copy in which the given children have been inserted at the end */
-  def plusChildren(elem: Elem, childSeq: immutable.IndexedSeq[Node]): Elem
+  def plusChildren(elem: ElemType, childSeq: immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Returns a copy in which the child at the given position (0-based) has been removed.
    * Throws an exception if `index >= children(elem).size`.
    */
-  def minusChild(elem: Elem, index: Int): Elem
+  def minusChild(elem: ElemType, index: Int): ElemType
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -117,10 +117,10 @@ trait ElemUpdateApi {
    * updateChildElems(elem, Set(pathEntry)) { case (che, pe) => f(che) }
    * }}}
    */
-  def updateChildElem(elem: Elem, pathEntry: Path.Entry)(f: Elem => Elem): Elem
+  def updateChildElem(elem: ElemType, pathEntry: Path.Entry)(f: ElemType => ElemType): ElemType
 
   /** Returns `updateChildElem(elem, pathEntry) { e => newElem }` */
-  def updateChildElem(elem: Elem, pathEntry: Path.Entry, newElem: Elem): Elem
+  def updateChildElem(elem: ElemType, pathEntry: Path.Entry, newElem: ElemType): ElemType
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -131,10 +131,10 @@ trait ElemUpdateApi {
    * updateChildElemsWithNodeSeq(elem, Set(pathEntry)) { case (che, pe) => f(che) }
    * }}}
    */
-  def updateChildElemWithNodeSeq(elem: Elem, pathEntry: Path.Entry)(f: Elem => immutable.IndexedSeq[Node]): Elem
+  def updateChildElemWithNodeSeq(elem: ElemType, pathEntry: Path.Entry)(f: ElemType => immutable.IndexedSeq[NodeType]): ElemType
 
   /** Returns `updateChildElemWithNodeSeq(elem, pathEntry) { e => newNodes }` */
-  def updateChildElemWithNodeSeq(elem: Elem, pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[Node]): Elem
+  def updateChildElemWithNodeSeq(elem: ElemType, pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function
@@ -145,10 +145,10 @@ trait ElemUpdateApi {
    * updateElemsOrSelf(elem, Set(path)) { case (e, path) => f(e) }
    * }}}
    */
-  def updateElemOrSelf(elem: Elem, path: Path)(f: Elem => Elem): Elem
+  def updateElemOrSelf(elem: ElemType, path: Path)(f: ElemType => ElemType): ElemType
 
   /** Returns `updateElemOrSelf(elem, path) { e => newElem }` */
-  def updateElemOrSelf(elem: Elem, path: Path, newElem: Elem): Elem
+  def updateElemOrSelf(elem: ElemType, path: Path, newElem: ElemType): ElemType
 
   /**
    * Functionally updates the tree with this element as root element, by applying the passed function to the element
@@ -160,10 +160,10 @@ trait ElemUpdateApi {
    * updateElemsWithNodeSeq(elem, Set(path)) { case (e, path) => f(e) }
    * }}}
    */
-  def updateElemWithNodeSeq(elem: Elem, path: Path)(f: Elem => immutable.IndexedSeq[Node]): Elem
+  def updateElemWithNodeSeq(elem: ElemType, path: Path)(f: ElemType => immutable.IndexedSeq[NodeType]): ElemType
 
   /** Returns `updateElemWithNodeSeq(elem, path) { e => newNodes }` */
-  def updateElemWithNodeSeq(elem: Elem, path: Path, newNodes: immutable.IndexedSeq[Node]): Elem
+  def updateElemWithNodeSeq(elem: ElemType, path: Path, newNodes: immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Updates the child elements with the given path entries, applying the passed update function.
@@ -175,7 +175,7 @@ trait ElemUpdateApi {
    *
    * If the set of path entries is small, this method is rather efficient.
    */
-  def updateChildElems(elem: Elem, pathEntries: Set[Path.Entry])(f: (Elem, Path.Entry) => Elem): Elem
+  def updateChildElems(elem: ElemType, pathEntries: Set[Path.Entry])(f: (ElemType, Path.Entry) => ElemType): ElemType
 
   /**
    * '''Updates the child elements with the given path entries''', applying the passed update function.
@@ -192,7 +192,7 @@ trait ElemUpdateApi {
    *   // Updating in reverse order of indexes, in order not to invalidate the path entries
    *   val newChildren = indexesByPathEntries.reverse.foldLeft(children(elem)) {
    *     case (accChildNodes, (pathEntry, idx)) =>
-   *       val che = accChildNodes(idx).asInstanceOf[Elem]
+   *       val che = accChildNodes(idx).asInstanceOf[ElemType]
    *       accChildNodes.patch(idx, f(che, pathEntry), 1)
    *   }
    *   withChildren(elem, newChildren)
@@ -201,7 +201,7 @@ trait ElemUpdateApi {
    *
    * If the set of path entries is small, this method is rather efficient.
    */
-  def updateChildElemsWithNodeSeq(elem: Elem, pathEntries: Set[Path.Entry])(f: (Elem, Path.Entry) => immutable.IndexedSeq[Node]): Elem
+  def updateChildElemsWithNodeSeq(elem: ElemType, pathEntries: Set[Path.Entry])(f: (ElemType, Path.Entry) => immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Updates the descendant-or-self elements with the given paths, applying the passed update function.
@@ -235,7 +235,7 @@ trait ElemUpdateApi {
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElemsOrSelf(elem: Elem, paths: Set[Path])(f: (Elem, Path) => Elem): Elem
+  def updateElemsOrSelf(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => ElemType): ElemType
 
   /**
    * Updates the descendant elements with the given paths, applying the passed update function.
@@ -256,7 +256,7 @@ trait ElemUpdateApi {
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElems(elem: Elem, paths: Set[Path])(f: (Elem, Path) => Elem): Elem
+  def updateElems(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => ElemType): ElemType
 
   /**
    * Updates the descendant-or-self elements with the given paths, applying the passed update function.
@@ -291,7 +291,7 @@ trait ElemUpdateApi {
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElemsOrSelfWithNodeSeq(elem: Elem, paths: Set[Path])(f: (Elem, Path) => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node]
+  def updateElemsOrSelfWithNodeSeq(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType]
 
   /**
    * Updates the descendant elements with the given paths, applying the passed update function.
@@ -313,12 +313,12 @@ trait ElemUpdateApi {
    *
    * If the set of paths is small, this method is rather efficient.
    */
-  def updateElemsWithNodeSeq(elem: Elem, paths: Set[Path])(f: (Elem, Path) => immutable.IndexedSeq[Node]): Elem
+  def updateElemsWithNodeSeq(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => immutable.IndexedSeq[NodeType]): ElemType
 
   /**
    * Invokes `updateChildElems`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
-   * val editsByPathEntries: Map[Path.Entry, Elem] =
+   * val editsByPathEntries: Map[Path.Entry, ElemType] =
    *   findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) =>
    *     f(che, pe).map(newE => (pe, newE)) }).toMap
    *
@@ -326,12 +326,12 @@ trait ElemUpdateApi {
    *   editsByPathEntries.getOrElse(pe, che) }
    * }}}
    */
-  def updateChildElems(elem: Elem, f: (Elem, Path.Entry) => Option[Elem]): Elem
+  def updateChildElems(elem: ElemType, f: (ElemType, Path.Entry) => Option[ElemType]): ElemType
 
   /**
    * Invokes `updateChildElemsWithNodeSeq`, passing the path entries for which the passed function is defined. It is equivalent to:
    * {{{
-   * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[Node]] =
+   * val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[NodeType]] =
    *   findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) =>
    *     f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
    *
@@ -340,16 +340,16 @@ trait ElemUpdateApi {
    * }
    * }}}
    */
-  def updateChildElemsWithNodeSeq(elem: Elem, f: (Elem, Path.Entry) => Option[immutable.IndexedSeq[Node]]): Elem
+  def updateChildElemsWithNodeSeq(elem: ElemType, f: (ElemType, Path.Entry) => Option[immutable.IndexedSeq[NodeType]]): ElemType
 }
 
 object ElemUpdateApi {
 
   /**
-   * This query API type, restricting Node and Elem to the passed type parameters.
+   * This query API type, restricting NodeType and ElemType to the passed type parameters.
    *
    * @tparam N The node type
    * @tparam E The element type
    */
-  type Aux[N, E] = ElemUpdateApi { type Node = N; type Elem = E }
+  type Aux[N, E] = ElemUpdateApi { type NodeType = N; type ElemType = E }
 }

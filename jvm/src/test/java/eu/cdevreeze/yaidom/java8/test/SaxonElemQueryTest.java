@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 
 import org.junit.Test;
 
-import eu.cdevreeze.yaidom.java8.saxonelem.SaxonDocument;
 import eu.cdevreeze.yaidom.java8.saxonelem.SaxonElem;
 import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;

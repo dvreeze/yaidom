@@ -29,27 +29,27 @@ import scala.collection.immutable
  */
 trait ElemTransformationLike extends ElemTransformationApi {
 
-  type Node
+  type NodeType
 
-  type Elem <: Node
+  type ElemType <: NodeType
 
-  def transformChildElems(elem: Elem, f: Elem => Elem): Elem
+  def transformChildElems(elem: ElemType, f: ElemType => ElemType): ElemType
 
-  def transformChildElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem
+  def transformChildElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType
 
-  final def transformElemsOrSelf(elem: Elem, f: Elem => Elem): Elem = {
+  final def transformElemsOrSelf(elem: ElemType, f: ElemType => ElemType): ElemType = {
     f(transformChildElems(elem, e => transformElemsOrSelf(e, f)))
   }
 
-  final def transformElems(elem: Elem, f: Elem => Elem): Elem = {
+  final def transformElems(elem: ElemType, f: ElemType => ElemType): ElemType = {
     transformChildElems(elem, e => transformElemsOrSelf(e, f))
   }
 
-  final def transformElemsOrSelfToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): immutable.IndexedSeq[Node] = {
+  final def transformElemsOrSelfToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType] = {
     f(transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f)))
   }
 
-  final def transformElemsToNodeSeq(elem: Elem, f: Elem => immutable.IndexedSeq[Node]): Elem = {
+  final def transformElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
     transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f))
   }
 }
@@ -57,10 +57,10 @@ trait ElemTransformationLike extends ElemTransformationApi {
 object ElemTransformationLike {
 
   /**
-   * This query API type, restricting Node and Elem to the passed type parameters.
+   * This query API type, restricting NodeType and ElemType to the passed type parameters.
    *
    * @tparam N The node type
    * @tparam E The element type
    */
-  type Aux[N, E] = ElemTransformationLike { type Node = N; type Elem = E }
+  type Aux[N, E] = ElemTransformationLike { type NodeType = N; type ElemType = E }
 }
