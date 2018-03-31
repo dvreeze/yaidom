@@ -84,6 +84,10 @@ class ClarkElemTest extends FunSuite {
     val adaptedScope =
       scope.withoutDefaultNamespace ++ Scope.from("xbrli" -> "http://www.xbrl.org/2003/instance")
 
+    assertResult(adaptedScope) {
+      adaptedScope.withoutDefaultNamespace.makeInvertible
+    }
+
     val convertedInstance = simple.Elem.from(clarkInstance, adaptedScope)
 
     assertResult(resolved.Elem.from(parsedInstance)) {
