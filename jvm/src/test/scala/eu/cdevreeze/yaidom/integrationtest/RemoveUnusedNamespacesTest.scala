@@ -108,8 +108,8 @@ class RemoveUnusedNamespacesTest extends FunSuite {
       editedRootElem.findAllElemsOrSelf.map(_.scope).toSet
     }
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
   }
 
@@ -146,12 +146,12 @@ class RemoveUnusedNamespacesTest extends FunSuite {
     }
 
     assertResult {
-      resolved.Elem(rootElem) transformChildElemsToNodeSeq {
+      resolved.Elem.from(rootElem) transformChildElemsToNodeSeq {
         case e: resolved.Elem if e.resolvedName.namespaceUriOption.contains("http://www.w3.org/2005/Atom") => Vector(e)
         case e: resolved.Elem => Vector()
       }
     } {
-      resolved.Elem(editedRootElem)
+      resolved.Elem.from(editedRootElem)
     }
   }
 
@@ -198,8 +198,8 @@ class RemoveUnusedNamespacesTest extends FunSuite {
       editedRootElem.findAllElemsOrSelf.map(_.scope).toSet
     }
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
   }
 
@@ -231,8 +231,8 @@ class RemoveUnusedNamespacesTest extends FunSuite {
       editedRootElem.findAllElemsOrSelf.map(_.scope).toSet
     }
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
   }
 
@@ -278,8 +278,8 @@ class RemoveUnusedNamespacesTest extends FunSuite {
       newElem2.findAllElemsOrSelf.map(_.scope).toSet
     }
 
-    assertResult(resolved.Elem(newElem1)) {
-      resolved.Elem(newElem2)
+    assertResult(resolved.Elem.from(newElem1)) {
+      resolved.Elem.from(newElem2)
     }
   }
 }

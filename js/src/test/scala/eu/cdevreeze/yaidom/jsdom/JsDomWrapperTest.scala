@@ -230,8 +230,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.size
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(root)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(root)
     }
 
     val iroot = indexed.Elem(root)
@@ -250,8 +250,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.size
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -268,8 +268,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.toSet
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -294,8 +294,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.mkString
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -360,8 +360,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.toSet
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -409,8 +409,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
         flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -448,8 +448,8 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       iroot.findAllElemsOrSelf.flatMap(_.resolvedAttributes.toMap.keySet).toSet
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -465,15 +465,15 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
     assertResult(false) {
       val firstDescendant = domRoot.findAllElems.head
-      resolved.Elem(firstDescendant.parent) == resolved.Elem(firstDescendant)
+      resolved.Elem.from(firstDescendant.parent) == resolved.Elem.from(firstDescendant)
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(domRoot.findAllElems.head.parent)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(domRoot.findAllElems.head.parent)
     }
 
-    assertResult(domRoot.findAllElems.map(_.parent).map(e => resolved.Elem(e))) {
-      iroot.findAllElems.map(_.parent).map(e => resolved.Elem(e.underlyingElem))
+    assertResult(domRoot.findAllElems.map(_.parent).map(e => resolved.Elem.from(e))) {
+      iroot.findAllElems.map(_.parent).map(e => resolved.Elem.from(e.underlyingElem))
     }
 
     assertResult(List(root.resolvedName)) {
@@ -493,16 +493,16 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
 
     val paths = iroot.findAllElemsOrSelf.map(_.path).ensuring(_.head.isEmpty).ensuring(_.tail.head.nonEmpty)
 
-    assertResult(paths.map(path => resolved.Elem(domRoot.getElemOrSelfByPath(path)))) {
-      paths.map(path => resolved.Elem(root.getElemOrSelfByPath(path)))
+    assertResult(paths.map(path => resolved.Elem.from(domRoot.getElemOrSelfByPath(path)))) {
+      paths.map(path => resolved.Elem.from(root.getElemOrSelfByPath(path)))
     }
 
     assertResult(iroot.findAllElemsOrSelf.map(_.path)) {
       domRoot.findAllElemsOrSelf.map(_.path)
     }
 
-    assertResult(List(resolved.Elem(root))) {
-      domRoot.findAllElemsOrSelf.map(_.rootElem).map(e => resolved.Elem(e)).distinct
+    assertResult(List(resolved.Elem.from(root))) {
+      domRoot.findAllElemsOrSelf.map(_.rootElem).map(e => resolved.Elem.from(e)).distinct
     }
   }
 

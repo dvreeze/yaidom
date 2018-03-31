@@ -61,9 +61,11 @@ lazy val root = project.in(file("."))
 lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
   .settings(commonSettings: _*)
   .jvmSettings(
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-10" % "optional",
+    // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
-    libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0" % "optional",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-10",
+
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 

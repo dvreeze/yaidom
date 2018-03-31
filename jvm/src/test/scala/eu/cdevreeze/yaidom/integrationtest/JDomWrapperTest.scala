@@ -775,9 +775,9 @@ class JDomWrapperTest extends FunSuite {
   }
 
   private def checkEqualityOfDomAndJDomElems(d: org.w3c.dom.Document): Unit = {
-    val rootElem1 = resolved.Elem(DomDocument(d).documentElement)
+    val rootElem1 = resolved.Elem.from(DomDocument(d).documentElement)
     val domBuilder = new org.jdom2.input.DOMBuilder
-    val rootElem2 = resolved.Elem(JDomNode.wrapDocument(domBuilder.build(d)).documentElement)
+    val rootElem2 = resolved.Elem.from(JDomNode.wrapDocument(domBuilder.build(d)).documentElement)
 
     assertResult(rootElem1) {
       rootElem2

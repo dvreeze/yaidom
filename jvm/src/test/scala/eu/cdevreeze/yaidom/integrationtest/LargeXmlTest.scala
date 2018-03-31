@@ -150,7 +150,7 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testQueryResolvedElem") {
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     doQueryTest(resolvedElem, "resolved.Elem")
   }
@@ -367,14 +367,14 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Comparing the corresponding resolved elements
 
-    val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
+    val resolvedElm1: resolved.Elem = resolved.Elem.from(doc.documentElement)
 
-    val resolvedDocElm = resolved.Elem(doc.documentElement)
+    val resolvedDocElm = resolved.Elem.from(doc.documentElement)
     val resolvedElm2: resolved.Elem = resolvedDocElm.updateElemOrSelf(path) { e =>
       e.withChildren(Vector(resolved.Text(newPhone)))
     }
 
-    val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
+    val resolvedElm3: resolved.Elem = resolved.Elem.from(updatedDoc.documentElement)
 
     assertResult(false) {
       resolvedElm1 == resolvedElm2
@@ -423,15 +423,15 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Comparing the corresponding resolved elements
 
-    val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
+    val resolvedElm1: resolved.Elem = resolved.Elem.from(doc.documentElement)
 
-    val resolvedDocElm = resolved.Elem(doc.documentElement)
+    val resolvedDocElm = resolved.Elem.from(doc.documentElement)
     val resolvedElm2: resolved.Elem = resolvedDocElm.updateElemsOrSelf(paths) { (e, p) =>
       if (p == path) e.withChildren(Vector(resolved.Text(newPhone)))
       else e
     }
 
-    val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
+    val resolvedElm3: resolved.Elem = resolved.Elem.from(updatedDoc.documentElement)
 
     assertResult(false) {
       resolvedElm1 == resolvedElm2
@@ -478,14 +478,14 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     // Comparing the corresponding resolved elements
 
-    val resolvedElm1: resolved.Elem = resolved.Elem(doc.documentElement)
+    val resolvedElm1: resolved.Elem = resolved.Elem.from(doc.documentElement)
 
-    val resolvedDocElm = resolved.Elem(doc.documentElement)
+    val resolvedDocElm = resolved.Elem.from(doc.documentElement)
     val resolvedElm2: resolved.Elem = resolvedDocElm updateTopmostElemsWithNodeSeq { (elem, p) =>
       if (p == path) Some(Vector(elem.withChildren(Vector(resolved.Text(newPhone))))) else None
     }
 
-    val resolvedElm3: resolved.Elem = resolved.Elem(updatedDoc.documentElement)
+    val resolvedElm3: resolved.Elem = resolved.Elem.from(updatedDoc.documentElement)
 
     assertResult(false) {
       resolvedElm1 == resolvedElm2
@@ -560,7 +560,7 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("testNavigationForResolvedElem") {
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     doNavigationTest(resolvedElem, "resolved.Elem")
   }

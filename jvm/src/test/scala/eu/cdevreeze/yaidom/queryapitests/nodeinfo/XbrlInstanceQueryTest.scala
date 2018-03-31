@@ -64,6 +64,6 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
     val xmlBytes = bos.toByteArray
 
     val docParser = DocumentParserUsingStax.newInstance
-    eu.cdevreeze.yaidom.resolved.Elem(docParser.parse(new ByteArrayInputStream(xmlBytes)).documentElement)
+    eu.cdevreeze.yaidom.resolved.Elem.from(docParser.parse(new ByteArrayInputStream(xmlBytes)).documentElement)
   }
 }

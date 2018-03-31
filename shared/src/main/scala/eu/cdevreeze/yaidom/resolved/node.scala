@@ -119,8 +119,8 @@ sealed trait Node extends Nodes.Node with Immutable
  *   }
  * }
  *
- * resolved.Elem(replaceTypeAttributes(schemaElem1)).removeAllInterElementWhitespace ==
- *   resolved.Elem(replaceTypeAttributes(schemaElem2)).removeAllInterElementWhitespace
+ * resolved.Elem.from(replaceTypeAttributes(schemaElem1)).removeAllInterElementWhitespace ==
+ *   resolved.Elem.from(replaceTypeAttributes(schemaElem2)).removeAllInterElementWhitespace
  * }}}
  */
 final case class Elem(
@@ -374,8 +374,8 @@ object Node extends ElemCreationApi {
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
-  def apply(n: Nodes.Node): Node = n match {
-    case e: Nodes.Elem with ClarkElemNodeApi => Elem(e)
+  def from(n: Nodes.Node): Node = n match {
+    case e: Nodes.Elem with ClarkElemNodeApi => Elem.from(e)
     case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
     case t: Nodes.Text                       => Text(t)
     case n                                   => sys.error(s"Not an element or text node: $n")
@@ -392,8 +392,6 @@ object Node extends ElemCreationApi {
   def elem(ename: EName, attributes: immutable.IndexedSeq[(EName, String)], children: immutable.IndexedSeq[Node]): Elem = {
     elem(ename, attributes.toMap, children)
   }
-
-  def text(textValue: String): Text = Text(textValue)
 
   def textElem(ename: EName, txt: String): Elem = {
     textElem(ename, Map[EName, String](), txt)
@@ -418,6 +416,8 @@ object Node extends ElemCreationApi {
   def emptyElem(ename: EName, attributes: immutable.IndexedSeq[(EName, String)]): Elem = {
     emptyElem(ename, attributes.toMap)
   }
+
+  def text(textValue: String): Text = Text(textValue)
 }
 
 object Elem {
@@ -435,14 +435,14 @@ object Elem {
    * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "resolved" `Elem`.
    * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
    */
-  def apply(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
+  def from(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
     val children = e.children collect {
       case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
       case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
       case childText: Nodes.Text                      => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
-    val resolvedChildren = children map { node => Node(node) }
+    val resolvedChildren = children map { node => Node.from(node) }
 
     Elem(e.resolvedName, e.resolvedAttributes.toMap, resolvedChildren)
   }

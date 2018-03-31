@@ -34,7 +34,7 @@ package eu.cdevreeze.yaidom
  * // Note the import of package resolved, and not of its members. That is indeed a best practice!
  * import eu.cdevreeze.yaidom.resolved
  *
- * val resolvedBookstoreElem = resolved.Elem(bookstoreElem)
+ * val resolvedBookstoreElem = resolved.Elem.from(bookstoreElem)
  *
  * val scalaBookAuthors =
  *   for {

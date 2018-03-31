@@ -64,7 +64,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <colorChoices>navy black</colorChoices>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -76,7 +76,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <desc>Our <i>favorite</i> shirt!</desc>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -120,7 +120,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -130,7 +130,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <name language="en">Deluxe Travel Bag</name>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -149,7 +149,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedProd)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElem).removeAllInterElementWhitespace
     }
   }
@@ -170,7 +170,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
 
     val expectedNameElems = List(
       <name language="en">Deluxe Travel Bag</name>,
-      <name language="en">Floppy Sun Hat</name>).map(e => eu.cdevreeze.yaidom.resolved.Elem(convertToElem(e)))
+      <name language="en">Floppy Sun Hat</name>).map(e => eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)))
 
     assertResult(expectedNameElems) {
       sortedProductNameElems.map(e => toResolvedElem(e))
@@ -203,7 +203,7 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <li class="ACC">Floppy Sun Hat</li>
       </ul>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(convertToElem(expectedResult)).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedResult)).removeAllInterElementWhitespace) {
       toResolvedElem(resultElem).removeAllInterElementWhitespace
     }
   }
@@ -242,8 +242,8 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
         <item num="784" name="Cotton Dress Shirt" quan="1"/>,
         <item num="557" name="Fleece Pullover" quan="1"/>)
 
-    assertResult(expectedResults.map(e => eu.cdevreeze.yaidom.resolved.Elem(convertToElem(e)).removeAllInterElementWhitespace)) {
-      itemElems.map(e => eu.cdevreeze.yaidom.resolved.Elem(e).removeAllInterElementWhitespace)
+    assertResult(expectedResults.map(e => eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)).removeAllInterElementWhitespace)) {
+      itemElems.map(e => eu.cdevreeze.yaidom.resolved.Elem.from(e).removeAllInterElementWhitespace)
     }
   }
 

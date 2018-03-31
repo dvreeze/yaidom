@@ -209,8 +209,8 @@ class Blog2Test extends FunSuite {
 
     require(div2ElemScope == Scope.from("" -> xhtmlNs, "example" -> examplesNs))
 
-    val feed1ResolvedElem = resolved.Elem(feed1DocElem)
-    val feed2ResolvedElem = resolved.Elem(feed2DocElem)
+    val feed1ResolvedElem = resolved.Elem.from(feed1DocElem)
+    val feed2ResolvedElem = resolved.Elem.from(feed2DocElem)
 
     require(feed1ResolvedElem.removeAllInterElementWhitespace ==
       feed2ResolvedElem.removeAllInterElementWhitespace)
@@ -245,7 +245,7 @@ class Blog2Test extends FunSuite {
         feed3DocElem.scope)
     require(div3Elem.scope == feed3DocElem.scope)
 
-    val feed3ResolvedElem = resolved.Elem(feed3DocElem)
+    val feed3ResolvedElem = resolved.Elem.from(feed3DocElem)
 
     require(feed1ResolvedElem.removeAllInterElementWhitespace ==
       feed3ResolvedElem.removeAllInterElementWhitespace)

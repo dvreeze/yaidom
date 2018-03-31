@@ -73,7 +73,7 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
     }
 
     assertResult(documentContent.findAllElemsOrSelf.map(_.resolvedName)) {
-      eu.cdevreeze.yaidom.resolved.Elem(documentContent.bridgeElem.toElem).findAllElemsOrSelf.map(_.resolvedName)
+      eu.cdevreeze.yaidom.resolved.Elem.from(documentContent.bridgeElem.toElem).findAllElemsOrSelf.map(_.resolvedName)
     }
   }
 

@@ -51,8 +51,8 @@ class NamespaceUtilsTest extends FunSuite {
 
     val editedRootElem = pushUpPrefixedNamespaces(rootElem)
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
 
     val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
@@ -68,8 +68,8 @@ class NamespaceUtilsTest extends FunSuite {
 
     val editedRootElem = pushUpPrefixedNamespaces(rootElem)
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
 
     val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
@@ -91,8 +91,8 @@ class NamespaceUtilsTest extends FunSuite {
 
     val editedRootElem = pushUpPrefixedNamespaces(rootElem)
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
 
     val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
@@ -111,8 +111,8 @@ class NamespaceUtilsTest extends FunSuite {
 
     val editedRootElem = pushUpPrefixedNamespaces(rootElem)
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
 
     val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
@@ -140,8 +140,8 @@ class NamespaceUtilsTest extends FunSuite {
 
     val editedRootElem = pushUpPrefixedNamespaces(rootElem)
 
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(editedRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(editedRootElem)
     }
 
     val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
@@ -179,8 +179,8 @@ class NamespaceUtilsTest extends FunSuite {
 
     val editedLastTable = stripUnusedNamespaces(lastTable, DocumentENameExtractor.NoOp)
 
-    assertResult(resolved.Elem(lastTable.underlyingElem)) {
-      resolved.Elem(editedLastTable)
+    assertResult(resolved.Elem.from(lastTable.underlyingElem)) {
+      resolved.Elem.from(editedLastTable)
     }
 
     assertResult(Set("table")) {

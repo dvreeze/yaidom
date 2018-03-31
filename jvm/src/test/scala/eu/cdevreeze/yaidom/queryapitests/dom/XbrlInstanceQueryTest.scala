@@ -47,5 +47,5 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.DomConversions.convertToElem(elem.wrappedNode, xbrlInstance.scope))
+    resolved.Elem.from(convert.DomConversions.convertToElem(elem.wrappedNode, xbrlInstance.scope))
 }

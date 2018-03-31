@@ -155,8 +155,8 @@ class BasicXmlProcessingTest extends FunSuite {
 
     // Let's take control of the equality we want here
     assertResult(true) {
-      val fooResolved = resolved.Elem(foo).removeAllInterElementWhitespace
-      val fooFromStringResolved = resolved.Elem(fooElemFromString).removeAllInterElementWhitespace
+      val fooResolved = resolved.Elem.from(foo).removeAllInterElementWhitespace
+      val fooFromStringResolved = resolved.Elem.from(fooElemFromString).removeAllInterElementWhitespace
       fooResolved == fooFromStringResolved
     }
   }
@@ -246,18 +246,18 @@ class BasicXmlProcessingTest extends FunSuite {
         case e => e
       }
 
-    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
-      resolved.Elem(musicElm2).removeAllInterElementWhitespace.findAllElemsOrSelf.size
+    assertResult(resolved.Elem.from(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
+      resolved.Elem.from(musicElm2).removeAllInterElementWhitespace.findAllElemsOrSelf.size
     }
-    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(musicElm2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    assertResult(resolved.Elem.from(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(musicElm2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
 
-    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
-      resolved.Elem(musicElm3).removeAllInterElementWhitespace.findAllElemsOrSelf.size
+    assertResult(resolved.Elem.from(musicElmWithoutLinks).removeAllInterElementWhitespace.findAllElemsOrSelf.size) {
+      resolved.Elem.from(musicElm3).removeAllInterElementWhitespace.findAllElemsOrSelf.size
     }
-    assertResult(resolved.Elem(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(musicElm3).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    assertResult(resolved.Elem.from(musicElmWithoutLinks).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(musicElm3).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
 }

@@ -69,8 +69,8 @@ class ClarkElemEditorTest extends FunSuite {
         Vector()
     }
 
-    assertResult(resolved.Elem(filteredInstance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(instance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    assertResult(resolved.Elem.from(filteredInstance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(instance).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
 

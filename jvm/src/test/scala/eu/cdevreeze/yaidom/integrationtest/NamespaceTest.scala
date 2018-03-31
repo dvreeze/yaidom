@@ -125,8 +125,8 @@ class NamespaceTest extends FunSuite {
     val doc2 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("feed2.xml"))
     val rootElm2 = doc2.documentElement
 
-    assertResult(resolved.Elem(rootElm1)) {
-      resolved.Elem(rootElm2)
+    assertResult(resolved.Elem.from(rootElm1)) {
+      resolved.Elem.from(rootElm2)
     }
   }
 
@@ -139,8 +139,8 @@ class NamespaceTest extends FunSuite {
     val doc2 = docParser.parse(classOf[NamespaceTest].getResourceAsStream("simpleStylesheet2.xsl"))
     val rootElm2 = doc2.documentElement
 
-    assertResult(resolved.Elem(rootElm1)) {
-      resolved.Elem(rootElm2)
+    assertResult(resolved.Elem.from(rootElm1)) {
+      resolved.Elem.from(rootElm2)
     }
 
     val elm1Option = rootElm1 findElem { e => e.qname == QName("xsl:template") }
@@ -342,9 +342,9 @@ class NamespaceTest extends FunSuite {
       // With an IBM JRE, more than 5 children are found
       divElmOption.get.removeAllInterElementWhitespace.children.size.min(5)
     }
-    assertResult(resolved.Elem(emElmOption.get)) {
+    assertResult(resolved.Elem.from(emElmOption.get)) {
       val child: Node = divElmOption.get.removeAllInterElementWhitespace.findChildElem(_.localName == "em").get
-      resolved.Node(child)
+      resolved.Node.from(child)
     }
 
     assertResult(Set(nsAtom, nsXhtml)) {
@@ -361,26 +361,26 @@ class NamespaceTest extends FunSuite {
 
     val rootElm2 = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).build(Scope.Empty)
 
-    assertResult(resolved.Elem(rootElm)) {
-      resolved.Elem(rootElm2)
+    assertResult(resolved.Elem.from(rootElm)) {
+      resolved.Elem.from(rootElm2)
     }
 
     val rootElm3 = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).build(Scope.from("" -> nsAtom))
 
-    assertResult(resolved.Elem(rootElm)) {
-      resolved.Elem(rootElm3)
+    assertResult(resolved.Elem.from(rootElm)) {
+      resolved.Elem.from(rootElm3)
     }
 
     val rootElm4 = NodeBuilder.fromElem(doc.documentElement)(Scope.from("atom" -> nsAtom)).build(Scope.Empty)
 
-    assertResult(resolved.Elem(rootElm)) {
-      resolved.Elem(rootElm4)
+    assertResult(resolved.Elem.from(rootElm)) {
+      resolved.Elem.from(rootElm4)
     }
 
     val rootElm5 = NodeBuilder.fromElem(doc.documentElement)(Scope.from("" -> nsAtom)).build(Scope.from("" -> nsAtom))
 
-    assertResult(resolved.Elem(rootElm)) {
-      resolved.Elem(rootElm5)
+    assertResult(resolved.Elem.from(rootElm)) {
+      resolved.Elem.from(rootElm5)
     }
 
     val docPrinter = DocumentPrinterUsingSax.newInstance
@@ -388,16 +388,16 @@ class NamespaceTest extends FunSuite {
     val xml = docPrinter.print(doc)
     val doc6 = docParser.parse(new InputSource(new jio.StringReader(xml)))
 
-    assertResult(resolved.Elem(rootElm)) {
-      resolved.Elem(doc6.documentElement)
+    assertResult(resolved.Elem.from(rootElm)) {
+      resolved.Elem.from(doc6.documentElement)
     }
 
-    assertResult(resolved.Elem(rootElm).findAllElemsOrSelf) {
-      rootElm.findAllElemsOrSelf map { e => resolved.Elem(e) }
+    assertResult(resolved.Elem.from(rootElm).findAllElemsOrSelf) {
+      rootElm.findAllElemsOrSelf map { e => resolved.Elem.from(e) }
     }
 
-    assertResult(resolved.Elem(rootElm) filterElemsOrSelf (_.resolvedName.namespaceUriOption.contains(nsAtom))) {
-      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption.contains(nsAtom) } map { e => resolved.Elem(e) }
+    assertResult(resolved.Elem.from(rootElm) filterElemsOrSelf (_.resolvedName.namespaceUriOption.contains(nsAtom))) {
+      rootElm filterElemsOrSelf { e => e.resolvedName.namespaceUriOption.contains(nsAtom) } map { e => resolved.Elem.from(e) }
     }
   }
 }

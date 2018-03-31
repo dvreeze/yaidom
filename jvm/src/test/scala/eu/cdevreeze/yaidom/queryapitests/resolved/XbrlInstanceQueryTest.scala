@@ -39,7 +39,7 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
     val is = classOf[XbrlInstanceQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/sample-xbrl-instance.xml")
 
     val doc = docParser.parse(is)
-    Elem(doc.documentElement)
+    Elem.from(doc.documentElement)
   }
 
   protected final def toResolvedElem(elem: E): Elem = elem

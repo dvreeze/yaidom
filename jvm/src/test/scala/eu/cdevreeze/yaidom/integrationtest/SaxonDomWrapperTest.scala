@@ -575,9 +575,9 @@ class SaxonDomWrapperTest extends FunSuite {
   }
 
   private def checkEqualityOfDomAndSaxonElems(d: SaxonDocument): Unit = {
-    val rootElem1 = resolved.Elem(d.documentElement)
+    val rootElem1 = resolved.Elem.from(d.documentElement)
     val rootElem2 =
-      resolved.Elem(dom.DomDocument.wrapDocument(NodeOverNodeInfo.wrap(d.wrappedNode).asInstanceOf[org.w3c.dom.Document]).documentElement)
+      resolved.Elem.from(dom.DomDocument.wrapDocument(NodeOverNodeInfo.wrap(d.wrappedNode).asInstanceOf[org.w3c.dom.Document]).documentElement)
 
     assertResult(rootElem1) {
       rootElem2

@@ -85,8 +85,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -117,8 +117,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -153,8 +153,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -366,8 +366,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -410,8 +410,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -444,8 +444,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -490,8 +490,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -568,8 +568,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 
@@ -610,8 +610,8 @@ class ScalaXmlWrapperTest extends FunSuite {
 
     val newRootElem2 = convertToElem(root2.wrappedNode)
 
-    assertResult(resolved.Elem(newRootElem1)) {
-      resolved.Elem(newRootElem2)
+    assertResult(resolved.Elem.from(newRootElem1)) {
+      resolved.Elem.from(newRootElem2)
     }
   }
 

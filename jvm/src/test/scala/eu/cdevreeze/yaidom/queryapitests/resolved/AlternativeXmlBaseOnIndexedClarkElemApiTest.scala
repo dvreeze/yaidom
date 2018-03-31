@@ -40,7 +40,7 @@ class AlternativeXmlBaseOnIndexedClarkElemApiTest extends AbstractAlternativeXml
   private val indexedElemBuilder = IndexedClarkElem
 
   protected def convertToDocElem(elem: simple.Elem, docUri: URI): E = {
-    indexedElemBuilder(Some(docUri), Elem(elem))
+    indexedElemBuilder(Some(docUri), Elem.from(elem))
   }
 
   protected def nullUri: URI = URI.create("")

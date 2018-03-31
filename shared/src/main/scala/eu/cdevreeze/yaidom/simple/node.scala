@@ -335,7 +335,7 @@ final class Elem(
    *
    * It can be proven by structural induction that for each `parentScope` the XML remains the "same":
    * {{{
-   * resolved.Elem(this.notUndeclaringPrefixes(parentScope)) == resolved.Elem(this)
+   * resolved.Elem.from(this.notUndeclaringPrefixes(parentScope)) == resolved.Elem.from(this)
    * }}}
    * Moreover, there are no prefixed namespace undeclarations:
    * {{{
@@ -785,7 +785,7 @@ object Elem {
    * Converts any `Nodes.Elem with ScopedElemNodeApi` element to a "simple" `Elem`.
    * All descendant-or-self (`Nodes.Elem`) elements must implement `ScopedElemNodeApi`, or else an exception is thrown.
    */
-  def apply(e: Nodes.Elem with ScopedElemNodeApi): Elem = {
+  def from(e: Nodes.Elem with ScopedElemNodeApi): Elem = {
     val children = e.children collect {
       case childElm: Nodes.Elem with ScopedElemNodeApi => childElm
       case childElm: Nodes.Elem                        => sys.error(s"Not an element that implements ScopedElemNodeApi")
@@ -795,7 +795,7 @@ object Elem {
       case childEr: Nodes.EntityRef                    => childEr
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
-    val simpleChildren = children map { node => Node(node) }
+    val simpleChildren = children map { node => Node.from(node) }
 
     Elem(e.qname, e.attributes.toIndexedSeq, e.scope, simpleChildren)
   }
@@ -848,8 +848,8 @@ object Node {
    * Converts any element, text, comment, PI or entity reference `Nodes.Node` to a "simple" `Node`.
    * All descendant-or-self elements must implement `ScopedElemNodeApi`, or else an exception is thrown.
    */
-  def apply(n: Nodes.Node): Node = n match {
-    case e: Nodes.Elem with ScopedElemNodeApi => Elem(e)
+  def from(n: Nodes.Node): Node = n match {
+    case e: Nodes.Elem with ScopedElemNodeApi => Elem.from(e)
     case e: Nodes.Elem                        => sys.error(s"Not an element that implements ScopedElemNodeApi")
     case t: Nodes.Text                        => Text(t.text, false)
     case c: Nodes.Comment                     => Comment(c.text)
@@ -875,17 +875,6 @@ object Node {
     new Elem(qname, attributes, scope, children)
   }
 
-  def text(textValue: String): Text = Text(text = textValue, isCData = false)
-
-  def cdata(textValue: String): Text = Text(text = textValue, isCData = true)
-
-  def processingInstruction(target: String, data: String): ProcessingInstruction =
-    ProcessingInstruction(target, data)
-
-  def entityRef(entity: String): EntityRef = EntityRef(entity)
-
-  def comment(textValue: String): Comment = Comment(textValue)
-
   def textElem(qname: QName, scope: Scope, txt: String): Elem = {
     textElem(qname, Vector(), scope, txt)
   }
@@ -910,4 +899,15 @@ object Node {
 
     new Elem(qname, attributes, scope, Vector())
   }
+
+  def text(textValue: String): Text = Text(text = textValue, isCData = false)
+
+  def cdata(textValue: String): Text = Text(text = textValue, isCData = true)
+
+  def processingInstruction(target: String, data: String): ProcessingInstruction =
+    ProcessingInstruction(target, data)
+
+  def entityRef(entity: String): EntityRef = EntityRef(entity)
+
+  def comment(textValue: String): Comment = Comment(textValue)
 }

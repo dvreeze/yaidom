@@ -69,8 +69,8 @@ class JaxbTest extends FunSuite {
       xbrlInstanceElem2.findAllElemsOrSelf.size >= 500
     }
 
-    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
-      resolved.Elem(xbrlInstanceElem2).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem.from(xbrlInstanceElem2).removeAllInterElementWhitespace
     }
   }
 }

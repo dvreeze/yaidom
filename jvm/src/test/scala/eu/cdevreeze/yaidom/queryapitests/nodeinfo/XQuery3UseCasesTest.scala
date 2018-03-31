@@ -171,7 +171,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
     val xmlBytes = bos.toByteArray
 
     val docParser = DocumentParserUsingStax.newInstance
-    eu.cdevreeze.yaidom.resolved.Elem(docParser.parse(new ByteArrayInputStream(xmlBytes)).documentElement)
+    eu.cdevreeze.yaidom.resolved.Elem.from(docParser.parse(new ByteArrayInputStream(xmlBytes)).documentElement)
   }
 
   protected def fromSimpleElem(elem: Elem): E =

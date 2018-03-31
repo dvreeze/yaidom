@@ -541,5 +541,5 @@ class QueryTest extends AbstractElemLikeQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
+    resolved.Elem.from(convert.DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
 }

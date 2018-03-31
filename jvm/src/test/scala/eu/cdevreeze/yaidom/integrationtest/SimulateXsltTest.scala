@@ -84,8 +84,8 @@ class SimulateXsltTest extends FunSuite {
         }
       }
 
-    assertResult(resolved.Elem(expectedHtmlElem).removeAllInterElementWhitespace) {
-      resolved.Elem(htmlElem).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedHtmlElem).removeAllInterElementWhitespace) {
+      resolved.Elem.from(htmlElem).removeAllInterElementWhitespace
     }
   }
 
@@ -131,8 +131,8 @@ class SimulateXsltTest extends FunSuite {
       }
     val htmlElem = htmlElems.head.asInstanceOf[Elem]
 
-    assertResult(resolved.Elem(expectedHtmlElem).removeAllInterElementWhitespace) {
-      resolved.Elem(htmlElem).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedHtmlElem).removeAllInterElementWhitespace) {
+      resolved.Elem.from(htmlElem).removeAllInterElementWhitespace
     }
   }
 
@@ -159,8 +159,8 @@ class SimulateXsltTest extends FunSuite {
               emptyElem(QName("hr"), scope),
               textElem(QName("i"), scope, comment))))
 
-    assertResult(resolved.Elem(expectedHtmlElem).removeAllInterElementWhitespace) {
-      resolved.Elem(htmlElem).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedHtmlElem).removeAllInterElementWhitespace) {
+      resolved.Elem.from(htmlElem).removeAllInterElementWhitespace
     }
   }
 

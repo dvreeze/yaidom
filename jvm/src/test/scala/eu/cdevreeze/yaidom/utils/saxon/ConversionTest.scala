@@ -59,8 +59,8 @@ class ConversionTest extends FunSuite {
   test("testRoundtrippingStartingWithSaxon") {
     val simpleDoc = saxonToSimpleElemConverter.convertSaxonDocument(doc)
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(simpleDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(simpleDoc.documentElement)
     }
     assertResult(doc.uriOption) {
       simpleDoc.uriOption
@@ -68,8 +68,8 @@ class ConversionTest extends FunSuite {
 
     val saxonDoc = simpleToSaxonElemConverter.convertSimpleDocument(simpleDoc)
 
-    assertResult(resolved.Elem(simpleDoc.documentElement)) {
-      resolved.Elem(saxonDoc.documentElement)
+    assertResult(resolved.Elem.from(simpleDoc.documentElement)) {
+      resolved.Elem.from(saxonDoc.documentElement)
     }
     assertResult(simpleDoc.uriOption) {
       saxonDoc.uriOption
@@ -88,8 +88,8 @@ class ConversionTest extends FunSuite {
 
     val saxonDoc = simpleToSaxonElemConverter.convertSimpleDocument(simpleDoc)
 
-    assertResult(resolved.Elem(simpleDoc.documentElement)) {
-      resolved.Elem(saxonDoc.documentElement)
+    assertResult(resolved.Elem.from(simpleDoc.documentElement)) {
+      resolved.Elem.from(saxonDoc.documentElement)
     }
     assertResult(simpleDoc.uriOption) {
       saxonDoc.uriOption
@@ -97,8 +97,8 @@ class ConversionTest extends FunSuite {
 
     val simpleDoc2 = saxonToSimpleElemConverter.convertSaxonDocument(saxonDoc)
 
-    assertResult(resolved.Elem(saxonDoc.documentElement)) {
-      resolved.Elem(simpleDoc2.documentElement)
+    assertResult(resolved.Elem.from(saxonDoc.documentElement)) {
+      resolved.Elem.from(simpleDoc2.documentElement)
     }
     assertResult(saxonDoc.uriOption) {
       simpleDoc2.uriOption
@@ -131,12 +131,12 @@ class ConversionTest extends FunSuite {
       saxonDoc.documentElement.filterElems(_.qname == QName("link:linkbaseRef")).isEmpty
     }
 
-    assertResult(resolved.Elem(editedRootElem)) {
-      resolved.Elem(saxonDoc.documentElement)
+    assertResult(resolved.Elem.from(editedRootElem)) {
+      resolved.Elem.from(saxonDoc.documentElement)
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(saxonDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(saxonDoc.documentElement)
     }
   }
 }

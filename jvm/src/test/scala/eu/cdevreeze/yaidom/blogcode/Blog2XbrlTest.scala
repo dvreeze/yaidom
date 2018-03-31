@@ -393,12 +393,12 @@ class Blog2XbrlTest extends FunSuite {
 
   def comparablePeriodAspectOption(fact: indexed.Elem): Option[Set[resolved.Elem]] = {
     periodAspectOption(fact).map(e =>
-      e.findAllChildElems.map(che => resolved.Elem(che).removeAllInterElementWhitespace).toSet)
+      e.findAllChildElems.map(che => resolved.Elem.from(che).removeAllInterElementWhitespace).toSet)
   }
 
   def comparableUnitAspectOption(fact: indexed.Elem): Option[Set[resolved.Elem]] = {
     unitAspectOption(fact).map(e =>
-      e.findAllChildElems.map(che => resolved.Elem(che).removeAllInterElementWhitespace).toSet)
+      e.findAllChildElems.map(che => resolved.Elem.from(che).removeAllInterElementWhitespace).toSet)
   }
 
   // Create alternative XBRL instance representation

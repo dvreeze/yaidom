@@ -415,8 +415,8 @@ class XPathTest extends FunSuite {
     assertResult(List.empty) {
       resultElem.filterElemsOrSelf(_.qname.prefixOption.isEmpty)
     }
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(resultElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(resultElem)
     }
   }
 
@@ -445,11 +445,11 @@ class XPathTest extends FunSuite {
     assertResult(false) {
       resultRootElem.filterElemsOrSelf(_.qname.prefixOption.isEmpty).isEmpty
     }
-    assertResult(resolved.Elem(firstContext)) {
-      resolved.Elem(resultContextElem)
+    assertResult(resolved.Elem.from(firstContext)) {
+      resolved.Elem.from(resultContextElem)
     }
-    assertResult(resolved.Elem(rootElem)) {
-      resolved.Elem(resultRootElem)
+    assertResult(resolved.Elem.from(rootElem)) {
+      resolved.Elem.from(resultRootElem)
     }
   }
 

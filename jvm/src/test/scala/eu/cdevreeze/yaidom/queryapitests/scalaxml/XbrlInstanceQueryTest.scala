@@ -45,5 +45,5 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(ScalaXmlConversions.convertToElem(elem.wrappedNode))
+    resolved.Elem.from(ScalaXmlConversions.convertToElem(elem.wrappedNode))
 }

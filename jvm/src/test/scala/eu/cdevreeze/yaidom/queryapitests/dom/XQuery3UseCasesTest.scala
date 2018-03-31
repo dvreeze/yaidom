@@ -160,7 +160,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
   }
 
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem =
-    resolved.Elem(DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
+    resolved.Elem.from(DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
 
   protected def fromSimpleElem(elem: Elem): E = {
     val dbf = DocumentBuilderFactory.newInstance

@@ -72,5 +72,5 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.DomConversions.convertToElem(elem.wrappedNode, xsdSchemaElem.scope))
+    resolved.Elem.from(convert.DomConversions.convertToElem(elem.wrappedNode, xsdSchemaElem.scope))
 }

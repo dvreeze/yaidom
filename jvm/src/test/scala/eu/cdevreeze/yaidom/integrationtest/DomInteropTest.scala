@@ -181,7 +181,7 @@ class DomInteropTest extends FunSuite {
 
     // 7. Convert to resolved.Elem, and check again
 
-    val root5: resolved.Elem = resolved.Elem(doc.documentElement)
+    val root5: resolved.Elem = resolved.Elem.from(doc.documentElement)
 
     assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root5.findAllElems map (e => e.localName)).toSet

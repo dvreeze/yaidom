@@ -44,5 +44,5 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(elem.underlyingElem)
+    resolved.Elem.from(elem.underlyingElem)
 }

@@ -230,9 +230,9 @@ class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
     val equivalentDoc = Document(convertToElem(equivalentXml))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -336,9 +336,9 @@ class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
     val equivalentDoc = Document(convertToElem(equivalentXml))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -470,19 +470,19 @@ class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
     val almostEquivalentDoc = Document(convertToElem(almostEquivalentXml))
 
-    val resolvedAlmostEquivalentElem = resolved.Elem(almostEquivalentDoc.documentElement)
+    val resolvedAlmostEquivalentElem = resolved.Elem.from(almostEquivalentDoc.documentElement)
 
     val f: resolved.Elem => resolved.Elem = {
       case e: resolved.Elem if e.resolvedName == EName(nsProd, "number") =>
         val scope = doc.documentElement.scope ++ Scope.from("prod" -> nsProd2)
         val v = (doc.documentElement \\ EName(nsProd2, "number")).map(_.text).mkString
         val result = NodeBuilder.textElem(QName("prod", "number"), v).build(scope)
-        resolved.Elem(result)
+        resolved.Elem.from(result)
       case e => e
     }
     val resolvedEquivalentElem = resolvedAlmostEquivalentElem.transformElemsOrSelf(f)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -586,9 +586,9 @@ class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
     val equivalentDoc = Document(convertToElem(equivalentXml))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -762,9 +762,9 @@ class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
     val equivalentDoc = Document(convertToElem(equivalentXml))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -998,9 +998,9 @@ class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
 
     val equivalentDoc = Document(convertToElem(equivalentXml))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(

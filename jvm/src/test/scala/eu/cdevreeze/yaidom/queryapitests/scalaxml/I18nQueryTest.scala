@@ -53,5 +53,5 @@ class I18nQueryTest extends AbstractI18nQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(ScalaXmlConversions.convertToElem(elem.wrappedNode))
+    resolved.Elem.from(ScalaXmlConversions.convertToElem(elem.wrappedNode))
 }

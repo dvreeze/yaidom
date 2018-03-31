@@ -83,7 +83,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         textElem(QName("product"), Vector(QName("name") -> "toaster"), scope, "200")))
     }
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
       toResolvedElem(result).removeAllInterElementWhitespace
     }
   }
@@ -164,7 +164,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         group("MA", "kitchen", 300)))
     }
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
       toResolvedElem(result).removeAllInterElementWhitespace
     }
   }
@@ -249,7 +249,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         group("MA", "kitchen", 14000)))
     }
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
       toResolvedElem(result).removeAllInterElementWhitespace
     }
   }
@@ -341,7 +341,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
             emptyElem(QName("product"), Vector(QName("name") -> "toaster", QName("total-qty") -> "50"), scope)))))))
     }
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
       toResolvedElem(result).removeAllInterElementWhitespace
     }
   }
@@ -400,7 +400,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
           emptyElem(QName("product"), Vector(QName("name") -> "shirt", QName("qty") -> "10"), scope)))))
     }
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
+    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
       toResolvedElem(result).removeAllInterElementWhitespace
     }
   }

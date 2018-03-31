@@ -128,7 +128,7 @@ class FriendFeedTest extends FunSuite {
 
     assertResult(expectedTwitterSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
-      resolved.Elem(twitterSummaryElm).removeAllInterElementWhitespace
+      resolved.Elem.from(twitterSummaryElm).removeAllInterElementWhitespace
     }
 
     val googleReaderSummaryElm: Elem = createServiceSummary(feedElm, "googlereader")
@@ -150,7 +150,7 @@ class FriendFeedTest extends FunSuite {
 
     assertResult(expectedGoogleReaderSummaryElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
-      resolved.Elem(googleReaderSummaryElm).removeAllInterElementWhitespace
+      resolved.Elem.from(googleReaderSummaryElm).removeAllInterElementWhitespace
     }
 
     val docPrinter: print.DocumentPrinter = {
@@ -205,7 +205,7 @@ class FriendFeedTest extends FunSuite {
 
     assertResult(expectedStatsElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
-      resolved.Elem(statsElm).removeAllInterElementWhitespace
+      resolved.Elem.from(statsElm).removeAllInterElementWhitespace
     }
 
     val statsXml: String = docPrinter.print(statsElm)
@@ -248,7 +248,7 @@ class FriendFeedTest extends FunSuite {
 
     assertResult(expectedStatsElm) {
       // There is no inter-element whitespace in this case, but removing it is a good habit before making equality comparisons
-      resolved.Elem(stats2Elm).removeAllInterElementWhitespace
+      resolved.Elem.from(stats2Elm).removeAllInterElementWhitespace
     }
 
     val stats2Xml: String = docPrinter.print(stats2Elm)

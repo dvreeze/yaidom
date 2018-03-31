@@ -151,7 +151,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
   }
 
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem =
-    eu.cdevreeze.yaidom.resolved.Elem(convertToElem(elem.wrappedNode))
+    eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(elem.wrappedNode))
 
   protected def fromSimpleElem(elem: Elem): E = {
     ScalaXmlElem(ScalaXmlConversions.convertElem(elem))

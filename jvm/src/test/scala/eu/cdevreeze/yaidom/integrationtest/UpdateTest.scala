@@ -141,8 +141,8 @@ class UpdateTest extends FunSuite {
       elemNames[Node, Elem](doc2.documentElement) intersect Set(EName("{http://bookstore}Price"), EName("{http://bookstore}Edition"))
     }
 
-    val resolvedOriginalElm = resolved.Elem(doc1.documentElement)
-    val resolvedUpdatedElm = resolved.Elem(doc2.documentElement)
+    val resolvedOriginalElm = resolved.Elem.from(doc1.documentElement)
+    val resolvedUpdatedElm = resolved.Elem.from(doc2.documentElement)
 
     val updResolvedElem = { (e: resolved.Elem, attr: String) => updateBook(e, attr) }
     val updatedResolvedElm =
@@ -195,7 +195,7 @@ class UpdateTest extends FunSuite {
     // Parse and check the file with the expected updated result
 
     val expectedNewDoc = docParser.parse(classOf[UpdateTest].getResourceAsStream("updatedEmployee.xml"))
-    val expectedResolvedNewRoot = resolved.Elem(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
+    val expectedResolvedNewRoot = resolved.Elem.from(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
 
     // Is the parsed expected update result indeed as expected?
 
@@ -215,12 +215,12 @@ class UpdateTest extends FunSuite {
     // Finally we check the result of the functional update against this parsed expected update result
 
     assertResult(expectedResolvedNewRoot) {
-      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
+      resolved.Elem.from(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
     }
 
     // Same check, but invoking plusAttribute and minusAttribute as well.
     assertResult(expectedResolvedNewRoot) {
-      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace.
+      resolved.Elem.from(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace.
         minusAttribute(QName("x")).plusAttribute(QName("x"), "v").minusAttribute(QName("x")))
     }
   }
@@ -264,7 +264,7 @@ class UpdateTest extends FunSuite {
     // Parse and check the file with the expected updated result
 
     val expectedNewDoc = docParser.parse(classOf[UpdateTest].getResourceAsStream("updatedEmployee.xml"))
-    val expectedResolvedNewRoot = resolved.Elem(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
+    val expectedResolvedNewRoot = resolved.Elem.from(expectedNewDoc.documentElement.removeAllInterElementWhitespace)
 
     // Is the parsed expected update result indeed as expected?
 
@@ -284,14 +284,14 @@ class UpdateTest extends FunSuite {
     // Finally we check the result of the functional update against this parsed expected update result
 
     assertResult(expectedResolvedNewRoot.findAllElemsOrSelf.map(_.resolvedName)) {
-      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.map(_.resolvedName)
+      resolved.Elem.from(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.map(_.resolvedName)
     }
     assertResult(expectedResolvedNewRoot.findAllElemsOrSelf.flatMap(_.resolvedAttributes)) {
-      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.flatMap(_.resolvedAttributes)
+      resolved.Elem.from(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace).findAllElemsOrSelf.flatMap(_.resolvedAttributes)
     }
 
     assertResult(expectedResolvedNewRoot) {
-      resolved.Elem(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
+      resolved.Elem.from(formattedUpdatedDoc.documentElement.removeAllInterElementWhitespace)
     }
   }
 

@@ -50,7 +50,7 @@ class OtherNamespaceTestUsingSaxParserAndRoundTripping extends AbstractOtherName
       val result = doc.withDocumentElement(convertToElem(convertElem(doc.documentElement)))
 
       require(
-        resolved.Elem(doc.documentElement) == resolved.Elem(result.documentElement),
+        resolved.Elem.from(doc.documentElement) == resolved.Elem.from(result.documentElement),
         "Data loss during roundtripping")
 
       result
@@ -67,7 +67,7 @@ class OtherNamespaceTestUsingSaxParserAndRoundTripping extends AbstractOtherName
       val result = doc.withDocumentElement(convertToElem(convertElem(doc.documentElement)))
 
       require(
-        resolved.Elem(doc.documentElement) == resolved.Elem(result.documentElement),
+        resolved.Elem.from(doc.documentElement) == resolved.Elem.from(result.documentElement),
         "Data loss during roundtripping")
 
       result

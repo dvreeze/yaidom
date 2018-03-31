@@ -73,8 +73,8 @@ class AnotherUpdateTest extends FunSuite {
       case elem: resolved.Elem                       => Vector(elem)
     }
 
-    assertResult(resolved.Elem(docWithoutMags.documentElement)) {
-      resolved.Elem(doc.documentElement).transformElemsToNodeSeq(deleteMagsResolved)
+    assertResult(resolved.Elem.from(docWithoutMags.documentElement)) {
+      resolved.Elem.from(doc.documentElement).transformElemsToNodeSeq(deleteMagsResolved)
     }
 
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, deleteMags)
@@ -147,12 +147,12 @@ class AnotherUpdateTest extends FunSuite {
       docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
-    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
-      resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem.from(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
     val insertBook: Elem => immutable.IndexedSeq[Node] = {
-      case e: Elem if resolved.Elem(e) == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+      case e: Elem if resolved.Elem.from(e) == resolved.Elem.from(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
         Vector(e, newBook)
       case e: Elem => Vector(e)
     }
@@ -162,8 +162,8 @@ class AnotherUpdateTest extends FunSuite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
 
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
-      case e: resolved.Elem if e == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
-        Vector(e, resolved.Elem(newBook))
+      case e: resolved.Elem if e == resolved.Elem.from(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+        Vector(e, resolved.Elem.from(newBook))
       case e: resolved.Elem => Vector(e)
     })
   }
@@ -233,12 +233,12 @@ class AnotherUpdateTest extends FunSuite {
       docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
-    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
-      resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem.from(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
     val insertBook: Elem => immutable.IndexedSeq[Node] = {
-      case e: Elem if resolved.Elem(e) == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+      case e: Elem if resolved.Elem.from(e) == resolved.Elem.from(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
         Vector(newBook, e)
       case e: Elem => Vector(e)
     }
@@ -248,8 +248,8 @@ class AnotherUpdateTest extends FunSuite {
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook)
 
     testSymmetryPropertyAboutTransformElemsToNodeSeq(doc.documentElement, insertBook, {
-      case e: resolved.Elem if e == resolved.Elem(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
-        Vector(resolved.Elem(newBook), e)
+      case e: resolved.Elem if e == resolved.Elem.from(doc.documentElement.getElemOrSelfByPath(lastBookPath)) =>
+        Vector(resolved.Elem.from(newBook), e)
       case e: resolved.Elem => Vector(e)
     })
   }
@@ -315,8 +315,8 @@ class AnotherUpdateTest extends FunSuite {
       docWithScalaBook.transformElemsToNodeSeq(deleteNonDatabaseBook)
     }
 
-    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace) {
-      resolved.Elem(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(doc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem.from(docWithoutNonDatabaseBook.documentElement).removeAllInterElementWhitespace
     }
 
     testPropertyAboutTransformElemsToNodeSeq(doc.documentElement, { e => Vector(insertBook(e)) })
@@ -348,8 +348,8 @@ class AnotherUpdateTest extends FunSuite {
       result.withDocumentElement(result.documentElement.prettify(4))
     }
 
-    assertResult(resolved.Elem(updatedDoc.documentElement)) {
-      resolved.Elem(updatedDoc2.documentElement)
+    assertResult(resolved.Elem.from(updatedDoc.documentElement)) {
+      resolved.Elem.from(updatedDoc2.documentElement)
     }
 
     val newMag = {
@@ -385,8 +385,8 @@ class AnotherUpdateTest extends FunSuite {
 
     val updatedElem = elem.updateElemOrSelf(path.parentPathOption.getOrElse(Path.Empty))(g)
 
-    assertResult(resolved.Elem(updatedElem)) {
-      resolved.Elem(elem.updateElemWithNodeSeq(path)(f))
+    assertResult(resolved.Elem.from(updatedElem)) {
+      resolved.Elem.from(elem.updateElemWithNodeSeq(path)(f))
     }
   }
 
@@ -396,16 +396,16 @@ class AnotherUpdateTest extends FunSuite {
         acc.updateElemOrSelf(path)(f)
       }
 
-    assertResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformChildElems(f))
+    assertResult(resolved.Elem.from(expectedResult)) {
+      resolved.Elem.from(elem.transformChildElems(f))
     }
 
     val expectedResult2 = elem.findAllChildElemsWithPathEntries.map(_._2).reverse.foldLeft(elem) { (acc, pathEntry) =>
       acc.updateChildElem(pathEntry)(f)
     }
 
-    assertResult(resolved.Elem(expectedResult2)) {
-      resolved.Elem(elem.transformChildElems(f))
+    assertResult(resolved.Elem.from(expectedResult2)) {
+      resolved.Elem.from(elem.transformChildElems(f))
     }
   }
 
@@ -415,8 +415,8 @@ class AnotherUpdateTest extends FunSuite {
         acc.updateElemOrSelf(path)(f)
       }
 
-    assertResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformElemsOrSelf(f))
+    assertResult(resolved.Elem.from(expectedResult)) {
+      resolved.Elem.from(elem.transformElemsOrSelf(f))
     }
   }
 
@@ -426,8 +426,8 @@ class AnotherUpdateTest extends FunSuite {
         acc.updateElemOrSelf(path)(f)
       }
 
-    assertResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformElems(f))
+    assertResult(resolved.Elem.from(expectedResult)) {
+      resolved.Elem.from(elem.transformElems(f))
     }
   }
 
@@ -436,8 +436,8 @@ class AnotherUpdateTest extends FunSuite {
 
     val expectedResult = elem.transformElemsOrSelf(g)
 
-    assertResult(resolved.Elem(expectedResult)) {
-      resolved.Elem(elem.transformElemsToNodeSeq(f))
+    assertResult(resolved.Elem.from(expectedResult)) {
+      resolved.Elem.from(elem.transformElemsToNodeSeq(f))
     }
   }
 
@@ -446,8 +446,8 @@ class AnotherUpdateTest extends FunSuite {
     f:    Elem => immutable.IndexedSeq[Node],
     g:    resolved.Elem => immutable.IndexedSeq[resolved.Node]): Unit = {
 
-    assertResult(resolved.Elem(elem).transformElemsToNodeSeq(g)) {
-      resolved.Elem(elem.transformElemsToNodeSeq(f))
+    assertResult(resolved.Elem.from(elem).transformElemsToNodeSeq(g)) {
+      resolved.Elem.from(elem.transformElemsToNodeSeq(f))
     }
   }
 }

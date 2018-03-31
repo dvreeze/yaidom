@@ -82,8 +82,8 @@ class EqualityTest extends FunSuite {
 
     // 4. Check that the `resolved` trees (after removing element content whitespace) are equal
 
-    val resolvedRoot1 = resolved.Elem(root1)
-    val resolvedRoot2 = resolved.Elem(root2)
+    val resolvedRoot1 = resolved.Elem.from(root1)
+    val resolvedRoot2 = resolved.Elem.from(root2)
 
     assert(resolvedRoot1.children.size > resolvedRoot2.children.size)
     assert(resolvedRoot1.textChildren.size > resolvedRoot2.textChildren.size)
@@ -119,7 +119,7 @@ class EqualityTest extends FunSuite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = resolved.Elem(root)
+    val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { _.resolvedName }
@@ -144,7 +144,7 @@ class EqualityTest extends FunSuite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = resolved.Elem(root)
+    val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
@@ -205,7 +205,7 @@ class EqualityTest extends FunSuite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = resolved.Elem(root)
+    val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(xsElmENames) {
       val result = resolvedRoot \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
@@ -252,8 +252,8 @@ class EqualityTest extends FunSuite {
 
     // 2. Now check equalities for `resolved` counterparts
 
-    val resolvedRoot1 = resolved.Elem(root1)
-    val resolvedRoot2 = resolved.Elem(root2)
+    val resolvedRoot1 = resolved.Elem.from(root1)
+    val resolvedRoot2 = resolved.Elem.from(root2)
 
     assertResult(false) {
       resolvedRoot1 == resolvedRoot2
@@ -276,7 +276,7 @@ class EqualityTest extends FunSuite {
         e.withChildren(newChildren)
     }
 
-    val resolvedRoot3 = resolved.Elem(root3)
+    val resolvedRoot3 = resolved.Elem.from(root3)
 
     val adaptedResolvedRoot1 = resolvedRoot1.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     val adaptedResolvedRoot3 = resolvedRoot3.removeAllInterElementWhitespace.coalesceAndNormalizeAllText
@@ -307,7 +307,7 @@ class EqualityTest extends FunSuite {
 
     // 2. Check descendant elements of `resolved` tree
 
-    val resolvedRoot = resolved.Elem(root)
+    val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
@@ -350,11 +350,11 @@ class EqualityTest extends FunSuite {
     // Check equalities
 
     assertResult(false) {
-      resolved.Elem(root1) == resolved.Elem(root2)
+      resolved.Elem.from(root1) == resolved.Elem.from(root2)
     }
 
-    assertResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    assertResult(resolved.Elem.from(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
 
@@ -388,15 +388,15 @@ class EqualityTest extends FunSuite {
     // Check equalities
 
     assertResult(false) {
-      resolved.Elem(root1) == resolved.Elem(root2)
+      resolved.Elem.from(root1) == resolved.Elem.from(root2)
     }
 
-    assertResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    assertResult(resolved.Elem.from(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(root2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
 
-    assertResult(resolved.Elem(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(root2).removeAllInterElementWhitespace.coalesceAllAdjacentText.normalizeAllText
+    assertResult(resolved.Elem.from(root1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(root2).removeAllInterElementWhitespace.coalesceAllAdjacentText.normalizeAllText
     }
   }
 }

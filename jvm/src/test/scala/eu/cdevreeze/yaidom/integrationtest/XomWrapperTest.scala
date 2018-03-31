@@ -689,8 +689,8 @@ class XomWrapperTest extends FunSuite {
   }
 
   private def checkEqualityOfDomAndXomElems(d: org.w3c.dom.Document): Unit = {
-    val rootElem1 = resolved.Elem(DomDocument(d).documentElement)
-    val rootElem2 = resolved.Elem(XomNode.wrapDocument(nu.xom.converters.DOMConverter.convert(d)).documentElement)
+    val rootElem1 = resolved.Elem.from(DomDocument(d).documentElement)
+    val rootElem2 = resolved.Elem.from(XomNode.wrapDocument(nu.xom.converters.DOMConverter.convert(d)).documentElement)
 
     assertResult(rootElem1) {
       rootElem2

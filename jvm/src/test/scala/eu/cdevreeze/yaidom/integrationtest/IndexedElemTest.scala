@@ -87,20 +87,20 @@ class IndexedElemTest extends FunSuite {
     val rootElem = docWithCommentAtEnd.documentElement
     val strangeElem = IndexedScopedElem(IndexedScopedElem(rootElem))
 
-    assertResult(IndexedScopedElem(rootElem).findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem))) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem.underlyingElem))
+    assertResult(IndexedScopedElem(rootElem).findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem))) {
+      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem))
     }
 
-    assertResult(IndexedClarkElem(resolved.Elem(rootElem)).findAllElemsOrSelf.map(_.underlyingElem)) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem.underlyingElem))
+    assertResult(IndexedClarkElem(resolved.Elem.from(rootElem)).findAllElemsOrSelf.map(_.underlyingElem)) {
+      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem))
     }
 
-    assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem.underlyingElem))
+    assertResult(resolved.Elem.from(rootElem).findAllElemsOrSelf) {
+      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem))
     }
 
-    assertResult(resolved.Elem(rootElem).findAllElemsOrSelf) {
-      IndexedScopedElem(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem.underlyingElem.underlyingElem))
+    assertResult(resolved.Elem.from(rootElem).findAllElemsOrSelf) {
+      IndexedScopedElem(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem.underlyingElem))
     }
   }
 
@@ -145,7 +145,7 @@ class IndexedElemTest extends FunSuite {
       rootElem.findAllElemsOrSelf.map(_.reverseAncestryENames)
     }
 
-    val resolvedElem = resolved.Elem(rootElem.underlyingElem)
+    val resolvedElem = resolved.Elem.from(rootElem.underlyingElem)
     val indexedClarkElem = IndexedClarkElem(resolvedElem)
 
     assertResult(rootElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)) {
@@ -171,11 +171,11 @@ class IndexedElemTest extends FunSuite {
     // Some general properties
 
     assertResult(resolvedElem.findAllElemsOrSelf) {
-      indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem))
+      indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem))
     }
 
-    assertResult(indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingElem))) {
-      rootElem.underlyingElem.findAllElemsOrSelf.map(e => resolved.Elem(e))
+    assertResult(indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem))) {
+      rootElem.underlyingElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e))
     }
 
     assertResult(resolvedElem.findAllElemsOrSelf) {
@@ -183,7 +183,7 @@ class IndexedElemTest extends FunSuite {
     }
 
     assertResult(resolvedElem.findAllElemsOrSelf) {
-      rootElem.findAllElemsOrSelf.map(e => resolved.Elem(e.underlyingRootElem.getElemOrSelfByPath(e.path).asInstanceOf[Nodes.Elem with ClarkElemNodeApi]))
+      rootElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingRootElem.getElemOrSelfByPath(e.path).asInstanceOf[Nodes.Elem with ClarkElemNodeApi]))
     }
   }
 

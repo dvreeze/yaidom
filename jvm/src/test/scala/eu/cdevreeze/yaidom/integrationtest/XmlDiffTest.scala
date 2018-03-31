@@ -147,9 +147,9 @@ object XmlDiffTest {
    */
   def findDiffs[E <: Nodes.Elem with ClarkElemNodeApi.Aux[_, E]](elem1: E, elem2: E): Diffs = {
     val indexedResolvedElem1 =
-      indexed.IndexedClarkElem(resolved.Elem(elem1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
+      indexed.IndexedClarkElem(resolved.Elem.from(elem1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
     val indexedResolvedElem2 =
-      indexed.IndexedClarkElem(resolved.Elem(elem2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
+      indexed.IndexedClarkElem(resolved.Elem.from(elem2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
 
     val allElems1 = indexedResolvedElem1.findAllElemsOrSelf
     val allElems2 = indexedResolvedElem2.findAllElemsOrSelf

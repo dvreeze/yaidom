@@ -153,13 +153,13 @@ class Blog1Test extends FunSuite {
     // Method removeAllInterElementWhitespace makes the equality comparison
     // more robust, because it removes whitespace used for formatting
 
-    require(resolved.Elem(rootElem).removeAllInterElementWhitespace ==
-      resolved.Elem(rootElem2).removeAllInterElementWhitespace)
+    require(resolved.Elem.from(rootElem).removeAllInterElementWhitespace ==
+      resolved.Elem.from(rootElem2).removeAllInterElementWhitespace)
 
     // "Resolved" elements
 
     val resolvedDocElem =
-      resolved.Elem(doc.documentElement)
+      resolved.Elem.from(doc.documentElement)
 
     val bookAuthors2 =
       findAllBookAuthors(resolvedDocElem)

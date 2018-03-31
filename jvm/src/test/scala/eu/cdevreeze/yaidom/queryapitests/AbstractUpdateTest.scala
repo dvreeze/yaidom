@@ -96,7 +96,7 @@ abstract class AbstractUpdateTest extends FunSuite {
   }
 
   test("testUpdateElemsOrSelf") {
-    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem.from(rootElem))
 
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
@@ -113,7 +113,7 @@ abstract class AbstractUpdateTest extends FunSuite {
   }
 
   test("testUpdateElemsWithNodeSeqOnLazyIndexedElem") {
-    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem(rootElem))
+    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem.from(rootElem))
 
     val paths: Set[Path] =
       pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
@@ -301,8 +301,8 @@ abstract class AbstractUpdateTest extends FunSuite {
       elm.transformElems(e => if (e.localName == "segment") e.withChildren(Vector()) else e)
     }
 
-    assertResult(yaidom.resolved.Elem(makeSegmentEmpty(rootElem))) {
-      yaidom.resolved.Elem(makeSegmentEmpty(newRootElem))
+    assertResult(yaidom.resolved.Elem.from(makeSegmentEmpty(rootElem))) {
+      yaidom.resolved.Elem.from(makeSegmentEmpty(newRootElem))
     }
   }
 
@@ -338,19 +338,19 @@ abstract class AbstractUpdateTest extends FunSuite {
 
   private def checkElemAfterMeasureUpdate(elm: E): Unit = {
     assertResult(resolvedExpectedRootElemAfterMeasureUpdate) {
-      yaidom.resolved.Elem(elm)
+      yaidom.resolved.Elem.from(elm)
     }
   }
 
   private def checkElemAfterUnitUpdate(elm: E): Unit = {
     assertResult(resolvedExpectedRootElemAfterUnitUpdate) {
-      yaidom.resolved.Elem(elm)
+      yaidom.resolved.Elem.from(elm)
     }
   }
 
   private def checkElemAfterContextUpdate(elm: E): Unit = {
     assertResult(resolvedExpectedRootElemAfterContextUpdate) {
-      yaidom.resolved.Elem(elm)
+      yaidom.resolved.Elem.from(elm)
     }
   }
 
@@ -370,19 +370,19 @@ abstract class AbstractUpdateTest extends FunSuite {
       "PropertyPlantAndEquipmentEstimatedUsefulLife")
 
   private val resolvedExpectedRootElemAfterMeasureUpdate: yaidom.resolved.Elem =
-    yaidom.resolved.Elem(rootElem.transformElems(updateMeasure))
+    yaidom.resolved.Elem.from(rootElem.transformElems(updateMeasure))
 
-  assert(resolvedExpectedRootElemAfterMeasureUpdate != yaidom.resolved.Elem(rootElem))
+  assert(resolvedExpectedRootElemAfterMeasureUpdate != yaidom.resolved.Elem.from(rootElem))
 
   private val resolvedExpectedRootElemAfterUnitUpdate: yaidom.resolved.Elem =
-    yaidom.resolved.Elem(rootElem.transformElems((updateUnitId _) andThen (updateUnitRef _)))
+    yaidom.resolved.Elem.from(rootElem.transformElems((updateUnitId _) andThen (updateUnitRef _)))
 
-  assert(resolvedExpectedRootElemAfterUnitUpdate != yaidom.resolved.Elem(rootElem))
+  assert(resolvedExpectedRootElemAfterUnitUpdate != yaidom.resolved.Elem.from(rootElem))
 
   private val resolvedExpectedRootElemAfterContextUpdate: yaidom.resolved.Elem =
-    yaidom.resolved.Elem(rootElem.transformElems((updateContextId _) andThen (updateContextRef _)))
+    yaidom.resolved.Elem.from(rootElem.transformElems((updateContextId _) andThen (updateContextRef _)))
 
-  assert(resolvedExpectedRootElemAfterContextUpdate != yaidom.resolved.Elem(rootElem))
+  assert(resolvedExpectedRootElemAfterContextUpdate != yaidom.resolved.Elem.from(rootElem))
 
   protected def fromSimpleElem(e: Elem): E
 

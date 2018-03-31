@@ -106,8 +106,8 @@ class SimpleQueryTest extends FunSuite {
       convertToElem(<name language="en">Deluxe Travel Bag</name>),
       convertToElem(<name language="en">Floppy Sun Hat</name>))
 
-    assertResult(expectedResult.map(e => resolved.Elem(e))) {
-      accProductNameElems.map(e => resolved.Elem(e))
+    assertResult(expectedResult.map(e => resolved.Elem.from(e))) {
+      accProductNameElems.map(e => resolved.Elem.from(e))
     }
   }
 
@@ -138,8 +138,8 @@ class SimpleQueryTest extends FunSuite {
       convertToElem(xml)
     }
 
-    assertResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
-      resolved.Elem(accProductUlElem).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
+      resolved.Elem.from(accProductUlElem).removeAllInterElementWhitespace
     }
   }
 
@@ -180,8 +180,8 @@ class SimpleQueryTest extends FunSuite {
       convertToElem(xml)
     }
 
-    assertResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
-      resolved.Elem(accProductUlElem).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
+      resolved.Elem.from(accProductUlElem).removeAllInterElementWhitespace
     }
   }
 
@@ -220,8 +220,8 @@ class SimpleQueryTest extends FunSuite {
       convertToElem(xml)
     }
 
-    assertResult(resolved.Elem(expectedResult).removeAllInterElementWhitespace) {
-      resolved.Elem(accProductUlElem).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedResult).removeAllInterElementWhitespace) {
+      resolved.Elem.from(accProductUlElem).removeAllInterElementWhitespace
     }
   }
 
@@ -252,8 +252,8 @@ class SimpleQueryTest extends FunSuite {
         <item num="557" name="Fleece Pullover" quan="1"/>) map (e => convertToElem(e))
     }
 
-    assertResult(expectedResult.map(e => resolved.Elem(e).removeAllInterElementWhitespace)) {
-      itemElems.map(e => resolved.Elem(e).removeAllInterElementWhitespace)
+    assertResult(expectedResult.map(e => resolved.Elem.from(e).removeAllInterElementWhitespace)) {
+      itemElems.map(e => resolved.Elem.from(e).removeAllInterElementWhitespace)
     }
   }
 
@@ -281,8 +281,8 @@ class SimpleQueryTest extends FunSuite {
         <department name="WMN" totQuantity="2"/>) map (e => convertToElem(e))
     }
 
-    assertResult(expectedResult.map(e => resolved.Elem(e).removeAllInterElementWhitespace)) {
-      departmentElems.map(e => resolved.Elem(e).removeAllInterElementWhitespace)
+    assertResult(expectedResult.map(e => resolved.Elem.from(e).removeAllInterElementWhitespace)) {
+      departmentElems.map(e => resolved.Elem.from(e).removeAllInterElementWhitespace)
     }
   }
 

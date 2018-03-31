@@ -86,8 +86,8 @@ class EscapedXmlTest extends FunSuite {
       if (e.localName == "item") e.withChildren(Vector()) else e
     }
 
-    assertResult(resolved.Elem(outerXmlElem.transformElems(emptyItemElem)).removeAllInterElementWhitespace) {
-      resolved.Elem(outerXmlElem2.transformElems(emptyItemElem).removeAllInterElementWhitespace)
+    assertResult(resolved.Elem.from(outerXmlElem.transformElems(emptyItemElem)).removeAllInterElementWhitespace) {
+      resolved.Elem.from(outerXmlElem2.transformElems(emptyItemElem).removeAllInterElementWhitespace)
     }
 
     val itemElem = outerXmlElem2.findElem(_.localName == "item").get
@@ -99,8 +99,8 @@ class EscapedXmlTest extends FunSuite {
       innerXmlElem.filterElems(_.localName == "li").map(_.text)
     }
 
-    assertResult(resolved.Elem(innerXmlElem).removeAllInterElementWhitespace) {
-      resolved.Elem(innerXmlElem2).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(innerXmlElem).removeAllInterElementWhitespace) {
+      resolved.Elem.from(innerXmlElem2).removeAllInterElementWhitespace
     }
   }
 
@@ -160,8 +160,8 @@ class EscapedXmlTest extends FunSuite {
       if (e.localName == "item") e.withChildren(Vector()) else e
     }
 
-    assertResult(resolved.Elem(outerXmlElem.transformElems(emptyItemElem)).removeAllInterElementWhitespace) {
-      resolved.Elem(outerXmlElem2.transformElems(emptyItemElem).removeAllInterElementWhitespace)
+    assertResult(resolved.Elem.from(outerXmlElem.transformElems(emptyItemElem)).removeAllInterElementWhitespace) {
+      resolved.Elem.from(outerXmlElem2.transformElems(emptyItemElem).removeAllInterElementWhitespace)
     }
 
     val itemElem = outerXmlElem2.findElem(_.localName == "item").get
@@ -173,8 +173,8 @@ class EscapedXmlTest extends FunSuite {
       innerXmlElem.filterElems(_.localName == "li").map(_.text)
     }
 
-    assertResult(resolved.Elem(innerXmlElem).removeAllInterElementWhitespace) {
-      resolved.Elem(innerXmlElem2).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(innerXmlElem).removeAllInterElementWhitespace) {
+      resolved.Elem.from(innerXmlElem2).removeAllInterElementWhitespace
     }
   }
 }

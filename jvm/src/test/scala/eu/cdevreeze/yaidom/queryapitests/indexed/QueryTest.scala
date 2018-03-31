@@ -661,5 +661,5 @@ class QueryTest extends AbstractElemLikeQueryTest {
     Elem(Some(new URI("http://bookstore.xml")), result)
   }
 
-  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem(elem.underlyingElem)
+  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem.from(elem.underlyingElem)
 }

@@ -200,8 +200,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.size
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(root)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(root)
     }
 
     val iroot = indexed.Elem(root)
@@ -220,8 +220,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.size
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -235,8 +235,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.toSet
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -258,8 +258,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.mkString
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -321,8 +321,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       result.toSet
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -351,8 +351,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
         flatMap(_.textChildren.filter(_.text.trim.contains("Some Text"))).size
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -387,8 +387,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       iroot.findAllElemsOrSelf.flatMap(_.resolvedAttributes.toMap.keySet).toSet
     }
 
-    assertResult(resolved.Elem(domRoot)) {
-      resolved.Elem(iroot.underlyingElem)
+    assertResult(resolved.Elem.from(domRoot)) {
+      resolved.Elem.from(iroot.underlyingElem)
     }
   }
 
@@ -401,8 +401,8 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
 
     val paths = iroot.findAllElemsOrSelf.map(_.path).ensuring(_.head.isEmpty).ensuring(_.tail.head.nonEmpty)
 
-    assertResult(paths.map(path => resolved.Elem(domRoot.getElemOrSelfByPath(path)))) {
-      paths.map(path => resolved.Elem(root.getElemOrSelfByPath(path)))
+    assertResult(paths.map(path => resolved.Elem.from(domRoot.getElemOrSelfByPath(path)))) {
+      paths.map(path => resolved.Elem.from(root.getElemOrSelfByPath(path)))
     }
   }
 

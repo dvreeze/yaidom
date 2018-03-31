@@ -82,6 +82,6 @@ final class ResolvedText(override val underlyingNode: resolved.Text) extends Res
 object ResolvedElem {
 
   def apply(elem: Nodes.Elem with ClarkElemNodeApi): ResolvedElem = {
-    new ResolvedElem(resolved.Elem(elem))
+    new ResolvedElem(resolved.Elem.from(elem))
   }
 }

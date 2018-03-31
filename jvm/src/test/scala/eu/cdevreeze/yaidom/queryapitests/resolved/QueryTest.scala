@@ -533,7 +533,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
         children = Vector(
           book1Builder, book2Builder, book3Builder, book4Builder,
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
-    Elem(result)
+    Elem.from(result)
   }
 
   protected final def toResolvedElem(elem: E): Elem = elem

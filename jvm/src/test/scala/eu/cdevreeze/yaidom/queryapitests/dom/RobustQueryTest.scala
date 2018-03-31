@@ -52,5 +52,5 @@ class RobustQueryTest extends AbstractRobustQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.DomConversions.convertToElem(elem.wrappedNode, contactsElem.scope))
+    resolved.Elem.from(convert.DomConversions.convertToElem(elem.wrappedNode, contactsElem.scope))
 }

@@ -55,5 +55,5 @@ class I18nQueryTest extends AbstractI18nQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(elem.underlyingElem)
+    resolved.Elem.from(elem.underlyingElem)
 }

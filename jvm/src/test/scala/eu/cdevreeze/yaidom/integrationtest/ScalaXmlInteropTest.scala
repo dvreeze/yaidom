@@ -94,7 +94,7 @@ class ScalaXmlInteropTest extends FunSuite {
 
     // 3. Convert to resolved.Elem, and check again
 
-    val root5: resolved.Elem = resolved.Elem(root)
+    val root5: resolved.Elem = resolved.Elem.from(root)
 
     assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root5.findAllElems map (e => e.localName)).toSet
@@ -117,8 +117,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val root6 = convertToElem(convertElem(root))
 
-    assertResult(resolved.Elem(root)) {
-      resolved.Elem(root6)
+    assertResult(resolved.Elem.from(root)) {
+      resolved.Elem.from(root6)
     }
   }
 
@@ -149,8 +149,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val root5 = convertToElem(convertElem(root))
 
-    assertResult(resolved.Elem(root)) {
-      resolved.Elem(root5)
+    assertResult(resolved.Elem.from(root)) {
+      resolved.Elem.from(root5)
     }
   }
 
@@ -195,8 +195,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val root5 = convertToElem(convertElem(root))
 
-    assertResult(resolved.Elem(root)) {
-      resolved.Elem(root5)
+    assertResult(resolved.Elem.from(root)) {
+      resolved.Elem.from(root5)
     }
   }
 
@@ -252,8 +252,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val root5 = convertToElem(convertElem(root))
 
-    assertResult(resolved.Elem(root)) {
-      resolved.Elem(root5)
+    assertResult(resolved.Elem.from(root)) {
+      resolved.Elem.from(root5)
     }
   }
 
@@ -282,8 +282,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val root5 = convertToElem(convertElem(root))
 
-    assertResult(resolved.Elem(root)) {
-      resolved.Elem(root5)
+    assertResult(resolved.Elem.from(root)) {
+      resolved.Elem.from(root5)
     }
   }
 
@@ -385,8 +385,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val root5 = convertToElem(convertElem(root))
 
-    assertResult(resolved.Elem(root)) {
-      resolved.Elem(root5)
+    assertResult(resolved.Elem.from(root)) {
+      resolved.Elem.from(root5)
     }
   }
 
@@ -468,8 +468,8 @@ class ScalaXmlInteropTest extends FunSuite {
 
     val newRoot = convertToElem(convertElem(doc.documentElement))
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(newRoot)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(newRoot)
     }
   }
 

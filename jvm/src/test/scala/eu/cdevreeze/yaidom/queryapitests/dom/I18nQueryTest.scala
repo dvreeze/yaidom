@@ -52,5 +52,5 @@ class I18nQueryTest extends AbstractI18nQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.DomConversions.convertToElem(elem.wrappedNode, rootElem.scope))
+    resolved.Elem.from(convert.DomConversions.convertToElem(elem.wrappedNode, rootElem.scope))
 }

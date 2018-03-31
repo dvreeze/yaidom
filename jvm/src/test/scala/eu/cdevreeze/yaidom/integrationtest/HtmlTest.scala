@@ -68,8 +68,8 @@ class HtmlTest extends FunSuite with BeforeAndAfterAll {
       }
     }
 
-    assertResult(resolved.Elem(expectedLi).removeAllInterElementWhitespace) {
-      resolved.Elem(keepHref(firstLiOption.get)).removeAllInterElementWhitespace
+    assertResult(resolved.Elem.from(expectedLi).removeAllInterElementWhitespace) {
+      resolved.Elem.from(keepHref(firstLiOption.get)).removeAllInterElementWhitespace
     }
   }
 
@@ -90,8 +90,8 @@ class HtmlTest extends FunSuite with BeforeAndAfterAll {
       (doc2.documentElement \\! withNoNsEName("li")).size
     }
 
-    assertResult(resolved.Elem(doc.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))) {
-      resolved.Elem(doc2.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))
+    assertResult(resolved.Elem.from(doc.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))) {
+      resolved.Elem.from(doc2.documentElement).removeAllInterElementWhitespace.findTopmostElemsOrSelf(withNoNsEName("li"))
     }
   }
 }

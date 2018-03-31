@@ -149,7 +149,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
   }
 
   protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem =
-    eu.cdevreeze.yaidom.resolved.Elem(elem)
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
 
   protected def fromSimpleElem(elem: Elem): E = elem
 }

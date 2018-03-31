@@ -52,8 +52,8 @@ class ScopedQueryTest extends FunSuite with BeforeAndAfterAll {
 
     val expectedBookElems = doc.documentElement \\ withEName("http://bookstore", "Book")
 
-    assertResult(expectedBookElems.map(e => resolved.Elem(e))) {
-      bookElems.map(e => resolved.Elem(e))
+    assertResult(expectedBookElems.map(e => resolved.Elem.from(e))) {
+      bookElems.map(e => resolved.Elem.from(e))
     }
 
     val scope2 = Scope.from("books" -> "http://books")
@@ -70,8 +70,8 @@ class ScopedQueryTest extends FunSuite with BeforeAndAfterAll {
 
     val expectedBookElems2 = doc.documentElement \\ withEName("http://books", "Book")
 
-    assertResult(expectedBookElems2.map(e => resolved.Elem(e))) {
-      bookElems2.map(e => resolved.Elem(e))
+    assertResult(expectedBookElems2.map(e => resolved.Elem.from(e))) {
+      bookElems2.map(e => resolved.Elem.from(e))
     }
   }
 

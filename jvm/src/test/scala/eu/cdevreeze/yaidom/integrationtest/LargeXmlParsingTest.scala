@@ -96,7 +96,7 @@ class LargeXmlParsingTest extends FunSuite with BeforeAndAfterAll {
     val endMs = System.currentTimeMillis()
     logger.info(s"[testParseLargeXmlIntoResolvedElemUsingSax] Parsing (into a Document) took ${endMs - startMs} ms")
 
-    val resolvedRoot = resolved.Elem(doc.documentElement)
+    val resolvedRoot = resolved.Elem.from(doc.documentElement)
     doQueryTest(resolvedRoot)
 
     val emailElms = resolvedRoot findTopmostElems { e => e.localName == "email" } take (10)

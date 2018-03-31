@@ -48,7 +48,7 @@ class CreationTest extends FunSuite {
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
 
     val doc1: simple.Document = docParser.parse(is)
-    val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
+    val resolvedRootElm1: resolved.Elem = resolved.Elem.from(doc1.documentElement)
 
     val expectedResolvedBookElm: resolved.Elem = {
       import resolved._
@@ -104,7 +104,7 @@ class CreationTest extends FunSuite {
                   textElem(QName("names:Last_Name"), "Widom")))))))
 
     val elm2: simple.Elem = elm2Builder.build()
-    val resolvedElm2 = resolved.Elem(elm2)
+    val resolvedElm2 = resolved.Elem.from(elm2)
 
     assertResult(expectedResolvedBookElm) {
       resolvedElm2
@@ -162,7 +162,7 @@ class CreationTest extends FunSuite {
     }
 
     val elm3: simple.Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
-    val resolvedElm3 = resolved.Elem(elm3)
+    val resolvedElm3 = resolved.Elem.from(elm3)
 
     assertResult(expectedResolvedBookElm) {
       resolvedElm3
@@ -198,7 +198,7 @@ class CreationTest extends FunSuite {
                     "Widom")))))))
     }
 
-    val resolvedElm4 = resolved.Elem(elm4)
+    val resolvedElm4 = resolved.Elem.from(elm4)
 
     assertResult(expectedResolvedBookElm) {
       resolvedElm4
@@ -248,18 +248,18 @@ class CreationTest extends FunSuite {
       authorsElm4.scope
     }
 
-    val resolvedRoot = resolved.Elem(doc1.documentElement)
+    val resolvedRoot = resolved.Elem.from(doc1.documentElement)
 
     assertResult(resolvedRoot) {
-      resolved.Elem(doc2.documentElement)
+      resolved.Elem.from(doc2.documentElement)
     }
 
     assertResult(resolvedRoot) {
-      resolved.Elem(doc3.documentElement)
+      resolved.Elem.from(doc3.documentElement)
     }
 
     assertResult(resolvedRoot) {
-      resolved.Elem(doc4.documentElement)
+      resolved.Elem.from(doc4.documentElement)
     }
   }
 
@@ -269,7 +269,7 @@ class CreationTest extends FunSuite {
     val is = classOf[CreationTest].getResourceAsStream("books-with-strange-namespaces.xml")
 
     val doc1: simple.Document = docParser.parse(is)
-    val resolvedRootElm1: resolved.Elem = resolved.Elem(doc1.documentElement)
+    val resolvedRootElm1: resolved.Elem = resolved.Elem.from(doc1.documentElement)
 
     // First call notUndeclaringPrefixes with an empty Scope
 
@@ -277,7 +277,7 @@ class CreationTest extends FunSuite {
     val rootElem2 = doc1.documentElement.notUndeclaringPrefixes(parentScope2)
 
     assertResult(resolvedRootElm1) {
-      resolved.Elem(rootElem2)
+      resolved.Elem.from(rootElem2)
     }
 
     assertResult(Set(Declarations.Empty)) {
@@ -291,7 +291,7 @@ class CreationTest extends FunSuite {
     val rootElem3 = doc1.documentElement.notUndeclaringPrefixes(parentScope3)
 
     assertResult(resolvedRootElm1) {
-      resolved.Elem(rootElem3)
+      resolved.Elem.from(rootElem3)
     }
 
     assertResult(Set(Declarations.Empty)) {
@@ -305,7 +305,7 @@ class CreationTest extends FunSuite {
     val rootElem4 = doc1.documentElement.notUndeclaringPrefixes(parentScope4)
 
     assertResult(resolvedRootElm1) {
-      resolved.Elem(rootElem4)
+      resolved.Elem.from(rootElem4)
     }
 
     assertResult(Set(Declarations.Empty)) {
@@ -319,7 +319,7 @@ class CreationTest extends FunSuite {
     val rootElem5 = doc1.documentElement.notUndeclaringPrefixes(parentScope5)
 
     assertResult(resolvedRootElm1) {
-      resolved.Elem(rootElem5)
+      resolved.Elem.from(rootElem5)
     }
 
     assertResult(Set(Declarations.Empty)) {

@@ -293,7 +293,7 @@ object MileageRecordsTest {
 
     def toElem: Elem = {
       val xml = <tripCategory isPrivate={ isPrivate.toString }>{ name }</tripCategory>
-      convertToElem(xml).ensuring(e => resolved.Elem(e) == resolved.Elem(ScalaXmlElem(xml)))
+      convertToElem(xml).ensuring(e => resolved.Elem.from(e) == resolved.Elem.from(ScalaXmlElem(xml)))
     }
   }
 

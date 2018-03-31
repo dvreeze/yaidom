@@ -46,7 +46,7 @@ object NamespaceUtils {
    *
    * Therefore:
    * {{{
-   * resolved.Elem(pushUpPrefixedNamespaces(elem)) == resolved.Elem(elem)
+   * resolved.Elem.from(pushUpPrefixedNamespaces(elem)) == resolved.Elem.from(elem)
    * }}}
    * and the result contains no prefixed namespace undeclarations (not allowed in XML 1.0).
    */

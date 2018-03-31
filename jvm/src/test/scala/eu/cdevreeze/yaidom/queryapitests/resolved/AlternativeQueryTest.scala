@@ -57,7 +57,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    Elem(convertToElem(xml))
+    Elem.from(convertToElem(xml))
   }
 
   protected val pricesElem: E = {
@@ -78,7 +78,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    Elem(convertToElem(xml))
+    Elem.from(convertToElem(xml))
   }
 
   protected val orderElem: E = {
@@ -92,12 +92,12 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    Elem(convertToElem(xml))
+    Elem.from(convertToElem(xml))
   }
 
   protected final def toResolvedElem(elem: E): Elem = elem
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    Elem(convertToElem(elem))
+    Elem.from(convertToElem(elem))
   }
 }

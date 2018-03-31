@@ -245,9 +245,9 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
 
     val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -354,9 +354,9 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
 
     val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -488,19 +488,19 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
 
     val almostEquivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(almostEquivalentXml)))
 
-    val resolvedAlmostEquivalentElem = resolved.Elem(almostEquivalentDoc.documentElement)
+    val resolvedAlmostEquivalentElem = resolved.Elem.from(almostEquivalentDoc.documentElement)
 
     val f: resolved.Elem => resolved.Elem = {
       case e: resolved.Elem if e.resolvedName == EName(nsProd, "number") =>
         val scope = doc.documentElement.scope ++ Scope.from("prod" -> nsProd2)
         val v = (doc.documentElement \\ EName(nsProd2, "number")).map(_.text).mkString
         val result = NodeBuilder.textElem(QName("prod", "number"), v).build(scope)
-        resolved.Elem(result)
+        resolved.Elem.from(result)
       case e: resolved.Elem => e
     }
     val resolvedEquivalentElem = resolvedAlmostEquivalentElem.transformElemsOrSelf(f)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -607,9 +607,9 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
 
     val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -785,9 +785,9 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
 
     val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -1032,9 +1032,9 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
 
     val equivalentDoc = documentParser.parse(new InputSource(new jio.StringReader(equivalentXml)))
 
-    val resolvedEquivalentElem = resolved.Elem(equivalentDoc.documentElement)
+    val resolvedEquivalentElem = resolved.Elem.from(equivalentDoc.documentElement)
 
-    val resolvedElem = resolved.Elem(doc.documentElement)
+    val resolvedElem = resolved.Elem.from(doc.documentElement)
 
     assertResult(
       List(
@@ -1085,8 +1085,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 
@@ -1137,8 +1137,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 
@@ -1189,8 +1189,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 
@@ -1244,8 +1244,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 
@@ -1302,8 +1302,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 
@@ -1357,8 +1357,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 
@@ -1411,8 +1411,8 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
       NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
     }
 
-    assertResult(resolved.Elem(doc.documentElement)) {
-      resolved.Elem(fixedDoc.documentElement)
+    assertResult(resolved.Elem.from(doc.documentElement)) {
+      resolved.Elem.from(fixedDoc.documentElement)
     }
   }
 

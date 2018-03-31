@@ -647,7 +647,7 @@ class TheCaseForYaidomTest extends FunSuite {
       elm1 == elm2
     }
     assertResult(true) {
-      resolved.Elem(elm1) == resolved.Elem(elm2)
+      resolved.Elem.from(elm1) == resolved.Elem.from(elm2)
     }
   }
 
@@ -722,14 +722,14 @@ class TheCaseForYaidomTest extends FunSuite {
       elm1 == elm2
     }
     assertResult(true) {
-      resolved.Elem(elm1) == resolved.Elem(elm2)
+      resolved.Elem.from(elm1) == resolved.Elem.from(elm2)
     }
 
     assertResult(false) {
       elm1 == elm3
     }
     assertResult(true) {
-      resolved.Elem(elm1) == resolved.Elem(elm3)
+      resolved.Elem.from(elm1) == resolved.Elem.from(elm3)
     }
   }
 

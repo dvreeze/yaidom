@@ -76,8 +76,8 @@ class TransformEdifactTest extends FunSuite {
       declarationElem.findAllElemsOrSelf.map(_.resolvedName)
     }
 
-    assertResult(resolved.Elem(removeAllEmptyText(expectedDeclarationElem)).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
-      resolved.Elem(removeAllEmptyText(declarationElem)).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
+    assertResult(resolved.Elem.from(removeAllEmptyText(expectedDeclarationElem)).removeAllInterElementWhitespace.coalesceAndNormalizeAllText) {
+      resolved.Elem.from(removeAllEmptyText(declarationElem)).removeAllInterElementWhitespace.coalesceAndNormalizeAllText
     }
   }
 

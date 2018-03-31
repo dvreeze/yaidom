@@ -282,5 +282,5 @@ class QueryTest extends AbstractElemLikeQueryTest {
   }
 
   protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem(convert.ScalaXmlConversions.convertToElem(elem.wrappedNode))
+    resolved.Elem.from(convert.ScalaXmlConversions.convertToElem(elem.wrappedNode))
 }

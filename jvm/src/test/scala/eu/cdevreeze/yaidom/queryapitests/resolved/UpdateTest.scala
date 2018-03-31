@@ -42,7 +42,7 @@ class UpdateTest extends AbstractUpdateTest {
 
   implicit val clsTag: ClassTag[E] = classTag[Elem]
 
-  protected def fromSimpleElem(e: eu.cdevreeze.yaidom.simple.Elem): E = Elem(e)
+  protected def fromSimpleElem(e: eu.cdevreeze.yaidom.simple.Elem): E = Elem.from(e)
 
   protected def updateMeasure(e: E): E = {
     if (e.localName == "measure" && e.text.indexOf(':') < 0) {

@@ -48,8 +48,8 @@ class AlternativeUpdatesTest extends FunSuite {
       case e: Elem => e
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -61,8 +61,8 @@ class AlternativeUpdatesTest extends FunSuite {
       case e: Elem => e
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -78,8 +78,8 @@ class AlternativeUpdatesTest extends FunSuite {
       }
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -101,8 +101,8 @@ class AlternativeUpdatesTest extends FunSuite {
       }
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -121,8 +121,8 @@ class AlternativeUpdatesTest extends FunSuite {
       elem.withChildren(authors.take(1))
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -140,8 +140,8 @@ class AlternativeUpdatesTest extends FunSuite {
       if (path.lastEntry.index == 0) Vector(elem) else Vector()
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -166,8 +166,8 @@ class AlternativeUpdatesTest extends FunSuite {
     // The state of bookstoreWrapper is its wrapped DOM element, which has been updated
     val updatedElem = convert.DomConversions.convertToElem(bookstoreWrapper.wrappedNode, Scope.Empty)
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
   }
 
@@ -189,8 +189,8 @@ class AlternativeUpdatesTest extends FunSuite {
       }
     }
 
-    assertResult(resolved.Elem(bookstoreWithOnlyFirstAuthors.prettify(2))) {
-      resolved.Elem(updatedElem.prettify(2))
+    assertResult(resolved.Elem.from(bookstoreWithOnlyFirstAuthors.prettify(2))) {
+      resolved.Elem.from(updatedElem.prettify(2))
     }
 
     assertResult(paths) {
@@ -202,7 +202,7 @@ class AlternativeUpdatesTest extends FunSuite {
     assertResult(true) {
       foundPaths.zip(foundElemsWithoutChildren) forall {
         case (path, elem) =>
-          resolved.Elem(bookstore.getElemOrSelfByPath(path).withChildren(Vector())) == resolved.Elem(elem)
+          resolved.Elem.from(bookstore.getElemOrSelfByPath(path).withChildren(Vector())) == resolved.Elem.from(elem)
       }
     }
   }
