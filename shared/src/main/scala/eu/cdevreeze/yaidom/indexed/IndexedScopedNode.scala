@@ -76,17 +76,17 @@ object IndexedScopedNode {
 
       val children =
         underlyingElem.children flatMap {
-          case che: BackingNodes.Elem =>
+          case che: ScopedNodes.Elem =>
             val e = childElems(childElemIdx)
             childElemIdx += 1
             Some(e)
-          case ch: BackingNodes.Text =>
+          case ch: ScopedNodes.Text =>
             Some(Text(ch.text, false))
-          case ch: BackingNodes.Comment =>
+          case ch: ScopedNodes.Comment =>
             Some(Comment(ch.text))
-          case ch: BackingNodes.ProcessingInstruction =>
+          case ch: ScopedNodes.ProcessingInstruction =>
             Some(ProcessingInstruction(ch.target, ch.data))
-          case ch: BackingNodes.EntityRef =>
+          case ch: ScopedNodes.EntityRef =>
             Some(EntityRef(ch.entity))
           case ch =>
             None
