@@ -447,6 +447,13 @@ object ClarkNode {
   object Elem {
 
     /**
+     * Extractor of Elems, to be used for pattern matching.
+     */
+    def unapply(e: Elem): Option[(EName, immutable.IndexedSeq[(EName, String)], immutable.IndexedSeq[Node])] = {
+      Some((e.ename, e.attributes, e.children))
+    }
+
+    /**
      * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "Clark" `Elem`.
      * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
      */
