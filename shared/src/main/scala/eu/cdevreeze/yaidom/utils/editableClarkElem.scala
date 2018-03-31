@@ -39,6 +39,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 sealed trait EditableClarkElem extends Any {
 
   type N
@@ -130,6 +131,7 @@ sealed trait EditableClarkElem extends Any {
 /**
  * EditableClarkElem taking a resolved element.
  */
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 final class EditableResolvedElem(val elem: resolved.Elem) extends AnyVal with EditableClarkElem {
 
   type N = resolved.Node
@@ -218,6 +220,7 @@ final class EditableResolvedElem(val elem: resolved.Elem) extends AnyVal with Ed
  * The methods that functionally set or add children make sure that no prefixed namespace undeclarations are
  * introduced.
  */
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 final class EditableSimpleElem(
     val elem: simple.Elem,
     val getFallbackPrefixForNamespace: String => String) extends EditableClarkElem {

@@ -54,12 +54,15 @@ object ClarkNode {
    * The purpose of this element implementation is element creation and transformation/update,
    * without having to worry about namespace prefixes and any default namespaces.
    *
+   * In other words, using this element implementation it is possible to localize concerns about
+   * namespace prefixes, instead of having to worry about them all the time during element creation.
+   *
    * @author Chris de Vreeze
    */
   final class Elem(
-    val resolvedName:       EName,
-    val resolvedAttributes: immutable.IndexedSeq[(EName, String)],
-    val children:           immutable.IndexedSeq[Node])
+    val ename:      EName,
+    val attributes: immutable.IndexedSeq[(EName, String)],
+    val children:   immutable.IndexedSeq[Node])
     extends CanBeDocumentChild
     with Nodes.Elem
     with ClarkElemNodeApi
@@ -67,11 +70,21 @@ object ClarkNode {
     with UpdatableElemLike
     with TransformableElemLike {
 
+    require(ename ne null) // scalastyle:off null
+    require(attributes ne null) // scalastyle:off null
+    require(children ne null) // scalastyle:off null
+
+    require(attributes.toMap.size == attributes.size, s"There are duplicate attribute names: $attributes")
+
     type ThisNode = Node
 
     type ThisElem = Elem
 
     def thisElem: ThisElem = this
+
+    override def resolvedName: EName = ename
+
+    override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = attributes
 
     override def collectChildNodeIndexes(pathEntries: Set[Path.Entry]): Map[Path.Entry, Int] = {
       filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries).map(triple => (triple._2, triple._3)).toMap
@@ -82,7 +95,7 @@ object ClarkNode {
 
     /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
     override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
-      new Elem(resolvedName, resolvedAttributes, newChildren)
+      new Elem(ename, attributes, newChildren)
     }
 
     override def transformChildElems(f: Elem => Elem): Elem = {
@@ -103,8 +116,78 @@ object ClarkNode {
       withChildren(newChildren)
     }
 
+    /**
+     * Creates a copy, altered with the explicitly passed parameters (for ename, attributes and children).
+     */
+    def copy(
+      ename:      EName                                 = this.ename,
+      attributes: immutable.IndexedSeq[(EName, String)] = this.attributes,
+      children:   immutable.IndexedSeq[Node]            = this.children): Elem = {
+
+      new Elem(ename, attributes, children)
+    }
+
+    def withEName(newEName: EName): Elem = {
+      copy(ename = newEName)
+    }
+
+    def filteringAttributes(p: (EName, String) => Boolean): Elem = {
+      withAttributes(attributes filter { case (en, v) => p(en, v) })
+    }
+
+    /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
+    def withAttributes(newAttributes: immutable.IndexedSeq[(EName, String)]): Elem = {
+      copy(attributes = newAttributes)
+    }
+
+    /**
+     * Functionally adds or updates the given attribute.
+     *
+     * More precisely, if an attribute with the same name exists at position `idx` (0-based),
+     * `withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))` is returned.
+     * Otherwise, `withAttributes(attributes :+ (attributeName -> attributeValue))` is returned.
+     */
+    def plusAttribute(attributeName: EName, attributeValue: String): Elem = {
+      val idx = attributes indexWhere { case (attr, value) => attr == attributeName }
+
+      if (idx < 0) {
+        withAttributes(attributes :+ (attributeName -> attributeValue))
+      } else {
+        withAttributes(attributes.updated(idx, (attributeName -> attributeValue)))
+      }
+    }
+
+    /**
+     * Functionally adds or updates the given attribute, if a value is given.
+     * That is, returns `if (attributeValueOption.isEmpty) self else plusAttribute(attributeName, attributeValueOption.get)`.
+     */
+    def plusAttributeOption(attributeName: EName, attributeValueOption: Option[String]): Elem = {
+      if (attributeValueOption.isEmpty) thisElem else plusAttribute(attributeName, attributeValueOption.get)
+    }
+
+    def filteringChildren(p: Node => Boolean): Elem = {
+      withChildren(children.filter(p))
+    }
+
+    /**
+     * Functionally removes the given attribute, if present.
+     *
+     * More precisely, returns `withAttributes(thisElem.attributes filterNot (_._1 == attributeName))`.
+     */
+    def minusAttribute(attributeName: EName): Elem = {
+      val newAttributes = thisElem.attributes filterNot { case (attrName, attrValue) => attrName == attributeName }
+      withAttributes(newAttributes)
+    }
+
     /** Returns the text children */
     def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
+
+    /** Returns the comment children */
+    def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
+
+    /** Returns the processing instruction children */
+    def processingInstructionChildren: immutable.IndexedSeq[ProcessingInstruction] =
+      children collect { case pi: ProcessingInstruction => pi }
 
     /**
      * Returns the concatenation of the texts of text children, including whitespace. Non-text children are ignored.
@@ -178,7 +261,7 @@ object ClarkNode {
 
               val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
 
-              newChildrenBuffer += f(Text(combinedText, false))
+              newChildrenBuffer += f(Text(combinedText, false)) // No CDATA?
 
               // Recursive call
               accumulate(remainder, newChildrenBuffer)
@@ -211,7 +294,7 @@ object ClarkNode {
      * but more efficient.
      */
     def coalesceAndNormalizeAllText: Elem = {
-      coalesceAllAdjacentTextAndPostprocess(t => Text(XmlStringUtils.normalizeString(t.text), false))
+      coalesceAllAdjacentTextAndPostprocess(t => Text(XmlStringUtils.normalizeString(t.text), t.isCData))
     }
 
     /**

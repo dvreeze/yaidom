@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 sealed trait ClarkElemEditor {
 
   type N
@@ -39,6 +40,7 @@ sealed trait ClarkElemEditor {
 /**
  * Factory of EditableResolvedElem objects.
  */
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 object ResolvedElemEditor extends ClarkElemEditor {
 
   type N = resolved.Node
@@ -50,6 +52,7 @@ object ResolvedElemEditor extends ClarkElemEditor {
 /**
  * Factory of EditableSimpleElem objects.
  */
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 final class SimpleElemEditor(val getFallbackPrefixForNamespace: String => String) extends ClarkElemEditor {
 
   type N = simple.Node
@@ -58,6 +61,7 @@ final class SimpleElemEditor(val getFallbackPrefixForNamespace: String => String
   def wrap(elem: E): EditableSimpleElem = new EditableSimpleElem(elem, getFallbackPrefixForNamespace)
 }
 
+@deprecated(message = "For element creation, consider using 'ClarkNode.Elem' instead", since = "1.8.0")
 object SimpleElemEditor {
 
   def newInstanceUsingScopeAndPrefixGenerator(fallbackScope: Scope, generatePrefix: String => String): SimpleElemEditor = {
