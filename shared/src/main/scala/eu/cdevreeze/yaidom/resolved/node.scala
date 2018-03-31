@@ -23,10 +23,9 @@ import scala.collection.mutable
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ElemCreationApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -70,7 +69,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends Nodes.Node with Immutable
+sealed trait Node extends ClarkNodes.Node with Immutable
 
 /**
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation
@@ -128,8 +127,7 @@ final case class Elem(
   override val resolvedAttributes: Map[EName, String],
   override val children:           immutable.IndexedSeq[Node])
   extends Node
-  with Nodes.Elem
-  with ClarkElemNodeApi
+  with ClarkNodes.Elem
   with ClarkElemLike
   with UpdatableElemLike
   with TransformableElemLike {
@@ -346,7 +344,7 @@ final case class Elem(
   }
 }
 
-final case class Text(text: String) extends Node with Nodes.Text {
+final case class Text(text: String) extends Node with ClarkNodes.Text {
   require(text ne null) // scalastyle:off null
 
   /** Returns `text.trim`. */
@@ -363,8 +361,7 @@ object Node extends ElemCreationApi {
   type ElemType = Elem
 
   /**
-   * Converts any element or text `Nodes.Node` to a "resolved" `Node`. For other kinds of nodes, an exception is thrown.
-   * All descendant-or-self elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+   * Converts any element or text `ClarkNodes.Node` to a "resolved" `Node`. For other kinds of nodes, an exception is thrown.
    *
    * Note that entity references, comments, processing instructions and top-level documents are lost.
    * All that remains are elements (without qualified names) and text nodes.
@@ -374,11 +371,10 @@ object Node extends ElemCreationApi {
    * Note that if there are any unresolved entities in the yaidom `Node`, those entity references are silently ignored!
    * This is definitely something to keep in mind!
    */
-  def from(n: Nodes.Node): Node = n match {
-    case e: Nodes.Elem with ClarkElemNodeApi => Elem.from(e)
-    case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-    case t: Nodes.Text                       => Text(t)
-    case n                                   => sys.error(s"Not an element or text node: $n")
+  def from(n: ClarkNodes.Node): Node = n match {
+    case e: ClarkNodes.Elem => Elem.from(e)
+    case t: ClarkNodes.Text => Text(t)
+    case n                  => sys.error(s"Not an element or text node: $n")
   }
 
   def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
@@ -432,14 +428,13 @@ object Elem {
   }
 
   /**
-   * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "resolved" `Elem`.
+   * Converts any `ClarkNodes.Elem` element to a "resolved" `Elem`.
    * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
    */
-  def from(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
+  def from(e: ClarkNodes.Elem): Elem = {
     val children = e.children collect {
-      case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
-      case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-      case childText: Nodes.Text                      => childText
+      case childElm: ClarkNodes.Elem  => childElm
+      case childText: ClarkNodes.Text => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val resolvedChildren = children map { node => Node.from(node) }
@@ -448,16 +443,15 @@ object Elem {
   }
 
   /**
-   * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "resolved" `Elem`.
-   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+   * Converts any `ClarkNodes.Elem` element to a "resolved" `Elem`.
    */
   @deprecated(message = "Use method 'from' instead", since = "1.8.0")
-  def apply(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
+  def apply(e: ClarkNodes.Elem): Elem = {
     from(e)
   }
 }
 
 object Text {
 
-  def apply(t: Nodes.Text): Text = Text(t.text)
+  def apply(t: ClarkNodes.Text): Text = Text(t.text)
 }

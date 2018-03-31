@@ -26,8 +26,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 
 /**
  * BackingElemNodeApi test case.
@@ -57,8 +56,8 @@ abstract class AbstractBackingElemTest extends FunSuite {
   private val AttributeFormDefaultEName = EName("attributeFormDefault")
 
   // Nice, just the "raw" type without generics. There is a small price, though, and that is that some lambdas need explicit parameter types.
-  // That is the case because BackingElemNodeApi "overrides" some super-trait methods, restricting the ThisElem type member to the one of BackingElemNodeApi.
-  type E = BackingElemNodeApi
+  // That is the case because BackingNodes.Elem "overrides" some super-trait methods, restricting the ThisElem type member to the one of BackingElemNodeApi.
+  type E = BackingNodes.Elem
 
   def docElem: E
 
@@ -782,13 +781,13 @@ abstract class AbstractBackingElemTest extends FunSuite {
 
   test("testComments") {
     assertResult(Set("Some linkbase")) {
-      docElem.findAllElemsOrSelf.flatMap(e => e.children.collect({ case c: Nodes.Comment => c }).map(_.text.trim)).toSet
+      docElem.findAllElemsOrSelf.flatMap(e => e.children.collect({ case c: BackingNodes.Comment => c }).map(_.text.trim)).toSet
     }
   }
 
   test("testProcessingInstructions") {
     assertResult(Set(("PITarget", "PIContent"))) {
-      docElem.findAllElemsOrSelf.flatMap(e => e.children.collect({ case pi: Nodes.ProcessingInstruction => pi }).map(pi => (pi.target, pi.data))).toSet
+      docElem.findAllElemsOrSelf.flatMap(e => e.children.collect({ case pi: BackingNodes.ProcessingInstruction => pi }).map(pi => (pi.target, pi.data))).toSet
     }
   }
 }

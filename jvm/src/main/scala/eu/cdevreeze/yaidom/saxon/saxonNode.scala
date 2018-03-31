@@ -30,8 +30,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import net.sf.saxon.`type`.Type
 import net.sf.saxon.om.AbsolutePath
 import net.sf.saxon.om.AxisInfo
@@ -56,7 +55,7 @@ import net.sf.saxon.pattern.NodeKindTest
  * @author Chris de Vreeze
  */
 // scalastyle:off null
-sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends Nodes.Node {
+sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends BackingNodes.Node {
 
   final override def toString: String = wrappedNode.toString
 
@@ -100,7 +99,7 @@ sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends Nodes.Node {
   }
 }
 
-sealed trait SaxonCanBeDocumentChild extends SaxonNode with Nodes.CanBeDocumentChild
+sealed trait SaxonCanBeDocumentChild extends SaxonNode with BackingNodes.CanBeDocumentChild
 
 // TODO Consider using Saxon Navigator and AbsolutePath classes for navigation, as a faster alternative to yaidom Path navigation.
 
@@ -109,7 +108,7 @@ sealed trait SaxonCanBeDocumentChild extends SaxonNode with Nodes.CanBeDocumentC
  */
 // scalastyle:off number.of.methods
 final class SaxonElem(
-  override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode) with Nodes.Elem with SaxonCanBeDocumentChild with BackingElemNodeApi {
+  override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode) with BackingNodes.Elem with SaxonCanBeDocumentChild {
 
   require(wrappedNode ne null)
   require(wrappedNode.getNodeKind == Type.ELEMENT, s"Expected element but got node kind ${wrappedNode.getNodeKind}")
@@ -481,7 +480,7 @@ final class SaxonElem(
   def commentChildren: immutable.IndexedSeq[SaxonComment] = children collect { case c: SaxonComment => c }
 }
 
-final class SaxonText(override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode) with Nodes.Text {
+final class SaxonText(override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode) with BackingNodes.Text {
   require(wrappedNode ne null)
   require(
     wrappedNode.getNodeKind == Type.TEXT || wrappedNode.getNodeKind == Type.WHITESPACE_TEXT,
@@ -495,7 +494,7 @@ final class SaxonText(override val wrappedNode: NodeInfo) extends SaxonNode(wrap
 }
 
 final class SaxonProcessingInstruction(override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode)
-  with SaxonCanBeDocumentChild with Nodes.ProcessingInstruction {
+  with SaxonCanBeDocumentChild with BackingNodes.ProcessingInstruction {
 
   require(wrappedNode ne null)
   require(wrappedNode.getNodeKind == Type.PROCESSING_INSTRUCTION, s"Expected processing instruction but got node kind ${wrappedNode.getNodeKind}")
@@ -505,7 +504,7 @@ final class SaxonProcessingInstruction(override val wrappedNode: NodeInfo) exten
   def data: String = wrappedNode.getStringValue // ???
 }
 
-final class SaxonComment(override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode) with SaxonCanBeDocumentChild with Nodes.Comment {
+final class SaxonComment(override val wrappedNode: NodeInfo) extends SaxonNode(wrappedNode) with SaxonCanBeDocumentChild with BackingNodes.Comment {
   require(wrappedNode ne null)
   require(wrappedNode.getNodeKind == Type.COMMENT, s"Expected comment but got node kind ${wrappedNode.getNodeKind}")
 

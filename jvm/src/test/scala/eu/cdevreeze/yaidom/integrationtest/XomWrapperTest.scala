@@ -37,9 +37,8 @@ import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -708,7 +707,7 @@ class XomWrapperTest extends FunSuite {
 
 object XomWrapperTest {
 
-  sealed trait XomNode extends Nodes.Node {
+  sealed trait XomNode extends ScopedNodes.Node {
 
     type DomType <: nu.xom.Node
 
@@ -732,7 +731,7 @@ object XomWrapperTest {
   }
 
   final class XomElem(
-    override val wrappedNode: nu.xom.Element) extends XomNode with Nodes.Elem with ScopedElemNodeApi with ScopedElemLike with HasParent {
+    override val wrappedNode: nu.xom.Element) extends XomNode with ScopedNodes.Elem with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
@@ -819,7 +818,7 @@ object XomWrapperTest {
     }
   }
 
-  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode with Nodes.Text {
+  final class XomText(override val wrappedNode: nu.xom.Text) extends XomNode with ScopedNodes.Text {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.Text
@@ -831,7 +830,7 @@ object XomWrapperTest {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final class XomProcessingInstruction(override val wrappedNode: nu.xom.ProcessingInstruction) extends XomNode with Nodes.ProcessingInstruction {
+  final class XomProcessingInstruction(override val wrappedNode: nu.xom.ProcessingInstruction) extends XomNode with ScopedNodes.ProcessingInstruction {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.ProcessingInstruction
@@ -841,7 +840,7 @@ object XomWrapperTest {
     def data: String = wrappedNode.getValue
   }
 
-  final class XomComment(override val wrappedNode: nu.xom.Comment) extends XomNode with Nodes.Comment {
+  final class XomComment(override val wrappedNode: nu.xom.Comment) extends XomNode with ScopedNodes.Comment {
     require(wrappedNode ne null)
 
     override type DomType = nu.xom.Comment

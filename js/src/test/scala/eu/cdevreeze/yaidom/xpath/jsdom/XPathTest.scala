@@ -156,7 +156,7 @@ class XPathTest extends FunSuite {
       val someDimQNames =
         Set(QName("gaap:EntityAxis"), QName("gaap:VerificationAxis"), QName("gaap:PremiseAxis"), QName("gaap:ReportDateAxis"))
 
-      val someDimENames = someDimQNames.map(qn => rootElem.scope.resolveQNameOption(qn).get)
+      val someDimENames = someDimQNames.map(qn => rootElem.scope.resolveQName(qn))
 
       val foundDimensions =
         resultElems.flatMap(_.attributeAsResolvedQNameOption(EName("dimension"))).toSet

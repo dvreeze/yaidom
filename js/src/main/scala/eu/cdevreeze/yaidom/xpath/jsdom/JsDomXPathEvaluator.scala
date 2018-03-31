@@ -23,7 +23,7 @@ import org.scalajs.dom.{ raw => sjsdom }
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.xpath.XPathEvaluator
 
 /**
@@ -101,7 +101,7 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val scope: Scope) exte
     yaidom.jsdom.JsDomDocument.wrapDocument(docResult)
   }
 
-  def evaluateAsBackingElem(expr: XPathExpression, contextItemOption: Option[ContextItem]): BackingElemNodeApi = {
+  def evaluateAsBackingElem(expr: XPathExpression, contextItemOption: Option[ContextItem]): BackingNodes.Elem = {
     val nodeResult = evaluateAsNode(expr, contextItemOption)
 
     val elemResult: sjsdom.Element = nodeResult match {
@@ -113,7 +113,7 @@ final class JsDomXPathEvaluator(val doc: sjsdom.Document, val scope: Scope) exte
     yaidom.jsdom.JsDomElem(elemResult)
   }
 
-  def evaluateAsBackingElemSeq(expr: XPathExpression, contextItemOption: Option[ContextItem]): immutable.IndexedSeq[BackingElemNodeApi] = {
+  def evaluateAsBackingElemSeq(expr: XPathExpression, contextItemOption: Option[ContextItem]): immutable.IndexedSeq[BackingNodes.Elem] = {
     val nodeSeqResult = evaluateAsNodeSeq(expr, contextItemOption)
 
     nodeSeqResult map { n =>

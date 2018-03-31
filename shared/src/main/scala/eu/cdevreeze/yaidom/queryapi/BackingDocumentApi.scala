@@ -21,28 +21,28 @@ import scala.collection.immutable
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 
 /**
- * Backing document API, representing a document that contains a `BackingElemNodeApi` root element.
+ * Backing document API, representing a document that contains a `BackingNodes.Elem` root element.
  *
  * @author Chris de Vreeze
  */
 trait BackingDocumentApi extends DocumentApi {
 
-  type DocElemType <: BackingElemNodeApi
+  type DocElemType <: BackingNodes.Elem
 
   /**
    * Returns the child nodes of the document. Precisely one of them must be the document element.
    */
-  def children: immutable.IndexedSeq[Nodes.CanBeDocumentChild]
+  def children: immutable.IndexedSeq[BackingNodes.CanBeDocumentChild]
 
   /**
    * Returns the comment child nodes of the document.
    */
-  def comments: immutable.IndexedSeq[Nodes.Comment]
+  def comments: immutable.IndexedSeq[BackingNodes.Comment]
 
   /**
    * Returns the processing instruction child nodes of the document.
    */
-  def processingInstructions: immutable.IndexedSeq[Nodes.ProcessingInstruction]
+  def processingInstructions: immutable.IndexedSeq[BackingNodes.ProcessingInstruction]
 
   /**
    * Returns the optional XML declaration.
@@ -58,5 +58,5 @@ object BackingDocumentApi {
    * @tparam D The document type itself
    * @tparam E The document element type
    */
-  type Aux[D, E <: BackingElemNodeApi] = BackingDocumentApi { type ThisDoc = D; type DocElemType = E }
+  type Aux[D, E <: BackingNodes.Elem] = BackingDocumentApi { type ThisDoc = D; type DocElemType = E }
 }

@@ -25,8 +25,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 
@@ -145,7 +144,7 @@ object XmlDiffTest {
    * Both issues are resolvable. The matching function could be made pluggable. Using IndexedClarkElems is still
    * useful, for difference reporting purposes.
    */
-  def findDiffs[E <: Nodes.Elem with ClarkElemNodeApi.Aux[_, E]](elem1: E, elem2: E): Diffs = {
+  def findDiffs[E <: ClarkNodes.Elem.Aux[_, E]](elem1: E, elem2: E): Diffs = {
     val indexedResolvedElem1 =
       indexed.IndexedClarkElem(resolved.Elem.from(elem1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
     val indexedResolvedElem2 =

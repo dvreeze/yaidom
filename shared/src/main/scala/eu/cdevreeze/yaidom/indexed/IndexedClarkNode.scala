@@ -22,8 +22,7 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 object IndexedClarkNode {
@@ -33,7 +32,7 @@ object IndexedClarkNode {
    *
    * @author Chris de Vreeze
    */
-  sealed trait Node extends Nodes.Node
+  sealed trait Node extends ClarkNodes.Node
 
   /**
    * An element within its context. In other words, an element as a pair containing the root element (of an underlying element type)
@@ -107,7 +106,7 @@ object IndexedClarkNode {
    *
    * @author Chris de Vreeze
    */
-  final class Elem[U <: ClarkElemNodeApi.Aux[_, U]] private[IndexedClarkNode] (
+  final class Elem[U <: ClarkNodes.Elem.Aux[_, U]] private[IndexedClarkNode] (
     docUriOption:        Option[URI],
     parentBaseUriOption: Option[URI],
     underlyingRootElem:  U,
@@ -128,11 +127,11 @@ object IndexedClarkNode {
 
       val children =
         underlyingElem.children flatMap {
-          case che: Nodes.Elem =>
+          case che: ClarkNodes.Elem =>
             val e = childElems(childElemIdx)
             childElemIdx += 1
             Some(e)
-          case ch: Nodes.Text =>
+          case ch: ClarkNodes.Text =>
             Some(Text(ch.text, false))
           case ch =>
             None
@@ -176,7 +175,7 @@ object IndexedClarkNode {
     }
   }
 
-  final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
+  final case class Text(text: String, isCData: Boolean) extends Node with ClarkNodes.Text {
     require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 
@@ -189,7 +188,7 @@ object IndexedClarkNode {
 
   object Elem {
 
-    def apply[U <: ClarkElemNodeApi.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ClarkNodes.Elem.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
       val underlyingElem = underlyingRootElem.getElemOrSelfByPath(path)
 
       val parentBaseUriOption = path.parentPathOption map { pp =>
@@ -199,23 +198,23 @@ object IndexedClarkNode {
       new Elem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     }
 
-    def apply[U <: ClarkElemNodeApi.Aux[_, U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ClarkNodes.Elem.Aux[_, U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
       apply(Some(docUri), underlyingRootElem, path)
     }
 
-    def apply[U <: ClarkElemNodeApi.Aux[_, U]](underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ClarkNodes.Elem.Aux[_, U]](underlyingRootElem: U, path: Path): Elem[U] = {
       apply(None, underlyingRootElem, path)
     }
 
-    def apply[U <: ClarkElemNodeApi.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ClarkNodes.Elem.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
       apply(docUriOption, underlyingRootElem, Path.Empty)
     }
 
-    def apply[U <: ClarkElemNodeApi.Aux[_, U]](docUri: URI, underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ClarkNodes.Elem.Aux[_, U]](docUri: URI, underlyingRootElem: U): Elem[U] = {
       apply(Some(docUri), underlyingRootElem)
     }
 
-    def apply[U <: ClarkElemNodeApi.Aux[_, U]](underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ClarkNodes.Elem.Aux[_, U]](underlyingRootElem: U): Elem[U] = {
       apply(None, underlyingRootElem, Path.Empty)
     }
   }

@@ -25,7 +25,7 @@ import scala.util.Try
 
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingDocumentApi
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.saxon.SaxonElem
 import eu.cdevreeze.yaidom.saxon.SaxonNode
@@ -111,7 +111,7 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
     SaxonDocument.wrapDocument(nodeResult.getTreeInfo)
   }
 
-  def evaluateAsBackingElem(expr: XPathExpression, contextItemOption: Option[ContextItem]): BackingElemNodeApi = {
+  def evaluateAsBackingElem(expr: XPathExpression, contextItemOption: Option[ContextItem]): BackingNodes.Elem = {
     val nodeResult = evaluateAsNode(expr, contextItemOption)
     // Assuming the result to be an element node
     SaxonNode.wrapElement(nodeResult)
@@ -119,7 +119,7 @@ final class SaxonJaxpXPathEvaluator(val underlyingEvaluator: saxon.xpath.XPathEv
 
   def evaluateAsBackingElemSeq(
     expr:              XPathExpression,
-    contextItemOption: Option[ContextItem]): immutable.IndexedSeq[BackingElemNodeApi] = {
+    contextItemOption: Option[ContextItem]): immutable.IndexedSeq[BackingNodes.Elem] = {
 
     val nodeSeqResult = evaluateAsNodeSeq(expr, contextItemOption)
     // Assuming all results to be element nodes

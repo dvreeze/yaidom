@@ -27,9 +27,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 
 /**
  * Wrappers around `org.w3c.dom.Node` and subclasses, such that the wrapper around `org.w3c.dom.Element` conforms to the
@@ -46,7 +45,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait DomNode extends Nodes.Node {
+sealed trait DomNode extends ScopedNodes.Node {
 
   type DomType <: w3c.dom.Node
 
@@ -63,7 +62,7 @@ sealed trait DomNode extends Nodes.Node {
   final override def hashCode: Int = wrappedNode.hashCode
 }
 
-sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
+sealed trait CanBeDomDocumentChild extends DomNode with ScopedNodes.CanBeDocumentChild
 
 /**
  * Wrapper around `org.w3c.dom.Element`, conforming to the [[eu.cdevreeze.yaidom.queryapi.ElemLike]] API.
@@ -82,7 +81,7 @@ sealed trait CanBeDomDocumentChild extends DomNode with Nodes.CanBeDocumentChild
  * this DomElem makes namespace-aware querying of DOM elements far easier than direct querying of DOM elements.
  */
 final class DomElem(
-  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with Nodes.Elem with ScopedElemNodeApi with ScopedElemLike with HasParent {
+  override val wrappedNode: w3c.dom.Element) extends CanBeDomDocumentChild with ScopedNodes.Elem with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -169,7 +168,7 @@ final class DomElem(
   }
 }
 
-final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with Nodes.Text {
+final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with ScopedNodes.Text {
   require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = w3c.dom.Text
@@ -184,7 +183,7 @@ final class DomText(override val wrappedNode: w3c.dom.Text) extends DomNode with
 }
 
 final class DomProcessingInstruction(
-  override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
+  override val wrappedNode: w3c.dom.ProcessingInstruction) extends CanBeDomDocumentChild with ScopedNodes.ProcessingInstruction {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -196,7 +195,7 @@ final class DomProcessingInstruction(
 }
 
 final class DomEntityRef(
-  override val wrappedNode: w3c.dom.EntityReference) extends DomNode with Nodes.EntityRef {
+  override val wrappedNode: w3c.dom.EntityReference) extends DomNode with ScopedNodes.EntityRef {
 
   require(wrappedNode ne null) // scalastyle:off null
 
@@ -206,7 +205,7 @@ final class DomEntityRef(
 }
 
 final class DomComment(
-  override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
+  override val wrappedNode: w3c.dom.Comment) extends CanBeDomDocumentChild with ScopedNodes.Comment {
 
   require(wrappedNode ne null) // scalastyle:off null
 

@@ -25,10 +25,9 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
@@ -39,9 +38,9 @@ object IndexedScopedNode {
    *
    * @author Chris de Vreeze
    */
-  sealed trait Node extends Nodes.Node
+  sealed trait Node extends BackingNodes.Node
 
-  sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
+  sealed trait CanBeDocumentChild extends Node with BackingNodes.CanBeDocumentChild
 
   /**
    * Indexed Scoped element. Like `IndexedClarkElem` but instead of being and indexing
@@ -53,7 +52,7 @@ object IndexedScopedNode {
    *
    * @author Chris de Vreeze
    */
-  final class Elem[U <: ScopedElemNodeApi.Aux[_, U]] private[IndexedScopedNode] (
+  final class Elem[U <: ScopedNodes.Elem.Aux[_, U]] private[IndexedScopedNode] (
     docUriOption:        Option[URI],
     parentBaseUriOption: Option[URI],
     underlyingRootElem:  U,
@@ -61,7 +60,7 @@ object IndexedScopedNode {
     underlyingElem:      U)
     extends AbstractIndexedClarkElem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     with CanBeDocumentChild
-    with BackingElemNodeApi
+    with BackingNodes.Elem
     with ScopedElemLike
     with HasParent {
 
@@ -77,17 +76,17 @@ object IndexedScopedNode {
 
       val children =
         underlyingElem.children flatMap {
-          case che: Nodes.Elem =>
+          case che: BackingNodes.Elem =>
             val e = childElems(childElemIdx)
             childElemIdx += 1
             Some(e)
-          case ch: Nodes.Text =>
+          case ch: BackingNodes.Text =>
             Some(Text(ch.text, false))
-          case ch: Nodes.Comment =>
+          case ch: BackingNodes.Comment =>
             Some(Comment(ch.text))
-          case ch: Nodes.ProcessingInstruction =>
+          case ch: BackingNodes.ProcessingInstruction =>
             Some(ProcessingInstruction(ch.target, ch.data))
-          case ch: Nodes.EntityRef =>
+          case ch: BackingNodes.EntityRef =>
             Some(EntityRef(ch.entity))
           case ch =>
             None
@@ -146,7 +145,7 @@ object IndexedScopedNode {
     }
   }
 
-  final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
+  final case class Text(text: String, isCData: Boolean) extends Node with BackingNodes.Text {
     require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 
@@ -157,7 +156,7 @@ object IndexedScopedNode {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
+  final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with BackingNodes.ProcessingInstruction {
     require(target ne null) // scalastyle:off null
     require(data ne null) // scalastyle:off null
   }
@@ -172,17 +171,17 @@ object IndexedScopedNode {
    * EntityRef("hello")
    * }}}
    */
-  final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
+  final case class EntityRef(entity: String) extends Node with BackingNodes.EntityRef {
     require(entity ne null) // scalastyle:off null
   }
 
-  final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
+  final case class Comment(text: String) extends CanBeDocumentChild with BackingNodes.Comment {
     require(text ne null) // scalastyle:off null
   }
 
   object Elem {
 
-    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ScopedNodes.Elem.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U, path: Path): Elem[U] = {
       val underlyingElem = underlyingRootElem.getElemOrSelfByPath(path)
 
       val parentBaseUriOption = path.parentPathOption map { pp =>
@@ -192,23 +191,23 @@ object IndexedScopedNode {
       new Elem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     }
 
-    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ScopedNodes.Elem.Aux[_, U]](docUri: URI, underlyingRootElem: U, path: Path): Elem[U] = {
       apply(Some(docUri), underlyingRootElem, path)
     }
 
-    def apply[U <: ScopedElemNodeApi.Aux[_, U]](underlyingRootElem: U, path: Path): Elem[U] = {
+    def apply[U <: ScopedNodes.Elem.Aux[_, U]](underlyingRootElem: U, path: Path): Elem[U] = {
       apply(None, underlyingRootElem, path)
     }
 
-    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ScopedNodes.Elem.Aux[_, U]](docUriOption: Option[URI], underlyingRootElem: U): Elem[U] = {
       apply(docUriOption, underlyingRootElem, Path.Empty)
     }
 
-    def apply[U <: ScopedElemNodeApi.Aux[_, U]](docUri: URI, underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ScopedNodes.Elem.Aux[_, U]](docUri: URI, underlyingRootElem: U): Elem[U] = {
       apply(Some(docUri), underlyingRootElem, Path.Empty)
     }
 
-    def apply[U <: ScopedElemNodeApi.Aux[_, U]](underlyingRootElem: U): Elem[U] = {
+    def apply[U <: ScopedNodes.Elem.Aux[_, U]](underlyingRootElem: U): Elem[U] = {
       apply(None, underlyingRootElem, Path.Empty)
     }
   }

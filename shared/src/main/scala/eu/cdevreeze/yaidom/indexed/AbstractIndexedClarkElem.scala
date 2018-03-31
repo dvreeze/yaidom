@@ -22,9 +22,8 @@ import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
@@ -35,12 +34,12 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractIndexedClarkElem[U <: ClarkElemNodeApi.Aux[_, U]](
+abstract class AbstractIndexedClarkElem[U <: ClarkNodes.Elem.Aux[_, U]](
   val docUriOption:        Option[URI],
   val parentBaseUriOption: Option[URI],
   val underlyingRootElem:  U,
   val path:                Path,
-  val underlyingElem:      U) extends Nodes.Elem with ClarkElemNodeApi with IndexedClarkElemApi with ClarkElemLike {
+  val underlyingElem:      U) extends ClarkNodes.Elem with IndexedClarkElemApi with ClarkElemLike {
 
   type ThisElem <: AbstractIndexedClarkElem.Aux[ThisElem, U]
 
@@ -107,9 +106,9 @@ object AbstractIndexedClarkElem {
    * @tparam E The element self type
    * @tparam U The underlying element type
    */
-  type Aux[E, U <: ClarkElemNodeApi.Aux[_, U]] = AbstractIndexedClarkElem[U] { type ThisElem = E }
+  type Aux[E, U <: ClarkNodes.Elem.Aux[_, U]] = AbstractIndexedClarkElem[U] { type ThisElem = E }
 
-  private[yaidom] def computeParentBaseUriOption(elm: AbstractIndexedClarkElem[_ <: ClarkElemNodeApi]): Option[URI] = {
+  private[yaidom] def computeParentBaseUriOption(elm: AbstractIndexedClarkElem[_ <: ClarkNodes.Elem]): Option[URI] = {
     if (elm.path.isEmpty) {
       elm.docUriOption
     } else {

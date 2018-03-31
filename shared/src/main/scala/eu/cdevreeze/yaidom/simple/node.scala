@@ -28,10 +28,9 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.Nodes
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
-import eu.cdevreeze.yaidom.queryapi.ScopedElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -42,7 +41,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends Nodes.Node with Immutable with Serializable {
+sealed trait Node extends ScopedNodes.Node with Immutable with Serializable {
 
   /**
    * Returns the tree representation String, conforming to the tree representation DSL that creates `NodeBuilder`s.
@@ -78,7 +77,7 @@ sealed trait Node extends Nodes.Node with Immutable with Serializable {
   private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line]
 }
 
-sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
+sealed trait CanBeDocumentChild extends Node with ScopedNodes.CanBeDocumentChild
 
 /**
  * <em>Immutable</em>, thread-safe <em>element node</em>. It is the <em>default</em> element implementation in yaidom. As the default
@@ -176,8 +175,7 @@ final class Elem(
   val scope:             Scope,
   override val children: immutable.IndexedSeq[Node])
   extends CanBeDocumentChild
-  with Nodes.Elem
-  with ScopedElemNodeApi
+  with ScopedNodes.Elem
   with ScopedElemLike
   with UpdatableElemLike
   with TransformableElemLike {
@@ -678,7 +676,7 @@ final class Elem(
 }
 
 @SerialVersionUID(1L)
-final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
+final case class Text(text: String, isCData: Boolean) extends Node with ScopedNodes.Text {
   require(text ne null) // scalastyle:off null
   if (isCData) require(!text.containsSlice("]]>"))
 
@@ -702,7 +700,7 @@ final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Te
 }
 
 @SerialVersionUID(1L)
-final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
+final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with ScopedNodes.ProcessingInstruction {
   require(target ne null) // scalastyle:off null
   require(data ne null) // scalastyle:off null
 
@@ -727,7 +725,7 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
  * }}}
  */
 @SerialVersionUID(1L)
-final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
+final case class EntityRef(entity: String) extends Node with ScopedNodes.EntityRef {
   require(entity ne null) // scalastyle:off null
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
@@ -737,7 +735,7 @@ final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
 }
 
 @SerialVersionUID(1L)
-final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
+final case class Comment(text: String) extends CanBeDocumentChild with ScopedNodes.Comment {
   require(text ne null) // scalastyle:off null
 
   private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
@@ -783,17 +781,15 @@ object Elem {
   }
 
   /**
-   * Converts any `Nodes.Elem with ScopedElemNodeApi` element to a "simple" `Elem`.
-   * All descendant-or-self (`Nodes.Elem`) elements must implement `ScopedElemNodeApi`, or else an exception is thrown.
+   * Converts any `ScopedNodes.Elem` element to a "simple" `Elem`.
    */
-  def from(e: Nodes.Elem with ScopedElemNodeApi): Elem = {
+  def from(e: ScopedNodes.Elem): Elem = {
     val children = e.children collect {
-      case childElm: Nodes.Elem with ScopedElemNodeApi => childElm
-      case childElm: Nodes.Elem                        => sys.error(s"Not an element that implements ScopedElemNodeApi")
-      case childText: Nodes.Text                       => childText
-      case childComment: Nodes.Comment                 => childComment
-      case childPi: Nodes.ProcessingInstruction        => childPi
-      case childEr: Nodes.EntityRef                    => childEr
+      case childElm: ScopedNodes.Elem                 => childElm
+      case childText: ScopedNodes.Text                => childText
+      case childComment: ScopedNodes.Comment          => childComment
+      case childPi: ScopedNodes.ProcessingInstruction => childPi
+      case childEr: ScopedNodes.EntityRef             => childEr
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val simpleChildren = children map { node => Node.from(node) }
@@ -802,25 +798,22 @@ object Elem {
   }
 
   /**
-   * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "simple" `Elem`, given a Scope needed for
+   * Converts any `ClarkNodes.Elem` element to a "simple" `Elem`, given a Scope needed for
    * computing QNames from ENames (of elements and attributes). The passed Scope must not contain the default namespace.
    *
    * Preferably the passed Scope is invertible.
    *
-   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
-   *
    * The resulting element has its attributes sorted on the name (QName), throughout the element tree.
    */
-  def from(e: Nodes.Elem with ClarkElemNodeApi, scope: Scope): Elem = {
+  def from(e: ClarkNodes.Elem, scope: Scope): Elem = {
     require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
 
     val children = e.children collect {
-      case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
-      case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-      case childText: Nodes.Text                      => childText
-      case childComment: Nodes.Comment                => childComment
-      case childPi: Nodes.ProcessingInstruction       => childPi
-      case childEr: Nodes.EntityRef                   => childEr
+      case childElm: ClarkNodes.Elem                 => childElm
+      case childText: ClarkNodes.Text                => childText
+      case childComment: ClarkNodes.Comment          => childComment
+      case childPi: ClarkNodes.ProcessingInstruction => childPi
+      case childEr: ClarkNodes.EntityRef             => childEr
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val simpleChildren = children map { node => Node.from(node, scope) }
@@ -880,38 +873,33 @@ object Elem {
 object Node {
 
   /**
-   * Converts any element, text, comment, PI or entity reference `Nodes.Node` to a "simple" `Node`.
-   * All descendant-or-self elements must implement `ScopedElemNodeApi`, or else an exception is thrown.
+   * Converts any element, text, comment, PI or entity reference `ScopedNodes.Node` to a "simple" `Node`.
    */
-  def from(n: Nodes.Node): Node = n match {
-    case e: Nodes.Elem with ScopedElemNodeApi => Elem.from(e)
-    case e: Nodes.Elem                        => sys.error(s"Not an element that implements ScopedElemNodeApi")
-    case t: Nodes.Text                        => Text(t.text, false)
-    case c: Nodes.Comment                     => Comment(c.text)
-    case pi: Nodes.ProcessingInstruction      => ProcessingInstruction(pi.target, pi.data)
-    case er: Nodes.EntityRef                  => EntityRef(er.entity)
-    case n                                    => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
+  def from(n: ScopedNodes.Node): Node = n match {
+    case e: ScopedNodes.Elem                   => Elem.from(e)
+    case t: ScopedNodes.Text                   => Text(t.text, false)
+    case c: ScopedNodes.Comment                => Comment(c.text)
+    case pi: ScopedNodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
+    case er: ScopedNodes.EntityRef             => EntityRef(er.entity)
+    case n                                     => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
   }
 
   /**
-   * Converts any element, text, comment, PI or entity reference `Nodes.Node` to a "simple" `Node`, given a Scope needed for
+   * Converts any element, text, comment, PI or entity reference `ClarkNodes.Node` to a "simple" `Node`, given a Scope needed for
    * computing QNames from ENames (of elements and attributes). The passed Scope must not contain the default namespace.
    *
    * Preferably the passed Scope is invertible.
-   *
-   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
    */
-  def from(node: Nodes.Node, scope: Scope): Node = {
+  def from(node: ClarkNodes.Node, scope: Scope): Node = {
     require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
 
     node match {
-      case e: Nodes.Elem with ClarkElemNodeApi => Elem.from(e, scope)
-      case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-      case t: Nodes.Text                       => Text(t.text, false)
-      case c: Nodes.Comment                    => Comment(c.text)
-      case pi: Nodes.ProcessingInstruction     => ProcessingInstruction(pi.target, pi.data)
-      case er: Nodes.EntityRef                 => EntityRef(er.entity)
-      case n                                   => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
+      case e: ClarkNodes.Elem                   => Elem.from(e, scope)
+      case t: ClarkNodes.Text                   => Text(t.text, false)
+      case c: ClarkNodes.Comment                => Comment(c.text)
+      case pi: ClarkNodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
+      case er: ClarkNodes.EntityRef             => EntityRef(er.entity)
+      case n                                    => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
     }
   }
 

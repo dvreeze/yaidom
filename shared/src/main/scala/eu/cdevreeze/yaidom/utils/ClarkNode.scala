@@ -23,9 +23,8 @@ import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ElemCreationApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 
@@ -43,9 +42,9 @@ object ClarkNode {
    *
    * @author Chris de Vreeze
    */
-  sealed trait Node extends Nodes.Node
+  sealed trait Node extends ClarkNodes.Node
 
-  sealed trait CanBeDocumentChild extends Node with Nodes.CanBeDocumentChild
+  sealed trait CanBeDocumentChild extends Node with ClarkNodes.CanBeDocumentChild
 
   /**
    * "Clark element". Like resolved elements in the API, but adding more node types and keeping
@@ -64,8 +63,7 @@ object ClarkNode {
     val attributes: immutable.IndexedSeq[(EName, String)],
     val children:   immutable.IndexedSeq[Node])
     extends CanBeDocumentChild
-    with Nodes.Elem
-    with ClarkElemNodeApi
+    with ClarkNodes.Elem
     with ClarkElemLike
     with UpdatableElemLike
     with TransformableElemLike {
@@ -355,7 +353,7 @@ object ClarkNode {
     }
   }
 
-  final case class Text(text: String, isCData: Boolean) extends Node with Nodes.Text {
+  final case class Text(text: String, isCData: Boolean) extends Node with ClarkNodes.Text {
     require(text ne null) // scalastyle:off null
     if (isCData) require(!text.containsSlice("]]>"))
 
@@ -366,7 +364,7 @@ object ClarkNode {
     def normalizedText: String = XmlStringUtils.normalizeString(text)
   }
 
-  final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with Nodes.ProcessingInstruction {
+  final case class ProcessingInstruction(target: String, data: String) extends CanBeDocumentChild with ClarkNodes.ProcessingInstruction {
     require(target ne null) // scalastyle:off null
     require(data ne null) // scalastyle:off null
   }
@@ -381,11 +379,11 @@ object ClarkNode {
    * EntityRef("hello")
    * }}}
    */
-  final case class EntityRef(entity: String) extends Node with Nodes.EntityRef {
+  final case class EntityRef(entity: String) extends Node with ClarkNodes.EntityRef {
     require(entity ne null) // scalastyle:off null
   }
 
-  final case class Comment(text: String) extends CanBeDocumentChild with Nodes.Comment {
+  final case class Comment(text: String) extends CanBeDocumentChild with ClarkNodes.Comment {
     require(text ne null) // scalastyle:off null
   }
 
@@ -396,16 +394,14 @@ object ClarkNode {
     type ElemType = Elem
 
     /**
-     * Converts any element or text `Nodes.Node` to a "Clark" `Node`. For other kinds of nodes, an exception is thrown.
-     * All descendant-or-self elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+     * Converts any `ClarkNodes.Node` to a "Clark" `Node`.
      */
-    def from(n: Nodes.Node): Node = n match {
-      case e: Nodes.Elem with ClarkElemNodeApi => Elem.from(e)
-      case e: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-      case t: Nodes.Text                       => Text(t.text, false)
-      case c: Nodes.Comment                    => Comment(c.text)
-      case pi: Nodes.ProcessingInstruction     => ProcessingInstruction(pi.target, pi.data)
-      case er: Nodes.EntityRef                 => EntityRef(er.entity)
+    def from(n: ClarkNodes.Node): Node = n match {
+      case e: ClarkNodes.Elem                   => Elem.from(e)
+      case t: ClarkNodes.Text                   => Text(t.text, false)
+      case c: ClarkNodes.Comment                => Comment(c.text)
+      case pi: ClarkNodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
+      case er: ClarkNodes.EntityRef             => EntityRef(er.entity)
     }
 
     def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
@@ -454,17 +450,15 @@ object ClarkNode {
     }
 
     /**
-     * Converts any `Nodes.Elem with ClarkElemNodeApi` element to a "Clark" `Elem`.
-     * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
+     * Converts any `ClarkNodes.Elem` element to a "Clark" `Elem`.
      */
-    def from(e: Nodes.Elem with ClarkElemNodeApi): Elem = {
+    def from(e: ClarkNodes.Elem): Elem = {
       val children = e.children collect {
-        case childElm: Nodes.Elem with ClarkElemNodeApi => childElm
-        case childElm: Nodes.Elem                       => sys.error(s"Not an element that implements ClarkElemNodeApi")
-        case childText: Nodes.Text                      => childText
-        case childComment: Nodes.Comment                => Comment(childComment.text)
-        case childPi: Nodes.ProcessingInstruction       => ProcessingInstruction(childPi.target, childPi.data)
-        case childEr: Nodes.EntityRef                   => EntityRef(childEr.entity)
+        case childElm: ClarkNodes.Elem                 => childElm
+        case childText: ClarkNodes.Text                => childText
+        case childComment: ClarkNodes.Comment          => Comment(childComment.text)
+        case childPi: ClarkNodes.ProcessingInstruction => ProcessingInstruction(childPi.target, childPi.data)
+        case childEr: ClarkNodes.EntityRef             => EntityRef(childEr.entity)
       }
       // Recursion, with Node.apply and Elem.apply being mutually dependent
       val resolvedChildren = children map { node => Node.from(node) }

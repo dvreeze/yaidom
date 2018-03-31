@@ -30,9 +30,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
@@ -57,7 +56,7 @@ import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
  *
  * @author Chris de Vreeze
  */
-sealed trait JsDomNode extends Nodes.Node {
+sealed trait JsDomNode extends BackingNodes.Node {
 
   type DomType <: sjsdom.Node
 
@@ -74,7 +73,7 @@ sealed trait JsDomNode extends Nodes.Node {
   final override def hashCode: Int = wrappedNode.hashCode
 }
 
-sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChild
+sealed trait CanBeDomDocumentChild extends JsDomNode with BackingNodes.CanBeDocumentChild
 
 /**
  * Wrapper around `org.scalajs.dom.raw.Element`, conforming to the `eu.cdevreeze.yaidom.queryapi.BackingElemApi` API.
@@ -86,7 +85,7 @@ sealed trait CanBeDomDocumentChild extends JsDomNode with Nodes.CanBeDocumentChi
  */
 final class JsDomElem(
   override val wrappedNode: sjsdom.Element)
-  extends CanBeDomDocumentChild with Nodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
+  extends CanBeDomDocumentChild with BackingNodes.Elem with ScopedElemLike with HasParent {
 
   require(wrappedNode ne null, s"Missing underlying element node") // scalastyle:off null
 
@@ -257,7 +256,7 @@ final class JsDomElem(
   }
 }
 
-final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode with Nodes.Text {
+final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode with BackingNodes.Text {
   override type DomType = sjsdom.Text
 
   require(wrappedNode ne null, s"Missing underlying text node") // scalastyle:off null
@@ -272,7 +271,7 @@ final class JsDomText(override val wrappedNode: sjsdom.Text) extends JsDomNode w
 }
 
 final class JsDomProcessingInstruction(
-  override val wrappedNode: sjsdom.ProcessingInstruction) extends CanBeDomDocumentChild with Nodes.ProcessingInstruction {
+  override val wrappedNode: sjsdom.ProcessingInstruction) extends CanBeDomDocumentChild with BackingNodes.ProcessingInstruction {
 
   require(wrappedNode ne null, s"Missing underlying processing instruction node") // scalastyle:off null
 
@@ -284,7 +283,7 @@ final class JsDomProcessingInstruction(
 }
 
 final class JsDomComment(
-  override val wrappedNode: sjsdom.Comment) extends CanBeDomDocumentChild with Nodes.Comment {
+  override val wrappedNode: sjsdom.Comment) extends CanBeDomDocumentChild with BackingNodes.Comment {
 
   require(wrappedNode ne null, s"Missing underlying comment node") // scalastyle:off null
 

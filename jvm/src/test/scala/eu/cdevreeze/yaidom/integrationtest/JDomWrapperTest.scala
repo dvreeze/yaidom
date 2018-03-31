@@ -36,11 +36,10 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
-import eu.cdevreeze.yaidom.queryapi.BackingElemNodeApi
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.queryapi.HasParent
-import eu.cdevreeze.yaidom.queryapi.Nodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
@@ -795,7 +794,7 @@ class JDomWrapperTest extends FunSuite {
 
 object JDomWrapperTest {
 
-  sealed trait JDomNode extends Nodes.Node {
+  sealed trait JDomNode extends BackingNodes.Node {
 
     type DomType <: org.jdom2.Content
 
@@ -820,7 +819,7 @@ object JDomWrapperTest {
   }
 
   final class JDomElem(
-    override val wrappedNode: org.jdom2.Element) extends JDomNode with Nodes.Elem with BackingElemNodeApi with ScopedElemLike with HasParent {
+    override val wrappedNode: org.jdom2.Element) extends JDomNode with BackingNodes.Elem with ScopedElemLike with HasParent {
 
     require(wrappedNode ne null)
 
@@ -988,7 +987,7 @@ object JDomWrapperTest {
     }
   }
 
-  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode with Nodes.Text {
+  final class JDomText(override val wrappedNode: org.jdom2.Text) extends JDomNode with BackingNodes.Text {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.Text
@@ -1000,7 +999,9 @@ object JDomWrapperTest {
     def normalizedText: String = wrappedNode.getTextNormalize
   }
 
-  final class JDomProcessingInstruction(override val wrappedNode: org.jdom2.ProcessingInstruction) extends JDomNode with Nodes.ProcessingInstruction {
+  final class JDomProcessingInstruction(override val wrappedNode: org.jdom2.ProcessingInstruction)
+    extends JDomNode with BackingNodes.ProcessingInstruction {
+
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.ProcessingInstruction
@@ -1010,7 +1011,7 @@ object JDomWrapperTest {
     def data: String = wrappedNode.getValue
   }
 
-  final class JDomEntityRef(override val wrappedNode: org.jdom2.EntityRef) extends JDomNode with Nodes.EntityRef {
+  final class JDomEntityRef(override val wrappedNode: org.jdom2.EntityRef) extends JDomNode with BackingNodes.EntityRef {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.EntityRef
@@ -1018,7 +1019,7 @@ object JDomWrapperTest {
     def entity: String = wrappedNode.getName
   }
 
-  final class JDomComment(override val wrappedNode: org.jdom2.Comment) extends JDomNode with Nodes.Comment {
+  final class JDomComment(override val wrappedNode: org.jdom2.Comment) extends JDomNode with BackingNodes.Comment {
     require(wrappedNode ne null)
 
     override type DomType = org.jdom2.Comment

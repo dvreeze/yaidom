@@ -34,8 +34,7 @@ import eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.ClarkElemNodeApi
-import eu.cdevreeze.yaidom.queryapi.Nodes
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
@@ -123,12 +122,12 @@ class IndexedElemTest extends FunSuite {
     }
 
     assertResult(indexedElem.text) {
-      val textChildren = docElemChildren collect { case ch: Nodes.Text => ch }
+      val textChildren = docElemChildren collect { case ch: ClarkNodes.Text => ch }
       textChildren.map(_.text).mkString
     }
   }
 
-  private def doTestIndexing[U <: Nodes.Elem with ClarkElemNodeApi.Aux[_, U], E <: AbstractIndexedClarkElem[U]](rootElem: E): Unit = {
+  private def doTestIndexing[U <: ClarkNodes.Elem.Aux[_, U], E <: AbstractIndexedClarkElem[U]](rootElem: E): Unit = {
     assertResult(List("product", "number", "size")) {
       rootElem.findAllElemsOrSelf.map(_.localName)
     }
@@ -183,7 +182,7 @@ class IndexedElemTest extends FunSuite {
     }
 
     assertResult(resolvedElem.findAllElemsOrSelf) {
-      rootElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingRootElem.getElemOrSelfByPath(e.path).asInstanceOf[Nodes.Elem with ClarkElemNodeApi]))
+      rootElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingRootElem.getElemOrSelfByPath(e.path).asInstanceOf[ClarkNodes.Elem]))
     }
   }
 
