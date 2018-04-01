@@ -17,16 +17,16 @@
 package eu.cdevreeze
 
 /**
- * <em>Yaidom</em> is yet another Scala immutable DOM-like XML API. Some other well-known Scala immutable DOM-like APIs are
- * the standard scala.xml API and Anti-XML. The latter API is considered by many to be an improvement over the former, but both APIs:
+ * <em>Yaidom</em> is yet another Scala immutable DOM-like XML API. The best known Scala immutable DOM-like API is
+ * the standard scala.xml API. It:
  * <ul>
- * <li>attempt to offer an XPath-like querying experience, thus somewhat blurring the distinction between nodes and node collections</li>
- * <li>lack first-class support for namespaces (and namespace URIs)</li>
- * <li>have limited (functional) update support</li>
+ * <li>attempts to offer an XPath-like querying experience, thus somewhat blurring the distinction between nodes and node collections</li>
+ * <li>lacks first-class support for XML namespaces</li>
+ * <li>has limited (functional) update support</li>
  * </ul>
  *
- * Yaidom takes a different approach, avoiding XPath-like query support, and offering good namespace and decent (functional) update
- * support. Yaidom is also characterized by <em>almost mathematical precision</em> and clarity. Still, the API remains practical and
+ * Yaidom takes a different approach, avoiding XPath-like query support in its query API, and offering good namespace and decent (functional)
+ * update support. Yaidom is also characterized by <em>almost mathematical precision</em> and clarity. Still, the API remains practical and
  * pragmatic. In particular, the API user has much configuration control over parsing and serialization, because yaidom exposes
  * the underlying JAXP parsers and serializers, which can be configured by the library user.
  *
@@ -200,7 +200,7 @@ package eu.cdevreeze
  * collections, that can further be manipulated using the Scala Collections API.
  *
  * This query API is <em>uniform</em>, in that different element implementations share (most of) the same query API. It is also
- * <em>element-centric</em> (unlike standard Scala XML and Anti-XML).
+ * <em>element-centric</em> (unlike standard Scala XML).
  *
  * For example, consider the XML example given earlier, as a Scala XML literal named `bookstore`. We can wrap this Scala
  * XML Elem into a yaidom wrapper of type `ScalaXmlElem`, named `bookstoreElem`. Then we can query
@@ -300,8 +300,8 @@ package eu.cdevreeze
  * operations, as can be seen in the corresponding documentation.
  *
  * The uniform query API traits turn minimal APIs into richer APIs, where each richer API is defined very precisely in terms
- * of the minimal API. The most important query API trait is [[eu.cdevreeze.yaidom.queryapi.ElemLike]]. It needs to be given a method
- * implementation to query for child elements (not child nodes in general, but just child elements!), and it offers methods to query
+ * of the minimal API. The most important (partly concrete) query API trait is [[eu.cdevreeze.yaidom.queryapi.ElemLike]]. It needs to be given
+ * a method implementation to query for child elements (not child nodes in general, but just child elements!), and it offers methods to query
  * for some or all child elements, descendant elements, and descendant-or-self elements. That is, the minimal API consists
  * of abstract method `findAllChildElems`, and it offers methods such as `filterChildElems`, `filterElems` and `filterElemsOrSelf`.
  * This trait has no knowledge about elements at all, other than the fact that <em>elements can have child elements</em>.
@@ -333,24 +333,56 @@ package eu.cdevreeze
  * any paths. This is offered by trait [[eu.cdevreeze.yaidom.queryapi.TransformableElemLike]]. The Scala XML and DOM wrappers above do
  * not mix in this trait.
  *
+ * ==Three uniform query API levels==
+ *
+ * Above, several individual query API traits were mentioned. There are, however, 3 <em>query API levels</em>
+ * which are interesting for those who extend yaidom with new element implementations, but also for most users
+ * of the yaidom query API. These levels are represented by "combination traits" that combine several
+ * of the query API traits mentioned (or not mentioned) above.
+ *
+ * The most basic level is [[eu.cdevreeze.yaidom.queryapi.ClarkNodes.Elem]]. It combines traits such as
+ * [[eu.cdevreeze.yaidom.queryapi.ElemApi]] and [[eu.cdevreeze.yaidom.queryapi.HasENameApi]]. Object
+ * [[eu.cdevreeze.yaidom.queryapi.ClarkNodes]] also contains types for non-element nodes. All element
+ * implementations that extend trait `ClarkNodes.Elem` should have a node hierarchy with all kinds of
+ * nodes extending the appropriate `ClarkNodes` member type.
+ *
+ * All element implementation directly or indirectly implement the `ClarkNodes.Elem` trait. The part of
+ * the yaidom query API that knows about `ElemApi` querying and about ENames is the `ClarkNodes` query
+ * API level. It does not know about QNames, in-scope namespaces, ancestor elements, base URIs, etc.
+ *
+ * The next level is [[eu.cdevreeze.yaidom.queryapi.ScopedNodes.Elem]]. It extends the `ClarkNodes.Elem`
+ * trait, but offers knowledge about QNames and in-scope namespaces as well. Many element implementations
+ * offer at least this query API level. The remarks about non-element nodes above also apply here, and below.
+ *
+ * The third level is [[eu.cdevreeze.yaidom.queryapi.BackingNodes.Elem]]. It extends the `ScopedNodes.Elem`
+ * trait, but offers knowledge about ancestor elements and document/base URIs as well. This is the level
+ * typically used for "backing elements" in "yaidom dialects", thus allowing for multiple "XML backends"
+ * to be used behind "yaidom dialects". Yaidom dialects are specific "XML dialect" type-safe yaidom query APIs,
+ * mixing in and leveraging trait [[eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemApi]] (often in combination
+ * with [[eu.cdevreeze.yaidom.queryapi.ScopedNodes.Elem]]).
+ *
+ * To get to know the yaidom query API and its 3 levels, it pays off to study the API documentation of traits
+ * [[eu.cdevreeze.yaidom.queryapi.ClarkNodes.Elem]], [[eu.cdevreeze.yaidom.queryapi.ScopedNodes.Elem]] and
+ * [[eu.cdevreeze.yaidom.queryapi.BackingNodes.Elem]].
+ *
  * ==Some element implementations==
  *
- * The uniform query API traits, especially `ElemLike` and its sub-trait `ElemLike` are mixed in by many element
- * implementations. In package `simple` there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.simple.ElemBuilder]]
- * and [[eu.cdevreeze.yaidom.simple.Elem]].
+ * In package `simple` there are 2 immutable element implementations, [[eu.cdevreeze.yaidom.simple.ElemBuilder]]
+ * and [[eu.cdevreeze.yaidom.simple.Elem]]. Arguably, `ElemBuilder` is not an element implementation. Indeed,
+ * it does not even offer the `ClarkNodes.Elem` query API.
  *
- * Class [[eu.cdevreeze.yaidom.simple.Elem]] is the <em>default element implementatio</em>n of yaidom. It extends class [[eu.cdevreeze.yaidom.simple.Node]].
+ * Class [[eu.cdevreeze.yaidom.simple.Elem]] is the <em>default element implementation</em> of yaidom. It extends class [[eu.cdevreeze.yaidom.simple.Node]].
  * The latter also has sub-classes for text nodes, comments, entity references and processing instructions. Class [[eu.cdevreeze.yaidom.simple.Document]]
- * contains a document `Elem`, but is not a `Node` sub-class itself.
+ * contains a document `Elem`, but is not a `Node` sub-class itself. This node hierarchy offers the `ScopedNodes` query API,
+ * so simple elements offer the `ScopedNodes.Elem` query API.
  *
  * The [[eu.cdevreeze.yaidom.simple.Elem]] class has the following characteristics:
  * <ul>
  * <li>It is <em>immutable</em>, and thread-safe</li>
  * <li>These elements therefore cannot be queried for their parent elements</li>
- * <li>It mixes in query API traits [[eu.cdevreeze.yaidom.queryapi.ElemLike]], [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]] and
- * [[eu.cdevreeze.yaidom.queryapi.TransformableElemLike]], among others</li>
- * <li>Indeed this element class offers almost all of the yaidom query API, except `HasParent`</li>
- * <li>Besides the tag name, attributes and child nodes, it keeps a `Scope`, but no `Declarations`</li>
+ * <li>It mixes in query API trait [[eu.cdevreeze.yaidom.queryapi.ScopedNodes.Elem]], [[eu.cdevreeze.yaidom.queryapi.UpdatableElemApi]] and
+ * [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]]</li>
+ * <li>Besides the element name, attributes and child nodes, it keeps a `Scope`, but no `Declarations`</li>
  * <li>This makes it easy to compose these elements, as long as scopes are passed explicitly throughout the element tree</li>
  * <li>Equality is reference equality, because it is hard to come up with a sensible equality for this element class</li>
  * <li>Roundtripping cannot be entirely lossless, but this class does try to retain the attribute order (although irrelevant according to XML Infoset)</li>
@@ -438,19 +470,21 @@ package eu.cdevreeze
  * <li>Immutable class [[eu.cdevreeze.yaidom.simple.Elem]], the default (immutable) element implementation. See above.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.simple.ElemBuilder]] for creating an `Elem` by hand. See above.</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.resolved.Elem]], which takes namespace prefixes out of the equation, and therefore
- * makes useful (namespace-aware) equality comparisons feasible. It mixes in most of the same query API traits as the default
- * element implementation.</li>
+ * makes useful (namespace-aware) equality comparisons feasible. It offers the `ClarkNodes.Elem` query API (as well as
+ * update/transformation support).</li>
  * <li>Immutable class [[eu.cdevreeze.yaidom.indexed.Elem]], which offers views on default Elems that know the ancestry of
- * each element. It mixes in the `ElemLike` query API, but knows its ancestry, despite being immutable! This element implementation
+ * each element. It offers the `BackingNodes.Elem` query API, so knows its ancestry, despite being immutable! This element implementation
  * is handy for querying XML schemas, for example, because in schemas the ancestry of queried elements typically matters.</li>
  * </ul>
- * This illustrates that especially trait `ElemLike` is a uniform query API in yaidom.
  *
- * One yaidom wrapper that is very useful is a Saxon tiny tree yaidom wrapper. It has not been provided out of the box,
- * in order to prevent any yaidom dependency on Saxon (which could have been an optional dependency), and because of
- * changes among Saxon versions. Nevertheless, a Saxon wrapper has been tried out in test code (just like wrappers
- * around XOM and JDOM), thus showing how easy it is to create such a wrapper ourselves. In the case of Saxon, when
- * using schema-awareness (Saxon-EE), the wrapped tiny tree would contain interesting type information.
+ * One yaidom wrapper that is very useful is a Saxon tiny tree yaidom wrapper, namely [[eu.cdevreeze.yaidom.saxon.SaxonElem]].
+ * Like "indexed elements", it offers all of the `BackingNodes.Elem` query API. This element implementation is very efficient,
+ * especially in memory footprint (when using the default tree model, namely tiny trees). It is therefore the most attractive element
+ * implementation to use in "enterprise" production code. In combination with Saxon-EE (instead of Saxon-HE) the underlying
+ * Saxon `NodeInfo` objects can even carry interesting type information.
+ *
+ * For ad-hoc element creation, consider using "resolved" elements. They are easy to create, because there is no need to worry about
+ * namespace prefixes. Once created, they can be converted to "simple" elements, given an appropriate `Scope` (without default namespace).
  *
  * ==Packages and dependencies==
  *
@@ -460,17 +494,17 @@ package eu.cdevreeze
  * <li>Package [[eu.cdevreeze.yaidom.queryapi]], with the query API traits described above. It only depends on the `core` package.</li>
  * <li>Package [[eu.cdevreeze.yaidom.resolved]], with a minimal "James Clark" element implementation. It only depends on the `core` and
  * `queryapi` packages.</li>
- * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core`, `queryapi`
- * and `resolved` packages.</li>
- * <li>Package [[eu.cdevreeze.yaidom.indexed]], supporting "indexed" elements. It only depends on the `core`, `queryapi`, `resolved` and `simple`
+ * <li>Package [[eu.cdevreeze.yaidom.simple]], with the default element implementation described above. It only depends on the `core` and `queryapi`
+ * packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.indexed]], supporting "indexed" elements. It only depends on the `core`, `queryapi` and `simple`
  * packages.</li>
  * <li>Package `convert`. It contains conversions between default yaidom nodes on the one hand and DOM,
- * Scala XML, etc. on the other hand. Like the `indexed` package, the `convert` package depends on the yaidom `core`, `queryapi`, `resolved`
- * and `simple` packages.</li>
+ * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi`, `resolved` and `simple` packages.</li>
+ * <li>Package [[eu.cdevreeze.yaidom.saxon]], with the Saxon wrapper element implementation described above. It only depends on the `core`, `queryapi`
+ * and `convert` packages.</li>
  * <li>Packages `eu.cdevreeze.yaidom.parse` and `eu.cdevreeze.yaidom.print`, for parsing/printing Elems. They depend on
- * the packages mentioned above, except for `indexed`.</li>
- * <li>The other packages (except `utils`), such as `dom` and `scalaxml`. They depend on (some of)
- * the packages mentioned above,
+ * the packages mentioned above, except for `indexed` and `saxon`.</li>
+ * <li>The other packages (except `utils`), such as `dom` and `scalaxml`. They depend on (some of) the packages mentioned above,
  * but not on each other.</li>
  * <li>Package [[eu.cdevreeze.yaidom.utils]], which depends on all the packages above.</li>
  * </ol>
@@ -512,7 +546,7 @@ package eu.cdevreeze
  * better, but there are likely many scenarios in yaidom client code where an implicit ENameProvider or QNameProvider makes sense.
  *
  * The bottom line is that yaidom can be configured to be far less memory-hungry, and that yaidom client code can also take
- * some responsibility in reducing memory usage.
+ * some responsibility in reducing memory usage. Again, the Saxon wrapper implementation is an excellent and efficient choice.
  *
  * @author Chris de Vreeze
  */

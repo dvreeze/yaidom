@@ -38,7 +38,7 @@ import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.pattern.NodeKindTest
 
 /**
- * Saxon yaidom BackingElemNodeApi wrapper around Saxon (9.7+) NodeInfo backends. Saxon-HE is the minimal
+ * Saxon yaidom `BackingNodes.Elem` wrapper around Saxon (9.7+) NodeInfo backends. Saxon-HE is the minimal
  * requirement, but Saxon-EE can be used instead, of course.
  *
  * Typically the wrapped NodeInfo uses the tiny tree model, in which case these yaidom

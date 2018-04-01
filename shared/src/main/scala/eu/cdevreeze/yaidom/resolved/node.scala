@@ -465,7 +465,6 @@ object Elem {
 
   /**
    * Converts any `ClarkNodes.Elem` element to a "resolved" `Elem`.
-   * All descendant-or-self (`Nodes.Elem`) elements must implement `ClarkElemNodeApi`, or else an exception is thrown.
    */
   def from(e: ClarkNodes.Elem): Elem = {
     val children = e.children collect {

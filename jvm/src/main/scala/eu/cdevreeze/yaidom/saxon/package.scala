@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Saxon-based `BackingElemNodeApi` implementation that can be used as underlying element implementation in
+ * Saxon-based `BackingNodes.Elem` implementation that can be used as underlying element implementation in
  * any "yaidom dialect". If Saxon tiny trees are used under the hood, this implementation is very efficient,
  * in particular in memory footprint.
  *

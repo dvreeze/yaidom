@@ -32,7 +32,7 @@ lazy val commonSettings = Seq(
     else
       Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
-    
+
   pomExtra := pomData,
   pomIncludeRepository := { _ => false },
 
