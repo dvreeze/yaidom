@@ -477,10 +477,10 @@ package eu.cdevreeze
  * is handy for querying XML schemas, for example, because in schemas the ancestry of queried elements typically matters.</li>
  * </ul>
  *
- * One yaidom wrapper that is very useful is a Saxon tiny tree yaidom wrapper, namely [[eu.cdevreeze.yaidom.saxon.SaxonElem]].
+ * One yaidom wrapper that is very useful is a Saxon tiny tree yaidom wrapper, namely `SaxonElem` (JVM-only).
  * Like "indexed elements", it offers all of the `BackingNodes.Elem` query API. This element implementation is very efficient,
  * especially in memory footprint (when using the default tree model, namely tiny trees). It is therefore the most attractive element
- * implementation to use in "enterprise" production code. In combination with Saxon-EE (instead of Saxon-HE) the underlying
+ * implementation to use in "enterprise" production code, but only on the JVM. In combination with Saxon-EE (instead of Saxon-HE) the underlying
  * Saxon `NodeInfo` objects can even carry interesting type information.
  *
  * For ad-hoc element creation, consider using "resolved" elements. They are easy to create, because there is no need to worry about
@@ -500,7 +500,7 @@ package eu.cdevreeze
  * packages.</li>
  * <li>Package `convert`. It contains conversions between default yaidom nodes on the one hand and DOM,
  * Scala XML, etc. on the other hand. The `convert` package depends on the yaidom `core`, `queryapi`, `resolved` and `simple` packages.</li>
- * <li>Package [[eu.cdevreeze.yaidom.saxon]], with the Saxon wrapper element implementation described above. It only depends on the `core`, `queryapi`
+ * <li>Package `eu.cdevreeze.yaidom.saxon`, with the Saxon wrapper element implementation described above. It only depends on the `core`, `queryapi`
  * and `convert` packages.</li>
  * <li>Packages `eu.cdevreeze.yaidom.parse` and `eu.cdevreeze.yaidom.print`, for parsing/printing Elems. They depend on
  * the packages mentioned above, except for `indexed` and `saxon`.</li>
@@ -546,7 +546,7 @@ package eu.cdevreeze
  * better, but there are likely many scenarios in yaidom client code where an implicit ENameProvider or QNameProvider makes sense.
  *
  * The bottom line is that yaidom can be configured to be far less memory-hungry, and that yaidom client code can also take
- * some responsibility in reducing memory usage. Again, the Saxon wrapper implementation is an excellent and efficient choice.
+ * some responsibility in reducing memory usage. Again, the Saxon wrapper implementation is an excellent and efficient choice (but only on the JVM).
  *
  * @author Chris de Vreeze
  */
