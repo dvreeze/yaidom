@@ -25,7 +25,7 @@ The main changes in version 1.8.0-M4 (compared with milestone 3) are:
   * ``BackingNodes.Elem`` implementations include Saxon wrappers and native indexed elements; they know about ancestor nodes, base URI etc.
   * The abstraction used by yaidom XML dialects (e.g. in the TQA project) is ``BackingNodes.Elem``
 
-* Improved more general conversions to simple and resolved elements
+* Improved conversions to simple and resolved elements, and made them more generic
 
   * Any ``ScopedNodes.Elem`` can be converted to a simple element
   * Any ``ClarkNodes.Elem`` can be converted to a simple element, given a Scope without default namespace
@@ -37,7 +37,7 @@ The main changes in version 1.8.0-M4 (compared with milestone 3) are:
 * Improved element creation
 
   * Yaidom resolved elements are not only useful for equality tests, but also for ad-hoc element creation
-  * After all, while creating resolved elements tree, one does not have to worry about namespace prefixes
+  * After all, while creating resolved element trees, one does not have to worry about namespace prefixes
   * Resolved elements now also have some methods for adding/deleting/filtering attributes
   * The resolved Node companion object now extends the new trait ``ElemCreationApi``
   * See above for how resolved elements can easily be converted to simple elements, provided we have a suitable Scope
