@@ -402,6 +402,7 @@ object ClarkNode {
       case c: ClarkNodes.Comment                => Comment(c.text)
       case pi: ClarkNodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
       case er: ClarkNodes.EntityRef             => EntityRef(er.entity)
+      case n                                    => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
     }
 
     def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
@@ -454,12 +455,13 @@ object ClarkNode {
      */
     def from(e: ClarkNodes.Elem): Elem = {
       val children = e.children collect {
-        case childElm: ClarkNodes.Elem                 => childElm
-        case childText: ClarkNodes.Text                => childText
-        case childComment: ClarkNodes.Comment          => Comment(childComment.text)
-        case childPi: ClarkNodes.ProcessingInstruction => ProcessingInstruction(childPi.target, childPi.data)
-        case childEr: ClarkNodes.EntityRef             => EntityRef(childEr.entity)
+        case e: ClarkNodes.Elem                   => e
+        case t: ClarkNodes.Text                   => t
+        case c: ClarkNodes.Comment                => c
+        case pi: ClarkNodes.ProcessingInstruction => pi
+        case er: ClarkNodes.EntityRef             => er
       }
+
       // Recursion, with Node.apply and Elem.apply being mutually dependent
       val resolvedChildren = children map { node => Node.from(node) }
 

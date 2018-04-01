@@ -27,6 +27,7 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
@@ -785,12 +786,13 @@ object Elem {
    */
   def from(e: ScopedNodes.Elem): Elem = {
     val children = e.children collect {
-      case childElm: ScopedNodes.Elem                 => childElm
-      case childText: ScopedNodes.Text                => childText
-      case childComment: ScopedNodes.Comment          => childComment
-      case childPi: ScopedNodes.ProcessingInstruction => childPi
-      case childEr: ScopedNodes.EntityRef             => childEr
+      case e: ScopedNodes.Elem                   => e
+      case t: ScopedNodes.Text                   => t
+      case c: ScopedNodes.Comment                => c
+      case pi: ScopedNodes.ProcessingInstruction => pi
+      case er: ScopedNodes.EntityRef             => er
     }
+
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val simpleChildren = children map { node => Node.from(node) }
 
@@ -809,12 +811,13 @@ object Elem {
     require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
 
     val children = e.children collect {
-      case childElm: ClarkNodes.Elem                 => childElm
-      case childText: ClarkNodes.Text                => childText
-      case childComment: ClarkNodes.Comment          => childComment
-      case childPi: ClarkNodes.ProcessingInstruction => childPi
-      case childEr: ClarkNodes.EntityRef             => childEr
+      case e: ClarkNodes.Elem                   => e
+      case t: ClarkNodes.Text                   => t
+      case c: ClarkNodes.Comment                => c
+      case pi: ClarkNodes.ProcessingInstruction => pi
+      case er: ClarkNodes.EntityRef             => er
     }
+
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val simpleChildren = children map { node => Node.from(node, scope) }
 
@@ -962,17 +965,15 @@ object Node {
    * The scope must have no default namespace (so a created QName without prefix will have no namespace),
    * and it must find a prefix for the namespaces used in the EName.
    */
-  private[simple] def enameToQName(ename: EName, scope: Scope): QName = {
+  private[simple] def enameToQName(ename: EName, scope: Scope)(implicit qnameProvider: QNameProvider): QName = {
     assert(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
-
-    // TODO Use QNameProvider
 
     ename.namespaceUriOption match {
       case None =>
-        QName(ename.localPart)
+        qnameProvider.getUnprefixedQName(ename.localPart)
       case Some(ns) =>
         val prefix = scope.prefixForNamespace(ns, () => sys.error(s"No prefix found for namespace '$ns'"))
-        QName(prefix, ename.localPart)
+        qnameProvider.getQName(prefix, ename.localPart)
     }
   }
 }
