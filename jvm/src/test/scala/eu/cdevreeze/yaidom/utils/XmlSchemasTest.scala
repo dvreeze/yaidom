@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
+@deprecated(message = "XmlSchemas has been deprecated as well", since = "1.8.0")
 class XmlSchemasTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.utils")

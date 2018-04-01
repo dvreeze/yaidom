@@ -26,6 +26,7 @@ import eu.cdevreeze.yaidom.queryapi.BackingElemApi
  *
  * @author Chris de Vreeze
  */
+@deprecated(message = "Create or use a utility base on a 'yaidom XML dialect' for schemas instead, if needed", since = "1.8.0")
 object ENameProviderUtils {
 
   /**

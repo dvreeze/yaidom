@@ -22,10 +22,9 @@ import scala.reflect.classTag
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import AbstractSubtypeAwareElemLikeQueryTest._
@@ -34,6 +33,8 @@ import AbstractSubtypeAwareElemLikeQueryTest._
  * AbstractSubtypeAwareElemLike-based query test case, showing how to support custom XML dialects offering the
  * SubtypeAwareElemApi API, without depending on just one backing element implementation.
  *
+ * The backing element implementation is abstracted over by using the `BackingNodes.Elem` element abstraction.
+ *
  * This test case shows how yaidom can be used to support specific XML dialects in a reasonably type-safe manner,
  * while allowing for multiple backing element implementations.
  *
@@ -41,7 +42,7 @@ import AbstractSubtypeAwareElemLikeQueryTest._
  */
 abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
 
-  type E <: IndexedBridgeElem
+  protected val wrappedDocumentContent: BackingNodes.Elem
 
   test("testQueryTable") {
     val documentContent = new DocumentContent(wrappedDocumentContent)
@@ -73,7 +74,7 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
     }
 
     assertResult(documentContent.findAllElemsOrSelf.map(_.resolvedName)) {
-      eu.cdevreeze.yaidom.resolved.Elem.from(documentContent.bridgeElem.toElem).findAllElemsOrSelf.map(_.resolvedName)
+      eu.cdevreeze.yaidom.resolved.Elem.from(documentContent.backingElem).findAllElemsOrSelf.map(_.resolvedName)
     }
   }
 
@@ -91,8 +92,6 @@ abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
       }
     }
   }
-
-  protected val wrappedDocumentContent: E
 }
 
 object AbstractSubtypeAwareElemLikeQueryTest {
@@ -103,128 +102,55 @@ object AbstractSubtypeAwareElemLikeQueryTest {
   val TextNs = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 
   /**
-   * Bridge element that enables the `ScopedElemLike` API on the classes delegating to this bridge element.
-   *
-   * It offers pluggable DOM-like element implementations, without any "type gymnastics" and without paying any
-   * "cake pattern tax".
-   *
-   * Note that in yaidom, generics have been used extensively for composable pieces of the query API, in order to
-   * assemble these into concrete element implementations. Here we use abstract types, in order to make concrete element
-   * implementations pluggable as "XML back-ends". The goal is different, and so is the mechanism (abstract types
-   * instead of type parameters).
-   *
-   * This is a purely abstract universal trait, allowing for allocation-free value objects.
-   */
-  trait BridgeElem extends Any {
-
-    /**
-     * The backing element type, for example `indexed.Elem`
-     */
-    type BackingElem
-
-    /**
-     * The type of this bridge element itself
-     */
-    type SelfType <: BridgeElem
-
-    def backingElem: BackingElem
-
-    // Needed for the ScopedElemLike API
-
-    def findAllChildElems: immutable.IndexedSeq[SelfType]
-
-    def resolvedName: EName
-
-    def resolvedAttributes: immutable.Iterable[(EName, String)]
-
-    def qname: QName
-
-    def attributes: immutable.Iterable[(QName, String)]
-
-    def scope: Scope
-
-    def text: String
-
-    // Needed for the IsNavigable API
-
-    def findChildElemByPathEntry(entry: Path.Entry): Option[SelfType]
-
-    // Extra method
-
-    def toElem: eu.cdevreeze.yaidom.simple.Elem
-  }
-
-  /**
-   * Bridge element that adds support for "indexed elements".
-   *
-   * This is a purely abstract universal trait, allowing for allocation-free value objects.
-   */
-  trait IndexedBridgeElem extends Any with BridgeElem {
-
-    override type SelfType <: IndexedBridgeElem
-
-    /**
-     * The unwrapped backing element type, for example `simple.Elem`
-     */
-    type UnwrappedBackingElem <: ClarkElemApi.Aux[UnwrappedBackingElem]
-
-    def rootElem: UnwrappedBackingElem
-
-    def path: Path
-
-    def unwrappedBackingElem: UnwrappedBackingElem
-  }
-
-  /**
    * Super-class of elements in an ODS spreadsheet content.xml file. It offers the `SubtypeAwareElemApi` API, among
    * other query API traits.
    */
-  sealed class SpreadsheetElem(val bridgeElem: IndexedBridgeElem) extends ScopedElemLike with SubtypeAwareElemLike {
+  sealed class SpreadsheetElem(val backingElem: BackingNodes.Elem) extends ScopedElemLike with SubtypeAwareElemLike {
 
     type ThisElem = SpreadsheetElem
 
     def thisElem: ThisElem = this
 
     final def findAllChildElems: immutable.IndexedSeq[SpreadsheetElem] =
-      bridgeElem.findAllChildElems.map(e => SpreadsheetElem(e))
+      backingElem.findAllChildElems.map(e => SpreadsheetElem(e))
 
-    final def resolvedName: EName = bridgeElem.resolvedName
+    final def resolvedName: EName = backingElem.resolvedName
 
-    final def resolvedAttributes: immutable.Iterable[(EName, String)] = bridgeElem.resolvedAttributes
+    final def resolvedAttributes: immutable.Iterable[(EName, String)] = backingElem.resolvedAttributes
 
-    final def qname: QName = bridgeElem.qname
+    final def qname: QName = backingElem.qname
 
-    final def attributes: immutable.Iterable[(QName, String)] = bridgeElem.attributes
+    final def attributes: immutable.Iterable[(QName, String)] = backingElem.attributes
 
-    final def scope: Scope = bridgeElem.scope
+    final def scope: Scope = backingElem.scope
 
-    final def text: String = bridgeElem.text
+    final def text: String = backingElem.text
 
     final def reverseAncestryOrSelfENames: immutable.IndexedSeq[EName] = {
-      bridgeElem.rootElem.resolvedName +: bridgeElem.path.entries.map(_.elementName)
+      backingElem.rootElem.resolvedName +: backingElem.path.entries.map(_.elementName)
     }
 
     override def equals(other: Any): Boolean = other match {
-      case e: SpreadsheetElem => bridgeElem.backingElem == e.bridgeElem.backingElem
+      case e: SpreadsheetElem => backingElem == e.backingElem
       case _                  => false
     }
 
-    override def hashCode: Int = bridgeElem.backingElem.hashCode
+    override def hashCode: Int = backingElem.hashCode
   }
 
-  final class DocumentContent(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) {
+  final class DocumentContent(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) {
     require(resolvedName == EName(Some(OfficeNs), "document-content"))
   }
 
-  final class Body(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) {
+  final class Body(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) {
     require(resolvedName == EName(Some(OfficeNs), "body"))
   }
 
-  final class Spreadsheet(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) {
+  final class Spreadsheet(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) {
     require(resolvedName == EName(Some(OfficeNs), "spreadsheet"))
   }
 
-  final class Table(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
+  final class Table(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table"))
 
     def columns: immutable.IndexedSeq[TableColumn] = findAllChildElemsOfType(classTag[TableColumn])
@@ -232,23 +158,23 @@ object AbstractSubtypeAwareElemLikeQueryTest {
     def rows: immutable.IndexedSeq[TableRow] = findAllChildElemsOfType(classTag[TableRow])
   }
 
-  final class TableRow(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
+  final class TableRow(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table-row"))
 
     def cells: immutable.IndexedSeq[TableCell] = findAllChildElemsOfType(classTag[TableCell])
   }
 
-  final class TableColumn(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
+  final class TableColumn(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table-column"))
   }
 
-  final class TableCell(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
+  final class TableCell(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) with HasStyle {
     require(resolvedName == EName(Some(TableNs), "table-cell"))
 
     def cellText: String = findAllChildElemsOfType(classTag[Paragraph]).map(_.text).mkString
   }
 
-  final class Paragraph(bridgeElem: IndexedBridgeElem) extends SpreadsheetElem(bridgeElem) with HasStyle {
+  final class Paragraph(backingElem: BackingNodes.Elem) extends SpreadsheetElem(backingElem) with HasStyle {
     require(resolvedName == EName(Some(TextNs), "p"))
   }
 
@@ -259,7 +185,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
   object SpreadsheetElem {
 
-    def apply(elem: IndexedBridgeElem): SpreadsheetElem = {
+    def apply(elem: BackingNodes.Elem): SpreadsheetElem = {
       elem.resolvedName match {
         case EName(Some(OfficeNs), "document-content") =>
           new DocumentContent(elem)

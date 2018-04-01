@@ -31,6 +31,7 @@ import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
  *
  * @author Chris de Vreeze
  */
+@deprecated(message = "No longer needed when the deprecated ENameProviderUtils and QNameProviderUtils are no longer used", since = "1.8.0")
 private[utils] object XmlSchemas {
 
   private val scope = Scope.from("xs" -> "http://www.w3.org/2001/XMLSchema")

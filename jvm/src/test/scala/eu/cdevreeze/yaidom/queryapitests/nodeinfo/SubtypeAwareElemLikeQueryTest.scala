@@ -14,28 +14,35 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.indexed
+package eu.cdevreeze.yaidom.queryapitests.nodeinfo
+
+import java.io.File
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
+import net.sf.saxon.s9api.Processor
 
 /**
- * Query test case for an XML dialect using indexed elements.
+ * Query test case for an XML dialect using Saxon NodeInfo wrapper elements.
  *
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
-  protected val wrappedDocumentContent: BackingNodes.Elem = {
-    val docParser = DocumentParserUsingDom.newInstance
-    val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
-    val doc = docParser.parse(docUri)
+  private val processor = new Processor(false)
 
-    eu.cdevreeze.yaidom.indexed.Document(doc.withUriOption(Some(docUri))).documentElement
+  protected val wrappedDocumentContent: BackingNodes.Elem = {
+    val docBuilder = processor.newDocumentBuilder()
+
+    val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
+    val parseResult = docBuilder.build(new File(docUri))
+    val doc = SaxonDocument.wrapDocument(parseResult.getUnderlyingNode.getTreeInfo)
+
+    doc.documentElement
   }
 }

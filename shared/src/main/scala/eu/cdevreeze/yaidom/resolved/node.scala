@@ -175,6 +175,42 @@ final case class Elem(
     withChildren(newChildren)
   }
 
+  def filteringAttributes(p: (EName, String) => Boolean): Elem = {
+    withAttributes(resolvedAttributes filter { case (en, v) => p(en, v) })
+  }
+
+  /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
+  def withAttributes(newAttributes: Map[EName, String]): Elem = {
+    copy(resolvedAttributes = newAttributes)
+  }
+
+  /**
+   * Functionally adds or updates the given attribute.
+   */
+  def plusAttribute(attributeName: EName, attributeValue: String): Elem = {
+    withAttributes(resolvedAttributes + (attributeName -> attributeValue))
+  }
+
+  /**
+   * Functionally adds or updates the given attribute, if a value is given.
+   * That is, returns `if (attributeValueOption.isEmpty) thisElem else plusAttribute(attributeName, attributeValueOption.get)`.
+   */
+  def plusAttributeOption(attributeName: EName, attributeValueOption: Option[String]): Elem = {
+    if (attributeValueOption.isEmpty) thisElem else plusAttribute(attributeName, attributeValueOption.get)
+  }
+
+  def filteringChildren(p: Node => Boolean): Elem = {
+    withChildren(children.filter(p))
+  }
+
+  /**
+   * Functionally removes the given attribute, if present.
+   */
+  def minusAttribute(attributeName: EName): Elem = {
+    val newAttributes = thisElem.resolvedAttributes - attributeName
+    withAttributes(newAttributes)
+  }
+
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
 

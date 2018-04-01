@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.indexed
+package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
 /**
- * Query test case for an XML dialect using indexed elements.
+ * Query test case for an XML dialect using indexed elements over Scala XML wrappers.
  *
  * @author Chris de Vreeze
  */
@@ -35,7 +37,8 @@ class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTes
     val docParser = DocumentParserUsingDom.newInstance
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = docParser.parse(docUri)
+    val scalaXmlElem = ScalaXmlElem(ScalaXmlConversions.convertElem(doc.documentElement))
 
-    eu.cdevreeze.yaidom.indexed.Document(doc.withUriOption(Some(docUri))).documentElement
+    eu.cdevreeze.yaidom.indexed.IndexedScopedNode.Elem(docUri, scalaXmlElem)
   }
 }

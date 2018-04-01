@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * Several utilities, such as custom ENameProviders and QNameProviders. They are utilities "on top of yaidom", so the rest
+ * Several utilities, such as NamespaceUtils. They are utilities "on top of yaidom", so the rest
  * of yaidom has no dependencies on this package, but this package does depend on the rest of yaidom.
  *
  * @author Chris de Vreeze
