@@ -43,6 +43,8 @@ object ScopedNodes {
   trait Elem extends CanBeDocumentChild with ClarkNodes.Elem with ScopedElemApi with HasChildNodesApi {
 
     type ThisElem <: Elem
+
+    type ThisNode >: ThisElem <: Node
   }
 
   /**

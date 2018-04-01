@@ -42,6 +42,8 @@ object ClarkNodes {
   trait Elem extends CanBeDocumentChild with Nodes.Elem with ClarkElemApi with HasChildNodesApi {
 
     type ThisElem <: Elem
+
+    type ThisNode >: ThisElem <: Node
   }
 
   /**

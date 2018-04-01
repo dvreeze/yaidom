@@ -49,6 +49,8 @@ object BackingNodes {
   trait Elem extends CanBeDocumentChild with ScopedNodes.Elem with BackingElemApi with HasChildNodesApi {
 
     type ThisElem <: Elem
+
+    type ThisNode >: ThisElem <: Node
   }
 
   /**
