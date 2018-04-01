@@ -3,6 +3,51 @@ CHANGELOG
 =========
 
 
+1.8.0-M4
+========
+
+Milestone 4 of yaidom 1.8.0 brings yaidom even closer to its "hour glass" vision. The abstract query API
+mainly exposes 3 query API "flavors", and all element implementations fall in one of these 3 categories.
+One of these flavors is ``BackingNodes.Elem``, and it is the abstraction used for backing elements in
+yaidom XML dialect support. Implementations of this query API are indexed elements and Saxon wrapper elements.
+
+The main changes in version 1.8.0-M4 (compared with milestone 3) are:
+
+* Replaced ``BackingElemNodeApi`` by ``BackingNodes.Elem`` etc.
+
+  * The 3 main query API abstractions to be used by element implementations are ``BackingNodes.Elem``, ``ScopedNodes.Elem`` and ``ClarkNodes.Elem``
+  * "Backing" elements inherit from "scoped" elements, who inherit from "Clark" elements
+  * Each element implementation now directly inherits from one of these 3 abstractions
+  * Element implementations that extend ``BackingNodes.Elem`` must extend the other ``BackingNodes`` node types for non-element nodes, etc.
+  * These 3 new main abstractions give clarity to yaidom users, but also make conversions like the ones below feasible
+  * Direct ``ClarkNodes.Elem`` implementations include "resolved" elements; they know about ENames but not about QNames
+  * Direct ``ScopedNodes.Elem`` implementations include "simple" elements; they know about QNames but not about their ancestor nodes
+  * ``BackingNodes.Elem`` implementations include Saxon wrappers and native indexed elements; they know about ancestor nodes, base URI etc.
+  * The abstraction used by yaidom XML dialects (e.g. in the TQA project) is ``BackingNodes.Elem``
+
+* Improved more general conversions to simple and resolved elements
+
+  * Any ``ScopedNodes.Elem`` can be converted to a simple element
+  * Any ``ClarkNodes.Elem`` can be converted to a simple element, given a Scope without default namespace
+  * Any ``ClarkNodes.Elem`` can be converted to a resolved element
+  * These conversion methods are all called ``from`` (and the ``apply`` conversion method for resolved elements has been deprecated)
+  * Note how these conversions do not complicate dependencies among packages, since these conversions only depend on the queryapi package
+  * This improved element conversion story is useful for the TQA project in its support for programmatic taxonomy creation
+
+* Improved element creation
+
+  * Yaidom resolved elements are not only useful for equality tests, but also for ad-hoc element creation
+  * After all, while creating resolved elements tree, one does not have to worry about namespace prefixes
+  * Resolved elements now also have some methods for adding/deleting/filtering attributes
+  * The resolved Node companion object now extends the new trait ``ElemCreationApi``
+  * See above for how resolved elements can easily be converted to simple elements, provided we have a suitable Scope
+  * A new ``utils.ClarkNode.Elem`` class has been added; as opposed to resolved nodes, it knows about other nodes than elements and text
+  * This improved element creation story is useful for the TQA project in its support for programmatic taxonomy creation
+
+* Deprecated some code, mainly in the ``utils`` package
+* Added ``Scope`` methods ``makeInvertible`` and ``resolveQName``
+
+
 1.8.0-M3
 ========
 
