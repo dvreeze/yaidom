@@ -47,80 +47,21 @@ class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
 
   import XmlCreationTest._
 
-  private val year = 2017
+  test("testCreateTimesheetXmlFor2017") {
+    val timesheetAfterFirstPass: Timesheet =
+      getTimesheetAfterFirstPass(
+        LocalDate.of(2017, 1, 1),
+        LocalDate.of(2017, 12, 31),
+        dutchHolidays2017,
+        onVacation2017,
+        sickLeaveDays2017,
+        defaultTasksPerDay2017)
 
-  test("testCreateXml") {
-    val dates = getDatesReversed(Nil, year).reverse.toIndexedSeq
-
-    val nonWeekendDays = dates.filter(d => !isWeekend(d))
-
-    import resolved.Node._
-
-    val emptyTimesheetElem: resolved.Elem =
-      emptyElem(EName("timesheet"))
-        .plusChildren(
-          nonWeekendDays.map { day =>
-            emptyElem(EName("day"))
-              .plusAttribute(EName("date"), day.toString)
-              .plusAttribute(EName("dayOfWeek"), day.getDayOfWeek.toString)
-          })
-
-    val rawTimesheetElem = emptyTimesheetElem transformChildElems {
-      case elm if elm.localName == "day" =>
-        val day = TimesheetElem(indexed.Elem(simple.Elem.from(elm, Scope.Empty))).asInstanceOf[Day]
-
-        require(!isWeekend(day.date), s"Saturday or Sunday: ${day.date}")
-
-        if (isDutchHoliday(day.date)) {
-          addTask(elm, "official-holiday", 8)
-        } else if (onVacation(day.date)) {
-          addTask(elm, "vacation", 8)
-        } else if (onSickLeave(day.date)) {
-          addTask(elm, "sick", 8)
-        } else if (mayBeWorkingOnValidator(day.date)) {
-          addTask(elm, "XBRL-validator", 8)
-        } else {
-          elm
-        }
-      case elm =>
-        elm
-    }
-
-    val timesheetElem =
-      removeTasksWithoutHours(
-        rawTimesheetElem transformChildElems {
-          case elm if elm.localName == "day" =>
-            val day = TimesheetElem(indexed.Elem(simple.Elem.from(elm, Scope.Empty))).asInstanceOf[Day]
-
-            require(!isWeekend(day.date), s"Saturday or Sunday: ${day.date}")
-
-            if (isBlockchainTrainingDay(day.date)) {
-              tryToAddTaskWithoutChangingTotalHours(elm, "blockchain-training", 8)
-            } else if (isBlockchainPreparationDay(day.date)) {
-              tryToAddTaskWithoutChangingTotalHours(elm, "blockchain-preparation", 8)
-            } else if (day.date == LocalDate.of(year, 2, 8)) {
-              tryToAddTaskWithoutChangingTotalHours(elm, "blockchain-meeting", 3)
-            } else if (isBlockchainEvent(day.date)) {
-              tryToAddTaskWithoutChangingTotalHours(elm, "blockchain-event", 8)
-            } else if (teamDataHours.contains(day.date)) {
-              tryToAddTaskWithoutChangingTotalHours(elm, "team-data", teamDataHours(day.date))
-            } else {
-              elm
-            }
-          case elm =>
-            elm
-        })
+    val timesheet =
+      refineTimesheet(timesheetAfterFirstPass, refinementsPerDay2017)
 
     assertResult(true) {
-      timesheetElem.filterElems(_.localName == "day").size >= 250
-    }
-
-    val timesheetSimpleElem = simple.Elem.from(timesheetElem, Scope.Empty)
-
-    val timesheet = Timesheet(indexed.Elem(timesheetSimpleElem))
-
-    assertResult(resolved.Elem.from(timesheetElem)) {
-      resolved.Elem.from(timesheet)
+      timesheet.days.size >= 250
     }
 
     assertResult(true) {
@@ -130,163 +71,10 @@ class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
 
     val docPrinter = DocumentPrinterUsingDom.newInstance()
 
+    val timesheetSimpleElem = simple.Elem.from(timesheet)
+
     val xmlString = docPrinter.print(simple.Document(timesheetSimpleElem.prettify(2)))
     println(xmlString)
-  }
-
-  private def getDatesReversed(accDates: List[LocalDate], year: Int): List[LocalDate] = {
-    if (accDates.isEmpty) {
-      getDatesReversed(List(LocalDate.of(year, 1, 1)), year)
-    } else {
-      val nextDay = accDates.head.plusDays(1)
-
-      if (nextDay.getYear == year) getDatesReversed(nextDay :: accDates, year) else accDates
-    }
-  }
-
-  private def isWeekend(date: LocalDate): Boolean = {
-    (date.getDayOfWeek == DayOfWeek.SATURDAY) || (date.getDayOfWeek == DayOfWeek.SUNDAY)
-  }
-
-  // Specific dates
-
-  // TODO Check with agenda (e.g. recurring meetings) and commits in Github
-
-  private def onLeave(date: LocalDate): Boolean = {
-    !isWeekend(date) && (isDutchHoliday(date) || onVacation(date) || onSickLeave(date))
-  }
-
-  private def isDutchHoliday(date: LocalDate): Boolean = {
-    Set(
-      LocalDate.of(year, 1, 1),
-      LocalDate.of(year, 4, 16),
-      LocalDate.of(year, 4, 17),
-      LocalDate.of(year, 4, 27),
-      LocalDate.of(year, 5, 5),
-      LocalDate.of(year, 5, 25),
-      LocalDate.of(year, 6, 4),
-      LocalDate.of(year, 6, 5),
-      LocalDate.of(year, 12, 25),
-      LocalDate.of(year, 12, 26)).contains(date)
-  }
-
-  private def onVacation(date: LocalDate): Boolean = {
-    (date == LocalDate.of(year, 3, 3)) ||
-      (date == LocalDate.of(year, 5, 26)) ||
-      (date == LocalDate.of(year, 6, 2)) ||
-      (date.isAfter(LocalDate.of(year, 7, 20)) && date.isBefore(LocalDate.of(year, 8, 12))) ||
-      (date.isAfter(LocalDate.of(year, 12, 21)) && date.getYear == year)
-  }
-
-  private def onSickLeave(date: LocalDate): Boolean = {
-    date == LocalDate.of(year, 8, 21)
-  }
-
-  private def mayBeWorkingOnValidator(date: LocalDate): Boolean = {
-    date.getYear == year
-  }
-
-  private def isBlockchainTrainingDay(date: LocalDate): Boolean = {
-    (date == LocalDate.of(year, 1, 12)) || (date == LocalDate.of(year, 1, 13))
-  }
-
-  private def isBlockchainPreparationDay(date: LocalDate): Boolean = {
-    (date == LocalDate.of(year, 1, 26)) || (date == LocalDate.of(year, 2, 1))
-  }
-
-  private def isBlockchainEvent(date: LocalDate): Boolean = {
-    date.isAfter(LocalDate.of(year, 2, 8)) && date.isBefore(LocalDate.of(year, 2, 14))
-  }
-
-  private val teamDataHours: Map[LocalDate, Int] =
-    Map(
-      LocalDate.of(year, 4, 14) -> 8,
-      LocalDate.of(year, 4, 18) -> 6,
-      LocalDate.of(year, 5, 2) -> 8,
-      LocalDate.of(year, 5, 10) -> 5,
-      LocalDate.of(year, 5, 12) -> 6,
-      LocalDate.of(year, 5, 16) -> 8,
-      LocalDate.of(year, 5, 17) -> 5,
-      LocalDate.of(year, 5, 24) -> 5,
-      LocalDate.of(year, 6, 12) -> 3,
-      LocalDate.of(year, 6, 14) -> 5,
-      LocalDate.of(year, 8, 23) -> 6,
-      LocalDate.of(year, 10, 3) -> 8)
-
-  // Adding and updating tasks
-
-  private def addTask(dayElem: resolved.Elem, taskName: String, hours: Int): resolved.Elem = {
-    assert(dayElem.localName == "day")
-
-    dayElem
-      .plusChild(
-        resolved.Node.emptyElem(EName("task"), Map(EName("name") -> taskName, EName("hours") -> hours.toString)))
-  }
-
-  private def tryToSubtractHoursFromTask(dayElem: resolved.Elem, taskName: String, hours: Int): Option[resolved.Elem] = {
-    assert(dayElem.localName == "day")
-
-    val day = TimesheetElem(indexed.Elem(simple.Elem.from(dayElem, Scope.Empty))).asInstanceOf[Day]
-
-    val taskIndex: Int =
-      day.tasks.zipWithIndex.find(kv => kv._1.taskName == taskName && kv._1.hours >= hours).map(_._2).getOrElse(-1)
-
-    if (taskIndex < 0) {
-      None
-    } else {
-      val pathEntry = Path.Entry(EName("task"), taskIndex)
-      val prevTaskValue = day.tasks(taskIndex).ensuring(_.taskName == taskName)
-
-      val result =
-        dayElem.updateChildElem(pathEntry) { taskElm =>
-          taskElm
-            .plusAttribute(EName("hours"), (prevTaskValue.hours.ensuring(_ >= hours) - hours).toString)
-        }
-
-      Some(result)
-    }
-  }
-
-  private def tryToAddTaskWithoutChangingTotalHours(
-    dayElem:  resolved.Elem,
-    taskName: String,
-    hours:    Int): resolved.Elem = {
-
-    assert(dayElem.localName == "day")
-
-    val day = TimesheetElem(indexed.Elem(simple.Elem.from(dayElem, Scope.Empty))).asInstanceOf[Day]
-
-    require(!onLeave(day.date), s"Cannot add task (on ${day.date} the employee is on leave)")
-
-    val longestTaskOption: Option[Task] = day.tasks.sortBy(_.hours).reverse.headOption
-
-    if (longestTaskOption.isEmpty) {
-      dayElem
-    } else if (longestTaskOption.get.hours < hours) {
-      dayElem
-    } else {
-      val longestTask = longestTaskOption.get
-
-      val tempResultOption: Option[resolved.Elem] =
-        tryToSubtractHoursFromTask(dayElem, longestTask.taskName, hours)
-
-      tempResultOption.map(d => addTask(d, taskName, hours)).getOrElse(dayElem)
-    } ensuring { newDayElm =>
-      val newDay = TimesheetElem(indexed.Elem(simple.Elem.from(newDayElm, Scope.Empty))).asInstanceOf[Day]
-
-      newDay.tasks.map(_.hours).sum == day.tasks.map(_.hours).sum
-    }
-  }
-
-  private def removeTasksWithoutHours(timesheetElem: resolved.Elem): resolved.Elem = {
-    assert(timesheetElem.localName == "timesheet")
-
-    timesheetElem transformElemsToNodeSeq {
-      case e if e.localName == "task" && e.attribute(EName("hours")).toInt == 0 =>
-        Vector()
-      case e =>
-        Vector(e)
-    }
   }
 }
 
@@ -381,5 +169,283 @@ object XmlCreationTest {
     def apply(backingElem: BackingNodes.Elem): Timesheet = {
       TimesheetElem(backingElem.ensuring(_.localName == "timesheet")).asInstanceOf[Timesheet]
     }
+  }
+
+  // Timesheet manipulation
+
+  val OfficialHoliday = "official-holiday"
+  val Vacation = "vacation"
+  val Sick = "sick"
+
+  private def isWeekend(date: LocalDate): Boolean = {
+    (date.getDayOfWeek == DayOfWeek.SATURDAY) || (date.getDayOfWeek == DayOfWeek.SUNDAY)
+  }
+
+  private def getTimesheetAfterFirstPass(
+    startDate:          LocalDate,
+    endDate:            LocalDate,
+    officialHolidays:   Set[LocalDate],
+    vacationDays:       Set[LocalDate],
+    sickLeaveDays:      Set[LocalDate],
+    defaultTasksPerDay: Map[LocalDate, Map[String, Int]]): Timesheet = {
+
+    require(startDate.isBefore(endDate), s"$startDate not before $endDate")
+
+    val allDates = getPeriodAsLocalDateSeq(startDate, endDate)
+
+    require(
+      officialHolidays.union(vacationDays).union(sickLeaveDays).union(defaultTasksPerDay.keySet).subsetOf(allDates.toSet),
+      s"Not all used dates fit in the period from $startDate to $endDate")
+
+    val nonWeekendDays = allDates.filter(d => !isWeekend(d))
+
+    import resolved.Node._
+
+    val emptyTimesheetElem: resolved.Elem =
+      emptyElem(EName("timesheet"))
+        .plusChildren(
+          nonWeekendDays.map { day =>
+            emptyElem(EName("day"))
+              .plusAttribute(EName("date"), day.toString)
+              .plusAttribute(EName("dayOfWeek"), day.getDayOfWeek.toString)
+          })
+
+    val timesheetElem = emptyTimesheetElem transformChildElems {
+      case elm if elm.localName == "day" =>
+        val day = TimesheetElem(indexed.Elem(simple.Elem.from(elm, Scope.Empty))).asInstanceOf[Day]
+
+        require(!isWeekend(day.date), s"Saturday or Sunday: ${day.date}")
+
+        if (officialHolidays.contains(day.date)) {
+          addTask(elm, OfficialHoliday, 8)
+        } else if (vacationDays.contains(day.date)) {
+          addTask(elm, Vacation, 8)
+        } else if (sickLeaveDays.contains(day.date)) {
+          addTask(elm, Sick, 8)
+        } else if (defaultTasksPerDay.contains(day.date)) {
+          defaultTasksPerDay(day.date).foldLeft(elm) {
+            case (accDayElm, (taskName, hours)) =>
+              addTask(accDayElm, taskName, hours)
+          }
+        } else {
+          elm
+        }
+      case elm =>
+        elm
+    }
+
+    val timesheet = Timesheet(indexed.Elem(simple.Elem.from(timesheetElem, Scope.Empty)))
+    timesheet
+  }
+
+  private def refineTimesheet(
+    prevTimesheet:      Timesheet,
+    refinedTasksPerDay: Map[LocalDate, Map[String, Int]]): Timesheet = {
+
+    require(
+      refinedTasksPerDay.keySet.subsetOf(prevTimesheet.days.map(_.date).toSet),
+      s"Not all used dates fit in the period of the given timesheet")
+
+    val pathsPerDate: Map[LocalDate, Path] = {
+      prevTimesheet.days.map(d => d.date -> d.backingElem.path).toMap
+    }
+
+    val paths: Set[Path] = pathsPerDate.filterKeys(refinedTasksPerDay.keySet).values.toSet
+
+    val rawResultTimesheetElem =
+      resolved.Elem.from(prevTimesheet).updateElems(paths) {
+        case (elm, path) =>
+          assert(elm.localName == "day")
+
+          val date = LocalDate.parse(elm.attribute(EName("date")))
+          assert(refinedTasksPerDay.contains(date))
+
+          val taskHours: Map[String, Int] = refinedTasksPerDay(date)
+
+          taskHours.foldLeft(elm) {
+            case (accDayElm, (taskName, hours)) =>
+              tryToAddTaskWithoutChangingTotalHours(accDayElm, taskName, hours)
+          }
+      }
+
+    val resultTimesheetElem = removeTasksWithoutHours(rawResultTimesheetElem)
+
+    val resultTimesheet = Timesheet(indexed.Elem(simple.Elem.from(resultTimesheetElem, Scope.Empty)))
+    resultTimesheet
+  }
+
+  private def onLeave(day: Day): Boolean = {
+    !isWeekend(day.date) &&
+      ((day.tasks.exists(_.taskName == OfficialHoliday)) ||
+        (day.tasks.exists(_.taskName == Vacation)) ||
+        (day.tasks.exists(_.taskName == Sick)))
+  }
+
+  // Adding and updating tasks
+
+  private def addTask(dayElem: resolved.Elem, taskName: String, hours: Int): resolved.Elem = {
+    assert(dayElem.localName == "day")
+
+    dayElem
+      .plusChild(
+        resolved.Node.emptyElem(EName("task"), Map(EName("name") -> taskName, EName("hours") -> hours.toString)))
+  }
+
+  private def tryToSubtractHoursFromTask(dayElem: resolved.Elem, taskName: String, hours: Int): Option[resolved.Elem] = {
+    assert(dayElem.localName == "day")
+
+    val day = TimesheetElem(indexed.Elem(simple.Elem.from(dayElem, Scope.Empty))).asInstanceOf[Day]
+
+    val taskIndex: Int =
+      day.tasks.zipWithIndex.find(kv => kv._1.taskName == taskName && kv._1.hours >= hours).map(_._2).getOrElse(-1)
+
+    if (taskIndex < 0) {
+      None
+    } else {
+      val pathEntry = Path.Entry(EName("task"), taskIndex)
+      val prevTaskValue = day.tasks(taskIndex).ensuring(_.taskName == taskName)
+
+      val result =
+        dayElem.updateChildElem(pathEntry) { taskElm =>
+          taskElm
+            .plusAttribute(EName("hours"), (prevTaskValue.hours.ensuring(_ >= hours) - hours).toString)
+        }
+
+      Some(result)
+    }
+  }
+
+  private def tryToAddTaskWithoutChangingTotalHours(
+    dayElem:  resolved.Elem,
+    taskName: String,
+    hours:    Int): resolved.Elem = {
+
+    assert(dayElem.localName == "day")
+
+    val day = TimesheetElem(indexed.Elem(simple.Elem.from(dayElem, Scope.Empty))).asInstanceOf[Day]
+
+    require(!onLeave(day), s"Cannot add task (on ${day.date} the employee is on leave)")
+
+    val longestTaskOption: Option[Task] = day.tasks.sortBy(_.hours).reverse.headOption
+
+    if (longestTaskOption.isEmpty) {
+      dayElem
+    } else if (longestTaskOption.get.hours < hours) {
+      dayElem
+    } else {
+      val longestTask = longestTaskOption.get
+
+      val tempResultOption: Option[resolved.Elem] =
+        tryToSubtractHoursFromTask(dayElem, longestTask.taskName, hours)
+
+      tempResultOption.map(d => addTask(d, taskName, hours)).getOrElse(dayElem)
+    } ensuring { newDayElm =>
+      val newDay = TimesheetElem(indexed.Elem(simple.Elem.from(newDayElm, Scope.Empty))).asInstanceOf[Day]
+
+      newDay.tasks.map(_.hours).sum == day.tasks.map(_.hours).sum
+    }
+  }
+
+  private def removeTasksWithoutHours(timesheetElem: resolved.Elem): resolved.Elem = {
+    assert(timesheetElem.localName == "timesheet")
+
+    timesheetElem transformElemsToNodeSeq {
+      case e if e.localName == "task" && e.attribute(EName("hours")).toInt == 0 =>
+        Vector()
+      case e =>
+        Vector(e)
+    }
+  }
+
+  def getPeriodAsLocalDateSeq(startDate: LocalDate, endDate: LocalDate): immutable.IndexedSeq[LocalDate] = {
+    require(startDate.isBefore(endDate), s"$startDate not before $endDate")
+
+    Stream.from(0).map(i => startDate.plusDays(i)).takeWhile(d => !d.isAfter(endDate)).toIndexedSeq
+  }
+
+  def getYearAsPeriodAsLocalDateSeq(year: Int): immutable.IndexedSeq[LocalDate] = {
+    getPeriodAsLocalDateSeq(LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31))
+  }
+
+  // Timesheet data 2017
+
+  // Pass 1
+
+  private val dutchHolidays2017: Set[LocalDate] = {
+    Set(
+      LocalDate.of(2017, 1, 1),
+      LocalDate.of(2017, 4, 16),
+      LocalDate.of(2017, 4, 17),
+      LocalDate.of(2017, 4, 27),
+      LocalDate.of(2017, 5, 5),
+      LocalDate.of(2017, 5, 25),
+      LocalDate.of(2017, 6, 4),
+      LocalDate.of(2017, 6, 5),
+      LocalDate.of(2017, 12, 25),
+      LocalDate.of(2017, 12, 26))
+  }
+
+  private val onVacation2017: Set[LocalDate] = {
+    Set(LocalDate.of(2017, 3, 3), LocalDate.of(2017, 5, 26), LocalDate.of(2017, 6, 2))
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2017, 7, 21), LocalDate.of(2017, 8, 11)).toSet)
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2017, 12, 22), LocalDate.of(2017, 12, 31)).toSet)
+  }
+
+  private val sickLeaveDays2017: Set[LocalDate] = {
+    Set(LocalDate.of(2017, 8, 21))
+  }
+
+  private val defaultTasksPerDay2017: Map[LocalDate, Map[String, Int]] = {
+    getYearAsPeriodAsLocalDateSeq(2017)
+      .map(d => d -> Map("XBRL-validator" -> 8))
+      .toMap
+  }
+
+  // Pass 2
+
+  // TODO Check with agenda (e.g. recurring meetings) and commits in Github
+
+  private val refinementsPerDay2017: Map[LocalDate, Map[String, Int]] = {
+    Map(
+      LocalDate.of(2017, 1, 12) ->
+        Map("blockchain-training" -> 8),
+      LocalDate.of(2017, 1, 13) ->
+        Map("blockchain-training" -> 8),
+      LocalDate.of(2017, 1, 26) ->
+        Map("blockchain-preparation" -> 8),
+      LocalDate.of(2017, 2, 1) ->
+        Map("blockchain-preparation" -> 8),
+      LocalDate.of(2017, 2, 8) ->
+        Map("blockchain-meeting" -> 3),
+      LocalDate.of(2017, 2, 9) ->
+        Map("blockchain-event" -> 8),
+      LocalDate.of(2017, 2, 10) ->
+        Map("blockchain-event" -> 8),
+      LocalDate.of(2017, 2, 13) ->
+        Map("blockchain-event" -> 8),
+      LocalDate.of(2017, 4, 14) ->
+        Map("team-data" -> 8),
+      LocalDate.of(2017, 4, 18) ->
+        Map("team-data" -> 6),
+      LocalDate.of(2017, 5, 2) ->
+        Map("team-data" -> 8),
+      LocalDate.of(2017, 5, 10) ->
+        Map("team-data" -> 5),
+      LocalDate.of(2017, 5, 12) ->
+        Map("team-data" -> 6),
+      LocalDate.of(2017, 5, 16) ->
+        Map("team-data" -> 8),
+      LocalDate.of(2017, 5, 17) ->
+        Map("team-data" -> 5),
+      LocalDate.of(2017, 5, 24) ->
+        Map("team-data" -> 5),
+      LocalDate.of(2017, 6, 12) ->
+        Map("team-data" -> 3),
+      LocalDate.of(2017, 6, 14) ->
+        Map("team-data" -> 5),
+      LocalDate.of(2017, 8, 23) ->
+        Map("team-data" -> 6),
+      LocalDate.of(2017, 10, 3) ->
+        Map("team-data" -> 8))
   }
 }
