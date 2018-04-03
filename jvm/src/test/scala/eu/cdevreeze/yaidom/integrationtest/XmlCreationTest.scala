@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.time.DayOfWeek
+import java.time.Month
 import java.time.LocalDate
 
 import scala.collection.immutable
@@ -28,12 +29,15 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
-import eu.cdevreeze.yaidom.queryapi._
+import eu.cdevreeze.yaidom.queryapi.BackingNodes
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
+import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 
@@ -67,6 +71,13 @@ class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
     assertResult(true) {
       timesheet.days.count(_.dayOfWeek == DayOfWeek.MONDAY) >= 35 &&
         timesheet.days.count(_.dayOfWeek == DayOfWeek.MONDAY) < 70
+    }
+
+    assertResult(24) {
+      timesheet.allTasks.filter(_.taskName == "blockchain-event").map(_.hours).sum
+    }
+    assertResult(Set(Month.FEBRUARY)) {
+      timesheet.allTasks.filter(_.taskName == "blockchain-event").map(_.date.getMonth).toSet
     }
 
     val docPrinter = DocumentPrinterUsingDom.newInstance()
