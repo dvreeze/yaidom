@@ -74,10 +74,14 @@ class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
     }
 
     assertResult(24) {
-      timesheet.allTasks.filter(_.taskName == "blockchain-event").map(_.hours).sum
+      timesheet.allTasks.filter(_.taskName == "blockchain-hackathon").map(_.hours).sum
     }
     assertResult(Set(Month.FEBRUARY)) {
-      timesheet.allTasks.filter(_.taskName == "blockchain-event").map(_.date.getMonth).toSet
+      timesheet.allTasks.filter(_.taskName == "blockchain-hackathon").map(_.date.getMonth).toSet
+    }
+
+    assertResult(Set(8)) {
+      timesheet.days.map(_.totalHours).toSet
     }
 
     val docPrinter = DocumentPrinterUsingDom.newInstance()
@@ -188,6 +192,8 @@ object XmlCreationTest {
   val Vacation = "vacation"
   val Sick = "sick"
 
+  // Weekends are considered free time here!
+
   private def isWeekend(date: LocalDate): Boolean = {
     (date.getDayOfWeek == DayOfWeek.SATURDAY) || (date.getDayOfWeek == DayOfWeek.SUNDAY)
   }
@@ -206,7 +212,7 @@ object XmlCreationTest {
 
     require(
       officialHolidays.union(vacationDays).union(sickLeaveDays).union(defaultTasksPerDay.keySet).subsetOf(allDates.toSet),
-      s"Not all used dates fit in the period from $startDate to $endDate")
+      s"Not all used dates (in the first pass) fit in the period from $startDate to $endDate (maybe weekend?)")
 
     val nonWeekendDays = allDates.filter(d => !isWeekend(d))
 
@@ -247,6 +253,7 @@ object XmlCreationTest {
 
     val timesheet = Timesheet(indexed.Elem(simple.Elem.from(timesheetElem, Scope.Empty)))
     timesheet
+      .ensuring(_.days.map(_.date).toSet == nonWeekendDays.toSet, s"Not all days filled from $startDate to $endDate")
   }
 
   private def refineTimesheet(
@@ -255,7 +262,7 @@ object XmlCreationTest {
 
     require(
       refinedTasksPerDay.keySet.subsetOf(prevTimesheet.days.map(_.date).toSet),
-      s"Not all used dates fit in the period of the given timesheet")
+      s"Not all used dates (in the second pass or later) fit in the period of the given timesheet (maybe weekend?)")
 
     val pathsPerDate: Map[LocalDate, Path] = {
       prevTimesheet.days.map(d => d.date -> d.backingElem.path).toMap
@@ -418,45 +425,72 @@ object XmlCreationTest {
 
   private val refinementsPerDay2017: Map[LocalDate, Map[String, Int]] = {
     Map(
-      LocalDate.of(2017, 1, 12) ->
-        Map("blockchain-training" -> 8),
-      LocalDate.of(2017, 1, 13) ->
-        Map("blockchain-training" -> 8),
-      LocalDate.of(2017, 1, 26) ->
-        Map("blockchain-preparation" -> 8),
-      LocalDate.of(2017, 2, 1) ->
-        Map("blockchain-preparation" -> 8),
-      LocalDate.of(2017, 2, 8) ->
-        Map("blockchain-meeting" -> 3),
-      LocalDate.of(2017, 2, 9) ->
-        Map("blockchain-event" -> 8),
-      LocalDate.of(2017, 2, 10) ->
-        Map("blockchain-event" -> 8),
-      LocalDate.of(2017, 2, 13) ->
-        Map("blockchain-event" -> 8),
-      LocalDate.of(2017, 4, 14) ->
-        Map("team-data" -> 8),
-      LocalDate.of(2017, 4, 18) ->
-        Map("team-data" -> 6),
-      LocalDate.of(2017, 5, 2) ->
-        Map("team-data" -> 8),
-      LocalDate.of(2017, 5, 10) ->
-        Map("team-data" -> 5),
-      LocalDate.of(2017, 5, 12) ->
-        Map("team-data" -> 6),
-      LocalDate.of(2017, 5, 16) ->
-        Map("team-data" -> 8),
-      LocalDate.of(2017, 5, 17) ->
-        Map("team-data" -> 5),
-      LocalDate.of(2017, 5, 24) ->
-        Map("team-data" -> 5),
-      LocalDate.of(2017, 6, 12) ->
-        Map("team-data" -> 3),
-      LocalDate.of(2017, 6, 14) ->
-        Map("team-data" -> 5),
-      LocalDate.of(2017, 8, 23) ->
-        Map("team-data" -> 6),
-      LocalDate.of(2017, 10, 3) ->
-        Map("team-data" -> 8))
-  }
+      LocalDate.of(2017, 1, 3) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 1, 4) -> Map("blockchain-preparation" -> 1),
+      LocalDate.of(2017, 1, 12) -> Map("blockchain-training" -> 8),
+      LocalDate.of(2017, 1, 13) -> Map("blockchain-training" -> 8),
+      LocalDate.of(2017, 1, 17) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 1, 20) -> Map("performance-review" -> 1),
+      LocalDate.of(2017, 1, 26) -> Map("blockchain-preparation" -> 8),
+      LocalDate.of(2017, 1, 30) -> Map("training-sharepoint" -> 1),
+      LocalDate.of(2017, 1, 31) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 2, 1) -> Map("blockchain-preparation" -> 8),
+      LocalDate.of(2017, 2, 3) -> Map("blockchain-preparation" -> 1),
+      LocalDate.of(2017, 2, 8) -> Map("blockchain-preparation" -> 4),
+      LocalDate.of(2017, 2, 9) -> Map("blockchain-hackathon" -> 8),
+      LocalDate.of(2017, 2, 10) -> Map("blockchain-hackathon" -> 8),
+      LocalDate.of(2017, 2, 13) -> Map("blockchain-hackathon" -> 8),
+      LocalDate.of(2017, 2, 14) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 2, 20) -> Map("HR" -> 1, "new-year" -> 3),
+      LocalDate.of(2017, 2, 24) -> Map("brainstorm-session" -> 1),
+      LocalDate.of(2017, 2, 28) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 3, 14) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 3, 17) -> Map("interview-applicant" -> 2),
+      LocalDate.of(2017, 3, 24) -> Map("bila" -> 1),
+      LocalDate.of(2017, 3, 28) -> Map("sprint-demo" -> 4, "interview-applicant" -> 2),
+      LocalDate.of(2017, 4, 11) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 4, 14) -> Map("team-data" -> 8),
+      LocalDate.of(2017, 4, 18) -> Map("team-data" -> 6),
+      LocalDate.of(2017, 4, 25) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 5, 2) -> Map("team-data" -> 8),
+      LocalDate.of(2017, 5, 9) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 5, 10) -> Map("team-data" -> 5, "knowledge-session" -> 2),
+      LocalDate.of(2017, 5, 12) -> Map("team-data" -> 6),
+      LocalDate.of(2017, 5, 15) -> Map("bila" -> 1),
+      LocalDate.of(2017, 5, 16) -> Map("team-data" -> 8),
+      LocalDate.of(2017, 5, 17) -> Map("team-data" -> 5),
+      LocalDate.of(2017, 5, 18) -> Map("interview-applicant" -> 2),
+      LocalDate.of(2017, 5, 19) -> Map("bila" -> 1),
+      LocalDate.of(2017, 5, 23) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 5, 24) -> Map("team-data" -> 5),
+      LocalDate.of(2017, 6, 6) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 6, 12) -> Map("team-data" -> 3, "strategy-team-orange" -> 2),
+      LocalDate.of(2017, 6, 14) -> Map("team-data" -> 5),
+      LocalDate.of(2017, 6, 20) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 7, 4) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 8, 15) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 8, 23) -> Map("team-data" -> 6, "bila" -> 1),
+      LocalDate.of(2017, 8, 29) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 8, 31) -> Map("farewell" -> 2, "interview-applicant" -> 2),
+      LocalDate.of(2017, 9, 1) -> Map("meeting-development-process" -> 2),
+      LocalDate.of(2017, 9, 12) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 9, 18) -> Map("bila" -> 1),
+      LocalDate.of(2017, 9, 26) -> Map("organisation-change" -> 2),
+      LocalDate.of(2017, 10, 3) -> Map("team-data" -> 8),
+      LocalDate.of(2017, 10, 10) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 10, 16) -> Map("team-data" -> 3, "bila" -> 1),
+      LocalDate.of(2017, 10, 24) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 11, 7) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 11, 16) -> Map("organisation-change" -> 2),
+      LocalDate.of(2017, 11, 17) -> Map("farewell" -> 2),
+      LocalDate.of(2017, 11, 21) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 11, 22) -> Map("bila" -> 1, "townhall" -> 2),
+      LocalDate.of(2017, 11, 24) -> Map("chapter-meeting" -> 1),
+      LocalDate.of(2017, 11, 28) -> Map("meeting-about-conferences" -> 2),
+      LocalDate.of(2017, 11, 30) -> Map("organisation-change" -> 2),
+      LocalDate.of(2017, 12, 5) -> Map("sprint-demo" -> 4),
+      LocalDate.of(2017, 12, 14) -> Map("meeting-performance-reviews" -> 2, "chapter-meeeting" -> 1),
+      LocalDate.of(2017, 12, 18) -> Map("bila" -> 1),
+      LocalDate.of(2017, 12, 19) -> Map("organisation-change" -> 2))
+  } ensuring (_.keySet.forall(d => !isWeekend(d)), s"No weekend days allowed")
 }
