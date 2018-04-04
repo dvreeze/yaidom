@@ -51,6 +51,119 @@ At the other end of the "hour glass", the new main query API traits help a lot i
 abstracting over backing elements. The improved conversions to simple and resolved elements also increase yaidom's power
 at very low "conceptual costs".
 
+Breaking changes compared to version 1.7.1 (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues):
+
+* the type hierarchy of interface eu.cdevreeze.yaidom.simple.CanBeDocumentChild is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.CanBeDocumentChild")
+* the type hierarchy of class eu.cdevreeze.yaidom.simple.Comment is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.Comment")
+* the type hierarchy of class eu.cdevreeze.yaidom.simple.Text is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Text,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.Text")
+* the type hierarchy of class eu.cdevreeze.yaidom.simple.EntityRef is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.EntityRef")
+* the type hierarchy of interface eu.cdevreeze.yaidom.simple.Node is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.Node")
+* the type hierarchy of class eu.cdevreeze.yaidom.simple.ProcessingInstruction is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.ProcessingInstruction")
+* the type hierarchy of class eu.cdevreeze.yaidom.simple.Elem is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Elem,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.simple.Elem")
+* method apply(eu.cdevreeze.yaidom.resolved.ResolvedNodes#Elem)eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem in object eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem, (eu.cdevreeze.yaidom.resolved.Elem)eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem.apply")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlCData is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Text,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlCData")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Elem,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem")
+* the type hierarchy of interface eu.cdevreeze.yaidom.scalaxml.CanBeScalaXmlDocumentChild is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.CanBeScalaXmlDocumentChild")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlAtom is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlAtom")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlProcessingInstruction is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlProcessingInstruction")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlComment is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlComment")
+* the type hierarchy of interface eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlEntityRef is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlEntityRef")
+* the type hierarchy of class eu.cdevreeze.yaidom.scalaxml.ScalaXmlText is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Text,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.scalaxml.ScalaXmlText")
+* method apply(eu.cdevreeze.yaidom.resolved.ResolvedNodes#Text)eu.cdevreeze.yaidom.resolved.Text in object eu.cdevreeze.yaidom.resolved.Text in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Text)eu.cdevreeze.yaidom.resolved.Text, (java.lang.String)eu.cdevreeze.yaidom.resolved.Text
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.resolved.Text.apply")
+* method apply(eu.cdevreeze.yaidom.resolved.ResolvedNodes#Node)eu.cdevreeze.yaidom.resolved.Node in object eu.cdevreeze.yaidom.resolved.Node does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Node.apply")
+* interface eu.cdevreeze.yaidom.resolved.ResolvedNodes#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.resolved.ResolvedNodes$Elem")
+* class eu.cdevreeze.yaidom.resolved.ResolvedNodes does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.resolved.ResolvedNodes")
+* method apply(eu.cdevreeze.yaidom.resolved.ResolvedNodes#Elem)eu.cdevreeze.yaidom.resolved.Elem in object eu.cdevreeze.yaidom.resolved.Elem's type is different in current version, where it is (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.resolved.Elem instead of (eu.cdevreeze.yaidom.resolved.ResolvedNodes#Elem)eu.cdevreeze.yaidom.resolved.Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.resolved.Elem.apply")
+* interface eu.cdevreeze.yaidom.resolved.ResolvedNodes#Text does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.resolved.ResolvedNodes$Text")
+* object eu.cdevreeze.yaidom.resolved.ResolvedNodes does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.resolved.ResolvedNodes$")
+* the type hierarchy of class eu.cdevreeze.yaidom.resolved.Elem is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Elem,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.resolved.Elem")
+* the type hierarchy of class eu.cdevreeze.yaidom.resolved.Text is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Text,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.resolved.Text")
+* interface eu.cdevreeze.yaidom.resolved.ResolvedNodes#Node does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node")
+* the type hierarchy of interface eu.cdevreeze.yaidom.resolved.Node is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.resolved.Node")
+* method apply(scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in current version does not have a correspondent with same parameter signature among (scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.apply")
+* method apply(java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in current version does not have a correspondent with same parameter signature among (scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.apply")
+* method apply(eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.apply")
+* method apply(scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkElemApi)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.apply")
+* method apply(java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkElemApi)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem, (scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.apply")
+* method apply(eu.cdevreeze.yaidom.queryapi.ClarkElemApi)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem's type is different in current version, where it is (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem instead of (eu.cdevreeze.yaidom.queryapi.ClarkElemApi)eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.apply")
+* method getChildren(eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem)scala.collection.immutable.IndexedSeq in object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.getChildren")
+* method apply(scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedElemApi,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in current version does not have a correspondent with same parameter signature among (java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.apply")
+* method apply(java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedElemApi,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in current version does not have a correspondent with same parameter signature among (java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.apply")
+* method apply(eu.cdevreeze.yaidom.queryapi.ScopedElemApi,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in current version does not have a correspondent with same parameter signature among (scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.apply")
+* method apply(scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedElemApi)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in current version does not have a correspondent with same parameter signature among (scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.apply")
+* method apply(java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedElemApi)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in current version does not have a correspondent with same parameter signature among (scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (java.net.URI,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem, (eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.apply")
+* method apply(eu.cdevreeze.yaidom.queryapi.ScopedElemApi)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem's type is different in current version, where it is (eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem instead of (eu.cdevreeze.yaidom.queryapi.ScopedElemApi)eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.apply")
+* method getChildren(eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem)scala.collection.immutable.IndexedSeq in object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.getChildren")
+* method this(scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedElemApi,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ScopedElemApi)Unit in class eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem's type is different in current version, where it is (scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ScopedNodes#Elem)Unit instead of (scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ScopedElemApi,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ScopedElemApi)Unit
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem.this")
+* method this(scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ClarkElemApi)Unit in class eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem's type is different in current version, where it is (scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)Unit instead of (scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ClarkElemApi)Unit
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem.this")
+* method underlyingRootElem()eu.cdevreeze.yaidom.queryapi.ClarkElemApi in class eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem has a different result type in current version, where it is eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem rather than eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+  filter with: ProblemFilters.exclude[IncompatibleResultTypeProblem]("eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem.underlyingRootElem")
+* method underlyingElem()eu.cdevreeze.yaidom.queryapi.ClarkElemApi in class eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem has a different result type in current version, where it is eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem rather than eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+  filter with: ProblemFilters.exclude[IncompatibleResultTypeProblem]("eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem.underlyingElem")
+* method this(scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ClarkElemApi)Unit in class eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem's type is different in current version, where it is (scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)Unit instead of (scala.Option,scala.Option,eu.cdevreeze.yaidom.queryapi.ClarkElemApi,eu.cdevreeze.yaidom.core.Path,eu.cdevreeze.yaidom.queryapi.ClarkElemApi)Unit
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem.this")
+* abstract method children()scala.collection.immutable.IndexedSeq in interface eu.cdevreeze.yaidom.queryapi.HasChildNodesApi is inherited by class AbstractIndexedClarkElem in current version.
+  filter with: ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("eu.cdevreeze.yaidom.queryapi.HasChildNodesApi.children")
+* the type hierarchy of class eu.cdevreeze.yaidom.dom.DomElem is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Elem,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.DomElem")
+* the type hierarchy of class eu.cdevreeze.yaidom.dom.DomEntityRef is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.DomEntityRef")
+* the type hierarchy of interface eu.cdevreeze.yaidom.dom.CanBeDomDocumentChild is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.CanBeDomDocumentChild")
+* the type hierarchy of interface eu.cdevreeze.yaidom.dom.DomNode is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.DomNode")
+* the type hierarchy of class eu.cdevreeze.yaidom.dom.DomComment is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.DomComment")
+* the type hierarchy of class eu.cdevreeze.yaidom.dom.DomProcessingInstruction is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.DomProcessingInstruction")
+* the type hierarchy of class eu.cdevreeze.yaidom.dom.DomText is different in current version. Missing types {eu.cdevreeze.yaidom.resolved.ResolvedNodes$Text,eu.cdevreeze.yaidom.resolved.ResolvedNodes$Node}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.dom.DomText")
+
 
 1.8.0-M4
 ========
