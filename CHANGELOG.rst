@@ -42,6 +42,8 @@ Yaidom 1.8.0 is almost the same as 1.8.0-M4. It is largely the same as 1.7.1, ex
   * See the release notes of version 1.8.0-M3
 
 * Removed ``ResolvedNodes`` object
+* Deprecated some code, especially in the utils package
+* Also deprecated method ``resolved.Elem.apply``, introducing method ``resolved.Elem.from`` in its place
 
 This brings yaidom even closer to its "hour glass" vision than versions 1.7.X. The addition of yaidom Saxon wrappers is
 a very important one. Without it, the portfolio of yaidom element implementations (on the JVM) would be a lot more limited.
