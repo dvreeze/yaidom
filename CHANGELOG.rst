@@ -3,6 +3,53 @@ CHANGELOG
 =========
 
 
+1.8.0
+=====
+
+Yaidom 1.8.0 is almost the same as 1.8.0-M4. It is largely the same as 1.7.1, except for the following (main) changes:
+
+* Added main query API traits ``BackingNodes.Elem``, ``ScopedNodes.Elem`` and ``ClarkNodes.Elem``
+
+  * The 3 main query API abstractions to be used by element implementations are ``BackingNodes.Elem``, ``ScopedNodes.Elem`` and ``ClarkNodes.Elem``
+  * This is also true for "yaidom dialects"
+  * These traits mix in the new trait ``HasChildNodesApi``, promising a method to get all child nodes (not only element nodes)
+  * See the explanation of these traits in the release notes of version 1.8.0-M4
+
+* Improved conversions to simple and resolved elements, and made them more generic
+
+  * These conversions work for any element implementation that uses the main query API traits mentioned above
+  * See the release notes of version 1.8.0-M4
+
+* Improved element creation
+
+  * Yaidom resolved elements are not only useful for equality tests, but also for ad-hoc element creation
+  * See the release notes of version 1.8.0-M4
+
+* Yaidom 1.8.0 dropped support for Java 6 and 7
+* Saxon wrapper elements
+
+  * It has been copied from TQA, where it will no longer live
+  * It requires Saxon 9.8 or 9.7, and works for Saxon-HE, Saxon-PE and Saxon-EE
+  * It has good query performance, and is quite memory-efficient, when using the default Saxon tiny tree implementation
+  * On the JVM, the Saxon wrapper elements are the best yaidom element implementation available
+  * See the release notes of version 1.8.0-M3
+
+* An XPath evaluation API has been added
+
+  * It has been inspired by the JAXP XPath API, but it is more Scala-friendly, more type-safe, and more yaidom-friendly
+  * It is not as complete as the JAXP standard XPath API, because it does not yet model functions and variables
+  * There is a Saxon JAXP backed implementation of this API (JVM-only)
+  * See the release notes of version 1.8.0-M3
+
+* Removed ``ResolvedNodes`` object
+
+This brings yaidom even closer to its "hour glass" vision than versions 1.7.X. The addition of yaidom Saxon wrappers is
+a very important one. Without it, the portfolio of yaidom element implementations (on the JVM) would be a lot more limited.
+At the other end of the "hour glass", the new main query API traits help a lot in defining "yaidom XML dialects" and in
+abstracting over backing elements. The improved conversions to simple and resolved elements also increase yaidom's power
+at very low "conceptual costs".
+
+
 1.8.0-M4
 ========
 
@@ -23,7 +70,7 @@ The main changes in version 1.8.0-M4 (compared with milestone 3) are:
   * Direct ``ClarkNodes.Elem`` implementations include "resolved" elements; they know about ENames but not about QNames
   * Direct ``ScopedNodes.Elem`` implementations include "simple" elements; they know about QNames but not about their ancestor nodes
   * ``BackingNodes.Elem`` implementations include Saxon wrappers and native indexed elements; they know about ancestor nodes, base URI etc.
-  * The abstraction used by yaidom XML dialects (e.g. in the TQA project) is ``BackingNodes.Elem``
+  * The abstraction used by yaidom XML dialects for the backing elements (e.g. in the TQA project) is ``BackingNodes.Elem``
 
 * Improved conversions to simple and resolved elements, and made them more generic
 
