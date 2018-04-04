@@ -343,7 +343,7 @@ package eu.cdevreeze
  * The most basic level is [[eu.cdevreeze.yaidom.queryapi.ClarkNodes.Elem]]. It combines traits such as
  * [[eu.cdevreeze.yaidom.queryapi.ElemApi]] and [[eu.cdevreeze.yaidom.queryapi.HasENameApi]]. Object
  * [[eu.cdevreeze.yaidom.queryapi.ClarkNodes]] also contains types for non-element nodes. All element
- * implementations that extend trait `ClarkNodes.Elem` should have a node hierarchy with all kinds of
+ * implementations that extend trait `ClarkNodes.Elem` should have a node hierarchy with all its kinds of
  * nodes extending the appropriate `ClarkNodes` member type.
  *
  * All element implementation directly or indirectly implement the `ClarkNodes.Elem` trait. The part of
@@ -352,7 +352,7 @@ package eu.cdevreeze
  *
  * The next level is [[eu.cdevreeze.yaidom.queryapi.ScopedNodes.Elem]]. It extends the `ClarkNodes.Elem`
  * trait, but offers knowledge about QNames and in-scope namespaces as well. Many element implementations
- * offer at least this query API level. The remarks about non-element nodes above also apply here, and below.
+ * offer at least this query API level. The remarks about non-element nodes above also apply here, and apply below.
  *
  * The third level is [[eu.cdevreeze.yaidom.queryapi.BackingNodes.Elem]]. It extends the `ScopedNodes.Elem`
  * trait, but offers knowledge about ancestor elements and document/base URIs as well. This is the level

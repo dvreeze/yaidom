@@ -21,10 +21,9 @@ package eu.cdevreeze.yaidom
  * partial implementation traits.
  *
  * '''Generic code abstracting over yaidom element implementations should either use
- * trait `ClarkElemApi` or sub-trait `ScopedElemApi`, or even `BackingElemApi`, depending on the abstraction level.'''
+ * trait `ClarkNodes.Elem` or sub-trait `ScopedNodes.Elem`, or even `BackingNodes.Elem`, depending on the abstraction level.'''
  *
- * Most API traits are orthogonal, but some API traits are useful combinations of other ones. Examples include
- * the above-mentioned `ClarkElemApi` and `ScopedElemApi` traits.
+ * These traits are combinations of several small query API traits. Most of these API traits are orthogonal.
  *
  * <em>Simplicity</em> and <em>consistency</em> of the entire query API are 2 important design considerations. For example, the query
  * API methods themselves use no parameterized types. Note how the resulting API with type members is essentially the same as the
@@ -33,9 +32,9 @@ package eu.cdevreeze.yaidom
  * This package depends only on the core package in yaidom, but many other packages do depend on this one.
  *
  * Note: whereas the old query API used F-bounded polymorphism with type parameters extensively, this new query API
- * essentially just uses type member ThisElem, defined in a common super-trait. The old query API may be somewhat easier to develop
- * (that is, convincing the compiler), but the new query API is easier to use as generic "backend" element query API. As an example,
- * common "bridge" element query APIs come to mind, used within type-safe XML dialect DOM tree implementations. The reason
+ * essentially just uses type member(s) ThisElem (and ThisNode), defined in a common super-trait. The old query API may be somewhat easier
+ * to develop (that is, convincing the compiler), but the new query API is easier to use as generic "backend" element query API. As an
+ * example, common "bridge" element query APIs come to mind, used within type-safe XML dialect DOM tree implementations. The reason
  * this is easier with the new API is intuitively that fewer type constraints leak to the query API client code.
  *
  * @author Chris de Vreeze
