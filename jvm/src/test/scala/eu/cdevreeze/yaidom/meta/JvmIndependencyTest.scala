@@ -116,7 +116,7 @@ class JvmIndependencyTest extends FunSuite {
 
     val otherImporters =
       importers.filterNot(isJavaImporter).filterNot(isScalaImporter).
-        filterNot(isScalaJsDomImporter).filterNot(isYaidomImporter)
+        filterNot(isScalaJsDomImporter).filterNot(isScalaTagsImporter).filterNot(isYaidomImporter)
 
     assertResult(Nil) {
       otherImporters.filterNot(isOtherAllowedImporter)
@@ -300,6 +300,13 @@ class JvmIndependencyTest extends FunSuite {
 
     termNames.take(3).map(_.structure) ==
       List(Term.Name("org"), Term.Name("scalajs"), Term.Name("dom")).map(_.structure)
+  }
+
+  private def isScalaTagsImporter(importer: Importer): Boolean = {
+    val termNames = importer.ref collect { case tn: Term.Name => tn }
+
+    termNames.take(1).map(_.structure) ==
+      List(Term.Name("scalatags")).map(_.structure)
   }
 
   private def isYaidomImporter(importer: Importer): Boolean = {

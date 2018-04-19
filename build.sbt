@@ -141,9 +141,26 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     // Do we need this jsEnv?
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
+    libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.4",
+
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.5",
 
+    libraryDependencies ++= {
+      scalaBinaryVersion.value match {
+        case "2.13.0-M3" => Seq()
+        case _           => Seq("com.lihaoyi" %%% "scalatags" % "0.6.7" % "optional")
+      }
+    },
+
     parallelExecution in Test := false,
+
+    excludeFilter in (Compile, unmanagedSources) := {
+      if (scalaBinaryVersion.value == "2.13.0-M3") {
+        new SimpleFileFilter(f => f.toString.contains("jsdemoapp"))
+      } else {
+        NothingFilter
+      }
+    },
 
     mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.7.1")
   )

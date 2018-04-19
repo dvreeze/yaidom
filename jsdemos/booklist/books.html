@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta charset="utf-8"/>
+    <title>Book Catalogue</title>
+    <link rel="stylesheet" href="books.css" type="text/css">
+</head>
+
+<body>
+	<!-- Include Scala.js compiled code -->
+	<script type="text/javascript" src="../../js/target/scala-2.12/yaidom-fastopt.js"></script>
+
+	<script type="text/javascript" src="../../js/target/scala-2.12/yaidom-jsdeps.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  BookList.retrieveBookList(
+    "books.xml",
+    document.getElementById("title"),
+    document.getElementById("books"),
+    document.getElementById("genres"));
+});
+</script>
+
+<h1 id="title">Book Catalogue</h1>
+
+<p>Click the selection button next to a genre to view books for that genre.</p>
+<p>Click on any column heading to sort the table.</p>
+
+<h2>Genres</h2>
+<div id="genres"></div>
+
+<h2>Books</h2>
+<div id="books"></div>
+
+
+<div id="sortToolTip" class="tooltip" style="position:fixed; visibility:hidden; left:0px; top:0px">
+    Click to sort on this column
+</div>
+    
+</body>
+</html>
