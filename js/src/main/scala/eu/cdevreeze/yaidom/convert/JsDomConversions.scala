@@ -19,8 +19,6 @@ package eu.cdevreeze.yaidom.convert
 /**
  * Conversions between yaidom nodes and JS DOM nodes.
  *
- * TODO Conversion from yaidom to JS DOM.
- *
  * @author Chris de Vreeze
  */
-object JsDomConversions extends JsDomToYaidomConversions
+object JsDomConversions extends YaidomToJsDomConversions with JsDomToYaidomConversions

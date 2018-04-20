@@ -18,56 +18,64 @@ package eu.cdevreeze.yaidom.jsdemoapp
 
 import java.time.LocalDate
 
+import scala.collection.immutable
+
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.Failure
 import scala.util.Success
 
+import org.scalajs.dom.console
+import org.scalajs.dom.window
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.raw._
 
+import eu.cdevreeze.yaidom.convert.JsDomConversions
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.jsdom.JsDomDocument
 import eu.cdevreeze.yaidom.jsdom.JsDomElem
+import eu.cdevreeze.yaidom.simple
 import scalatags.JsDom.all._
 
 /**
  * Book list example, from https://www.saxonica.com/saxon-js/documentation/index.html#!samples/booklist,
  * but using yaidom instead of Saxon-JS.
  *
+ * TODO Try to make this code more "declarative", like the Saxon-JS original stylesheet.
+ *
+ * TODO Create yaidom dialect for HTML, and use that.
+ *
  * @author Chris de Vreeze
  */
 @JSExportTopLevel("BookList")
 object BookList {
 
-  private var doc: JsDomDocument = null
+  private var bookListDoc: JsDomDocument = null
 
   @JSExport("retrieveBookList")
-  def retrieveBookList(
-    bookListUri: String,
-    titleHeading: HTMLHeadingElement,
-    booksDiv: HTMLDivElement,
-    genresDiv: HTMLDivElement): Unit = {
-
+  def retrieveBookList(bookListUri: String): Unit = {
     Ajax.get(bookListUri) onComplete {
       case Success(xhr) =>
         val responseXml = xhr.responseXML
 
         val wrapperDoc = JsDomDocument(responseXml)
-        doc = wrapperDoc
+        bookListDoc = wrapperDoc
 
-        println(s"Received response XML (${wrapperDoc.documentElement.findAllElemsOrSelf.size} elements)")
+        displayTitle()
+        displayBooks()
+        displayGenres()
 
-        displayTitle(titleHeading)
-        displayBooks(booksDiv)
-        displayGenres(genresDiv)
+        addGenreOnclickHandlers()
+
+        addTableHeaderEventHandlers()
       case Failure(xhr) =>
-        println(s"Could not retrieve book list at URL '$bookListUri'")
+        console.error(s"Could not retrieve book list at URL '$bookListUri'")
     }
   }
 
-  def displayTitle(titleHeading: HTMLHeadingElement): Unit = {
+  def displayTitle(): Unit = {
     val today = LocalDate.now
 
     // We cannot yet use localized formatter patterns!
@@ -79,7 +87,7 @@ object BookList {
     titleHeading.textContent = s"Books available at $dayOfMonth $month $year"
   }
 
-  def displayBooks(booksDiv: HTMLDivElement): Unit = {
+  def displayBooks(): Unit = {
     def detailRow(elem: JsDomElem): HTMLTableRowElement = {
       tr(attr("data-genre") := elem.attribute(EName("CAT")))(
         td(elem.getChildElem(_.localName == "AUTHOR").text),
@@ -87,8 +95,8 @@ object BookList {
         td(attr("align") := "right")(elem.getChildElem(_.localName == "PRICE").text)).render
     }
 
-    val docElem: JsDomElem =
-      doc.ensuring(_ != null, s"Document (element) must not be null").documentElement
+    val bookListDocElem: JsDomElem =
+      bookListDoc.ensuring(_ != null, s"Document (element) must not be null").documentElement
 
     val bookTable: HTMLTableElement =
       table(id := "book-table")(
@@ -98,12 +106,12 @@ object BookList {
             th("Title"),
             th(attr("data-type") := "number")("Price"))),
         tbody(
-          docElem.filterElems(_.localName == "ITEM").map(e => detailRow(e)))).render
+          bookListDocElem.filterElems(_.localName == "ITEM").map(e => detailRow(e)))).render
 
     booksDiv.appendChild(bookTable)
   }
 
-  def displayGenres(genresDiv: HTMLDivElement): Unit = {
+  def displayGenres(): Unit = {
     def detailRow(elem: JsDomElem): HTMLTableRowElement = {
       val code = elem.attribute(EName("CODE"))
 
@@ -114,8 +122,8 @@ object BookList {
           input(tpe := "checkbox", name := "genre", value := code, checked := "checked")())).render
     }
 
-    val docElem: JsDomElem =
-      doc.ensuring(_ != null, s"Document (element) must not be null").documentElement
+    val bookListDocElem: JsDomElem =
+      bookListDoc.ensuring(_ != null, s"Document (element) must not be null").documentElement
 
     val genresTable: HTMLTableElement =
       table(id := "genre-table")(
@@ -124,10 +132,201 @@ object BookList {
             th("Code"),
             th("Description"))),
         tbody(
-          docElem.filterElems(_.localName == "CATEGORY").map(e => detailRow(e)))).render
+          bookListDocElem.filterElems(_.localName == "CATEGORY").map(e => detailRow(e)))).render
 
     val genresForm: HTMLFormElement = form(genresTable).render
 
     genresDiv.appendChild(genresForm)
+  }
+
+  def addGenreOnclickHandlers(): Unit = {
+    val genreInputElems: immutable.IndexedSeq[HTMLInputElement] = genresDivAsJsDomElem
+      .filterElems { e =>
+        e.localName.toLowerCase == "input" &&
+          e.attributeOption(EName("type")).contains("checkbox") &&
+          e.attributeOption(EName("name")).contains("genre")
+      }
+      .map(_.wrappedNode.asInstanceOf[HTMLInputElement])
+
+    genreInputElems.foreach { genreInputElem =>
+      genreInputElem.onclick = { event =>
+        val bookRowsForGenre = getBookRowsForGenre(genreInputElem.value)
+
+        bookRowsForGenre.foreach { bookRow =>
+          bookRow.style.display = if (genreInputElem.checked) "table-row" else "none"
+        }
+      }
+    }
+  }
+
+  def addTableHeaderEventHandlers(): Unit = {
+    val tableHeaderCellElems = getTableHeaderCellsAsJsDomElems
+
+    addTableHeaderOnclickHandlers(tableHeaderCellElems)
+
+    addTableHeaderOnMouseoverHandlers(tableHeaderCellElems)
+    addTableHeaderOnMouseoutHandlers(tableHeaderCellElems)
+  }
+
+  def addTableHeaderOnclickHandlers(headerCellElems: immutable.IndexedSeq[JsDomElem]): Unit = {
+    headerCellElems.foreach { headerCellElem =>
+      val headerCell = headerCellElem.wrappedNode.asInstanceOf[HTMLTableHeaderCellElement]
+
+      headerCell.onclick = { event =>
+        val headerCellJsDomElem =
+          htmlAsJsDomDocument.documentElement.findElem(_.path == headerCellElem.path).getOrElse(sys.error(s"Could not find back header cell"))
+
+        val tableId = headerCellJsDomElem.findAncestor(_.localName.toLowerCase == "table").get.attribute(EName("id"))
+
+        val colNrOneBased = headerCellJsDomElem.path.lastEntry.position
+
+        val dataType =
+          if (headerCellJsDomElem.attributeOption(EName("data-type")).contains("number")) "number" else "text"
+
+        val ascending =
+          !headerCellJsDomElem.parent.parent.attributeOption(EName("data-order")).map(_.toInt).contains(colNrOneBased)
+
+        sortTable(tableId, colNrOneBased, dataType, ascending)
+      }
+    }
+  }
+
+  def addTableHeaderOnMouseoverHandlers(headerCellElems: immutable.IndexedSeq[JsDomElem]): Unit = {
+    headerCellElems
+      .foreach { headerCellElem =>
+        val headerCell = headerCellElem.wrappedNode.asInstanceOf[HTMLTableHeaderCellElement]
+
+        headerCell.onmouseover = { event =>
+          sortToolTipDiv.style.left = s"${event.clientX + 30}px"
+          sortToolTipDiv.style.top = s"${event.clientY - 15}px"
+          sortToolTipDiv.style.visibility = "visible"
+        }
+      }
+  }
+
+  def addTableHeaderOnMouseoutHandlers(headerCellElems: immutable.IndexedSeq[JsDomElem]): Unit = {
+    headerCellElems
+      .foreach { headerCellElem =>
+        val headerCell = headerCellElem.wrappedNode.asInstanceOf[HTMLTableHeaderCellElement]
+
+        headerCell.onmouseout = { event =>
+          sortToolTipDiv.style.visibility = "hidden"
+        }
+      }
+  }
+
+  // Private methods
+
+  private def getBookRowsForGenre(genre: String): immutable.IndexedSeq[HTMLTableRowElement] = {
+    booksDivAsJsDomElem
+      .filterElems { e =>
+        e.localName.toLowerCase == "tr" && e.attributeOption(EName("data-genre")).contains(genre)
+      }
+      .map(_.wrappedNode.asInstanceOf[HTMLTableRowElement])
+  }
+
+  // Generic table sort
+
+  private def sortTable(tableId: String, columnNumberOneBased: Int, dataType: String, ascending: Boolean): Unit = {
+    console.log(s"Sorting table. ID: $tableId, col: $columnNumberOneBased, type: $dataType, ascending: $ascending")
+
+    val tableElem: JsDomElem =
+      htmlAsJsDomDocument.documentElement
+        .findElem(e => e.localName.toLowerCase == "table" && e.attributeOption(EName("id")).contains(tableId))
+        .getOrElse(sys.error(s"Missing table with ID '$tableId'"))
+
+    // Convert the table element to a yaidom native simple element, sort the rows, and convert back
+
+    val tableSimpleElem: simple.Elem =
+      JsDomConversions.convertToElem(tableElem.wrappedNode, tableElem.parent.scope)
+
+    val editedTableSimpleElem: simple.Elem =
+      tableSimpleElem
+        .transformElems { e =>
+          e.localName.toLowerCase match {
+            case "thead" =>
+              e.plusAttribute(
+                QName("data-order"),
+                (if (ascending) columnNumberOneBased else -columnNumberOneBased).toString)
+            case "tbody" =>
+              val preSortedRows = e.findAllChildElems
+                .sortBy { che =>
+                  require(che.localName.toLowerCase == "tr", s"Expected 'tr' element but found '${che.localName}'")
+
+                  val tdElem = che.filterElems(_.localName.toLowerCase == "td").apply(columnNumberOneBased - 1)
+
+                  if (dataType == "number") f"${tdElem.text.toDouble}%08.2f" else tdElem.text
+                }
+
+              val sortedRows = if (ascending) preSortedRows else preSortedRows.reverse
+
+              e.withChildren(sortedRows)
+            case _ =>
+              e
+          }
+        }
+
+    val editedTableElem: JsDomElem =
+      JsDomElem(JsDomConversions.convertElem(editedTableSimpleElem, htmlAsJsDomDocument.wrappedDocument, tableElem.parent.scope))
+
+    val parentElem: JsDomElem = tableElem.parent
+    parentElem.wrappedNode.replaceChild(editedTableElem.wrappedNode, tableElem.wrappedNode)
+
+    // Note that we have new table content (as far as object identity is concerned), so re-register event handlers
+
+    addTableHeaderEventHandlers()
+    addGenreOnclickHandlers()
+  }
+
+  // Getting specific parts of the HTML DOM
+
+  private def htmlAsJsDomDocument: JsDomDocument = {
+    JsDomDocument(window.document)
+  }
+
+  private def getTableHeaderCellsAsJsDomElems: immutable.IndexedSeq[JsDomElem] = {
+    htmlAsJsDomDocument
+      .documentElement
+      .filterElems(_.localName.toLowerCase == "th")
+  }
+
+  private def titleHeadingAsJsDomElem: JsDomElem = {
+    findElemOrSelfByNameAndId("h1", "title").get
+  }
+
+  private def titleHeading: HTMLHeadingElement = {
+    titleHeadingAsJsDomElem.wrappedNode.asInstanceOf[HTMLHeadingElement]
+  }
+
+  private def booksDivAsJsDomElem: JsDomElem = {
+    findElemOrSelfByNameAndId("div", "books").get
+  }
+
+  private def booksDiv: HTMLDivElement = {
+    booksDivAsJsDomElem.wrappedNode.asInstanceOf[HTMLDivElement]
+  }
+
+  private def genresDivAsJsDomElem: JsDomElem = {
+    findElemOrSelfByNameAndId("div", "genres").get
+  }
+
+  private def genresDiv: HTMLDivElement = {
+    genresDivAsJsDomElem.wrappedNode.asInstanceOf[HTMLDivElement]
+  }
+
+  private def sortToolTipDivAsJsDomElem: JsDomElem = {
+    findElemOrSelfByNameAndId("div", "sortToolTip").get
+  }
+
+  private def sortToolTipDiv: HTMLDivElement = {
+    sortToolTipDivAsJsDomElem.wrappedNode.asInstanceOf[HTMLDivElement]
+  }
+
+  // Helper method for getting DOM content
+
+  private def findElemOrSelfByNameAndId(localName: String, id: String): Option[JsDomElem] = {
+    htmlAsJsDomDocument
+      .documentElement
+      .findElemOrSelf(e => e.localName.toLowerCase == localName && e.attributeOption(EName("id")).contains(id))
   }
 }
