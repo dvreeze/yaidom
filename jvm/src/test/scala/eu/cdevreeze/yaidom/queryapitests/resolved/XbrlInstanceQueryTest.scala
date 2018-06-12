@@ -41,6 +41,4 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
     val doc = docParser.parse(is)
     Elem.from(doc.documentElement)
   }
-
-  protected final def toResolvedElem(elem: E): Elem = elem
 }

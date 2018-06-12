@@ -22,7 +22,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapitests.AbstractI18nQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -51,7 +50,4 @@ class I18nQueryTest extends AbstractI18nQueryTest {
 
     convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty)
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(elem)
 }

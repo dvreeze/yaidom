@@ -24,7 +24,8 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
-import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 
 /**
  * ScopedElemLike-based query test case.
@@ -33,7 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractScopedElemLikeQueryTest extends FunSuite {
 
-  type E <: ScopedElemLike.Aux[E]
+  type E <: ScopedNodes.Elem with ScopedElemApi.Aux[E]
 
   val XsNamespace = "http://www.w3.org/2001/XMLSchema"
 
@@ -127,5 +128,7 @@ abstract class AbstractScopedElemLikeQueryTest extends FunSuite {
 
   protected val xsdSchemaElem: E
 
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
 }

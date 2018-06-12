@@ -19,9 +19,7 @@ package eu.cdevreeze.yaidom.queryapitests.scalaxml
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
 /**
@@ -94,10 +92,6 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
       </order>
 
     ScalaXmlElem(xml)
-  }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem = {
-    resolved.Elem.from(convertToElem(elem.wrappedNode))
   }
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {

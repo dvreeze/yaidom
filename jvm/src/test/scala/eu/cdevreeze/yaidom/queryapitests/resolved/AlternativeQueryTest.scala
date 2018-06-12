@@ -95,8 +95,6 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
     Elem.from(convertToElem(xml))
   }
 
-  protected final def toResolvedElem(elem: E): Elem = elem
-
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
     Elem.from(convertToElem(elem))
   }

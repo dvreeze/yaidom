@@ -24,7 +24,6 @@ import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -158,9 +157,6 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
     val db = dbf.newDocumentBuilder
     DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
-
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem =
-    resolved.Elem.from(DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
 
   protected def fromSimpleElem(elem: Elem): E = {
     val dbf = DocumentBuilderFactory.newInstance

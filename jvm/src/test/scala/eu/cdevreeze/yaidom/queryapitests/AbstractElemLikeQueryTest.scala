@@ -25,7 +25,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 
@@ -41,7 +42,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  */
 abstract class AbstractElemLikeQueryTest extends FunSuite {
 
-  type E <: ClarkElemLike.Aux[E]
+  type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 
   test("testQueryBookTitles") {
     // XPath: doc("bookstore.xml")/Bookstore/Book/Title
@@ -917,5 +918,7 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
   protected def book4: E =
     bookstore.findElem(e => e.localName == "Book" && e.findAttributeByLocalName("ISBN").contains("ISBN-9-88-777777-6")).get
 
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
 }

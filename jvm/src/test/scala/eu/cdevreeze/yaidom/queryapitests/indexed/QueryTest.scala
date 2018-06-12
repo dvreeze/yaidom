@@ -32,7 +32,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
-import eu.cdevreeze.yaidom.resolved
 
 /**
  * Query test case for indexed Elems.
@@ -660,6 +659,4 @@ class QueryTest extends AbstractElemLikeQueryTest {
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
     Elem(Some(new URI("http://bookstore.xml")), result)
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem.from(elem.underlyingElem)
 }

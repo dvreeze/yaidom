@@ -23,7 +23,6 @@ import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.queryapitests.AbstractI18nQueryTest
-import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -53,7 +52,4 @@ class I18nQueryTest extends AbstractI18nQueryTest {
       Some(new java.net.URI("")),
       convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty))
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(elem.underlyingElem)
 }

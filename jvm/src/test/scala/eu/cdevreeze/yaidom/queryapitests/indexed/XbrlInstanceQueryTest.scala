@@ -22,7 +22,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
-import eu.cdevreeze.yaidom.resolved
 
 /**
  * XBRL instance query test case for indexed elements.
@@ -42,7 +41,4 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
     val doc = docParser.parse(is)
     Elem(doc.documentElement)
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(elem.underlyingElem)
 }

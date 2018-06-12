@@ -21,7 +21,7 @@ import org.scalatest.FunSuite
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
-import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 
 /**
  * ScopedElemLike-based I18N query test case. Make sure the encoding of this source file is UTF-8!
@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  */
 abstract class AbstractI18nQueryTest extends FunSuite {
 
-  type E <: ScopedElemLike.Aux[E]
+  type E <: ScopedNodes.Elem
 
   test("testI18n") {
     val facts = rootElem.filterChildElems(e => e.qname.prefixOption.contains("tx"))
@@ -77,5 +77,7 @@ abstract class AbstractI18nQueryTest extends FunSuite {
 
   protected val rootElem: E
 
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
 }

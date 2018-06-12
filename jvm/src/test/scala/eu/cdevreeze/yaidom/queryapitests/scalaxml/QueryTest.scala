@@ -29,7 +29,6 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
 /**
@@ -280,7 +279,4 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     new ScalaXmlElem(scalaElem)
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(convert.ScalaXmlConversions.convertToElem(elem.wrappedNode))
 }

@@ -24,7 +24,6 @@ import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
-import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -103,10 +102,6 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
     val dbf = DocumentBuilderFactory.newInstance
     val db = dbf.newDocumentBuilder
     DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
-  }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem = {
-    resolved.Elem.from(DomConversions.convertToElem(elem.wrappedNode, Scope.Empty))
   }
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {

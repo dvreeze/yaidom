@@ -16,21 +16,15 @@
 
 package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.saxon.SaxonElem
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.Processor
-import net.sf.saxon.s9api.XdmNode
 
 /**
  * XBRL instance query test case for Saxon wrapper elements.
@@ -53,17 +47,5 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
       SaxonDocument.wrapDocument(
         processor.getUnderlyingConfiguration.buildDocumentTree(new StreamSource(is), parseOptions))
     doc.documentElement
-  }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem = {
-    // Very inefficient!
-
-    val bos = new ByteArrayOutputStream
-    val serializer = processor.newSerializer(bos)
-    serializer.serializeNode(new XdmNode(elem.asInstanceOf[SaxonElem].wrappedNode))
-    val xmlBytes = bos.toByteArray
-
-    val docParser = DocumentParserUsingStax.newInstance
-    eu.cdevreeze.yaidom.resolved.Elem.from(docParser.parse(new ByteArrayInputStream(xmlBytes)).documentElement)
   }
 }

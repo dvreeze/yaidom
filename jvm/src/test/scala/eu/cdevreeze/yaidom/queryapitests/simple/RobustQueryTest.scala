@@ -21,7 +21,6 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractRobustQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 
 /**
@@ -41,7 +40,4 @@ class RobustQueryTest extends AbstractRobustQueryTest {
 
     docParser.parse(is).documentElement
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(elem)
 }

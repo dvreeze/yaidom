@@ -26,7 +26,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -71,7 +70,4 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
     convert.DomConversions.convertToElem(domDoc.getDocumentElement(), Scope.Empty)
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(elem)
 }

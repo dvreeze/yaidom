@@ -185,6 +185,4 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
     IndexedClarkElem(Elem.from(result))
   }
-
-  protected final def toResolvedElem(elem: E): Elem = elem.underlyingElem
 }

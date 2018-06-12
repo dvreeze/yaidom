@@ -40,7 +40,4 @@ class RobustQueryTest extends AbstractRobustQueryTest {
 
     Elem.from(docParser.parse(is).documentElement)
   }
-
-  protected final def toResolvedElem(elem: E): Elem =
-    elem
 }

@@ -22,7 +22,6 @@ import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
-import eu.cdevreeze.yaidom.resolved
 
 /**
  * Alternative query test case for standard Elems.
@@ -95,8 +94,6 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
     convertToElem(xml)
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem.from(elem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = convertToElem(elem)
 }

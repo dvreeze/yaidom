@@ -20,7 +20,6 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Elem
@@ -149,9 +148,6 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
     ScalaXmlElem(xml)
   }
-
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem =
-    eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(elem.wrappedNode))
 
   protected def fromSimpleElem(elem: Elem): E = {
     ScalaXmlElem(ScalaXmlConversions.convertElem(elem))

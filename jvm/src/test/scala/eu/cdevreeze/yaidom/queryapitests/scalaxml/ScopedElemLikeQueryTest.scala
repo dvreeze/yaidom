@@ -22,9 +22,7 @@ import org.junit.runner.RunWith
 import org.xml.sax.InputSource
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
 
@@ -65,7 +63,4 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
     val root: ScalaXmlElem = ScalaXmlNode.wrapElement(resolvingXmlLoader.load(is))
     root
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(ScalaXmlConversions.convertToElem(elem.wrappedNode))
 }

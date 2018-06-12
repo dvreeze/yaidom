@@ -163,14 +163,19 @@ final class ScalaXmlCData(override val wrappedNode: scala.xml.PCData) extends Sc
 }
 
 /**
- * Wrapper around a Scala XML Atom that is not Text or PCData
+ * Wrapper around a Scala XML Atom that is not Text or PCData.
+ * See for example http://sites.google.com/site/burakemir/scalaxbook.docbk.html?attredirects=0.
  */
-final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends ScalaXmlNode {
+final class ScalaXmlAtom(override val wrappedNode: scala.xml.Atom[_]) extends ScalaXmlNode with ScopedNodes.Text {
   require(wrappedNode ne null) // scalastyle:off null
 
   override type DomType = scala.xml.Atom[_]
 
   def text: String = wrappedNode.data.toString
+
+  def trimmedText: String = text.trim
+
+  def normalizedText: String = XmlStringUtils.normalizeString(text)
 }
 
 final class ScalaXmlProcessingInstruction(
@@ -209,16 +214,16 @@ object ScalaXmlNode {
 
   def wrapNodeOption(node: scala.xml.Node): Option[ScalaXmlNode] = {
     node match {
-      case e: scala.xml.Elem       => Some(new ScalaXmlElem(e))
+      case e: scala.xml.Elem => Some(new ScalaXmlElem(e))
       case cdata: scala.xml.PCData => Some(new ScalaXmlCData(cdata))
-      case t: scala.xml.Text       => Some(new ScalaXmlText(t))
+      case t: scala.xml.Text => Some(new ScalaXmlText(t))
       case at: scala.xml.Atom[_] =>
         // Possibly an evaluated "parameter" in an XML literal
         Some(new ScalaXmlAtom(at))
       case pi: scala.xml.ProcInstr => Some(new ScalaXmlProcessingInstruction(pi))
       case er: scala.xml.EntityRef => Some(new ScalaXmlEntityRef(er))
-      case c: scala.xml.Comment    => Some(new ScalaXmlComment(c))
-      case _                       => None
+      case c: scala.xml.Comment => Some(new ScalaXmlComment(c))
+      case _ => None
     }
   }
 

@@ -25,7 +25,6 @@ import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
-import eu.cdevreeze.yaidom.resolved
 
 /**
  * Alternative query test case for indexed Elems.
@@ -107,8 +106,6 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
     indexedElemBuilder(Some(new URI("http://order")), convertToElem(xml))
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem = resolved.Elem.from(elem.underlyingElem)
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
     indexedElemBuilder(Some(new URI("http://bogus-uri")), convertToElem(elem))

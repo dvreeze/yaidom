@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.StringReader
 
 import org.junit.runner.RunWith
@@ -25,7 +23,6 @@ import org.scalatest.junit.JUnitRunner
 import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
@@ -35,7 +32,6 @@ import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.Processor
-import net.sf.saxon.s9api.XdmNode
 
 /**
  * AbstractXQuery3UseCasesTest for Saxon wrapper Elems.
@@ -162,16 +158,6 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
       </stores>
 
     fromSimpleElem(convertToElem(xml))
-  }
-
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
-    val bos = new ByteArrayOutputStream
-    val serializer = processor.newSerializer(bos)
-    serializer.serializeNode(new XdmNode(elem.asInstanceOf[SaxonElem].wrappedNode))
-    val xmlBytes = bos.toByteArray
-
-    val docParser = DocumentParserUsingStax.newInstance
-    eu.cdevreeze.yaidom.resolved.Elem.from(docParser.parse(new ByteArrayInputStream(xmlBytes)).documentElement)
   }
 
   protected def fromSimpleElem(elem: Elem): E =

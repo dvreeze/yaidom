@@ -165,5 +165,7 @@ abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
 
   protected val xbrlInstance: E
 
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
 }

@@ -25,6 +25,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withEName
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
 
@@ -41,7 +42,7 @@ import eu.cdevreeze.yaidom.simple.Node
  */
 abstract class AbstractXQuery3UseCasesTest extends FunSuite {
 
-  type E <: ScopedElemApi.Aux[E]
+  type E <: ScopedNodes.Elem with ScopedElemApi.Aux[E]
 
   protected val ns = "http://www.w3.org/TR/xquery-30-use-cases/"
 
@@ -411,7 +412,9 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
 
   protected val storesElem: E
 
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
 
   protected def fromSimpleElem(elem: Elem): E
 }

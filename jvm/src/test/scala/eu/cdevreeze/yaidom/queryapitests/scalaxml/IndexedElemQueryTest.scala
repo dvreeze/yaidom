@@ -19,10 +19,8 @@ package eu.cdevreeze.yaidom.queryapitests.scalaxml
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
-import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
 /**
@@ -110,7 +108,4 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
     IndexedClarkElem(ScalaXmlElem(scalaElem))
   }
-
-  protected final def toResolvedElem(elem: E): resolved.Elem =
-    resolved.Elem.from(convert.ScalaXmlConversions.convertToElem(elem.underlyingElem.wrappedNode))
 }

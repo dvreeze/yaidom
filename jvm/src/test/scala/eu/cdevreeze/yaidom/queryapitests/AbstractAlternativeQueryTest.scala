@@ -26,7 +26,8 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
 
 /**
@@ -39,7 +40,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
  */
 abstract class AbstractAlternativeQueryTest extends FunSuite {
 
-  type E <: ClarkElemLike.Aux[E]
+  type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 
   test("testFindAllCatalogProducts") {
     // See example 1-4.
@@ -253,7 +254,9 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
 
   protected val orderElem: E
 
-  protected def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
 
   protected def fromScalaElem(elem: scala.xml.Elem): E
 }

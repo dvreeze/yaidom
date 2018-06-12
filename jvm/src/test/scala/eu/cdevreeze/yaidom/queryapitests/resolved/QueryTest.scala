@@ -535,6 +535,4 @@ class QueryTest extends AbstractElemLikeQueryTest {
           magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
     Elem.from(result)
   }
-
-  protected final def toResolvedElem(elem: E): Elem = elem
 }
