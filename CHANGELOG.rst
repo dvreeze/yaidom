@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+1.8.1
+=====
+
+Yaidom 1.8.1 is almost the same as version 1.8.0. It only updated some dependencies, and simplified conversions
+to resolved elements in test code. There are no breaking changes.
+
+
 1.8.0
 =====
 

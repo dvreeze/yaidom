@@ -135,7 +135,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       }
     },
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.7.1")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.0")
   )
   .jsSettings(
     // Do we need this jsEnv?
@@ -182,7 +182,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       }
     },
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.7.1")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.0")
   )
 
 lazy val yaidomJVM = yaidom.jvm
