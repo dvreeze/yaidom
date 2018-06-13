@@ -5,7 +5,7 @@
 // See https://github.com/cquiroz/scala-java-time/blob/master/build.sbt as a "template" for this build file.
 
 
-val scalaVer = "2.12.5"
+val scalaVer = "2.12.6"
 val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-M3")
 
 lazy val commonSettings = Seq(
@@ -90,7 +90,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies += ("org.joda" % "joda-convert" % "2.0.1" % "test").intransitive(),
 
-    libraryDependencies += "com.google.guava" % "guava" % "24.1-jre" % "test",
+    libraryDependencies += "com.google.guava" % "guava" % "25.1-jre" % "test",
 
     libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test",
 
@@ -141,7 +141,27 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     // Do we need this jsEnv?
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.4",
+    // It turns out that scalajs-jsjoda is far more complete than scalajs-java-time!
+
+    libraryDependencies ++= {
+      scalaBinaryVersion.value match {
+        case "2.13.0-M3" => Seq()
+        case _           =>
+          Seq(
+            "com.zoepepper" %%% "scalajs-jsjoda" % "1.1.1",
+            "com.zoepepper" %%% "scalajs-jsjoda-as-java-time" % "1.1.1")
+      }
+    },
+
+    jsDependencies ++= {
+      scalaBinaryVersion.value match {
+        case "2.13.0-M3" => Seq()
+        case _           =>
+          Seq(
+            "org.webjars.npm" % "js-joda" % "1.3.0" / "dist/js-joda.js" minified "dist/js-joda.min.js",
+            "org.webjars.npm" % "js-joda-timezone" % "1.0.0" / "dist/js-joda-timezone.js" minified "dist/js-joda-timezone.min.js")
+      }
+    },
 
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.5",
 
