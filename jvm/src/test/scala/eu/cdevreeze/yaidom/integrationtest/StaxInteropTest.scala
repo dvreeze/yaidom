@@ -1086,7 +1086,7 @@ class StaxInteropTest extends FunSuite {
     val staxParser = DocumentParserUsingStax.newInstance
 
     val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
-    val ba = Stream.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
+    val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
     val baWithBom = addUtf8Bom(ba)
     assert(baWithBom.size == ba.size + 3)
     assert(baWithBom.toSeq.drop(3) == ba.toSeq)

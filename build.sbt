@@ -5,8 +5,12 @@
 // See https://github.com/cquiroz/scala-java-time/blob/master/build.sbt as a "template" for this build file.
 
 
+// shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
+
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+
 val scalaVer = "2.12.6"
-val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-M3")
+val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-M4")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
@@ -17,14 +21,14 @@ lazy val commonSettings = Seq(
   scalaVersion       := scalaVer,
   crossScalaVersions := crossScalaVer,
 
-  // No longer targeting Java 6 class files, to prevent compilation errors like:
+  // No longer targeting Java 6 class files, and not only to prevent compilation errors like:
   // "Static methods in interface require -target:jvm-1.8".
 
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint", "-target:jvm-1.8"),
 
   publishArtifact in Test := false,
   publishMavenStyle := true,
-  
+
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -40,7 +44,7 @@ lazy val commonSettings = Seq(
 
   libraryDependencies ++= {
     scalaBinaryVersion.value match {
-      case "2.13.0-M3" => Seq("org.scalatest" %%% "scalatest" % "3.0.5-M1" % "test")
+      case "2.13.0-M4" => Seq("org.scalatest" %%% "scalatest" % "3.0.6-SNAP1" % "test")
       case _           => Seq("org.scalatest" %%% "scalatest" % "3.0.5" % "test")
     }
   }
@@ -58,22 +62,24 @@ lazy val root = project.in(file("."))
     publishArtifact      := false,
     Keys.`package`       := file(""))
 
-lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
+lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("."))
   .settings(commonSettings: _*)
   .jvmSettings(
     // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-10",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-12",
 
-    libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.8.0",
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.9.0",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M3" => Seq()
+        case "2.13.0-M4" => Seq()
         case _           => Seq("org.scalameta" %%% "scalameta" % "3.6.0" % "test")
       }
     },
@@ -84,43 +90,19 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
 
-    // no need for joda-time on Java 8, though
-
-    libraryDependencies += ("joda-time" % "joda-time" % "2.9.9" % "test").intransitive(),
-
-    libraryDependencies += ("org.joda" % "joda-convert" % "2.0.1" % "test").intransitive(),
-
     libraryDependencies += "com.google.guava" % "guava" % "25.1-jre" % "test",
 
     libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test",
 
-    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "test").intransitive(),
+    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.1.0" % "test").intransitive(),
 
-    libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.0.0" % "test",
+    libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.1" % "test",
 
-    excludeFilter in (Compile, unmanagedSources) := {
-      if (isBeforeJava8) {
-        // Dangerous: the resulting JAR contents depends on the Java version!
-
-        new SimpleFileFilter(_.toString.contains("java8"))
-      } else {
-        NothingFilter
-      }
-    },
-
-    // Excluding UpdateTest in Scala 2.13.0-M3 build due to regression:
+    // Excluding UpdateTest in Scala 2.13.0-M4 build due to regression:
     // "inferred type ... contains type selection from volatile type ..."
 
     excludeFilter in (Test, unmanagedSources) := {
-      if (isBeforeJava8) {
-        // Exclude tests with Java 8 dependencies
-
-        new SimpleFileFilter(f => f.toString.contains("java8") ||
-          f.toString.contains("ScalaMetaExperimentTest") ||
-          f.toString.contains("PackageDependencyTest") ||
-          f.toString.contains("JvmIndependencyTest") ||
-          f.toString.contains("NamePoolingTest"))
-      } else if (scalaBinaryVersion.value == "2.13.0-M3") {
+      if (scalaBinaryVersion.value == "2.13.0-M4") {
         new SimpleFileFilter(f => f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("PackageDependencyTest") ||
@@ -135,7 +117,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       }
     },
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.0")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.1")
   )
   .jsSettings(
     // Do we need this jsEnv?
@@ -145,7 +127,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M3" => Seq()
+        case "2.13.0-M4" => Seq()
         case _           =>
           Seq(
             "com.zoepepper" %%% "scalajs-jsjoda" % "1.1.1",
@@ -155,7 +137,7 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
 
     jsDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M3" => Seq()
+        case "2.13.0-M4" => Seq()
         case _           =>
           Seq(
             "org.webjars.npm" % "js-joda" % "1.3.0" / "dist/js-joda.js" minified "dist/js-joda.min.js",
@@ -163,11 +145,11 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
       }
     },
 
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.5",
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.6",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M3" => Seq()
+        case "2.13.0-M4" => Seq()
         case _           => Seq("com.lihaoyi" %%% "scalatags" % "0.6.7" % "optional")
       }
     },
@@ -175,14 +157,14 @@ lazy val yaidom = crossProject.crossType(CrossType.Full).in(file("."))
     parallelExecution in Test := false,
 
     excludeFilter in (Compile, unmanagedSources) := {
-      if (scalaBinaryVersion.value == "2.13.0-M3") {
+      if (scalaBinaryVersion.value == "2.13.0-M4") {
         new SimpleFileFilter(f => f.toString.contains("jsdemoapp"))
       } else {
         NothingFilter
       }
     },
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.0")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.1")
   )
 
 lazy val yaidomJVM = yaidom.jvm
@@ -213,11 +195,6 @@ lazy val pomData =
 
 
 // Helper functions
-
-def isBeforeJava8: Boolean = {
-  // Brittle
-  scala.util.Try(Class.forName("java.util.stream.Stream")).toOption.isEmpty
-}
 
 def isAtLeastJava9: Boolean = {
   // Brittle

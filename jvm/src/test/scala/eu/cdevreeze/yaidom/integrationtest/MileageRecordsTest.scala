@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
+import java.time.DayOfWeek
+import java.time.LocalDate
+
 import scala.collection.immutable
 import scala.math.BigDecimal
 import scala.math.BigDecimal.double2bigDecimal
@@ -23,8 +26,6 @@ import scala.math.BigDecimal.int2bigDecimal
 import scala.math.ceil
 import scala.math.floor
 
-import org.joda.time.DateTimeConstants
-import org.joda.time.LocalDate
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -279,7 +280,7 @@ class MileageRecordsTest extends FunSuite {
       val dayOfWeek = trip.date.getDayOfWeek()
 
       assertResult(true, s"Work trip found on ${trip.date} in the weekend") {
-        (dayOfWeek != DateTimeConstants.SATURDAY) && (dayOfWeek != DateTimeConstants.SUNDAY)
+        (dayOfWeek != DayOfWeek.SATURDAY) && (dayOfWeek != DayOfWeek.SUNDAY)
       }
     }
   }

@@ -100,14 +100,14 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
       val result = storesElem.filterChildElems(withEName(ns, "store")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "store-number")).text
       }
-      result.toMap.mapValues(_.head)
+      result.toMap.mapValues(_.head).toMap
     }
 
     val productElemsByName: Map[String, E] = {
       val result = productsElem.filterChildElems(withEName(ns, "product")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "name")).text
       }
-      result.toMap.mapValues(_.head)
+      result.toMap.mapValues(_.head).toMap
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
@@ -181,14 +181,14 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
       val result = storesElem.filterChildElems(withEName(ns, "store")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "store-number")).text
       }
-      result.toMap.mapValues(_.head)
+      result.toMap.mapValues(_.head).toMap
     }
 
     val productElemsByName: Map[String, E] = {
       val result = productsElem.filterChildElems(withEName(ns, "product")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "name")).text
       }
-      result.toMap.mapValues(_.head)
+      result.toMap.mapValues(_.head).toMap
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {

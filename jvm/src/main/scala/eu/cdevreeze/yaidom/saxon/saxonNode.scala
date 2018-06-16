@@ -77,7 +77,7 @@ sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends BackingNodes.
   final def children: immutable.IndexedSeq[SaxonNode] = {
     val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
 
-    val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toIndexedSeq
+    val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toIndexedSeq
 
     nodes.flatMap(nodeInfo => SaxonNode.wrapNodeOption(nodeInfo))
   }
@@ -85,7 +85,7 @@ sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends BackingNodes.
   final protected def filterElemsByAxisAndPredicate(axisNumber: Byte, p: SaxonElem => Boolean): immutable.IndexedSeq[SaxonElem] = {
     val it = wrappedNode.iterateAxis(axisNumber, NodeKindTest.ELEMENT)
 
-    val nodeStream = Stream.continually(it.next()).takeWhile(_ ne null)
+    val nodeStream = Iterator.continually(it.next()).takeWhile(_ ne null)
 
     nodeStream.map(nodeInfo => SaxonNode.wrapElement(nodeInfo)).filter(p).toIndexedSeq
   }
@@ -93,7 +93,7 @@ sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends BackingNodes.
   final protected def findElemByAxisAndPredicate(axisNumber: Byte, p: SaxonElem => Boolean): Option[SaxonElem] = {
     val it = wrappedNode.iterateAxis(axisNumber, NodeKindTest.ELEMENT)
 
-    val nodeStream = Stream.continually(it.next()).takeWhile(_ ne null)
+    val nodeStream = Iterator.continually(it.next()).takeWhile(_ ne null)
 
     nodeStream.map(nodeInfo => SaxonNode.wrapElement(nodeInfo)).find(p)
   }
@@ -271,7 +271,7 @@ final class SaxonElem(
   def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
 
-    val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+    val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toVector
 
     nodes map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
   }
@@ -319,7 +319,7 @@ final class SaxonElem(
   def attributes: immutable.IndexedSeq[(QName, String)] = {
     val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
 
-    val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+    val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toVector
 
     nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
   }
@@ -329,7 +329,7 @@ final class SaxonElem(
   def scope: Scope = {
     val it = wrappedNode.iterateAxis(AxisInfo.NAMESPACE)
 
-    val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+    val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toVector
 
     val resultMap = {
       val result =

@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.yaidom.convert
 
+import scala.collection.BufferedIterator
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.collection.immutable
 

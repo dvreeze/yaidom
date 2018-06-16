@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.convert
 
 import java.{ util => jutil }
 
-import scala.collection.JavaConverters.bufferAsJavaListConverter
+import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -94,12 +94,12 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
    */
   final def convertNode(node: Node, xmlEventFactory: XMLEventFactory, parentScope: Scope): immutable.IndexedSeq[XMLEvent] = {
     node match {
-      case e: Elem                   => convertElem(e, xmlEventFactory, parentScope)
-      case t: Text                   => convertText(t, xmlEventFactory)
+      case e: Elem => convertElem(e, xmlEventFactory, parentScope)
+      case t: Text => convertText(t, xmlEventFactory)
       case pi: ProcessingInstruction => convertProcessingInstruction(pi, xmlEventFactory)
       // Difficult to convert yaidom EntityRef to StAX EntityReference, because of missing declaration
-      case er: EntityRef             => immutable.IndexedSeq[XMLEvent]()
-      case c: Comment                => convertComment(c, xmlEventFactory)
+      case er: EntityRef => immutable.IndexedSeq[XMLEvent]()
+      case c: Comment => convertComment(c, xmlEventFactory)
     }
   }
 
@@ -158,7 +158,7 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
 
     val attrScope = elm.attributeScope
 
-    val attributeIterable: Iterable[Attribute] = {
+    val attributeIterable: immutable.IndexedSeq[Attribute] = {
       val result = elm.attributes map { kv =>
         val attrQName = kv._1
         val value = kv._2
@@ -171,10 +171,11 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
       result
     }
 
-    val attributes: jutil.Iterator[Attribute] = new jutil.ArrayList[Attribute](attributeIterable.toBuffer.asJava).iterator
+    val attributes: jutil.Iterator[Attribute] =
+      (new jutil.ArrayList[Attribute](attributeIterable.asJava)).iterator
 
     // scalastyle:off null
-    val namespaceIterable: Iterable[Namespace] = {
+    val namespaceIterable: immutable.IndexedSeq[Namespace] = {
       val result = namespaceDeclarations.prefixNamespaceMap map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
@@ -185,10 +186,11 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
           (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
         }
       }
-      result.values
+      result.values.toIndexedSeq
     }
 
-    val namespaces: jutil.Iterator[Namespace] = new jutil.ArrayList[Namespace](namespaceIterable.toBuffer.asJava).iterator
+    val namespaces: jutil.Iterator[Namespace] =
+      (new jutil.ArrayList[Namespace](namespaceIterable.asJava)).iterator
 
     xmlEventFactory.createStartElement(javaQName, attributes, namespaces)
   }
@@ -199,7 +201,7 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
     val javaQName = JavaQNames.enameToJavaQName(elm.resolvedName, elm.qname.prefixOption)
 
     // scalastyle:off null
-    val namespaceOutOfScopeIterable: Iterable[Namespace] = {
+    val namespaceOutOfScopeIterable: immutable.IndexedSeq[Namespace] = {
       val result = namespaceDeclarations.prefixNamespaceMap map { kv =>
         val prefix = kv._1
         val nsUri = kv._2
@@ -210,11 +212,11 @@ trait YaidomToStaxEventsConversions extends ElemConverter[XmlEventsProducer] wit
           (prefix -> xmlEventFactory.createNamespace(prefix, nsUri))
         }
       }
-      result.values
+      result.values.toIndexedSeq
     }
 
     val namespacesOutOfScope: jutil.Iterator[Namespace] =
-      new jutil.ArrayList[Namespace](namespaceOutOfScopeIterable.toBuffer.asJava).iterator
+      (new jutil.ArrayList[Namespace](namespaceOutOfScopeIterable.asJava)).iterator
 
     xmlEventFactory.createEndElement(javaQName, namespacesOutOfScope)
   }

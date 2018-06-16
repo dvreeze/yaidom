@@ -275,7 +275,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
   def filter(p: ((String, String)) => Boolean): Scope = Scope.from(this.prefixNamespaceMap.filter(p))
 
   /** Returns `Scope.from(this.prefixNamespaceMap.filterKeys(p))`. */
-  def filterKeys(p: String => Boolean): Scope = Scope.from(this.prefixNamespaceMap.filterKeys(p))
+  def filterKeys(p: String => Boolean): Scope = Scope.from(this.prefixNamespaceMap.filterKeys(p).toMap)
 
   /** Returns `this.prefixNamespaceMap.keySet`. */
   def keySet: Set[String] = this.prefixNamespaceMap.keySet
@@ -312,7 +312,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
 
     qname match {
       case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(getNoNsEName(unprefixedName.localPart))
-      case unprefixedName: UnprefixedName                                   => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
+      case unprefixedName: UnprefixedName => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
       case prefixedName: PrefixedName =>
         // The prefix scope (as Map), with the implicit "xml" namespace added
         val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> XmlNamespace)
@@ -349,7 +349,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
           Scope.this.prefixNamespaceMap.getOrElse(pref, "") != ns
       }
 
-      val removed: Set[String] = Scope.this.prefixNamespaceMap.keySet -- scope.prefixNamespaceMap.keySet
+      val removed: Set[String] = Scope.this.prefixNamespaceMap.keySet.diff(scope.prefixNamespaceMap.keySet)
       val undeclarations: Map[String, String] = (removed map (pref => (pref -> ""))).toMap
 
       assert(newlyDeclared.keySet.intersect(removed).isEmpty)
@@ -407,8 +407,8 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutabl
       result.toSet
     }
 
-    assert(result.values forall (prefixes => !prefixes.isEmpty))
-    result
+    assert(result.values forall (_.nonEmpty))
+    result.toMap
   }
 
   /**

@@ -378,7 +378,7 @@ object XmlCreationTest {
   def getPeriodAsLocalDateSeq(startDate: LocalDate, endDate: LocalDate): immutable.IndexedSeq[LocalDate] = {
     require(startDate.isBefore(endDate), s"$startDate not before $endDate")
 
-    Stream.from(0).map(i => startDate.plusDays(i)).takeWhile(d => !d.isAfter(endDate)).toIndexedSeq
+    Iterator.from(0).map(i => startDate.plusDays(i)).takeWhile(d => !d.isAfter(endDate)).toIndexedSeq
   }
 
   def getYearAsPeriodAsLocalDateSeq(year: Int): immutable.IndexedSeq[LocalDate] = {

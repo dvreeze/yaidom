@@ -55,12 +55,12 @@ private[yaidom] object XmlStringUtils {
 
     // Taken from Anti-XML, and enhanced (there are 5 predefined entities)
     s flatMap {
-      case '&'  => "&amp;"
-      case '<'  => "&lt;"
-      case '>'  => "&gt;"
+      case '&' => "&amp;"
+      case '<' => "&lt;"
+      case '>' => "&gt;"
       case '\'' => "&apos;"
-      case '"'  => "&quot;"
-      case c    => List(c)
+      case '"' => "&quot;"
+      case c => String.valueOf(c)
     }
   }
 
@@ -79,10 +79,10 @@ private[yaidom] object XmlStringUtils {
   }
 
   private def isProbableXmlNameStart(c: Char): Boolean = c match {
-    case '-'                             => false
-    case '.'                             => false
+    case '-' => false
+    case '.' => false
     case c if jlang.Character.isDigit(c) => false
-    case _                               => isProbableXmlNameChar(c)
+    case _ => isProbableXmlNameChar(c)
   }
 
   private def isProbableXmlNameChar(c: Char): Boolean = c match {

@@ -51,7 +51,7 @@ final class SaxonDocument(val wrappedTreeInfo: TreeInfo) extends BackingDocument
   def children: immutable.IndexedSeq[SaxonCanBeDocumentChild] = {
     val it = wrappedNode.iterateAxis(AxisInfo.CHILD)
 
-    val nodes = Stream.continually(it.next()).takeWhile(_ ne null).toVector
+    val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toVector
 
     nodes.flatMap(nodeInfo => SaxonNode.wrapNodeOption(nodeInfo)) collect {
       case ch: SaxonCanBeDocumentChild => ch

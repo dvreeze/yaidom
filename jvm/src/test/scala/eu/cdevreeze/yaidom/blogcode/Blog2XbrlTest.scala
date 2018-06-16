@@ -16,9 +16,10 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
+import java.time.LocalDate
+
 import scala.Vector
 
-import org.joda.time.LocalDate
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -308,7 +309,7 @@ class Blog2XbrlTest extends FunSuite {
       Map("startBalance" -> 1000, "change" -> -1000, "endBalance" -> 0),
       Map("startBalance" -> -3000, "change" -> 4000, "endBalance" -> 1000))) {
 
-      evalResults.map(_.facts.mapValues(_.text.toInt)).toSet
+      evalResults.map(_.facts.mapValues(_.text.toInt).toMap).toSet
     }
   }
 
@@ -318,10 +319,16 @@ class Blog2XbrlTest extends FunSuite {
   private val idocElem = idoc.documentElement
 
   val contextsById: Map[String, indexed.Elem] =
-    idocElem.filterChildElems(withEName(XbrliNs, "context")).groupBy(_.attribute(EName("id"))).mapValues(_.head)
+    idocElem.filterChildElems(withEName(XbrliNs, "context"))
+      .groupBy(_.attribute(EName("id")))
+      .mapValues(_.head)
+      .toMap
 
   val unitsById: Map[String, indexed.Elem] =
-    idocElem.filterChildElems(withEName(XbrliNs, "unit")).groupBy(_.attribute(EName("id"))).mapValues(_.head)
+    idocElem.filterChildElems(withEName(XbrliNs, "unit"))
+      .groupBy(_.attribute(EName("id")))
+      .mapValues(_.head)
+      .toMap
 
   // See http://www.xbrl.org/Specification/variables/REC-2009-06-22/.
 

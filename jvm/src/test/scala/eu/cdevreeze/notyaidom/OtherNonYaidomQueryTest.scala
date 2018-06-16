@@ -410,7 +410,7 @@ class OtherNonYaidomQueryTest extends FunSuite {
         titleString: String = bookOrMagazine.findAllChildElems.find(_.name == "Title").get.text.trim
         otherBooksAndMagazines = {
           val result = bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.name) }
-          result.toSet -- Set(bookOrMagazine)
+          result.toSet.diff(Set(bookOrMagazine))
         }
         titles = otherBooksAndMagazines map { e => e.findAllChildElems.find(_.name == "Title").get }
         titleStrings = {
@@ -435,7 +435,7 @@ class OtherNonYaidomQueryTest extends FunSuite {
       for {
         bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.name) }
         titleString: String = bookOrMagazine.findAllChildElems.find(_.name == "Title").get.text.trim
-        otherBooks = bookstore.findAllChildElems.filter(_.name == "Book").toSet -- Set(bookOrMagazine)
+        otherBooks = bookstore.findAllChildElems.filter(_.name == "Book").toSet.diff(Set(bookOrMagazine))
         titles = otherBooks map { e => e.findAllChildElems.find(_.name == "Title").get }
         titleStrings = {
           val result = titles map { _.text.trim }
@@ -787,7 +787,7 @@ class OtherNonYaidomQueryTest extends FunSuite {
         author <- book filterElemsOrSelf { _.name == "Author" }
         if author.findAllChildElems.find(_.name == "Last_Name").get.text.trim == authorLastName
       } yield {
-        val attrs = book.attributes filterKeys { a => Set("ISBN", "Price").contains(a) }
+        val attrs = book.attributes.filterKeys(a => Set("ISBN", "Price").contains(a)).toMap
         new Elem(
           name = "Book",
           attributes = attrs,

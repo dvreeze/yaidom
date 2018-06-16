@@ -170,7 +170,7 @@ class ElemLikePropTest extends FunSuite with Checkers {
       doc <- oneOf(docs)
       elems <- someOf(doc.documentElement.findAllElemsOrSelf)
       if elems.nonEmpty
-      elem <- oneOf(elems)
+      elem <- oneOf(elems.toIndexedSeq)
     } yield elem
   }
 

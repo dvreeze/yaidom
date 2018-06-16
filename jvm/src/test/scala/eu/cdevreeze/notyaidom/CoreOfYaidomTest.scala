@@ -411,7 +411,7 @@ class CoreOfYaidomTest extends FunSuite {
         titleString: String = bookOrMagazine.findAllChildElems.find(_.name == "Title").get.text.trim
         otherBooksAndMagazines = {
           val result = bookstoreIndexedElem filterChildElems { e => Set("Book", "Magazine").contains(e.name) }
-          result.toSet -- Set(bookOrMagazine)
+          result.toSet.diff(Set(bookOrMagazine))
         }
         titles = otherBooksAndMagazines map { e => e.findAllChildElems.find(_.name == "Title").get }
         titleStrings = {
@@ -436,7 +436,7 @@ class CoreOfYaidomTest extends FunSuite {
       for {
         bookOrMagazine <- bookstoreIndexedElem filterChildElems { e => Set("Book", "Magazine").contains(e.name) }
         titleString: String = bookOrMagazine.findAllChildElems.find(_.name == "Title").get.text.trim
-        otherBooks = bookstoreIndexedElem.findAllChildElems.filter(_.name == "Book").toSet -- Set(bookOrMagazine)
+        otherBooks = bookstoreIndexedElem.findAllChildElems.filter(_.name == "Book").toSet.diff(Set(bookOrMagazine))
         titles = otherBooks map { e => e.findAllChildElems.find(_.name == "Title").get }
         titleStrings = {
           val result = titles map { _.text.trim }
@@ -793,7 +793,7 @@ class CoreOfYaidomTest extends FunSuite {
         author <- book filterElemsOrSelf { _.name == "Author" }
         if author.findAllChildElems.find(_.name == "Last_Name").get.text.trim == authorLastName
       } yield {
-        val attrs = book.attributes filterKeys { a => Set("ISBN", "Price").contains(a) }
+        val attrs = book.attributes.filterKeys(a => Set("ISBN", "Price").contains(a)).toMap
         new Elem(
           name = "Book",
           attributes = attrs,
@@ -1110,9 +1110,9 @@ object CoreOfYaidomTest {
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final class Elem(
-    val name:       String,
+    val name: String,
     val attributes: Map[String, String],
-    val children:   immutable.IndexedSeq[Node]) extends Node with ElemLike {
+    val children: immutable.IndexedSeq[Node]) extends Node with ElemLike {
 
     type ThisElem = Elem
 
@@ -1177,7 +1177,7 @@ object CoreOfYaidomTest {
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final case class IndexedElem(
-    val rootElem:                  Elem,
+    val rootElem: Elem,
     val ownRelativeNavigationPath: NavigationPath) extends IndexedNode with BackingElemApi with ElemLike with HasParent {
 
     type ThisElem = IndexedElem

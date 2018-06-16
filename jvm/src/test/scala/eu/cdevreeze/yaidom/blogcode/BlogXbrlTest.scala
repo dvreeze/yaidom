@@ -123,7 +123,7 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
     // Knowing the units are the same, the gaap:AverageNumberEmployees facts are uniquely identified by contexts.
 
     val avgNumEmployeesFactsByContext: Map[String, simple.Elem] = {
-      avgNumEmployeesFacts.groupBy(_.attribute(EName("contextRef"))).mapValues(_.head)
+      avgNumEmployeesFacts.groupBy(_.attribute(EName("contextRef"))).mapValues(_.head).toMap
     }
 
     assertResult(Set("D-2003", "D-2004", "D-2005", "D-2007-BS1", "D-2007-BS2", "D-2006", "D-2007")) {
@@ -274,28 +274,28 @@ class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
     val remainingChildElems =
       xbrlInstance.findAllChildElems dropWhile {
         case e: SchemaRef => true
-        case e            => false
+        case e => false
       } dropWhile {
         case e: LinkbaseRef => true
-        case e              => false
+        case e => false
       } dropWhile {
         case e: RoleRef => true
-        case e          => false
+        case e => false
       } dropWhile {
         case e: ArcroleRef => true
-        case e             => false
+        case e => false
       } dropWhile {
         case e: XbrliContext => true
-        case e               => false
+        case e => false
       } dropWhile {
         case e: XbrliUnit => true
-        case e            => false
+        case e => false
       } dropWhile {
         case e: Fact => true
-        case e       => false
+        case e => false
       } dropWhile {
         case e: FootnoteLink => true
-        case e               => false
+        case e => false
       }
 
     assertResult(true) {

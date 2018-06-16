@@ -415,7 +415,7 @@ class NonYaidomQueryTest extends FunSuite {
         titleString: String = bookOrMagazine.findAllChildElems.find(_.name == "Title").get.text.trim
         otherBooksAndMagazines = {
           val result = bookstore.findAllChildElems filter { e => Set("Book", "Magazine").contains(e.name) }
-          result.toSet -- Set(bookOrMagazine)
+          result.toSet.diff(Set(bookOrMagazine))
         }
         titles = otherBooksAndMagazines map { e => e.findAllChildElems.find(_.name == "Title").get }
         titleStrings = {
@@ -440,7 +440,7 @@ class NonYaidomQueryTest extends FunSuite {
       for {
         bookOrMagazine <- bookstore.findAllChildElems filter { e => Set("Book", "Magazine").contains(e.name) }
         titleString: String = bookOrMagazine.findAllChildElems.find(_.name == "Title").get.text.trim
-        otherBooks = bookstore.findAllChildElems.filter(_.name == "Book").toSet -- Set(bookOrMagazine)
+        otherBooks = bookstore.findAllChildElems.filter(_.name == "Book").toSet.diff(Set(bookOrMagazine))
         titles = otherBooks map { e => e.findAllChildElems.find(_.name == "Title").get }
         titleStrings = {
           val result = titles map { _.text.trim }
@@ -792,7 +792,7 @@ class NonYaidomQueryTest extends FunSuite {
         author <- book.findAllElemsOrSelf filter { _.name == "Author" }
         if author.findAllChildElems.find(_.name == "Last_Name").get.text.trim == authorLastName
       } yield {
-        val attrs = book.attributes filterKeys { a => Set("ISBN", "Price").contains(a) }
+        val attrs = book.attributes.filterKeys(a => Set("ISBN", "Price").contains(a)).toMap
         new Elem(
           name = "Book",
           attributes = attrs,
@@ -1001,9 +1001,9 @@ object NonYaidomQueryTest {
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final class Elem(
-      val name: String,
-      val attributes: Map[String, String],
-      val children: immutable.IndexedSeq[Node]) extends Node { self =>
+    val name: String,
+    val attributes: Map[String, String],
+    val children: immutable.IndexedSeq[Node]) extends Node { self =>
 
     def this(name: String, children: immutable.IndexedSeq[Node]) =
       this(name, Map(), children)

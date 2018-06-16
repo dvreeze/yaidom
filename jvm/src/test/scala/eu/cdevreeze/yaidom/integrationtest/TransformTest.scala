@@ -17,7 +17,6 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import scala.Vector
-import scala.collection.immutable.Stream.consWrapper
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -48,28 +47,29 @@ class TransformTest extends FunSuite {
 
     import NodeBuilder._
 
-    def fooIdBits(i: Int): Stream[Elem] = {
-      val currentFooBuilder =
-        elem(
-          QName("foo"),
-          Vector(QName("id") -> i.toString),
-          Vector(
-            elem(
-              QName("bar"),
-              Vector(QName("id") -> "0"),
-              Vector(
-                elem(
-                  QName("baz"),
-                  Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"),
-                  Vector(
-                    emptyElem(QName("buz"), Vector(QName("id") -> "0")))),
-                emptyElem(
-                  QName("buz"),
-                  Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"))))))
+    def fooIdBits(i: Int): Iterator[Elem] = {
+      Iterator.from(i).map { idx =>
+        val currentFooBuilder =
+          elem(
+            QName("foo"),
+            Vector(QName("id") -> idx.toString),
+            Vector(
+              elem(
+                QName("bar"),
+                Vector(QName("id") -> "0"),
+                Vector(
+                  elem(
+                    QName("baz"),
+                    Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"),
+                    Vector(
+                      emptyElem(QName("buz"), Vector(QName("id") -> "0")))),
+                  emptyElem(
+                    QName("buz"),
+                    Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"))))))
 
-      val currentFoo = currentFooBuilder.build(Scope.Empty)
-
-      currentFoo #:: fooIdBits(i + 1)
+        val currentFoo = currentFooBuilder.build(Scope.Empty)
+        currentFoo
+      }
     }
 
     val fooIdElem = Node.elem(QName("root"), scope, fooIdBits(1).take(50).toVector)
