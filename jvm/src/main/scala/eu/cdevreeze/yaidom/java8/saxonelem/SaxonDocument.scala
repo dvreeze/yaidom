@@ -23,6 +23,7 @@ import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 import eu.cdevreeze.yaidom.saxon
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingDocumentApi
+import net.sf.saxon.om.TreeInfo
 
 /**
  * Wrapper around Saxon wrapper document.
@@ -37,5 +38,16 @@ final class SaxonDocument(val underlyingDocument: saxon.SaxonDocument) extends S
 
   def uriOption: Optional[URI] = {
     underlyingDocument.uriOption.asJava
+  }
+}
+
+object SaxonDocument {
+
+  def apply(treeInfo: TreeInfo): SaxonDocument = {
+    apply(new saxon.SaxonDocument(treeInfo))
+  }
+
+  def apply(underlyingDocument: saxon.SaxonDocument): SaxonDocument = {
+    new SaxonDocument(underlyingDocument)
   }
 }

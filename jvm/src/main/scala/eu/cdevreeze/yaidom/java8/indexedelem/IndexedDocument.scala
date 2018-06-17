@@ -39,3 +39,10 @@ final class IndexedDocument(val underlyingDocument: indexed.Document) extends St
     underlyingDocument.uriOption.asJava
   }
 }
+
+object IndexedDocument {
+
+  def apply(underlyingDocument: indexed.Document): IndexedDocument = {
+    new IndexedDocument(underlyingDocument)
+  }
+}

@@ -86,7 +86,7 @@ final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDo
 
   override def equals(other: Any): Boolean = other match {
     case other: SimpleElem => this.underlyingNode == other.underlyingNode
-    case _                 => false
+    case _ => false
   }
 
   override def hashCode: Int = {
@@ -120,4 +120,11 @@ final class SimpleProcessingInstruction(override val underlyingNode: simple.Proc
 final class SimpleEntityRef(override val underlyingNode: simple.EntityRef) extends SimpleNode(underlyingNode) {
 
   def entity: String = underlyingNode.entity
+}
+
+object SimpleElem {
+
+  def apply(underlyingNode: simple.Elem): SimpleElem = {
+    new SimpleElem(underlyingNode)
+  }
 }

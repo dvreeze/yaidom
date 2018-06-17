@@ -168,7 +168,7 @@ final class SaxonElem(override val underlyingNode: saxon.SaxonElem)
 
   override def equals(other: Any): Boolean = other match {
     case other: SaxonElem => this.underlyingNode == other.underlyingNode
-    case _                => false
+    case _ => false
   }
 
   override def hashCode: Int = {
@@ -200,6 +200,10 @@ final class SaxonProcessingInstruction(override val underlyingNode: saxon.SaxonP
 object SaxonElem {
 
   def apply(nodeInfo: NodeInfo): SaxonElem = {
-    new SaxonElem(new saxon.SaxonElem(nodeInfo))
+    apply(new saxon.SaxonElem(nodeInfo))
+  }
+
+  def apply(underlyingNode: saxon.SaxonElem): SaxonElem = {
+    new SaxonElem(underlyingNode)
   }
 }

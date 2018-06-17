@@ -73,7 +73,7 @@ public class ScalaXmlElemQueryTest extends AbstractElemQueryTest<ScalaXmlElem> {
 		try {
 			docUri = ScalaXmlElemQueryTest.class.getResource("books.xml").toURI();
 			Document doc = docParser.parse(docUri);
-			return new ScalaXmlElem(ScalaXmlConversions.convertElem(doc.documentElement()));
+			return ScalaXmlElem.apply(ScalaXmlConversions.convertElem(doc.documentElement()));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

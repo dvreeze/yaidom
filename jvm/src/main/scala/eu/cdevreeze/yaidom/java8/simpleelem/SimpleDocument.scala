@@ -39,3 +39,10 @@ final class SimpleDocument(val underlyingDocument: simple.Document) extends Stre
     underlyingDocument.uriOption.asJava
   }
 }
+
+object SimpleDocument {
+
+  def apply(underlyingDocument: simple.Document): SimpleDocument = {
+    new SimpleDocument(underlyingDocument)
+  }
+}

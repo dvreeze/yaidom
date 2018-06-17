@@ -76,6 +76,6 @@ public class ResolvedElemQueryTest extends AbstractElemQueryTest<ResolvedElem> {
 			throw new RuntimeException(e);
 		}
 		Document doc = docParser.parse(docUri);
-		return ResolvedElem.apply(doc.documentElement());
+		return ResolvedElem.from(doc.documentElement());
 	}
 }

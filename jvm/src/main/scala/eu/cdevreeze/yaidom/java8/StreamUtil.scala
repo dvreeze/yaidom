@@ -47,6 +47,8 @@ object StreamUtil {
 
   /**
    * Returns `asJavaFunction { x: A => toStream(f(x)) }`.
+   *
+   * Note that from Scala 2.12 on (at least 2.12.6, if not a lot earlier) the asJavaFunction call is unnecessary.
    */
   def toJavaStreamFunction[A, B](f: A => immutable.IndexedSeq[B]): Function[A, Stream[B]] = {
     asJavaFunction { x: A => toStream(f(x)) }

@@ -97,9 +97,9 @@ public abstract class AbstractElemQueryTest<E extends StreamingClarkElemApi<E>> 
 
 		ENameProvider enameProvider = new ENameProvider.TrivialENameProvider();
 
-		EName bookEName = scope.resolveQNameOption(bookQName, enameProvider).get();
-		EName priceEName = scope.withoutDefaultNamespace().resolveQNameOption(priceQName, enameProvider).get();
-		EName titleEName = scope.resolveQNameOption(titleQName, enameProvider).get();
+		EName bookEName = scope.resolveQName(bookQName, enameProvider);
+		EName priceEName = scope.withoutDefaultNamespace().resolveQName(priceQName, enameProvider);
+		EName titleEName = scope.resolveQName(titleQName, enameProvider);
 
 		Stream<E> books = bookstore.filterChildElems(withEName(bookEName));
 

@@ -76,6 +76,6 @@ public class SimpleElemQueryTest extends AbstractElemQueryTest<SimpleElem> {
 			throw new RuntimeException(e);
 		}
 		Document doc = docParser.parse(docUri);
-		return new SimpleElem(doc.documentElement());
+		return SimpleElem.apply(doc.documentElement());
 	}
 }

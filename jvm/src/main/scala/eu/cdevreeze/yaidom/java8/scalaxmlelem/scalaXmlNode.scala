@@ -92,7 +92,7 @@ final class ScalaXmlElem(override val underlyingNode: Elem) extends CanBeScalaXm
 
   override def equals(other: Any): Boolean = other match {
     case other: ScalaXmlElem => this.underlyingNode == other.underlyingNode
-    case _                   => false
+    case _ => false
   }
 
   override def hashCode: Int = {
@@ -124,4 +124,11 @@ final class ScalaXmlProcessingInstruction(override val underlyingNode: ProcInstr
 final class ScalaXmlEntityRef(override val underlyingNode: EntityRef) extends ScalaXmlNode(underlyingNode) {
 
   def entity: String = scalaxml.ScalaXmlEntityRef(underlyingNode).entity
+}
+
+object ScalaXmlElem {
+
+  def apply(underlyingNode: Elem): ScalaXmlElem = {
+    new ScalaXmlElem(underlyingNode)
+  }
 }

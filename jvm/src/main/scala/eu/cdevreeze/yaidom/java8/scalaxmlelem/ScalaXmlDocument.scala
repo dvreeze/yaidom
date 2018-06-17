@@ -39,3 +39,10 @@ final class ScalaXmlDocument(val underlyingDocument: scala.xml.Document) extends
     scalaxml.ScalaXmlDocument(underlyingDocument).uriOption.asJava
   }
 }
+
+object ScalaXmlDocument {
+
+  def apply(underlyingDocument: scala.xml.Document): ScalaXmlDocument = {
+    new ScalaXmlDocument(underlyingDocument)
+  }
+}

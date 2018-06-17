@@ -41,3 +41,10 @@ final class DomDocument(val underlyingDocument: Document) extends StreamingDocum
     dom.DomDocument(underlyingDocument).uriOption.asJava
   }
 }
+
+object DomDocument {
+
+  def apply(underlyingDocument: Document): DomDocument = {
+    new DomDocument(underlyingDocument)
+  }
+}

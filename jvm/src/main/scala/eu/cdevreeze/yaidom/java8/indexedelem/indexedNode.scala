@@ -52,9 +52,9 @@ sealed abstract class CanBeDocumentChild(override val underlyingNode: IndexedSco
  * Wrapper around native yaidom indexed element, offering the streaming element query API.
  */
 final class IndexedElem(override val underlyingNode: indexed.Elem)
-    extends CanBeDocumentChild(underlyingNode)
-    with StreamingBackingElemApi[IndexedElem]
-    with StreamingScopedElemLike[IndexedElem] {
+  extends CanBeDocumentChild(underlyingNode)
+  with StreamingBackingElemApi[IndexedElem]
+  with StreamingScopedElemLike[IndexedElem] {
 
   def findAllChildElems: Stream[IndexedElem] = {
     val underlyingResult: Stream[indexed.Elem] =
@@ -168,7 +168,7 @@ final class IndexedElem(override val underlyingNode: indexed.Elem)
 
   override def equals(other: Any): Boolean = other match {
     case other: IndexedElem => this.underlyingNode == other.underlyingNode
-    case _                  => false
+    case _ => false
   }
 
   override def hashCode: Int = {
@@ -205,6 +205,10 @@ final class IndexedEntityRef(override val underlyingNode: IndexedScopedNode.Enti
 }
 
 object IndexedElem {
+
+  def apply(underlyingNode: indexed.Elem): IndexedElem = {
+    new IndexedElem(underlyingNode)
+  }
 
   def apply(elem: eu.cdevreeze.yaidom.simple.Elem, path: Path): IndexedElem = {
     new IndexedElem(IndexedScopedNode.Elem(elem, path))

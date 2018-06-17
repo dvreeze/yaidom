@@ -7,12 +7,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Test;
 
-import eu.cdevreeze.yaidom.convert.DomConversions;
-import eu.cdevreeze.yaidom.core.Scope;
+import eu.cdevreeze.yaidom.java8.domelem.DomDocument;
 import eu.cdevreeze.yaidom.java8.domelem.DomElem;
-import eu.cdevreeze.yaidom.parse.DocumentParser;
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax;
-import eu.cdevreeze.yaidom.simple.Document;
 
 public class DomElemQueryTest extends AbstractElemQueryTest<DomElem> {
 
@@ -72,13 +68,10 @@ public class DomElemQueryTest extends AbstractElemQueryTest<DomElem> {
 	}
 
 	protected DomElem getBookstore() {
-		DocumentParser docParser = DocumentParserUsingSax.newInstance();
-		URI docUri;
 		try {
-			docUri = DomElemQueryTest.class.getResource("books.xml").toURI();
-			Document doc = docParser.parse(docUri);
+			URI docUri = DomElemQueryTest.class.getResource("books.xml").toURI();
 			DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			return new DomElem(DomConversions.convertElem(doc.documentElement(), db.newDocument(), Scope.Empty()));
+			return DomDocument.apply(db.parse(docUri.toURL().openStream())).documentElement();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

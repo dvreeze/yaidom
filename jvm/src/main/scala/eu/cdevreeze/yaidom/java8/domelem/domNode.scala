@@ -93,7 +93,7 @@ final class DomElem(override val underlyingNode: Element) extends CanBeDomDocume
 
   override def equals(other: Any): Boolean = other match {
     case other: DomElem => this.underlyingNode == other.underlyingNode
-    case _              => false
+    case _ => false
   }
 
   override def hashCode: Int = {
@@ -125,4 +125,11 @@ final class DomProcessingInstruction(override val underlyingNode: ProcessingInst
 final class DomEntityRef(override val underlyingNode: EntityReference) extends DomNode(underlyingNode) {
 
   def entity: String = dom.DomEntityRef(underlyingNode).entity
+}
+
+object DomElem {
+
+  def apply(underlyingNode: Element): DomElem = {
+    new DomElem(underlyingNode)
+  }
 }
