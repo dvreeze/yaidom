@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 
 import org.junit.Test;
 
+import eu.cdevreeze.yaidom.java8.saxonelem.SaxonDocument;
 import eu.cdevreeze.yaidom.java8.saxonelem.SaxonElem;
 import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;
@@ -13,7 +14,9 @@ import net.sf.saxon.s9api.SaxonApiException;
 
 public class SaxonElemQueryTest extends AbstractElemQueryTest<SaxonElem> {
 
-	private Processor processor = new Processor(false);
+	private Processor processor() {
+		return new Processor(false);
+	}
 
 	@Test
 	public void testQueryBookTitles() {
@@ -71,12 +74,14 @@ public class SaxonElemQueryTest extends AbstractElemQueryTest<SaxonElem> {
 	}
 
 	protected SaxonElem getBookstore() {
-		DocumentBuilder docBuilder = processor.newDocumentBuilder();
+		DocumentBuilder docBuilder = processor().newDocumentBuilder();
 		URI docUri;
 		try {
 			docUri = SaxonElemQueryTest.class.getResource("books.xml").toURI();
 
-			SaxonElem docElem = SaxonElem.apply(docBuilder.build(new File(docUri)).getUnderlyingNode());
+			SaxonDocument doc = SaxonDocument
+					.apply(docBuilder.build(new File(docUri)).getUnderlyingNode().getTreeInfo());
+			SaxonElem docElem = doc.documentElement();
 			return docElem;
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
