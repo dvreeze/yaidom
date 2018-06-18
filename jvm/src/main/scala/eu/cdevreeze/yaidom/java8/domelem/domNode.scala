@@ -57,7 +57,7 @@ final class DomElem(override val underlyingNode: Element) extends CanBeDomDocume
     val underlyingResult: Stream[dom.DomElem] =
       toSingletonStream(dom.DomElem(underlyingNode)).flatMap(toJavaStreamFunction(e => e.findAllChildElems))
 
-    underlyingResult.map[DomElem](asJavaFunction(e => new DomElem(e.wrappedNode)))
+    underlyingResult.map[DomElem](asJavaFunction(e => DomElem(e.wrappedNode)))
   }
 
   def resolvedName: EName = {

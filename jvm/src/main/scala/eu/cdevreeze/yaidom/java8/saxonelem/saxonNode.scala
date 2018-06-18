@@ -49,7 +49,14 @@ sealed abstract class SaxonNode(val underlyingNode: saxon.SaxonNode)
 sealed abstract class CanBeDocumentChild(override val underlyingNode: saxon.SaxonCanBeDocumentChild) extends SaxonNode(underlyingNode)
 
 /**
- * Wrapper around Saxon element, offering the streaming element query API.
+ * Wrapper around Saxon (wrapper) element, offering the streaming element query API.
+ *
+ * This wrapper does not directly wrap the underlying native Saxon nodes, but it wraps their yaidom wrappers, in
+ * order to leverage much of this efficient Saxon yaidom wrapper implementation instead of having to re-implement
+ * most of the same logic.
+ *
+ * TODO Do not extend StreamingScopedElemLike, but implement each method by invoking the corresponding underlying
+ * Saxon wrapper element method.
  */
 final class SaxonElem(override val underlyingNode: saxon.SaxonElem)
   extends CanBeDocumentChild(underlyingNode)
