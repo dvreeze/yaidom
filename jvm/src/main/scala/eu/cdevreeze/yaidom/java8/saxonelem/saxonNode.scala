@@ -35,7 +35,7 @@ import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
 import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
 import eu.cdevreeze.yaidom.java8.StreamUtil.toStream
-import eu.cdevreeze.yaidom.java8.queryapi.StreamingBackingElemApi
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingBackingNodes
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
 import net.sf.saxon.om.NodeInfo
 
@@ -44,9 +44,10 @@ import net.sf.saxon.om.NodeInfo
  *
  * @author Chris de Vreeze
  */
-sealed abstract class SaxonNode(val underlyingNode: saxon.SaxonNode)
+sealed abstract class SaxonNode(val underlyingNode: saxon.SaxonNode) extends StreamingBackingNodes.Node
 
-sealed abstract class CanBeDocumentChild(override val underlyingNode: saxon.SaxonCanBeDocumentChild) extends SaxonNode(underlyingNode)
+sealed abstract class CanBeDocumentChild(override val underlyingNode: saxon.SaxonCanBeDocumentChild)
+  extends SaxonNode(underlyingNode) with StreamingBackingNodes.CanBeDocumentChild
 
 /**
  * Wrapper around Saxon (wrapper) element, offering the streaming element query API.
@@ -60,8 +61,16 @@ sealed abstract class CanBeDocumentChild(override val underlyingNode: saxon.Saxo
  */
 final class SaxonElem(override val underlyingNode: saxon.SaxonElem)
   extends CanBeDocumentChild(underlyingNode)
-  with StreamingBackingElemApi[SaxonElem]
+  with StreamingBackingNodes.Elem[SaxonNode, SaxonElem]
   with StreamingScopedElemLike[SaxonElem] {
+
+  def children: Stream[SaxonNode] = {
+    val underlyingResult: Stream[saxon.SaxonNode] =
+      toSingletonStream(underlyingNode).flatMap(toJavaStreamFunction(e => e.children))
+
+    underlyingResult
+      .map[SaxonNode](asJavaFunction(n => SaxonNode(n)))
+  }
 
   def findAllChildElems: Stream[SaxonElem] = {
     val underlyingResult: Stream[saxon.SaxonElem] =
@@ -183,7 +192,8 @@ final class SaxonElem(override val underlyingNode: saxon.SaxonElem)
   }
 }
 
-final class SaxonText(override val underlyingNode: saxon.SaxonText) extends SaxonNode(underlyingNode) {
+final class SaxonText(override val underlyingNode: saxon.SaxonText)
+  extends SaxonNode(underlyingNode) with StreamingBackingNodes.Text {
 
   def text: String = underlyingNode.text
 
@@ -192,16 +202,30 @@ final class SaxonText(override val underlyingNode: saxon.SaxonText) extends Saxo
   def normalizedText: String = underlyingNode.normalizedText
 }
 
-final class SaxonComment(override val underlyingNode: saxon.SaxonComment) extends CanBeDocumentChild(underlyingNode) {
+final class SaxonComment(override val underlyingNode: saxon.SaxonComment)
+  extends CanBeDocumentChild(underlyingNode) with StreamingBackingNodes.Comment {
 
   def text: String = underlyingNode.text
 }
 
-final class SaxonProcessingInstruction(override val underlyingNode: saxon.SaxonProcessingInstruction) extends CanBeDocumentChild(underlyingNode) {
+final class SaxonProcessingInstruction(override val underlyingNode: saxon.SaxonProcessingInstruction)
+  extends CanBeDocumentChild(underlyingNode) with StreamingBackingNodes.ProcessingInstruction {
 
   def target: String = underlyingNode.target
 
   def data: String = underlyingNode.data
+}
+
+object SaxonNode {
+
+  def apply(underlyingNode: saxon.SaxonNode): SaxonNode = {
+    underlyingNode match {
+      case e: saxon.SaxonElem => new SaxonElem(e)
+      case t: saxon.SaxonText => new SaxonText(t)
+      case c: saxon.SaxonComment => new SaxonComment(c)
+      case pi: saxon.SaxonProcessingInstruction => new SaxonProcessingInstruction(pi)
+    }
+  }
 }
 
 object SaxonElem {

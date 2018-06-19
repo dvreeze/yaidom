@@ -30,6 +30,7 @@ import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
 import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
 import eu.cdevreeze.yaidom.java8.StreamUtil.toStream
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedNodes
 import eu.cdevreeze.yaidom.simple
 
 /**
@@ -37,14 +38,26 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-sealed abstract class SimpleNode(val underlyingNode: simple.Node)
+sealed abstract class SimpleNode(val underlyingNode: simple.Node) extends StreamingScopedNodes.Node
 
-sealed abstract class CanBeDocumentChild(override val underlyingNode: simple.CanBeDocumentChild) extends SimpleNode(underlyingNode)
+sealed abstract class CanBeDocumentChild(override val underlyingNode: simple.CanBeDocumentChild)
+  extends SimpleNode(underlyingNode) with StreamingScopedNodes.CanBeDocumentChild
 
 /**
  * Wrapper around native yaidom simple element, offering the streaming element query API.
  */
-final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDocumentChild(underlyingNode) with StreamingScopedElemLike[SimpleElem] {
+final class SimpleElem(override val underlyingNode: simple.Elem)
+  extends CanBeDocumentChild(underlyingNode)
+  with StreamingScopedNodes.Elem[SimpleNode, SimpleElem]
+  with StreamingScopedElemLike[SimpleElem] {
+
+  def children: Stream[SimpleNode] = {
+    val underlyingResult: Stream[simple.Node] =
+      toSingletonStream(underlyingNode).flatMap(toJavaStreamFunction(e => e.children))
+
+    underlyingResult
+      .map[SimpleNode](asJavaFunction(n => SimpleNode(n)))
+  }
 
   def findAllChildElems: Stream[SimpleElem] = {
     val underlyingResult: Stream[simple.Elem] =
@@ -94,7 +107,8 @@ final class SimpleElem(override val underlyingNode: simple.Elem) extends CanBeDo
   }
 }
 
-final class SimpleText(override val underlyingNode: simple.Text) extends SimpleNode(underlyingNode) {
+final class SimpleText(override val underlyingNode: simple.Text)
+  extends SimpleNode(underlyingNode) with StreamingScopedNodes.Text {
 
   def text: String = underlyingNode.text
 
@@ -105,21 +119,37 @@ final class SimpleText(override val underlyingNode: simple.Text) extends SimpleN
   def normalizedText: String = underlyingNode.normalizedText
 }
 
-final class SimpleComment(override val underlyingNode: simple.Comment) extends CanBeDocumentChild(underlyingNode) {
+final class SimpleComment(override val underlyingNode: simple.Comment)
+  extends CanBeDocumentChild(underlyingNode) with StreamingScopedNodes.Comment {
 
   def text: String = underlyingNode.text
 }
 
-final class SimpleProcessingInstruction(override val underlyingNode: simple.ProcessingInstruction) extends CanBeDocumentChild(underlyingNode) {
+final class SimpleProcessingInstruction(override val underlyingNode: simple.ProcessingInstruction)
+  extends CanBeDocumentChild(underlyingNode) with StreamingScopedNodes.ProcessingInstruction {
 
   def target: String = underlyingNode.target
 
   def data: String = underlyingNode.data
 }
 
-final class SimpleEntityRef(override val underlyingNode: simple.EntityRef) extends SimpleNode(underlyingNode) {
+final class SimpleEntityRef(override val underlyingNode: simple.EntityRef)
+  extends SimpleNode(underlyingNode) with StreamingScopedNodes.EntityRef {
 
   def entity: String = underlyingNode.entity
+}
+
+object SimpleNode {
+
+  def apply(underlyingNode: simple.Node): SimpleNode = {
+    underlyingNode match {
+      case e: simple.Elem => new SimpleElem(e)
+      case t: simple.Text => new SimpleText(t)
+      case c: simple.Comment => new SimpleComment(c)
+      case pi: simple.ProcessingInstruction => new SimpleProcessingInstruction(pi)
+      case er: simple.EntityRef => new SimpleEntityRef(er)
+    }
+  }
 }
 
 object SimpleElem {

@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
 import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
 import eu.cdevreeze.yaidom.java8.StreamUtil.toStream
-import eu.cdevreeze.yaidom.java8.queryapi.StreamingBackingElemApi
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingBackingNodes
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
 
 /**
@@ -44,17 +44,26 @@ import eu.cdevreeze.yaidom.java8.queryapi.StreamingScopedElemLike
  *
  * @author Chris de Vreeze
  */
-sealed abstract class IndexedNode(val underlyingNode: IndexedScopedNode.Node)
+sealed abstract class IndexedNode(val underlyingNode: IndexedScopedNode.Node) extends StreamingBackingNodes.Node
 
-sealed abstract class CanBeDocumentChild(override val underlyingNode: IndexedScopedNode.CanBeDocumentChild) extends IndexedNode(underlyingNode)
+sealed abstract class CanBeDocumentChild(override val underlyingNode: IndexedScopedNode.CanBeDocumentChild)
+  extends IndexedNode(underlyingNode) with StreamingBackingNodes.CanBeDocumentChild
 
 /**
  * Wrapper around native yaidom indexed element, offering the streaming element query API.
  */
 final class IndexedElem(override val underlyingNode: indexed.Elem)
   extends CanBeDocumentChild(underlyingNode)
-  with StreamingBackingElemApi[IndexedElem]
+  with StreamingBackingNodes.Elem[IndexedNode, IndexedElem]
   with StreamingScopedElemLike[IndexedElem] {
+
+  def children: Stream[IndexedNode] = {
+    val underlyingResult: Stream[IndexedScopedNode.Node] =
+      toSingletonStream(underlyingNode).flatMap(toJavaStreamFunction(e => e.children))
+
+    underlyingResult
+      .map[IndexedNode](asJavaFunction(n => IndexedNode(n)))
+  }
 
   def findAllChildElems: Stream[IndexedElem] = {
     val underlyingResult: Stream[indexed.Elem] =
@@ -176,7 +185,8 @@ final class IndexedElem(override val underlyingNode: indexed.Elem)
   }
 }
 
-final class IndexedText(override val underlyingNode: IndexedScopedNode.Text) extends IndexedNode(underlyingNode) {
+final class IndexedText(override val underlyingNode: IndexedScopedNode.Text)
+  extends IndexedNode(underlyingNode) with StreamingBackingNodes.Text {
 
   def text: String = underlyingNode.text
 
@@ -187,21 +197,42 @@ final class IndexedText(override val underlyingNode: IndexedScopedNode.Text) ext
   def normalizedText: String = underlyingNode.normalizedText
 }
 
-final class IndexedComment(override val underlyingNode: IndexedScopedNode.Comment) extends CanBeDocumentChild(underlyingNode) {
+final class IndexedComment(override val underlyingNode: IndexedScopedNode.Comment)
+  extends CanBeDocumentChild(underlyingNode) with StreamingBackingNodes.Comment {
 
   def text: String = underlyingNode.text
 }
 
-final class IndexedProcessingInstruction(override val underlyingNode: IndexedScopedNode.ProcessingInstruction) extends CanBeDocumentChild(underlyingNode) {
+final class IndexedProcessingInstruction(override val underlyingNode: IndexedScopedNode.ProcessingInstruction)
+  extends CanBeDocumentChild(underlyingNode) with StreamingBackingNodes.ProcessingInstruction {
 
   def target: String = underlyingNode.target
 
   def data: String = underlyingNode.data
 }
 
-final class IndexedEntityRef(override val underlyingNode: IndexedScopedNode.EntityRef) extends IndexedNode(underlyingNode) {
+final class IndexedEntityRef(override val underlyingNode: IndexedScopedNode.EntityRef)
+  extends IndexedNode(underlyingNode) with StreamingBackingNodes.EntityRef {
 
   def entity: String = underlyingNode.entity
+}
+
+object IndexedNode {
+
+  def apply(underlyingNode: indexed.IndexedScopedNode.Node): IndexedNode = {
+    underlyingNode match {
+      case e: indexed.IndexedScopedNode.Elem[_] =>
+        IndexedElem(e.asInstanceOf[indexed.Elem])
+      case t: indexed.IndexedScopedNode.Text =>
+        new IndexedText(t)
+      case c: indexed.IndexedScopedNode.Comment =>
+        new IndexedComment(c)
+      case pi: indexed.IndexedScopedNode.ProcessingInstruction =>
+        new IndexedProcessingInstruction(pi)
+      case er: indexed.IndexedScopedNode.EntityRef =>
+        new IndexedEntityRef(er)
+    }
+  }
 }
 
 object IndexedElem {

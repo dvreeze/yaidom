@@ -49,36 +49,22 @@ object ClarkNodes {
   /**
    * Arbitrary text node
    */
-  trait Text extends Node with Nodes.Text {
-
-    def text: String
-  }
+  trait Text extends Node with Nodes.Text
 
   /**
    * Arbitrary comment node
    */
-  trait Comment extends CanBeDocumentChild with Nodes.Comment {
-
-    def text: String
-  }
+  trait Comment extends CanBeDocumentChild with Nodes.Comment
 
   /**
    * Arbitrary processing instruction node
    */
-  trait ProcessingInstruction extends CanBeDocumentChild with Nodes.ProcessingInstruction {
-
-    def target: String
-
-    def data: String
-  }
+  trait ProcessingInstruction extends CanBeDocumentChild with Nodes.ProcessingInstruction
 
   /**
    * Arbitrary entity reference node
    */
-  trait EntityRef extends Node with Nodes.EntityRef {
-
-    def entity: String
-  }
+  trait EntityRef extends Node with Nodes.EntityRef
 
   object Elem {
 

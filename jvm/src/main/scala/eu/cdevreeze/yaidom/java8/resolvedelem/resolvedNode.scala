@@ -27,6 +27,7 @@ import eu.cdevreeze.yaidom.java8.ResolvedAttr
 import eu.cdevreeze.yaidom.java8.StreamUtil.toJavaStreamFunction
 import eu.cdevreeze.yaidom.java8.StreamUtil.toSingletonStream
 import eu.cdevreeze.yaidom.java8.queryapi.StreamingClarkElemLike
+import eu.cdevreeze.yaidom.java8.queryapi.StreamingClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.resolved
 
@@ -35,12 +36,21 @@ import eu.cdevreeze.yaidom.resolved
  *
  * @author Chris de Vreeze
  */
-sealed abstract class ResolvedNode(val underlyingNode: resolved.Node)
+sealed abstract class ResolvedNode(val underlyingNode: resolved.Node) extends StreamingClarkNodes.Node
 
 /**
  * Wrapper around native yaidom resolved element, offering the streaming element query API.
  */
-final case class ResolvedElem(override val underlyingNode: resolved.Elem) extends ResolvedNode(underlyingNode) with StreamingClarkElemLike[ResolvedElem] {
+final case class ResolvedElem(override val underlyingNode: resolved.Elem)
+  extends ResolvedNode(underlyingNode) with StreamingClarkNodes.Elem[ResolvedNode, ResolvedElem] with StreamingClarkElemLike[ResolvedElem] {
+
+  def children: Stream[ResolvedNode] = {
+    val underlyingResult: Stream[resolved.Node] =
+      toSingletonStream(underlyingNode).flatMap(toJavaStreamFunction(e => e.children))
+
+    underlyingResult
+      .map[ResolvedNode](asJavaFunction(n => ResolvedNode(n)))
+  }
 
   def findAllChildElems: Stream[ResolvedElem] = {
     val underlyingResult: Stream[resolved.Elem] =
@@ -69,13 +79,24 @@ final case class ResolvedElem(override val underlyingNode: resolved.Elem) extend
   }
 }
 
-final class ResolvedText(override val underlyingNode: resolved.Text) extends ResolvedNode(underlyingNode) {
+final case class ResolvedText(override val underlyingNode: resolved.Text)
+  extends ResolvedNode(underlyingNode) with StreamingClarkNodes.Text {
 
   def text: String = underlyingNode.text
 
   def trimmedText: String = underlyingNode.trimmedText
 
   def normalizedText: String = underlyingNode.normalizedText
+}
+
+object ResolvedNode {
+
+  def apply(underlyingNode: resolved.Node): ResolvedNode = {
+    underlyingNode match {
+      case e: resolved.Elem => ResolvedElem(e)
+      case t: resolved.Text => ResolvedText(t)
+    }
+  }
 }
 
 object ResolvedElem {

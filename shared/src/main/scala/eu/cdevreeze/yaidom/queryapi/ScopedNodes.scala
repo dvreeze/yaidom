@@ -50,36 +50,22 @@ object ScopedNodes {
   /**
    * Arbitrary text node
    */
-  trait Text extends Node with ClarkNodes.Text {
-
-    def text: String
-  }
+  trait Text extends Node with ClarkNodes.Text
 
   /**
    * Arbitrary comment node
    */
-  trait Comment extends CanBeDocumentChild with ClarkNodes.Comment {
-
-    def text: String
-  }
+  trait Comment extends CanBeDocumentChild with ClarkNodes.Comment
 
   /**
    * Arbitrary processing instruction node
    */
-  trait ProcessingInstruction extends CanBeDocumentChild with ClarkNodes.ProcessingInstruction {
-
-    def target: String
-
-    def data: String
-  }
+  trait ProcessingInstruction extends CanBeDocumentChild with ClarkNodes.ProcessingInstruction
 
   /**
    * Arbitrary entity reference node
    */
-  trait EntityRef extends Node with ClarkNodes.EntityRef {
-
-    def entity: String
-  }
+  trait EntityRef extends Node with ClarkNodes.EntityRef
 
   object Elem {
 
