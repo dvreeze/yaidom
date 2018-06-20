@@ -77,6 +77,10 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test",
 
+    // JUnit tests (the ones intentionally written in Java) should run as well
+
+    libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
+
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13.0-M4" => Seq()
@@ -116,6 +120,8 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
         NothingFilter
       }
     },
+
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
 
     mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.1")
   )
