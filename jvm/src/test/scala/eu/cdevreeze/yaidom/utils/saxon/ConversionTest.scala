@@ -88,14 +88,18 @@ class ConversionTest extends FunSuite {
 
     val saxonDoc = simpleToSaxonElemConverter.convertSimpleDocument(simpleDoc)
 
-    assertResult(resolved.Elem.from(simpleDoc.documentElement)) {
-      resolved.Elem.from(saxonDoc.documentElement)
+    // Below, I had to remove the inter-element whitespace in order for the comparison to succeed on an IBM J9 JRE.
+
+    assertResult(resolved.Elem.from(simpleDoc.documentElement).removeAllInterElementWhitespace) {
+      resolved.Elem.from(saxonDoc.documentElement).removeAllInterElementWhitespace
     }
     assertResult(simpleDoc.uriOption) {
       saxonDoc.uriOption
     }
 
     val simpleDoc2 = saxonToSimpleElemConverter.convertSaxonDocument(saxonDoc)
+
+    // But here the inter-element whitespace removal is not needed...
 
     assertResult(resolved.Elem.from(saxonDoc.documentElement)) {
       resolved.Elem.from(simpleDoc2.documentElement)

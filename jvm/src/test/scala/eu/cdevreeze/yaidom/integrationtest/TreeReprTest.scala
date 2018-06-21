@@ -27,6 +27,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.EntityRef
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -333,7 +334,21 @@ class TreeReprTest extends FunSuite {
   The entity is defined in the included DTD.
   """)))))))
 
-    doTest(doc, docBuilder)
+    // We only check the entity reference, for consistent results between Oracle and IBM J9.
+    // Note that above the string "hi" should not be there in the first place in the second text node.
+
+    def transform(d: Document): Document = {
+      d.transformElemsOrSelf {
+        case e if e.localName == "child" =>
+          e.withChildren(e.children collect { case er: EntityRef => er })
+            .ensuring(_.findAllElemsOrSelf.flatMap(_.children.collect { case er: EntityRef => er }).nonEmpty)
+        case e => e
+      }
+    }
+
+    doTest(
+      transform(doc),
+      DocBuilder.fromDocument(transform(docBuilder.build())))
   }
 
   test("testCreateTreeForXmlWithNamespaceUndeclarations") {
