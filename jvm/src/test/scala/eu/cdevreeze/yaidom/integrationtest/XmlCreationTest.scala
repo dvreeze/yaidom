@@ -89,6 +89,42 @@ class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
     val timesheetSimpleElem = simple.Elem.from(timesheet)
 
     val xmlString = docPrinter.print(simple.Document(timesheetSimpleElem.prettify(2)))
+    println()
+    println(xmlString)
+  }
+
+  test("testCreateTimesheetXmlFor2018") {
+    val timesheetAfterFirstPass: Timesheet =
+      getTimesheetAfterFirstPass(
+        LocalDate.of(2018, 1, 1),
+        LocalDate.of(2018, 12, 31),
+        dutchHolidays2018,
+        onVacation2018,
+        sickLeaveDays2018,
+        defaultTasksPerDay2018)
+
+    val timesheet =
+      refineTimesheet(timesheetAfterFirstPass, refinementsPerDay2018)
+
+    assertResult(true) {
+      timesheet.days.size >= 250
+    }
+
+    assertResult(true) {
+      timesheet.days.count(_.dayOfWeek == DayOfWeek.MONDAY) >= 35 &&
+        timesheet.days.count(_.dayOfWeek == DayOfWeek.MONDAY) < 70
+    }
+
+    assertResult(Set(8)) {
+      timesheet.days.map(_.totalHours).toSet
+    }
+
+    val docPrinter = DocumentPrinterUsingDom.newInstance()
+
+    val timesheetSimpleElem = simple.Elem.from(timesheet)
+
+    val xmlString = docPrinter.print(simple.Document(timesheetSimpleElem.prettify(2)))
+    println()
     println(xmlString)
   }
 }
@@ -114,7 +150,7 @@ object XmlCreationTest {
       backingElem.children flatMap {
         case e: BackingNodes.Elem => Some(TimesheetElem(e))
         case t: BackingNodes.Text => Some(TimesheetText(t.text))
-        case _                    => None
+        case _ => None
       }
     }
 
@@ -172,9 +208,9 @@ object XmlCreationTest {
     def apply(backingElem: BackingNodes.Elem): TimesheetElem = {
       backingElem.resolvedName match {
         case EName(_, "timesheet") => new Timesheet(backingElem)
-        case EName(_, "day")       => new Day(backingElem)
-        case EName(_, "task")      => new Task(backingElem)
-        case _                     => new TimesheetElem(backingElem)
+        case EName(_, "day") => new Day(backingElem)
+        case EName(_, "task") => new Task(backingElem)
+        case _ => new TimesheetElem(backingElem)
       }
     }
   }
@@ -199,11 +235,11 @@ object XmlCreationTest {
   }
 
   private def getTimesheetAfterFirstPass(
-    startDate:          LocalDate,
-    endDate:            LocalDate,
-    officialHolidays:   Set[LocalDate],
-    vacationDays:       Set[LocalDate],
-    sickLeaveDays:      Set[LocalDate],
+    startDate: LocalDate,
+    endDate: LocalDate,
+    officialHolidays: Set[LocalDate],
+    vacationDays: Set[LocalDate],
+    sickLeaveDays: Set[LocalDate],
     defaultTasksPerDay: Map[LocalDate, Map[String, Int]]): Timesheet = {
 
     require(startDate.isBefore(endDate), s"$startDate not before $endDate")
@@ -257,7 +293,7 @@ object XmlCreationTest {
   }
 
   private def refineTimesheet(
-    prevTimesheet:      Timesheet,
+    prevTimesheet: Timesheet,
     refinedTasksPerDay: Map[LocalDate, Map[String, Int]]): Timesheet = {
 
     require(
@@ -334,9 +370,9 @@ object XmlCreationTest {
   }
 
   private def tryToAddTaskWithoutChangingTotalHours(
-    dayElem:  resolved.Elem,
+    dayElem: resolved.Elem,
     taskName: String,
-    hours:    Int): resolved.Elem = {
+    hours: Int): resolved.Elem = {
 
     assert(dayElem.localName == "day")
 
@@ -493,4 +529,75 @@ object XmlCreationTest {
       LocalDate.of(2017, 12, 18) -> Map("bila" -> 1),
       LocalDate.of(2017, 12, 19) -> Map("organisation-change" -> 2))
   } ensuring (_.keySet.forall(d => !isWeekend(d)), s"No weekend days allowed")
+
+  // Timesheet data 2018
+
+  // Pass 1
+
+  private val dutchHolidays2018: Set[LocalDate] = {
+    Set(
+      LocalDate.of(2018, 1, 1),
+      LocalDate.of(2018, 4, 1),
+      LocalDate.of(2018, 4, 2),
+      LocalDate.of(2018, 4, 27),
+      LocalDate.of(2018, 5, 10),
+      LocalDate.of(2018, 5, 20),
+      LocalDate.of(2018, 5, 21),
+      LocalDate.of(2018, 12, 25),
+      LocalDate.of(2018, 12, 26))
+  }
+
+  private val onVacation2018: Set[LocalDate] = {
+    Set(LocalDate.of(2018, 5, 11))
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2018, 7, 20), LocalDate.of(2018, 8, 10)).toSet)
+  }
+
+  private val sickLeaveDays2018: Set[LocalDate] = {
+    Set(LocalDate.of(2018, 1, 19))
+  }
+
+  private val defaultTasksPerDay2018: Map[LocalDate, Map[String, Int]] = {
+    val maintenanceDates: immutable.IndexedSeq[LocalDate] =
+      getPeriodAsLocalDateSeq(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 2, 28))
+
+    val devDates: immutable.IndexedSeq[LocalDate] =
+      getPeriodAsLocalDateSeq(LocalDate.of(2018, 3, 1), LocalDate.of(2018, 12, 31))
+
+    maintenanceDates.distinct.map(d => d -> Map("Gegevenstooling maintenance" -> 8)).toMap ++
+      devDates.distinct.map(d => d -> Map("Gegevenstooling development" -> 8)).toMap
+  }
+
+  // Pass 2
+
+  // TODO Check with agenda (e.g. recurring meetings) and commits in Github
+
+  private val refinementsPerDay2018: Map[LocalDate, Map[String, Int]] = {
+    Map(
+      LocalDate.of(2018, 1, 8) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 1, 24) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 2, 5) -> Map("Meeting" -> 4),
+      LocalDate.of(2018, 2, 6) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 2, 7) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 2, 19) -> Map("Meeting" -> 5),
+      LocalDate.of(2018, 2, 22) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 3, 7) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 3, 9) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 3, 13) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 3, 15) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 3, 22) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 3, 28) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 4, 6) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 4, 10) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 4, 16) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 4, 20) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 4, 24) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 4, 26) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 5, 1) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 5, 3) -> Map("Meeting" -> 4),
+      LocalDate.of(2018, 5, 22) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 5, 23) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 6, 13) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 6, 25) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 7, 12) -> Map("Meeting" -> 1))
+  }
 }
