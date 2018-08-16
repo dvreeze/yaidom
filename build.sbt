@@ -44,7 +44,7 @@ lazy val commonSettings = Seq(
 
   libraryDependencies ++= {
     scalaBinaryVersion.value match {
-      case "2.13.0-M4" => Seq("org.scalatest" %%% "scalatest" % "3.0.6-SNAP1" % "test")
+      case "2.13.0-M4" => Seq("org.scalatest" %%% "scalatest" % "3.0.6-SNAP2" % "test")
       case _           => Seq("org.scalatest" %%% "scalatest" % "3.0.5" % "test")
     }
   }
@@ -69,7 +69,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(
     // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-12",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-14",
 
     libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.9.0",
 
@@ -84,7 +84,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13.0-M4" => Seq()
-        case _           => Seq("org.scalameta" %%% "scalameta" % "3.6.0" % "test")
+        case _           => Seq("org.scalameta" %%% "scalameta" % "3.7.4" % "test")
       }
     },
 
@@ -94,7 +94,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
 
-    libraryDependencies += "com.google.guava" % "guava" % "25.1-jre" % "test",
+    libraryDependencies += "com.google.guava" % "guava" % "26.0-jre" % "test",
 
     libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test",
 
