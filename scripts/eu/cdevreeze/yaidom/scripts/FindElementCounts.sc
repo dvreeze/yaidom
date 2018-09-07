@@ -20,7 +20,7 @@ def isProbableXmlFile(f: File): Boolean = {
 def filterFiles(rootDir: File, p: File => Boolean): immutable.IndexedSeq[File] = {
   require(rootDir.isDirectory, s"Not a directory: $rootDir")
   
-  val filesInDir = rootDir.listFiles.toIndexedSeq
+  val filesInDir = Option(rootDir.listFiles).map(_.toIndexedSeq).getOrElse(immutable.IndexedSeq())
   
   filesInDir
     .flatMap { f =>
@@ -35,7 +35,9 @@ def filterFiles(rootDir: File, p: File => Boolean): immutable.IndexedSeq[File] =
     }
 }
 
-val docParser = parse.DocumentParserUsingSax.newInstance()
+// The DocumentParserUsingStax is the most efficient one of the DocumentParser implementations offered by yaidom
+
+val docParser = parse.DocumentParserUsingStax.newInstance()
 
 final case class ElementDepth(elementName: EName, depth: Int)
 
