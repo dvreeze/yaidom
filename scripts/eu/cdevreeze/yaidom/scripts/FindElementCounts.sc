@@ -7,10 +7,28 @@
 import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.1`
 
 import java.io._
+import javax.xml.stream._
 import scala.collection.immutable
 import scala.util.Try
 import eu.cdevreeze.yaidom.core._
 import eu.cdevreeze.yaidom._
+
+// The DocumentParserUsingStax is the most efficient one of the DocumentParser implementations offered by yaidom
+
+class MyXmlResolver extends XMLResolver {
+  override def resolveEntity(publicId: String, systemId: String, baseUri: String, namespace: String): AnyRef = {
+    new java.io.StringReader("")
+  }
+}
+
+val docParser: parse.DocumentParser = {
+  val xmlInputFactory = XMLInputFactory.newFactory()
+  xmlInputFactory.setXMLResolver(new MyXmlResolver) // to prevent W3C server timeouts when retrieving DTDs
+
+  parse.DocumentParserUsingStax.newInstance(xmlInputFactory)
+}
+
+// Helper functions for the script
 
 def isProbableXmlFile(f: File): Boolean = {
   val name = Option(f.getName).getOrElse("")
@@ -35,14 +53,12 @@ def filterFiles(rootDir: File, p: File => Boolean): immutable.IndexedSeq[File] =
     }
 }
 
-// The DocumentParserUsingStax is the most efficient one of the DocumentParser implementations offered by yaidom
-
-val docParser = parse.DocumentParserUsingStax.newInstance()
+// Data and logic used by the script
 
 final case class ElementDepth(elementName: EName, depth: Int)
 
-def extractElementDepths(rootElem: simple.Elem): immutable.IndexedSeq[ElementDepth] = {
-  indexed.Elem(rootElem)
+def extractElementDepths(rootElem: queryapi.BackingNodes.Elem): immutable.IndexedSeq[ElementDepth] = {
+  rootElem
     .findAllElemsOrSelf
     .map(e => ElementDepth(e.resolvedName, e.path.entries.size))
 }
@@ -51,7 +67,7 @@ def extractElementDepthsFromFile(f: File): immutable.IndexedSeq[ElementDepth] = 
   // Note that the DOM tree is only local to this method, so it is ready for garbage collection almost immediately
   
   Try(docParser.parse(f)).toOption.toIndexedSeq
-    .flatMap(doc => extractElementDepths(doc.documentElement))
+    .flatMap(doc => extractElementDepths(indexed.Document(doc).documentElement))
 }
 
 type Depth = Int
@@ -110,3 +126,4 @@ def findElementCounts(rootDir: File): Unit = {
 }
 
 // Now call function findElementCounts(rootDir), passing a rootDir as File object.
+
