@@ -103,7 +103,7 @@ def findElementCounts(rootDir: File): Unit = {
 
   println()  
   println(s"Found ${elementDepths.size} elements (with their depths)")
-  println(s"Found ${elementDepths.map(_.elementName).distinct.size} different element names")
+  println(s"Found ${elementDepths.map(_.elementName).toSet.size} different element names")
   
   val groupedElementCounts = groupElementCounts(elementDepths)
 
