@@ -35,6 +35,10 @@ def isProbableXmlFile(f: File): Boolean = {
   List("xml", "xsd", "xbrl").exists(suffix => name.endsWith("." + suffix))
 }
 
+def hasLengthLte(lth: Long)(f: File): Boolean = {
+  f.length <= lth
+}
+
 def filterFiles(rootDir: File, p: File => Boolean): immutable.IndexedSeq[File] = {
   require(rootDir.isDirectory, s"Not a directory: $rootDir")
   
@@ -82,6 +86,7 @@ def groupElementCounts(elementDepths: immutable.IndexedSeq[ElementDepth]): Map[E
 
 def findElementCounts(rootDir: File): Unit = {
   val probableXmlFiles = filterFiles(rootDir, isProbableXmlFile)
+    .filter(hasLengthLte(100000000L))
   
   println(s"Found ${probableXmlFiles.size} probable XML files")
 
