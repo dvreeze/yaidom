@@ -86,7 +86,7 @@ def groupElementCounts(elementDepths: immutable.IndexedSeq[ElementDepth]): Map[E
 
 def findElementCounts(rootDir: File): Unit = {
   val probableXmlFiles = filterFiles(rootDir, isProbableXmlFile)
-    .filter(hasLengthLte(100000000L))
+    .filter(hasLengthLte(50000000L))
   
   println(s"Found ${probableXmlFiles.size} probable XML files")
 
@@ -101,9 +101,12 @@ def findElementCounts(rootDir: File): Unit = {
       extractElementDepthsFromFile(f)
     }
 
+  println(s"Processed all ${probableXmlFiles.size} (probable) XML documents")
+
   println()  
   println(s"Found ${elementDepths.size} elements (with their depths)")
-  println(s"Found ${elementDepths.map(_.elementName).toSet.size} different element names")
+
+  println(s"Found ${elementDepths.groupBy(_.elementName).keySet.size} different element names")
   
   val groupedElementCounts = groupElementCounts(elementDepths)
 
