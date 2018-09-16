@@ -23,6 +23,7 @@ import scala.collection.immutable
 import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
@@ -32,7 +33,7 @@ import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import net.sf.saxon.`type`.Type
-import net.sf.saxon.om.AbsolutePath
+import net.sf.saxon.om.{ AbsolutePath => SaxonAbsolutePath }
 import net.sf.saxon.om.AxisInfo
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.pattern.NodeKindTest
@@ -69,7 +70,7 @@ sealed abstract class SaxonNode(val wrappedNode: NodeInfo) extends BackingNodes.
 
   final override def equals(obj: Any): Boolean = obj match {
     case other: SaxonNode => this.wrappedNode == other.wrappedNode
-    case _                => false
+    case _ => false
   }
 
   final override def hashCode: Int = this.wrappedNode.hashCode
@@ -228,8 +229,8 @@ final class SaxonElem(
     val entryCount = path.entries.size
 
     def findReverseAncestryOrSelfByPath(
-      currentRoot:     ThisElem,
-      entryIndex:      Int,
+      currentRoot: ThisElem,
+      entryIndex: Int,
       reverseAncestry: immutable.IndexedSeq[ThisElem]): Option[immutable.IndexedSeq[ThisElem]] = {
 
       assert(entryIndex >= 0 && entryIndex <= entryCount)
@@ -400,22 +401,13 @@ final class SaxonElem(
   }
 
   def path: Path = {
-    // Not too slow, but not very fast either
+    // Not very slow, but not very fast either
 
-    val pathEntries: immutable.IndexedSeq[Path.Entry] = reverseAncestryOrSelf.tail map { elm =>
-      val saxonAbsolutePathString = AbsolutePath.pathToNode(elm.wrappedNode).getPathUsingUris
+    val saxonAbsolutePath = SaxonAbsolutePath.pathToNode(wrappedNode)
+    val absolutePath = AbsolutePath.fromCanonicalXPath(saxonAbsolutePath.getPathUsingUris)
 
-      val lastSquareStartBracketIdx = saxonAbsolutePathString.lastIndexOf('[')
-      require(lastSquareStartBracketIdx > 0, s"Found no '[' in '${saxonAbsolutePathString}'")
-      require(saxonAbsolutePathString.endsWith("]"), s"Found no ']' at the end of '${saxonAbsolutePathString}'")
-
-      val elementIndex =
-        saxonAbsolutePathString.substring(lastSquareStartBracketIdx + 1, saxonAbsolutePathString.length - 1).toInt - 1
-
-      Path.Entry(elm.resolvedName, elementIndex)
-    }
-
-    Path(pathEntries)
+    val result: Path = Path(absolutePath.entries.drop(1).map(e => Path.Entry(e.elementName, e.index)))
+    result
   }
 
   def rootElem: ThisElem = {
@@ -466,7 +458,9 @@ final class SaxonElem(
   }
 
   def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
-    if (p(this)) Some(this) else {
+    if (p(this)) {
+      Some(this)
+    } else {
       parentOption.flatMap(pe => pe.findAncestorOrSelf(p))
     }
   }
@@ -518,12 +512,12 @@ object SaxonNode {
 
   def wrapNodeOption(node: NodeInfo): Option[SaxonNode] = {
     node.getNodeKind match {
-      case Type.ELEMENT                => Some(new SaxonElem(node))
-      case Type.TEXT                   => Some(new SaxonText(node))
-      case Type.WHITESPACE_TEXT        => Some(new SaxonText(node))
+      case Type.ELEMENT => Some(new SaxonElem(node))
+      case Type.TEXT => Some(new SaxonText(node))
+      case Type.WHITESPACE_TEXT => Some(new SaxonText(node))
       case Type.PROCESSING_INSTRUCTION => Some(new SaxonProcessingInstruction(node))
-      case Type.COMMENT                => Some(new SaxonComment(node))
-      case _                           => None
+      case Type.COMMENT => Some(new SaxonComment(node))
+      case _ => None
     }
   }
 

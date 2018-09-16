@@ -64,8 +64,18 @@ final case class EName(namespaceUriOption: Option[String], localPart: String) ex
 
   /** The `String` representation, in the format of the `javax.xml.namespace.QName.toString` method */
   override def toString: String = namespaceUriOption match {
-    case None        => localPart
+    case None => localPart
     case Some(nsUri) => "{" + nsUri + "}" + localPart
+  }
+
+  /**
+   * Returns the string representation of this EName as URI qualified name, as a braced URI literal followed by
+   * an NC-name. See for example https://www.w3.org/TR/xpath-31/#prod-xpath31-URIQualifiedName.
+   */
+  def toUriQualifiedNameString: String = {
+    val ns = namespaceUriOption.getOrElse("")
+
+    s"Q{$ns}$localPart"
   }
 
   /**
@@ -110,5 +120,27 @@ object EName {
       require(st.indexOf("}") < 0, s"Closing brace without matching opening brace not allowed in EName '${st}'")
       EName(None, st)
     }
+  }
+
+  /**
+   * Parses a `String` into an `EName`. The `String` must conform to the `toUriQualifiedNameString` format of an `EName`.
+   */
+  def fromUriQualifiedNameString(uriQualifiedName: String): EName = {
+    require(
+      uriQualifiedName.startsWith("Q{"),
+      s"Not an URI qualified name (it does not start with 'Q{'): $uriQualifiedName")
+
+    val endBraceIdx = uriQualifiedName.indexOf("}")
+
+    require(endBraceIdx > 0, s"Not an URI qualified name (it has no '}'): $uriQualifiedName")
+
+    val ns = uriQualifiedName.substring(2, endBraceIdx)
+    val nsOption = if (ns.isEmpty) None else Some(ns)
+
+    val localPart = uriQualifiedName.substring(endBraceIdx + 1)
+
+    require(localPart.length > 0, s"Not an URI qualified name (it has no local part): $uriQualifiedName")
+
+    EName(nsOption, localPart)
   }
 }
