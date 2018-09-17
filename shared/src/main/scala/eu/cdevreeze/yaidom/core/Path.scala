@@ -116,7 +116,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
   /** Returns the `Path` with the first path entry (if any) removed, wrapped in an `Option`. */
   def withoutFirstEntryOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
-    case _                => Some(Path(entries.tail))
+    case _ => Some(Path(entries.tail))
   }
 
   /** Like `withoutFirstEntryOption`, but unwrapping the result (or throwing an exception otherwise) */
@@ -140,7 +140,7 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
    */
   def parentPathOption: Option[Path] = entries match {
     case xs if xs.isEmpty => None
-    case _                => Some(Path(entries.dropRight(1)))
+    case _ => Some(Path(entries.dropRight(1)))
   }
 
   /** Like `parentPathOption`, but unwrapping the result (or throwing an exception otherwise) */
@@ -224,6 +224,10 @@ final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutabl
    * unlike real XPath expressions (canonical or otherwise). This is an important advantage of these expressions, in spite
    * of their relative verbosity. A good use case is error reporting about parts of XML documents.
    * For example, Saxon-EE uses a similar notation for error reporting (in XML format) in its schema validator.
+   *
+   * Preferably used method `AbsolutePath.toCanonicalXPath` instead, because the notion of canonical XPath
+   * applies more to absolute paths than to navigation paths, and also because that method returns real XPath
+   * expressions, be it without QNames but using URI-qualified EQ-names in their place.
    */
   def toResolvedCanonicalXPath: String = {
     val entryXPaths = entries map { entry => entry.toResolvedCanonicalXPath }
@@ -249,6 +253,10 @@ object Path {
    * Entry boundaries are recognized by finding ']' characters (followed by the slash starting the
    * next entry). In theory this is not robust, but in practice it is. See discussions on valid
    * characters in IRIs and URIs.
+   *
+   * Preferably used method `AbsolutePath.fromCanonicalXPath` instead, because the notion of canonical XPath
+   * applies more to absolute paths than to navigation paths, and also because that method parses real XPath
+   * expressions, be it without QNames but using URI-qualified EQ-names in their place.
    */
   def fromResolvedCanonicalXPath(s: String): Path = {
     require(s.startsWith("/*"), "The 'resolved' canonical XPath must start with '/*'")
@@ -297,7 +305,13 @@ object Path {
     /** Position (1-based) of the element as child of the parent. Is 1 + index. */
     def position: Int = 1 + index
 
-    /** Returns the corresponding "resolved" canonical XPath, replacing QNames by ENames */
+    /**
+     * Returns the corresponding "resolved" canonical XPath, replacing QNames by ENames.
+     *
+     * Preferably used method `AbsolutePath.Entry.toCanonicalXPath` instead, because the notion of canonical XPath
+     * applies more to absolute paths than to navigation paths, and also because that method returns real XPath
+     * expressions, be it without QNames but using URI-qualified EQ-names in their place.
+     */
     def toResolvedCanonicalXPath: String = {
       s"/${elementName.toString}[${position}]"
     }
@@ -307,7 +321,13 @@ object Path {
 
   object Entry {
 
-    /** Parses a `String`, which must be in the `toResolvedCanonicalXPath` format, into an `Path.Entry` */
+    /**
+     * Parses a `String`, which must be in the `toResolvedCanonicalXPath` format, into an `Path.Entry`.
+     *
+     * Preferably used method `AbsolutePath.Entry.fromCanonicalXPath` instead, because the notion of canonical XPath
+     * applies more to absolute paths than to navigation paths, and also because that method parses real XPath
+     * expressions, be it without QNames but using URI-qualified EQ-names in their place.
+     */
     def fromResolvedCanonicalXPath(s: String): Entry = {
       require(s.startsWith("/"), "The 'resolved' canonical XPath for the 'entry' must start with a slash")
       require(s.endsWith("]"), "The 'resolved' canonical XPath for the 'entry' must have a position ending with ']', such as [1]")

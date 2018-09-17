@@ -28,6 +28,7 @@ import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
@@ -406,7 +407,7 @@ final class SaxonElem(
     val saxonAbsolutePath = SaxonAbsolutePath.pathToNode(wrappedNode)
     val absolutePath = AbsolutePath.fromCanonicalXPath(saxonAbsolutePath.getPathUsingUris)
 
-    val result: Path = Path(absolutePath.entries.drop(1).map(e => Path.Entry(e.elementName, e.index)))
+    val result: Path = PathConversions.convertAbsolutePathToPath(absolutePath)
     result
   }
 
