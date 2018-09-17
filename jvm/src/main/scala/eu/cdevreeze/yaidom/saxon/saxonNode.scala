@@ -185,8 +185,10 @@ final class SaxonElem(
 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: ThisElem): Unit = {
-      if (p(elm)) result += elm else {
-        elm.findAllChildElems foreach { e => accumulate(e) }
+      if (p(elm)) {
+        result += elm
+      } else {
+        elm.findAllChildElems.foreach(accumulate)
       }
     }
 
@@ -236,7 +238,9 @@ final class SaxonElem(
 
       assert(entryIndex >= 0 && entryIndex <= entryCount)
 
-      if (entryIndex == entryCount) Some(reverseAncestry :+ currentRoot) else {
+      if (entryIndex == entryCount) {
+        Some(reverseAncestry :+ currentRoot)
+      } else {
         val newRootOption: Option[ThisElem] = currentRoot.findChildElemByPathEntry(path.entries(entryIndex))
         // Recursive call. Not tail-recursive, but recursion depth should be limited.
         newRootOption flatMap { newRoot =>
@@ -402,13 +406,14 @@ final class SaxonElem(
   }
 
   def path: Path = {
+    PathConversions.convertAbsolutePathToPath(absolutePath)
+  }
+
+  def absolutePath: AbsolutePath = {
     // Not very slow, but not very fast either
 
     val saxonAbsolutePath = SaxonAbsolutePath.pathToNode(wrappedNode)
-    val absolutePath = AbsolutePath.fromCanonicalXPath(saxonAbsolutePath.getPathUsingUris)
-
-    val result: Path = PathConversions.convertAbsolutePathToPath(absolutePath)
-    result
+    AbsolutePath.fromCanonicalXPath(saxonAbsolutePath.getPathUsingUris)
   }
 
   def rootElem: ThisElem = {
@@ -447,23 +452,23 @@ final class SaxonElem(
   }
 
   def ancestors: immutable.IndexedSeq[ThisElem] = {
-    ancestorsOrSelf.tail
+    // This is a reverse axis, so the results are given in reverse document order
+    filterElemsByAxisAndPredicate(AxisInfo.ANCESTOR, _ => true)
   }
 
   def ancestorsOrSelf: immutable.IndexedSeq[ThisElem] = {
-    this +: (parentOption.toIndexedSeq flatMap ((e: ThisElem) => e.ancestorsOrSelf))
+    // This is a reverse axis, so the results are given in reverse document order
+    filterElemsByAxisAndPredicate(AxisInfo.ANCESTOR_OR_SELF, _ => true)
   }
 
   def findAncestor(p: ThisElem => Boolean): Option[ThisElem] = {
-    parentOption flatMap { e => e.findAncestorOrSelf(p) }
+    // This is a reverse axis, so the optional result is found in reverse document order
+    findElemByAxisAndPredicate(AxisInfo.ANCESTOR, p)
   }
 
   def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
-    if (p(this)) {
-      Some(this)
-    } else {
-      parentOption.flatMap(pe => pe.findAncestorOrSelf(p))
-    }
+    // This is a reverse axis, so the optional result is found in reverse document order
+    findElemByAxisAndPredicate(AxisInfo.ANCESTOR_OR_SELF, p)
   }
 
   // Extra methods

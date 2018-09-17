@@ -30,9 +30,11 @@ import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 
 import JDomWrapperTest._
+import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
@@ -932,9 +934,18 @@ object JDomWrapperTest {
     def path: Path = {
       // Expensive!
 
-      val reverseAncestorOrSelfPairs = reverseAncestryOrSelf.sliding(2).toIndexedSeq.filter(_.size == 2)
+      PathConversions.convertAbsolutePathToPath(absolutePath)
+    }
 
-      val pathEntries: immutable.IndexedSeq[Path.Entry] = reverseAncestorOrSelfPairs map { pair =>
+    def absolutePath: AbsolutePath = {
+      // Expensive!
+
+      val currentReverseAncestryOrSelf = reverseAncestryOrSelf.ensuring(_.nonEmpty)
+
+      val reverseAncestorOrSelfPairs =
+        currentReverseAncestryOrSelf.sliding(2).toIndexedSeq.filter(_.size == 2)
+
+      val remainingEntries: immutable.IndexedSeq[AbsolutePath.Entry] = reverseAncestorOrSelfPairs map { pair =>
         val fromElem = pair(0)
         val toElem = pair(1)
 
@@ -943,9 +954,11 @@ object JDomWrapperTest {
         val idxOption = sameNameChildElems.zipWithIndex.find(pair => pair._1 == toElem).map(_._2)
         require(idxOption.isDefined, s"Corrupt data. No Path found for element $wrappedNode")
 
-        Path.Entry(expandedName, idxOption.get)
+        AbsolutePath.Entry(expandedName, idxOption.get)
       }
-      Path(pathEntries)
+
+      val firstEntry = AbsolutePath.createRoot(currentReverseAncestryOrSelf.head.resolvedName).firstEntry
+      AbsolutePath(firstEntry +: remainingEntries)
     }
 
     def reverseAncestry: immutable.IndexedSeq[JDomElem] = {
@@ -970,7 +983,7 @@ object JDomWrapperTest {
 
     override def equals(other: Any): Boolean = other match {
       case other: JDomElem => this.wrappedNode == other.wrappedNode
-      case _               => false
+      case _ => false
     }
 
     override def hashCode: Int = {
@@ -1033,13 +1046,13 @@ object JDomWrapperTest {
 
     def wrapNodeOption(node: org.jdom2.Content): Option[JDomNode] = {
       node match {
-        case e: org.jdom2.Element                => Some(new JDomElem(e))
-        case cdata: org.jdom2.CDATA              => Some(new JDomText(cdata))
-        case t: org.jdom2.Text                   => Some(new JDomText(t))
+        case e: org.jdom2.Element => Some(new JDomElem(e))
+        case cdata: org.jdom2.CDATA => Some(new JDomText(cdata))
+        case t: org.jdom2.Text => Some(new JDomText(t))
         case pi: org.jdom2.ProcessingInstruction => Some(new JDomProcessingInstruction(pi))
-        case er: org.jdom2.EntityRef             => Some(new JDomEntityRef(er))
-        case c: org.jdom2.Comment                => Some(new JDomComment(c))
-        case _                                   => None
+        case er: org.jdom2.EntityRef => Some(new JDomEntityRef(er))
+        case c: org.jdom2.Comment => Some(new JDomComment(c))
+        case _ => None
       }
     }
 

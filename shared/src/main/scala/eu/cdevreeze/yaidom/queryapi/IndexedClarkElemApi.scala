@@ -20,6 +20,7 @@ import java.net.URI
 
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 
@@ -54,6 +55,11 @@ trait IndexedClarkElemApi extends ClarkElemApi {
    * The path of this element, relative to the root element
    */
   def path: Path
+
+  /**
+   * The absolute path of this element, starting with the root element
+   */
+  def absolutePath: AbsolutePath
 
   /**
    * Returns the optional base URI, computed from the document URI, if any, and the XML base attributes of the

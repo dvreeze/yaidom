@@ -25,9 +25,11 @@ import org.scalajs.dom.{ raw => sjsdom }
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.convert.JsDomConversions
+import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
@@ -207,13 +209,20 @@ final class JsDomElem(
    * Somewhat inefficient function to get the relative Path.
    */
   override def path: Path = {
-    val entriesReversed: List[Path.Entry] =
-      JsDomElem.getAncestorsOrSelf(wrappedNode).dropRight(1) map { elem =>
+    PathConversions.convertAbsolutePathToPath(absolutePath)
+  }
+
+  /**
+   * Somewhat inefficient function to get the absolute path.
+   */
+  override def absolutePath: AbsolutePath = {
+    val entriesReversed: List[AbsolutePath.Entry] =
+      JsDomElem.getAncestorsOrSelf(wrappedNode) map { elem =>
         val ename = JsDomConversions.toEName(elem)
         val cnt = filterPreviousSiblingElements(elem, (e => JsDomConversions.toEName(e) == ename)).size
-        Path.Entry(ename, cnt)
+        AbsolutePath.Entry(ename, cnt)
       }
-    Path(entriesReversed.toIndexedSeq.reverse)
+    AbsolutePath(entriesReversed.toIndexedSeq.reverse)
   }
 
   override def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
@@ -341,7 +350,7 @@ object JsDomElem {
   private def getAncestorsOrSelf(elem: sjsdom.Element): List[sjsdom.Element] = {
     val parentElement: sjsdom.Element = elem.parentNode match {
       case e: sjsdom.Element => e
-      case _                 => null
+      case _ => null
     }
 
     if (parentElement eq null) {

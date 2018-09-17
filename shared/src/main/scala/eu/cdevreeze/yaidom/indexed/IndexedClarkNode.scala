@@ -21,7 +21,9 @@ import java.net.URI
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
@@ -107,11 +109,11 @@ object IndexedClarkNode {
    * @author Chris de Vreeze
    */
   final class Elem[U <: ClarkNodes.Elem.Aux[_, U]] private[IndexedClarkNode] (
-    docUriOption:        Option[URI],
+    docUriOption: Option[URI],
     parentBaseUriOption: Option[URI],
-    underlyingRootElem:  U,
-    path:                Path,
-    underlyingElem:      U)
+    underlyingRootElem: U,
+    path: Path,
+    underlyingElem: U)
     extends AbstractIndexedClarkElem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     with Node {
 
@@ -121,7 +123,7 @@ object IndexedClarkNode {
 
     def thisElem: ThisElem = this
 
-    final def children: immutable.IndexedSeq[Node] = {
+    def children: immutable.IndexedSeq[Node] = {
       val childElems = findAllChildElems
       var childElemIdx = 0
 
@@ -142,7 +144,7 @@ object IndexedClarkNode {
       children
     }
 
-    final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
+    def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
       val baseUriOpt = baseUriOption
 
       underlyingElem.findAllChildElemsWithPathEntries map {
@@ -151,20 +153,20 @@ object IndexedClarkNode {
       }
     }
 
-    final override def equals(obj: Any): Boolean = obj match {
+    override def equals(obj: Any): Boolean = obj match {
       case other: Elem[U] =>
         (other.docUriOption == this.docUriOption) && (other.underlyingRootElem == this.underlyingRootElem) &&
           (other.path == this.path) && (other.underlyingElem == this.underlyingElem)
       case _ => false
     }
 
-    final override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
+    override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
 
-    final def rootElem: ThisElem = {
+    def rootElem: ThisElem = {
       new Elem[U](docUriOption, docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
     }
 
-    final def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
+    def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
       val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
 
       assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
@@ -172,6 +174,10 @@ object IndexedClarkNode {
       assert(resultOption.get.last == thisElem)
 
       resultOption.get
+    }
+
+    def absolutePath: AbsolutePath = {
+      PathConversions.convertPathToAbsolutePath(path, underlyingRootElem.resolvedName)
     }
   }
 

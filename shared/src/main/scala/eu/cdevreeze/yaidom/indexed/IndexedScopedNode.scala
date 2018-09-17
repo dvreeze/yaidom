@@ -21,8 +21,10 @@ import java.net.URI
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
+import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
@@ -53,11 +55,11 @@ object IndexedScopedNode {
    * @author Chris de Vreeze
    */
   final class Elem[U <: ScopedNodes.Elem.Aux[_, U]] private[IndexedScopedNode] (
-    docUriOption:        Option[URI],
+    docUriOption: Option[URI],
     parentBaseUriOption: Option[URI],
-    underlyingRootElem:  U,
-    path:                Path,
-    underlyingElem:      U)
+    underlyingRootElem: U,
+    path: Path,
+    underlyingElem: U)
     extends AbstractIndexedClarkElem[U](docUriOption, parentBaseUriOption, underlyingRootElem, path, underlyingElem)
     with CanBeDocumentChild
     with BackingNodes.Elem
@@ -70,7 +72,7 @@ object IndexedScopedNode {
 
     def thisElem: ThisElem = this
 
-    final def children: immutable.IndexedSeq[Node] = {
+    def children: immutable.IndexedSeq[Node] = {
       val childElems = findAllChildElems
       var childElemIdx = 0
 
@@ -97,7 +99,7 @@ object IndexedScopedNode {
       children
     }
 
-    final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
+    def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
       val baseUriOpt = baseUriOption
 
       underlyingElem.findAllChildElemsWithPathEntries map {
@@ -106,26 +108,26 @@ object IndexedScopedNode {
       }
     }
 
-    final def qname: QName = underlyingElem.qname
+    def qname: QName = underlyingElem.qname
 
-    final def attributes: immutable.IndexedSeq[(QName, String)] = underlyingElem.attributes.toIndexedSeq
+    def attributes: immutable.IndexedSeq[(QName, String)] = underlyingElem.attributes.toIndexedSeq
 
-    final def scope: Scope = underlyingElem.scope
+    def scope: Scope = underlyingElem.scope
 
-    final override def equals(obj: Any): Boolean = obj match {
+    override def equals(obj: Any): Boolean = obj match {
       case other: Elem[U] =>
         (other.docUriOption == this.docUriOption) && (other.underlyingRootElem == this.underlyingRootElem) &&
           (other.path == this.path) && (other.underlyingElem == this.underlyingElem)
       case _ => false
     }
 
-    final override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
+    override def hashCode: Int = (docUriOption, underlyingRootElem, path, underlyingElem).hashCode
 
-    final def rootElem: ThisElem = {
+    def rootElem: ThisElem = {
       new Elem[U](docUriOption, docUriOption, underlyingRootElem, Path.Empty, underlyingRootElem)
     }
 
-    final def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
+    def reverseAncestryOrSelf: immutable.IndexedSeq[ThisElem] = {
       val resultOption = rootElem.findReverseAncestryOrSelfByPath(path)
 
       assert(resultOption.isDefined, s"Corrupt data! The reverse ancestry-or-self (of $resolvedName) cannot be empty")
@@ -135,11 +137,15 @@ object IndexedScopedNode {
       resultOption.get
     }
 
-    final def parentOption: Option[ThisElem] = {
+    def absolutePath: AbsolutePath = {
+      PathConversions.convertPathToAbsolutePath(path, underlyingRootElem.resolvedName)
+    }
+
+    def parentOption: Option[ThisElem] = {
       path.parentPathOption.map(pp => Elem(this.docUriOption, this.underlyingRootElem, pp))
     }
 
-    final def namespaces: Declarations = {
+    def namespaces: Declarations = {
       val parentScope = this.path.parentPathOption map { path => rootElem.getElemOrSelfByPath(path).scope } getOrElse (Scope.Empty)
       parentScope.relativize(this.scope)
     }
