@@ -19,6 +19,7 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
@@ -52,6 +53,23 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
     assertResult(List("Jeffrey", "Jennifer")) {
       theBookAuthors.map(_.getChildElem(withLocalName("First_Name")).text)
+    }
+
+    val theBookAuthors2 =
+      for {
+        author <- bookstore.filterElems(withLocalName("Author"))
+        bookAbsolutePath <- author.absolutePath.findAncestor(_.elementName.localPart == "Book")
+        bookPath = PathConversions.convertAbsolutePathToPath(bookAbsolutePath)
+        book <- bookstore.findElem(_.path == bookPath)
+        if book.getChildElem(withLocalName("Title")).underlyingElem.text.startsWith("A First Course in Database Systems")
+      } yield author
+
+    assertResult(List("Ullman", "Widom")) {
+      theBookAuthors2.map(_.getChildElem(withLocalName("Last_Name")).text)
+    }
+
+    assertResult(List("Jeffrey", "Jennifer")) {
+      theBookAuthors2.map(_.getChildElem(withLocalName("First_Name")).text)
     }
   }
 
