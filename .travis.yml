@@ -3,8 +3,8 @@ language: scala
 
 install:
   - . $HOME/.nvm/nvm.sh
-  - nvm install 10.9.0
-  - nvm use 10.9.0
+  - nvm install stable
+  - nvm use stable
   - npm install
   - npm install jsdom
 
