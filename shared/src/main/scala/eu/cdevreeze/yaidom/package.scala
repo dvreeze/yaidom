@@ -537,7 +537,7 @@ package eu.cdevreeze
  * }}}
  *
  * Note that the global ENameProvider or QNameProvider can typically be configured rather late during development, but the
- * memory cost savings can be substantial. Also note that the global ENameProvider or QNameProvider can be used implicitly in
+ * memory cost savings can be substantial once configured. Also note that the global ENameProvider or QNameProvider can be used implicitly in
  * application code, by writing:
  * {{{
  * bookstoreElem filterElemsOrSelf getEName("http://bookstore/book", "Book")

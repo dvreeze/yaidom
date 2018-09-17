@@ -76,8 +76,8 @@ object ENameProvider {
    * `ENameProvider.globalENameProvider` is stable, and therefore its members can be imported.
    *
    * Be careful: this global instance should be updated only during the "startup phase" of the application.
-   * Also be careful to choose an instance that is thread-safe and designed for a "long life" (unlike caching providers
-   * that can only grow a lot).
+   * Also be careful to choose an instance that is thread-safe and designed for a "long life" (unlike mutable Map-based
+   * EName providers that have no eviction strategy).
    */
   implicit val globalENameProvider: UpdatableENameProvider = new UpdatableENameProvider(defaultInstance)
 
@@ -110,7 +110,7 @@ object ENameProvider {
   final class ENameProviderUsingImmutableCache(val enames: Set[EName]) extends ENameProvider {
 
     val cache: Map[(Option[String], String), EName] =
-      enames.map(ename => (ename.namespaceUriOption, ename.localPart) -> ename).toMap
+      enames.toIndexedSeq.map(ename => (ename.namespaceUriOption, ename.localPart) -> ename).toMap
 
     def getEName(namespaceUriOption: Option[String], localPart: String): EName =
       cache.getOrElse((namespaceUriOption, localPart), EName(namespaceUriOption, localPart))

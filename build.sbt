@@ -73,6 +73,10 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.9.0",
 
+    libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "2.6.2",
+
+    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2",
+
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test",
@@ -93,10 +97,6 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test",
 
     libraryDependencies += ("xom" % "xom" % "1.2.5" % "test").intransitive(),
-
-    libraryDependencies += "com.google.guava" % "guava" % "26.0-jre" % "test",
-
-    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test",
 
     libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.1.0" % "test").intransitive(),
 

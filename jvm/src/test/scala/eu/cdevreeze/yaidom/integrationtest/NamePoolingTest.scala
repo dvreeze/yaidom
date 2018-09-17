@@ -20,14 +20,10 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
-import com.google.common.cache.LoadingCache
-
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
-import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.core.jvm.CaffeineENameProvider
+import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.HasENameApi
@@ -43,10 +39,9 @@ class NamePoolingTest extends FunSuite {
   import NamePoolingTest._
   import HasENameApi._
 
-  // TODO Fix!
-  ignore("testNamePooling") {
-    ENameProvider.globalENameProvider.become(new GuavaENameProvider(1000))
-    QNameProvider.globalQNameProvider.become(new GuavaQNameProvider(1000))
+  test("testNamePooling") {
+    ENameProvider.globalENameProvider.become(enameProvider)
+    QNameProvider.globalQNameProvider.become(qnameProvider)
 
     val docParser = DocumentParserUsingDom.newInstance()
 
@@ -56,96 +51,32 @@ class NamePoolingTest extends FunSuite {
 
     val xsElementElems = doc.documentElement \\ withLocalName("element")
 
-    require(xsElementElems.size >= 50)
+    require(xsElementElems.size >= 200)
 
     assertResult(true) {
-      val firstXsElementElem = xsElementElems(0)
+      println(s"EName cache hitCount: ${enameCache.stats().hitCount()}")
+      println(s"EName cache missCount: ${enameCache.stats().missCount()}")
 
-      xsElementElems.drop(1).filter(e => e.resolvedName eq firstXsElementElem.resolvedName).size >= 30
+      enameCache.stats().hitCount() >= 1000
     }
 
     assertResult(true) {
-      val firstXsElementElem = xsElementElems(0)
+      println(s"QName cache hitCount: ${qnameCache.stats().hitCount()}")
+      println(s"QName cache missCount: ${qnameCache.stats().missCount()}")
 
-      xsElementElems.drop(1).filter(e => e.qname eq firstXsElementElem.qname).size >= 30
+      qnameCache.stats().hitCount() >= 1000
     }
-
-    // Reset EName/QName providers
 
     ENameProvider.globalENameProvider.reset()
     QNameProvider.globalQNameProvider.reset()
-
-    val doc2: Document = docParser.parse(classOf[NamePoolingTest].getResourceAsStream("gaap.xsd"))
-
-    val xsElementElems2 = doc2.documentElement \\ withLocalName("element")
-
-    require(xsElementElems2.size >= 50)
-
-    assertResult(true) {
-      val firstXsElementElem = xsElementElems2(0)
-
-      xsElementElems2.drop(1).filter(e => e.resolvedName eq firstXsElementElem.resolvedName).isEmpty
-    }
-
-    assertResult(true) {
-      val firstXsElementElem = xsElementElems2(0)
-
-      xsElementElems2.drop(1).filter(e => e.qname eq firstXsElementElem.qname).isEmpty
-    }
   }
 }
 
 object NamePoolingTest {
 
-  final class GuavaENameProvider(val cacheSize: Int) extends ENameProvider {
+  val enameCache = CaffeineENameProvider.createCache(1000, true)
+  val enameProvider = new CaffeineENameProvider(enameCache)
 
-    private val cache: LoadingCache[(String, String), EName] = {
-      val cacheLoader = new CacheLoader[(String, String), EName] {
-        def load(key: (String, String)): EName =
-          if (key._1.isEmpty) EName(None, key._2) else EName(Some(key._1), key._2)
-      }
-      val result = CacheBuilder.newBuilder().maximumSize(cacheSize).build(cacheLoader)
-      result
-    }
-
-    def getEName(namespaceUriOption: Option[String], localPart: String): EName =
-      cache.get((namespaceUriOption.getOrElse(""), localPart))
-
-    def getEName(namespaceUri: String, localPart: String): EName =
-      cache.get((namespaceUri, localPart))
-
-    def getNoNsEName(localPart: String): EName =
-      cache.get(("", localPart))
-
-    def parseEName(s: String): EName = {
-      val ename = EName.parse(s)
-      cache.get((ename.namespaceUriOption.getOrElse(""), ename.localPart))
-    }
-  }
-
-  final class GuavaQNameProvider(val cacheSize: Int) extends QNameProvider {
-
-    private val cache: LoadingCache[(String, String), QName] = {
-      val cacheLoader = new CacheLoader[(String, String), QName] {
-        def load(key: (String, String)): QName =
-          if (key._1.isEmpty) QName(None, key._2) else QName(Some(key._1), key._2)
-      }
-      val result = CacheBuilder.newBuilder().maximumSize(cacheSize).build(cacheLoader)
-      result
-    }
-
-    def getQName(prefixOption: Option[String], localPart: String): QName =
-      cache.get((prefixOption.getOrElse(""), localPart))
-
-    def getQName(prefix: String, localPart: String): QName =
-      cache.get((prefix, localPart))
-
-    def getUnprefixedQName(localPart: String): QName =
-      cache.get(("", localPart))
-
-    def parseQName(s: String): QName = {
-      val qname = QName.parse(s)
-      cache.get((qname.prefixOption.getOrElse(""), qname.localPart))
-    }
-  }
+  val qnameCache = CaffeineQNameProvider.createCache(1000, true)
+  val qnameProvider = new CaffeineQNameProvider(qnameCache)
 }

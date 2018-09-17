@@ -49,8 +49,10 @@ import net.sf.saxon.pattern.NodeKindTest
  * Be careful to cautiously manage the underlying Saxon Processor (or Configuration) objects in the application
  * using these Saxon node wrappers. Do not shared them naively, and also do not use new instances of them naively.
  *
- * Yaidom `EName` and `QName` instances are created from Saxon `NodeInfo` objects using the
+ * Yaidom `EName` and `QName` instances are created from Saxon `NodeInfo` objects using the implicitly available
+ * `ENameProvider` and `QNameProvider`, respectively. They can be set globally by "updating" the
  * global `ENameProvider.globalENameProvider` and `QNameProvider.globalQNameProvider`, respectively.
+ * Alternatively, they can be set locally using implicit EName/QName providers with a very local scope.
  * Consider using efficient implementations for those name providers that use name pooling (at least
  * for commonly used names).
  *
@@ -513,9 +515,6 @@ final class SaxonComment(override val wrappedNode: NodeInfo) extends SaxonNode(w
 
 object SaxonNode {
 
-  import ENameProvider.globalENameProvider._
-  import QNameProvider.globalQNameProvider._
-
   def wrapNodeOption(node: NodeInfo): Option[SaxonNode] = {
     node.getNodeKind match {
       case Type.ELEMENT => Some(new SaxonElem(node))
@@ -529,15 +528,15 @@ object SaxonNode {
 
   def wrapElement(elm: NodeInfo): SaxonElem = new SaxonElem(elm)
 
-  def nodeInfo2EName(nodeInfo: NodeInfo): EName = {
+  def nodeInfo2EName(nodeInfo: NodeInfo)(implicit enameProvider: ENameProvider): EName = {
     val ns: String = nodeInfo.getURI
     val nsOption: Option[String] = if (ns == "") None else Some(ns)
-    getEName(nsOption, nodeInfo.getLocalPart)
+    enameProvider.getEName(nsOption, nodeInfo.getLocalPart)
   }
 
-  def nodeInfo2QName(nodeInfo: NodeInfo): QName = {
+  def nodeInfo2QName(nodeInfo: NodeInfo)(implicit qnameProvider: QNameProvider): QName = {
     val pref: String = nodeInfo.getPrefix
     val prefOption: Option[String] = if (pref == "") None else Some(pref)
-    getQName(prefOption, nodeInfo.getLocalPart)
+    qnameProvider.getQName(prefOption, nodeInfo.getLocalPart)
   }
 }

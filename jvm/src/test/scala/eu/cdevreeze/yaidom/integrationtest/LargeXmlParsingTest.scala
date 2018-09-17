@@ -26,8 +26,9 @@ import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
-import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
+import eu.cdevreeze.yaidom.core.jvm.CaffeineENameProvider
+import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -49,12 +50,8 @@ class LargeXmlParsingTest extends FunSuite with BeforeAndAfterAll {
 
   @volatile private var xmlBytes: Array[Byte] = _
 
-  val enames =
-    Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))
-  val qnames = enames.map(en => QName(en.localPart))
-
-  ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(enames))
-  QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(qnames))
+  ENameProvider.globalENameProvider.become(CaffeineENameProvider.fromMaximumCacheSize(50))
+  QNameProvider.globalQNameProvider.become(CaffeineQNameProvider.fromMaximumCacheSize(50))
 
   protected override def beforeAll(): Unit = {
     val zipFileUrl = classOf[LargeXmlParsingTest].getResource("veryBigFile.zip")

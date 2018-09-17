@@ -34,6 +34,8 @@ import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.jvm.CaffeineENameProvider
+import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -64,12 +66,8 @@ class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   @volatile private var doc: Document = _
 
-  val enames =
-    Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))
-  val qnames = enames.map(en => QName(en.localPart))
-
-  ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(enames))
-  QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(qnames))
+  ENameProvider.globalENameProvider.become(CaffeineENameProvider.fromMaximumCacheSize(50))
+  QNameProvider.globalQNameProvider.become(CaffeineQNameProvider.fromMaximumCacheSize(50))
 
   private val processor = new Processor(false)
 
