@@ -9,8 +9,8 @@
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-val scalaVer = "2.12.6"
-val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-M4")
+val scalaVer = "2.13.0-M4"
+val crossScalaVer = Seq(scalaVer)
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
