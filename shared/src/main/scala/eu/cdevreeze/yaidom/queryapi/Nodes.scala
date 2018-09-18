@@ -31,7 +31,10 @@ object Nodes {
   /**
    * Arbitrary node
    */
-  trait Node
+  trait Node {
+
+    def nodeKind: NodeKind
+  }
 
   /**
    * Potential document child, so an element, processing instruction or comment
@@ -41,12 +44,17 @@ object Nodes {
   /**
    * Arbitrary element node
    */
-  trait Elem extends CanBeDocumentChild
+  trait Elem extends CanBeDocumentChild {
+
+    final def nodeKind: NodeKind = ElementKind
+  }
 
   /**
    * Arbitrary text node
    */
   trait Text extends Node {
+
+    final def nodeKind: NodeKind = TextKind
 
     def text: String
   }
@@ -56,6 +64,8 @@ object Nodes {
    */
   trait Comment extends CanBeDocumentChild {
 
+    final def nodeKind: NodeKind = CommentKind
+
     def text: String
   }
 
@@ -63,6 +73,8 @@ object Nodes {
    * Arbitrary processing instruction node
    */
   trait ProcessingInstruction extends CanBeDocumentChild {
+
+    final def nodeKind: NodeKind = ProcessingInstructionKind
 
     def target: String
 
@@ -74,6 +86,16 @@ object Nodes {
    */
   trait EntityRef extends Node {
 
+    final def nodeKind: NodeKind = EntityRefKind
+
     def entity: String
   }
+
+  /** Node kind, which can be used for cheap pattern matching on kinds of nodes */
+  sealed trait NodeKind
+  case object ElementKind extends NodeKind
+  case object TextKind extends NodeKind
+  case object CommentKind extends NodeKind
+  case object ProcessingInstructionKind extends NodeKind
+  case object EntityRefKind extends NodeKind
 }

@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.InitYaidomSession"
 
-// Taking yaidom version 1.8.1
+// Taking yaidom version 1.8.2-SNAPSHOT
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.1`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.2-SNAPSHOT`
 
 // Imports that (must) remain available after this initialization script
 
@@ -48,9 +48,12 @@ import ENameUtil._
 
 import queryapi.HasENameApi._
 
+ENameProvider.globalENameProvider.become(jvm.CaffeineENameProvider.fromMaximumCacheSize(5000))
+QNameProvider.globalQNameProvider.become(jvm.CaffeineQNameProvider.fromMaximumCacheSize(5000))
+
 // Default parser and printer, without any configuration (not even setting document URI)
 
-val defaultParser = parse.DocumentParserUsingSax.newInstance()
+val defaultParser = parse.DocumentParserUsingStax.newInstance()
 
 val defaultPrinter = print.DocumentPrinterUsingDom.newInstance()
 

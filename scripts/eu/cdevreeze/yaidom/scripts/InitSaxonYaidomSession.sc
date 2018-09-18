@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.InitSaxonYaidomSession"
 
-// Taking yaidom version 1.8.1
+// Taking yaidom version 1.8.2-SNAPSHOT
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.1`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.2-SNAPSHOT`
 
 // Imports that (must) remain available after this initialization script
 
@@ -20,6 +20,9 @@ import net.sf.saxon.s9api.Processor
 // Easy creation of element predicates, even implicitly from ENames
 
 import queryapi.HasENameApi._
+
+ENameProvider.globalENameProvider.become(jvm.CaffeineENameProvider.fromMaximumCacheSize(5000))
+QNameProvider.globalQNameProvider.become(jvm.CaffeineQNameProvider.fromMaximumCacheSize(5000))
 
 val processor = new Processor(false)
 

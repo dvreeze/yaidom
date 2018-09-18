@@ -171,9 +171,9 @@ sealed trait CanBeDocumentChild extends Node with ScopedNodes.CanBeDocumentChild
  */
 @SerialVersionUID(1L)
 final class Elem(
-  val qname:             QName,
-  val attributes:        immutable.IndexedSeq[(QName, String)],
-  val scope:             Scope,
+  val qname: QName,
+  val attributes: immutable.IndexedSeq[(QName, String)],
+  val scope: Scope,
   override val children: immutable.IndexedSeq[Node])
   extends CanBeDocumentChild
   with ScopedNodes.Elem
@@ -254,10 +254,10 @@ final class Elem(
    * Creates a copy, altered with the explicitly passed parameters (for qname, attributes, scope and children).
    */
   def copy(
-    qname:      QName                                 = this.qname,
+    qname: QName = this.qname,
     attributes: immutable.IndexedSeq[(QName, String)] = this.attributes,
-    scope:      Scope                                 = this.scope,
-    children:   immutable.IndexedSeq[Node]            = this.children): Elem = {
+    scope: Scope = this.scope,
+    children: immutable.IndexedSeq[Node] = this.children): Elem = {
 
     new Elem(qname, attributes, scope, children)
   }
@@ -373,12 +373,12 @@ final class Elem(
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
-      case _                                => false
+      case _ => false
     }
 
     def isNonTextNode(n: Node): Boolean = n match {
       case t: Text => false
-      case n       => true
+      case n => true
     }
 
     val doStripWhitespace = (findChildElem(_ => true).nonEmpty) && (children forall (n => isWhitespaceText(n) || isNonTextNode(n)))
@@ -415,7 +415,7 @@ final class Elem(
           case t: Text =>
             val (textNodes, remainder) = childNodes span {
               case t: Text => true
-              case _       => false
+              case _ => false
             }
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
@@ -465,7 +465,7 @@ final class Elem(
         elm.children map { (n: Node) =>
           n match {
             case t: Text => f(t)
-            case n       => n
+            case n => n
           }
         }
       }
@@ -507,7 +507,7 @@ final class Elem(
     def containsWhitespaceOnly(elem: Elem): Boolean = {
       elem.children forall {
         case t: Text if t.text.trim.isEmpty => true
-        case n                              => false
+        case n => false
       }
     }
 
@@ -519,15 +519,15 @@ final class Elem(
   }
 
   private def prettify(
-    elm:                   Elem,
-    currentIndent:         Int,
-    indent:                Int,
+    elm: Elem,
+    currentIndent: Int,
+    indent: Int,
     indentStringsByIndent: mutable.Map[Int, String],
-    indentToIndentString:  Int => String): Elem = {
+    indentToIndentString: Int => String): Elem = {
 
     def isText(n: Node): Boolean = n match {
       case t: Text => true
-      case _       => false
+      case _ => false
     }
 
     val childNodes = elm.children
@@ -543,7 +543,7 @@ final class Elem(
       // Recursive calls
       val prettifiedChildNodes = childNodes map {
         case e: Elem => prettify(e, newIndent, indent, indentStringsByIndent, indentToIndentString)
-        case n       => n
+        case n => n
       }
 
       val prefixedPrettifiedChildNodes = prettifiedChildNodes flatMap { n => List(Text(indentTextString, false), n) }
@@ -753,10 +753,10 @@ final case class Comment(text: String) extends CanBeDocumentChild with ScopedNod
 object Elem {
 
   private[yaidom] final class ElemSerializationProxy(
-    val qname:      QName,
+    val qname: QName,
     val attributes: immutable.IndexedSeq[(QName, String)],
-    val scope:      Scope,
-    val children:   immutable.IndexedSeq[Node]) extends Serializable {
+    val scope: Scope,
+    val children: immutable.IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
     def readResolve(): Any = new Elem(qname, attributes, scope, children)
@@ -769,10 +769,10 @@ object Elem {
    * To construct `Elem`s, prefer using an `ElemBuilder`, via method `NodeBuilder.elem`.
    */
   def apply(
-    qname:      QName,
+    qname: QName,
     attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
-    scope:      Scope                                 = Scope.Empty,
-    children:   immutable.IndexedSeq[Node]            = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
+    scope: Scope = Scope.Empty,
+    children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
 
   /**
    * Extractor of Elems, to be used for pattern matching.
@@ -786,14 +786,14 @@ object Elem {
    */
   def from(e: ScopedNodes.Elem): Elem = {
     val children = e.children collect {
-      case e: ScopedNodes.Elem                   => e
-      case t: ScopedNodes.Text                   => t
-      case c: ScopedNodes.Comment                => c
+      case e: ScopedNodes.Elem => e
+      case t: ScopedNodes.Text => t
+      case c: ScopedNodes.Comment => c
       case pi: ScopedNodes.ProcessingInstruction => pi
-      case er: ScopedNodes.EntityRef             => er
+      case er: ScopedNodes.EntityRef => er
     }
 
-    // Recursion, with Node.apply and Elem.apply being mutually dependent
+    // Recursion, with Node.from and Elem.from being mutually dependent
     val simpleChildren = children map { node => Node.from(node) }
 
     Elem(e.qname, e.attributes.toIndexedSeq, e.scope, simpleChildren)
@@ -811,14 +811,14 @@ object Elem {
     require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
 
     val children = e.children collect {
-      case e: ClarkNodes.Elem                   => e
-      case t: ClarkNodes.Text                   => t
-      case c: ClarkNodes.Comment                => c
+      case e: ClarkNodes.Elem => e
+      case t: ClarkNodes.Text => t
+      case c: ClarkNodes.Comment => c
       case pi: ClarkNodes.ProcessingInstruction => pi
-      case er: ClarkNodes.EntityRef             => er
+      case er: ClarkNodes.EntityRef => er
     }
 
-    // Recursion, with Node.apply and Elem.apply being mutually dependent
+    // Recursion, with Node.from and Elem.from being mutually dependent
     val simpleChildren = children map { node => Node.from(node, scope) }
 
     val qname = Node.enameToQName(e.resolvedName, scope)
@@ -879,12 +879,12 @@ object Node {
    * Converts any element, text, comment, PI or entity reference `ScopedNodes.Node` to a "simple" `Node`.
    */
   def from(n: ScopedNodes.Node): Node = n match {
-    case e: ScopedNodes.Elem                   => Elem.from(e)
-    case t: ScopedNodes.Text                   => Text(t.text, false)
-    case c: ScopedNodes.Comment                => Comment(c.text)
+    case e: ScopedNodes.Elem => Elem.from(e)
+    case t: ScopedNodes.Text => Text(t.text, false)
+    case c: ScopedNodes.Comment => Comment(c.text)
     case pi: ScopedNodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
-    case er: ScopedNodes.EntityRef             => EntityRef(er.entity)
-    case n                                     => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
+    case er: ScopedNodes.EntityRef => EntityRef(er.entity)
+    case n => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
   }
 
   /**
@@ -897,28 +897,28 @@ object Node {
     require(scope.defaultNamespaceOption.isEmpty, s"No default namespace allowed, but got scope $scope")
 
     node match {
-      case e: ClarkNodes.Elem                   => Elem.from(e, scope)
-      case t: ClarkNodes.Text                   => Text(t.text, false)
-      case c: ClarkNodes.Comment                => Comment(c.text)
+      case e: ClarkNodes.Elem => Elem.from(e, scope)
+      case t: ClarkNodes.Text => Text(t.text, false)
+      case c: ClarkNodes.Comment => Comment(c.text)
       case pi: ClarkNodes.ProcessingInstruction => ProcessingInstruction(pi.target, pi.data)
-      case er: ClarkNodes.EntityRef             => EntityRef(er.entity)
-      case n                                    => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
+      case er: ClarkNodes.EntityRef => EntityRef(er.entity)
+      case n => sys.error(s"Not an element, text, comment, processing instruction or entity reference node: $n")
     }
   }
 
   def elem(
-    qname:    QName,
-    scope:    Scope,
+    qname: QName,
+    scope: Scope,
     children: immutable.IndexedSeq[Node]): Elem = {
 
     elem(qname, Vector(), scope, children)
   }
 
   def elem(
-    qname:      QName,
+    qname: QName,
     attributes: immutable.IndexedSeq[(QName, String)],
-    scope:      Scope,
-    children:   immutable.IndexedSeq[Node]): Elem = {
+    scope: Scope,
+    children: immutable.IndexedSeq[Node]): Elem = {
 
     new Elem(qname, attributes, scope, children)
   }
@@ -928,10 +928,10 @@ object Node {
   }
 
   def textElem(
-    qname:      QName,
+    qname: QName,
     attributes: immutable.IndexedSeq[(QName, String)],
-    scope:      Scope,
-    txt:        String): Elem = {
+    scope: Scope,
+    txt: String): Elem = {
 
     new Elem(qname, attributes, scope, Vector(text(txt)))
   }
@@ -941,9 +941,9 @@ object Node {
   }
 
   def emptyElem(
-    qname:      QName,
+    qname: QName,
     attributes: immutable.IndexedSeq[(QName, String)],
-    scope:      Scope): Elem = {
+    scope: Scope): Elem = {
 
     new Elem(qname, attributes, scope, Vector())
   }

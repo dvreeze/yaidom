@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.FindElementCounts"
 
-// Taking yaidom version 1.8.1
+// Taking yaidom version 1.8.2-SNAPSHOT
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.1`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.8.2-SNAPSHOT`
 
 import java.io._
 import javax.xml.stream._
@@ -12,6 +12,9 @@ import scala.collection.immutable
 import scala.util.Try
 import eu.cdevreeze.yaidom.core._
 import eu.cdevreeze.yaidom._
+
+ENameProvider.globalENameProvider.become(jvm.CaffeineENameProvider.fromMaximumCacheSize(5000))
+QNameProvider.globalQNameProvider.become(jvm.CaffeineQNameProvider.fromMaximumCacheSize(5000))
 
 // The DocumentParserUsingStax is the most efficient one of the DocumentParser implementations offered by yaidom
 
