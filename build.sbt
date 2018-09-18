@@ -26,20 +26,6 @@ lazy val commonSettings = Seq(
 
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint", "-target:jvm-1.8"),
 
-  publishArtifact in Test := false,
-  publishMavenStyle := true,
-
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-    },
-
-  pomExtra := pomData,
-  pomIncludeRepository := { _ => false },
-
   libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.1.0",
 
   libraryDependencies ++= {
@@ -175,30 +161,6 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
 lazy val yaidomJVM = yaidom.jvm
 lazy val yaidomJS = yaidom.js
-
-lazy val pomData =
-  <url>https://github.com/dvreeze/yaidom</url>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-      <comments>Yaidom is licensed under Apache License, Version 2.0</comments>
-    </license>
-  </licenses>
-  <scm>
-    <connection>scm:git:git@github.com:dvreeze/yaidom.git</connection>
-    <url>https://github.com/dvreeze/yaidom.git</url>
-    <developerConnection>scm:git:git@github.com:dvreeze/yaidom.git</developerConnection>
-  </scm>
-  <developers>
-    <developer>
-      <id>dvreeze</id>
-      <name>Chris de Vreeze</name>
-      <email>chris.de.vreeze@caiway.net</email>
-    </developer>
-  </developers>
-
 
 // Helper functions
 
