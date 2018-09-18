@@ -11,11 +11,7 @@ install:
 matrix:
   include:
   - jdk: oraclejdk9
-    scala: 2.12.6
-  - jdk: oraclejdk8
-    scala: 2.12.6
-  - jdk: oraclejdk8
-    scala: 2.11.12
+    scala: 2.13.0-M4
   - jdk: oraclejdk8
     scala: 2.13.0-M4
 
