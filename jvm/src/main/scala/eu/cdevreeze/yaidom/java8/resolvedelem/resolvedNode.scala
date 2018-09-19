@@ -104,9 +104,4 @@ object ResolvedElem {
   def from(elem: ClarkNodes.Elem): ResolvedElem = {
     new ResolvedElem(resolved.Elem.from(elem))
   }
-
-  @deprecated(message = "Use method 'from' instead", since = "1.9.0")
-  def apply(elem: ClarkNodes.Elem): ResolvedElem = {
-    from(elem)
-  }
 }

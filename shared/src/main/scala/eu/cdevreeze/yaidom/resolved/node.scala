@@ -123,9 +123,9 @@ sealed trait Node extends ClarkNodes.Node with Immutable
  * }}}
  */
 final case class Elem(
-  override val resolvedName:       EName,
+  override val resolvedName: EName,
   override val resolvedAttributes: Map[EName, String],
-  override val children:           immutable.IndexedSeq[Node])
+  override val children: immutable.IndexedSeq[Node])
   extends Node
   with ClarkNodes.Elem
   with ClarkElemLike
@@ -239,12 +239,12 @@ final case class Elem(
   def removeAllInterElementWhitespace: Elem = {
     def isWhitespaceText(n: Node): Boolean = n match {
       case t: Text if t.trimmedText.isEmpty => true
-      case _                                => false
+      case _ => false
     }
 
     def isNonTextNode(n: Node): Boolean = n match {
       case t: Text => false
-      case n       => true
+      case n => true
     }
 
     val doStripWhitespace = (findChildElem(_ => true).nonEmpty) && (children forall (n => isWhitespaceText(n) || isNonTextNode(n)))
@@ -281,7 +281,7 @@ final case class Elem(
           case t: Text =>
             val (textNodes, remainder) = childNodes span {
               case t: Text => true
-              case _       => false
+              case _ => false
             }
 
             val combinedText: String = textNodes collect { case t: Text => t.text } mkString ""
@@ -331,7 +331,7 @@ final case class Elem(
         elm.children map { (n: Node) =>
           n match {
             case t: Text => f(t)
-            case n       => n
+            case n => n
           }
         }
       }
@@ -410,7 +410,7 @@ object Node extends ElemCreationApi {
   def from(n: ClarkNodes.Node): Node = n match {
     case e: ClarkNodes.Elem => Elem.from(e)
     case t: ClarkNodes.Text => Text(t)
-    case n                  => sys.error(s"Not an element or text node: $n")
+    case n => sys.error(s"Not an element or text node: $n")
   }
 
   def elem(ename: EName, children: immutable.IndexedSeq[Node]): Elem = {
@@ -455,9 +455,9 @@ object Node extends ElemCreationApi {
 object Elem {
 
   private[resolved] final class ElemSerializationProxy(
-    val resolvedName:       EName,
+    val resolvedName: EName,
     val resolvedAttributes: Map[EName, String],
-    val children:           immutable.IndexedSeq[Node]) extends Serializable {
+    val children: immutable.IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
     def readResolve(): Any = new Elem(resolvedName, resolvedAttributes, children)
@@ -468,21 +468,13 @@ object Elem {
    */
   def from(e: ClarkNodes.Elem): Elem = {
     val children = e.children collect {
-      case childElm: ClarkNodes.Elem  => childElm
+      case childElm: ClarkNodes.Elem => childElm
       case childText: ClarkNodes.Text => childText
     }
     // Recursion, with Node.apply and Elem.apply being mutually dependent
     val resolvedChildren = children map { node => Node.from(node) }
 
     Elem(e.resolvedName, e.resolvedAttributes.toMap, resolvedChildren)
-  }
-
-  /**
-   * Converts any `ClarkNodes.Elem` element to a "resolved" `Elem`.
-   */
-  @deprecated(message = "Use method 'from' instead", since = "1.8.0")
-  def apply(e: ClarkNodes.Elem): Elem = {
-    from(e)
   }
 }
 
