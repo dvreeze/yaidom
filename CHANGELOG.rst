@@ -3,6 +3,127 @@ CHANGELOG
 =========
 
 
+1.9.0
+=====
+
+Yaidom 1.9.0 is a performance-oriented release. The most important changes are:
+
+* Method ``SaxonElem.path`` now more efficiently uses Saxon's ``AbsolutePath`` class underneath, thus improving its performance
+* This led to the introduction of class ``AbsolutePath`` to yaidom, which is quite useful in its own right
+* Related to that are the added conversions between ENames and namespace-URI qualified EQ-names
+* Addition of ENameProviders and QNameProviders backed by a Caffeine cache
+* Further improvements in the ``SaxonElem`` implementation (for performance and clarity)
+* Enhancements in the Java 8 wrapper API
+* Removal of deprecated classes and methods, which account for most of the breaking changes
+
+To reduce memory footprint in applications using yaidom, it is important to activate the new EName and QName
+providers backed by a Caffeine cache. See the scripts in the yaidom project for how to use them. Of course,
+a cache is a rather heavy tool for implementing name pooling, but the slight loss in execution speed is more than
+compensated by the reduced memory footprint.
+
+So what is the performance story for yaidom? See also Li Haoyi's article on Benchmarking Scala Collections
+for some background. This article implies that future versions of yaidom that target Scala 2.13 and later can likely
+have much better performance by exploiting the immutable ``ArraySeq`` collection instead of ``Vector`` collections
+which are now used all over the place inside yaidom (for good reasons, though). It is important that yaidom can
+keep its immutability and thread-safety promises with regard to the native element implementations (although
+a Scala Vector or List is only thread-safe when "published safely").
+
+Still, yaidom query performance on the JVM is quite good at the moment, but mind the following:
+
+* When using the element query API for querying descendant elements, query performance is quite good
+* This holds for most element implementations, especially for the Saxon wrappers and the 3 native element implementations
+* When querying for ancestor elements and/or absolute paths, it depends on the element implementation how expensive these queries are
+* The Saxon wrappers seem to be doing quite well when querying for ancestors, and reasonably well when querying for absolute paths
+* When working in-memory with complete XML documents over 100 MB, only the Saxon wrapper element implementations are useful in practice
+* The transformation/update APIs have not been battle-tested to the extent that the query API has
+* When working with large (and/or very many) XML documents, take care not to lean too much on potentially slow "reverse axis" (or path) queries
+
+Besides the breaking changes due to removed deprecated code, there are hardly any breaking changes for applications
+that do not create their own element implementations, because they are not affected by newly added query API methods.
+The only breaking changes for such applications are the nodeInfo2EName and NodeInfo2QName methods in the SaxonNode companion object.
+
+Breaking changes compared to version 1.8.1 (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues):
+
+* method apply(eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem in object eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem's type is different in current version, where it is (eu.cdevreeze.yaidom.resolved.Elem)eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem instead of (eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.java8.resolvedelem.ResolvedElem.apply")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#XsdElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$XsdElem$")
+* object eu.cdevreeze.yaidom.utils.SimpleElemEditor#DefaultPrefixGenerator does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.SimpleElemEditor$DefaultPrefixGenerator$")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#GlobalAttributeDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$GlobalAttributeDeclaration$")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#LocalElementDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$LocalElementDeclaration$")
+* object eu.cdevreeze.yaidom.utils.ResolvedElemEditor does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.ResolvedElemEditor$")
+* class eu.cdevreeze.yaidom.utils.ResolvedElemEditor does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.ResolvedElemEditor")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#ElementReference does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$ElementReference$")
+* object eu.cdevreeze.yaidom.utils.EditableResolvedElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.EditableResolvedElem$")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#GlobalElementDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$GlobalElementDeclaration")
+* class eu.cdevreeze.yaidom.utils.ENameProviderUtils does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.ENameProviderUtils")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$")
+* class eu.cdevreeze.yaidom.utils.EditableResolvedElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.EditableResolvedElem")
+* class eu.cdevreeze.yaidom.utils.SimpleElemEditor does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.SimpleElemEditor")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#GlobalAttributeDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$GlobalAttributeDeclaration")
+* interface eu.cdevreeze.yaidom.utils.XmlSchemas#XsdElemFactory does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$XsdElemFactory")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#LocalAttributeDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$LocalAttributeDeclaration")
+* class eu.cdevreeze.yaidom.utils.EditableSimpleElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.EditableSimpleElem")
+* object eu.cdevreeze.yaidom.utils.QNameProviderUtils does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.QNameProviderUtils$")
+* class eu.cdevreeze.yaidom.utils.QNameProviderUtils does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.QNameProviderUtils")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#LocalElementDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$LocalElementDeclaration")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#LocalAttributeDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$LocalAttributeDeclaration$")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#SchemaRoot does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$SchemaRoot")
+* interface eu.cdevreeze.yaidom.utils.ClarkElemEditor does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.ClarkElemEditor")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#XsdElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$XsdElem")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#ElementReference does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$ElementReference")
+* object eu.cdevreeze.yaidom.utils.ENameProviderUtils does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.ENameProviderUtils$")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#AttributeReference does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$AttributeReference$")
+* class eu.cdevreeze.yaidom.utils.XmlSchemas#AttributeReference does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$AttributeReference")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#SchemaRoot does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$SchemaRoot$")
+* interface eu.cdevreeze.yaidom.utils.EditableClarkElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.EditableClarkElem")
+* object eu.cdevreeze.yaidom.utils.XmlSchemas#GlobalElementDeclaration does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.XmlSchemas$GlobalElementDeclaration$")
+* object eu.cdevreeze.yaidom.utils.SimpleElemEditor does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.utils.SimpleElemEditor$")
+* abstract method absolutePath()eu.cdevreeze.yaidom.core.AbsolutePath in interface eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi is present only in current version
+  filter with: ProblemFilters.exclude[ReversedMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi.absolutePath")
+* abstract method nodeKind()eu.cdevreeze.yaidom.queryapi.Nodes#NodeKind in interface eu.cdevreeze.yaidom.queryapi.Nodes#Node is present only in current version
+  filter with: ProblemFilters.exclude[ReversedMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.Nodes#Node.nodeKind")
+* method nodeInfo2EName(net.sf.saxon.om.NodeInfo)eu.cdevreeze.yaidom.core.EName in object eu.cdevreeze.yaidom.saxon.SaxonNode does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.saxon.SaxonNode.nodeInfo2EName")
+* method nodeInfo2QName(net.sf.saxon.om.NodeInfo)eu.cdevreeze.yaidom.core.QName in object eu.cdevreeze.yaidom.saxon.SaxonNode does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.saxon.SaxonNode.nodeInfo2QName")
+* deprecated method apply(eu.cdevreeze.yaidom.queryapi.ClarkNodes#Elem)eu.cdevreeze.yaidom.resolved.Elem in object eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.apply")
+
+
 1.8.1
 =====
 
