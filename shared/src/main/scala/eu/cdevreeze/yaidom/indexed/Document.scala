@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.simple
  */
 final class Document(
   xmlDeclarationOption: Option[XmlDeclaration],
-  children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends IndexedDocument(xmlDeclarationOption, children) with Immutable {
+  children: immutable.IndexedSeq[IndexedScopedNode.CanBeDocumentChild]) extends IndexedDocument(xmlDeclarationOption, children) {
 
   type ThisDoc = Document
 

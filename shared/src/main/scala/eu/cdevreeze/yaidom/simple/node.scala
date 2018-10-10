@@ -42,7 +42,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends ScopedNodes.Node with Immutable with Serializable {
+sealed trait Node extends ScopedNodes.Node with Serializable {
 
   /**
    * Returns the tree representation String, conforming to the tree representation DSL that creates `NodeBuilder`s.

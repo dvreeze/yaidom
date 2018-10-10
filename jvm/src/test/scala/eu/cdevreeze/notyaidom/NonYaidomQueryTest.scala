@@ -992,7 +992,7 @@ object NonYaidomQueryTest {
   /**
    * Naive node trait, with only subclasses for elements and text nodes.
    */
-  sealed trait Node extends Immutable
+  sealed trait Node
 
   /**
    * Naive element class, which for example is not namespace-aware.

@@ -73,7 +73,7 @@ import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait NodeBuilder extends Immutable with Serializable {
+sealed trait NodeBuilder extends Serializable {
 
   type NodeType <: Node
 

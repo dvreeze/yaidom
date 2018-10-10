@@ -69,7 +69,7 @@ import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
  *
  * @author Chris de Vreeze
  */
-sealed trait Node extends ClarkNodes.Node with Immutable
+sealed trait Node extends ClarkNodes.Node
 
 /**
  * Element as abstract data type. It contains only expanded names, not qualified names. This reminds of James Clark notation

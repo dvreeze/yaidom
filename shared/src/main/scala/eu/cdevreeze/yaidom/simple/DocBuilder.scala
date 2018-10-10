@@ -39,7 +39,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 final class DocBuilder(
     val uriOption: Option[URI],
     val xmlDeclarationOption: Option[XmlDeclaration],
-    val children: immutable.IndexedSeq[CanBeDocBuilderChild]) extends DocumentApi with Immutable with Serializable {
+    val children: immutable.IndexedSeq[CanBeDocBuilderChild]) extends DocumentApi with Serializable {
 
   require(uriOption ne null) // scalastyle:off null
   require(xmlDeclarationOption ne null) // scalastyle:off null

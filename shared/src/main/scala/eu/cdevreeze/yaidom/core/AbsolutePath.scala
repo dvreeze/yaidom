@@ -36,7 +36,7 @@ import scala.collection.mutable
  *
  * @author Chris de Vreeze
  */
-final class AbsolutePath(val entries: immutable.IndexedSeq[AbsolutePath.Entry]) extends Immutable {
+final class AbsolutePath(val entries: immutable.IndexedSeq[AbsolutePath.Entry]) {
   require(entries ne null) // scalastyle:off null
   require(entries.nonEmpty, s"Empty absolute paths not allowed")
   require(entries(0).index == 0, s"The first absolute path entry must have index 0 (position 1)")
@@ -177,7 +177,7 @@ object AbsolutePath {
   }
 
   /** An entry in an `AbsolutePath`, as an expanded element name plus zero-based index of the elem as child element (with that name) of the parent. */
-  final case class Entry(elementName: EName, index: Int) extends Immutable {
+  final case class Entry(elementName: EName, index: Int) {
     require(elementName ne null) // scalastyle:off null
     require(index >= 0)
 

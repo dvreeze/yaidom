@@ -95,7 +95,7 @@ import scala.collection.mutable
  *
  * @author Chris de Vreeze
  */
-final class Path(val entries: immutable.IndexedSeq[Path.Entry]) extends Immutable { self =>
+final class Path(val entries: immutable.IndexedSeq[Path.Entry]) { self =>
   require(entries ne null) // scalastyle:off null
 
   /** Returns true if this is the empty `Path`, so if it has no entries */
@@ -298,7 +298,7 @@ object Path {
   }
 
   /** An entry in an `Path`, as an expanded element name plus zero-based index of the elem as child element (with that name) of the parent. */
-  final case class Entry(elementName: EName, index: Int) extends Immutable {
+  final case class Entry(elementName: EName, index: Int) {
     require(elementName ne null) // scalastyle:off null
     require(index >= 0)
 
