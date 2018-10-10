@@ -264,7 +264,7 @@ class BasicXmlProcessingTest extends FunSuite {
 
 object BasicXmlProcessingTest {
 
-  final case class Song(val title: String, val length: String) extends Immutable {
+  final case class Song(val title: String, val length: String) {
     val timeInSeconds: Int = {
       val arr = length.split(":")
       require(arr.length == 2)
@@ -274,10 +274,10 @@ object BasicXmlProcessingTest {
     }
   }
 
-  final case class Album(val title: String, val songs: immutable.IndexedSeq[Song], val description: String) extends Immutable {
+  final case class Album(val title: String, val songs: immutable.IndexedSeq[Song], val description: String) {
     val timeInSeconds: Int = songs.map(_.timeInSeconds).sum
     val length: String = (timeInSeconds / 60).toString + ":" + (timeInSeconds % 60).toString
   }
 
-  final case class Artist(val name: String, val albums: immutable.IndexedSeq[Album]) extends Immutable
+  final case class Artist(val name: String, val albums: immutable.IndexedSeq[Album])
 }

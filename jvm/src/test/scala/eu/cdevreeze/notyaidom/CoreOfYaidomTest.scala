@@ -1101,7 +1101,7 @@ object CoreOfYaidomTest {
   /**
    * Naive node trait, with only subclasses for elements and text nodes.
    */
-  sealed trait Node extends Immutable
+  sealed trait Node
 
   /**
    * Naive element class, which for example is not namespace-aware.
@@ -1168,7 +1168,7 @@ object CoreOfYaidomTest {
   /**
    * Naive (indexed) node trait, with only subclasses for elements and text nodes.
    */
-  sealed trait IndexedNode extends Immutable
+  sealed trait IndexedNode
 
   /**
    * Naive (indexed) element class, which for example is not namespace-aware.

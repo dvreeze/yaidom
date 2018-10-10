@@ -26,7 +26,7 @@ import java.nio.charset.Charset
 final case class XmlDeclaration(
     val version: String,
     val encodingOption: Option[Charset],
-    val standaloneOption: Option[Boolean]) extends Immutable {
+    val standaloneOption: Option[Boolean]) {
 
   require(version ne null) // scalastyle:off null
   require(encodingOption ne null) // scalastyle:off null

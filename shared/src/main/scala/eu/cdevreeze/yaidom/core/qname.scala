@@ -53,7 +53,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  *
  * @author Chris de Vreeze
  */
-sealed trait QName extends Immutable with Serializable {
+sealed trait QName extends Serializable {
 
   def localPart: String
   def prefixOption: Option[String]

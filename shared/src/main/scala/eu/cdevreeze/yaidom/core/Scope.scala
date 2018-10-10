@@ -223,7 +223,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  *
  * @author Chris de Vreeze
  */
-final case class Scope(prefixNamespaceMap: Map[String, String]) extends Immutable {
+final case class Scope(prefixNamespaceMap: Map[String, String]) {
   import Scope._
 
   validate(prefixNamespaceMap)

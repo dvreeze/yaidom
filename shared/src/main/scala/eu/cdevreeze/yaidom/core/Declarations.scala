@@ -53,7 +53,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  *
  * @author Chris de Vreeze
  */
-final case class Declarations(prefixNamespaceMap: Map[String, String]) extends Immutable {
+final case class Declarations(prefixNamespaceMap: Map[String, String]) {
   import Declarations._
 
   validate(prefixNamespaceMap)
