@@ -100,14 +100,16 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
       val result = storesElem.filterChildElems(withEName(ns, "store")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "store-number")).text
       }
-      result.toMap.mapValues(_.head).toMap
+      // Method mapValues deprecated since Scala 2.13.0.
+      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
     }
 
     val productElemsByName: Map[String, E] = {
       val result = productsElem.filterChildElems(withEName(ns, "product")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "name")).text
       }
-      result.toMap.mapValues(_.head).toMap
+      // Method mapValues deprecated since Scala 2.13.0.
+      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
@@ -181,14 +183,16 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
       val result = storesElem.filterChildElems(withEName(ns, "store")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "store-number")).text
       }
-      result.toMap.mapValues(_.head).toMap
+      // Method mapValues deprecated since Scala 2.13.0.
+      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
     }
 
     val productElemsByName: Map[String, E] = {
       val result = productsElem.filterChildElems(withEName(ns, "product")) groupBy { elem =>
         elem.getChildElem(withEName(ns, "name")).text
       }
-      result.toMap.mapValues(_.head).toMap
+      // Method mapValues deprecated since Scala 2.13.0.
+      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
@@ -295,7 +299,9 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
           emptyElem(QName("state"), Vector(QName("name") -> state), scope) withChildren {
             for {
               (category, products) <- allProductsByCategory
-              productRecords = allSalesByProduct.filterKeys(products.flatMap(_ \ withEName(ns, "name")).map(_.text).toSet)
+              // Method filterKeys deprecated since Scala 2.13.0.
+              productRecords = allSalesByProduct
+                .filter { case (prod, _) => products.flatMap(_ \ withEName(ns, "name")).map(_.text).toSet.contains(prod) }
             } yield {
               emptyElem(QName("category"), Vector(QName("name") -> category), scope) withChildren {
                 for {

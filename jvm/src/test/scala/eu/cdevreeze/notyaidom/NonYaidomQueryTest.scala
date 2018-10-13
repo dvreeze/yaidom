@@ -792,7 +792,8 @@ class NonYaidomQueryTest extends FunSuite {
         author <- book.findAllElemsOrSelf filter { _.name == "Author" }
         if author.findAllChildElems.find(_.name == "Last_Name").get.text.trim == authorLastName
       } yield {
-        val attrs = book.attributes.filterKeys(a => Set("ISBN", "Price").contains(a)).toMap
+        // Method filterKeys deprecated since Scala 2.13.0.
+        val attrs = book.attributes.filter { case (a, _) => Set("ISBN", "Price").contains(a) }.toMap
         new Elem(
           name = "Book",
           attributes = attrs,

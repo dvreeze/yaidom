@@ -119,14 +119,16 @@ trait AbstractBlogXbrlTestSupport {
     val allContexts: immutable.IndexedSeq[XbrliContext] =
       findAllChildElemsOfType(classTag[XbrliContext])
 
+    // Method mapValues deprecated since Scala 2.13.0.
     val allContextsById: Map[String, XbrliContext] =
-      allContexts.groupBy(_.id).mapValues(_.head).toMap
+      allContexts.groupBy(_.id).map { case (id, ctxs) => id -> ctxs.head }.toMap
 
     val allUnits: immutable.IndexedSeq[XbrliUnit] =
       findAllChildElemsOfType(classTag[XbrliUnit])
 
+    // Method mapValues deprecated since Scala 2.13.0.
     val allUnitsById: Map[String, XbrliUnit] =
-      allUnits.groupBy(_.id).mapValues(_.head).toMap
+      allUnits.groupBy(_.id).map { case (id, uns) => id -> uns.head }.toMap
 
     val allTopLevelFacts: immutable.IndexedSeq[Fact] =
       findAllChildElemsOfType(classTag[Fact])

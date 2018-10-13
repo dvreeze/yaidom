@@ -113,8 +113,10 @@ class Blog2XbrlTest extends FunSuite {
 
     // Having the same unit, the gaap:AverageNumberEmployees facts are uniquely identified by contexts.
 
+    // Method mapValues deprecated since Scala 2.13.0.
     val avgNumEmployeesFactsByContext =
-      avgNumEmployeesFacts.groupBy(_.attribute(EName("contextRef"))).mapValues(_.head)
+      avgNumEmployeesFacts.groupBy(_.attribute(EName("contextRef")))
+        .map { case (ctxRef, facts) => ctxRef -> facts.head }
 
     assertResult(
       Set("D-2006", "D-2007", "D-2008", "D-2009", "D-2010", "D-2010-BS1", "D-2010-BS2", "D-2010-CON", "D-2010-E", "D-2010-ALL")) {
@@ -309,7 +311,8 @@ class Blog2XbrlTest extends FunSuite {
       Map("startBalance" -> 1000, "change" -> -1000, "endBalance" -> 0),
       Map("startBalance" -> -3000, "change" -> 4000, "endBalance" -> 1000))) {
 
-      evalResults.map(_.facts.mapValues(_.text.toInt).toMap).toSet
+      // Method mapValues deprecated since Scala 2.13.0.
+      evalResults.map(_.facts.map { case (k, facts) => k -> facts.text.toInt }.toMap).toSet
     }
   }
 
@@ -318,16 +321,18 @@ class Blog2XbrlTest extends FunSuite {
   private val idoc = indexed.Document(docParser.parse(sampleXbrlInstanceFile))
   private val idocElem = idoc.documentElement
 
+  // Method mapValues deprecated since Scala 2.13.0.
   val contextsById: Map[String, indexed.Elem] =
     idocElem.filterChildElems(withEName(XbrliNs, "context"))
       .groupBy(_.attribute(EName("id")))
-      .mapValues(_.head)
+      .map { case (id, ctxs) => id -> ctxs.head }
       .toMap
 
+  // Method mapValues deprecated since Scala 2.13.0.
   val unitsById: Map[String, indexed.Elem] =
     idocElem.filterChildElems(withEName(XbrliNs, "unit"))
       .groupBy(_.attribute(EName("id")))
-      .mapValues(_.head)
+      .map { case (id, uns) => id -> uns.head }
       .toMap
 
   // See http://www.xbrl.org/Specification/variables/REC-2009-06-22/.
@@ -384,7 +389,8 @@ class Blog2XbrlTest extends FunSuite {
     fact: indexed.Elem,
     dimension: EName): Option[EName] = {
 
-    explicitDimensionAspects(fact).filterKeys(Set(dimension)).headOption.map(_._2)
+    // Method filterKeys deprecated since Scala 2.13.0.
+    explicitDimensionAspects(fact).filter { case (dim, mem) => Set(dimension).contains(dim) }.headOption.map(_._2)
   }
 
   def unitAspectOption(fact: indexed.Elem): Option[simple.Elem] = {
@@ -445,7 +451,8 @@ object Blog2XbrlTest {
   final case class EvaluationResult(val facts: Map[String, indexed.Elem], val result: Boolean) {
 
     override def toString: String = {
-      s"EvaluationResult(result: $result, facts: ${facts.mapValues(_.underlyingElem)})"
+      // Method mapValues deprecated since Scala 2.13.0.
+      s"EvaluationResult(result: $result, facts: ${facts.map { case (k, fact) => k -> fact.underlyingElem }})"
     }
   }
 }

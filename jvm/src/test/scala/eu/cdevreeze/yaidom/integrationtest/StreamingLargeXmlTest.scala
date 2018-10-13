@@ -357,8 +357,9 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
     val contexts = contextBuffer.toIndexedSeq
     val units = unitBuffer.toIndexedSeq
 
-    val contextsById = contexts.groupBy(_.attribute(EName("id"))).mapValues(_.head)
-    val unitsById = units.groupBy(_.attribute(EName("id"))).mapValues(_.head)
+    // Method mapValues deprecated since Scala 2.13.0.
+    val contextsById = contexts.groupBy(_.attribute(EName("id"))).map { case (id, ctxs) => id -> ctxs.head }
+    val unitsById = units.groupBy(_.attribute(EName("id"))).map { case (id, uns) => id -> uns.head }
 
     // Let's do the second pass, taking one fact element at a time
 
