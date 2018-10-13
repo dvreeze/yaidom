@@ -304,7 +304,9 @@ object XmlCreationTest {
       prevTimesheet.days.map(d => d.date -> d.backingElem.path).toMap
     }
 
-    val paths: Set[Path] = pathsPerDate.filterKeys(refinedTasksPerDay.keySet).values.toSet
+    // Method filterKeys deprecated since Scala 2.13.0.
+    val paths: Set[Path] =
+      pathsPerDate.filter { case (dt, _) => refinedTasksPerDay.keySet.contains(dt) }.values.toSet
 
     val rawResultTimesheetElem =
       resolved.Elem.from(prevTimesheet).updateElems(paths) {

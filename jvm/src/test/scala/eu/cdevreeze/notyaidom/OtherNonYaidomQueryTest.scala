@@ -787,7 +787,8 @@ class OtherNonYaidomQueryTest extends FunSuite {
         author <- book filterElemsOrSelf { _.name == "Author" }
         if author.findAllChildElems.find(_.name == "Last_Name").get.text.trim == authorLastName
       } yield {
-        val attrs = book.attributes.filterKeys(a => Set("ISBN", "Price").contains(a)).toMap
+        // Method filterKeys deprecated since Scala 2.13.0.
+        val attrs = book.attributes.filter { case (a, _) => Set("ISBN", "Price").contains(a) }.toMap
         new Elem(
           name = "Book",
           attributes = attrs,
@@ -1040,9 +1041,9 @@ object OtherNonYaidomQueryTest {
    * Collections API, already provide a pretty powerful XML querying API.
    */
   final class Elem(
-      val name: String,
-      val attributes: Map[String, String],
-      val children: immutable.IndexedSeq[Node]) extends Node with ElemLike {
+    val name: String,
+    val attributes: Map[String, String],
+    val children: immutable.IndexedSeq[Node]) extends Node with ElemLike {
 
     type ThisElem = Elem
 
