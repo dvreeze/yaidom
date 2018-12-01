@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.convert
 
 import java.net.URI
 import java.nio.charset.Charset
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 import org.w3c.dom.Attr
 import org.w3c.dom.Element
 import org.w3c.dom.NamedNodeMap
@@ -86,7 +86,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
    */
   final def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
-    val attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(v.getAttributes)
+    val attributes: ArraySeq[(QName, String)] = extractAttributes(v.getAttributes)
 
     val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.getAttributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
@@ -150,8 +150,8 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   /** Converts an `org.w3c.dom.Comment` to a [[eu.cdevreeze.yaidom.simple.Comment]] */
   final def convertToComment(v: org.w3c.dom.Comment): Comment = Comment(v.getData)
 
-  /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */
-  final def extractAttributes(domAttributes: NamedNodeMap): immutable.IndexedSeq[(QName, String)] = {
+  /** Converts a `NamedNodeMap` to an `IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */
+  final def extractAttributes(domAttributes: NamedNodeMap): ArraySeq[(QName, String)] = {
     (0 until domAttributes.getLength).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
 
@@ -161,7 +161,7 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
         val qname: QName = toQName(attr)
         Some(qname -> attr.getValue)
       }
-    }).toIndexedSeq
+    }).to(ArraySeq)
   }
 
   /** Converts the namespace declarations in a `NamedNodeMap` to a `Declarations` */
@@ -183,9 +183,9 @@ trait DomToYaidomConversions extends ConverterToDocument[org.w3c.dom.Document] {
   }
 
   /** Helper method that converts a `NodeList` to an `IndexedSeq[org.w3c.dom.Node]` */
-  final def nodeListToIndexedSeq(nodeList: NodeList): immutable.IndexedSeq[org.w3c.dom.Node] = {
+  final def nodeListToIndexedSeq(nodeList: NodeList): ArraySeq[org.w3c.dom.Node] = {
     val result = (0 until nodeList.getLength) map { i => nodeList.item(i) }
-    result.toIndexedSeq
+    result.to(ArraySeq)
   }
 
   /** Extracts the `QName` of an `org.w3c.dom.Element` */

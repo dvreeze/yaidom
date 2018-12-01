@@ -16,8 +16,7 @@
 
 package eu.cdevreeze.yaidom.simple
 
-import scala.Vector
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
@@ -113,9 +112,9 @@ sealed trait CanBeDocBuilderChild extends NodeBuilder {
 @SerialVersionUID(1L)
 final class ElemBuilder(
     val qname: QName,
-    val attributes: immutable.IndexedSeq[(QName, String)],
+    val attributes: ArraySeq[(QName, String)],
     val namespaces: Declarations,
-    val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi with HasText {
+    val children: ArraySeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi with HasText {
 
   require(qname ne null) // scalastyle:off null
   require(attributes ne null) // scalastyle:off null
@@ -133,7 +132,7 @@ final class ElemBuilder(
   type NodeType = Elem
 
   /** Returns the element children as ElemBuilder instances */
-  override def findAllChildElems: immutable.IndexedSeq[ElemBuilder] = children collect { case e: ElemBuilder => e }
+  override def findAllChildElems: IndexedSeq[ElemBuilder] = children.collect { case e: ElemBuilder => e }
 
   override def transformChildElems(f: ElemBuilder => ElemBuilder): ElemBuilder = {
     val newChildren =
@@ -144,11 +143,11 @@ final class ElemBuilder(
     withChildren(newChildren)
   }
 
-  override def transformChildElemsToNodeSeq(f: ElemBuilder => immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+  override def transformChildElemsToNodeSeq(f: ElemBuilder => IndexedSeq[NodeBuilder]): ElemBuilder = {
     val newChildren =
       children flatMap {
         case e: ElemBuilder => f(e)
-        case n: NodeBuilder => Vector(n)
+        case n: NodeBuilder => ArraySeq(n)
       }
     withChildren(newChildren)
   }
@@ -163,7 +162,7 @@ final class ElemBuilder(
   }
 
   /** Returns the text children */
-  def textChildren: immutable.IndexedSeq[TextBuilder] = children collect { case t: TextBuilder => t }
+  def textChildren: IndexedSeq[TextBuilder] = children collect { case t: TextBuilder => t }
 
   /**
    * Creates an `Elem` from this element builder, using the passed parent scope.
@@ -187,15 +186,15 @@ final class ElemBuilder(
    */
   def copy(
     qname: QName = this.qname,
-    attributes: immutable.IndexedSeq[(QName, String)] = this.attributes,
+    attributes: IndexedSeq[(QName, String)] = this.attributes,
     namespaces: Declarations = this.namespaces,
-    children: immutable.IndexedSeq[NodeBuilder] = this.children): ElemBuilder = {
+    children: IndexedSeq[NodeBuilder] = this.children): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, children)
+    new ElemBuilder(qname, attributes.to(ArraySeq), namespaces, children.to(ArraySeq))
   }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
-  def withChildren(newChildren: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+  def withChildren(newChildren: IndexedSeq[NodeBuilder]): ElemBuilder = {
     copy(children = newChildren)
   }
 
@@ -297,34 +296,34 @@ object NodeBuilder {
 
   def elem(
     qname: QName,
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    children: IndexedSeq[NodeBuilder]): ElemBuilder = {
 
-    elem(qname, Vector(), children)
+    elem(qname, ArraySeq(), children.to(ArraySeq))
   }
 
   def elem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    attributes: IndexedSeq[(QName, String)],
+    children: IndexedSeq[NodeBuilder]): ElemBuilder = {
 
-    elem(qname, attributes, Declarations.Empty, children)
+    elem(qname, attributes.to(ArraySeq), Declarations.Empty, children.to(ArraySeq))
   }
 
   def elem(
     qname: QName,
     namespaces: Declarations,
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    children: IndexedSeq[NodeBuilder]): ElemBuilder = {
 
-    elem(qname, Vector(), namespaces, children)
+    elem(qname, ArraySeq(), namespaces, children.to(ArraySeq))
   }
 
   def elem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     namespaces: Declarations,
-    children: immutable.IndexedSeq[NodeBuilder]): ElemBuilder = {
+    children: IndexedSeq[NodeBuilder]): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, children)
+    new ElemBuilder(qname, attributes.to(ArraySeq), namespaces, children.to(ArraySeq))
   }
 
   def text(textValue: String): TextBuilder = TextBuilder(text = textValue, isCData = false)
@@ -339,15 +338,15 @@ object NodeBuilder {
   def comment(textValue: String): CommentBuilder = CommentBuilder(textValue)
 
   def textElem(qname: QName, txt: String): ElemBuilder = {
-    textElem(qname, Vector(), txt)
+    textElem(qname, ArraySeq(), txt)
   }
 
   def textElem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     txt: String): ElemBuilder = {
 
-    textElem(qname, attributes, Declarations.Empty, txt)
+    textElem(qname, attributes.to(ArraySeq), Declarations.Empty, txt)
   }
 
   def textElem(
@@ -355,42 +354,42 @@ object NodeBuilder {
     namespaces: Declarations,
     txt: String): ElemBuilder = {
 
-    textElem(qname, Vector(), namespaces, txt)
+    textElem(qname, ArraySeq(), namespaces, txt)
   }
 
   def textElem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     namespaces: Declarations,
     txt: String): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, Vector(text(txt)))
+    new ElemBuilder(qname, attributes.to(ArraySeq), namespaces, ArraySeq(text(txt)))
   }
 
   def emptyElem(qname: QName): ElemBuilder = {
-    emptyElem(qname, Vector())
+    emptyElem(qname, ArraySeq())
   }
 
   def emptyElem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)]): ElemBuilder = {
+    attributes: IndexedSeq[(QName, String)]): ElemBuilder = {
 
-    emptyElem(qname, attributes, Declarations.Empty)
+    emptyElem(qname, attributes.to(ArraySeq), Declarations.Empty)
   }
 
   def emptyElem(
     qname: QName,
     namespaces: Declarations): ElemBuilder = {
 
-    emptyElem(qname, Vector(), namespaces)
+    emptyElem(qname, ArraySeq(), namespaces)
   }
 
   def emptyElem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     namespaces: Declarations): ElemBuilder = {
 
-    new ElemBuilder(qname, attributes, namespaces, Vector())
+    new ElemBuilder(qname, attributes.to(ArraySeq), namespaces, ArraySeq())
   }
 
   /**

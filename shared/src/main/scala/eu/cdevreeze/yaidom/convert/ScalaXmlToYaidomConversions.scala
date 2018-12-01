@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.convert
 
 import java.nio.charset.Charset
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
@@ -82,11 +82,11 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
    */
   final def convertToElem(v: scala.xml.Elem): Elem = {
     val qname: QName = toQName(v)
-    val attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(v.attributes)
+    val attributes: ArraySeq[(QName, String)] = extractAttributes(v.attributes)
     val scope: Scope = extractScope(v.scope)
 
     // Recursive (not tail-recursive)
-    val childSeq = v.child.toIndexedSeq flatMap { n: scala.xml.Node => convertToNodeOption(n) }
+    val childSeq = v.child.to(ArraySeq) flatMap { n: scala.xml.Node => convertToNodeOption(n) }
 
     new Elem(
       qname = qname,
@@ -129,9 +129,9 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
   /** Converts an `scala.xml.Comment` to a [[eu.cdevreeze.yaidom.simple.Comment]] */
   final def convertToComment(v: scala.xml.Comment): Comment = Comment(v.commentText)
 
-  /** Converts attributes, given as `scala.xml.MetaData`, to an `immutable.IndexedSeq[(QName, String)]`. */
-  final def extractAttributes(attrs: scala.xml.MetaData): immutable.IndexedSeq[(QName, String)] = {
-    attrs.toIndexedSeq map { attr: scala.xml.MetaData =>
+  /** Converts attributes, given as `scala.xml.MetaData`, to an `IndexedSeq[(QName, String)]`. */
+  final def extractAttributes(attrs: scala.xml.MetaData): ArraySeq[(QName, String)] = {
+    attrs.to(ArraySeq) map { attr: scala.xml.MetaData =>
       val attrValue = attr.value
       val attrValueText = if (attrValue.size >= 1) attrValue(0).text else ""
       (toQName(attr) -> attrValueText)

@@ -16,8 +16,7 @@
 
 package eu.cdevreeze.yaidom.simple
 
-import scala.Vector
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.PrettyPrinting.Line
@@ -75,7 +74,7 @@ sealed trait Node extends ScopedNodes.Node with Serializable {
   final override def toString: String = toTreeRepr
 
   /** Returns the tree representation as LineSeq, shifted indent spaces to the right */
-  private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line]
+  private[yaidom] def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): IndexedSeq[Line]
 }
 
 sealed trait CanBeDocumentChild extends Node with ScopedNodes.CanBeDocumentChild
@@ -172,9 +171,9 @@ sealed trait CanBeDocumentChild extends Node with ScopedNodes.CanBeDocumentChild
 @SerialVersionUID(1L)
 final class Elem(
   val qname: QName,
-  val attributes: immutable.IndexedSeq[(QName, String)],
+  val attributes: ArraySeq[(QName, String)],
   val scope: Scope,
-  override val children: immutable.IndexedSeq[Node])
+  override val children: ArraySeq[Node])
   extends CanBeDocumentChild
   with ScopedNodes.Elem
   with ScopedElemLike
@@ -205,10 +204,10 @@ final class Elem(
    * The attributes as an ordered mapping from `EName`s (instead of `QName`s) to values, obtained by resolving attribute `QName`s against
    * the attribute scope
    */
-  override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
+  override val resolvedAttributes: IndexedSeq[(EName, String)] = {
     val attrScope = attributeScope
 
-    attributes map { kv =>
+    attributes.map { kv =>
       val attName = kv._1
       val attValue = kv._2
       val expandedName =
@@ -225,10 +224,10 @@ final class Elem(
   def attributeScope: Scope = scope.withoutDefaultNamespace
 
   /** Returns the element children */
-  override def findAllChildElems: immutable.IndexedSeq[Elem] = children collect { case e: Elem => e }
+  override def findAllChildElems: IndexedSeq[Elem] = children collect { case e: Elem => e }
 
   /** Creates a copy, but with (only) the children passed as parameter `newChildren` */
-  override def withChildren(newChildren: immutable.IndexedSeq[Node]): Elem = {
+  override def withChildren(newChildren: IndexedSeq[Node]): Elem = {
     copy(children = newChildren)
   }
 
@@ -241,11 +240,11 @@ final class Elem(
     withChildren(newChildren)
   }
 
-  override def transformChildElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Elem = {
+  override def transformChildElemsToNodeSeq(f: Elem => IndexedSeq[Node]): Elem = {
     val newChildren =
       children flatMap {
         case e: Elem => f(e)
-        case n: Node => Vector(n)
+        case n: Node => IndexedSeq(n)
       }
     withChildren(newChildren)
   }
@@ -255,15 +254,15 @@ final class Elem(
    */
   def copy(
     qname: QName = this.qname,
-    attributes: immutable.IndexedSeq[(QName, String)] = this.attributes,
+    attributes: IndexedSeq[(QName, String)] = this.attributes,
     scope: Scope = this.scope,
-    children: immutable.IndexedSeq[Node] = this.children): Elem = {
+    children: IndexedSeq[Node] = this.children): Elem = {
 
-    new Elem(qname, attributes, scope, children)
+    new Elem(qname, attributes.to(ArraySeq), scope, children.to(ArraySeq))
   }
 
   /** Creates a copy, but with the attributes passed as parameter `newAttributes` */
-  def withAttributes(newAttributes: immutable.IndexedSeq[(QName, String)]): Elem = {
+  def withAttributes(newAttributes: IndexedSeq[(QName, String)]): Elem = {
     copy(attributes = newAttributes)
   }
 
@@ -303,13 +302,13 @@ final class Elem(
   }
 
   /** Returns the text children */
-  def textChildren: immutable.IndexedSeq[Text] = children collect { case t: Text => t }
+  def textChildren: IndexedSeq[Text] = children collect { case t: Text => t }
 
   /** Returns the comment children */
-  def commentChildren: immutable.IndexedSeq[Comment] = children collect { case c: Comment => c }
+  def commentChildren: IndexedSeq[Comment] = children collect { case c: Comment => c }
 
   /** Returns the processing instruction children */
-  def processingInstructionChildren: immutable.IndexedSeq[ProcessingInstruction] =
+  def processingInstructionChildren: IndexedSeq[ProcessingInstruction] =
     children collect { case pi: ProcessingInstruction => pi }
 
   /**
@@ -461,7 +460,7 @@ final class Elem(
    */
   def transformAllText(f: Text => Text): Elem = {
     thisElem transformElemsOrSelf { elm =>
-      val newChildren: immutable.IndexedSeq[Node] = {
+      val newChildren: IndexedSeq[Node] = {
         elm.children map { (n: Node) =>
           n match {
             case t: Text => f(t)
@@ -512,7 +511,7 @@ final class Elem(
     }
 
     def fixIfWhitespaceOnly(elem: Elem): Elem =
-      if (containsWhitespaceOnly(elem)) elem.withChildren(Vector()) else elem
+      if (containsWhitespaceOnly(elem)) elem.withChildren(IndexedSeq()) else elem
 
     prettify(this.removeAllInterElementWhitespace, 0, indent, indentStringsByIndent, indentToIndentString).
       transformElemsOrSelf(fixIfWhitespaceOnly _)
@@ -556,29 +555,29 @@ final class Elem(
     }
   }
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): IndexedSeq[Line] = {
     // Given that this method is recursive, using structural recursion on the element tree, the non-recursive part
     // must be as fast as possible. This implies that for example we must not repeatedly "shift" the same group of lines multiple times.
 
     val innerIndent = indent + indentStep
 
-    val qnameLineSeq: immutable.IndexedSeq[Line] =
-      immutable.IndexedSeq(
+    val qnameLineSeq: IndexedSeq[Line] =
+      IndexedSeq(
         Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "qname = QName(", toStringLiteralAsSeq(this.qname.toString), ")"))
 
-    val attributesLineSeqOption: Option[immutable.IndexedSeq[Line]] = getAttributesLineSeqOption(innerIndent)
+    val attributesLineSeqOption: Option[IndexedSeq[Line]] = getAttributesLineSeqOption(innerIndent)
 
-    val namespacesLineSeqOption: Option[immutable.IndexedSeq[Line]] = getNamespacesLineSeqOption(innerIndent, parentScope)
+    val namespacesLineSeqOption: Option[IndexedSeq[Line]] = getNamespacesLineSeqOption(innerIndent, parentScope)
 
-    val childrenLineSeqOption: Option[immutable.IndexedSeq[Line]] =
+    val childrenLineSeqOption: Option[IndexedSeq[Line]] =
       if (this.children.isEmpty) {
         None
       } else {
         val firstLine = new Line(innerIndent, "children = Vector(")
 
-        val contentLines: immutable.IndexedSeq[Line] = {
+        val contentLines: IndexedSeq[Line] = {
           // Recursive calls
-          val groups: immutable.IndexedSeq[immutable.IndexedSeq[Line]] =
+          val groups: IndexedSeq[IndexedSeq[Line]] =
             thisElem.children map { child =>
               // Mind the indentation below.
               child.toTreeReprAsLineSeq(thisElem.scope, innerIndent + indentStep)(indentStep)
@@ -592,11 +591,11 @@ final class Elem(
         Some((firstLine +: contentLines) :+ lastLine)
       }
 
-    val contentParts: immutable.IndexedSeq[immutable.IndexedSeq[Line]] =
-      immutable.IndexedSeq(Some(qnameLineSeq), attributesLineSeqOption, namespacesLineSeqOption, childrenLineSeqOption).flatten
+    val contentParts: IndexedSeq[IndexedSeq[Line]] =
+      IndexedSeq(Some(qnameLineSeq), attributesLineSeqOption, namespacesLineSeqOption, childrenLineSeqOption).flatten
 
     // All content parts must now be properly indented
-    val content: immutable.IndexedSeq[Line] = Line.mkLineSeq(contentParts, ",")
+    val content: IndexedSeq[Line] = Line.mkLineSeq(contentParts, ",")
 
     val elemFunctionNameWithOpeningBracket: String = if (childrenLineSeqOption.isEmpty) "emptyElem(" else "elem("
 
@@ -606,45 +605,45 @@ final class Elem(
     (firstLine +: content) :+ lastLine
   }
 
-  private def getAttributesLineSeqOption(innerIndent: Int): Option[immutable.IndexedSeq[Line]] = {
+  private def getAttributesLineSeqOption(innerIndent: Int): Option[IndexedSeq[Line]] = {
     if (this.attributes.isEmpty) {
       None
     } else {
-      val attributeEntryStrings: immutable.IndexedSeq[String] = {
+      val attributeEntryStrings: IndexedSeq[String] = {
         val rawResult = this.attributes flatMap { kv => attributeEntryStringSeq(kv._1, kv._2) :+ ", " }
         rawResult.ensuring(_.nonEmpty).ensuring(_.last == ", ").dropRight(1)
       }
 
       val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "attributes = Vector(", attributeEntryStrings, ")")
-      Some(immutable.IndexedSeq(line))
+      Some(IndexedSeq(line))
     }
   }
 
-  private def getNamespacesLineSeqOption(innerIndent: Int, parentScope: Scope): Option[immutable.IndexedSeq[Line]] = {
+  private def getNamespacesLineSeqOption(innerIndent: Int, parentScope: Scope): Option[IndexedSeq[Line]] = {
     val declarations: Declarations = parentScope.relativize(thisElem.scope)
 
     if (declarations.prefixNamespaceMap.isEmpty) {
       None
     } else {
-      val namespaceEntryStrings: immutable.IndexedSeq[String] = {
+      val namespaceEntryStrings: IndexedSeq[String] = {
         val rawResult = declarations.prefixNamespaceMap.toIndexedSeq flatMap { kv => namespaceEntryStringSeq(kv._1, kv._2) :+ ", " }
         rawResult.ensuring(_.nonEmpty).ensuring(_.last == ", ").dropRight(1)
       }
 
       val line = Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "namespaces = Declarations.from(", namespaceEntryStrings, ")")
-      Some(immutable.IndexedSeq(line))
+      Some(IndexedSeq(line))
     }
   }
 
-  private def attributeEntryStringSeq(qn: QName, attrValue: String): immutable.IndexedSeq[String] = {
+  private def attributeEntryStringSeq(qn: QName, attrValue: String): IndexedSeq[String] = {
     ("QName(" +: toStringLiteralAsSeq(qn.toString) :+ ") -> ") ++ toStringLiteralAsSeq(attrValue)
   }
 
-  private def namespaceEntryStringSeq(prefix: String, nsUri: String): immutable.IndexedSeq[String] = {
+  private def namespaceEntryStringSeq(prefix: String, nsUri: String): IndexedSeq[String] = {
     (toStringLiteralAsSeq(prefix) :+ " -> ") ++ toStringLiteralAsSeq(nsUri)
   }
 
-  private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): immutable.IndexedSeq[(Elem, Path.Entry, Int)] = {
+  private def filterChildElemsWithPathEntriesAndNodeIndexes(pathEntries: Set[Path.Entry]): IndexedSeq[(Elem, Path.Entry, Int)] = {
     // Implementation inspired by findAllChildElemsWithPathEntries.
     // The fewer path entries passed, the more efficient this method is.
 
@@ -687,15 +686,15 @@ final case class Text(text: String, isCData: Boolean) extends Node with ScopedNo
   /** Returns `XmlStringUtils.normalizeString(text)` .*/
   def normalizedText: String = XmlStringUtils.normalizeString(text)
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): IndexedSeq[Line] = {
     val parts = toStringLiteralAsSeq(text)
 
     val prefix = if (isCData) "cdata(" else "text("
 
     if (parts.forall(_.isEmpty)) {
-      immutable.IndexedSeq()
+      IndexedSeq()
     } else {
-      immutable.IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, prefix, parts, ")"))
+      IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, prefix, parts, ")"))
     }
   }
 }
@@ -705,12 +704,12 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
   require(target ne null) // scalastyle:off null
   require(data ne null) // scalastyle:off null
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): IndexedSeq[Line] = {
     val targetStringLiteral = toStringLiteralAsSeq(target)
     val dataStringLiteral = toStringLiteralAsSeq(data)
     val partOfLine = (targetStringLiteral :+ ", ") ++ dataStringLiteral
 
-    immutable.IndexedSeq(
+    IndexedSeq(
       Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "processingInstruction(", partOfLine, ")"))
   }
 }
@@ -729,9 +728,9 @@ final case class ProcessingInstruction(target: String, data: String) extends Can
 final case class EntityRef(entity: String) extends Node with ScopedNodes.EntityRef {
   require(entity ne null) // scalastyle:off null
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): IndexedSeq[Line] = {
     val entityStringLiteral = toStringLiteralAsSeq(entity)
-    immutable.IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "entityRef(", entityStringLiteral, ")"))
+    IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "entityRef(", entityStringLiteral, ")"))
   }
 }
 
@@ -739,13 +738,13 @@ final case class EntityRef(entity: String) extends Node with ScopedNodes.EntityR
 final case class Comment(text: String) extends CanBeDocumentChild with ScopedNodes.Comment {
   require(text ne null) // scalastyle:off null
 
-  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
+  private[yaidom] override def toTreeReprAsLineSeq(parentScope: Scope, indent: Int)(indentStep: Int): IndexedSeq[Line] = {
     val parts = toStringLiteralAsSeq(text)
 
     if (parts.forall(_.isEmpty)) {
-      immutable.IndexedSeq()
+      IndexedSeq()
     } else {
-      immutable.IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "comment(", parts, ")"))
+      IndexedSeq(Line.fromIndexAndPrefixAndPartsAndSuffix(indent, "comment(", parts, ")"))
     }
   }
 }
@@ -754,12 +753,12 @@ object Elem {
 
   private[yaidom] final class ElemSerializationProxy(
     val qname: QName,
-    val attributes: immutable.IndexedSeq[(QName, String)],
+    val attributes: IndexedSeq[(QName, String)],
     val scope: Scope,
-    val children: immutable.IndexedSeq[Node]) extends Serializable {
+    val children: IndexedSeq[Node]) extends Serializable {
 
     @throws(classOf[java.io.ObjectStreamException])
-    def readResolve(): Any = new Elem(qname, attributes, scope, children)
+    def readResolve(): Any = new Elem(qname, attributes.to(ArraySeq), scope, children.to(ArraySeq))
   }
 
   /**
@@ -770,14 +769,17 @@ object Elem {
    */
   def apply(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)] = Vector(),
+    attributes: IndexedSeq[(QName, String)] = ArraySeq(),
     scope: Scope = Scope.Empty,
-    children: immutable.IndexedSeq[Node] = immutable.IndexedSeq()): Elem = new Elem(qname, attributes, scope, children)
+    children: IndexedSeq[Node] = IndexedSeq()): Elem = {
+
+    new Elem(qname, attributes.to(ArraySeq), scope, children.to(ArraySeq))
+  }
 
   /**
    * Extractor of Elems, to be used for pattern matching.
    */
-  def unapply(e: Elem): Option[(QName, immutable.IndexedSeq[(QName, String)], Scope, immutable.IndexedSeq[Node])] = {
+  def unapply(e: Elem): Option[(QName, IndexedSeq[(QName, String)], Scope, IndexedSeq[Node])] = {
     Some((e.qname, e.attributes, e.scope, e.children))
   }
 
@@ -909,43 +911,43 @@ object Node {
   def elem(
     qname: QName,
     scope: Scope,
-    children: immutable.IndexedSeq[Node]): Elem = {
+    children: IndexedSeq[Node]): Elem = {
 
-    elem(qname, Vector(), scope, children)
+    elem(qname, ArraySeq(), scope, children.to(ArraySeq))
   }
 
   def elem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     scope: Scope,
-    children: immutable.IndexedSeq[Node]): Elem = {
+    children: IndexedSeq[Node]): Elem = {
 
-    new Elem(qname, attributes, scope, children)
+    new Elem(qname, attributes.to(ArraySeq), scope, children.to(ArraySeq))
   }
 
   def textElem(qname: QName, scope: Scope, txt: String): Elem = {
-    textElem(qname, Vector(), scope, txt)
+    textElem(qname, ArraySeq(), scope, txt)
   }
 
   def textElem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     scope: Scope,
     txt: String): Elem = {
 
-    new Elem(qname, attributes, scope, Vector(text(txt)))
+    new Elem(qname, attributes.to(ArraySeq), scope, ArraySeq(text(txt)))
   }
 
   def emptyElem(qname: QName, scope: Scope): Elem = {
-    emptyElem(qname, Vector(), scope)
+    emptyElem(qname, ArraySeq(), scope)
   }
 
   def emptyElem(
     qname: QName,
-    attributes: immutable.IndexedSeq[(QName, String)],
+    attributes: IndexedSeq[(QName, String)],
     scope: Scope): Elem = {
 
-    new Elem(qname, attributes, scope, Vector())
+    new Elem(qname, attributes.to(ArraySeq), scope, ArraySeq())
   }
 
   def text(textValue: String): Text = Text(text = textValue, isCData = false)

@@ -18,8 +18,7 @@ package eu.cdevreeze.yaidom.simple
 
 import java.net.URI
 
-import scala.Vector
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 
 import NodeBuilder.fromCanBeDocumentChild
 import eu.cdevreeze.yaidom.core.Scope
@@ -37,9 +36,9 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  */
 @SerialVersionUID(1L)
 final class DocBuilder(
-    val uriOption: Option[URI],
-    val xmlDeclarationOption: Option[XmlDeclaration],
-    val children: immutable.IndexedSeq[CanBeDocBuilderChild]) extends DocumentApi with Serializable {
+  val uriOption: Option[URI],
+  val xmlDeclarationOption: Option[XmlDeclaration],
+  val children: ArraySeq[CanBeDocBuilderChild]) extends DocumentApi with Serializable {
 
   require(uriOption ne null) // scalastyle:off null
   require(xmlDeclarationOption ne null) // scalastyle:off null
@@ -55,10 +54,10 @@ final class DocBuilder(
 
   val documentElement: ElemBuilder = children.collect({ case elm: ElemBuilder => elm }).head
 
-  def processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] =
+  def processingInstructions: IndexedSeq[ProcessingInstructionBuilder] =
     children.collect({ case pi: ProcessingInstructionBuilder => pi })
 
-  def comments: immutable.IndexedSeq[CommentBuilder] =
+  def comments: IndexedSeq[CommentBuilder] =
     children.collect({ case c: CommentBuilder => c })
 
   /**
@@ -98,26 +97,29 @@ object DocBuilder {
 
   def document(
     uriOption: Option[String],
-    children: immutable.IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
+    children: IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
 
-    new DocBuilder(uriOption map { uriString => new URI(uriString) }, None, children)
+    new DocBuilder(uriOption map { uriString => new URI(uriString) }, None, children.to(ArraySeq))
   }
 
   def document(
     uriOption: Option[String],
     xmlDeclarationOption: Option[XmlDeclaration],
-    children: immutable.IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
+    children: IndexedSeq[CanBeDocBuilderChild]): DocBuilder = {
 
-    new DocBuilder(uriOption map { uriString => new URI(uriString) }, xmlDeclarationOption, children)
+    new DocBuilder(uriOption map { uriString => new URI(uriString) }, xmlDeclarationOption, children.to(ArraySeq))
   }
 
   def document(
     uriOption: Option[String] = None,
     xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: ElemBuilder,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstructionBuilder] = Vector(),
-    comments: immutable.IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
+    processingInstructions: IndexedSeq[ProcessingInstructionBuilder] = Vector(),
+    comments: IndexedSeq[CommentBuilder] = Vector()): DocBuilder = {
 
-    document(uriOption, xmlDeclarationOption, processingInstructions ++ comments ++ Vector(documentElement))
+    document(
+      uriOption,
+      xmlDeclarationOption,
+      processingInstructions.to(ArraySeq) ++ comments.to(ArraySeq) ++ ArraySeq(documentElement))
   }
 }

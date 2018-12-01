@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.parse
 import java.nio.charset.Charset
 
 import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 import scala.collection.mutable
 
 import org.xml.sax.Attributes
@@ -61,7 +61,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   // It is also a good fit for the implementation of "parsing state", because we need stable object identities,
   // but rapidly changing state of those objects. Hence old-fashioned mutable objects.
 
-  private var docChildren: immutable.IndexedSeq[CanBeInternalDocumentChild] = immutable.IndexedSeq()
+  private var docChildren: ArraySeq[CanBeInternalDocumentChild] = ArraySeq()
 
   private var currentRoot: InternalElemNode = _
 
@@ -263,7 +263,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     Declarations.from(prefUriMap)
   }
 
-  private def extractAttributeMap(atts: Attributes)(implicit qnameProvider: QNameProvider): immutable.IndexedSeq[(QName, String)] = {
+  private def extractAttributeMap(atts: Attributes)(implicit qnameProvider: QNameProvider): ArraySeq[(QName, String)] = {
     val result = attributeOrDeclarationSeq(atts) collect {
       case (qn, v) if !isNamespaceDeclaration(qn) =>
         val qname = qnameProvider.parseQName(qn)
@@ -273,8 +273,8 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
     result
   }
 
-  private def attributeOrDeclarationSeq(atts: Attributes): immutable.IndexedSeq[(String, String)] = {
-    val result = (0 until atts.getLength).toIndexedSeq map { (idx: Int) => (atts.getQName(idx) -> atts.getValue(idx)) }
+  private def attributeOrDeclarationSeq(atts: Attributes): ArraySeq[(String, String)] = {
+    val result = (0 until atts.getLength).to(ArraySeq) map { (idx: Int) => (atts.getQName(idx) -> atts.getValue(idx)) }
     result
   }
 
@@ -299,7 +299,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
   private[parse] final class InternalElemNode(
       var parentOption: Option[InternalElemNode],
       val qname: QName,
-      val attributes: immutable.IndexedSeq[(QName, String)],
+      val attributes: ArraySeq[(QName, String)],
       val scope: Scope,
       var children: mutable.IndexedSeq[InternalNode]) extends CanBeInternalDocumentChild {
 
@@ -307,7 +307,7 @@ trait DefaultElemProducingSaxHandler extends ElemProducingSaxHandler with Lexica
 
     def toNode: Elem = {
       // Recursive (not tail-recursive)
-      val childSeq = (children map { ch => ch.toNode }).toVector
+      val childSeq = children.to(ArraySeq) map { ch => ch.toNode }
 
       new Elem(
         qname = qname,

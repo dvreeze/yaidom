@@ -19,6 +19,7 @@ package eu.cdevreeze.yaidom.convert
 import java.net.URI
 
 import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 
 import org.scalajs.dom.raw.Attr
 import org.scalajs.dom.raw.Element
@@ -80,13 +81,13 @@ trait JsDomToYaidomConversions extends ConverterToDocument[org.scalajs.dom.raw.D
    */
   final def convertToElem(v: Element, parentScope: Scope): Elem = {
     val qname: QName = toQName(v)
-    val attributes: immutable.IndexedSeq[(QName, String)] = extractAttributes(v.attributes)
+    val attributes: ArraySeq[(QName, String)] = extractAttributes(v.attributes)
 
     val namespaceDeclarations: Declarations = extractNamespaceDeclarations(v.attributes)
     val newScope: Scope = parentScope.resolve(namespaceDeclarations)
 
     // Recursive (not tail-recursive)
-    val childSeq = nodeListToIndexedSeq(v.childNodes) flatMap { n => convertToNodeOption(n, newScope) }
+    val childSeq = nodeListToIndexedSeq(v.childNodes).flatMap { n => convertToNodeOption(n, newScope) }
 
     new Elem(
       qname = qname,
@@ -137,7 +138,7 @@ trait JsDomToYaidomConversions extends ConverterToDocument[org.scalajs.dom.raw.D
   final def convertToComment(v: org.scalajs.dom.raw.Comment): Comment = Comment(v.data)
 
   /** Converts a `NamedNodeMap` to an `immutable.IndexedSeq[(QName, String)]`. Namespace declarations are skipped. */
-  final def extractAttributes(domAttributes: NamedNodeMap): immutable.IndexedSeq[(QName, String)] = {
+  final def extractAttributes(domAttributes: NamedNodeMap): ArraySeq[(QName, String)] = {
     (0 until domAttributes.length).flatMap(i => {
       val attr = domAttributes.item(i).asInstanceOf[Attr]
 
@@ -147,7 +148,7 @@ trait JsDomToYaidomConversions extends ConverterToDocument[org.scalajs.dom.raw.D
         val qname: QName = toQName(attr)
         Some(qname -> attr.value)
       }
-    }).toIndexedSeq
+    }).to(ArraySeq)
   }
 
   /** Converts the namespace declarations in a `NamedNodeMap` to a `Declarations` */
@@ -169,9 +170,9 @@ trait JsDomToYaidomConversions extends ConverterToDocument[org.scalajs.dom.raw.D
   }
 
   /** Helper method that converts a `NodeList` to an `IndexedSeq[org.scalajs.dom.raw.Node]` */
-  final def nodeListToIndexedSeq(nodeList: NodeList): immutable.IndexedSeq[org.scalajs.dom.raw.Node] = {
+  final def nodeListToIndexedSeq(nodeList: NodeList): ArraySeq[org.scalajs.dom.raw.Node] = {
     val result = (0 until nodeList.length) map { i => nodeList.item(i) }
-    result.toIndexedSeq
+    result.to(ArraySeq)
   }
 
   /** Extracts the `QName` of an `org.scalajs.dom.raw.Element` */

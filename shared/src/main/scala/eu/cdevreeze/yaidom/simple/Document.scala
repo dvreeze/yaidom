@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.simple
 import java.net.URI
 
 import scala.Vector
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 
 import eu.cdevreeze.yaidom.PrettyPrinting.Line
 import eu.cdevreeze.yaidom.PrettyPrinting.toStringLiteralAsSeq
@@ -53,7 +53,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
 final class Document(
     val uriOption: Option[URI],
     val xmlDeclarationOption: Option[XmlDeclaration],
-    val children: immutable.IndexedSeq[CanBeDocumentChild]) extends DocumentApi with Serializable {
+    val children: ArraySeq[CanBeDocumentChild]) extends DocumentApi with Serializable {
 
   require(uriOption ne null) // scalastyle:off null
   require(xmlDeclarationOption ne null) // scalastyle:off null
@@ -69,23 +69,23 @@ final class Document(
 
   val documentElement: Elem = children.collect({ case elm: Elem => elm }).head
 
-  def processingInstructions: immutable.IndexedSeq[ProcessingInstruction] =
+  def processingInstructions: IndexedSeq[ProcessingInstruction] =
     children.collect({ case pi: ProcessingInstruction => pi })
 
-  def comments: immutable.IndexedSeq[Comment] =
+  def comments: IndexedSeq[Comment] =
     children.collect({ case c: Comment => c })
 
   /** Expensive method to obtain all processing instructions, throughout the tree */
-  def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
-    val elemPIs: immutable.IndexedSeq[ProcessingInstruction] =
-      documentElement.findAllElemsOrSelf flatMap { e: Elem => e.processingInstructionChildren }
+  def allProcessingInstructions: IndexedSeq[ProcessingInstruction] = {
+    val elemPIs: ArraySeq[ProcessingInstruction] =
+      documentElement.findAllElemsOrSelf.to(ArraySeq) flatMap { e: Elem => e.processingInstructionChildren }
     processingInstructions ++ elemPIs
   }
 
   /** Expensive method to obtain all comments, throughout the tree */
-  def allComments: immutable.IndexedSeq[Comment] = {
-    val elemComments: immutable.IndexedSeq[Comment] =
-      documentElement.findAllElemsOrSelf flatMap { e: Elem => e.commentChildren }
+  def allComments: IndexedSeq[Comment] = {
+    val elemComments: ArraySeq[Comment] =
+      documentElement.findAllElemsOrSelf.to(ArraySeq) flatMap { e: Elem => e.commentChildren }
     comments ++ elemComments
   }
 
@@ -126,19 +126,19 @@ final class Document(
     withDocumentElement(this.documentElement.updateElemOrSelf(path, newElem))
 
   /** Returns `withDocumentElement(this.documentElement.updateElemWithNodeSeq(path)(f))` */
-  def updateElemWithNodeSeq(path: Path)(f: Elem => immutable.IndexedSeq[Node]): Document =
+  def updateElemWithNodeSeq(path: Path)(f: Elem => IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updateElemWithNodeSeq(path)(f))
 
   /** Returns `withDocumentElement(this.documentElement.updateElemWithNodeSeq(path, newNodes))` */
-  def updateElemWithNodeSeq(path: Path, newNodes: immutable.IndexedSeq[Node]): Document =
-    withDocumentElement(this.documentElement.updateElemWithNodeSeq(path, newNodes))
+  def updateElemWithNodeSeq(path: Path, newNodes: IndexedSeq[Node]): Document =
+    withDocumentElement(this.documentElement.updateElemWithNodeSeq(path, newNodes.to(ArraySeq)))
 
   /** Returns `withDocumentElement(this.documentElement.updateElemsOrSelf(paths)(f))` */
   def updateElemsOrSelf(paths: Set[Path])(f: (Elem, Path) => Elem): Document =
     withDocumentElement(this.documentElement.updateElemsOrSelf(paths)(f))
 
   /** Returns `withDocumentElement(this.documentElement.updateElemsWithNodeSeq(paths)(f))` */
-  def updateElemsWithNodeSeq(paths: Set[Path])(f: (Elem, Path) => immutable.IndexedSeq[Node]): Document =
+  def updateElemsWithNodeSeq(paths: Set[Path])(f: (Elem, Path) => IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updateElemsWithNodeSeq(paths)(f))
 
   /** Returns `withDocumentElement(this.documentElement.updateTopmostElemsOrSelf(f))` */
@@ -146,7 +146,7 @@ final class Document(
     withDocumentElement(this.documentElement.updateTopmostElemsOrSelf(f))
 
   /** Returns `withDocumentElement(this.documentElement.updateTopmostElemsWithNodeSeq(f))` */
-  def updateTopmostElemsWithNodeSeq(f: (Elem, Path) => Option[immutable.IndexedSeq[Node]]): Document =
+  def updateTopmostElemsWithNodeSeq(f: (Elem, Path) => Option[IndexedSeq[Node]]): Document =
     withDocumentElement(this.documentElement.updateTopmostElemsWithNodeSeq(f))
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */
@@ -154,7 +154,7 @@ final class Document(
     withDocumentElement(this.documentElement.transformElemsOrSelf(f))
 
   /** Returns `withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))` */
-  def transformElemsToNodeSeq(f: Elem => immutable.IndexedSeq[Node]): Document =
+  def transformElemsToNodeSeq(f: Elem => IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.transformElemsToNodeSeq(f))
 
   def toTreeRepr(): String = {
@@ -166,22 +166,22 @@ final class Document(
   /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
   override def toString: String = toTreeRepr
 
-  private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
+  private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): IndexedSeq[Line] = {
     val innerIndent = indent + indentStep
 
     val parentScope = Scope.Empty
 
-    val uriOptionLineSeq: immutable.IndexedSeq[Line] =
+    val uriOptionLineSeq: IndexedSeq[Line] =
       if (this.uriOption.isEmpty) {
         val line = new Line(innerIndent, "uriOption = None")
-        immutable.IndexedSeq(line)
+        IndexedSeq(line)
       } else {
         val line =
           Line.fromIndexAndPrefixAndPartsAndSuffix(innerIndent, "uriOption = Some(", toStringLiteralAsSeq(this.uriOption.get.toString), ")")
-        immutable.IndexedSeq(line)
+        IndexedSeq(line)
       }
 
-    val childrenLineSeq: immutable.IndexedSeq[Line] = {
+    val childrenLineSeq: IndexedSeq[Line] = {
       val firstLine = new Line(innerIndent, "children = Vector(")
 
       val contentLines = {
@@ -199,8 +199,8 @@ final class Document(
       (firstLine +: contentLines) :+ lastLine
     }
 
-    val content: immutable.IndexedSeq[Line] =
-      Line.mkLineSeq(immutable.IndexedSeq(uriOptionLineSeq, childrenLineSeq), ",")
+    val content: IndexedSeq[Line] =
+      Line.mkLineSeq(IndexedSeq(uriOptionLineSeq, childrenLineSeq), ",")
 
     val firstLine = new Line(indent, "document(")
     val lastLine = new Line(indent, ")")
@@ -219,9 +219,9 @@ object Document {
   def apply(
     uriOption: Option[URI],
     xmlDeclarationOption: Option[XmlDeclaration],
-    children: immutable.IndexedSeq[CanBeDocumentChild]): Document = {
+    children: IndexedSeq[CanBeDocumentChild]): Document = {
 
-    new Document(uriOption, xmlDeclarationOption, children)
+    new Document(uriOption, xmlDeclarationOption, children.to(ArraySeq))
   }
 
   /**
@@ -233,13 +233,13 @@ object Document {
     uriOption: Option[URI],
     xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = immutable.IndexedSeq(),
-    comments: immutable.IndexedSeq[Comment] = immutable.IndexedSeq()): Document = {
+    processingInstructions: IndexedSeq[ProcessingInstruction] = IndexedSeq(),
+    comments: IndexedSeq[Comment] = IndexedSeq()): Document = {
 
     new Document(
       uriOption,
       xmlDeclarationOption,
-      processingInstructions ++ comments ++ Vector(documentElement))
+      processingInstructions.to(ArraySeq) ++ comments.to(ArraySeq) ++ Array(documentElement))
   }
 
   /**
@@ -261,31 +261,31 @@ object Document {
 
   def document(
     uriOption: Option[String],
-    children: immutable.IndexedSeq[CanBeDocumentChild]): Document = {
+    children: IndexedSeq[CanBeDocumentChild]): Document = {
 
-    apply(uriOption map { uriString => new URI(uriString) }, None, children)
+    apply(uriOption map { uriString => new URI(uriString) }, None, children.to(ArraySeq))
   }
 
   def document(
     uriOption: Option[String],
     xmlDeclarationOption: Option[XmlDeclaration],
-    children: immutable.IndexedSeq[CanBeDocumentChild]): Document = {
+    children: IndexedSeq[CanBeDocumentChild]): Document = {
 
-    apply(uriOption map { uriString => new URI(uriString) }, xmlDeclarationOption, children)
+    apply(uriOption map { uriString => new URI(uriString) }, xmlDeclarationOption, children.to(ArraySeq))
   }
 
   def document(
     uriOption: Option[String] = None,
     xmlDeclarationOption: Option[XmlDeclaration],
     documentElement: Elem,
-    processingInstructions: immutable.IndexedSeq[ProcessingInstruction] = Vector(),
-    comments: immutable.IndexedSeq[Comment] = Vector()): Document = {
+    processingInstructions: IndexedSeq[ProcessingInstruction] = Vector(),
+    comments: IndexedSeq[Comment] = Vector()): Document = {
 
     apply(
       uriOption map { uriString => new URI(uriString) },
       xmlDeclarationOption,
       documentElement,
-      processingInstructions,
-      comments)
+      processingInstructions.to(ArraySeq),
+      comments.to(ArraySeq))
   }
 }

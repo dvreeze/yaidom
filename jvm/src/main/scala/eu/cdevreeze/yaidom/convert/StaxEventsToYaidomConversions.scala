@@ -20,11 +20,11 @@ import java.net.URI
 import java.nio.charset.Charset
 import java.{ util => jutil }
 
-import scala.Vector
 import scala.collection.BufferedIterator
 import scala.collection.Iterator
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
 import scala.collection.mutable
 
 import eu.cdevreeze.yaidom.core.AncestryPath
@@ -212,7 +212,7 @@ trait StaxEventsToYaidomConversions extends ConverterToDocument[Iterator[XMLEven
         Some(new URI(startDocument.getSystemId))
       }
 
-    new Document(uriOption = uriOption, xmlDeclarationOption = xmlDeclOption, children = docChildren.toVector)
+    new Document(uriOption = uriOption, xmlDeclarationOption = xmlDeclOption, children = docChildren.to(ArraySeq))
   }
 
   /**
