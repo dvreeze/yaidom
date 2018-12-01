@@ -115,8 +115,7 @@ class Blog2XbrlTest extends FunSuite {
 
     // Method mapValues deprecated since Scala 2.13.0.
     val avgNumEmployeesFactsByContext =
-      avgNumEmployeesFacts.groupBy(_.attribute(EName("contextRef")))
-        .map { case (ctxRef, facts) => ctxRef -> facts.head }
+      avgNumEmployeesFacts.groupBy(_.attribute(EName("contextRef"))).view.mapValues(_.head)
 
     assertResult(
       Set("D-2006", "D-2007", "D-2008", "D-2009", "D-2010", "D-2010-BS1", "D-2010-BS2", "D-2010-CON", "D-2010-E", "D-2010-ALL")) {
@@ -312,7 +311,7 @@ class Blog2XbrlTest extends FunSuite {
       Map("startBalance" -> -3000, "change" -> 4000, "endBalance" -> 1000))) {
 
       // Method mapValues deprecated since Scala 2.13.0.
-      evalResults.map(_.facts.map { case (k, facts) => k -> facts.text.toInt }.toMap).toSet
+      evalResults.map(_.facts.view.mapValues(_.text.toInt).toMap).toSet
     }
   }
 
@@ -325,14 +324,14 @@ class Blog2XbrlTest extends FunSuite {
   val contextsById: Map[String, indexed.Elem] =
     idocElem.filterChildElems(withEName(XbrliNs, "context"))
       .groupBy(_.attribute(EName("id")))
-      .map { case (id, ctxs) => id -> ctxs.head }
+      .view.mapValues(_.head)
       .toMap
 
   // Method mapValues deprecated since Scala 2.13.0.
   val unitsById: Map[String, indexed.Elem] =
     idocElem.filterChildElems(withEName(XbrliNs, "unit"))
       .groupBy(_.attribute(EName("id")))
-      .map { case (id, uns) => id -> uns.head }
+      .view.mapValues(_.head)
       .toMap
 
   // See http://www.xbrl.org/Specification/variables/REC-2009-06-22/.
@@ -390,7 +389,7 @@ class Blog2XbrlTest extends FunSuite {
     dimension: EName): Option[EName] = {
 
     // Method filterKeys deprecated since Scala 2.13.0.
-    explicitDimensionAspects(fact).filter { case (dim, mem) => Set(dimension).contains(dim) }.headOption.map(_._2)
+    explicitDimensionAspects(fact).view.filterKeys(Set(dimension)).headOption.map(_._2)
   }
 
   def unitAspectOption(fact: indexed.Elem): Option[simple.Elem] = {
@@ -452,7 +451,7 @@ object Blog2XbrlTest {
 
     override def toString: String = {
       // Method mapValues deprecated since Scala 2.13.0.
-      s"EvaluationResult(result: $result, facts: ${facts.map { case (k, fact) => k -> fact.underlyingElem }})"
+      s"EvaluationResult(result: $result, facts: ${facts.view.mapValues(_.underlyingElem)})"
     }
   }
 }

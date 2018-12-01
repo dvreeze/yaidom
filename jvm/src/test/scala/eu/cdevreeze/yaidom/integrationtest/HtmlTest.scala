@@ -65,7 +65,7 @@ class HtmlTest extends FunSuite with BeforeAndAfterAll {
       require(elem.localName == "li")
       elem transformChildElems { e =>
         // Method filterKeys deprecated since Scala 2.13.0.
-        e.copy(attributes = e.attributes.toMap.filter { case (attrName, _) => Set(QName("href")).contains(attrName) }.toVector)
+        e.copy(attributes = e.attributes.toMap.view.filterKeys(Set(QName("href"))).toVector)
       }
     }
 

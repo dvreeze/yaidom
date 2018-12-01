@@ -277,7 +277,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) {
   /** Returns `Scope.from(this.prefixNamespaceMap.filterKeys(p))`. */
   def filterKeys(p: String => Boolean): Scope = {
     // Method filterKeys deprecated since Scala 2.13.0.
-    Scope.from(this.prefixNamespaceMap.filter { case (pref, _) => p(pref) }.toMap)
+    Scope.from(this.prefixNamespaceMap.view.filterKeys(p).toMap)
   }
 
   /** Returns `this.prefixNamespaceMap.keySet`. */
@@ -406,11 +406,10 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) {
     val nsPrefixPairsGroupedByNs = nsPrefixPairs groupBy { case (ns, prefix) => ns }
 
     // Method mapValues deprecated since Scala 2.13.0.
-    val result = nsPrefixPairsGroupedByNs.map {
-      case (ns, xs) =>
-        val result = xs map { case (ns, prefix) => prefix }
-        ns -> result.toSet
-    }
+    val result = nsPrefixPairsGroupedByNs.view.mapValues { xs =>
+      val result = xs.map { case (ns, prefix) => prefix }
+      result.toSet
+    }.toMap
 
     assert(result.values forall (_.nonEmpty))
     result.toMap
@@ -423,8 +422,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) {
    */
   def makeInvertible: Scope = {
     // Method mapValues deprecated since Scala 2.13.0.
-    val prefixNsMap = inverse.map { case (ns, prefs) => ns -> prefs.head }
-      .collect { case (ns, pref) => pref -> ns }.toMap
+    val prefixNsMap = inverse.view.mapValues(_.head).collect { case (ns, pref) => pref -> ns }.toMap
 
     Scope.from(prefixNsMap).ensuring(_.isInvertible)
   }

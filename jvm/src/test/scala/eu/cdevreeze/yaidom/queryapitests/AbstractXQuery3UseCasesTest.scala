@@ -101,7 +101,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         elem.getChildElem(withEName(ns, "store-number")).text
       }
       // Method mapValues deprecated since Scala 2.13.0.
-      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
+      result.view.mapValues(_.head).toMap
     }
 
     val productElemsByName: Map[String, E] = {
@@ -109,7 +109,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         elem.getChildElem(withEName(ns, "name")).text
       }
       // Method mapValues deprecated since Scala 2.13.0.
-      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
+      result.view.mapValues(_.head).toMap
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
@@ -184,7 +184,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         elem.getChildElem(withEName(ns, "store-number")).text
       }
       // Method mapValues deprecated since Scala 2.13.0.
-      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
+      result.view.mapValues(_.head).toMap
     }
 
     val productElemsByName: Map[String, E] = {
@@ -192,7 +192,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
         elem.getChildElem(withEName(ns, "name")).text
       }
       // Method mapValues deprecated since Scala 2.13.0.
-      result.toMap.map { case (n, elms) => n -> elms.head }.toMap
+      result.view.mapValues(_.head).toMap
     }
 
     val allSalesByStateAndCategory: Vector[((String, String), immutable.IndexedSeq[E])] = {
@@ -301,7 +301,7 @@ abstract class AbstractXQuery3UseCasesTest extends FunSuite {
               (category, products) <- allProductsByCategory
               // Method filterKeys deprecated since Scala 2.13.0.
               productRecords = allSalesByProduct
-                .filter { case (prod, _) => products.flatMap(_ \ withEName(ns, "name")).map(_.text).toSet.contains(prod) }
+                .view.filterKeys(products.flatMap(_ \ withEName(ns, "name")).map(_.text).toSet)
             } yield {
               emptyElem(QName("category"), Vector(QName("name") -> category), scope) withChildren {
                 for {

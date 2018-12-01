@@ -794,7 +794,7 @@ class CoreOfYaidomTest extends FunSuite {
         if author.findAllChildElems.find(_.name == "Last_Name").get.text.trim == authorLastName
       } yield {
         // Method filterKeys deprecated since Scala 2.13.0.
-        val attrs = book.attributes.filter { case (a, _) => Set("ISBN", "Price").contains(a) }.toMap
+        val attrs = book.attributes.view.filterKeys(Set("ISBN", "Price")).toMap
         new Elem(
           name = "Book",
           attributes = attrs,

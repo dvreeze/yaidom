@@ -306,7 +306,7 @@ object XmlCreationTest {
 
     // Method filterKeys deprecated since Scala 2.13.0.
     val paths: Set[Path] =
-      pathsPerDate.filter { case (dt, _) => refinedTasksPerDay.keySet.contains(dt) }.values.toSet
+      pathsPerDate.view.filterKeys(refinedTasksPerDay.keySet).values.toSet
 
     val rawResultTimesheetElem =
       resolved.Elem.from(prevTimesheet).updateElems(paths) {
