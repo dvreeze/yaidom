@@ -10,7 +10,7 @@ install:
 
 matrix:
   include:
-  - jdk: oraclejdk9
+  - jdk: openjdk11
     scala: 2.12.7
   - jdk: oraclejdk8
     scala: 2.12.7
