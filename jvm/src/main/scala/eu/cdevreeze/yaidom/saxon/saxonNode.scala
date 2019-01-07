@@ -108,7 +108,11 @@ sealed trait SaxonCanBeDocumentChild extends SaxonNode with BackingNodes.CanBeDo
 // TODO Consider using Saxon Navigator and AbsolutePath classes for navigation, as a faster alternative to yaidom Path navigation.
 
 /**
- * Saxon NodeInfo element wrapper. It is efficient, because of an entirely custom query API implementation tailored to Saxon.
+ * Saxon NodeInfo element wrapper. It is efficient, because of an entirely custom query API implementation tailored to Saxon,
+ * and because of the fact that the state of a `SaxonElem` is only the Saxon `NodeInfo` (so creation of a `SaxonElem`
+ * is just a cheap object creation, and the query API uses fast `NodeInfo` XPath axis traversal methods).
+ *
+ * One operation is rather slow, and that is the computation of the path or absolute path of a `SaxonElem`.
  */
 // scalastyle:off number.of.methods
 final class SaxonElem(
