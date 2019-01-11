@@ -1054,7 +1054,7 @@ object SaxonInspiredQueryTest {
     def this(name: String, children: immutable.IndexedSeq[Node]) =
       this(name, Map(), children)
 
-    def select(step: ElemStep): immutable.IndexedSeq[Elem] = {
+    def select(step: Step[Elem]): immutable.IndexedSeq[Elem] = {
       step(this)
     }
 
