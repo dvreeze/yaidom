@@ -114,6 +114,8 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
           f.toString.contains("DomInteropTest") || // Serialization issue in Scala 2.13.0-M5?
           f.toString.contains("DomLSInteropTest") || // Serialization issue in Scala 2.13.0-M5?
           f.toString.contains("JaxbTest"))
+      } else if (scalaBinaryVersion.value == "2.11.12") {
+        new SimpleFileFilter(f => f.toString.contains("SaxonInspiredQueryTest"))
       } else if (isAtLeastJava9) {
         // Exclude tests with JAXB dependencies
 
