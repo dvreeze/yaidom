@@ -107,14 +107,15 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     excludeFilter in (Test, unmanagedSources) := {
       if (scalaBinaryVersion.value == "2.13.0-M5") {
-        new SimpleFileFilter(f => f.toString.contains("ScalaMetaExperimentTest") ||
+        new SimpleFileFilter(f =>
+          f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("PackageDependencyTest") ||
           f.toString.contains("UpdateTest") ||
           f.toString.contains("DomInteropTest") || // Serialization issue in Scala 2.13.0-M5?
           f.toString.contains("DomLSInteropTest") || // Serialization issue in Scala 2.13.0-M5?
           f.toString.contains("JaxbTest"))
-      } else if (scalaBinaryVersion.value == "2.11.12") {
+      } else if (scalaBinaryVersion.value == "2.11") {
         new SimpleFileFilter(f => f.toString.contains("SaxonInspiredQueryTest"))
       } else if (isAtLeastJava9) {
         // Exclude tests with JAXB dependencies
