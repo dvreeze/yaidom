@@ -43,7 +43,7 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    val bookTitles = bookstore.select { childElems("Book") / childElems("Title").first }
+    val bookTitles = bookstore.select { childElems("Book") / childElems("Title").firstOption }
 
     assertResult(Set(
       "A First Course in Database Systems",
@@ -80,7 +80,7 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    val titles = bookstore.select { childElems() / childElems("Title").first }
+    val titles = bookstore.select { childElems() / childElems("Title").firstOption }
 
     assertResult(Set(
       "A First Course in Database Systems",
@@ -231,7 +231,7 @@ class SaxonInspiredQueryTest extends FunSuite {
         childElems("Book").where { e =>
           e.attributes("Price").toInt < 90 &&
             e.select { childElems("Authors") / childElems("Author") / childElems("Last_Name").where(_.text.trim == "Ullman") }.nonEmpty
-        } / childElems("Title").first
+        } / childElems("Title").firstOption
       }
 
     assertResult(Set(
@@ -247,27 +247,24 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    def authorLastAndFirstNames(bookElem: Elem): immutable.IndexedSeq[(String, String)] = {
-      for {
-        author <- bookElem.select(descendantElemsOrSelf("Author"))
-      } yield {
-        val lastNames = author.select(childElems("Last_Name")) map { _.text.trim }
-        val firstNames = author.select(childElems("First_Name")) map { _.text.trim }
-        (lastNames.mkString, firstNames.mkString)
-      }
-    }
-
     val bookTitles =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        if book.attributes("Price").toInt < 90 && authorLastAndFirstNames(book).contains(("Ullman", "Jeffrey"))
-      } yield book.select(childElems()).find(_.name == "Title").get
+      bookstore.select {
+        childElems("Book").where { e =>
+          e.attributes("Price").toInt < 90 &&
+            e.select {
+              descendantElemsOrSelf("Author").where { e =>
+                e.select { childElems("Last_Name") }.map(_.text.trim).contains("Ullman") &&
+                  e.select { childElems("First_Name") }.map(_.text.trim).contains("Jeffrey")
+              }
+            }.nonEmpty
+        } / childElems("Title").firstOption
+      }
 
     assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.text.trim }
-      result.toSet
+
+      bookTitles.map(_.text.trim).toSet
     }
   }
 
@@ -277,20 +274,18 @@ class SaxonInspiredQueryTest extends FunSuite {
     require(bookstore.name == "Bookstore")
 
     val bookTitles =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        authors <- book.select(childElems("Authors")).headOption
-        lastNameStrings = for {
-          author <- authors.select(childElems("Author"))
-          lastNameString = author.select(childElems("Last_Name")).head.text.trim
-        } yield lastNameString
-        if lastNameStrings.contains("Ullman") && !lastNameStrings.contains("Widom")
-      } yield book.select(childElems()).find(_.name == "Title").get
+      bookstore.select {
+        childElems("Book")
+          .where { e =>
+            e.select { childElems("Authors") / childElems("Author") / childElems("Last_Name").where(_.text.trim == "Ullman") }.nonEmpty &&
+              e.select { childElems("Authors") / childElems("Author") / childElems("Last_Name").where(_.text.trim == "Widom") }.isEmpty
+          } / childElems("Title")
+      }
 
     assertResult(Set(
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.text.trim }
-      result.toSet
+
+      bookTitles.map(_.text.trim).toSet
     }
   }
 
@@ -299,22 +294,15 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    val secondAuthors =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        authors = book.select(childElems("Authors")).head
-        authorColl = authors.select(childElems("Author"))
-        if authorColl.size >= 2
-        secondAuthor <- authorColl.drop(1).headOption
-      } yield secondAuthor
+    val secondAuthorLastNames =
+      bookstore.select { descendantElemsOrSelf("Authors") / (_.select(childElems("Author")).slice(1, 2)) / childElems("Last_Name") }
 
-    val secondAuthorLastNames = secondAuthors map { e => e.select(childElems()).find(_.name == "Last_Name").get }
     assertResult(Set(
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
-      val result = secondAuthorLastNames map { _.text.trim }
-      result.toSet
+
+      secondAuthorLastNames.map(_.text.trim).toSet
     }
   }
 
@@ -323,16 +311,13 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    val titles =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        remark <- book.select(childElems("Remark"))
-        if remark.text.trim.indexOf("great") >= 0
-      } yield book.select(childElems()).find(_.name == "Title").get
+    val titles = bookstore.select {
+      descendantElemsOrSelf("Book")
+        .where(_.select(childElems("Remark")).map(_.text.trim).exists(_.contains("great"))) / childElems("Title")
+    }
 
     assertResult(Set("Database Systems: The Complete Book")) {
-      val result = titles map { _.text.trim }
-      result.toSet
+      titles.map(_.text.trim).toSet
     }
   }
 
@@ -341,21 +326,13 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
+    def title(bookOrMagazine: Elem): String = bookOrMagazine.select { childElems("Title") }.map(_.text.trim).mkString
+
     val magazines =
-      for {
-        magazine <- bookstore.select(childElems("Magazine"))
-        magazineTitle = magazine.select(childElems()).find(_.name == "Title").get.text.trim
-        booksWithSameName = for {
-          book <- bookstore.select(childElems("Book"))
-          bookTitle = book.select(childElems()).find(_.name == "Title").get.text.trim
-          if magazineTitle == bookTitle
-        } yield book
-        if booksWithSameName.nonEmpty
-      } yield magazine
+      bookstore.select { childElems("Magazine").where(e => bookstore.select(childElems("Book")).map(title(_)).contains(title(e))) }
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = magazines flatMap { mag => mag.select(descendantElemsOrSelf()) find (_.name == "Title") map { _.text.trim } }
-      result.toSet
+      magazines.flatMap { _.select(descendantElemsOrSelf("Title")).map(_.text.trim) }.toSet
     }
   }
 
@@ -364,25 +341,16 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    val booksAndMagazines =
-      for {
-        bookOrMagazine <- bookstore.select(childElems(e => Set("Book", "Magazine").contains(e.name)))
-        titleString: String = bookOrMagazine.select(childElems()).find(_.name == "Title").get.text.trim
-        otherBooksAndMagazines = {
-          val result = bookstore.select(childElems(e => Set("Book", "Magazine").contains(e.name)))
-          result.toSet.diff(Set(bookOrMagazine))
-        }
-        titles = otherBooksAndMagazines map { e => e.select(childElems()).find(_.name == "Title").get }
-        titleStrings = {
-          val result = titles map { _.text.trim }
-          result.toSet
-        }
-        if titleStrings.contains(titleString)
-      } yield bookOrMagazine
+    def title(bookOrMagazine: Elem): String = bookOrMagazine.select { childElems("Title") }.map(_.text.trim).mkString
+
+    val booksAndMagazines = bookstore.select {
+      childElems("Book").cat(childElems("Magazine")).where { e =>
+        bookstore.select(childElems().where(_ != e)).filter(title(_) == title(e)).nonEmpty
+      }
+    }
 
     assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = booksAndMagazines flatMap { mag => mag.select(descendantElemsOrSelf()) find (_.name == "Title") map { _.text.trim } }
-      result.toSet
+      booksAndMagazines.flatMap { _.select(descendantElemsOrSelf("Title")).map(_.text.trim) }.toSet
     }
   }
 
@@ -391,22 +359,16 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     require(bookstore.name == "Bookstore")
 
-    val booksAndMagazines =
-      for {
-        bookOrMagazine <- bookstore.select(childElems(e => Set("Book", "Magazine").contains(e.name)))
-        titleString: String = bookOrMagazine.select(childElems()).find(_.name == "Title").get.text.trim
-        otherBooks = bookstore.select(childElems()).filter(_.name == "Book").toSet.diff(Set(bookOrMagazine))
-        titles = otherBooks map { e => e.select(childElems()).find(_.name == "Title").get }
-        titleStrings = {
-          val result = titles map { _.text.trim }
-          result.toSet
-        }
-        if titleStrings.contains(titleString)
-      } yield bookOrMagazine
+    def title(bookOrMagazine: Elem): String = bookOrMagazine.select { childElems("Title") }.map(_.text.trim).mkString
+
+    val booksAndMagazines = bookstore.select {
+      childElems("Book").cat(childElems("Magazine")).where { e =>
+        bookstore.select(childElems("Book").where(_ != e)).filter(title(_) == title(e)).nonEmpty
+      }
+    }
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = booksAndMagazines flatMap { mag => mag.select(descendantElemsOrSelf()) find (_.name == "Title") map { _.text.trim } }
-      result.toSet
+      booksAndMagazines.flatMap { _.select(descendantElemsOrSelf("Title")).map(_.text.trim) }.toSet
     }
   }
 
@@ -426,21 +388,15 @@ class SaxonInspiredQueryTest extends FunSuite {
     require(bookstore.name == "Bookstore")
 
     val books =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        authorNames = {
-          val result = for {
-            author <- book.select(descendantElemsOrSelf("Author"))
-            firstName = author.select(childElems()).find(_.name == "First_Name").get
-          } yield firstName.text.trim
-          result.toSet
+      bookstore.select {
+        childElems("Book").where { e =>
+          e.select { descendantElemsOrSelf("Author").where(_.select(childElems("First_Name").where(_.text.contains("J"))).nonEmpty) }.size ==
+            e.select { descendantElemsOrSelf("Author") / childElems("First_Name") }.size
         }
-        if authorNames forall { name => name.indexOf("J") >= 0 }
-      } yield book
+      }
 
     assertResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.select(descendantElemsOrSelf()).find(_.name == "Title") map { _.text.trim } }
-      result.toSet
+      books.flatMap { _.select(descendantElemsOrSelf("Title")).map(_.text.trim) }.toSet
     }
   }
 
@@ -450,23 +406,14 @@ class SaxonInspiredQueryTest extends FunSuite {
     require(bookstore.name == "Bookstore")
 
     def findAuthorNames(bookElem: Elem): immutable.IndexedSeq[String] = {
-      for {
-        lastName <- bookElem.select(descendantElemsOrSelf("Author") / childElems("Last_Name"))
-      } yield lastName.text.trim
+      bookElem.select { descendantElemsOrSelf("Author") / childElems("Last_Name") }.map(_.text.trim).distinct
     }
 
-    val titles =
-      for {
-        book <- bookstore.select(childElems())
-        if book.name == "Book"
-        authorNames = findAuthorNames(book)
-        if authorNames.contains("Ullman") && !authorNames.contains("Widom")
-      } yield book.select(childElems()).find(_.name == "Title").get
+    val books =
+      bookstore.select { childElems("Book").where(e => findAuthorNames(e).contains("Ullman") && !findAuthorNames(e).contains("Widom")) }
 
-    assertResult(Set(
-      "Hector and Jeff's Database Hints")) {
-      val result = titles map { _.text.trim }
-      result.toSet
+    assertResult(Set("Hector and Jeff's Database Hints")) {
+      books.flatMap(_.select(childElems("Title"))).map(_.text.trim).toSet
     }
   }
 
@@ -486,27 +433,25 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     val titleAndFirstNames =
       for {
-        book <- bookstore.select(childElems("Book"))
-        title = book.select(childElems()).find(_.name == "Title").get
-        authorFirstNames = {
-          val result = book.select(descendantElemsOrSelf("Author")) map { _.select(childElems()).find(_.name == "First_Name").get.text.trim }
-          result.toSet
-        }
-        searchedForFirstNames = authorFirstNames filter { firstName => title.text.trim.indexOf(firstName) >= 0 }
+        book <- bookstore.select { childElems("Book") }
+        title <- book.select { childElems("Title") }
+        authorFirstNames = book.select { descendantElemsOrSelf("Author") / childElems("First_Name") }.map(_.text.trim).toSet
+        searchedForFirstNames = authorFirstNames.filter(firstName => title.text.trim.indexOf(firstName) >= 0)
         if searchedForFirstNames.nonEmpty
-      } yield new Elem(
-        name = "Book",
-        children = Vector(
-          title,
-          textElem("First_Name", searchedForFirstNames.head)))
+      } yield {
+        new Elem(
+          name = "Book",
+          children = Vector(
+            title,
+            textElem("First_Name", searchedForFirstNames.head)))
+      }
 
     assertResult(2) {
       titleAndFirstNames.size
     }
     assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val titleElms = titleAndFirstNames map { e => e.select(descendantElemsOrSelf("Title")) }
-      val result = titleElms.flatten map { e => e.text.trim }
-      result.toSet
+      val titleElms = titleAndFirstNames.flatMap { _.select(descendantElemsOrSelf("Title")) }
+      titleElms.map(_.text.trim).toSet
     }
   }
 
@@ -522,13 +467,9 @@ class SaxonInspiredQueryTest extends FunSuite {
   test("testQueryAverageBookPrice") {
     require(bookstore.name == "Bookstore")
 
-    val prices: immutable.IndexedSeq[Double] =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        price = book.attributes("Price").toDouble
-      } yield price
-    val averagePrice =
-      textElem("Average", (prices.sum.toDouble / prices.size).toString)
+    val prices: immutable.IndexedSeq[Double] = bookstore.select { childElems("Book") }.map(_.attributes("Price").toDouble)
+
+    val averagePrice = textElem("Average", (prices.sum.toDouble / prices.size).toString)
 
     assertResult(65) {
       averagePrice.text.trim.toDouble.intValue
@@ -550,35 +491,30 @@ class SaxonInspiredQueryTest extends FunSuite {
   test("testQueryBooksPricedBelowAverage") {
     require(bookstore.name == "Bookstore")
 
-    val prices: immutable.IndexedSeq[Double] =
-      for {
-        book <- bookstore.select(childElems("Book"))
-        price = book.attributes("Price").toDouble
-      } yield price
-
+    val prices: immutable.IndexedSeq[Double] = bookstore.select { childElems("Book") }.map(_.attributes("Price").toDouble)
     val avg: Double = prices.sum.toDouble / prices.size
 
     val cheapBooks =
       for {
-        book <- bookstore.select(childElems("Book"))
+        book <- bookstore.select { childElems("Book") }
         price = book.attributes("Price").toDouble
         if price < avg
-      } yield new Elem(
-        name = "Book",
-        children = Vector(
-          book.select(childElems()).find(_.name == "Title").get,
-          textElem("Price", price.toString)))
+      } yield {
+        new Elem(
+          name = "Book",
+          children = Vector(
+            book.select(childElems()).find(_.name == "Title").get,
+            textElem("Price", price.toString)))
+      }
 
     assertResult(2) {
       cheapBooks.size
     }
     assertResult(Set(50, 25)) {
-      val result = cheapBooks flatMap { e => e.select(descendantElemsOrSelf("Price")) } map { e => e.text.trim.toDouble.intValue }
-      result.toSet
+      cheapBooks.flatMap { _.select(descendantElemsOrSelf("Price")) }.map(_.text.trim.toDouble.intValue).toSet
     }
     assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val result = cheapBooks flatMap { e => e.select(descendantElemsOrSelf("Title")) } map { e => e.text.trim }
-      result.toSet
+      cheapBooks.flatMap { _.select(descendantElemsOrSelf("Title")) }.map(_.text.trim).toSet
     }
   }
 
@@ -597,34 +533,35 @@ class SaxonInspiredQueryTest extends FunSuite {
     require(bookstore.name == "Bookstore")
 
     def cheaper(book1: Elem, book2: Elem): Boolean = {
-      val price1 = book1.attributes("Price").toInt
-      val price2 = book2.attributes("Price").toInt
-      price1 < price2
+      book1.attributes("Price").toInt < book2.attributes("Price").toInt
     }
 
     val books = {
       for {
-        book <- bookstore.select(childElems("Book")) sortWith { cheaper _ }
+        book <- bookstore.select { childElems("Book") }.sortWith(cheaper _)
         price = book.attributes("Price").toDouble
-      } yield new Elem(
-        name = "Book",
-        children = Vector(
-          book.select(childElems()).find(_.name == "Title").get,
-          textElem("Price", price.toString)))
+      } yield {
+        new Elem(
+          name = "Book",
+          children = Vector(
+            book.select(childElems()).find(_.name == "Title").get,
+            textElem("Price", price.toString)))
+      }
     }
 
     assertResult(4) {
       books.size
     }
     assertResult(List(25, 50, 85, 100)) {
-      books flatMap { e => e.select(descendantElemsOrSelf("Price")) } map { e => e.text.trim.toDouble.intValue }
+      books.flatMap { _.select(descendantElemsOrSelf("Price")) }.map(_.text.trim.toDouble.intValue)
     }
     assertResult(List(
       "Jennifer's Economical Database Hints",
       "Hector and Jeff's Database Hints",
       "A First Course in Database Systems",
       "Database Systems: The Complete Book")) {
-      books flatMap { e => e.select(descendantElemsOrSelf("Title")) } map { e => e.text.trim }
+
+      books.flatMap { _.select(descendantElemsOrSelf("Title")) }.map(_.text.trim)
     }
   }
 
@@ -641,14 +578,9 @@ class SaxonInspiredQueryTest extends FunSuite {
     require(bookstore.name == "Bookstore")
 
     val lastNameValues: immutable.IndexedSeq[String] =
-      for {
-        lastName <- (bookstore.select(descendantElemsOrSelf("Last_Name")) map (e => e.text.trim)).distinct
-      } yield lastName
+      bookstore.select { descendantElemsOrSelf("Last_Name") }.map(_.text.trim).distinct
 
-    assertResult(Set(
-      "Ullman",
-      "Widom",
-      "Garcia-Molina")) {
+    assertResult(Set("Ullman", "Widom", "Garcia-Molina")) {
       lastNameValues.toSet
     }
   }
@@ -670,51 +602,48 @@ class SaxonInspiredQueryTest extends FunSuite {
     require(bookstore.name == "Bookstore")
 
     def bookAuthorLastNames(book: Elem): Set[String] = {
-      val authors = book.select(childElems()).find(_.name == "Authors").get
-      val result = for {
-        author <- authors.select(childElems("Author"))
-        lastName = author.select(childElems()).find(_.name == "Last_Name").get
-        lastNameValue: String = lastName.text.trim
-      } yield lastNameValue
-      result.toSet
+      val lastNames = book.select { childElems("Authors") / childElems("Author") / childElems("Last_Name") }
+      lastNames.map(_.text.trim).toSet
     }
 
-    def bookTitle(book: Elem): String = book.select(childElems()).find(_.name == "Title").get.text.trim
+    def bookTitle(book: Elem): String = book.select(childElems("Title")).headOption.map(_.text.trim).mkString
 
     val pairs =
       for {
-        book1 <- bookstore.select(childElems("Book"))
-        book2 <- bookstore.select(childElems("Book"))
+        book1 <- bookstore.select { childElems("Book") }
+        book2 <- bookstore.select { childElems("Book") }
         if bookAuthorLastNames(book1).intersect(bookAuthorLastNames(book2)).size > 0
         if bookTitle(book1) < bookTitle(book2)
-      } yield new Elem(
-        name = "BookPair",
-        children = Vector(
-          textElem("Title1", bookTitle(book1)),
-          textElem("Title2", bookTitle(book2))))
+      } yield {
+        new Elem(
+          name = "BookPair",
+          children = Vector(
+            textElem("Title1", bookTitle(book1)),
+            textElem("Title2", bookTitle(book2))))
+      }
 
     assertResult(5) {
       pairs.size
     }
     assertResult(3) {
       pairs.filter(pair =>
-        pair.select(childElems()).filter(_.name == "Title1").head.text.trim == bookTitle(book1) ||
-          pair.select(childElems()).filter(_.name == "Title2").head.text.trim == bookTitle(book1)).size
+        pair.select(childElems("Title1")).head.text.trim == bookTitle(book1) ||
+          pair.select(childElems("Title2")).head.text.trim == bookTitle(book1)).size
     }
     assertResult(3) {
       pairs.filter(pair =>
-        pair.select(childElems()).filter(_.name == "Title1").head.text.trim == bookTitle(book2) ||
-          pair.select(childElems()).filter(_.name == "Title2").head.text.trim == bookTitle(book2)).size
+        pair.select(childElems("Title1")).head.text.trim == bookTitle(book2) ||
+          pair.select(childElems("Title2")).head.text.trim == bookTitle(book2)).size
     }
     assertResult(2) {
       pairs.filter(pair =>
-        pair.select(childElems()).filter(_.name == "Title1").head.text.trim == bookTitle(book3) ||
-          pair.select(childElems()).filter(_.name == "Title2").head.text.trim == bookTitle(book3)).size
+        pair.select(childElems("Title1")).head.text.trim == bookTitle(book3) ||
+          pair.select(childElems("Title2")).head.text.trim == bookTitle(book3)).size
     }
     assertResult(2) {
       pairs.filter(pair =>
-        pair.select(childElems()).filter(_.name == "Title1").head.text.trim == bookTitle(book4) ||
-          pair.select(childElems()).filter(_.name == "Title2").head.text.trim == bookTitle(book4)).size
+        pair.select(childElems("Title1")).head.text.trim == bookTitle(book4) ||
+          pair.select(childElems("Title2")).head.text.trim == bookTitle(book4)).size
     }
   }
 
@@ -740,9 +669,9 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     def books(authorLastName: String) =
       for {
-        book <- bookstore.select(childElems("Book"))
-        author <- book.select(descendantElemsOrSelf("Author"))
-        if author.select(childElems()).find(_.name == "Last_Name").get.text.trim == authorLastName
+        book <- bookstore.select { childElems("Book") }
+        author <- book.select { descendantElemsOrSelf("Author") }
+        if author.select(childElems("Last_Name")).head.text.trim == authorLastName
       } yield {
         // Method filterKeys deprecated since Scala 2.13.0.
         val attrs = book.attributes.filter { case (a, _) => Set("ISBN", "Price").contains(a) }.toMap
@@ -754,19 +683,12 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     val authorsWithBooks =
       for {
-        lastNameValue <- {
-          val result = bookstore.select(descendantElemsOrSelf("Author")) map { e => e.select(childElems()).find(_.name == "Last_Name").get.text.trim }
-          result.distinct
-        }
+        lastNameValue <- bookstore.select { descendantElemsOrSelf("Author") / childElems("Last_Name") }.map(_.text.trim).distinct
       } yield {
-        val author: Elem = {
-          val result = for {
-            author <- bookstore.select(descendantElemsOrSelf("Author"))
-            if author.select(childElems()).find(_.name == "Last_Name").get.text.trim == lastNameValue
-          } yield author
-          result.head
-        }
-        val firstNameValue: String = author.select(childElems()).find(_.name == "First_Name").get.text.trim
+        val authors: immutable.IndexedSeq[Elem] =
+          bookstore.select { descendantElemsOrSelf("Author").where(_.select(childElems("Last_Name")).exists(_.text.trim == lastNameValue)) }
+
+        val firstNameValue: String = authors.head.select(childElems("First_Name")).head.text.trim
 
         val foundBooks = books(lastNameValue)
 
@@ -790,9 +712,9 @@ class SaxonInspiredQueryTest extends FunSuite {
 
     val bookOrMagazineTitles =
       for {
-        bookOrMagazine <- bookstore.select(childElems(e => Set("Book", "Magazine").contains(e.name)))
+        bookOrMagazine <- bookstore.select { childElems(e => Set("Book", "Magazine").contains(e.name)) }
       } yield {
-        val titleString = bookOrMagazine.select(childElems()).find(_.name == "Title").get.text.trim
+        val titleString = bookOrMagazine.select { childElems("Title") }.head.text.trim
 
         if (bookOrMagazine.name == "Book") {
           textElem("BookTitle", titleString)
@@ -802,9 +724,9 @@ class SaxonInspiredQueryTest extends FunSuite {
       }
 
     assertResult(Set("BookTitle", "MagazineTitle")) {
-      bookOrMagazineTitles.map(e => e.name).toSet
+      bookOrMagazineTitles.map(_.name).toSet
     }
-    val ngCount = bookOrMagazineTitles count { e => e.text.trim == "National Geographic" }
+    val ngCount = bookOrMagazineTitles.count(_.text.trim == "National Geographic")
     assert(ngCount == 2, "Expected 'National Geographic' twice")
   }
 
