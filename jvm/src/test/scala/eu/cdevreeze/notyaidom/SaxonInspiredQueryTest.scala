@@ -730,6 +730,57 @@ class SaxonInspiredQueryTest extends FunSuite {
     assert(ngCount == 2, "Expected 'National Geographic' twice")
   }
 
+  test("testQueryAuthorLastNamesShowingMonoidLaws") {
+    // XPath: doc("bookstore.xml")//Book[@Price < 90]//Authors/Author/Last_Name
+
+    require(bookstore.name == "Bookstore")
+
+    val lastNames1 = bookstore.select {
+      descendantElemsOrSelf("Book").where(_.attributes("Price").toInt < 90) / descendantElemsOrSelf("Authors") /
+        childElems("Author") / childElems("Last_Name")
+    }
+
+    val lastNames2 = bookstore.select {
+      descendantElemsOrSelf("Book").where(_.attributes("Price").toInt < 90) /
+        (descendantElemsOrSelf("Authors") / (childElems("Author") / childElems("Last_Name")))
+    }
+
+    val lastNames3 = bookstore.select {
+      (descendantElemsOrSelf("Book").where(_.attributes("Price").toInt < 90) / descendantElemsOrSelf("Authors")) /
+        (childElems("Author") / childElems("Last_Name"))
+    }
+
+    val lastNames4 = bookstore.select {
+      descendantElemsOrSelf("Book").where(_.attributes("Price").toInt < 90) / descendantElemsOrSelf("Authors") /
+        childElems("Author") / childElems("Last_Name") / Step.empty
+    }
+
+    val lastNames5 = bookstore.select {
+      descendantElemsOrSelf("Book").where(_.attributes("Price").toInt < 90) / descendantElemsOrSelf("Authors") /
+        childElems("Author") / (Step.empty / childElems("Last_Name"))
+    }
+
+    assertResult(Set("Ullman", "Widom", "Garcia-Molina")) {
+      lastNames1.map(_.text.trim).toSet
+    }
+
+    assertResult(lastNames1.map(_.text.trim).toSet) {
+      lastNames2.map(_.text.trim).toSet
+    }
+
+    assertResult(lastNames1.map(_.text.trim).toSet) {
+      lastNames3.map(_.text.trim).toSet
+    }
+
+    assertResult(lastNames1.map(_.text.trim).toSet) {
+      lastNames4.map(_.text.trim).toSet
+    }
+
+    assertResult(lastNames1.map(_.text.trim).toSet) {
+      lastNames5.map(_.text.trim).toSet
+    }
+  }
+
   private def textElem(elmName: String, txt: String): Elem =
     new Elem(
       name = elmName,
@@ -866,14 +917,24 @@ object SaxonInspiredQueryTest {
 
   // Abstract Step and Step factory API
 
+  /**
+   * Step, which is a function from elements to collections of elements. This is a monoid. See
+   * https://typelevel.org/cats/typeclasses/monoid.html.
+   */
   trait Step[E] extends Function1[E, immutable.IndexedSeq[E]] {
 
-    def followedBy(step: Step[E]): Step[E] = {
+    /**
+     * Associative operation to combine 2 steps.
+     */
+    def combine(step: Step[E]): Step[E] = {
       { elem => this(elem).flatMap(step) }
     }
 
+    /**
+     * Alias for method combine.
+     */
     def /(step: Step[E]): Step[E] = {
-      followedBy(step)
+      combine(step)
     }
 
     def where(p: E => Boolean): Step[E] = {
@@ -890,6 +951,16 @@ object SaxonInspiredQueryTest {
 
     def firstOption: Step[E] = {
       { elem => this(elem).headOption.toIndexedSeq }
+    }
+  }
+
+  object Step {
+
+    /**
+     * The empty value of the Step monoid.
+     */
+    def empty[E]: Step[E] = {
+      { elem => immutable.IndexedSeq(elem) }
     }
   }
 
