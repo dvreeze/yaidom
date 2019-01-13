@@ -926,15 +926,15 @@ object SaxonInspiredQueryTest {
     /**
      * Associative operation to combine 2 steps.
      */
-    def combine(step: Step[E]): Step[E] = {
+    def concat(step: Step[E]): Step[E] = {
       { elem => this(elem).flatMap(step) }
     }
 
     /**
-     * Alias for method combine.
+     * Alias for method concat.
      */
     def /(step: Step[E]): Step[E] = {
-      combine(step)
+      concat(step)
     }
 
     def where(p: E => Boolean): Step[E] = {
