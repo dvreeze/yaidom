@@ -306,7 +306,7 @@ package eu.cdevreeze
  * of abstract method `findAllChildElems`, and it offers methods such as `filterChildElems`, `filterElems` and `filterElemsOrSelf`.
  * This trait has no knowledge about elements at all, other than the fact that <em>elements can have child elements</em>.
  *
- * Trait [[eu.cdevreeze.yaidom.queryapi.HasEName]] needs minimal knowledge about elements themselves, viz. that elements have a
+ * Trait [[eu.cdevreeze.yaidom.queryapi.ClarkElemApi]] needs minimal knowledge about elements themselves, viz. that elements have a
  * <em>"resolved"</em> (or expanded) name, and "resolved" attributes (mapping attribute expanded names to attribute values). That is,
  * it needs to be given implementations of abstract methods `resolvedName` and `resolvedAttributes`, and then offers methods to
  * query for individual attributes or the local name of the element.
@@ -315,13 +315,10 @@ package eu.cdevreeze
  * have been circular dependencies between both concepts, because attributes with namespaces require in-scope namespaces and therefore
  * namespace declarations for resolving the names of these attributes.
  *
- * Many traits, such as [[eu.cdevreeze.yaidom.queryapi.HasEName]], are just "capabilities", and need to be combined with trait
- * [[eu.cdevreeze.yaidom.queryapi.ElemLike]] in order to offer a useful element querying API.
- *
  * Note that trait [[eu.cdevreeze.yaidom.queryapi.ElemLike]] only knows about elements, not about other kinds of nodes.
  * Of course the actual element implementations mixing in this query API know about other node types, but that knowledge is outside
- * the uniform query API. Note that the example queries above only use the minimal element knowledge that traits `ElemLike` and `HasEName`
- * together have about elements. Therefore the query code can be used unchanged for different element implementations.
+ * the uniform query API. Note that the example queries above only use the minimal element knowledge that trait `ClarkElemApi`
+ * has about elements. Therefore the query code can be used unchanged for different element implementations.
  *
  * Trait [[eu.cdevreeze.yaidom.queryapi.IsNavigable]] is used to navigate to an element given a Path.
  *
@@ -340,8 +337,7 @@ package eu.cdevreeze
  * of the yaidom query API. These levels are represented by "combination traits" that combine several
  * of the query API traits mentioned (or not mentioned) above.
  *
- * The most basic level is [[eu.cdevreeze.yaidom.queryapi.ClarkNodes.Elem]]. It combines traits such as
- * [[eu.cdevreeze.yaidom.queryapi.ElemApi]] and [[eu.cdevreeze.yaidom.queryapi.HasENameApi]]. Object
+ * The most basic level is [[eu.cdevreeze.yaidom.queryapi.ClarkNodes.Elem]], which extends trait `ClarkElemApi`. Object
  * [[eu.cdevreeze.yaidom.queryapi.ClarkNodes]] also contains types for non-element nodes. All element
  * implementations that extend trait `ClarkNodes.Elem` should have a node hierarchy with all its kinds of
  * nodes extending the appropriate `ClarkNodes` member type.
@@ -519,7 +515,7 @@ package eu.cdevreeze
  *
  * As for querying, prefer:
  * {{{
- * import HasENameApi._
+ * import ClarkElemApi._
  *
  * bookstoreElem filterElemsOrSelf withEName("http://bookstore/book", "Book")
  * }}}

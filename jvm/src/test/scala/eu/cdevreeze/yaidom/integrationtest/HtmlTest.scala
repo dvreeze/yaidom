@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.withNoNsEName
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withNoNsEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 

@@ -28,8 +28,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.saxon.SaxonElem
@@ -106,7 +105,7 @@ class SaxonDomWrapperTest extends FunSuite {
       root.scope
     }
     assertResult(Scope.from("ns" -> "http://www.google.com")) {
-      root.getChildElem(HasENameApi.withLocalName("foo")).scope
+      root.getChildElem(ClarkElemApi.withLocalName("foo")).scope
     }
 
     checkEqualityOfDomAndSaxonElems(domDoc)

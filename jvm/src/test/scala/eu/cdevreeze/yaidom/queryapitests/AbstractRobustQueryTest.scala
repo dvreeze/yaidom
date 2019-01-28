@@ -21,7 +21,7 @@ import scala.Vector
 import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
 
 /**
  * ClarkElemLike-based query test case showing robust querying.

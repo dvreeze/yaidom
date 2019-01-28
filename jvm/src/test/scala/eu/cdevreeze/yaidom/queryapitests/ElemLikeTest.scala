@@ -33,7 +33,7 @@ import eu.cdevreeze.yaidom.indexed.{ Elem => IElem }
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 
 /**
  * ElemLike test case.

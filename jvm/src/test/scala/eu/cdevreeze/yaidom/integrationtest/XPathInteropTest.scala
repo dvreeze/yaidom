@@ -33,7 +33,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.parse
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 
@@ -73,7 +73,7 @@ class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
       bookElems.map(_.resolvedName).toSet
     }
 
-    import HasENameApi._
+    import ClarkElemApi._
 
     val authors: Set[String] = {
       val result =

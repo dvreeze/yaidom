@@ -19,6 +19,7 @@ package eu.cdevreeze.yaidom.queryapi
 import scala.collection.immutable
 import scala.collection.mutable
 
+import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 
@@ -27,7 +28,7 @@ import eu.cdevreeze.yaidom.core.Path
  *
  * @author Chris de Vreeze
  */
-trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable with HasEName with HasText {
+trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
 
   type ThisElem <: ClarkElemLike.Aux[ThisElem]
 
@@ -82,6 +83,52 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable with Has
       nextEntries.put(ename, entry.index + 1)
       (e, entry)
     }
+  }
+
+  /**
+   * The local name, that is, the local part of the EName
+   */
+  final def localName: String = {
+    resolvedName.localPart
+  }
+
+  /**
+   * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
+   */
+  final def attributeOption(expandedName: EName): Option[String] = {
+    resolvedAttributes find { case (en, v) => (en == expandedName) } map (_._2)
+  }
+
+  /**
+   * Returns the value of the attribute with the given expanded name, and throws an exception otherwise.
+   */
+  final def attribute(expandedName: EName): String = {
+    attributeOption(expandedName).getOrElse(sys.error(s"Missing attribute $expandedName"))
+  }
+
+  /**
+   * Returns the first found attribute value of an attribute with the given local name, if any, wrapped in an `Option`.
+   * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
+   */
+  final def findAttributeByLocalName(localName: String): Option[String] = {
+    resolvedAttributes find { case (en, v) => en.localPart == localName } map (_._2)
+  }
+
+  /**
+   * Shorthand for `attributeOption(expandedName)`.
+   */
+  final def \@(expandedName: EName): Option[String] = {
+    attributeOption(expandedName)
+  }
+
+  /** Returns `text.trim`. */
+  final def trimmedText: String = {
+    text.trim
+  }
+
+  /** Returns `XmlStringUtils.normalizeString(text)`. */
+  final def normalizedText: String = {
+    XmlStringUtils.normalizeString(text)
   }
 }
 

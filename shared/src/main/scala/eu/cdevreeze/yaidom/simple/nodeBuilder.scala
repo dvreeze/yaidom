@@ -19,12 +19,12 @@ package eu.cdevreeze.yaidom.simple
 import scala.Vector
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ElemLike
 import eu.cdevreeze.yaidom.queryapi.HasQNameApi
-import eu.cdevreeze.yaidom.queryapi.HasText
 import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
 
 /**
@@ -115,7 +115,7 @@ final class ElemBuilder(
     val qname: QName,
     val attributes: immutable.IndexedSeq[(QName, String)],
     val namespaces: Declarations,
-    val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi with HasText {
+    val children: immutable.IndexedSeq[NodeBuilder]) extends CanBeDocBuilderChild with ElemLike with TransformableElemLike with HasQNameApi {
 
   require(qname ne null) // scalastyle:off null
   require(attributes ne null) // scalastyle:off null
@@ -157,13 +157,23 @@ final class ElemBuilder(
    * Returns the concatenation of the texts of text children, including whitespace and CData. Non-text children are ignored.
    * If there are no text children, the empty string is returned.
    */
-  override def text: String = {
+  def text: String = {
     val textStrings = textChildren map { t => t.text }
     textStrings.mkString
   }
 
   /** Returns the text children */
   def textChildren: immutable.IndexedSeq[TextBuilder] = children collect { case t: TextBuilder => t }
+
+  /** Returns `text.trim`. */
+  def trimmedText: String = {
+    text.trim
+  }
+
+  /** Returns `XmlStringUtils.normalizeString(text)`. */
+  def normalizedText: String = {
+    XmlStringUtils.normalizeString(text)
+  }
 
   /**
    * Creates an `Elem` from this element builder, using the passed parent scope.

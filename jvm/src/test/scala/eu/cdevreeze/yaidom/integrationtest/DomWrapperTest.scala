@@ -37,7 +37,7 @@ import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.dom.DomEntityRef
 import eu.cdevreeze.yaidom.dom.DomProcessingInstruction
 import eu.cdevreeze.yaidom.dom.DomText
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 

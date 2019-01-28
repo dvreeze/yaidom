@@ -16,10 +16,10 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
  * Code of yaidom blog 2 ("namespaces in yaidom"). The blog uses the excellent article http://www.lenzconsulting.com/namespaces/.
@@ -50,7 +50,7 @@ class Blog2Test extends FunSuite {
     import eu.cdevreeze.yaidom.parse
     import eu.cdevreeze.yaidom.resolved
 
-    import HasENameApi._
+    import ClarkElemApi._
 
     // Using a yaidom DocumentParser that used SAX internally
     val docParser = parse.DocumentParserUsingSax.newInstance

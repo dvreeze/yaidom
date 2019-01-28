@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.core.jvm.CaffeineENameProvider
 import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 
 /**
  * Name pooling test, using Google Guava cache based EName and QName providers.
@@ -37,7 +37,7 @@ import eu.cdevreeze.yaidom.queryapi.HasENameApi
 class NamePoolingTest extends FunSuite {
 
   import NamePoolingTest._
-  import HasENameApi._
+  import ClarkElemApi._
 
   test("testNamePooling") {
     ENameProvider.globalENameProvider.become(enameProvider)

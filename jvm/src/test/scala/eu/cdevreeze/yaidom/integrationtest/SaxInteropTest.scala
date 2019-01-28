@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax.RichSAXParserFactory
 import eu.cdevreeze.yaidom.parse.SaxHandlerWithLocator
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
-import eu.cdevreeze.yaidom.queryapi.HasENameApi.ToHasElemApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.DocBuilder

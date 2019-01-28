@@ -20,7 +20,6 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
 
 /**
  * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from the coursera course Introduction to Databases,
@@ -88,7 +87,7 @@ class Blog1Test extends FunSuite {
       bookElems3 == bookElems1,
       "Expected the same books as in bookElems1")
 
-    import HasENameApi._
+    import ClarkElemApi._
 
     // What's the point of not using the following 3 expressions?
 
@@ -128,7 +127,7 @@ class Blog1Test extends FunSuite {
     // End of section that does not need to be copied again
 
     def findAllBookAuthors[E <: ClarkElemApi.Aux[E]](docElem: E): immutable.IndexedSeq[String] = {
-      import HasENameApi._
+      import ClarkElemApi._
       val result =
         for {
           bookElem <- docElem \ withEName(ns, "Book")
@@ -217,7 +216,7 @@ class Blog1Test extends FunSuite {
 
     // End of section that does not need to be copied again
 
-    import HasENameApi._
+    import ClarkElemApi._
 
     val authorLastNames =
       for {

@@ -37,7 +37,7 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.HasENameApi
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.resolved
 
 /**
@@ -288,7 +288,7 @@ class MileageRecordsTest extends FunSuite {
 
 object MileageRecordsTest {
 
-  import HasENameApi._
+  import ClarkElemApi._
 
   final class TripCategory(val name: String, val isPrivate: Boolean) {
 
