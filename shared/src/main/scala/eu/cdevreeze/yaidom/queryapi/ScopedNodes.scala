@@ -20,7 +20,7 @@ package eu.cdevreeze.yaidom.queryapi
  * '''Core API''' for element nodes that offer the central `ScopedElemApi with HasChildNodesApi` query API. Each element implementation that
  * knows about expanded names as well as qualified name should directly or indirectly implement this API.
  *
- * This API is directly implemented by elements that know about expanded names but not about qualified names,
+ * This API is directly implemented by elements that know about expanded names and qualified names,
  * but that do not know about their ancestor elements.
  *
  * @author Chris de Vreeze
