@@ -26,7 +26,7 @@ lazy val commonSettings = Seq(
 
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint", "-target:jvm-1.8"),
 
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   publishMavenStyle := true,
 
   publishTo := {
@@ -105,7 +105,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     // Excluding UpdateTest in Scala 2.13.0-M5 build due to regression:
     // "inferred type ... contains type selection from volatile type ..."
 
-    excludeFilter in (Test, unmanagedSources) := {
+    Test / unmanagedSources / excludeFilter := {
       if (scalaBinaryVersion.value == "2.13.0-M5") {
         new SimpleFileFilter(f =>
           f.toString.contains("ScalaMetaExperimentTest") ||
@@ -117,10 +117,6 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
           f.toString.contains("JaxbTest"))
       } else if (scalaBinaryVersion.value == "2.11") {
         new SimpleFileFilter(f => f.toString.contains("SaxonInspiredQueryTest"))
-      } else if (isAtLeastJava9) {
-        // Exclude tests with JAXB dependencies
-
-        new SimpleFileFilter(f => f.toString.contains("JaxbTest"))
       } else {
         NothingFilter
       }
@@ -165,9 +161,9 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       }
     },
 
-    parallelExecution in Test := false,
+    Test / parallelExecution := false,
 
-    excludeFilter in (Compile, unmanagedSources) := {
+    Compile / unmanagedSources / excludeFilter := {
       if (scalaBinaryVersion.value == "2.13.0-M5") {
         new SimpleFileFilter(f => f.toString.contains("jsdemoapp"))
       } else {
@@ -203,11 +199,3 @@ lazy val pomData =
       <email>chris.de.vreeze@caiway.net</email>
     </developer>
   </developers>
-
-
-// Helper functions
-
-def isAtLeastJava9: Boolean = {
-  // Brittle
-  scala.util.Try(Class.forName("javax.xml.catalog.Catalog")).toOption.nonEmpty
-}

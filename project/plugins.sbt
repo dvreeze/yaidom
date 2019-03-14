@@ -1,11 +1,9 @@
 
-// Version 0.6.24 is problematic in combination with the latest stable node version(s)
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.26")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
-addSbtPlugin("org.scalastyle" % "scalastyle-sbt-plugin" % "0.8.0")
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.18")
+addSbtPlugin("org.scalastyle" % "scalastyle-sbt-plugin" % "1.0.0")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.3.0")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.0")
-// sbt-scalafmt requires Java 8, so does not work in a Java 7 build
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")
 addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.15")
