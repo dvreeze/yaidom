@@ -550,8 +550,11 @@ object XmlCreationTest {
   }
 
   private val onVacation2018: Set[LocalDate] = {
-    Set(LocalDate.of(2018, 5, 11))
+    Set(LocalDate.of(2018, 5, 11), LocalDate.of(2018, 8, 22))
       .union(getPeriodAsLocalDateSeq(LocalDate.of(2018, 7, 20), LocalDate.of(2018, 8, 10)).toSet)
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2018, 9, 17), LocalDate.of(2018, 9, 21)).toSet)
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2018, 12, 21), LocalDate.of(2018, 12, 24)).toSet)
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2018, 12, 27), LocalDate.of(2018, 12, 31)).toSet)
   }
 
   private val sickLeaveDays2018: Set[LocalDate] = {
@@ -600,6 +603,27 @@ object XmlCreationTest {
       LocalDate.of(2018, 5, 23) -> Map("Meeting" -> 1),
       LocalDate.of(2018, 6, 13) -> Map("Meeting" -> 1),
       LocalDate.of(2018, 6, 25) -> Map("Meeting" -> 1),
-      LocalDate.of(2018, 7, 12) -> Map("Meeting" -> 1))
+      LocalDate.of(2018, 7, 12) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 8, 21) -> Map("Meeting" -> 4),
+      LocalDate.of(2018, 8, 29) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 9, 3) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 9, 5) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 9, 13) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 9, 27) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 10, 5) -> Map("Borrel" -> 3),
+      LocalDate.of(2018, 10, 10) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 10, 12) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 10, 23) -> Map("XBRL-Workshop" -> 3),
+      LocalDate.of(2018, 10, 26) -> Map("Meeting" -> 3),
+      LocalDate.of(2018, 11, 5) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 11, 9) -> Map("Company-Outing" -> 2),
+      LocalDate.of(2018, 11, 20) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 11, 23) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 11, 22) -> Map("Security-Training" -> 4),
+      LocalDate.of(2018, 11, 28) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 11, 30) -> Map("Meeting" -> 1),
+      LocalDate.of(2018, 12, 4) -> Map("Meeting" -> 3),
+      LocalDate.of(2018, 12, 5) -> Map("Meeting" -> 2),
+      LocalDate.of(2018, 12, 20) -> Map("Borrel" -> 1))
   }
 }

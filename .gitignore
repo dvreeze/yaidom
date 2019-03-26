@@ -11,6 +11,7 @@ temp/
 .history
 scalastyle-config.xml
 node_modules/
+.idea/
 
 # /project/
 /project/boot
