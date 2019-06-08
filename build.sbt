@@ -134,12 +134,8 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       if (scalaBinaryVersion.value == "2.13.0-RC3") {
         new SimpleFileFilter(f =>
           f.toString.contains("java8") ||
-          f.toString.contains("ScalaMetaExperimentTest") ||
-          f.toString.contains("JvmIndependencyTest") ||
-          f.toString.contains("PackageDependencyTest") ||
-          f.toString.contains("DomInteropTest") || // Serialization issue in Scala 2.13.0-M5?
-          f.toString.contains("DomLSInteropTest") || // Serialization issue in Scala 2.13.0-M5?
-          f.toString.contains("JaxbTest"))
+          f.toString.contains("DomInteropTest") || // Serialization issue since Scala 2.13.0-M5?
+          f.toString.contains("DomLSInteropTest")) // Serialization issue since Scala 2.13.0-M5?
       } else if (scalaBinaryVersion.value == "2.11") {
         new SimpleFileFilter(f => f.toString.contains("SaxonInspiredQueryTest"))
       } else {
